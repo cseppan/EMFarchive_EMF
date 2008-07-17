@@ -3870,11 +3870,10 @@ public class ManagedCaseService {
             checkJobsDuplication(existingJobs, jobs2copy, jobPrefix);
 
             CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy);
-            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), dao.getJobSpecNonSpecCaseInputs(
-                    template.getId(), jobIds, session).toArray(new CaseInput[0]), session);
-            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(), dao
-                    .getJobSpecNonSpecCaseParameters(template.getId(), jobIds, session).toArray(new CaseParameter[0]),
-                    session);
+            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), getValidCaseInputs4SensitivityCase(
+                    template.getId(), jobIds, jobs2copy, session), session);
+            CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(),
+                    getValidCaseParameters4SensitivityCase(template.getId(), jobIds, jobs2copy, session), session);
 
             addCaseJobs(user, targetId, jobs);
             addCaseInputs(user, targetId, removeRedundantInputs(inputs, existingInputs, jobPrefix), jobPrefix);
@@ -4072,8 +4071,8 @@ public class ManagedCaseService {
 
             CaseJob[] jobs2copy = getJobs2Copy(jobIds);
             CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy);
-            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), 
-                    getValidCaseInputs4SensitivityCase(template.getId(), jobIds, jobs2copy, session), session);
+            CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), getValidCaseInputs4SensitivityCase(
+                    template.getId(), jobIds, jobs2copy, session), session);
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(),
                     getValidCaseParameters4SensitivityCase(template.getId(), jobIds, jobs2copy, session), session);
 
@@ -4197,7 +4196,7 @@ public class ManagedCaseService {
 
         for (int i = 0; i < inputs.length; i++) {
             CaseInput tempInput = (CaseInput) DeepCopy.copy(inputs[i]);
-            CaseInput inputFromParent = dao.loadCaseInput(parentCaseId, inputs[i], session);
+            CaseInput inputFromParent = getParentCaseInputs4SensitivityCase(parentCaseId, inputs[i], session);
             boolean modifiedFromParent = false;
 
             if (inputFromParent != null) {
@@ -4248,7 +4247,7 @@ public class ManagedCaseService {
 
         for (int i = 0; i < params.length; i++) {
             CaseParameter tempParam = (CaseParameter) DeepCopy.copy(params[i]);
-            CaseParameter parentParameter = dao.loadCaseParameter(parentCaseId, params[i], session);
+            CaseParameter parentParameter = getParentCaseParameters4SensitivityCase(parentCaseId, params[i], session);
             boolean modifiedFromParent = false;
 
             if (parentParameter != null) {
@@ -4449,21 +4448,98 @@ public class ManagedCaseService {
         if (numIDs < 1)
             return "";
 
-        //NOTE: the following implementation reflects this logic:
-        //      If you select job1 which is sector1, the logic for selecting the appropriate parameters from the template is:
-        //      (All job AND All sectors) OR (all jobs AND sector = sector1) OR (job = job1 AND All sectors) OR (job=job1 AND sector = sector1)
-        //      You have to also make sure this doesn't fail if the sector of the job is All sectors. 
-        
+        // NOTE: the following implementation reflects this logic:
+        // If you select job1 which is sector1, the logic for selecting the appropriate parameters from the template is:
+        // (All job AND All sectors) OR (all jobs AND sector = sector1) OR (job = job1 AND All sectors) OR (job=job1 AND
+        // sector = sector1)
+        // You have to also make sure this doesn't fail if the sector of the job is All sectors.
+
         for (int i = 0; i < numIDs; i++) {
             if (sectorIds[i] != -1)
-                sb.append(" OR (" + jobIdString + " = 0 AND " + sectorIdString + " = " + sectorIds[i] + ")" +
-                        " OR (" + jobIdString + " = " + jobIds[i] + " AND " + sectorIdString + " is null)" +
-                        " OR (" + jobIdString + " = " + jobIds[i] + " AND " + sectorIdString + " = " + sectorIds[i] + ")");
-            else 
+                sb.append(" OR (" + jobIdString + " = 0 AND " + sectorIdString + " = " + sectorIds[i] + ")" + " OR ("
+                        + jobIdString + " = " + jobIds[i] + " AND " + sectorIdString + " is null)" + " OR ("
+                        + jobIdString + " = " + jobIds[i] + " AND " + sectorIdString + " = " + sectorIds[i] + ")");
+            else
                 sb.append(" OR (" + jobIdString + " = " + jobIds[i] + " AND " + sectorIdString + " is null)");
         }
 
         return sb.toString();
+    }
+
+    // NOTE: the following implementation reflects this logic:
+    //        
+    // same env variable as param1 AND ((all jobs and all sectors) OR (all jobs and same sector as param1))
+    //
+    // If you get multiple parameters from that query, then you match with same sector.
+    //
+    // example:
+    // template (name, env variable, sector, job) parent (name, env variable, sector, job)
+    // PARAM1, EV1,all sectors, all jobs PARAM1,EV1,all sectors,all jobs
+    // PARAM2,EV1,sector1, all jobs PARAM2,EV1,sector1, all jobs
+    // PARAM3,EV1,all sectors, job1 PARAM3, EV1, sector2,all jobs
+    // PARAM4,EV1,sector2,all jobs
+    // PARAM5,EV1,sector3,all jobs
+    //
+    // So, the matching would be:
+    // template, parent
+    // 1,1
+    // 2,2
+    // 3,1
+    // 4,3
+    // 5,1
+
+    private CaseParameter getParentCaseParameters4SensitivityCase(int caseId, CaseParameter param, Session session) {
+        ParameterEnvVar env = param.getEnvVar();
+        Sector sector = param.getSector();
+        CaseParameter theParameter = null;
+
+        String query = "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = "
+                + caseId + " AND obj.envVar.id = " + env.getId() + " AND ((obj.jobId = 0 AND obj.sector.id is null)"
+                + " OR (obj.jobId = 0 AND obj.sector.id " + (sector == null ? "is null" : "= " + sector.getId()) + "))";
+
+        if (DebugLevels.DEBUG_9)
+            log.warn(query);
+
+        List<?> ids = session.createQuery(query).list();
+
+        for (Iterator<?> iter = ids.iterator(); iter.hasNext();) {
+            theParameter = dao.getCaseParameter((Integer) iter.next(), session);
+
+            if (sector != null && sector.equals(theParameter.getSector()))
+                return theParameter;
+        }
+
+        return theParameter;
+    }
+
+    private CaseInput getParentCaseInputs4SensitivityCase(int caseId, CaseInput input, Session session) {
+        InputEnvtVar env = input.getEnvtVars();
+
+        if (env == null)
+            return null; // NOTE: this policy is to be determined.
+
+        Sector sector = input.getSector();
+        CaseInput theInput = null;
+
+        String query = "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
+                + " AND obj.envtVars.id = " + env.getId() + " AND ((obj.caseJobID = 0 AND obj.sector.id is null)"
+                + " OR (obj.caseJobID = 0 AND obj.sector.id " + (sector == null ? "is null" : "= " + sector.getId())
+                + "))";
+
+        if (DebugLevels.DEBUG_9)
+            log.warn(query);
+
+        List<?> ids = session.createQuery(query).list();
+
+        for (Iterator<?> iter = ids.iterator(); iter.hasNext();) {
+            Integer id = (Integer) iter.next();
+            theInput = dao.getCaseInput(id, session);
+
+            if (sector != null && sector.equals(theInput.getSector()))
+                return theInput;
+        }
+
+        return theInput;
     }
 
 }
