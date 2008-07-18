@@ -275,14 +275,10 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     public void addNewSectorToSummary(CaseJob job) {
 
         Sector sector = job.getSector();
-        List<Sector> sectors = new ArrayList<Sector>();
-        sectors.addAll(Arrays.asList(caseObj.getSectors()));
-        if ( sector != null && !sectors.contains(sector)){
-            sectors.add(sector);
-            caseObj.setSectors(sectors.toArray(new Sector[0]));
-            view.resetSectors();
-        }
-
+//      List<Sector> sectors = new ArrayList<Sector>();
+//      sectors.addAll(Arrays.asList(caseObj.getSectors()));
+//      if ( sector != null && !sectors.contains(sector)){
+        view.addSector(sector);
     }
 
 }

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -576,8 +577,9 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
     }
 
-    public void resetSectors() {
-        parentPresenter.resetSectors();
+    public void addSector(Sector sector) {
+        parentPresenter.addSector(sector);
+        //setMessage("A new sector is added to sectors on summary tab.");
     }
 
 }

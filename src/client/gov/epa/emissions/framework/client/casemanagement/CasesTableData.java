@@ -93,7 +93,7 @@ public class CasesTableData extends AbstractTableData {
     }
 
     private String numMetLayers(Case element) {
-        return element.getNumMetLayers()+"" != null ? element.getNumMetLayers()+"" : "";
+        return element.getNumMetLayers() != null ? element.getNumMetLayers()+"" : "";
     }
 
     private String futureYear(Case element) {

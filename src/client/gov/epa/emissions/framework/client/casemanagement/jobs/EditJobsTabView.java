@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -21,6 +22,6 @@ public interface EditJobsTabView {
     
     String getCaseOutputFileDir();
     
-    void resetSectors();
+    void addSector(Sector sector);
 
 }
