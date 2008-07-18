@@ -63,9 +63,9 @@ public class Case implements Comparable, Lockable, Serializable {
     
     private GridResolution gridResolution;
     
-    private int numMetLayers;
+    private Integer numMetLayers;
 
-    private int numEmissionsLayers;
+    private Integer numEmissionsLayers;
     
     private int baseYear;
     
@@ -326,19 +326,19 @@ public class Case implements Comparable, Lockable, Serializable {
         this.modelingRegion = modelingRegion;
     }
 
-    public int getNumEmissionsLayers() {
+    public Integer getNumEmissionsLayers() {
         return numEmissionsLayers;
     }
 
-    public void setNumEmissionsLayers(int numEmissionsLayers) {
+    public void setNumEmissionsLayers(Integer numEmissionsLayers) {
         this.numEmissionsLayers = numEmissionsLayers;
     }
 
-    public int getNumMetLayers() {
+    public Integer getNumMetLayers() {
         return numMetLayers;
     }
 
-    public void setNumMetLayers(int numMetLayers) {
+    public void setNumMetLayers(Integer numMetLayers) {
         this.numMetLayers = numMetLayers;
     }
 
