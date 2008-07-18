@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTabView;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabView;
 import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTabView;
@@ -33,6 +34,6 @@ public interface CaseEditorPresenter {
     
     void checkIfLockedByCurrentUser() throws EmfException;
     
-    void resetSectors();
+    void addSector(Sector sector);
     
 }

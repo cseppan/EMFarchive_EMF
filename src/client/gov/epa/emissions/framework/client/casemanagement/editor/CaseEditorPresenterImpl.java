@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTabPresenter;
@@ -205,9 +206,9 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         }
     }
 
-    public void resetSectors() {
+    public void addSector(Sector sector) {
         if (summaryPresenter != null)
-            summaryPresenter.resetSectors();
+            summaryPresenter.addSector(sector);
     }
 
 }

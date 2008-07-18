@@ -1,5 +1,13 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
+import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.RemoveButton;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.ui.ListWidget;
+
 import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -9,14 +17,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
-import gov.epa.emissions.commons.data.Sector;
-import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.gui.buttons.AddButton;
-import gov.epa.emissions.commons.gui.buttons.RemoveButton;
-import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.ui.ListWidget;
 
 public class AddRemoveSectorWidget extends JPanel {
 
@@ -41,12 +41,13 @@ public class AddRemoveSectorWidget extends JPanel {
 
     }
     public void setSectors(Sector[] sectors) {
+        sectorsList.removeAllElements();   
+        Arrays.sort(sectors);
         for (int i = 0; i < sectors.length; i++) {
-            if (!sectorsList.contains(sectors[i]))
-                sectorsList.addElement(sectors[i]);
+            sectorsList.addElement(sectors[i]);
         }
     }
-
+    
     public Sector[] getSectors() {
         return Arrays.asList(sectorsList.getAllElements()).toArray(new Sector[0]);
     }
@@ -116,4 +117,21 @@ public class AddRemoveSectorWidget extends JPanel {
         addButton.setVisible(false);
         removeButton.setVisible(false);  
     }
+    
+    public void addSector(Sector sector){
+        if (!sectorsList.contains(sector))
+            sectorsList.addElement(sector);
+        sort(); 
+    }
+    
+    private void sort() {
+        Sector[] sectors = Arrays.asList(sectorsList.getAllElements()).toArray(new Sector[0]);
+        Arrays.sort(sectors);
+        sectorsList.removeAllElements();
+        for (int i = 0; i < sectors.length; i++) {
+            sectorsList.addElement(sectors[i]);
+        }
+    }
+   
+
 }

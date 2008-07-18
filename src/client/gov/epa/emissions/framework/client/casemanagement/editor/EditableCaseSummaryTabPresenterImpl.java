@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 
@@ -29,9 +30,8 @@ public class EditableCaseSummaryTabPresenterImpl implements EditableCaseSummaryT
         //
     }
 
-    public void resetSectors() {
-        view.resetSectors();
-        
+    public void addSector(Sector sector) {
+        view.addSector(sector);
     }
 
 }

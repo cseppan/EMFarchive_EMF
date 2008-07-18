@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
+import gov.epa.emissions.commons.data.Sector;
+
 public interface EditableCaseSummaryTabPresenter extends CaseEditorTabPresenter {
-    void resetSectors();
+    void addSector(Sector sector);
 }

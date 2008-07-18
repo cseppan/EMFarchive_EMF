@@ -100,6 +100,16 @@ public class SectorChooser extends JDialog {
             if (!sectorsListWidget.contains(selected[i]))
                 sectorsListWidget.addElement(selected[i]);
         }
+        sort(); 
     }
-
+    
+    private void sort() {
+        Sector[] sectors = Arrays.asList(sectorsListWidget.getAllElements()).toArray(new Sector[0]);
+        Arrays.sort(sectors);
+        sectorsListWidget.removeAllElements();
+        for (int i = 0; i < sectors.length; i++) {
+            sectorsListWidget.addElement(sectors[i]);
+        }
+    }
+   
 }
