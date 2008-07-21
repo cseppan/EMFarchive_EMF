@@ -458,10 +458,12 @@ public class DatasetDAO {
 
         DatasetType type = dataset.getDatasetType();
         InternalSource[] sources = dataset.getInternalSources();
-
-        if (dataset.getName().equalsIgnoreCase(oldDataset.getName())) {
+        
+        if (type != null && type.getName().equalsIgnoreCase("SMOKE Report"))
             return false;
-        }
+
+        if (dataset.getName().equalsIgnoreCase(oldDataset.getName())) 
+            return false;
 
         if (sources == null || sources.length == 0 || type.getTablePerDataset() != 1) {
             return false;
@@ -782,7 +784,7 @@ public class DatasetDAO {
 
         try {
             if (type.contains("A/M/PTPRO") || type.contains("TEMPORAL PROFILE") || type.contains("COSTCY")
-                    || type.contains("COUNTRY, STATE, AND COUNTY"))
+                    || type.contains("COUNTRY, STATE, AND COUNTY") || type.contains("SMOKE REPORT"))
                 tableTool.deleteRecords(table, source.getCols()[1], "integer", "" + dsID); // 2nd column: dataset_id
             else {
                 if (DebugLevels.DEBUG_16)

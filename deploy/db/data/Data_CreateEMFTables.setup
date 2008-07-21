@@ -369,3 +369,18 @@ CREATE TABLE emf.datasets_notes
 ) 
 WITHOUT OIDS;
 -- emf.datasets_notes
+
+-- Table: emf.table_consolidations
+CREATE TABLE emf.table_consolidations
+(
+  id SERIAL PRIMARY KEY,
+  dataset_type_id int4 NOT NULL REFERENCES emf.dataset_types(id),
+  output_table varchar(64),
+  num_col int4 NOT NULL DEFAULT 0,
+  col_names text,
+  col_types text,
+  size_limit real,
+  UNIQUE(dataset_type_id, output_table)
+) 
+WITHOUT OIDS;
+-- emf.table_consolidations
