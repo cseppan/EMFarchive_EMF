@@ -4139,7 +4139,7 @@ public class ManagedCaseService {
         sensitivityCase.setAirQualityModel(parent.getAirQualityModel());
         sensitivityCase.setBaseYear(parent.getBaseYear());
         sensitivityCase.setControlRegion(parent.getControlRegion());
-        sensitivityCase.setDescription(parent.getDescription());
+        sensitivityCase.setDescription("Sensitivity on " + parent.getDescription());
         sensitivityCase.setEmissionsYear(parent.getEmissionsYear());
         sensitivityCase.setFutureYear(parent.getFutureYear());
         sensitivityCase.setGrid(parent.getGrid());
