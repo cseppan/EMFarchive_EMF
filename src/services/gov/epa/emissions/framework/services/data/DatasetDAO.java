@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
@@ -616,23 +617,23 @@ public class DatasetDAO {
         if (list != null && list.size() > 0)
             throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
 
-        // check if dataset is a detailed result dataset for some strategy
-        list = session.createQuery(
-                "select cS.name from ControlStrategyResult sR, ControlStrategy cS where sR.controlStrategyId = cS.id "
-                        + "and (sR.detailedResultDataset.id = "
-                        + getAndOrClause(datasetIDs, "sR.detailedResultDataset.id") + ")").list();
-
-        if (list != null && list.size() > 0)
-            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
-
-        // check if dataset is a controlled inventory for some strategy
-        list = session.createQuery(
-                "select cS.name from ControlStrategyResult sR, ControlStrategy cS where sR.controlStrategyId = cS.id "
-                        + "and (sR.controlledInventoryDataset.id = "
-                        + getAndOrClause(datasetIDs, "sR.controlledInventoryDataset.id") + ")").list();
-
-        if (list != null && list.size() > 0)
-            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
+//        // check if dataset is a detailed result dataset for some strategy
+//        list = session.createQuery(
+//                "select cS.name from ControlStrategyResult sR, ControlStrategy cS where sR.controlStrategyId = cS.id "
+//                        + "and (sR.detailedResultDataset.id = "
+//                        + getAndOrClause(datasetIDs, "sR.detailedResultDataset.id") + ")").list();
+//
+//        if (list != null && list.size() > 0)
+//            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
+//
+//        // check if dataset is a controlled inventory for some strategy
+//        list = session.createQuery(
+//                "select cS.name from ControlStrategyResult sR, ControlStrategy cS where sR.controlStrategyId = cS.id "
+//                        + "and (sR.controlledInventoryDataset.id = "
+//                        + getAndOrClause(datasetIDs, "sR.controlledInventoryDataset.id") + ")").list();
+//
+//        if (list != null && list.size() > 0)
+//            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
 
         // check if dataset is used as a region/county dataset for specific strategy measures
         list = session.createQuery(
@@ -681,6 +682,8 @@ public class DatasetDAO {
 
         deleteFromObjectTable(datasetIDs, QAStepResult.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, QAStep.class, "datasetId", session);
+        deleteFromObjectTable(datasetIDs, ControlStrategyResult.class, "detailedResultDataset.id", session);
+        deleteFromObjectTable(datasetIDs, ControlStrategyResult.class, "controlledInventoryDataset.id", session);
 
         if (exception != null)
             throw new EmfException(exception.getMessage());
