@@ -282,10 +282,13 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             String runStatus = dao.getControlStrategyRunStatus(controlStrategyId, session);
             if (runStatus.equals("Cancelled")) return;
             
+            ControlStrategy strategy = getById(controlStrategyId);
+            
+            //make sure a valid server-side export path was specified
+            validateExportPath(strategy.getExportDirectory());
+            
             //queue up the strategy to be run, by setting runStatus to Waiting
             dao.setControlStrategyRunStatus(controlStrategyId, "Waiting", session);
-            
-            ControlStrategy strategy = getById(controlStrategyId);
             
             StrategyFactory factory = new StrategyFactory();
             validatePath(strategy.getExportDirectory());
@@ -296,6 +299,14 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             throw new EmfException(e.getMessage());
         } finally {
             session.close();
+        }
+    }
+
+    private void validateExportPath(String folderPath) throws EmfException {
+        File file = new File(folderPath);
+
+        if (!file.exists() || !file.isDirectory()) {
+            throw new EmfException ("Export folder does not exist: " + folderPath);
         }
     }
 
