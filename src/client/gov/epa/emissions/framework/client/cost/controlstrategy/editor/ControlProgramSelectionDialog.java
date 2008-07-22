@@ -53,7 +53,7 @@ public class ControlProgramSelectionDialog extends JDialog implements ControlPro
 
         setTitle("Select Control Programs");
         this.pack();
-        this.setSize(900,600);
+        this.setSize(600,400);
         this.setLocation(ScreenUtils.getPointToCenter(parent));
         this.setVisible(true);
     }
