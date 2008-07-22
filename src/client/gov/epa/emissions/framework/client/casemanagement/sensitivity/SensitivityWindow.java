@@ -263,7 +263,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
    
    private JScrollPane buildGridsPanel(){
        grids = new JList();
-       grids.setListData(new Grid[] {new Grid("Grid 1"), new Grid("Grid 2"), new Grid("Grid 3")});
+       grids.setListData(new Grid[] {new Grid("Select One"), new Grid("Grid 1"), new Grid("Grid 2"), new Grid("Grid 3")});
        grids.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
        JScrollPane scrollPane = new JScrollPane(grids, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -305,6 +305,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         List<Sector> commonSectors=new ArrayList<Sector>(); 
         //Sector[] pSectors = parentCase.getSectors();
         List<Sector> tSectors = Arrays.asList(selectedTem.getSectors());
+        commonSectors.add(new Sector("Select One", "Select One"));
         for (Sector pSector: parentCase.getSectors()){
             if (tSectors.contains(pSector))
                 commonSectors.add(pSector);
@@ -569,16 +570,23 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     }
     
     private Grid[] getSelectedGrids(){
+        
         List<Grid> list = new ArrayList<Grid>(grids.getSelectedValues().length);
-        for (int i = 0; i < grids.getSelectedValues().length; i++)
-            list.add((Grid) grids.getSelectedValues()[i]);
+        for (int i = 0; i < grids.getSelectedValues().length; i++){
+            Grid grid = (Grid) grids.getSelectedValues()[i];
+            if (!grid.getName().equalsIgnoreCase("select one"))
+                list.add((Grid) grids.getSelectedValues()[i]);
+        }
         return list.toArray(new Grid[0]);
     }
 
     private Sector[] getSelectedSectors(){
         List<Sector> list = new ArrayList<Sector>(sectors.getSelectedValues().length);
-        for (int i = 0; i < sectors.getSelectedValues().length; i++)
-            list.add((Sector) sectors.getSelectedValues()[i]);
+        for (int i = 0; i < sectors.getSelectedValues().length; i++){
+            Sector sector = (Sector) sectors.getSelectedValues()[i];
+            if (!sector.getName().equalsIgnoreCase("select one"))
+                list.add((Sector) sectors.getSelectedValues()[i]);
+        }
         return list.toArray(new Sector[0]);
     }
 }
