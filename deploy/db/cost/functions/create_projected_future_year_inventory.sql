@@ -502,7 +502,7 @@ BEGIN
 		left outer join emissions.' || detailed_result_table_name || ' dr
 		on inv.record_id = dr.source_id
 		
-	where ' || replace(replace(replace(inv_filter, 'version', 'inv.version'), 'dataset_id', 'inv.dataset_id'), 'delete_versions ', 'inv.delete_versions ') || coalesce(county_dataset_filter_sql, '') || '
+	where ' || replace(replace(replace(inv_filter, '(version', '(inv.version'), 'dataset_id', 'inv.dataset_id'), 'delete_versions', 'inv.delete_versions') || coalesce(county_dataset_filter_sql, '') || '
 
 		-- get rid of plant closures records
 		and not exists (
