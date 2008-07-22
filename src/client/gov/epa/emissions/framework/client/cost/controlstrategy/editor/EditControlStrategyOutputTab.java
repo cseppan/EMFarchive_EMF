@@ -520,6 +520,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         table.refresh(tableData);
         tablePanel.removeAll();
         tablePanel.add(table);
+        detailButton.setSelected(true);
+        toggleRadioButtons();
         super.validate();
     }
 
