@@ -37,12 +37,15 @@ public class ControlProgramPresenterImpl implements ControlProgramPresenter {
     
     private boolean hasResults = false;
     
+    private ControlProgramManagerPresenter controlProgramManagerPresenter;
+    
     public ControlProgramPresenterImpl(ControlProgram controlProgram, EmfSession session, 
             ControlProgramView view, ControlProgramManagerPresenter controlProgramManagerPresenter) {
         this.controlProgram = controlProgram;
         this.session = session;
         this.view = view;
         this.presenters = new ArrayList<ControlProgramTabPresenter>();
+        this.controlProgramManagerPresenter = controlProgramManagerPresenter;
     }
 
     public void doDisplay() throws EmfException {
@@ -96,7 +99,7 @@ public class ControlProgramPresenterImpl implements ControlProgramPresenter {
         } else {
             service().updateControlProgramWithLock(controlProgram);
         }
-//        managerPresenter.doRefresh();
+        controlProgramManagerPresenter.doRefresh();
     }
 
     protected void saveTabs() throws EmfException {
