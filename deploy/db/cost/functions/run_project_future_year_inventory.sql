@@ -421,11 +421,27 @@ BEGIN
 		-- look at the closure control program inputs
 		IF control_program.type = 'Plant Closure' THEN
 
-			-- make sire the 
+			-- make sure the plant closure effective date is in the right format
 			execute 'select count(1) from emissions.' || control_program.table_name || ' where not public.isdate(effective_date)'
 			into gimme_count;
 			IF gimme_count > 0 THEN
 				RAISE EXCEPTION 'Control program, %, plant closure dataset has % effective date(s) that are not in the correct date format.', control_program.control_program_name, gimme_count;
+				return;
+			END IF;
+
+			-- make sure the plant closure effective date is in the right format
+			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(fips), '''') = ''''' || ' '
+			into gimme_count;
+			IF gimme_count > 0 THEN
+				RAISE EXCEPTION 'Control program, %, plant closure dataset has % missing fip(s) codes.', control_program.control_program_name, gimme_count;
+				return;
+			END IF;
+
+			-- make sure the plant closure effective date is in the right format
+			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(plantid), '''') = ''''' || ' '
+			into gimme_count;
+			IF gimme_count > 0 THEN
+				RAISE EXCEPTION 'Control program, %, plant closure dataset has % missing plant Id(s).', control_program.control_program_name, gimme_count;
 				return;
 			END IF;
 
