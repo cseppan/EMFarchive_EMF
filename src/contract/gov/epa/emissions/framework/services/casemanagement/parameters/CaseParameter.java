@@ -79,6 +79,11 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
     public String getName() {
         return this.parameterName.getName();
     }
+    
+    public int getModelToRunId() {
+        return this.parameterName.getModelToRunId();
+    }
+
     public ParameterName getParameterName() {
         return parameterName;
     }

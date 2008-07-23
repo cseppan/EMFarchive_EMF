@@ -206,3 +206,9 @@ WITHOUT OIDS;
 
 -- 5/23/08  cases.cases_casejobs
 ALTER TABLE cases.cases_casejobs RENAME COLUMN job_abbrev TO job_group;
+
+-- 7/22/2008 add a new column model_to_runs to cases.parameter_names table
+ALTER TABLE cases.parameter_names ADD COLUMN model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id);
+ALTER TABLE cases.parameter_env_vars ADD COLUMN model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id);
+ALTER TABLE cases.inputnames ADD COLUMN model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id);
+ALTER TABLE cases.input_envt_vars ADD COLUMN model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id);

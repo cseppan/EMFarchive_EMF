@@ -167,6 +167,10 @@ public class CaseInput implements Serializable, Comparable {
     public void setInputName(InputName inputName) {
         this.inputName = inputName;
     }
+    
+    public int getModelToRunId(){
+        return inputName.getModelToRunId();
+    }
 
     public String getName() {
         return inputName == null ? null : inputName.getName();

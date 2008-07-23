@@ -8,6 +8,8 @@ public class ParameterEnvVar implements Serializable, Comparable {
     
     private String name;
     
+    private int modelToRunId;
+    
     public ParameterEnvVar() {
         //
     }
@@ -30,6 +32,14 @@ public class ParameterEnvVar implements Serializable, Comparable {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public int getModelToRunId() {
+        return modelToRunId;
+    }
+
+    public void setModelToRunId(int modelToRunId) {
+        this.modelToRunId = modelToRunId;
     }
     
     public String toString() {

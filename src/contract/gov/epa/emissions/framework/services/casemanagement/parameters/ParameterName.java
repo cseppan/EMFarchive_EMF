@@ -9,6 +9,8 @@ public class ParameterName implements Serializable, Comparable {
     
     private String name;
     
+    private int modelToRunId;
+    
     public ParameterName() {
         //
     }
@@ -31,6 +33,14 @@ public class ParameterName implements Serializable, Comparable {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public int getModelToRunId() {
+        return modelToRunId;
+    }
+
+    public void setModelToRunId(int modelToRunId) {
+        this.modelToRunId = modelToRunId;
     }
     
     public boolean equals(Object other) {

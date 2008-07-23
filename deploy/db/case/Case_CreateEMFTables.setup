@@ -69,7 +69,8 @@ WITHOUT OIDS;
 CREATE TABLE cases.inputnames
 (
   id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
+  name varchar(255) NOT NULL UNIQUE,
+  model_to_run_id int4 REFERENCES cases.model_to_runs(id)
 ) 
 WITHOUT OIDS;
 -- cases.inputnames
@@ -78,7 +79,8 @@ WITHOUT OIDS;
 CREATE TABLE cases.input_envt_vars
 (
   id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
+  name varchar(255) NOT NULL UNIQUE,
+  model_to_run_id int4 REFERENCES cases.model_to_runs(id)
 ) 
 WITHOUT OIDS;
 -- cases.input_envt_vars
@@ -260,7 +262,8 @@ WITHOUT OIDS;
 CREATE TABLE cases.parameter_env_vars
 (
   id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
+  name varchar(255) NOT NULL UNIQUE,
+  model_to_run_id int4  REFERENCES cases.model_to_runs(id)
 )
 WITHOUT OIDS;
 -- cases.parameter_env_vars
@@ -278,7 +281,8 @@ WITHOUT OIDS;
 CREATE TABLE cases.parameter_names
 (
   id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
+  name varchar(255) NOT NULL UNIQUE,
+  model_to_run_id int4  REFERENCES cases.model_to_runs(id)
 )
 WITHOUT OIDS;
 -- cases.parameter_names
