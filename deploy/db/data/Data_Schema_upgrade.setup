@@ -389,3 +389,35 @@ CREATE TABLE emf.table_consolidations
 ) 
 WITHOUT OIDS;
 -- emf.table_consolidations
+
+-- DCD 7/23/2008 Fixed bug with lat and long, they were switched.
+-- Summarize by Plant and Pollutant - ORL Point Inventory (PTINV)
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select fips, 
+	plantid, 
+	plant, 
+	poll, 
+	sum(ann_emis) as ann_emis, 
+	sum(avd_emis) as avd_emis,  
+	avg(yloc) as avg_lat, 
+	avg(xloc) as avg_long, 
+	max(stkhgt) as max_stkhgt, 
+	max(stkdiam) as max_stkdiam, 
+	max(stktemp) as max_stktemp, 
+	max(stkflow) as max_stkflow, 
+	max(stkvel) as max_stkvel
+from $TABLE[1] e
+group by fips,
+	plantid,
+	plant,
+	poll
+order by fips, 
+	plantid, 
+	poll'
+where dataset_type_id in (
+	select id 
+	from emf.dataset_types dt
+	where name in ('ORL Point Inventory (PTINV)')
+	)
+	and "name" = 'Summarize by Plant and Pollutant';
+
