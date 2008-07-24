@@ -2952,6 +2952,17 @@ public class ManagedCaseService {
             String endString = caseObj.getEndDate().toString();
             sbuf.append(shellSetenv("EPI_ENDATE_TIME", endString));
         }
+        // Parent case
+        String parentName = caseObj.getTemplateUsed();
+        if (parentName != null ||  parentName != "") {
+            try {
+                Case parentCase = dao.getCaseFromName(parentName, session);
+                sbuf.append(shellSetenv("PARENT_CASE", parentCase.getAbbreviation().getName()));   
+            } catch (Exception e){
+                log.error("Parent case (" + parentName +") does not exist. Will not set PARENT_CASE parameter");
+                log.error(e.getMessage());
+            }
+        }
 
         // Add Parameters from job tab
         sbuf.append(eolString);
