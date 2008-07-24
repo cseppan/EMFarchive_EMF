@@ -255,6 +255,12 @@ public class CaseDAO {
         return (Case) hibernateFacade.load(Case.class, crit, session);
     }
 
+    public Case getCaseFromName(String name, Session session) {
+        // Get a case from it's name
+        Criterion crit = Restrictions.eq("name", name);
+        return (Case) hibernateFacade.load(Case.class, crit, session);
+    }
+
     public List getPrograms(Session session) {
         return hibernateFacade.getAll(CaseProgram.class, Order.asc("name"), session);
     }
