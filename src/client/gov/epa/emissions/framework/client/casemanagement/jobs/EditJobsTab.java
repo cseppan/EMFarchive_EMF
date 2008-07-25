@@ -579,7 +579,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
     public void addSector(Sector sector) {
         parentPresenter.addSector(sector);
-        //setMessage("A new sector is added to sectors on summary tab.");
     }
 
 }

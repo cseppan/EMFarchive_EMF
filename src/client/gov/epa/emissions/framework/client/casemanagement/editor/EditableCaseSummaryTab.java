@@ -30,6 +30,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -54,7 +55,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private TextField futureYear;
 
     private TextField template;
-    
+
     private TextField numMetLayers, numEmissionLayers;
 
     private TextArea description;
@@ -67,7 +68,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private ComboBox modRegionsCombo;
 
-    //private ComboBox controlRegionsCombo;
+    // private ComboBox controlRegionsCombo;
 
     private EditableComboBox abbreviationsCombo;
 
@@ -102,10 +103,11 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private EditCaseSummaryTabPresenter presenter;
 
     private EmfConsole parentConsole;
+
     private MessagePanel messagePanel;
-    
-    private int fieldWidth=23;
-    
+
+    private int fieldWidth = 23;
+
     public EditableCaseSummaryTab(Case caseObj, EmfSession session, ManageChangeables changeablesList,
             MessagePanel messagePanel, EmfConsole parentConsole) {
         super.setName("summary");
@@ -202,7 +204,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         layoutGenerator.addLabelWidgetPair("Model to Run:", modelToRun(), panel);
         layoutGenerator.addLabelWidgetPair("Modeling Region:", modRegions(), panel);
-        //layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
+        // layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
         layoutGenerator.addLabelWidgetPair("Grid Name:", grids(), panel);
         layoutGenerator.addLabelWidgetPair("Grid Resolution:", gridResolution(), panel);
         layoutGenerator.addLabelWidgetPair("Met/Emis Layers:", metEmisLayers(), panel);
@@ -230,16 +232,16 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private JLabel creator() {
-        return createLeftAlignedLabel(caseObj.getLastModifiedBy().getName()+ " on "
-                +format(caseObj.getLastModifiedDate()));
+        return createLeftAlignedLabel(caseObj.getLastModifiedBy().getName() + " on "
+                + format(caseObj.getLastModifiedDate()));
     }
 
     private ScrollableComponent description() {
         description = new TextArea("description", caseObj.getDescription(), fieldWidth, 3);
         changeablesList.addChangeable(description);
- 
+
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(description);
-        descScrollableTextArea.setPreferredSize(new Dimension(255,80));
+        descScrollableTextArea.setPreferredSize(new Dimension(255, 80));
         return descScrollableTextArea;
     }
 
@@ -252,7 +254,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         return name;
     }
-    
 
     private TextField futureYear() {
         futureYear = new TextField("Future Year", fieldWidth);
@@ -262,22 +263,22 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         return futureYear;
     }
-    
+
     private JPanel metEmisLayers() {
-        JPanel panel = new JPanel(); 
+        JPanel panel = new JPanel();
         numMetLayers = new TextField("Num Met Layers", 11);
         numEmissionLayers = new TextField("Num Emis Layers", 11);
-        
-        numMetLayers.setText(caseObj.getNumMetLayers() != null ? caseObj.getNumMetLayers()+"" : "");
+
+        numMetLayers.setText(caseObj.getNumMetLayers() != null ? caseObj.getNumMetLayers() + "" : "");
         numMetLayers.setToolTipText("Enter # of met layers");
-        numMetLayers.setPreferredSize(defaultDimension);  //new Dimension(255, 22));
+        numMetLayers.setPreferredSize(defaultDimension); // new Dimension(255, 22));
         changeablesList.addChangeable(numMetLayers);
-        
-        numEmissionLayers.setText(caseObj.getNumMetLayers() != null ? caseObj.getNumMetLayers()+"" : "");
+
+        numEmissionLayers.setText(caseObj.getNumEmissionsLayers() != null ? caseObj.getNumEmissionsLayers() + "" : "");
         numEmissionLayers.setToolTipText("Enter # of emission layers");
         numEmissionLayers.setPreferredSize(defaultDimension);
         changeablesList.addChangeable(numEmissionLayers);
-        
+
         panel.add(numMetLayers);
         panel.add(numEmissionLayers);
         return panel;
@@ -346,14 +347,14 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return gridResolutionCombo;
     }
 
-//    private ComboBox controlRegions() throws EmfException {
-//        controlRegionsCombo = new ComboBox(presenter.getRegions());
-//        controlRegionsCombo.setSelectedItem(caseObj.getControlRegion());
-//        controlRegionsCombo.setPreferredSize(defaultDimension);
-//        changeablesList.addChangeable(controlRegionsCombo);
-//
-//        return controlRegionsCombo;
-//    }
+    // private ComboBox controlRegions() throws EmfException {
+    // controlRegionsCombo = new ComboBox(presenter.getRegions());
+    // controlRegionsCombo.setSelectedItem(caseObj.getControlRegion());
+    // controlRegionsCombo.setPreferredSize(defaultDimension);
+    // changeablesList.addChangeable(controlRegionsCombo);
+    //
+    // return controlRegionsCombo;
+    // }
 
     private EditableComboBox abbreviations() throws EmfException {
         abbreviationsCombo = new EditableComboBox(presenter.getAbbreviations());
@@ -391,7 +392,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         sectorsWidget.setPreferredSize(new Dimension(255, 80));
         return sectorsWidget;
     }
-    
 
     private EditableComboBox emissionsYears() throws EmfException {
         emissionsYearCombo = new EditableComboBox(presenter.getEmissionsYears());
@@ -522,8 +522,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setIsFinal(isFinal.isSelected());
         caseObj.setProject(presenter.getProject(projectsCombo.getSelectedItem()));
         caseObj.setModelingRegion((Region) modRegionsCombo.getSelectedItem());
-        //caseObj.setControlRegion((Region) controlRegionsCombo.getSelectedItem());
-        caseObj.setNumMetLayers( validateInt(numMetLayers));
+        // caseObj.setControlRegion((Region) controlRegionsCombo.getSelectedItem());
+        caseObj.setNumMetLayers(validateInt(numMetLayers));
         caseObj.setNumEmissionsLayers(validateInt(numEmissionLayers));
         caseObj.setAbbreviation(presenter.getAbbreviation(abbreviationsCombo.getSelectedItem()));
         caseObj.setAirQualityModel(presenter.getAirQualityModel(airQualityModelsCombo.getSelectedItem()));
@@ -539,9 +539,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setModel(presenter.getModelToRun(modelToRunCombo.getSelectedItem()));
         caseObj.setGridResolution(presenter.getGridResolutionl(gridResolutionCombo.getSelectedItem()));
     }
-    
-    private Integer validateInt(TextField value) throws EmfException{
-        NumberFieldVerifier verifier = new NumberFieldVerifier("Case Summary tab: "); 
+
+    private Integer validateInt(TextField value) throws EmfException {
+        NumberFieldVerifier verifier = new NumberFieldVerifier("Case Summary tab: ");
         if (value.getText().trim().length() > 0)
             return verifier.parseInteger(value);
         return null;
@@ -600,18 +600,26 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
             throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
                     + " has it now.");
     }
-    
 
-//    public void resetSectors() {
-//        sectorsWidget.setSectors(caseObj.getSectors());
-//    }
-    
+    // public void resetSectors() {
+    // sectorsWidget.setSectors(caseObj.getSectors());
+    // }
+
     public void addSector(Sector sector) {
-      List<Sector> sectors = new ArrayList<Sector>();
-      sectors.addAll(Arrays.asList(sectorsWidget.getSectors()));
-      if ( sector != null && !sectors.contains(sector))
-        sectorsWidget.addSector(sector);
-        messagePanel.setMessage("A new sector is added to sectors on summary tab.");
+        List<Sector> sectors = new ArrayList<Sector>();
+        sectors.addAll(Arrays.asList(sectorsWidget.getSectors()));
+        boolean found = false;
+
+        for (Iterator<Sector> iter = sectors.iterator(); iter.hasNext();) {
+            Sector item = iter.next();
+            if (sector != null && sector.equals(item))
+                found = true;
+        }
+
+        if (!found) {
+            sectorsWidget.addSector(sector);
+            messagePanel.setMessage("The sector " + sector.getName() + " has been added to the summary tab.");
+        }
     }
 
 }

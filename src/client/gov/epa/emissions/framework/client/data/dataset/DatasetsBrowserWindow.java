@@ -98,7 +98,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 try {
                     doRefresh();
                 } catch (EmfException e1) {
-                    messagePanel.setError("Could not retrieve all dataset types with -- " + type.getName());
+                    messagePanel.setError("Could not retrieve all datasets for dataset type " + type.getName());
                 }
             }
         });

@@ -109,6 +109,7 @@ insert into emf.dataset_types values(DEFAULT,'Strategy Messages (CSV)','Strategy
 insert into emf.dataset_types values(DEFAULT,'Plant Closure (CSV)','Plant Closure (CSV)', '1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 insert into emf.dataset_types values(DEFAULT,'Abbreviated Projection (CSV)','Abbreviated Projection (CSV)', '1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 insert into emf.dataset_types values(DEFAULT,'Extended Projection (CSV)','Extended Projection (CSV)', '1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
+insert into emf.dataset_types values(DEFAULT,'Projection Packet','Projection Packet', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.ProjectionPacketImporter', 'gov.epa.emissions.commons.io.other.ProjectionPacketExporter');
 -- emf.dataset_types
 --
 -- emf.intended_uses

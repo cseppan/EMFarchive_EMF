@@ -207,6 +207,12 @@ WITHOUT OIDS;
 -- 5/23/08  cases.cases_casejobs
 ALTER TABLE cases.cases_casejobs RENAME COLUMN job_abbrev TO job_group;
 
+-- 7/23/2008 to add job into case input uniqueness check
+ALTER TABLE cases.cases_caseinputs DROP CONSTRAINT cases_caseinputs_case_id_key;
+ALTER TABLE cases.cases_caseinputs ADD CONSTRAINT caseinputs_uniqueness_key UNIQUE (case_id, input_name_id, sector_id, program_id, case_job_id);
+
+ALTER TABLE cases.cases_casejobs RENAME COLUMN job_abbrev TO job_group;
+
 -- 7/22/2008 add a new column model_to_runs to cases.parameter_names table
 ALTER TABLE cases.parameter_names ADD COLUMN model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id);
 ALTER TABLE cases.parameter_env_vars ADD COLUMN model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id);

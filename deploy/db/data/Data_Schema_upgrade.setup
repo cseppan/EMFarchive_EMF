@@ -390,6 +390,9 @@ CREATE TABLE emf.table_consolidations
 WITHOUT OIDS;
 -- emf.table_consolidations
 
+-- 7/24/2008
+insert into emf.dataset_types values(DEFAULT,'Projection Packet','Projection Packet', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.ProjectionPacketImporter', 'gov.epa.emissions.commons.io.other.ProjectionPacketExporter');-- emf.table_consolidations
+
 -- DCD 7/23/2008 Fixed bug with lat and long, they were switched.
 -- Summarize by Plant and Pollutant - ORL Point Inventory (PTINV)
 update emf.dataset_types_qa_step_templates 

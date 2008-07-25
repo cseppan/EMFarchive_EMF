@@ -108,11 +108,10 @@ public class DatasetDAO {
     // FIXME: to be deleted after dataset removed from db
     public List allNonDeleted(Session session) {
         return session
-        .createQuery(
-                "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime) "
-                        + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
-                        + " where DS.status <> 'Deleted' order by DS.name")
-        .list();
+                .createQuery(
+                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime) "
+                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
+                                + " where DS.status <> 'Deleted' order by DS.name").list();
     }
 
     public void add(EmfDataset dataset, Session session) {
@@ -138,7 +137,7 @@ public class DatasetDAO {
         hibernateFacade.remove(dataset, session);
     }
 
-    //FIXME: change this method name to indicate mark deleted
+    // FIXME: change this method name to indicate mark deleted
     public void remove(User user, EmfDataset dataset, Session session) throws EmfException {
         if (DebugLevels.DEBUG_14)
             System.out.println("DatasetDAO starts removing dataset " + dataset.getName() + " " + new Date());
@@ -260,9 +259,9 @@ public class DatasetDAO {
                 .createQuery(
                         "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime) "
                                 + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
-                                + " where DS.datasetType.id = " + datasetTypeId
-                                + " and DS.status <> 'Deleted' order by DS.name")
-                .list();
+                                + " where DS.datasetType.id = "
+                                + datasetTypeId
+                                + " and DS.status <> 'Deleted' order by DS.name").list();
     }
 
     public List getDatasets(Session session, int datasetTypeId, String nameContains) {
@@ -293,12 +292,12 @@ public class DatasetDAO {
         Criterion criterion = Restrictions.and(statusCrit, idCrit);
         return (EmfDataset) hibernateFacade.load(EmfDataset.class, criterion, session);
     }
-    
+
     public Version getVersion(Session session, int datasetId, int version) {
-        Criterion crit1 = Restrictions.eq("datasetId", new Integer(datasetId)); 
+        Criterion crit1 = Restrictions.eq("datasetId", new Integer(datasetId));
         Criterion crit2 = Restrictions.eq("version", new Integer(version));
         Criterion criterion = Restrictions.and(crit1, crit2);
-        
+
         return (Version) hibernateFacade.load(Version.class, criterion, session);
     }
 
@@ -452,6 +451,8 @@ public class DatasetDAO {
         }
     }
 
+    // when you remove a dataset, you need to rename emissions tables to mark as deleted
+    // if the table is shared by multiple datasets, you don't wan to rename it
     private boolean continueToRename(EmfDataset dataset, EmfDataset oldDataset) {
         if (oldDataset == null) {
             return false;
@@ -459,11 +460,15 @@ public class DatasetDAO {
 
         DatasetType type = dataset.getDatasetType();
         InternalSource[] sources = dataset.getInternalSources();
-        
-        if (type != null && type.getName().equalsIgnoreCase("SMOKE Report"))
-            return false;
 
-        if (dataset.getName().equalsIgnoreCase(oldDataset.getName())) 
+        if (type != null) {
+            String name = type.getName().toUpperCase();
+
+            if (name.contains("SMOKE REPORT") || name.contains("SMKREPORT"))
+                return false;
+        }
+
+        if (dataset.getName().equalsIgnoreCase(oldDataset.getName()))
             return false;
 
         if (sources == null || sources.length == 0 || type.getTablePerDataset() != 1) {
@@ -536,8 +541,8 @@ public class DatasetDAO {
         EmfDataset[] deletableDatasets = getCaseFreeDatasets(datasets, session);
         // NOTE: wait till decided by EPA OAQPS
         // checkIfUsedByStrategies(datasetIDs, session);
-        //EmfDataset[] deletableDatasets = getControlStrateyFreeDatasets(datasets, session);
-        
+        // EmfDataset[] deletableDatasets = getControlStrateyFreeDatasets(datasets, session);
+
         if (deletableDatasets == null || deletableDatasets.length == 0)
             return;
 
@@ -743,18 +748,18 @@ public class DatasetDAO {
 
     private void dropDataTables(EmfDataset[] datasets, TableCreator tableTool) throws EmfException {
         int problemCount = 0;
-        
+
         for (int i = 0; i < datasets.length; i++) {
             try {
-               dropDataTables(tableTool, datasets[i]);
+                dropDataTables(tableTool, datasets[i]);
             } catch (Exception exc) {
                 LOG.error(exc);
                 problemCount++;
             }
         }
-        
+
         if (problemCount > 0)
-            throw new EmfException("There were problems dropping tables for "+problemCount+" datasets");
+            throw new EmfException("There were problems dropping tables for " + problemCount + " datasets");
     }
 
     private void dropDataTables(TableCreator tableTool, EmfDataset dataset) throws EmfException {
@@ -767,16 +772,16 @@ public class DatasetDAO {
         int problemCount = 0;
 
         for (int i = 0; i < sources.length; i++) {
-            try { 
-               dropIndividualTable(tableTool, sources[i], (type != null) ? type.getName() : "", dataset.getId());
+            try {
+                dropIndividualTable(tableTool, sources[i], (type != null) ? type.getName() : "", dataset.getId());
             } catch (Exception exc) { // if there is a problem with one table, keep going
                 problemCount++;
                 LOG.error(exc);
             }
         }
-        
+
         if (problemCount > 0)
-            throw new EmfException("There were problems deleting/removing records from " + problemCount 
+            throw new EmfException("There were problems deleting/removing records from " + problemCount
                     + " tables for dataset " + dataset.getName());
     }
 
@@ -787,7 +792,7 @@ public class DatasetDAO {
 
         try {
             if (type.contains("A/M/PTPRO") || type.contains("TEMPORAL PROFILE") || type.contains("COSTCY")
-                    || type.contains("COUNTRY, STATE, AND COUNTY") || type.contains("SMOKE REPORT"))
+                    || type.contains("COUNTRY, STATE, AND COUNTY") || type.contains("SMOKE REPORT") || type.contains("SMKREPORT"))
                 tableTool.deleteRecords(table, source.getCols()[1], "integer", "" + dsID); // 2nd column: dataset_id
             else {
                 if (DebugLevels.DEBUG_16)
@@ -861,28 +866,28 @@ public class DatasetDAO {
 
         for (EmfDataset dataset : datasets) {
             try {
-                checkIfUsedByCases(new int[]{dataset.getId()}, session);
+                checkIfUsedByCases(new int[] { dataset.getId() }, session);
                 list.add(dataset);
             } catch (Exception e) {
                 LOG.warn(e.getMessage());
             }
         }
-        
+
         return list.toArray(new EmfDataset[0]);
     }
 
     public EmfDataset[] getControlStrateyFreeDatasets(EmfDataset[] datasets, Session session) {
         List<EmfDataset> list = new ArrayList<EmfDataset>();
-        
+
         for (EmfDataset dataset : datasets) {
             try {
-                checkIfUsedByStrategies(new int[]{dataset.getId()}, session);
+                checkIfUsedByStrategies(new int[] { dataset.getId() }, session);
                 list.add(dataset);
             } catch (Exception e) {
                 LOG.warn(e.getMessage());
             }
         }
-        
+
         return list.toArray(new EmfDataset[0]);
     }
 
