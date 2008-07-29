@@ -9,7 +9,7 @@ public interface ParameterFieldsPanelView {
 
     void observe(ParameterFieldsPanelPresenter presenter);
 
-    void display(CaseParameter param, JComponent container) throws EmfException;
+    void display(CaseParameter param, int model_id, JComponent container) throws EmfException;
 
     CaseParameter setFields() throws EmfException;
     

@@ -330,15 +330,17 @@ public class CaseObjectManager {
         return newVar;
     }
 
-    public synchronized ParameterEnvVar getOrAddParameterEnvtVar(Object selected) throws EmfException {
+    public synchronized ParameterEnvVar getOrAddParameterEnvtVar(Object selected, int modelToRunId) throws EmfException {
         if (selected == null)
             return null;
 
         ParameterEnvVar parameterEnvtVar = null;
         if (selected instanceof String) {
             parameterEnvtVar = new ParameterEnvVar(selected.toString());
+            parameterEnvtVar.setModelToRunId(modelToRunId);
         } else if (selected instanceof ParameterEnvVar) {
             parameterEnvtVar = (ParameterEnvVar) selected;
+            parameterEnvtVar.setModelToRunId(modelToRunId);
         }
         this.getParameterEnvVars(); // make sure parameterEnvtVar have been retrieved
 
@@ -354,9 +356,25 @@ public class CaseObjectManager {
             parameterNames = Arrays.asList(caseService.getParameterNames());
             Collections.sort(parameterNames);
         }
-
+        
         return parameterNames.toArray(new ParameterName[0]);
     }
+    
+    public synchronized ParameterName[] getParameterNames(int model_id) throws EmfException
+    {
+      // in this method, call getParameterNames() to make sure the list
+      // of all parameter names has already been populated
+        getParameterNames();
+      // next, look through the parameterNames list to find the ones that
+      // are for the specified model_id, and then return a list of only
+      // those from this method
+        List<ParameterName> filteredParameterNames = new ArrayList<ParameterName>();
+        for (int i=0; i<parameterNames.size(); i++){
+            if (parameterNames.get(i).getModelToRunId()== model_id )
+                filteredParameterNames.add(parameterNames.get(i));
+        }
+        return filteredParameterNames.toArray(new ParameterName[0]);
+    } 
 
     public synchronized ParameterName addParameterName(ParameterName name) throws EmfException {
         ParameterName newName = caseService.addParameterName(name);
@@ -368,15 +386,17 @@ public class CaseObjectManager {
         return newName;
     }
 
-    public synchronized ParameterName getOrAddParameterName(Object selected) throws EmfException {
+    public synchronized ParameterName getOrAddParameterName(Object selected, int modelToRunId) throws EmfException {
         if (selected == null)
             return null;
 
         ParameterName parameterName = null;
         if (selected instanceof String) {
             parameterName = new ParameterName(selected.toString());
+            parameterName.setModelToRunId(modelToRunId);
         } else if (selected instanceof ParameterName) {
             parameterName = (ParameterName) selected;
+            parameterName.setModelToRunId(modelToRunId);
         }
         this.getParameterNames(); // make sure parameterEnvtVar have been retrieved
 

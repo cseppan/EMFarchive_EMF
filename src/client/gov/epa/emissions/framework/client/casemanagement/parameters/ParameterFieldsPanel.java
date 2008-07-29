@@ -61,20 +61,23 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
     private TextField order;
 
     private MessagePanel messagePanel;
+    
+    private int model_id; 
 
     public ParameterFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList) {
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
     }
 
-    public void display(CaseParameter param, JComponent container) throws EmfException {
+    public void display(CaseParameter param, int model_id, JComponent container) throws EmfException {
         this.parameter = param;
+        this.model_id = model_id;
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         String width = EmptyStrings.create(65);
         Dimension preferredSize = new Dimension(300, 25);
 
-        parameterName = new EditableComboBox(presenter.getParameterNames());
+        parameterName = new EditableComboBox(presenter.getParameterNames(model_id));
         addPopupMenuListener(parameterName, "parameternames");
         parameterName.setSelectedItem(param.getParameterName());
         parameterName.setPreferredSize(preferredSize);
@@ -194,7 +197,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
 
     protected Object[] getAllObjects(String toget) throws EmfException {
         if (toget.equals("parameternames"))
-            return presenter.getParameterNames();
+            return presenter.getParameterNames(model_id);
 
         if (toget.equals("programs"))
             return presenter.getPrograms();
@@ -250,7 +253,8 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
 
     private void updateParameterName() throws EmfException {
         Object selected = parameterName.getSelectedItem();
-        parameter.setParameterName(presenter.getParameterName(selected));
+        parameter.setParameterName(presenter.getParameterName(selected, model_id));
+        //parameter.getParameterName().setModelToRunId(model_id);
     }
 
     private void updateProgram() throws EmfException {
@@ -270,7 +274,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
             return;
         }
 
-        parameter.setEnvVar(presenter.getParameterEnvtVar(selected));
+        parameter.setEnvVar(presenter.getParameterEnvtVar(selected, model_id));
     }
 
     private void updateSector() {

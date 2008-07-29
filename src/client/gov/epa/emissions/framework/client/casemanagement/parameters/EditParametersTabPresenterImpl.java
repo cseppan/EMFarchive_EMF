@@ -71,9 +71,11 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     }
 
     public void editParameter(CaseParameter param, EditCaseParameterView parameterEditor) throws EmfException {
-        EditCaseParameterPresenter editInputPresenter = new EditCaseParameterPresenterImpl(caseObj.getId(),
+        EditCaseParameterPresenter editParaPresenter = new EditCaseParameterPresenterImpl(caseObj.getId(),
                 parameterEditor, view, session);
-        editInputPresenter.display(param);
+        if (caseObj.getModel()==null || caseObj.getModel().getId() ==0)
+            throw new EmfException ("Please specify a model to run. ");
+        editParaPresenter.display(param, caseObj.getModel().getId());
     }
 
     public void copyParameter(NewCaseParameterDialog dialog, CaseParameter param) throws Exception {
@@ -95,7 +97,9 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
             ParameterFieldsPanelView parameterFields) throws EmfException {
         ParameterFieldsPanelPresenter parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseObj.getId(),
                 parameterFields, session);
-        parameterFieldsPresenter.display(newParameter, container);
+//        if ( caseObj.getModel() == null ) 
+//            throw new EmfException("Please specify model to run 0n summary tab. ");
+        parameterFieldsPresenter.display(newParameter, caseObj.getModel().getId(), container);
     }
 
     public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {

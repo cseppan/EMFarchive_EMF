@@ -18,7 +18,7 @@ public class EditCaseParameterPresenterImpl implements EditCaseParameterPresente
     
     private CaseParameter parameter;
     
-    private int caseid;
+    private int caseid, model_id;
 
     public EditCaseParameterPresenterImpl(int caseid, EditCaseParameterView view, 
             EditCaseParametersTabView parentView, EmfSession session) {
@@ -35,8 +35,9 @@ public class EditCaseParameterPresenterImpl implements EditCaseParameterPresente
         this.caseid = caseid;
     }
     
-    public void display(CaseParameter param) throws EmfException {
+    public void display(CaseParameter param, int model_id) throws EmfException {
         this.parameter = param;
+        this.model_id = model_id;
         view.observe(this);
         view.display(param);
         view.populateFields();
@@ -45,7 +46,7 @@ public class EditCaseParameterPresenterImpl implements EditCaseParameterPresente
     public void doAddInputFields(JComponent container, 
             ParameterFieldsPanelView parameterFields) throws EmfException {
         parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseid, parameterFields, session);
-        parameterFieldsPresenter.display(parameter, container);
+        parameterFieldsPresenter.display(parameter, model_id, container);
     }
     
     public void doSave() throws EmfException {

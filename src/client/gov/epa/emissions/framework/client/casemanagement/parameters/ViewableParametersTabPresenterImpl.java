@@ -39,13 +39,13 @@ public class ViewableParametersTabPresenterImpl {
     }
     
     public void editParameter(CaseParameter param, EditCaseParameterView parameterEditor) throws EmfException {
-        EditCaseParameterPresenter editInputPresenter = new EditCaseParameterPresenterImpl(caseObj.getId(), parameterEditor, session);
-        editInputPresenter.display(param);
+        EditCaseParameterPresenter editParaPresenter = new EditCaseParameterPresenterImpl(caseObj.getId(), parameterEditor, session);
+        editParaPresenter.display(param, caseObj.getModel().getId());
     }
 
     public void addParameterFields(CaseParameter newParameter, JComponent container, ParameterFieldsPanelView parameterFields) throws EmfException {
         ParameterFieldsPanelPresenter parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseObj.getId(), parameterFields, session);
-        parameterFieldsPresenter.display(newParameter, container);
+        parameterFieldsPresenter.display(newParameter,caseObj.getModel().getId(), container);
     }
 
     public CaseParameter[] getCaseParameters(int caseId) throws EmfException {

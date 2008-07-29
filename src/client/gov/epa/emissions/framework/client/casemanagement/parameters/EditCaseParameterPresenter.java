@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParame
 
 public interface EditCaseParameterPresenter {
     
-    void display(CaseParameter param) throws EmfException;
+    void display(CaseParameter param, int model_id) throws EmfException;
     
 //    void viewDisplay(CaseParameter param);
     

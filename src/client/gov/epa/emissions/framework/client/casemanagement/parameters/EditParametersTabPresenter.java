@@ -13,9 +13,9 @@ public interface EditParametersTabPresenter extends CaseEditorTabPresenter {
     
     void addNewParameterDialog(NewCaseParameterView view, CaseParameter param) throws EmfException;
     
-    void addNewParameter(CaseParameter input) throws EmfException;
+    void addNewParameter(CaseParameter para) throws EmfException;
 
-    void editParameter(CaseParameter input, EditCaseParameterView inputEditor) throws EmfException;
+    void editParameter(CaseParameter para, EditCaseParameterView inputEditor) throws EmfException;
 
    // void doCheckDuplicate(CaseInput input, CaseInput[] existingInputs) throws EmfException;
 

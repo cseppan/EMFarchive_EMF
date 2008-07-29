@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement.editor;
 
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
@@ -11,6 +12,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.casemanagement.RunStatuses;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -64,7 +66,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EmfSession session;
 
-    private EditableComboBox modelToRunCombo;
+    private EditableComboBox modelToRunCombo, modelVersionCombo;
 
     private ComboBox modRegionsCombo;
 
@@ -266,6 +268,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private JPanel metEmisLayers() {
         JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        //panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
         numMetLayers = new TextField("Num Met Layers", 11);
         numEmissionLayers = new TextField("Num Emis Layers", 11);
 
@@ -280,6 +284,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         changeablesList.addChangeable(numEmissionLayers);
 
         panel.add(numMetLayers);
+        panel.add(new Label("empty", "  "));
         panel.add(numEmissionLayers);
         return panel;
     }
@@ -319,14 +324,31 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return projectsCombo;
     }
 
-    private EditableComboBox modelToRun() throws EmfException {
+    private JPanel modelToRun() throws EmfException {
+        JPanel panel = new JPanel(); 
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        //panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
+        Version version1 = new Version();
+        version1.setName("213");
+        if (caseObj.getModel()==null)
+            messagePanel.setMessage("Please specify model to run. ");
         modelToRunCombo = new EditableComboBox(presenter.getModelToRuns());
         modelToRunCombo.setSelectedItem(caseObj.getModel());
-        modelToRunCombo.setPreferredSize(defaultDimension);
+        modelToRunCombo.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
         changeablesList.addChangeable(modelToRunCombo);
+        
+        modelVersionCombo = new EditableComboBox(new Version[]{new Version()});
+        modelVersionCombo.setSelectedItem(version1);
+        modelVersionCombo.setPreferredSize(new Dimension(122, 22));
+        addPopupMenuListener(modelToRunCombo, "modeltoruns");
+        changeablesList.addChangeable(modelToRunCombo);
+        
+        panel.add(modelToRunCombo);
+        panel.add(new Label("empty", "  "));
+        panel.add(modelVersionCombo);
 
-        return modelToRunCombo;
+        return panel;
     }
 
     private ComboBox modRegions() throws EmfException {

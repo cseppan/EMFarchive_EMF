@@ -36,13 +36,13 @@ public class ParameterFieldsPanelPresenter {
         this.caseObjectManager = CaseObjectManager.getCaseObjectManager(session);
     }
 
-    public void display(CaseParameter param, JComponent container) throws EmfException {
+    public void display(CaseParameter param, int model_id, JComponent container) throws EmfException {
         view.observe(this);
-        view.display(param, container);
+        view.display(param, model_id, container);
     }
 
-    public ParameterName[] getParameterNames() throws EmfException {
-        return caseObjectManager.getParameterNames();
+    public ParameterName[] getParameterNames(int model_id) throws EmfException {
+        return caseObjectManager.getParameterNames(model_id);
     }
 
     public Sector[] getSectors() throws EmfException {
@@ -108,12 +108,12 @@ public class ParameterFieldsPanelPresenter {
         view.setFields(); // FIXME: should do more check here
     }
 
-    public ParameterName getParameterName(Object selected) throws EmfException {
-        return caseObjectManager.getOrAddParameterName(selected);
+    public ParameterName getParameterName(Object selected, int modelId) throws EmfException {
+        return caseObjectManager.getOrAddParameterName(selected, modelId);
     }
 
-    public ParameterEnvVar getParameterEnvtVar(Object selected) throws EmfException {
-        return caseObjectManager.getOrAddParameterEnvtVar(selected);
+    public ParameterEnvVar getParameterEnvtVar(Object selected, int modelId) throws EmfException {
+        return caseObjectManager.getOrAddParameterEnvtVar(selected, modelId);
     }
 
     public CaseProgram getCaseProgram(Object selected) throws EmfException {

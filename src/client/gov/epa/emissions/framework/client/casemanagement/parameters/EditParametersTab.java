@@ -261,6 +261,10 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     }
 
     protected void doNewInput(EditParametersTabPresenter presenter) {
+        if (caseObj.getModel() == null ||caseObj.getModel().getId() == 0 ){
+            messagePanel.setMessage("Please specify model to run on summary tab. ");
+            return; 
+        }
         NewCaseParameterDialog view = new NewCaseParameterDialog(parentConsole);
         try {
             CaseParameter newParameter = new CaseParameter();
