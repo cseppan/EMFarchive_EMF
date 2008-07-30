@@ -93,7 +93,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         program.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
-        envtVar = new EditableComboBox(presenter.getEnvtVars());
+        envtVar = new EditableComboBox(presenter.getEnvtVars(model_id));
         addPopupMenuListener(envtVar, "envtvars");
         envtVar.setSelectedItem(param.getEnvVar());
         envtVar.setPreferredSize(preferredSize);
@@ -203,7 +203,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
             return presenter.getPrograms();
 
         if (toget.equals("envtvars"))
-            return presenter.getEnvtVars();
+            return presenter.getEnvtVars(model_id);
 
         if (toget.equals("vartypes"))
             return presenter.getValueTypes();

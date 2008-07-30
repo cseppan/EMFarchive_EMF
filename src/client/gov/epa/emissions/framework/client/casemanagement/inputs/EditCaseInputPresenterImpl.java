@@ -18,7 +18,7 @@ public class EditCaseInputPresenterImpl implements EditInputPresenter {
     
     private CaseInput input;
     
-    private int caseid;
+    private int caseid, modelToRunId;
 
     public EditCaseInputPresenterImpl(int caseid, EditCaseInputView view, 
             EditInputsTabView parentView, EmfSession session) {
@@ -35,17 +35,18 @@ public class EditCaseInputPresenterImpl implements EditInputPresenter {
         this.caseid = caseid;
     }
     
-    public void display(CaseInput input) throws EmfException {
+    public void display(CaseInput input, int modelToRunId) throws EmfException {
         this.input = input;
         view.observe(this);
         view.display(input);
         view.populateFields();
+        this.modelToRunId = modelToRunId;
     }
     
     public void doAddInputFields(JComponent container, 
             InputFieldsPanelView inputFields) throws EmfException {
         inputFieldsPresenter = new InputFieldsPanelPresenter(caseid, inputFields, session);
-        inputFieldsPresenter.display(input, container);
+        inputFieldsPresenter.display(input, container, modelToRunId);
     }
     
     public void doSave() throws EmfException {

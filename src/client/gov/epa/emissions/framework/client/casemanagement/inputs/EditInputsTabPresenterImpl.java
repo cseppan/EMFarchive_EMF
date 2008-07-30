@@ -82,9 +82,9 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     public void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException {
         EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(caseObj.getId(), inputEditor, view,
                 session);
-        editInputPresenter.display(input);
+        editInputPresenter.display(input, caseObj.getModel().getId());
     }
-
+    
     public void copyInput(CaseInput input, NewInputView dialog) throws Exception {
         CaseInput newInput = (CaseInput) DeepCopy.copy(input);
         addNewInputDialog(dialog, newInput);
@@ -112,7 +112,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
         InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), inputFields,
                 session);
-        inputFieldsPresenter.display(newInput, container);
+        inputFieldsPresenter.display(newInput, container, caseObj.getModel().getId());
     }
 
     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {

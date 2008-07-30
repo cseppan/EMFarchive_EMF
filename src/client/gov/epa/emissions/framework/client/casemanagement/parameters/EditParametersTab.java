@@ -236,6 +236,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             public void actionPerformed(ActionEvent e) {
                 try {
                     clearMessage();
+                    checkModelToRun();
                     editParameter(presenter);
                 } catch (EmfException ex) {
                     messagePanel.setError(ex.getMessage());
@@ -252,6 +253,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             public void actionPerformed(ActionEvent arg0) {
                 try {
                     clearMessage();
+                    checkModelToRun();
                     copyParameters(localPresenter);
                 } catch (Exception ex) {
                     messagePanel.setError(ex.getMessage());
@@ -261,12 +263,9 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     }
 
     protected void doNewInput(EditParametersTabPresenter presenter) {
-        if (caseObj.getModel() == null ||caseObj.getModel().getId() == 0 ){
-            messagePanel.setMessage("Please specify model to run on summary tab. ");
-            return; 
-        }
-        NewCaseParameterDialog view = new NewCaseParameterDialog(parentConsole);
         try {
+            checkModelToRun();
+            NewCaseParameterDialog view = new NewCaseParameterDialog(parentConsole);
             CaseParameter newParameter = new CaseParameter();
             newParameter.setCaseID(caseId);
             newParameter.setLocal(true);
@@ -276,7 +275,12 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             messagePanel.setError(e.getMessage());
         }
     }
-
+    
+    private void checkModelToRun() throws EmfException{
+        if (caseObj.getModel() == null ||caseObj.getModel().getId() == 0 )
+            throw new EmfException("Please specify model to run on summary tab. ");
+    }
+    
     protected void removeParameter(EditParametersTabPresenter presenter) throws EmfException {
         CaseParameter[] params = getSelectedParameters().toArray(new CaseParameter[0]);
 

@@ -53,8 +53,8 @@ public class ParameterFieldsPanelPresenter {
         return caseObjectManager.getPrograms();
     }
 
-    public ParameterEnvVar[] getEnvtVars() throws EmfException {
-        return caseObjectManager.getParameterEnvVars();
+    public ParameterEnvVar[] getEnvtVars(int model_id) throws EmfException {
+        return caseObjectManager.getParameterEnvVars(model_id);
     }
 
     public CaseJob[] getCaseJobs() throws EmfException {

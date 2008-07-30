@@ -45,9 +45,9 @@ public class InputFieldsPanelPresenter {
         this.caseObjectManager = CaseObjectManager.getCaseObjectManager(session);
     }
 
-    public void display(CaseInput input, JComponent container) throws EmfException {
+    public void display(CaseInput input, JComponent container, int modelToRunId) throws EmfException {
         view.observe(this);
-        view.display(input, container, session);
+        view.display(input, container, modelToRunId , session);
     }
 
 //    public CaseInputNames getCaseInputNames() throws EmfException {
@@ -78,8 +78,8 @@ public class InputFieldsPanelPresenter {
 //        return this.subdirs;
 //    }
 
-    public InputName[] getInputNames() throws EmfException {
-        return caseObjectManager.getInputNames();
+    public InputName[] getInputNames(int modelToRunId) throws EmfException {
+        return caseObjectManager.getInputNames(modelToRunId);
     }
 
     public Sector[] getSectors() throws EmfException {
@@ -94,8 +94,8 @@ public class InputFieldsPanelPresenter {
         return caseObjectManager.getSubDirs();
     }
 
-    public InputEnvtVar[] getEnvtVars() throws EmfException {
-        return caseObjectManager.getInputEnvtVars();
+    public InputEnvtVar[] getEnvtVars(int modelToRunId) throws EmfException {
+        return caseObjectManager.getInputEnvtVars(modelToRunId);
     }
 
     public CaseJob[] getCaseJobs() throws EmfException 
@@ -139,12 +139,12 @@ public class InputFieldsPanelPresenter {
         view.setFields(); // FIXME: should do more check here
     }
 
-    public InputName getInputName(Object selected) throws EmfException {
-        return caseObjectManager.getOrAddInputName(selected);
+    public InputName getInputName(Object selected, int modelToRunId) throws EmfException {
+        return caseObjectManager.getOrAddInputName(selected, modelToRunId);
     }
 
-    public InputEnvtVar getInputEnvtVar(Object selected) throws EmfException {
-        return caseObjectManager.getOrAddInputEnvtVar(selected);
+    public InputEnvtVar getInputEnvtVar(Object selected, int modelToRunId) throws EmfException {
+        return caseObjectManager.getOrAddInputEnvtVar(selected, modelToRunId);
     }
 
     public CaseProgram getCaseProgram(Object selected) throws EmfException {

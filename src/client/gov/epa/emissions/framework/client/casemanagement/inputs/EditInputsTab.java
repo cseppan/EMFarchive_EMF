@@ -244,7 +244,11 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMessage();
-                doNewInput(presenter);
+                try {
+                    doNewInput(presenter);
+                } catch (EmfException e1) {
+                    messagePanel.setError(e1.getMessage());
+                }
             }
         });
         add.setMargin(insets);
@@ -335,7 +339,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         return action; 
     }
 
-    protected void doNewInput(EditInputsTabPresenter presenter) {
+    protected void doNewInput(EditInputsTabPresenter presenter) throws EmfException {
+        checkModelToRun();
         NewInputDialog view = new NewInputDialog(parentConsole);
         try {
             CaseInput newInput = new CaseInput();
@@ -369,6 +374,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
     }
 
     private void doEditInput(EditInputsTabPresenter presenter) throws EmfException {
+        checkModelToRun(); 
+        
         List<CaseInput> inputs = getSelectedInputs();
 
         if (inputs.size() == 0) {
@@ -383,8 +390,14 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             presenter.doEditInput(input, inputEditor);
         }
     }
+    
+    private void checkModelToRun() throws EmfException{
+        if (caseObj.getModel() == null || caseObj.getModel().getId()==0)
+            throw new EmfException("Please specify model to run on summary tab. ");
+    }
 
     private void copyInputs(EditInputsTabPresenter presenter) throws Exception {
+        checkModelToRun();
         List<CaseInput> inputs = getSelectedInputs();
 
         if (inputs.size() == 0) {

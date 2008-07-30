@@ -240,6 +240,16 @@ public class CaseObjectManager {
 
         return inputs.toArray(new InputName[0]);
     }
+    
+    public synchronized InputName[] getInputNames(int modelToRunId) throws EmfException {
+        getInputNames();
+        List<InputName> filteredInputNames = new ArrayList<InputName>();
+        for (int i=0; i<inputNames.length; i++){
+            if (inputNames[i].getModelToRunId()== modelToRunId )
+                filteredInputNames.add(inputNames[i]);
+        }
+        return filteredInputNames.toArray(new InputName[0]);
+    }
 
     public synchronized InputName addInputName(InputName inputName) throws EmfException {
         InputName newVar = caseService.addCaseInputName(inputName);
@@ -251,17 +261,19 @@ public class CaseObjectManager {
         return newVar;
     }
 
-    public synchronized InputName getOrAddInputName(Object selected) throws EmfException {
+    public synchronized InputName getOrAddInputName(Object selected, int modelToRunId) throws EmfException {
         if (selected == null)
             return null;
 
         InputName inputName = null;
         if (selected instanceof String) {
             inputName = new InputName(selected.toString());
+            inputName.setModelToRunId(modelToRunId);
         } else if (selected instanceof InputName) {
             inputName = (InputName) selected;
+            inputName.setModelToRunId(modelToRunId);
         }
-        this.getInputNames(); // make sure programs have been retrieved
+        this.getInputNames(modelToRunId); // make sure programs have been retrieved
 
         for (int i = 0; i < inputNames.length; i++) {
             if (inputNames[i].toString().equalsIgnoreCase(inputName.getName().toString()))
@@ -280,6 +292,16 @@ public class CaseObjectManager {
 
         return inputVars.toArray(new InputEnvtVar[0]);
     }
+    
+    public synchronized InputEnvtVar[] getInputEnvtVars(int modelToRunId) throws EmfException {
+        getInputEnvtVars();
+        List<InputEnvtVar> filtereInputEnvtVar = new ArrayList<InputEnvtVar>();
+        for (int i=0; i<inputEnvtVars.length; i++){
+            if (inputEnvtVars[i].getModelToRunId()== modelToRunId )
+                filtereInputEnvtVar.add(inputEnvtVars[i]);
+        }
+        return filtereInputEnvtVar.toArray(new InputEnvtVar[0]);
+    }
 
     public synchronized InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException {
         InputEnvtVar newVar = caseService.addInputEnvtVar(inputEnvtVar);
@@ -291,15 +313,17 @@ public class CaseObjectManager {
         return newVar;
     }
 
-    public synchronized InputEnvtVar getOrAddInputEnvtVar(Object selected) throws EmfException {
+    public synchronized InputEnvtVar getOrAddInputEnvtVar(Object selected, int modelToRunId) throws EmfException {
         if (selected == null)
             return null;
 
         InputEnvtVar inputEnvtVar = null;
         if (selected instanceof String) {
             inputEnvtVar = new InputEnvtVar(selected.toString());
+            inputEnvtVar.setModelToRunId(modelToRunId);
         } else if (selected instanceof InputEnvtVar) {
             inputEnvtVar = (InputEnvtVar) selected;
+            inputEnvtVar.setModelToRunId(modelToRunId);
         }
         this.getInputEnvtVars(); // make sure programs have been retrieved
 
@@ -318,6 +342,17 @@ public class CaseObjectManager {
         }
 
         return parameterEnvtVars.toArray(new ParameterEnvVar[0]);
+    }
+    
+    public synchronized ParameterEnvVar[] getParameterEnvVars(int model_id) throws EmfException {
+        getParameterEnvVars();
+        
+        List<ParameterEnvVar> filteredEnvVars = new ArrayList<ParameterEnvVar>();
+        for (int i=0; i<parameterEnvtVars.size(); i++){
+            if (parameterEnvtVars.get(i).getModelToRunId()== model_id )
+                filteredEnvVars.add(parameterEnvtVars.get(i));
+        }
+        return filteredEnvVars.toArray(new ParameterEnvVar[0]);
     }
 
     public synchronized ParameterEnvVar addParameterEnvVar(ParameterEnvVar envVar) throws EmfException {

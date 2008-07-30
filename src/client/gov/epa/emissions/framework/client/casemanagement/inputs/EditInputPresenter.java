@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 
 public interface EditInputPresenter {
     
-    void display(CaseInput input) throws EmfException;
+    void display(CaseInput input, int modelToRunId) throws EmfException;
     
     void doSave() throws EmfException;
     

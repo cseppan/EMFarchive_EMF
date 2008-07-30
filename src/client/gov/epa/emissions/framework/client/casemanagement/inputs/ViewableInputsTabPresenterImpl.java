@@ -48,7 +48,7 @@ public class ViewableInputsTabPresenterImpl {
     public void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException {
         EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(caseObj.getId(), inputEditor,
                 session);
-        editInputPresenter.display(input);
+        editInputPresenter.display(input, caseObj.getModel().getId());
     }
     
     public void doAddInputFields(JComponent container, InputFieldsPanelView inputFields, CaseInput newInput) throws EmfException {
@@ -56,7 +56,7 @@ public class ViewableInputsTabPresenterImpl {
         
         InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), inputFields,
                 session);
-        inputFieldsPresenter.display(newInput, container);
+        inputFieldsPresenter.display(newInput, container, caseObj.getModel().getId());
     }
 
     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {

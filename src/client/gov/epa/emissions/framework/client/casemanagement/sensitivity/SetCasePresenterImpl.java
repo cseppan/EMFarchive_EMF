@@ -51,7 +51,7 @@ public class SetCasePresenterImpl implements SetCasePresenter {
 
     public void doAddInputFields(CaseInput input, JPanel container, SetInputFieldsPanel setInputFieldsPanel) throws EmfException {
         InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), setInputFieldsPanel, session);
-        inputFieldsPresenter.display(input, container);
+        inputFieldsPresenter.display(input, container, caseObj.getModel().getId());
     }
 
     public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {

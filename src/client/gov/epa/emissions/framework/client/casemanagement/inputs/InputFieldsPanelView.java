@@ -10,7 +10,7 @@ public interface InputFieldsPanelView {
 
     void observe(InputFieldsPanelPresenter presenter);
 
-    void display(CaseInput input, JComponent container, EmfSession session) throws EmfException;
+    void display(CaseInput input, JComponent container, int modelToRunId, EmfSession session) throws EmfException;
 
     CaseInput setFields() throws EmfException;
     

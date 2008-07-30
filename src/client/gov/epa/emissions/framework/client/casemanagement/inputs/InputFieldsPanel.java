@@ -78,6 +78,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
     protected EmfConsole parentConsole;
     
+    private int modelToRunId;
+    
     private Dimension preferredSize = new Dimension(450, 25);
 
     public InputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList, 
@@ -87,13 +89,14 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         this.parentConsole = parentConsole;
     }
 
-    public void display(CaseInput input, JComponent container, EmfSession session) throws EmfException {
+    public void display(CaseInput input, JComponent container, int modelToRunId, EmfSession session) throws EmfException {
         this.input = input;
         this.session = session; 
+        this.modelToRunId = modelToRunId;
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        inputName = new EditableComboBox(presenter.getInputNames());
+        inputName = new EditableComboBox(presenter.getInputNames(modelToRunId));
         inputName.setSelectedItem(input.getInputName());
         addPopupMenuListener(inputName, "inputnames");
         changeablesList.addChangeable(inputName);
@@ -108,7 +111,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         program.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
-        envtVar = new EditableComboBox(presenter.getEnvtVars());
+        envtVar = new EditableComboBox(presenter.getEnvtVars(modelToRunId));
         envtVar.setSelectedItem(input.getEnvtVars());
         addPopupMenuListener(envtVar, "envtvars");
         changeablesList.addChangeable(envtVar);
@@ -270,13 +273,13 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             return presenter.getDSTypes();
 
         else if (toget.equals("inputnames"))
-            return presenter.getInputNames();
+            return presenter.getInputNames(modelToRunId);
 
         else if (toget.equals("programs"))
             return presenter.getPrograms();
 
         else if (toget.equals("envtvars"))
-            return presenter.getEnvtVars();
+            return presenter.getEnvtVars(modelToRunId);
 
         else if (toget.equals("sectors"))
             return presenter.getSectors();
@@ -357,7 +360,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
     private void updateInputName() throws EmfException {
         Object selected = inputName.getSelectedItem();
-        input.setInputName(presenter.getInputName(selected));
+        input.setInputName(presenter.getInputName(selected, modelToRunId));
     }
 
     private void updateProgram() throws EmfException {
@@ -387,7 +390,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             return;
         }
 
-        input.setEnvtVars(presenter.getInputEnvtVar(selected));
+        input.setEnvtVars(presenter.getInputEnvtVar(selected, modelToRunId));
     }
 
     private void updateSector() {
