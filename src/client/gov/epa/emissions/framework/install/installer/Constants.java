@@ -2,13 +2,13 @@ package gov.epa.emissions.framework.install.installer;
 
 
 public class Constants {
-	public static final String VERSION = "6/26/2006";
+	public static final String VERSION = "7/29/2008";
 	public static final String SEPARATOR = System.getProperty("line.separator");
     public static final String WORK_DIR = System.getProperty("user.dir");
 	
 	public static final String TIME_FORMAT = "MM/dd/yyyy hh:mmaaa";
-    public static final String EMF_URL = "http://www.cep.unc.edu/empd/projects/emf/install/";
-	public static final String SERVER_ADDRESS = "http://emf.rtpnc.epa.gov:8080/emf/services";
+    public static final String EMF_URL = "http://www.ie.unc.edu/cempd/projects/emf/install/";
+	public static final String SERVER_ADDRESS = "http://orchid.nesc.epa.gov:8080/emf/services";
     
 	public static final String INSTALLER_PREFERENCES_FILE = "EMFUserInstallPrefs.ini";
     public static final String EMF_CLIENT_PREFERENCES_FILE = "EMFPrefs.txt";
