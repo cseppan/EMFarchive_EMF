@@ -75,7 +75,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         tabbedPane.addTab("Notes", createNotesTab(parentConsole));
         tabbedPane.addTab("Revisions", createRevisionsTab(parentConsole));
         tabbedPane.addTab("History", createLogsTab(dataset, parentConsole));
-        tabbedPane.addTab("Tables", createInfoTab(dataset, parentConsole));
+        tabbedPane.addTab("Sources", createInfoTab(dataset, parentConsole));
         tabbedPane.addTab("QA", createQATab());
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -123,7 +123,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private JPanel createInfoTab(EmfDataset dataset, EmfConsole parentConsole) {
-        InfoTab view = new InfoTab(parentConsole);
+        InfoTab view = new InfoTab(parentConsole, false);
         InfoTabPresenter presenter = new InfoTabPresenter(view, dataset);
         presenter.doDisplay();
 

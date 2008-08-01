@@ -2,13 +2,16 @@ package gov.epa.emissions.framework.client.meta.info;
 
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
@@ -18,17 +21,20 @@ public class InfoTab extends JPanel implements InfoTabView {
     private EmfConsole parentConsole;
 
     private JPanel sourcesPanel;
+    
+    private boolean forViewer;
 
-    //private SingleLineMessagePanel messagePanel;
+    // private SingleLineMessagePanel messagePanel;
 
-    public InfoTab(EmfConsole parentConsole) {
+    public InfoTab(EmfConsole parentConsole, boolean forViewer) {
         setName("infoTab");
         this.parentConsole = parentConsole;
+        this.forViewer = forViewer;
 
         super.setLayout(new BorderLayout());
 
-        //messagePanel = new SingleLineMessagePanel();
-        //add(messagePanel, BorderLayout.PAGE_START);
+        // messagePanel = new SingleLineMessagePanel();
+        // add(messagePanel, BorderLayout.PAGE_START);
         add(createLayout(), BorderLayout.CENTER);
     }
 
@@ -43,27 +49,50 @@ public class InfoTab extends JPanel implements InfoTabView {
     }
 
     public void displayInternalSources(InternalSource[] sources) {
-        displaySources("Data Tables", new InternalSourcesTableData(sources));
+        displaySources("Data Tables", new InternalSourcesTableData(sources), false);
     }
 
     public void displayExternalSources(ExternalSource[] sources) {
-        displaySources("External Files", new ExternalSourcesTableData(sources));
+        displaySources("External Files", new ExternalSourcesTableData(sources), true);
     }
 
-    private void displaySources(String title, TableData tableData) {
+    private void displaySources(String title, TableData tableData, boolean external) {
         sourcesPanel.removeAll();
         sourcesPanel.setBorder(new Border(title));
-        sourcesPanel.add(createSortFilterPane(tableData, parentConsole));
+        sourcesPanel.add(createSortFilterPane(tableData, parentConsole, external));
     }
 
-    private JPanel createSortFilterPane(TableData tableData, EmfConsole parentConsole) {
+    private JPanel createSortFilterPane(TableData tableData, EmfConsole parentConsole, boolean external) {
         JPanel tablePanel = new JPanel(new BorderLayout());
-        //SimpleTableModel wrapperModel = new SimpleTableModel(model);
 
         SelectableSortFilterWrapper table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
-        tablePanel.add(table);
+        tablePanel.add(table, BorderLayout.CENTER);
+
+        if (external && !forViewer)
+            tablePanel.add(controlPanel(), BorderLayout.PAGE_END);
 
         return tablePanel;
+    }
+
+    private JPanel controlPanel() {
+        JPanel container = new JPanel();
+
+        Button update = new Button("Update", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                updateSources();
+            }
+        });
+        container.add(update);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(container, BorderLayout.WEST);
+
+        return panel;
+    }
+
+    private void updateSources() {
+        // NOTE Auto-generated method stub
+
     }
 
 }
