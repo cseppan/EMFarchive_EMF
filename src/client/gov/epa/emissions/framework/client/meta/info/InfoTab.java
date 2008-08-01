@@ -3,7 +3,10 @@ package gov.epa.emissions.framework.client.meta.info;
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.TableData;
@@ -15,7 +18,6 @@ import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-//FIXME: very similar to LogsTab (uneditable table displays). Refactor ?
 public class InfoTab extends JPanel implements InfoTabView {
 
     private EmfConsole parentConsole;
@@ -24,17 +26,18 @@ public class InfoTab extends JPanel implements InfoTabView {
     
     private boolean forViewer;
 
-    // private SingleLineMessagePanel messagePanel;
+    private InfoTabPresenter sourceTabPresenter;
+    
+    private DesktopManager desktopManager;
 
-    public InfoTab(EmfConsole parentConsole, boolean forViewer) {
+    public InfoTab(EmfConsole parentConsole, DesktopManager desktopManager, boolean forViewer) {
         setName("infoTab");
         this.parentConsole = parentConsole;
         this.forViewer = forViewer;
+        this.desktopManager = desktopManager;
 
         super.setLayout(new BorderLayout());
 
-        // messagePanel = new SingleLineMessagePanel();
-        // add(messagePanel, BorderLayout.PAGE_START);
         add(createLayout(), BorderLayout.CENTER);
     }
 
@@ -91,8 +94,16 @@ public class InfoTab extends JPanel implements InfoTabView {
     }
 
     private void updateSources() {
-        // NOTE Auto-generated method stub
+        EmfDataset dataset = sourceTabPresenter.getDataset();
+        EmfSession session = sourceTabPresenter.getSession();
+        String title = "Update Dataset External Source for Dataset: " + dataset.getName();
+        ExternalSourceUpdateView view = new ExternalSourceUpdateWindow(title, desktopManager, parentConsole, session);
+        ExternalSourceUpdatePresenter updatePresenter = new ExternalSourceUpdatePresenter(dataset, session);
+        updatePresenter.display(view);
+    }
 
+    public void observe(InfoTabPresenter presenter) {
+        sourceTabPresenter = presenter;
     }
 
 }

@@ -424,3 +424,6 @@ where dataset_type_id in (
 	)
 	and "name" = 'Summarize by Plant and Pollutant';
 
+-- 8/1/2008 added two more keywords to dataset
+insert INTO emf.keywords VALUES (DEFAULT, 'WORK_LOCATION');
+insert INTO emf.keywords VALUES (DEFAULT, 'MASS_STORE_LOCATION');
