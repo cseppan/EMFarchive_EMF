@@ -36,11 +36,11 @@ public class EditCaseInputPresenterImpl implements EditInputPresenter {
     }
     
     public void display(CaseInput input, int modelToRunId) throws EmfException {
+        this.modelToRunId = modelToRunId;
         this.input = input;
         view.observe(this);
         view.display(input);
         view.populateFields();
-        this.modelToRunId = modelToRunId;
     }
     
     public void doAddInputFields(JComponent container, 
