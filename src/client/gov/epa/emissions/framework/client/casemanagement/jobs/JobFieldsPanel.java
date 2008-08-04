@@ -498,8 +498,11 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         
         if (path.contains("/"))
             return '/';
+        
+        if (path.contains("\\"))
+            return '\\';
 
-        return '\\';
+        return '/';
     }
 
     private Executable getExecutable(Executable exe) {

@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.client.casemanagement.RunStatuses;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
@@ -66,7 +67,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EmfSession session;
 
-    private EditableComboBox modelToRunCombo, modelVersionCombo;
+    private EditableComboBox modelToRunCombo;
+    
+    private TextField modelVersionField;
 
     private ComboBox modRegionsCombo;
 
@@ -204,7 +207,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Model to Run:", modelToRun(), panel);
+        layoutGenerator.addLabelWidgetPair("Model & Version:", modelToRun(), panel);
         layoutGenerator.addLabelWidgetPair("Modeling Region:", modRegions(), panel);
         // layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
         layoutGenerator.addLabelWidgetPair("Grid Name:", grids(), panel);
@@ -221,7 +224,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Air Quality Model:", airQualityModels(), panel);
+        layoutGenerator.addLabelWidgetPair("Downstream Model:", airQualityModels(), panel);
         layoutGenerator.addLabelWidgetPair("Speciation:", speciations(), panel);
         layoutGenerator.addLabelWidgetPair("Meteorological Year:", meteorlogicalYears(), panel);
         layoutGenerator.addLabelWidgetPair("Base Year:", emissionsYears(), panel);
@@ -327,26 +330,27 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private JPanel modelToRun() throws EmfException {
         JPanel panel = new JPanel(); 
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        //panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
         Version version1 = new Version();
         version1.setName("213");
+        ModelToRun runModel = caseObj.getModel();
+        
         if (caseObj.getModel()==null)
             messagePanel.setMessage("Please specify model to run. ");
         modelToRunCombo = new EditableComboBox(presenter.getModelToRuns());
-        modelToRunCombo.setSelectedItem(caseObj.getModel());
+        modelToRunCombo.setSelectedItem(runModel);
         modelToRunCombo.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
         changeablesList.addChangeable(modelToRunCombo);
         
-        modelVersionCombo = new EditableComboBox(new Version[]{new Version()});
-        modelVersionCombo.setSelectedItem(version1);
-        modelVersionCombo.setPreferredSize(new Dimension(122, 22));
+        modelVersionField = new TextField("modelVersion", fieldWidth / 2);
+        modelVersionField.setToolTipText("Input model version.");
+        modelVersionField.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
         changeablesList.addChangeable(modelToRunCombo);
         
         panel.add(modelToRunCombo);
-        panel.add(new Label("empty", "  "));
-        panel.add(modelVersionCombo);
+        panel.add(new Label("empty", "   "));
+        panel.add(modelVersionField);
 
         return panel;
     }
