@@ -126,8 +126,13 @@ public class AddRemoveSectorWidget extends JPanel {
     
     private void sort() {
         Sector[] sectors = Arrays.asList(sectorsList.getAllElements()).toArray(new Sector[0]);
+        
+        if (sectors == null || sectors.length == 0)
+            return;
+        
         Arrays.sort(sectors);
         sectorsList.removeAllElements();
+        
         for (int i = 0; i < sectors.length; i++) {
             sectorsList.addElement(sectors[i]);
         }
