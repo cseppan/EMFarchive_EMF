@@ -207,7 +207,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     public void addSector(Sector sector) {
-        if (summaryPresenter != null)
+        if (summaryPresenter != null && sector != null)
             summaryPresenter.addSector(sector);
     }
 

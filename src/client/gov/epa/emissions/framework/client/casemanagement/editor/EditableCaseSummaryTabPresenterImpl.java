@@ -31,6 +31,9 @@ public class EditableCaseSummaryTabPresenterImpl implements EditableCaseSummaryT
     }
 
     public void addSector(Sector sector) {
+        if (sector == null)
+            return;
+        
         view.addSector(sector);
     }
 
