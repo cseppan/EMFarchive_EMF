@@ -1,26 +1,19 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.List;
-
 import javax.swing.JComponent;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
-//import gov.epa.emissions.framework.client.casemanagement.SubDirs;
 import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
-//import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
-//import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
@@ -37,8 +30,7 @@ public class InputFieldsPanelPresenter {
     
     private CaseObjectManager caseObjectManager = null;
     
-    public InputFieldsPanelPresenter(int caseId, InputFieldsPanelView inputFields, EmfSession session) //throws EmfException 
-    {
+    public InputFieldsPanelPresenter(int caseId, InputFieldsPanelView inputFields, EmfSession session) {
         this.session = session;
         this.view = inputFields;
         this.caseId = caseId;
@@ -49,34 +41,6 @@ public class InputFieldsPanelPresenter {
         view.observe(this);
         view.display(input, container, modelToRunId , session);
     }
-
-//    public CaseInputNames getCaseInputNames() throws EmfException {
-//        System.out.println("InputFieldsPanelPresenter: Get case input names");
-//        if (caseInputNames == null)
-//            this.caseInputNames = new CaseInputNames(session,getInputNames());
-//        return caseInputNames;
-//    }
-//
-//    public CaseInputEnvtVars getCaseInputEnvtVars() throws EmfException {
-//        System.out.println("InputFieldsPanelPresenter: Get envt vars");
-//        if (caseInputEnvtVars == null)
-//            this.caseInputEnvtVars = new CaseInputEnvtVars(session, getEnvtVars());
-//        return this.caseInputEnvtVars;
-//    }
-
-//    public Programs getCasePrograms() throws EmfException {
-//        System.out.println("InputFieldsPanelPresenter: Get programs");
-//        if (programs == null)
-//            this.programs = new Programs(session, getPrograms());
-//        return this.programs;
-//    }
-    
-//    public SubDirs getSubDirs() throws EmfException {
-//        System.out.println("InputFieldsPanelPresenter: Get sub dirs");
-//        if (subdirs == null)
-//            this.subdirs = new SubDirs(session, getSubdirs());
-//        return this.subdirs;
-//    }
 
     public InputName[] getInputNames(int modelToRunId) throws EmfException {
         return caseObjectManager.getInputNames(modelToRunId);

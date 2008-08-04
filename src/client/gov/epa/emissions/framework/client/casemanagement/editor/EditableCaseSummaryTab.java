@@ -73,8 +73,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private ComboBox modRegionsCombo;
 
-    // private ComboBox controlRegionsCombo;
-
     private EditableComboBox abbreviationsCombo;
 
     private EditableComboBox airQualityModelsCombo;
@@ -343,6 +341,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         changeablesList.addChangeable(modelToRunCombo);
         
         modelVersionField = new TextField("modelVersion", fieldWidth / 2);
+        modelVersionField.setText(caseObj.getModelVersion());
         modelVersionField.setToolTipText("Input model version.");
         modelVersionField.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
@@ -548,7 +547,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setIsFinal(isFinal.isSelected());
         caseObj.setProject(presenter.getProject(projectsCombo.getSelectedItem()));
         caseObj.setModelingRegion((Region) modRegionsCombo.getSelectedItem());
-        // caseObj.setControlRegion((Region) controlRegionsCombo.getSelectedItem());
         caseObj.setNumMetLayers(validateInt(numMetLayers));
         caseObj.setNumEmissionsLayers(validateInt(numEmissionLayers));
         caseObj.setAbbreviation(presenter.getAbbreviation(abbreviationsCombo.getSelectedItem()));
@@ -564,6 +562,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setSectors(sectorsWidget.getSectors());
         caseObj.setModel(presenter.getModelToRun(modelToRunCombo.getSelectedItem()));
         caseObj.setGridResolution(presenter.getGridResolutionl(gridResolutionCombo.getSelectedItem()));
+        caseObj.setModelVersion((modelVersionField.getText() == null) ? null : modelVersionField.getText().trim());
     }
 
     private Integer validateInt(TextField value) throws EmfException {

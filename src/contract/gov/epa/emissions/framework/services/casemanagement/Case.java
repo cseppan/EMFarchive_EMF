@@ -22,6 +22,8 @@ public class Case implements Comparable, Lockable, Serializable {
     private Abbreviation abbreviation;
     
     private ModelToRun model;
+    
+    private String modelVersion;
 
     private AirQualityModel airQualityModel;
 
@@ -420,6 +422,14 @@ public class Case implements Comparable, Lockable, Serializable {
 
     public void setModel(ModelToRun model) {
         this.model = model;
+    }
+
+    public String getModelVersion() {
+        return modelVersion;
+    }
+
+    public void setModelVersion(String modelVersion) {
+        this.modelVersion = modelVersion;
     }
 
 }

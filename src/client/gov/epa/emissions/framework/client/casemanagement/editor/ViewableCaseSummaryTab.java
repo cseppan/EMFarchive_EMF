@@ -8,11 +8,13 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.casemanagement.RunStatuses;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
@@ -91,6 +93,8 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
     
     private EditCaseSummaryTabPresenter presenter;
 
+    private TextField modelVersionField;
+
     public ViewableCaseSummaryTab(Case caseObj, EmfSession session,
             EmfConsole parentConsole) {
         super.setName("viewSummary");
@@ -108,19 +112,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         futureYear.setEditable(false);
         template.setEditable(false);
         description.setEditable(false);
-//        projectsCombo.setEnabled(false);
-//        modelToRunCombo.setEnabled(false);
-//        modRegionsCombo.setEnabled(false);
-//        controlRegionsCombo.setEnabled(false);
-//        abbreviationsCombo.setEnabled(false);
-//        airQualityModelsCombo.setEnabled(false);
-//        categoriesCombo.setEnabled(false);
-//        emissionsYearCombo.setEnabled(false);
-//        gridCombo.setEnabled(false);
-//        meteorlogicalYearCombo.setEnabled(false);
-//        speciationCombo.setEnabled(false);
-//        gridResolutionCombo.setEnabled(false);
-//        runStatusCombo.setEnabled(false);
         isFinal.setEnabled(false);
         isTemplate.setEnabled(false);
         startDate.setEditable(false);
@@ -209,7 +200,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Model to Run:", modelToRun(), panel);
+        layoutGenerator.addLabelWidgetPair("Model & Version:", modelToRun(), panel);
         layoutGenerator.addLabelWidgetPair("Modeling Region:", modRegions(), panel);
         layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
         layoutGenerator.addLabelWidgetPair("Grid Name:", grids(), panel);
@@ -225,7 +216,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Air Quality Model:", airQualityModels(), panel);
+        layoutGenerator.addLabelWidgetPair("Downstream Model:", airQualityModels(), panel);
         layoutGenerator.addLabelWidgetPair("Speciation:", speciations(), panel);
         layoutGenerator.addLabelWidgetPair("Meteorological Year:", meteorlogicalYears(), panel);
         layoutGenerator.addLabelWidgetPair("Base Year:", emissionsYears(), panel);
@@ -301,26 +292,44 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         projectsCombo.setSelectedItem(caseObj.getProject());
         projectsCombo.setPreferredSize(defaultDimension);
         addPopupMenuListener(projectsCombo, "projects");
-        //changeablesList.addChangeable(projectsCombo);
 
         return projectsCombo;
     }
 
-    private ComboBox modelToRun() throws EmfException {
+//    private ComboBox modelToRun() throws EmfException {
+//        modelToRunCombo = new ComboBox(presenter.getModelToRuns());
+//        modelToRunCombo.setSelectedItem(caseObj.getModel());
+//        modelToRunCombo.setPreferredSize(defaultDimension);
+//        addPopupMenuListener(modelToRunCombo, "modeltoruns");
+//
+//        return modelToRunCombo;
+//    }
+    
+    private JComponent modelToRun() throws EmfException {
+        JPanel panel = new JPanel(); 
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        ModelToRun runModel = caseObj.getModel();
+        
         modelToRunCombo = new ComboBox(presenter.getModelToRuns());
-        modelToRunCombo.setSelectedItem(caseObj.getModel());
-        modelToRunCombo.setPreferredSize(defaultDimension);
-        addPopupMenuListener(modelToRunCombo, "modeltoruns");
-        //changeablesList.addChangeable(modelToRunCombo);
+        modelToRunCombo.setSelectedItem(runModel);
+        modelToRunCombo.setPreferredSize(new Dimension(122, 22));
+        
+        modelVersionField = new TextField("modelVersion", fieldWidth / 2);
+        modelVersionField.setText(caseObj.getModelVersion());
+        modelVersionField.setEditable(false);
+        modelVersionField.setPreferredSize(new Dimension(122, 22));
+        
+        panel.add(modelToRunCombo);
+        panel.add(new Label("empty", "   "));
+        panel.add(modelVersionField);
 
-        return modelToRunCombo;
+        return panel;
     }
 
     private ComboBox modRegions() throws EmfException {
         modRegionsCombo = new ComboBox(presenter.getRegions());
         modRegionsCombo.setSelectedItem(caseObj.getModelingRegion());
         modRegionsCombo.setPreferredSize(defaultDimension);
-        //changeablesList.addChangeable(modRegionsCombo);
 
         return modRegionsCombo;
     }
@@ -329,7 +338,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         gridResolutionCombo = new ComboBox(presenter.getGridResolutions());
         gridResolutionCombo.setSelectedItem(caseObj.getGridResolution());
         gridResolutionCombo.setPreferredSize(defaultDimension);
-        //changeablesList.addChangeable(gridResolutionCombo);
 
         return gridResolutionCombo;
     }

@@ -131,6 +131,7 @@ CREATE TABLE cases.cases
   user_id int4  REFERENCES emf.users(id),
   creator_user_id int4  REFERENCES emf.users(id),
   model_to_run_id int4  REFERENCES cases.model_to_runs(id),
+  model_version varchar(64),
   air_quality_model_id int4  REFERENCES cases.air_quality_models(id),
   category_id int4  REFERENCES cases.case_categories(id),
   project_id int4  REFERENCES emf.projects(id),

@@ -26,6 +26,7 @@
     <property name="gridDescription" column="grid_description" type="java.lang.String" not-null="false"/>       
 	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
   	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
+  	<property name="modelVersion" column="model_version" type="java.lang.String" not-null="false"/>
   	
 	 <many-to-one cascade="save-update"
             name="abbreviation" 
