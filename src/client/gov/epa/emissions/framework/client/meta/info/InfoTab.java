@@ -98,7 +98,7 @@ public class InfoTab extends JPanel implements InfoTabView {
         EmfSession session = sourceTabPresenter.getSession();
         String title = "Update Dataset External Source for Dataset: " + dataset.getName();
         ExternalSourceUpdateView view = new ExternalSourceUpdateWindow(title, desktopManager, parentConsole, session);
-        ExternalSourceUpdatePresenter updatePresenter = new ExternalSourceUpdatePresenter(dataset, session);
+        ExternalSourceUpdatePresenter updatePresenter = new ExternalSourceUpdatePresenter(sourceTabPresenter);
         updatePresenter.display(view);
     }
 

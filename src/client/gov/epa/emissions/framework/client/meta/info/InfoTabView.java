@@ -9,4 +9,5 @@ public interface InfoTabView {
     void displayExternalSources(ExternalSource[] sources);
     
     void observe(InfoTabPresenter presenter);
+
 }

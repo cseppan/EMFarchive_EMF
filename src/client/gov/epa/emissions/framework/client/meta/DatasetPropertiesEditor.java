@@ -14,7 +14,6 @@ import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportPresenterImpl;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.info.InfoTab;
-import gov.epa.emissions.framework.client.meta.info.InfoTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
@@ -124,8 +123,13 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private JPanel createInfoTab(EmfDataset dataset, EmfConsole parentConsole) {
         InfoTab view = new InfoTab(parentConsole, desktopManager, false);
-        InfoTabPresenter presenter = new InfoTabPresenter(view, dataset, session);
-        presenter.doDisplay();
+        
+        try {
+            presenter.set(view);
+        } catch (EmfException e) {
+            showError("Could not load Sources Tab." + e.getMessage());
+            return createErrorTab("Could not load Sources Tab." + e.getMessage());
+        }
 
         return view;
     }
@@ -196,7 +200,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
-        panel.add(createTabbedPane(dataset, versions), BorderLayout.CENTER);
+        panel.add(createTabbedPane(this.dataset, versions), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(panel);

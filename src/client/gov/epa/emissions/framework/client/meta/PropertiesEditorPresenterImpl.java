@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
+import gov.epa.emissions.framework.client.meta.info.InfoTabPresenter;
+import gov.epa.emissions.framework.client.meta.info.InfoTabView;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
@@ -124,6 +126,12 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
         presenter.display(view);
     }
 
+    public void set(InfoTabView view) {
+        InfoTabPresenter presenter = new InfoTabPresenter(view, dataset, session);
+        presenter.doDisplay();
+        presenters.add(presenter);
+    }
+    
     public EmfSession getSession() {
         return this.session;
     }

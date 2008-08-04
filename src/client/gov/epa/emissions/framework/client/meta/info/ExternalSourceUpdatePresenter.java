@@ -20,12 +20,15 @@ public class ExternalSourceUpdatePresenter {
     private EmfDataset dataset;
 
     private EmfSession session;
+    
+    private InfoTabPresenter sourceTabPresenter;
 
     private static String lastFolder = null;
 
-    public ExternalSourceUpdatePresenter(EmfDataset dataset, EmfSession session) {
-        this.dataset = dataset;
-        this.session = session;
+    public ExternalSourceUpdatePresenter(InfoTabPresenter sourceTabPresenter) {
+        this.dataset = sourceTabPresenter.getDataset();
+        this.session = sourceTabPresenter.getSession();
+        this.sourceTabPresenter = sourceTabPresenter;
     }
 
     public void notifyDone() {
@@ -113,6 +116,8 @@ public class ExternalSourceUpdatePresenter {
             
             dataset.setKeyVals(all.toArray(new KeyVal[0]));
         }
+        
+        updateDatasetSource();
 
     }
 
@@ -120,5 +125,9 @@ public class ExternalSourceUpdatePresenter {
         ExternalSource[] sources = dataset.getExternalSources();
 
         return new File(sources[0].getDatasource()).getParent();
+    }
+    
+    public void updateDatasetSource() {
+        this.sourceTabPresenter.updateKeyVals(dataset.getKeyVals());
     }
 }
