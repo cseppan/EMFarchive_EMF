@@ -348,9 +348,9 @@ WITHOUT OIDS;
 CREATE TABLE cases.taskmanager_persist
 (
   id serial NOT NULL,
-  job_id integer NOT NULL,
-  case_id integer NOT NULL,
-  user_id integer NOT NULL,
+  job_id integer NOT NULL REFERENCES cases.cases_casejobs(id),
+  case_id integer NOT NULL REFERENCES cases.cases(id),
+  user_id integer NOT NULL REFERENCES emf.users(id),
   CONSTRAINT taskmanager_persist_pkey PRIMARY KEY (id)
 ) 
 WITHOUT OIDS;

@@ -220,3 +220,10 @@ ALTER TABLE cases.inputnames ADD COLUMN model_to_run_id int4 default 1 REFERENCE
 ALTER TABLE cases.input_envt_vars ADD COLUMN model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id);
 
 ALTER TABLE cases.cases ADD COLUMN model_version varchar(64);
+
+-- 8/5/2008 to add constraints to persisted job tasks so that jobs won't be removed if it is still in active state
+ALTER TABLE cases.taskmanager_persist ADD CONSTRAINT job_id_foreign_key FOREIGN KEY (job_id) REFERENCES cases.cases_casejobs(id) MATCH SIMPLE;
+ALTER TABLE cases.taskmanager_persist ADD CONSTRAINT case_id_foreign_key FOREIGN KEY (case_id) REFERENCES cases.cases(id)  MATCH SIMPLE;
+ALTER TABLE cases.taskmanager_persist ADD CONSTRAINT user_id_foreign_key FOREIGN KEY (user_id) REFERENCES emf.users(id) MATCH SIMPLE;
+
+
