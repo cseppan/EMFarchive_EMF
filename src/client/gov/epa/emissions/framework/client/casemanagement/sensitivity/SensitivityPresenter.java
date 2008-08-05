@@ -120,7 +120,7 @@ public class SensitivityPresenter {
         if ( sectors != null && grids.length > 0 ){
             for (Grid grid : grids){
                 for (CaseJob job : jobs){
-                    if ((job.getName().toLowerCase()).contains(grid.toString().toLowerCase()))
+                    if ((job.getName().toLowerCase().replace("_", " ")).contains(grid.toString().toLowerCase().replace("_", " ")))
                         filteredJobs1.add(job);
                 }
             }
