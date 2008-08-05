@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.casemanagement.RunStatuses;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
@@ -68,7 +69,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private EmfSession session;
 
     private EditableComboBox modelToRunCombo;
-    
+
     private TextField modelVersionField;
 
     private ComboBox modRegionsCombo;
@@ -270,7 +271,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private JPanel metEmisLayers() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        //panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
+        // panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
         numMetLayers = new TextField("Num Met Layers", 11);
         numEmissionLayers = new TextField("Num Emis Layers", 11);
 
@@ -326,27 +327,27 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private JPanel modelToRun() throws EmfException {
-        JPanel panel = new JPanel(); 
+        JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         Version version1 = new Version();
         version1.setName("213");
         ModelToRun runModel = caseObj.getModel();
-        
-        if (caseObj.getModel()==null)
+
+        if (caseObj.getModel() == null)
             messagePanel.setMessage("Please specify model to run. ");
         modelToRunCombo = new EditableComboBox(presenter.getModelToRuns());
         modelToRunCombo.setSelectedItem(runModel);
         modelToRunCombo.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
         changeablesList.addChangeable(modelToRunCombo);
-        
+
         modelVersionField = new TextField("modelVersion", fieldWidth / 2);
         modelVersionField.setText(caseObj.getModelVersion());
         modelVersionField.setToolTipText("Input model version.");
         modelVersionField.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
         changeablesList.addChangeable(modelToRunCombo);
-        
+
         panel.add(modelToRunCombo);
         panel.add(new Label("empty", "   "));
         panel.add(modelVersionField);
@@ -549,7 +550,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setModelingRegion((Region) modRegionsCombo.getSelectedItem());
         caseObj.setNumMetLayers(validateInt(numMetLayers));
         caseObj.setNumEmissionsLayers(validateInt(numEmissionLayers));
-        caseObj.setAbbreviation(presenter.getAbbreviation(abbreviationsCombo.getSelectedItem()));
+        updateAbbreviation(caseObj);
         caseObj.setAirQualityModel(presenter.getAirQualityModel(airQualityModelsCombo.getSelectedItem()));
         caseObj.setCaseCategory(presenter.getCaseCategory(categoriesCombo.getSelectedItem()));
         caseObj.setEmissionsYear(presenter.getEmissionsYear(emissionsYearCombo.getSelectedItem()));
@@ -563,6 +564,19 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setModel(presenter.getModelToRun(modelToRunCombo.getSelectedItem()));
         caseObj.setGridResolution(presenter.getGridResolutionl(gridResolutionCombo.getSelectedItem()));
         caseObj.setModelVersion((modelVersionField.getText() == null) ? null : modelVersionField.getText().trim());
+    }
+
+    private void updateAbbreviation(Case caseObj) throws EmfException {
+        Abbreviation existed = caseObj.getAbbreviation();
+        Object selected = abbreviationsCombo.getSelectedItem();
+        
+        if (existed != null && selected instanceof String) {
+            existed.setName(selected.toString());
+            caseObj.setAbbreviation(existed);
+            return;
+        }
+        
+        caseObj.setAbbreviation(presenter.getAbbreviation(selected));
     }
 
     private Integer validateInt(TextField value) throws EmfException {
@@ -629,7 +643,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     public void addSector(Sector sector) {
         if (sector == null)
             return;
-        
+
         List<Sector> sectors = new ArrayList<Sector>();
         sectors.addAll(Arrays.asList(sectorsWidget.getSectors()));
         boolean found = false;
