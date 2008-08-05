@@ -51,6 +51,12 @@ public class CaseViewerPresenterImpl implements CaseViewerPresenter {
         this.session = session;
         this.view = view;
     }
+    
+    public CaseViewerPresenterImpl(Case caseObj, EmfSession session, CaseViewerView view) {
+        this.caseObj = caseObj;
+        this.session = session;
+        this.view = view;
+    }
 
     public void doDisplay() throws EmfException {
         view.observe(this);
@@ -130,5 +136,18 @@ public class CaseViewerPresenterImpl implements CaseViewerPresenter {
     public void set(ViewableCaseSummaryTab summaryView) {
         // NOTE Auto-generated method stub
         
+    }
+    
+    public Case getCaseFromName(String caseName) throws EmfException{
+        return service().getCaseFromName(caseName);
+    }
+    
+    private CaseService service() {
+        return session.caseService();
+    }
+    
+    public void doView(CaseViewerView caseView, Case caseObj) throws EmfException {
+        CaseViewerPresenter presenter = new CaseViewerPresenterImpl(caseObj, session, caseView);
+        presenter.doDisplay();
     }
 }

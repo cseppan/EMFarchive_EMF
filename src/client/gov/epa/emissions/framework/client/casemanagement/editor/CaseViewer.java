@@ -44,6 +44,8 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
     
     private JTabbedPane tabbedPane;
     
+    private Case caseObj; 
+    
     public CaseViewer(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("Case Viewer", new Dimension(820, 580), desktopManager);
         this.session = session;
@@ -149,6 +151,7 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         super.setLabel("Case Viewer: " + caseObj);
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
+        this.caseObj = caseObj;
 
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
@@ -187,6 +190,14 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         buttonsPanel.add(refresh);
         refresh.setToolTipText("Refresh only the current tab with focus.");
 
+        Button viewParent = new Button("View Parent", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                viewParentCase();
+            }
+        });
+        //viewParent.setEnabled(false);
+        buttonsPanel.add(viewParent);  
+        
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
@@ -240,9 +251,19 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         }
     }
     
-//    public void showLockingMsg(String msg) {
-//        InfoDialog dialog = new InfoDialog(parentConsole, "Message", msg);
-//        dialog.confirm();
-//    }
+    private void viewParentCase() {
+        try {
+            Case parentCase = presenter.getCaseFromName(caseObj.getTemplateUsed());
+            if (parentCase ==null){
+                showError("No parent case available. ");
+                return;
+            }
+            CaseViewer view = new CaseViewer(parentConsole, session, desktopManager);
+            presenter.doView(view, parentCase);
+        } catch (EmfException e) {
+            showError(e.getMessage());
+        }
+
+    }
 
 }

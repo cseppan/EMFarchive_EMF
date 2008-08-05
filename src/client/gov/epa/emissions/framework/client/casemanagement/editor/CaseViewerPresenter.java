@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.client.casemanagement.jobs.ViewableJobsTab;
 import gov.epa.emissions.framework.client.casemanagement.outputs.ViewableOutputsTab;
 import gov.epa.emissions.framework.client.casemanagement.parameters.ViewableParametersTab;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.Case;
 
 public interface CaseViewerPresenter {
 
@@ -26,5 +27,9 @@ public interface CaseViewerPresenter {
     void set(ViewableHistoryTab caseHistoryView);
 
     void doLoad(String tabTitle) throws EmfException;
+    
+    Case getCaseFromName(String caseName) throws EmfException;
+    
+    void doView(CaseViewerView caseView, Case caseObj) throws EmfException;
 
 }

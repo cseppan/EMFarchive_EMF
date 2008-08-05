@@ -433,12 +433,12 @@ public class CaseObjectManager {
             parameterName = (ParameterName) selected;
             parameterName.setModelToRunId(modelToRunId);
         }
-        this.getParameterNames(); // make sure parameterEnvtVar have been retrieved
+        this.getParameterNames(modelToRunId); // make sure parameterEnvtVar have been retrieved
 
         if (parameterNames.contains(parameterName))
             return parameterNames.get(parameterNames.indexOf(parameterName));
 
-        // the parameterEnvtVar was not found in the list
+        // the parameterName was not found in the list
         return addParameterName(parameterName);
     }
 

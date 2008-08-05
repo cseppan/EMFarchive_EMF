@@ -105,6 +105,10 @@ public class CaseServiceImpl implements CaseService {
     public Case reloadCase(int caseId) throws EmfException {
         return getCaseService().getCase(caseId);
     }
+    
+    public Case getCaseFromName(String name) throws EmfException {
+        return getCaseService().getCaseFromName(name);
+    }
 
     public Abbreviation[] getAbbreviations() throws EmfException {
         return getCaseService().getAbbreviations();

@@ -207,6 +207,20 @@ public class ManagedCaseService {
             session.close();
         }
     }
+    
+    public synchronized Case getCaseFromName(String name) throws EmfException{
+        Session session = sessionFactory.getSession();
+        try {
+            Case caseObj = dao.getCaseFromName(name, session);
+            return caseObj;
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            log.error("Could not get case", e);
+            throw new EmfException("Could not get case");
+        } finally {
+            session.close();
+        }
+    }
 
     private Case getCase(int caseId, Session session) throws EmfException {
         try {

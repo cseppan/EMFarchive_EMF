@@ -210,5 +210,14 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         if (summaryPresenter != null && sector != null)
             summaryPresenter.addSector(sector);
     }
+    
+    public Case getCaseFromName(String caseName) throws EmfException{
+        return service().getCaseFromName(caseName);
+    }
+    
+    public void doView(CaseViewerView caseView, Case caseObj) throws EmfException {
+        CaseViewerPresenter presenter = new CaseViewerPresenterImpl(caseObj, session, caseView);
+        presenter.doDisplay();
+    }
 
 }

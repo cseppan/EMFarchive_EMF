@@ -1096,5 +1096,16 @@ public class CaseServiceTransport implements CaseService {
         return (String[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
 
+    public Case getCaseFromName(String name) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCaseFromName");
+        call.addStringParam("name");
+        call.setReturnType(caseMappings.caseObject());
+
+        return (Case) call.requestResponse(new Object[] { name });
+    
+    }
+
 
 }

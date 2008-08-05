@@ -70,6 +70,8 @@ public interface CaseService {
     
     Case reloadCase(int caseId) throws EmfException;
     
+    Case getCaseFromName(String name) throws EmfException;
+    
     InputName addCaseInputName(InputName name) throws EmfException;
 
     CaseProgram addProgram(CaseProgram program) throws EmfException;

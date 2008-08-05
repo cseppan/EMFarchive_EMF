@@ -48,6 +48,8 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private JTabbedPane tabbedPane;
     
+    private Case caseObj; 
+    
     public CaseEditor(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("Case Editor", new Dimension(820, 580), desktopManager);
         this.session = session;
@@ -55,7 +57,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         this.parentConsole = parentConsole;
     }
 
-    private JTabbedPane createTabbedPane(Case caseObj, MessagePanel messagePanel) {
+    private JTabbedPane createTabbedPane(MessagePanel messagePanel) {
         tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Summary", createSummaryTab(caseObj, messagePanel));
@@ -153,11 +155,13 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         super.setLabel("Case Editor: " + caseObj);
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
+        
+        this.caseObj=caseObj;
 
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
-        panel.add(createTabbedPane(caseObj, messagePanel), BorderLayout.CENTER);
+        panel.add(createTabbedPane(messagePanel), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         if (msg != null && !msg.isEmpty())
@@ -197,6 +201,14 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         });
         buttonsPanel.add(save);
         save.setToolTipText("Saves only the information on the Summary tab and the input and output folders.");
+
+        Button viewParent = new Button("View Parent", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                viewParentCase();
+            }
+        });
+        //viewParent.setEnabled(false);
+        buttonsPanel.add(viewParent);
 
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -269,6 +281,21 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     public void showLockingMsg(String msg) {
         InfoDialog dialog = new InfoDialog(parentConsole, "Message", msg);
         dialog.confirm();
+    }
+    
+    private void viewParentCase() {
+        try {
+            Case parentCase = presenter.getCaseFromName(caseObj.getTemplateUsed());
+            if (parentCase ==null){
+                showRemindingMessage("No parent case available. ");
+                return;
+            }
+            CaseViewer view = new CaseViewer(parentConsole, session, desktopManager);
+            presenter.doView(view, parentCase);
+        } catch (EmfException e) {
+            showError(e.getMessage());
+        }
+
     }
 
 }
