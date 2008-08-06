@@ -13,4 +13,6 @@ public interface EditControlStrategyTabView {
     void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults);
 
     void notifyStrategyTypeChange(StrategyType strategyType);
+
+    void notifyStrategyRun(ControlStrategy controlStrategy);
 }

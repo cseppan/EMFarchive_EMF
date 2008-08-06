@@ -24,5 +24,4 @@ public interface EditControlStrategyView extends ManagedView {
     void signalChanges();
 
     void stopRun();
-    
 }

@@ -204,4 +204,9 @@ public class EditControlStrategyPollutantsTab extends JPanel implements ControlS
         // NOTE Auto-generated method stub
         
     }
+
+    public void notifyStrategyRun(ControlStrategy controlStrategy) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

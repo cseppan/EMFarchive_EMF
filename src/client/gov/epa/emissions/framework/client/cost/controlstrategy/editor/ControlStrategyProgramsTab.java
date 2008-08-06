@@ -203,4 +203,9 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
 
         }
     }
+
+    public void notifyStrategyRun(ControlStrategy controlStrategy) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

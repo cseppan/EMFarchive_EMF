@@ -356,6 +356,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                     controlStrategy.setStartDate(new Date());
                     presenter.setResults(controlStrategy);
                     presenter.runStrategy();
+                    outputTabView.notifyStrategyRun(controlStrategy);
                     messagePanel
                             .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
                     enableButtons(false);

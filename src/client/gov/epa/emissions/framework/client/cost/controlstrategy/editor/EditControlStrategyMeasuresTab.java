@@ -417,5 +417,10 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         // NOTE Auto-generated method stub
         
     }
+
+    public void notifyStrategyRun(ControlStrategy controlStrategy) {
+        // NOTE Auto-generated method stub
+        
+    }
         
 }

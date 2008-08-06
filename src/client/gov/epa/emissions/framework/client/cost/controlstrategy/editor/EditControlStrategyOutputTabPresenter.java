@@ -112,9 +112,12 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         presenter.doDisplay(propertiesView);
     }
 
-    public void doDisplayPropertiesEditor(DatasetPropertiesEditorView editor, EmfDataset detailedResultDataset) throws EmfException {
+    public void doDisplayPropertiesEditor(DatasetPropertiesEditorView editor, EmfDataset dataset) throws EmfException {
         view.clearMsgPanel();
-        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(detailedResultDataset, editor, session);
+//        //make sure the dataset still exists, it could have been removed and the client might not of/
+//        //refreshed their view, so lets check for the existence of the dataset
+//        dataset = 
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, editor, session);
         presenter.doDisplay();
 //        editor.setDefaultTab(7);
     }

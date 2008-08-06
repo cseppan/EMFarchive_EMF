@@ -411,4 +411,9 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         else
             mergeInventories.setVisible(false);
     }
+
+    public void notifyStrategyRun(ControlStrategy controlStrategy) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

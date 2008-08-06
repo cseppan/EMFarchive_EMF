@@ -266,4 +266,9 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
             replacementControlMinEfficiencyDiff.setEnabled(false);
         }
     }
+
+    public void notifyStrategyRun(ControlStrategy controlStrategy) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

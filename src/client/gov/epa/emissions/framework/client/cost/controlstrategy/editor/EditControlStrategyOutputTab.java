@@ -574,5 +574,11 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         
     }
 
+    public void notifyStrategyRun(ControlStrategy controlStrategy) {
+        if (controlStrategy.getDeleteResults()) {
+            refresh(controlStrategy, new ControlStrategyResult[] {});
+        }
+    }
+
 
 }
