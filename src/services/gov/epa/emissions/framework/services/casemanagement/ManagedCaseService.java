@@ -3894,7 +3894,7 @@ public class ManagedCaseService {
 
             checkJobsDuplication(existingJobs, jobs2copy, jobPrefix);
 
-            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy);
+            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy, user);
             CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), getValidCaseInputs4SensitivityCase(
                     template.getId(), jobIds, jobs2copy, session), session);
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(),
@@ -4095,7 +4095,7 @@ public class ManagedCaseService {
                         + " has the lock for case '" + template.getName() + "'");
 
             CaseJob[] jobs2copy = getJobs2Copy(jobIds);
-            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy);
+            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy, user);
             CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), getValidCaseInputs4SensitivityCase(
                     template.getId(), jobIds, jobs2copy, session), session);
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(),
@@ -4200,7 +4200,7 @@ public class ManagedCaseService {
     }
 
     private CaseJob[] cloneCaseJobs(int targetCaseId, int parentCaseId, String jobGroup, String jobPrefix,
-            CaseJob[] objects) throws Exception {
+            CaseJob[] objects, User user) throws Exception {
         List<CaseJob> copied = new ArrayList<CaseJob>();
 
         for (int i = 0; i < objects.length; i++) {
@@ -4209,6 +4209,8 @@ public class ManagedCaseService {
             job.setCaseId(targetCaseId);
             job.setParentCaseId(parentCaseId);
             job.setJobGroup(jobGroup);
+            job.setUser(user);
+            job.setRunJobUser(user);
             copied.add(job);
         }
 
