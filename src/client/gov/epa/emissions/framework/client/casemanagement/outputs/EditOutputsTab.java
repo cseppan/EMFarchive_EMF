@@ -123,7 +123,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         jobCombo=new ComboBox("Select One", caseJobs.toArray(new CaseJob[0]));
-        jobCombo.setPreferredSize(new Dimension(300,20));
+        jobCombo.setPreferredSize(new Dimension(550,20));
         if (selectedJob!=null)
             jobCombo.setSelectedItem(selectedJob);
             
@@ -145,7 +145,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
         });
         layoutGenerator.addLabelWidgetPair("Job: ", jobCombo, panel);
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                150, 15, // initialX, initialY
+                100, 15, // initialX, initialY
                 5, 15);// xPad, yPad
         return panel;
     }
