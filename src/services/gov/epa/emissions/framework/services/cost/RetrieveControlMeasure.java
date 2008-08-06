@@ -5,19 +5,16 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.cost.data.SumEffRec;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
+import gov.epa.emissions.framework.services.cost.data.SumEffRec;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class RetrieveControlMeasure {
-    private static Log log = LogFactory.getLog(RetrieveControlMeasure.class);
+//    private static Log log = LogFactory.getLog(RetrieveControlMeasure.class);
 
     private DbServer dbServer;
     
@@ -124,7 +121,6 @@ public class RetrieveControlMeasure {
             }
         } finally {
             rs.close();
-            log.error(cms.size() + "");
         }
         return (ControlMeasure[]) cms.toArray(new ControlMeasure[0]);
     }
@@ -143,10 +139,10 @@ public class RetrieveControlMeasure {
                 "cm.cm_class_id, cmc.name, " +
                 "s.name, aer.pollutant_id, " +
                 "p.name, " +
-                "max_efficiency, min_efficiency, " +
-                "avg_efficiency, max_cost_per_ton, " +
-                "min_cost_per_ton, avg_cost_per_ton, " +
-                "avg_rule_effectiveness, avg_rule_penetration, " +
+                "aer.max_efficiency, aer.min_efficiency, " +
+                "aer.avg_efficiency, aer.max_cost_per_ton, " +
+                "aer.min_cost_per_ton, aer.avg_cost_per_ton, " +
+                "aer.avg_rule_effectiveness, aer.avg_rule_penetration, " +
                 "cm.equipment_life, cm.data_souce, cms.sector_id " +
                 "from emf.control_measures cm " +
                 "left outer join emf.control_measure_sectors cms " +
@@ -205,12 +201,14 @@ public class RetrieveControlMeasure {
         "cm.cm_class_id, cmc.name, " +
         "s.name, aer.pollutant_id, " +
         "p.name, " +
-        "max_efficiency, min_efficiency, " +
-        "avg_efficiency, max_cost_per_ton, " +
-        "min_cost_per_ton, avg_cost_per_ton, " +
-        "avg_rule_effectiveness, avg_rule_penetration, " +
+        "aer.max_efficiency, aer.min_efficiency, " +
+        "aer.avg_efficiency, aer.max_cost_per_ton, " +
+        "aer.min_cost_per_ton, aer.avg_cost_per_ton, " +
+        "aer.avg_rule_effectiveness, aer.avg_rule_penetration, " +
         "cm.equipment_life, cm.data_souce, cms.sector_id " +
         "from emf.control_measures cm " +
+        "inner join emf.aggregrated_efficiencyrecords mpers " +
+        "on mpers.control_measures_id = cm.id " +
         "left outer join emf.control_measure_sectors cms " +
         "on cms.control_measure_id = cm.id " +
         "left outer join emf.sectors s " +
@@ -246,7 +244,7 @@ public class RetrieveControlMeasure {
         "left outer join emf.pollutants mp " +
         "on mp.id = cm.major_pollutant " +
 //        if (whereFilter.trim().equals("") )
-         "where cm.major_pollutant = " + majorPollutantId + " " +
+         "where mpers.pollutant_id = " + majorPollutantId + " " +
             //don't include filter if no sccs
         (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + 
          " order by cm.name, cm.id, s.name, p.name";

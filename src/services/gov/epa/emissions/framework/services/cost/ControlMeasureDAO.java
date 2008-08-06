@@ -416,12 +416,12 @@ public class ControlMeasureDAO {
         return efficiencyRecord.getId();
     }
 
-    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord, StatelessSession session) throws EmfException {
-        checkForDuplicateEfficiencyRecord(efficiencyRecord, session);
-        session.insert(efficiencyRecord);
-//        hibernateFacade.add(efficiencyRecord, session);
-        return efficiencyRecord.getId();
-    }
+//    public int addEfficiencyRecord(EfficiencyRecord efficiencyRecord, StatelessSession session) throws EmfException {
+//        checkForDuplicateEfficiencyRecord(efficiencyRecord, session);
+//        session.insert(efficiencyRecord);
+////        hibernateFacade.add(efficiencyRecord, session);
+//        return efficiencyRecord.getId();
+//    }
 
     public void checkForDuplicateEfficiencyRecord(EfficiencyRecord record, Session session) throws EmfException {
         Criterion id = Restrictions.ne("id", new Integer(record.getId()));
@@ -500,7 +500,8 @@ public class ControlMeasureDAO {
     public List getControlMeasures(int majorPollutantId, Session session, String whereFilter) {
         return session.createQuery("select new ControlMeasure(cM.id, cM.name, " +
                 "cM.abbreviation, cM.majorPollutant.name) " +
-                "from ControlMeasure cM where cM.majorPollutant.id=" + majorPollutantId + (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + " order by cM.name").list();
+                "from ControlMeasure cM where cM.id in (select distinct controlMeasureId from EfficiencyRecord where pollutant.id = " + majorPollutantId + ")" + (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + " order by cM.name").list();
+                //"from ControlMeasure cM where cM.majorPollutant.id=" + majorPollutantId + (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + " order by cM.name").list();
     }
 
     private void updateAggregateEfficiencyRecords(int controlMeasureId, DbServer dbServer) throws EmfException {
