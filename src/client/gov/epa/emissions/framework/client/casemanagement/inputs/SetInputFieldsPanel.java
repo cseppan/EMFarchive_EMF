@@ -43,7 +43,7 @@ public class SetInputFieldsPanel extends InputFieldsPanel{
         super(messagePanel, changeablesList, parentConsole);
     }
 
-    public void display(CaseInput input, JComponent container, EmfSession session) throws EmfException {
+    public void display(CaseInput input, JComponent container, int modelToRunId, EmfSession session) throws EmfException {
         this.input = input;
         this.session=session; 
         JPanel panel = new JPanel(new SpringLayout());
