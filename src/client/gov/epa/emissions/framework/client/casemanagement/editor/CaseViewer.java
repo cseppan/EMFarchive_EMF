@@ -255,7 +255,7 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         try {
             Case parentCase = presenter.getCaseFromName(caseObj.getTemplateUsed());
             if (parentCase ==null){
-                showError("No parent case available. ");
+                showError("No parent case is available. ");
                 return;
             }
             CaseViewer view = new CaseViewer(parentConsole, session, desktopManager);

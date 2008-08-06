@@ -287,7 +287,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         try {
             Case parentCase = presenter.getCaseFromName(caseObj.getTemplateUsed());
             if (parentCase ==null){
-                showRemindingMessage("No parent case available. ");
+                showRemindingMessage("No parent case is available. ");
                 return;
             }
             CaseViewer view = new CaseViewer(parentConsole, session, desktopManager);

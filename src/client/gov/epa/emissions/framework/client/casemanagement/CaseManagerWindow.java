@@ -277,15 +277,6 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         });
         crudPanel.add(sensitivityButton);
         
-        Button viewParent = new Button("View Parent", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                clearMsgPanel();
-                // to do view parent case;
-            }
-        });
-        viewParent.setEnabled(false);
-        crudPanel.add(viewParent);
-
         return crudPanel;
     }
 
