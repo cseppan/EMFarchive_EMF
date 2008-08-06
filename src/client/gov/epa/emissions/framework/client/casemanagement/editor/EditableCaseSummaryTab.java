@@ -563,7 +563,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setSectors(sectorsWidget.getSectors());
         caseObj.setModel(presenter.getModelToRun(modelToRunCombo.getSelectedItem()));
         caseObj.setGridResolution(presenter.getGridResolutionl(gridResolutionCombo.getSelectedItem()));
-        caseObj.setModelVersion((modelVersionField.getText() == null) ? null : modelVersionField.getText().trim());
+        caseObj.setModelVersion((modelVersionField.getText() == null) ? "" : modelVersionField.getText().trim());
     }
 
     private void updateAbbreviation(Case caseObj) throws EmfException {
