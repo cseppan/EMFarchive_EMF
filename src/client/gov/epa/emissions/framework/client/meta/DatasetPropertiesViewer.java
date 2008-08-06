@@ -113,7 +113,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     }
 
     private JPanel createInfoTab(EmfConsole parentConsole) {
-        InfoTab view = new InfoTab(parentConsole, desktopManager, true);
+        InfoTab view = new InfoTab(parentConsole, true);
         presenter.set(view);
         return view;
     }

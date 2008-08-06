@@ -1,13 +1,10 @@
 package gov.epa.emissions.framework.client.meta.info;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableComponent;
-import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
-import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -16,21 +13,24 @@ import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-public class ExternalSourceUpdateWindow extends DisposableInteralFrame implements ExternalSourceUpdateView {
+public class ExternalSourceUpdateWindow extends JDialog {
 
     private SingleLineMessagePanel messagePanel;
 
@@ -40,25 +40,26 @@ public class ExternalSourceUpdateWindow extends DisposableInteralFrame implement
 
     private JCheckBox massLoc;
     
-    private JCheckBox workLoc;
-
-    private TextArea purpose;
-
     private JButton updateButton;
 
     private EmfConsole parentConsole;
 
     private DataCommonsService service;
 
-    public ExternalSourceUpdateWindow(String title, DesktopManager desktopManager, EmfConsole parentConsole, EmfSession session) {
-        super(title, desktopManager);
-        super.setName("externalSourceUpdateWindow:" + hashCode());
+    public ExternalSourceUpdateWindow(String title, EmfConsole parentConsole, EmfSession session) {
+        super(parentConsole);
+        super.setTitle(title);
+        super.setLocation(ScreenUtils.getPointToCenter(parentConsole));
+        super.setModal(true);
 
         this.parentConsole = parentConsole;
         this.service = session.dataCommonsService();
-
         this.getContentPane().add(createLayout());
+    }
+    
+    public void display() {
         this.pack();
+        this.setVisible(true);
     }
 
     public void observe(ExternalSourceUpdatePresenter presenter) {
@@ -71,13 +72,13 @@ public class ExternalSourceUpdateWindow extends DisposableInteralFrame implement
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        panel.add(createExportPanel());
+        panel.add(createFolderPanel());
         panel.add(createButtonsPanel());
 
         return panel;
     }
 
-    private JPanel createExportPanel() {
+    private JPanel createFolderPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -89,32 +90,16 @@ public class ExternalSourceUpdateWindow extends DisposableInteralFrame implement
                 selectFolder();
             }
         });
-        Icon icon = new ImageResources().open("Export a Dataset");
+        Icon icon = new ImageResources().open("Open a folder");
         button.setIcon(icon);
 
         JPanel folderPanel = new JPanel(new BorderLayout(2, 0));
         folderPanel.add(folder, BorderLayout.LINE_START);
         folderPanel.add(button, BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("Folder", folderPanel, panel);
+        layoutGenerator.addLabelWidgetPair("New Folder", folderPanel, panel);
 
-        // purpose
-        purpose = new TextArea("purpose", "");
-        purpose.setSize(2, 45);
-        purpose.setLineWrap(false);
-        layoutGenerator.addLabelWidgetPair("Purpose", new ScrollableComponent(purpose), panel);
-
-        // work location, mass storage location
-        JPanel workLocPanel = new JPanel(new BorderLayout());
-        workLoc = new JCheckBox("Is this a work location?", false);
-        workLoc.setEnabled(true);
-        workLoc.setName("worklocation");
-        workLocPanel.add(workLoc, BorderLayout.LINE_START);
-
-        panel.add(new JPanel());// filler
-        panel.add(workLocPanel);
-        
         JPanel massLocPanel = new JPanel(new BorderLayout());
-        massLoc = new JCheckBox("Is this a mass storage location?", false);
+        massLoc = new JCheckBox("Is the new location in mass storage?", false);
         massLoc.setEnabled(true);
         massLoc.setName("masslocation");
         massLocPanel.add(massLoc, BorderLayout.LINE_START);
@@ -124,7 +109,7 @@ public class ExternalSourceUpdateWindow extends DisposableInteralFrame implement
 
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
 
@@ -140,47 +125,50 @@ public class ExternalSourceUpdateWindow extends DisposableInteralFrame implement
         layout.setVgap(25);
         container.setLayout(layout);
 
-        updateButton = new Button("Update", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                clearMessagePanel();
-                update();
-            }
-        });
+        updateButton = new Button("Update", update());
         container.add(updateButton);
         getRootPane().setDefaultButton(updateButton);
 
-        JButton done = new Button("Done", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                presenter.notifyDone();
-            }
-        });
-        container.add(done);
+        JButton cancelButton = new CancelButton(cancelAction());
+        container.add(cancelButton);
 
         panel.add(container, BorderLayout.EAST);
 
         return panel;
     }
 
-    private void refresh() {
-        super.validate();
+    private Action update() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e){
+                clearMessagePanel();
+                
+                try {
+                    presenter.update(folder.getText(), massLoc.isSelected());
+                } catch (EmfException e1) {
+                    e1.printStackTrace();
+                    messagePanel.setError(e1.getMessage());
+                }
+                
+                dispose();
+            }
+        };
     }
 
-    private void update() {
-        try {
-            presenter.update(folder.getText(), purpose.getText(), workLoc.isSelected(), massLoc.isSelected());
-            updateButton.setEnabled(false);
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
+    private Action cancelAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e){ 
+                dispose();
+            }
+        };
     }
+    
 
     private void clearMessagePanel() {
         messagePanel.clear();
-        refresh();
     }
 
     public void setMostRecentUsedFolder(String mostRecentUsedFolder) {
-        if (mostRecentUsedFolder != null)
+        if (mostRecentUsedFolder != null && folder != null)
             folder.setText(mostRecentUsedFolder);
     }
 

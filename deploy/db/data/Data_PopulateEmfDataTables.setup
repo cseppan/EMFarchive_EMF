@@ -143,8 +143,8 @@ insert INTO emf.keywords VALUES (DEFAULT, 'REPLACES_DATASET');
 insert INTO emf.keywords VALUES (DEFAULT, 'REPLACED_BY_DATASET');
 insert INTO emf.keywords VALUES (DEFAULT, 'EXPORT_COLUMN_LABEL');
 insert INTO emf.keywords VALUES (DEFAULT, 'COLUMN_TYPES');
-insert INTO emf.keywords VALUES (DEFAULT, 'WORK_LOCATION');
-insert INTO emf.keywords VALUES (DEFAULT, 'MASS_STORE_LOCATION');
+insert INTO emf.keywords VALUES (DEFAULT, 'PREVIOUS_LOCATION');
+insert INTO emf.keywords VALUES (DEFAULT, 'MASS_STORAGE_LOCATION');
 -- emf.keywords
 --
 

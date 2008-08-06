@@ -9,18 +9,13 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ExternalSourceUpdatePresenter {
-
-    private ExternalSourceUpdateView view;
 
     private EmfDataset dataset;
 
     private EmfSession session;
-    
+
     private InfoTabPresenter sourceTabPresenter;
 
     private static String lastFolder = null;
@@ -31,12 +26,7 @@ public class ExternalSourceUpdatePresenter {
         this.sourceTabPresenter = sourceTabPresenter;
     }
 
-    public void notifyDone() {
-        view.disposeView();
-    }
-
-    public void display(ExternalSourceUpdateView view) {
-        this.view = view;
+    public void display(ExternalSourceUpdateWindow view) {
         view.observe(this);
         view.setMostRecentUsedFolder(getFolder());
 
@@ -47,78 +37,98 @@ public class ExternalSourceUpdatePresenter {
         return (lastFolder != null) ? lastFolder : getDefaultFolder();
     }
 
-    public void update(String folder, String purpose, boolean isWorkLoc, boolean isMassLoc) throws EmfException {
-        if (!isWorkLoc && !isMassLoc)
-            throw new EmfException("Selected folder must be either a work location or a mass storage location.");
-        
+    public void update(String folder, boolean isMassLoc) throws EmfException {
+        ExternalSource[] sources = dataset.getExternalSources();
         KeyVal[] keys = dataset.getKeyVals();
-        int workLoc = -1;
-        int massLoc = -1;
         Keywords keywords = new Keywords(session.dataCommonsService().getKeywords());
-        Keyword massLocKeyword = keywords.get("MASS_STORE_LOCATION");
-        Keyword workLocKeyword = keywords.get("WORK_LOCATION");
+        Keyword massLocKeyword = keywords.get("MASS_STORAGE_LOCATION");
+        Keyword prevLocKeyword = keywords.get("PREVIOUS_LOCATION");
+        String existLoc = new File(sources[0].getDatasource()).getParent();
+
+        int massLoc = -1;
+        int prevLoc = -1;
 
         for (int i = 0; i < keys.length; i++) {
-            if (keys[i].getKeyword().equals(workLocKeyword))
-                workLoc = i;
+            if (keys[i].getKeyword().equals(prevLocKeyword))
+                prevLoc = i;
 
             if (keys[i].getKeyword().equals(massLocKeyword))
                 massLoc = i;
         }
 
-        if (massLoc == -1 && workLoc == -1) {
-            if (isWorkLoc)
-                dataset.addKeyVal(new KeyVal(workLocKeyword, folder));
+        updateKeyVals(existLoc, folder, isMassLoc, massLoc, prevLoc, keys, massLocKeyword, prevLocKeyword);
 
-            if (isMassLoc)
-                dataset.addKeyVal(new KeyVal(massLocKeyword, folder));
-        }
+        if (!existLoc.equals(folder))
+            updateExternalSources(folder, sources);
 
-        if (massLoc != -1 && workLoc != -1) {
-            if (isMassLoc)
-                keys[massLoc].setValue(folder);
-
-            if (isWorkLoc)
-                keys[workLoc].setValue(folder);
-
-            dataset.setKeyVals(keys);
-        }
-        
-        if (massLoc == -1 && workLoc != -1) {
-            if (isWorkLoc)
-                keys[workLoc].setValue(folder);
-            
-            if (!isMassLoc) {
-                dataset.setKeyVals(keys);
-                return;
-            }
-            
-            List<KeyVal> all = new ArrayList<KeyVal>();
-            all.addAll(Arrays.asList(keys));
-            all.add(new KeyVal(massLocKeyword, folder));
-            
-            dataset.setKeyVals(all.toArray(new KeyVal[0]));
-                
-        }
-        
-        if (massLoc != -1 && workLoc == -1) {
-            if (isMassLoc)
-                keys[massLoc].setValue(folder);
-            
-            if (!isWorkLoc) {
-                dataset.setKeyVals(keys);
-                return;
-            }
-            
-            List<KeyVal> all = new ArrayList<KeyVal>();
-            all.addAll(Arrays.asList(keys));
-            all.add(new KeyVal(workLocKeyword, folder));
-            
-            dataset.setKeyVals(all.toArray(new KeyVal[0]));
-        }
-        
         updateDatasetSource();
+    }
 
+    /*
+     * NOTE: following implementation reflects this logic: 1. From work location to new work location set
+     * PREVIOUS_LOCATION 2. From work location to mass storage location set PREVIOUS_LOCATION set MASS_STORAGE_LOCATION
+     * 3. From mass storage location to new mass storage location set MASS_STORAGE_LOCATION 4. From mass storage
+     * location to work location set nothing
+     */
+    private void updateKeyVals(String existLoc, String folder, boolean isMassLoc, int massLoc, int prevLoc,
+            KeyVal[] keys, Keyword massLocKeyword, Keyword prevLocKeyword) {
+        if (isMassLoc && massLoc == -1)
+            fromWork2MassStorage(existLoc, folder, massLoc, prevLoc, keys, massLocKeyword, prevLocKeyword);
+
+        if (isMassLoc && massLoc != -1 && !keys[massLoc].getValue().equals(existLoc))
+            fromWork2MassStorage(existLoc, folder, massLoc, prevLoc, keys, massLocKeyword, prevLocKeyword);
+
+        if (isMassLoc && massLoc != -1 && keys[massLoc].getValue().equals(existLoc))
+            fromMassStorage2MassStorage(folder, massLoc, keys);
+
+        if (!isMassLoc && massLoc == -1) {
+            fromWork2Work(existLoc, prevLoc, keys, prevLocKeyword);
+        }
+
+        if (!isMassLoc && massLoc != -1 && !keys[massLoc].getValue().equals(existLoc)) {
+            fromWork2Work(existLoc, prevLoc, keys, prevLocKeyword);
+        }
+    }
+
+    private void fromWork2Work(String existLoc, int prevLoc, KeyVal[] keys, Keyword prevLocKeyword) {
+        if (prevLoc == -1) {
+            dataset.addKeyVal(new KeyVal(prevLocKeyword, existLoc));
+            return;
+        }
+
+        keys[prevLoc].setValue(existLoc);
+        dataset.setKeyVals(keys);
+    }
+
+    private void fromMassStorage2MassStorage(String folder, int massLoc, KeyVal[] keys) {
+        keys[massLoc].setValue(folder);
+        dataset.setKeyVals(keys);
+    }
+
+    private void fromWork2MassStorage(String existLoc, String folder, int massLoc, int prevLoc, KeyVal[] keys,
+            Keyword massLocKeyword, Keyword prevLocKeyword) {
+        if (prevLoc != -1)
+            keys[prevLoc].setValue(existLoc);
+
+        if (massLoc != -1)
+            keys[massLoc].setValue(folder);
+
+        dataset.setKeyVals(keys);
+
+        if (prevLoc == -1)
+            dataset.addKeyVal(new KeyVal(prevLocKeyword, existLoc));
+
+        if (massLoc == -1)
+            dataset.addKeyVal(new KeyVal(massLocKeyword, folder));
+    }
+
+    private void updateExternalSources(String folder, ExternalSource[] sources) {
+        for (int i = 0; i < sources.length; i++) {
+            String temp = folder + File.separator + new File(sources[i].getDatasource()).getName();
+            sources[i].setDatasource(temp);
+        }
+
+        dataset.setExternalSources(sources);
     }
 
     private String getDefaultFolder() {
@@ -126,8 +136,8 @@ public class ExternalSourceUpdatePresenter {
 
         return new File(sources[0].getDatasource()).getParent();
     }
-    
+
     public void updateDatasetSource() {
-        this.sourceTabPresenter.updateKeyVals(dataset.getKeyVals());
+        this.sourceTabPresenter.updateExternalSources(dataset.getKeyVals(), dataset.getExternalSources());
     }
 }
