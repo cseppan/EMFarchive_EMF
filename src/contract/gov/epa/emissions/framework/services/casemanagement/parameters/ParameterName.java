@@ -47,7 +47,11 @@ public class ParameterName implements Serializable, Comparable {
         if (other == null || !(other instanceof ParameterName))
             return false;
 
-        return (id == ((ParameterName)other).id) || ((ParameterName) other).name.equals(this.name);
+        boolean eqID = (id == ((ParameterName)other).id);
+        boolean eqName = ((ParameterName) other).name.equals(this.name);
+        boolean eqModel2Run = (((ParameterName) other).modelToRunId == this.modelToRunId);
+
+        return  eqID || (eqName && eqModel2Run);
     }
 
     public int hashCode() {

@@ -229,3 +229,23 @@ ALTER TABLE cases.taskmanager_persist ADD CONSTRAINT user_id_foreign_key FOREIGN
 -- 8/6/2008 add a new column model_to_runs to cases.programs and cases.subdirs tables
 ALTER TABLE cases.programs ADD COLUMN model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id);
 ALTER TABLE cases.subdirs ADD COLUMN model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id);
+
+-- 8/7/2008 add model_to_run_id into uniqueness constraints in case programs, subdirs, input_names, input_env_vars, parameter_names, parameter_env_vars
+ALTER TABLE cases.inputnames DROP CONSTRAINT inputnames_name_key;
+ALTER TABLE cases.inputnames ADD CONSTRAINT inputnames_uniqueness_key UNIQUE (name, model_to_run_id);
+
+ALTER TABLE cases.input_envt_vars DROP CONSTRAINT input_envt_vars_unique;
+ALTER TABLE cases.input_envt_vars ADD CONSTRAINT input_envt_vars_uniqueness_key UNIQUE (name, model_to_run_id);
+
+ALTER TABLE cases.parameter_names DROP CONSTRAINT parameter_names_name_key;
+ALTER TABLE cases.parameter_names ADD CONSTRAINT parameter_names_uniqueness_key UNIQUE (name, model_to_run_id);
+
+ALTER TABLE cases.parameter_env_vars DROP CONSTRAINT parameter_env_vars_name_key;
+ALTER TABLE cases.parameter_env_vars ADD CONSTRAINT parameter_env_vars_uniqueness_key UNIQUE (name, model_to_run_id);
+
+ALTER TABLE cases.programs DROP CONSTRAINT programs_name_key;
+ALTER TABLE cases.programs ADD CONSTRAINT programs_uniqueness_key UNIQUE (name, model_to_run_id);
+
+ALTER TABLE cases.subdirs DROP CONSTRAINT subdirs_name_key;
+ALTER TABLE cases.subdirs ADD CONSTRAINT subdirs_uniqueness_key UNIQUE (name, model_to_run_id);
+

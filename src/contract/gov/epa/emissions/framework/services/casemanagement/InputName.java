@@ -48,8 +48,12 @@ public class InputName implements Serializable, Comparable {
     public boolean equals(Object other) {
         if (other == null || !(other instanceof InputName))
             return false;
+        
+        boolean eqID = (id == ((InputName)other).id);
+        boolean eqName = ((InputName) other).name.equals(this.name);
+        boolean eqModel2Run = (((InputName) other).modelToRunId == this.modelToRunId);
 
-        return (id == ((InputName)other).id) || ((InputName) other).name.equals(this.name);
+        return  eqID || (eqName && eqModel2Run);
     }
 
     public int hashCode() {

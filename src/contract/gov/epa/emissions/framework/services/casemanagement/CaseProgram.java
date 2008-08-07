@@ -49,7 +49,11 @@ public class CaseProgram implements Serializable, Comparable {
         if (other == null || !(other instanceof CaseProgram))
             return false;
 
-        return ((CaseProgram) other).name.equals(this.name) || ((CaseProgram)other).id == id;
+        boolean eqID = (id == ((CaseProgram)other).id);
+        boolean eqName = ((CaseProgram) other).name.equals(this.name);
+        boolean eqModel2Run = (((CaseProgram) other).modelToRunId == this.modelToRunId);
+
+        return  eqID || (eqName && eqModel2Run);
     }
 
     public int hashCode() {

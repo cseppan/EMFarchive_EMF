@@ -50,7 +50,11 @@ public class ParameterEnvVar implements Serializable, Comparable {
         if (other == null || !(other instanceof ParameterEnvVar))
             return false;
 
-        return (id == ((ParameterEnvVar)other).id) || ((ParameterEnvVar) other).name.equals(this.name);
+        boolean eqID = (id == ((ParameterEnvVar)other).id);
+        boolean eqName = ((ParameterEnvVar) other).name.equals(this.name);
+        boolean eqModel2Run = (((ParameterEnvVar) other).modelToRunId == this.modelToRunId);
+
+        return  eqID || (eqName && eqModel2Run);
     }
 
     public int hashCode() {

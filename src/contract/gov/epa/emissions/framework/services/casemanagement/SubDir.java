@@ -49,7 +49,11 @@ public class SubDir implements Serializable, Comparable {
         if (other == null || !(other instanceof SubDir))
             return false;
 
-        return (id == ((SubDir)other).id) || ((SubDir) other).name.equals(this.name);
+        boolean eqID = (id == ((SubDir)other).id);
+        boolean eqName = ((SubDir) other).name.equals(this.name);
+        boolean eqModel2Run = (((SubDir) other).modelToRunId == this.modelToRunId);
+
+        return  eqID || (eqName && eqModel2Run);
     }
 
     public int hashCode() {
