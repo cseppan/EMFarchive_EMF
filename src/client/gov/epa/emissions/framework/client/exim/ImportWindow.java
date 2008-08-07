@@ -89,7 +89,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
             } else {
                 presenter.doImport(importInputPanel.folder(), importInputPanel.files(), importInputPanel.datasetType());
             }
-        } catch (EmfException e) {
+        } catch (Exception e) {
             messagePanel.setError(e.getMessage());
         }
     }

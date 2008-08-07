@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.io.CommonFileHeaderReader;
 import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
@@ -376,6 +377,14 @@ public class ManagedImportService {
         } finally {
             headerReader.close();
         }
+        
+        Date startDate = headerReader.getStartDate();
+        Date endDate = headerReader.getEndDate();
+        
+        if (!startDate.before(CustomDateFormat.parse_MMddyyyy("1/1/2200")) || !endDate.before(CustomDateFormat.parse_MMddyyyy("1/1/2200"))) {
+            log.warn("EMF_START_DATE: " + startDate + "; EMF_END_DATE: " + endDate);
+            throw new EmfException("Wrong timestamp(s) for EMF start/end date in file header.");
+        }
 
         dataset.setName(name);
         dataset.setCreator(user.getUsername());
@@ -383,8 +392,8 @@ public class ManagedImportService {
         dataset.setCreatedDateTime(new Date());
         dataset.setModifiedDateTime(file.exists() ? new Date(file.lastModified()) : new Date());
         dataset.setAccessedDateTime(new Date());
-        dataset.setStartDateTime(headerReader.getStartDate());
-        dataset.setStopDateTime(headerReader.getEndDate());
+        dataset.setStartDateTime(startDate);
+        dataset.setStopDateTime(endDate);
         dataset.setTemporalResolution(headerReader.getTemporalResolution());
 
         return setDatasetProperties(dataset, headerReader.getRegion(), headerReader.getProject(), headerReader
