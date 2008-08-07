@@ -97,7 +97,7 @@ public class ManagedImportService {
     public ManagedImportService(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
-        
+
         if (System.getProperty("IMPORT_EXPORT_TEMP_DIR") == null)
             setProperties();
 
@@ -377,11 +377,12 @@ public class ManagedImportService {
         } finally {
             headerReader.close();
         }
-        
+
         Date startDate = headerReader.getStartDate();
         Date endDate = headerReader.getEndDate();
-        
-        if (!startDate.before(CustomDateFormat.parse_MMddyyyy("1/1/2200")) || !endDate.before(CustomDateFormat.parse_MMddyyyy("1/1/2200"))) {
+
+        if ((startDate != null && !startDate.before(CustomDateFormat.parse_MMddyyyy("1/1/2200")))
+                || (endDate != null && !endDate.before(CustomDateFormat.parse_MMddyyyy("1/1/2200")))) {
             log.warn("EMF_START_DATE: " + startDate + "; EMF_END_DATE: " + endDate);
             throw new EmfException("Wrong timestamp(s) for EMF start/end date in file header.");
         }
@@ -638,7 +639,7 @@ public class ManagedImportService {
 
         importOutputTasks.removeAll(importOutputTasks); // make sure the list is cleared once all tasks done
     }
-    
+
     private void setProperties() {
         Session session = sessionFactory.getSession();
         try {
