@@ -1983,7 +1983,7 @@ public class ManagedCaseService {
         List<?> list = session.createQuery(query).list();
 
         if (list != null && list.size() > 0)
-            throw new EmfException("Selected job(s) still waiting to run.");
+            throw new EmfException("Cannot delete job(s) -- selected job(s) is still active.");
     }
 
     private void deleteCaseJobKeyObjects(CaseJob[] jobs, Session session) throws EmfException {
