@@ -207,8 +207,8 @@ public class ManagedCaseService {
             session.close();
         }
     }
-    
-    public synchronized Case getCaseFromName(String name) throws EmfException{
+
+    public synchronized Case getCaseFromName(String name) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             Case caseObj = dao.getCaseFromName(name, session);
@@ -1941,6 +1941,7 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
 
         checkJobsStatuses(Arrays.asList(jobs), dao.getCase(jobs[0].getCaseId(), session));
+        checkTaskPersistItems(jobs, session);
         checkJobOutputItems(jobs, session);
         checkJobHistoryItems(jobs, session);
         resetRelatedJobsField(jobs);
@@ -1951,8 +1952,8 @@ public class ManagedCaseService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove case job " + jobs[0].getName() + " etc.\n" + e.getMessage());
-            throw new EmfException("Could not remove case job " + jobs[0].getName()
-                    + " etc. -- please check if it is depended on by other jobs.");
+            throw new EmfException(
+                    "Could not remove job; please verify that is not waiting on another job to finish before it can run.");
         } finally {
             session.close();
         }
@@ -1974,6 +1975,15 @@ public class ManagedCaseService {
 
         if (list != null && list.size() > 0)
             throw new EmfException("Please remove job messages for the selected jobs.");
+    }
+
+    private void checkTaskPersistItems(CaseJob[] jobs, Session session) throws EmfException {
+        String query = "SELECT obj.id from " + PersistedWaitTask.class.getSimpleName() + " obj WHERE obj.jobId = "
+                + getAndOrClause(jobs, "obj.jobId");
+        List<?> list = session.createQuery(query).list();
+
+        if (list != null && list.size() > 0)
+            throw new EmfException("Selected job(s) still waiting to run.");
     }
 
     private void deleteCaseJobKeyObjects(CaseJob[] jobs, Session session) throws EmfException {
@@ -2968,12 +2978,12 @@ public class ManagedCaseService {
         }
         // Parent case
         String parentName = caseObj.getTemplateUsed();
-        if (parentName != null ||  parentName != "") {
+        if (parentName != null || parentName != "") {
             try {
                 Case parentCase = dao.getCaseFromName(parentName, session);
-                sbuf.append(shellSetenv("PARENT_CASE", parentCase.getAbbreviation().getName()));   
-            } catch (Exception e){
-                log.error("Parent case (" + parentName +") does not exist. Will not set PARENT_CASE parameter");
+                sbuf.append(shellSetenv("PARENT_CASE", parentCase.getAbbreviation().getName()));
+            } catch (Exception e) {
+                log.error("Parent case (" + parentName + ") does not exist. Will not set PARENT_CASE parameter");
                 log.error(e.getMessage());
             }
         }
@@ -4164,7 +4174,7 @@ public class ManagedCaseService {
         sensitivityCase.setAirQualityModel(parent.getAirQualityModel());
         sensitivityCase.setBaseYear(parent.getBaseYear());
         sensitivityCase.setControlRegion(parent.getControlRegion());
-        sensitivityCase.setDescription("Sensitivity on " +parent.getName()+ ": "+ parent.getDescription());
+        sensitivityCase.setDescription("Sensitivity on " + parent.getName() + ": " + parent.getDescription());
         sensitivityCase.setEmissionsYear(parent.getEmissionsYear());
         sensitivityCase.setFutureYear(parent.getFutureYear());
         sensitivityCase.setGrid(parent.getGrid());

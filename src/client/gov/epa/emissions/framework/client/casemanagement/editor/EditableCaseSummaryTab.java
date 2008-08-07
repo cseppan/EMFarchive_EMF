@@ -68,7 +68,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EmfSession session;
 
-    private EditableComboBox modelToRunCombo;
+    private ComboBox modelToRunCombo;
 
     private TextField modelVersionField;
 
@@ -335,7 +335,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         if (caseObj.getModel() == null)
             messagePanel.setMessage("Please specify model to run. ");
-        modelToRunCombo = new EditableComboBox(presenter.getModelToRuns());
+        modelToRunCombo = new ComboBox(presenter.getModelToRuns());
         modelToRunCombo.setSelectedItem(runModel);
         modelToRunCombo.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
