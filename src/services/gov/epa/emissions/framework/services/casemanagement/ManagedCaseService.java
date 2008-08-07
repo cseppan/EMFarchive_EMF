@@ -2942,9 +2942,12 @@ public class ManagedCaseService {
         if (caseObj.getAbbreviation() != null) {
             sbuf.append(shellSetenv("CASE", caseObj.getAbbreviation().getName()));
         }
-        // Need to have quotes around model name b/c could be more than one word
+        // Need to have quotes around model name b/c could be more than one word, include version if available
         if (caseObj.getModel() != null) {
             String modelName = caseObj.getModel().getName();
+            if (caseObj.getModelVersion() != null) {
+                modelName += caseObj.getModelVersion();
+            }
             sbuf.append(shellSetenv("MODEL_LABEL", modelName));
         }
         if (caseObj.getGrid() != null) {
@@ -2978,7 +2981,7 @@ public class ManagedCaseService {
         }
         // Parent case
         String parentName = caseObj.getTemplateUsed();
-        if (parentName != null || parentName != "") {
+        if (parentName != null && parentName != "") {
             try {
                 Case parentCase = dao.getCaseFromName(parentName, session);
                 sbuf.append(shellSetenv("PARENT_CASE", parentCase.getAbbreviation().getName()));
