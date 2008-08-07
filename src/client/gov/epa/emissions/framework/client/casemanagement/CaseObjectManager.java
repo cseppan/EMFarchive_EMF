@@ -182,6 +182,16 @@ public class CaseObjectManager {
 
         return subDirs;
     }
+    
+    public synchronized SubDir[] getSubDirs(int modelToRunId) throws EmfException {
+        getSubDirs();
+        List<SubDir> filteredSubDirs = new ArrayList<SubDir>();
+        for (int i=0; i<subDirs.length; i++){
+            if (subDirs[i].getModelToRunId()== modelToRunId )
+                filteredSubDirs.add(subDirs[i]);
+        }
+        return filteredSubDirs.toArray(new SubDir[0]);
+    }
 
     public synchronized CaseJob[] getCaseJobsWithAll(int caseId) throws EmfException {
         if (this.lastCaseId == caseId) // if the same as the last case,
@@ -210,15 +220,17 @@ public class CaseObjectManager {
         return newVar;
     }
 
-    public synchronized SubDir getOrAddSubDir(Object selected) throws EmfException {
+    public synchronized SubDir getOrAddSubDir(Object selected, int modelToRunId) throws EmfException {
         if (selected == null)
             return null;
 
         SubDir subDir = null;
         if (selected instanceof String) {
             subDir = new SubDir(selected.toString());
+            subDir.setModelToRunId(modelToRunId);
         } else if (selected instanceof SubDir) {
             subDir = (SubDir) selected;
+            subDir.setModelToRunId(modelToRunId);
         }
         this.getSubDirs(); // make sure programs have been retrieved
 
@@ -451,6 +463,17 @@ public class CaseObjectManager {
 
         return programs;
     }
+    
+    public synchronized CaseProgram[] getPrograms(int modelToRunId) throws EmfException {
+        getPrograms();
+        List<CaseProgram> filteredPrograms = new ArrayList<CaseProgram>();
+        for (int i=0; i<programs.length; i++){
+            //System.out.println("program model to run "+ programs[i].getModelToRunId() + " "+modelToRunId);
+            if (programs[i].getModelToRunId()== modelToRunId )
+                filteredPrograms.add(programs[i]);
+        }
+        return filteredPrograms.toArray(new CaseProgram[0]);
+    }
 
     public synchronized CaseProgram addProgram(CaseProgram program) throws EmfException {
         CaseProgram newProgram = caseService.addProgram(program);
@@ -462,15 +485,17 @@ public class CaseObjectManager {
         return newProgram;
     }
 
-    public synchronized CaseProgram getOrAddProgram(Object selected) throws EmfException {
+    public synchronized CaseProgram getOrAddProgram(Object selected, int modelToRunId) throws EmfException {
         if (selected == null)
             return null;
 
         CaseProgram program = null;
         if (selected instanceof String) {
             program = new CaseProgram(selected.toString());
+            program.setModelToRunId(modelToRunId);
         } else if (selected instanceof CaseProgram) {
             program = (CaseProgram) selected;
+            program.setModelToRunId(modelToRunId);
         }
         this.getPrograms(); // make sure programs have been retrieved
 

@@ -7,6 +7,8 @@ public class CaseProgram implements Serializable, Comparable {
     private int id;
 
     private String name;
+    
+    private int modelToRunId;
 
     /*
      * Default constructor needed for hibernate and axis serialization
@@ -33,6 +35,14 @@ public class CaseProgram implements Serializable, Comparable {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public int getModelToRunId() {
+        return modelToRunId;
+    }
+
+    public void setModelToRunId(int modelToRunId) {
+        this.modelToRunId = modelToRunId;
     }
 
     public boolean equals(Object other) {

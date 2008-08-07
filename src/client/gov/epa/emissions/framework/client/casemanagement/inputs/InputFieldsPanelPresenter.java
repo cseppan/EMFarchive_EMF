@@ -50,12 +50,12 @@ public class InputFieldsPanelPresenter {
         return caseObjectManager.getSectorsWithAll();
     }
 
-    public CaseProgram[] getPrograms() throws EmfException {
-         return caseObjectManager.getPrograms();
+    public CaseProgram[] getPrograms(int modelToRunId) throws EmfException {
+         return caseObjectManager.getPrograms(modelToRunId);
     }
 
-    public SubDir[] getSubdirs() throws EmfException {
-        return caseObjectManager.getSubDirs();
+    public SubDir[] getSubdirs(int modelToRunId) throws EmfException {
+        return caseObjectManager.getSubDirs(modelToRunId);
     }
 
     public InputEnvtVar[] getEnvtVars(int modelToRunId) throws EmfException {
@@ -111,12 +111,12 @@ public class InputFieldsPanelPresenter {
         return caseObjectManager.getOrAddInputEnvtVar(selected, modelToRunId);
     }
 
-    public CaseProgram getCaseProgram(Object selected) throws EmfException {
-        return caseObjectManager.getOrAddProgram(selected);
+    public CaseProgram getCaseProgram(Object selected, int modelToRunId) throws EmfException {
+        return caseObjectManager.getOrAddProgram(selected, modelToRunId);
     }
 
-    public SubDir getSubDir(Object selected) throws EmfException {
-        return caseObjectManager.getOrAddSubDir(selected);
+    public SubDir getSubDir(Object selected, int modelToRunId) throws EmfException {
+        return caseObjectManager.getOrAddSubDir(selected, modelToRunId);
     }
 
     public int getJobIndex(int caseJobId, CaseJob [] jobs) //throws EmfException 

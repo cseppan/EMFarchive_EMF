@@ -49,8 +49,8 @@ public class ParameterFieldsPanelPresenter {
         return caseObjectManager.getSectorsWithAll();
     }
 
-    public CaseProgram[] getPrograms() throws EmfException {
-        return caseObjectManager.getPrograms();
+    public CaseProgram[] getPrograms(int model_id) throws EmfException {
+        return caseObjectManager.getPrograms(model_id);
     }
 
     public ParameterEnvVar[] getEnvtVars(int model_id) throws EmfException {
@@ -116,8 +116,8 @@ public class ParameterFieldsPanelPresenter {
         return caseObjectManager.getOrAddParameterEnvtVar(selected, modelId);
     }
 
-    public CaseProgram getCaseProgram(Object selected) throws EmfException {
-        return caseObjectManager.getOrAddProgram(selected);
+    public CaseProgram getCaseProgram(Object selected, int model_id) throws EmfException {
+        return caseObjectManager.getOrAddProgram(selected, model_id);
     }
 
     public int getJobIndex(int caseJobID) throws EmfException {

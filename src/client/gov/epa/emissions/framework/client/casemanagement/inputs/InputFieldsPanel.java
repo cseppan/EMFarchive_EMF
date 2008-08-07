@@ -104,7 +104,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         inputName.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("Input Name:", inputName, panel);
 
-        program = new EditableComboBox(presenter.getPrograms());
+        program = new EditableComboBox(presenter.getPrograms(modelToRunId));
         program.setSelectedItem(input.getProgram());
         addPopupMenuListener(program, "programs");
         changeablesList.addChangeable(program);
@@ -162,7 +162,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         qaStatus = new JLabel("");
         layoutGenerator.addLabelWidgetPair("QA Status:", qaStatus, panel);
 
-        subDir = new EditableComboBox(presenter.getSubdirs());
+        subDir = new EditableComboBox(presenter.getSubdirs(modelToRunId));
         subDir.setSelectedItem(input.getSubdirObj());
         addPopupMenuListener(subDir, "subdirs");
         changeablesList.addChangeable(subDir);
@@ -276,7 +276,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             return presenter.getInputNames(modelToRunId);
 
         else if (toget.equals("programs"))
-            return presenter.getPrograms();
+            return presenter.getPrograms(modelToRunId);
 
         else if (toget.equals("envtvars"))
             return presenter.getEnvtVars(modelToRunId);
@@ -285,7 +285,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             return presenter.getSectors();
 
         else if (toget.equals("subdirs"))
-            return presenter.getSubdirs();
+            return presenter.getSubdirs(modelToRunId);
 
         else
             throw new EmfException("Unknown object type: " + toget);
@@ -370,7 +370,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             return;
         }
 
-        input.setProgram(presenter.getCaseProgram(selected));
+        input.setProgram(presenter.getCaseProgram(selected, modelToRunId));
     }
 
     private void updateSubdir() throws EmfException {
@@ -380,7 +380,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             return;
         }
 
-        input.setSubdirObj(presenter.getSubDir(selected));
+        input.setSubdirObj(presenter.getSubDir(selected, modelToRunId));
     }
 
     private void updateEnvtVar() throws EmfException {

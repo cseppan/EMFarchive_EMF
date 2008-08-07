@@ -9,8 +9,6 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
-import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -106,13 +104,13 @@ public class OutputFieldsPanelPresenter{
          session.caseService().updateCaseOutput(session.user(), view.setFields());
     }
 
-    public CaseProgram getCaseProgram(Object selected) throws EmfException {
-        return caseObjectManager.getOrAddProgram(selected);
-    }
-
-    public SubDir getSubDir(Object selected) throws EmfException {
-        return caseObjectManager.getOrAddSubDir(selected);
-    }
+//    public CaseProgram getCaseProgram(Object selected) throws EmfException {
+//        return caseObjectManager.getOrAddProgram(selected);
+//    }
+//
+//    public SubDir getSubDir(Object selected) throws EmfException {
+//        return caseObjectManager.getOrAddSubDir(selected);
+//    }
 
     public int getJobIndex(int caseJobId, CaseJob [] jobs) //throws EmfException 
     {

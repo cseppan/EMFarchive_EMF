@@ -85,7 +85,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         parameterName.setPrototypeDisplayValue(width);
         layoutGenerator.addLabelWidgetPair("Parameter Name:", parameterName, panel);
 
-        program = new EditableComboBox(presenter.getPrograms());
+        program = new EditableComboBox(presenter.getPrograms(model_id));
         addPopupMenuListener(program, "programs");
         program.setSelectedItem(param.getProgram());
         program.setPreferredSize(preferredSize);
@@ -200,7 +200,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
             return presenter.getParameterNames(model_id);
 
         if (toget.equals("programs"))
-            return presenter.getPrograms();
+            return presenter.getPrograms(model_id);
 
         if (toget.equals("envtvars"))
             return presenter.getEnvtVars(model_id);
@@ -264,7 +264,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
             return;
         }
 
-        parameter.setProgram(presenter.getCaseProgram(selected));
+        parameter.setProgram(presenter.getCaseProgram(selected, model_id));
     }
 
     private void updateEnvtVar() throws EmfException {

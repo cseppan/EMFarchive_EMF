@@ -226,4 +226,6 @@ ALTER TABLE cases.taskmanager_persist ADD CONSTRAINT job_id_foreign_key FOREIGN 
 ALTER TABLE cases.taskmanager_persist ADD CONSTRAINT case_id_foreign_key FOREIGN KEY (case_id) REFERENCES cases.cases(id)  MATCH SIMPLE;
 ALTER TABLE cases.taskmanager_persist ADD CONSTRAINT user_id_foreign_key FOREIGN KEY (user_id) REFERENCES emf.users(id) MATCH SIMPLE;
 
-
+-- 8/6/2008 add a new column model_to_runs to cases.programs and cases.subdirs tables
+ALTER TABLE cases.programs ADD COLUMN model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id);
+ALTER TABLE cases.subdirs ADD COLUMN model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id);
