@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParame
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.emissions.framework.ui.YesNoDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -219,6 +220,8 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
 
             public void actionPerformed(ActionEvent event) {
                 clearMessage();
+                if (!shouldEditCase())
+                    return; 
                 try {
                     if (hasChanges()){
                         doSave();
@@ -355,4 +358,15 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
         return CustomDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
     }
 
+    private boolean shouldEditCase() {
+        String message = "Would you like to edit this case " + System.getProperty("line.separator")
+                + " without finishing the wizard?";
+        String title = "Finish Wizard?";
+        if (nexButton.isEnabled()) {
+            YesNoDialog dialog = new YesNoDialog(parentConsole, title, message);
+            return dialog.confirm();
+        }
+
+        return true;
+    }
 }
