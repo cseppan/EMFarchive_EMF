@@ -29,7 +29,7 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
 
     private Button ok;
     
-    private ParameterFieldsPanel inputFieldsPanel;
+    private ParameterFieldsPanel parameterFieldsPanel;
     
     public EditCaseParameterWindow(String title, DesktopManager desktopManager) {
         super(title, new Dimension(450, 550), desktopManager);
@@ -50,8 +50,8 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.inputFieldsPanel = new ParameterFieldsPanel(messagePanel, this);
-        presenter.doAddInputFields(panel, inputFieldsPanel);
+        this.parameterFieldsPanel = new ParameterFieldsPanel(messagePanel, this);
+        presenter.doAddInputFields(panel, parameterFieldsPanel);
         panel.add(buttonsPanel());
 
         return panel;
@@ -92,7 +92,7 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
     }
     
     private void doValidateFields() throws EmfException {
-        inputFieldsPanel.validateFields();
+        parameterFieldsPanel.validateFields();
     }
     
 //    private void doCheckDuplicate() throws EmfException {
@@ -138,7 +138,7 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
     public void viewOnly(String title){
         //super.setTitle("View Parameter: " + title);
         ok.setVisible(false);
-        inputFieldsPanel.viewOnly();
+        parameterFieldsPanel.viewOnly();
     }
     
 }

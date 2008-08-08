@@ -258,12 +258,12 @@ public class CaseObjectManager {
     public synchronized InputName[] refreshInputNames(int modelToRunId) throws EmfException {
         inputNames = caseService.getInputNames();
         List<InputName> filteredInputNames = new ArrayList<InputName>();
-        
+
         for (int i = 0; i < inputNames.length; i++) {
             if (inputNames[i].getModelToRunId() == modelToRunId)
                 filteredInputNames.add(inputNames[i]);
         }
-        
+
         Collections.sort(filteredInputNames);
 
         return filteredInputNames.toArray(new InputName[0]);
@@ -412,7 +412,8 @@ public class CaseObjectManager {
         for (Iterator<ParameterEnvVar> iter = parameterEnvtVars.iterator(); iter.hasNext();) {
             ParameterEnvVar envVar = iter.next();
 
-            if (envVar.equals(parameterEnvtVar))
+            if (envVar.equals(parameterEnvtVar)
+                    && envVar.getModelToRunId() == parameterEnvtVar.getModelToRunId())
                 return envVar;
         }
         // the parameterEnvtVar was not found in the list
@@ -470,7 +471,7 @@ public class CaseObjectManager {
         for (Iterator<ParameterName> iter = parameterNames.iterator(); iter.hasNext();) {
             ParameterName name = iter.next();
 
-            if (name.equals(parameterName))
+            if (name.equals(parameterName) && name.getModelToRunId() == parameterName.getModelToRunId())
                 return name;
         }
 
