@@ -203,6 +203,13 @@ public class ManagedExportService {
             throw new EmfException("Input folder: " + e1.getMessage());
         }
         
+        File inputsDir = new File(inputDirExpanded);
+        
+        if (!inputsDir.exists()) {
+            inputsDir.mkdirs();
+            inputsDir.setWritable(true, false);
+        }
+        
         Iterator<CaseInput> iter = inputs.iterator();
 
         // Make parent directory if doesn't exist

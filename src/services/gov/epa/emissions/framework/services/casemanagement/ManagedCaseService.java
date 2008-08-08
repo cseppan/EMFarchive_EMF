@@ -2128,6 +2128,13 @@ public class ManagedCaseService {
         if (datasets.length == 0)
             return;
 
+        File inputsDir = new File(dirName);
+        
+        if (!inputsDir.exists()) {
+            inputsDir.mkdirs();
+            inputsDir.setWritable(true, false);
+        }
+        
         for (int i = 0; i < datasets.length; i++) {
             String subdir = (subdirs[i] == null) ? "" : subdirs[i].getName();
             String exportDir = dirName + System.getProperty("file.separator") + subdir;
@@ -2599,6 +2606,13 @@ public class ManagedCaseService {
         if (datasets.length == 0)
             return;
 
+        File inputsDir = new File(dirName);
+        
+        if (!inputsDir.exists()) {
+            inputsDir.mkdirs();
+            inputsDir.setWritable(true, false);
+        }
+        
         for (int i = 0; i < datasets.length; i++) {
             String subdir = (subdirs[i] == null) ? "" : subdirs[i].getName();
 
