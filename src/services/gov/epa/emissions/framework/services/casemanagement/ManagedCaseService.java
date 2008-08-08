@@ -60,6 +60,8 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 public class ManagedCaseService {
     private static Log log = LogFactory.getLog(ManagedCaseService.class);
@@ -885,7 +887,10 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
         try {
             dao.add(name, session);
-            return (InputName) dao.load(InputName.class, name.getName(), session);
+            Criterion crit1 = Restrictions.eq("name", name.getName());
+            Criterion crit2 = Restrictions.eq("modelToRunId", new Integer(name.getModelToRunId()));
+            
+            return (InputName) dao.load(InputName.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new case input name '" + name.getName() + "'\n" + e.getMessage());
@@ -899,7 +904,10 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
         try {
             dao.add(program, session);
-            return (CaseProgram) dao.load(CaseProgram.class, program.getName(), session);
+            Criterion crit1 = Restrictions.eq("name", program.getName());
+            Criterion crit2 = Restrictions.eq("modelToRunId", new Integer(program.getModelToRunId()));
+            
+            return (CaseProgram) dao.load(CaseProgram.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new program '" + program.getName() + "'\n" + e.getMessage());
@@ -913,7 +921,9 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
         try {
             dao.add(inputEnvtVar, session);
-            return (InputEnvtVar) dao.load(InputEnvtVar.class, inputEnvtVar.getName(), session);
+            Criterion crit1 = Restrictions.eq("name", inputEnvtVar.getName());
+            Criterion crit2 = Restrictions.eq("modelToRunId", new Integer(inputEnvtVar.getModelToRunId()));
+            return (InputEnvtVar) dao.load(InputEnvtVar.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new input environment variable '" + inputEnvtVar.getName() + "'\n"
@@ -970,7 +980,9 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
         try {
             dao.add(subdir, session);
-            return (SubDir) dao.load(SubDir.class, subdir.getName(), session);
+            Criterion crit1 = Restrictions.eq("name", subdir.getName());
+            Criterion crit2 = Restrictions.eq("modelToRunId", new Integer(subdir.getModelToRunId()));
+            return (SubDir) dao.load(SubDir.class, new Criterion[]{crit1, crit2}, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new subdirectory '" + subdir.getName() + "'\n" + e.getMessage());
@@ -1705,7 +1717,9 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
         try {
             dao.addParameterName(name, session);
-            return (ParameterName) dao.load(ParameterName.class, name.getName(), session);
+            Criterion crit1 = Restrictions.eq("name", name.getName());
+            Criterion crit2 = Restrictions.eq("modelToRunId", new Integer(name.getModelToRunId()));
+            return (ParameterName) dao.load(ParameterName.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new parameter name '" + name.getName() + "'\n" + e.getMessage());
@@ -1765,7 +1779,9 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
         try {
             dao.add(envVar, session);
-            return (ParameterEnvVar) dao.load(ParameterEnvVar.class, envVar.getName(), session);
+            Criterion crit1 = Restrictions.eq("name", envVar.getName());
+            Criterion crit2 = Restrictions.eq("modelToRunId", new Integer(envVar.getModelToRunId()));
+            return (ParameterEnvVar) dao.load(ParameterEnvVar.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new parameter env variable '" + envVar.getName() + "'\n" + e.getMessage());

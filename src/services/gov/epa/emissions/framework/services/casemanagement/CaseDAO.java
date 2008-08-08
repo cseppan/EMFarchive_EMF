@@ -356,6 +356,10 @@ public class CaseDAO {
         Criterion criterion = Restrictions.eq("name", name);
         return hibernateFacade.load(clazz, criterion, session);
     }
+    
+    public Object load(Class clazz, Criterion[] criterions, Session session) {
+        return hibernateFacade.load(clazz, criterions, session);
+    }
 
     public Object load(Class clazz, int id, Session session) {
         Criterion criterion = Restrictions.eq("id", new Integer(id));

@@ -384,7 +384,7 @@ public class ManagedImportService {
         if ((startDate != null && !startDate.before(CustomDateFormat.parse_MMddyyyy("1/1/2200")))
                 || (endDate != null && !endDate.before(CustomDateFormat.parse_MMddyyyy("1/1/2200")))) {
             log.warn("EMF_START_DATE: " + startDate + "; EMF_END_DATE: " + endDate);
-            throw new EmfException("Wrong timestamp(s) for EMF start/end date in file header.");
+            throw new EmfException("Invalid year or date format for EMF start/end date in file header (use MM/dd/YYYY hh:mm).");
         }
 
         dataset.setName(name);

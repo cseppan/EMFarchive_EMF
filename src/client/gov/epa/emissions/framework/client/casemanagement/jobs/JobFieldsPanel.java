@@ -45,7 +45,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -465,8 +464,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             job.setUser(session.user());
         }
 
-        if (presenter.checkDuplication(job))
-            showRemind();
+//        if (presenter.checkDuplication(job))
+//            showRemind();
 
         return job;
     }
@@ -579,16 +578,16 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
 
 
-    private void showRemind() throws EmfException {
-        String title = "Warning";
-        String message = "A similar job already exists for this case. Are you sure want to add another one?";
-        int selection = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-
-        if (selection != JOptionPane.YES_OPTION) {
-            throw new EmfException("Please cancel or modify your job settings.");
-        }
-    }
+//    private void showRemind() throws EmfException {
+//        String title = "Warning";
+//        String message = "A similar job already exists for this case. Are you sure want to add another one?";
+//        int selection = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION,
+//                JOptionPane.QUESTION_MESSAGE);
+//
+//        if (selection != JOptionPane.YES_OPTION) {
+//            throw new EmfException("Please cancel or modify your job settings.");
+//        }
+//    }
 
     public CaseJob getJob() throws EmfException {
         presenter.doValidateFields();

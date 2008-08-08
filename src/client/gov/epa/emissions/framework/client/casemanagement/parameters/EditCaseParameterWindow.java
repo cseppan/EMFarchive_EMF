@@ -86,6 +86,7 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
             presenter.doSave();
             disposeView();
         } catch (EmfException e) {
+            e.printStackTrace();
             messagePanel.setError(e.getMessage());
         }
     }

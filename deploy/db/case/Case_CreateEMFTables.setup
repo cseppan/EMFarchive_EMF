@@ -315,7 +315,7 @@ CREATE TABLE cases.cases_parameters
   env_value varchar(255),
   purpose varchar(255),
   notes text,
-  UNIQUE (case_id,param_name_id,sector_id,program_id,case_job_id) 
+  UNIQUE (case_id,param_name_id,env_vars_id,sector_id,case_job_id) 
 ) 
 WITHOUT OIDS;
 -- cases.cases_parameters

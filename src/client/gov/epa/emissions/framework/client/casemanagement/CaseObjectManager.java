@@ -32,6 +32,7 @@ import gov.epa.emissions.framework.services.data.DataCommonsService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public class CaseObjectManager {
@@ -55,8 +56,8 @@ public class CaseObjectManager {
     private static Sector allSectors = null;
 
     private static CaseJob allJobsForSector = null;
-    
-    private CasesSens[] casesSens = null; 
+
+    private CasesSens[] casesSens = null;
 
     private int lastCaseId = -1;
 
@@ -140,7 +141,7 @@ public class CaseObjectManager {
         lastCaseId = -1;
         jobsForLastCaseId = null;
     }
-    
+
     public synchronized void refreshJobList() throws EmfException {
         List<CaseJob> jobs = new ArrayList<CaseJob>();
         jobs.addAll(Arrays.asList(caseService.getCaseJobs(lastCaseId)));
@@ -182,12 +183,12 @@ public class CaseObjectManager {
 
         return subDirs;
     }
-    
+
     public synchronized SubDir[] getSubDirs(int modelToRunId) throws EmfException {
         getSubDirs();
         List<SubDir> filteredSubDirs = new ArrayList<SubDir>();
-        for (int i=0; i<subDirs.length; i++){
-            if (subDirs[i].getModelToRunId()== modelToRunId )
+        for (int i = 0; i < subDirs.length; i++) {
+            if (subDirs[i].getModelToRunId() == modelToRunId)
                 filteredSubDirs.add(subDirs[i]);
         }
         return filteredSubDirs.toArray(new SubDir[0]);
@@ -235,7 +236,8 @@ public class CaseObjectManager {
         this.getSubDirs(); // make sure programs have been retrieved
 
         for (int i = 0; i < subDirs.length; i++) {
-            if (subDirs[i].toString().equalsIgnoreCase(subDir.getName().toString()))
+            if (subDirs[i].toString().equalsIgnoreCase(subDir.getName().toString())
+                    && subDirs[i].getModelToRunId() == subDir.getModelToRunId())
                 return subDirs[i]; // the program already exists (case insensitive check)
         }
         // the program was not found in the list
@@ -252,12 +254,26 @@ public class CaseObjectManager {
 
         return inputs.toArray(new InputName[0]);
     }
-    
+
+    public synchronized InputName[] refreshInputNames(int modelToRunId) throws EmfException {
+        inputNames = caseService.getInputNames();
+        List<InputName> filteredInputNames = new ArrayList<InputName>();
+        
+        for (int i = 0; i < inputNames.length; i++) {
+            if (inputNames[i].getModelToRunId() == modelToRunId)
+                filteredInputNames.add(inputNames[i]);
+        }
+        
+        Collections.sort(filteredInputNames);
+
+        return filteredInputNames.toArray(new InputName[0]);
+    }
+
     public synchronized InputName[] getInputNames(int modelToRunId) throws EmfException {
         getInputNames();
         List<InputName> filteredInputNames = new ArrayList<InputName>();
-        for (int i=0; i<inputNames.length; i++){
-            if (inputNames[i].getModelToRunId()== modelToRunId )
+        for (int i = 0; i < inputNames.length; i++) {
+            if (inputNames[i].getModelToRunId() == modelToRunId)
                 filteredInputNames.add(inputNames[i]);
         }
         return filteredInputNames.toArray(new InputName[0]);
@@ -285,11 +301,12 @@ public class CaseObjectManager {
             inputName = (InputName) selected;
             inputName.setModelToRunId(modelToRunId);
         }
-        this.getInputNames(modelToRunId); // make sure programs have been retrieved
+        InputName[] freshNames = refreshInputNames(modelToRunId); // make sure programs have been retrieved
 
-        for (int i = 0; i < inputNames.length; i++) {
-            if (inputNames[i].toString().equalsIgnoreCase(inputName.getName().toString()))
-                return inputNames[i]; // the program already exists (case insensitive check)
+        for (int i = 0; i < freshNames.length; i++) {
+            if (freshNames[i].toString().equalsIgnoreCase(inputName.getName().toString())
+                    && freshNames[i].getModelToRunId() == inputName.getModelToRunId())
+                return freshNames[i]; // the program already exists (case insensitive check)
         }
         // the program was not found in the list
         return addInputName(inputName);
@@ -304,12 +321,12 @@ public class CaseObjectManager {
 
         return inputVars.toArray(new InputEnvtVar[0]);
     }
-    
+
     public synchronized InputEnvtVar[] getInputEnvtVars(int modelToRunId) throws EmfException {
         getInputEnvtVars();
         List<InputEnvtVar> filtereInputEnvtVar = new ArrayList<InputEnvtVar>();
-        for (int i=0; i<inputEnvtVars.length; i++){
-            if (inputEnvtVars[i].getModelToRunId()== modelToRunId )
+        for (int i = 0; i < inputEnvtVars.length; i++) {
+            if (inputEnvtVars[i].getModelToRunId() == modelToRunId)
                 filtereInputEnvtVar.add(inputEnvtVars[i]);
         }
         return filtereInputEnvtVar.toArray(new InputEnvtVar[0]);
@@ -340,7 +357,8 @@ public class CaseObjectManager {
         this.getInputEnvtVars(); // make sure programs have been retrieved
 
         for (int i = 0; i < inputEnvtVars.length; i++) {
-            if (inputEnvtVars[i].toString().equalsIgnoreCase(inputEnvtVar.getName().toString()))
+            if (inputEnvtVars[i].toString().equalsIgnoreCase(inputEnvtVar.getName().toString())
+                    && inputEnvtVars[i].getModelToRunId() == inputEnvtVar.getModelToRunId())
                 return inputEnvtVars[i]; // the program already exists (case insensitive check)
         }
         // the program was not found in the list
@@ -355,13 +373,13 @@ public class CaseObjectManager {
 
         return parameterEnvtVars.toArray(new ParameterEnvVar[0]);
     }
-    
+
     public synchronized ParameterEnvVar[] getParameterEnvVars(int model_id) throws EmfException {
         getParameterEnvVars();
-        
+
         List<ParameterEnvVar> filteredEnvVars = new ArrayList<ParameterEnvVar>();
-        for (int i=0; i<parameterEnvtVars.size(); i++){
-            if (parameterEnvtVars.get(i).getModelToRunId()== model_id )
+        for (int i = 0; i < parameterEnvtVars.size(); i++) {
+            if (parameterEnvtVars.get(i).getModelToRunId() == model_id)
                 filteredEnvVars.add(parameterEnvtVars.get(i));
         }
         return filteredEnvVars.toArray(new ParameterEnvVar[0]);
@@ -391,9 +409,12 @@ public class CaseObjectManager {
         }
         this.getParameterEnvVars(); // make sure parameterEnvtVar have been retrieved
 
-        if (parameterEnvtVars.contains(parameterEnvtVar))
-            return parameterEnvtVars.get(parameterEnvtVars.indexOf(parameterEnvtVar));
+        for (Iterator<ParameterEnvVar> iter = parameterEnvtVars.iterator(); iter.hasNext();) {
+            ParameterEnvVar envVar = iter.next();
 
+            if (envVar.equals(parameterEnvtVar))
+                return envVar;
+        }
         // the parameterEnvtVar was not found in the list
         return addParameterEnvVar(parameterEnvtVar);
     }
@@ -403,25 +424,24 @@ public class CaseObjectManager {
             parameterNames = Arrays.asList(caseService.getParameterNames());
             Collections.sort(parameterNames);
         }
-        
+
         return parameterNames.toArray(new ParameterName[0]);
     }
-    
-    public synchronized ParameterName[] getParameterNames(int model_id) throws EmfException
-    {
-      // in this method, call getParameterNames() to make sure the list
-      // of all parameter names has already been populated
+
+    public synchronized ParameterName[] getParameterNames(int model_id) throws EmfException {
+        // in this method, call getParameterNames() to make sure the list
+        // of all parameter names has already been populated
         getParameterNames();
-      // next, look through the parameterNames list to find the ones that
-      // are for the specified model_id, and then return a list of only
-      // those from this method
+        // next, look through the parameterNames list to find the ones that
+        // are for the specified model_id, and then return a list of only
+        // those from this method
         List<ParameterName> filteredParameterNames = new ArrayList<ParameterName>();
-        for (int i=0; i<parameterNames.size(); i++){
-            if (parameterNames.get(i).getModelToRunId()== model_id )
+        for (int i = 0; i < parameterNames.size(); i++) {
+            if (parameterNames.get(i).getModelToRunId() == model_id)
                 filteredParameterNames.add(parameterNames.get(i));
         }
         return filteredParameterNames.toArray(new ParameterName[0]);
-    } 
+    }
 
     public synchronized ParameterName addParameterName(ParameterName name) throws EmfException {
         ParameterName newName = caseService.addParameterName(name);
@@ -447,8 +467,12 @@ public class CaseObjectManager {
         }
         this.getParameterNames(modelToRunId); // make sure parameterEnvtVar have been retrieved
 
-        if (parameterNames.contains(parameterName))
-            return parameterNames.get(parameterNames.indexOf(parameterName));
+        for (Iterator<ParameterName> iter = parameterNames.iterator(); iter.hasNext();) {
+            ParameterName name = iter.next();
+
+            if (name.equals(parameterName))
+                return name;
+        }
 
         // the parameterName was not found in the list
         return addParameterName(parameterName);
@@ -463,13 +487,13 @@ public class CaseObjectManager {
 
         return programs;
     }
-    
+
     public synchronized CaseProgram[] getPrograms(int modelToRunId) throws EmfException {
         getPrograms();
         List<CaseProgram> filteredPrograms = new ArrayList<CaseProgram>();
-        for (int i=0; i<programs.length; i++){
-            //System.out.println("program model to run "+ programs[i].getModelToRunId() + " "+modelToRunId);
-            if (programs[i].getModelToRunId()== modelToRunId )
+        for (int i = 0; i < programs.length; i++) {
+            // System.out.println("program model to run "+ programs[i].getModelToRunId() + " "+modelToRunId);
+            if (programs[i].getModelToRunId() == modelToRunId)
                 filteredPrograms.add(programs[i]);
         }
         return filteredPrograms.toArray(new CaseProgram[0]);
@@ -500,7 +524,8 @@ public class CaseObjectManager {
         this.getPrograms(); // make sure programs have been retrieved
 
         for (int i = 0; i < programs.length; i++) {
-            if (programs[i].toString().equalsIgnoreCase(program.getName().toString()))
+            if (programs[i].toString().equalsIgnoreCase(program.getName().toString())
+                    && programs[i].getModelToRunId() == program.getModelToRunId())
                 return programs[i]; // the program already exists (case insensitive check)
         }
         // the program was not found in the list
@@ -537,7 +562,7 @@ public class CaseObjectManager {
             host = (Host) selected;
         }
 
-        this.getPrograms(); // make sure hosts have been retrieved
+        this.getJobHosts(); // make sure hosts have been retrieved
 
         if (hosts.contains(host))
             return hosts.get(hosts.indexOf(host));
@@ -778,7 +803,7 @@ public class CaseObjectManager {
         // the AirQualityModel was not found in the list
         return addAirQualityModel(airQModel);
     }
-    
+
     public synchronized EmissionsYear[] getEmissionsYears() throws EmfException {
         emissionsYears = Arrays.asList(caseService.getEmissionsYears());
         Collections.sort(emissionsYears);
@@ -815,32 +840,32 @@ public class CaseObjectManager {
     public synchronized MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException {
         meteorlogicalYears = Arrays.asList(caseService.getMeteorlogicalYears());
         Collections.sort(meteorlogicalYears);
-        
+
         return meteorlogicalYears.toArray(new MeteorlogicalYear[0]);
     }
-    
+
     public synchronized MeteorlogicalYear addMeteorlogicalYear(MeteorlogicalYear metYear) throws EmfException {
         MeteorlogicalYear newMetYear = caseService.addMeteorologicalYear(metYear);
-        
+
         return newMetYear;
     }
-    
+
     public synchronized MeteorlogicalYear getOrAddMeteorlogicalYear(Object selected) throws EmfException {
         if (selected == null)
             return null;
-        
+
         MeteorlogicalYear metYear = null;
         if (selected instanceof String) {
             metYear = new MeteorlogicalYear(selected.toString());
         } else if (selected instanceof MeteorlogicalYear) {
             metYear = (MeteorlogicalYear) selected;
         }
-        
+
         this.getMeteorlogicalYears(); // make sure MeteorlogicalYear have been retrieved
-        
+
         if (meteorlogicalYears.contains(metYear))
             return meteorlogicalYears.get(meteorlogicalYears.indexOf(metYear));
-        
+
         // the MeteorlogicalYear was not found in the list
         return addMeteorlogicalYear(metYear);
     }
@@ -848,32 +873,32 @@ public class CaseObjectManager {
     public synchronized Speciation[] getSpeciations() throws EmfException {
         speciations = Arrays.asList(caseService.getSpeciations());
         Collections.sort(speciations);
-        
+
         return speciations.toArray(new Speciation[0]);
     }
-    
+
     public synchronized Speciation addSpeciation(Speciation speciation) throws EmfException {
         Speciation newSpeciation = caseService.addSpeciation(speciation);
-        
+
         return newSpeciation;
     }
-    
+
     public synchronized Speciation getOrAddSpeciation(Object selected) throws EmfException {
         if (selected == null)
             return null;
-        
+
         Speciation speication = null;
         if (selected instanceof String) {
             speication = new Speciation(selected.toString());
         } else if (selected instanceof Speciation) {
             speication = (Speciation) selected;
         }
-        
+
         this.getSpeciations(); // make sure Speciation have been retrieved
-        
+
         if (speciations.contains(speication))
             return speciations.get(speciations.indexOf(speication));
-        
+
         // the Speciation was not found in the list
         return addSpeciation(speication);
     }
@@ -881,32 +906,32 @@ public class CaseObjectManager {
     public synchronized GridResolution[] getGridResolutions() throws EmfException {
         gridResolutions = Arrays.asList(caseService.getGridResolutions());
         Collections.sort(gridResolutions);
-        
+
         return gridResolutions.toArray(new GridResolution[0]);
     }
-    
+
     public synchronized GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
         GridResolution newResolution = caseService.addGridResolution(gridResolution);
-        
+
         return newResolution;
     }
-    
+
     public synchronized GridResolution getOrAddGridResolution(Object selected) throws EmfException {
         if (selected == null)
             return null;
-        
+
         GridResolution gridResolution = null;
         if (selected instanceof String) {
             gridResolution = new GridResolution(selected.toString());
         } else if (selected instanceof GridResolution) {
             gridResolution = (GridResolution) selected;
         }
-        
+
         this.getGridResolutions(); // make sure GridResolution have been retrieved
-        
+
         if (gridResolutions.contains(gridResolution))
             return gridResolutions.get(gridResolutions.indexOf(gridResolution));
-        
+
         // the GridResolution was not found in the list
         return addGridResolution(gridResolution);
     }
@@ -914,32 +939,32 @@ public class CaseObjectManager {
     public synchronized Grid[] getGrids() throws EmfException {
         grids = Arrays.asList(caseService.getGrids());
         Collections.sort(grids);
-        
+
         return grids.toArray(new Grid[0]);
     }
-    
+
     public synchronized Grid addGrid(Grid grid) throws EmfException {
         Grid newGrid = caseService.addGrid(grid);
-        
+
         return newGrid;
     }
-    
+
     public synchronized Grid getOrAddGrid(Object selected) throws EmfException {
         if (selected == null)
             return null;
-        
+
         Grid grid = null;
         if (selected instanceof String) {
             grid = new Grid(selected.toString());
         } else if (selected instanceof Grid) {
             grid = (Grid) selected;
         }
-        
+
         this.getGrids(); // make sure Grid have been retrieved
-        
+
         if (grids.contains(grid))
             return grids.get(grids.indexOf(grid));
-        
+
         // the Grid was not found in the list
         return addGrid(grid);
     }
@@ -949,9 +974,9 @@ public class CaseObjectManager {
         {
             return this.casesSens;
         }
-        if (casesSens ==null){
-            
-            //casesSens = caseService.getCaseSens();
+        if (casesSens == null) {
+
+            // casesSens = caseService.getCaseSens();
         }
         return casesSens;
     }

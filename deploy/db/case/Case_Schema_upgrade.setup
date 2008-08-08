@@ -249,3 +249,6 @@ ALTER TABLE cases.programs ADD CONSTRAINT programs_uniqueness_key UNIQUE (name, 
 ALTER TABLE cases.subdirs DROP CONSTRAINT subdirs_name_key;
 ALTER TABLE cases.subdirs ADD CONSTRAINT subdirs_uniqueness_key UNIQUE (name, model_to_run_id);
 
+--8/8/2008 change uniqueness constraint on case parameters table
+ALTER TABLE cases.cases_parameters DROP CONSTRAINT cases_parameters_case_id_key;
+ALTER TABLE cases.cases_parameters ADD CONSTRAINT cases_parameters_case_id_key UNIQUE (case_id,param_name_id,env_vars_id,sector_id,case_job_id);

@@ -89,6 +89,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
             presenter.doSave();
             disposeView();
         } catch (EmfException e) {
+            e.printStackTrace();
             messagePanel.setError(e.getMessage());
         }
     }
