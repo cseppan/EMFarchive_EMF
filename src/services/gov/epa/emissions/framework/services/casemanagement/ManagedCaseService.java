@@ -2252,6 +2252,12 @@ public class ManagedCaseService {
                 // set the run user for the case job
                 caseJob.setRunJobUser(user);
 
+                // reset job run log
+                caseJob.setRunLog("");
+                
+                // NOTE: does this affect job run???
+                this.updateCaseJob(user, caseJob);
+                
                 // FIXME: Is this still needed?????
                 // caseJob.setRunStartDate(new Date());
                 if (DebugLevels.DEBUG_15) {
