@@ -234,7 +234,7 @@ ALTER TABLE cases.subdirs ADD COLUMN model_to_run_id int4 default 1 REFERENCES c
 ALTER TABLE cases.inputnames DROP CONSTRAINT inputnames_name_key;
 ALTER TABLE cases.inputnames ADD CONSTRAINT inputnames_uniqueness_key UNIQUE (name, model_to_run_id);
 
-ALTER TABLE cases.input_envt_vars DROP CONSTRAINT input_envt_vars_unique;
+ALTER TABLE cases.input_envt_vars DROP CONSTRAINT input_envt_vars_name_key;
 ALTER TABLE cases.input_envt_vars ADD CONSTRAINT input_envt_vars_uniqueness_key UNIQUE (name, model_to_run_id);
 
 ALTER TABLE cases.parameter_names DROP CONSTRAINT parameter_names_name_key;
