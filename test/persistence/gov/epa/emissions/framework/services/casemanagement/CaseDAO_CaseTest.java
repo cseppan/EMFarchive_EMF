@@ -416,6 +416,18 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         }
     }
 
+    
+    public void testGetCasesThatInputToOtherCases() {
+        try {
+            Case[] cases = dao.getCasesThatInputToOtherCases(1, session).toArray(new Case[0]);
+
+            assertEquals(0, cases.length);
+        } finally {
+            //
+        }
+    }
+
+    
     private Case newCase() {
         Case element = new Case("test" + Math.random());
         add(element);
