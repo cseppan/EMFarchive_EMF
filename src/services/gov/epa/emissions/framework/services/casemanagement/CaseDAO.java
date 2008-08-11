@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
@@ -453,6 +454,14 @@ public class CaseDAO {
         Criterion[] crits = (showAll) ? new Criterion[] { crit1, crit2 } : new Criterion[] { crit1, crit2, crit3 };
 
         return hibernateFacade.get(CaseInput.class, crits, session);
+    }
+
+    public List<Case> getCasesThatInputToOtherCases(int caseId, Session session) {
+        String sql = "select new gov.epa.emissions.framework.services.casemanagement.Case(cs.id, cs.name) from Case cs where cs.id in (select distinct cO.caseId from CaseInput as cI, CaseOutput as cO where cI.dataset.id = cO.datasetId and cI.caseID = :caseId)";
+        Query query = session.createQuery(sql)
+            .setInteger("caseId", caseId);
+        query.setCacheable(false);
+        return query.list();
     }
 
     private List<CaseInput> getCaseInputsWithSector(boolean showAll, Sector sector, int caseId, Session session) {

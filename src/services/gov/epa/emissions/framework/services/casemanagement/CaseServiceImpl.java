@@ -672,6 +672,13 @@ public class CaseServiceImpl implements CaseService {
     public String[] getJobGroups(int caseId) throws EmfException {
         return getCaseService().getJobGroups(caseId);
     }
-
-
+    
+    public Case[] getCasesThatInputToOtherCases(int caseId) {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getCasesThatInputToOtherCases(caseId, session).toArray(new Case[0]);
+        } finally {
+            session.close();
+        }
+    }
 }

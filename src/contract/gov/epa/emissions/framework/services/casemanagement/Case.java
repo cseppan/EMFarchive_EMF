@@ -97,6 +97,12 @@ public class Case implements Comparable, Lockable, Serializable {
         this.name = name;
     }
 
+    public Case(int id, String name) {
+        this();
+        this.id = id;
+        this.name = name;
+    }
+
     public int getId() {
         return id;
     }

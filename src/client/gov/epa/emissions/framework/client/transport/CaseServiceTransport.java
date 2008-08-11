@@ -1107,5 +1107,15 @@ public class CaseServiceTransport implements CaseService {
     
     }
 
+    public Case[] getCasesThatInputToOtherCases(int caseId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCasesThatInputToOtherCases");
+        call.addIntegerParam("caseId");
+        call.setReturnType(caseMappings.cases());
+
+        return (Case[]) call.requestResponse(new Object[] { new Integer(caseId) });
+    }
+
 
 }
