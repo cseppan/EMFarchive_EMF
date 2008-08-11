@@ -207,4 +207,6 @@ public interface CaseService {
     String[] getJobGroups(int caseId) throws EmfException;
     
     Case[] getCasesThatInputToOtherCases(int caseId) throws EmfException;
+    
+    Case[] getCasesThatOutputToOtherCases(int caseId) throws EmfException;
  }

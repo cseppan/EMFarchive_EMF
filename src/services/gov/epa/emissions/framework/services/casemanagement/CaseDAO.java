@@ -464,6 +464,14 @@ public class CaseDAO {
         return query.list();
     }
 
+    public List<Case> getCasesThatOutputToOtherCases(int caseId, Session session) {
+        String sql = "select new gov.epa.emissions.framework.services.casemanagement.Case(cs.id, cs.name) from Case cs where cs.id in (select distinct cI.caseID from CaseOutput as cO, CaseInput as cI where cI.dataset.id = cO.datasetId and cO.caseId = :caseId)";
+        Query query = session.createQuery(sql)
+            .setInteger("caseId", caseId);
+        query.setCacheable(false);
+        return query.list();
+    }
+
     private List<CaseInput> getCaseInputsWithSector(boolean showAll, Sector sector, int caseId, Session session) {
         Criterion crit1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("sector", sector);

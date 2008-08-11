@@ -681,4 +681,13 @@ public class CaseServiceImpl implements CaseService {
             session.close();
         }
     }
+    
+    public Case[] getCasesThatOutputToOtherCases(int caseId) {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getCasesThatOutputToOtherCases(caseId, session).toArray(new Case[0]);
+        } finally {
+            session.close();
+        }
+    }
 }
