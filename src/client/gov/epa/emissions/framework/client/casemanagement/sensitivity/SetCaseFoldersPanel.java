@@ -97,7 +97,7 @@ public class SetCaseFoldersPanel extends JPanel{
     }
     
     private ScrollableComponent description() {
-        description = new TextArea("description", caseObj.getDescription(), 25, 3);
+        description = new TextArea("description", caseObj.getDescription(), 25, 5);
         changeablesList.addChangeable(description);
  
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(description);
