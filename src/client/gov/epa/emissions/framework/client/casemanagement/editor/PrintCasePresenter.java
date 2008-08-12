@@ -32,7 +32,7 @@ public class PrintCasePresenter {
     }
 
     private String getDefaultFolder() {
-        return currentCase.getOutputFileDir();
+        return "";
     }
 
 }
