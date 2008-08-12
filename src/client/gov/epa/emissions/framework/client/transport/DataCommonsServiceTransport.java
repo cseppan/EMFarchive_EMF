@@ -437,7 +437,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.setOperation("getSubdirs");
         call.addParam("dir", mappings.emfFileInfo());
         call.setReturnType(mappings.emfFileInfos());
-        call.setTimeOut(10000); //set time out in milliseconds to terminate if service doesn't response
+        call.setTimeOut(30000); //set time out in milliseconds to terminate if service doesn't response
         
         return (EmfFileInfo[])call.requestResponse(new Object[] { dir });
     }
@@ -449,7 +449,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.addParam("dir", mappings.emfFileInfo());
         call.addStringParam("filter");
         call.setReturnType(mappings.emfFileInfos());
-        call.setTimeOut(10000); //set time out in milliseconds to terminate if service doesn't response
+        call.setTimeOut(30000); //set time out in milliseconds to terminate if service doesn't response
         
         return (EmfFileInfo[])call.requestResponse(new Object[] { dir, filter });
     }
