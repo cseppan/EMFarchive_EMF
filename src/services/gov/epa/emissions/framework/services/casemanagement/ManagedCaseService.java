@@ -3037,7 +3037,7 @@ public class ManagedCaseService {
         if (job.getSector() != null) {
             sbuf.append(shellSetenv("SECTOR", job.getSector().getName()));
         }
-        if (job.getJobGroup() != null) {
+        if (job.getJobGroup() != null && !job.getJobGroup().isEmpty()) {
             sbuf.append(shellSetenv("JOB_GROUP", job.getJobGroup()));
         }
 
