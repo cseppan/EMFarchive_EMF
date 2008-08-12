@@ -248,7 +248,12 @@ public class CaseDAO {
 
     public Case getCase(int caseId, Session session) {
         Criterion criterion = Restrictions.eq("id", new Integer(caseId));
-        return (Case) hibernateFacade.get(Case.class, criterion, session).get(0);
+        List<Case> caseObj = hibernateFacade.get(Case.class, criterion, session);
+        
+        if (caseObj == null || caseObj.size() == 0)
+            return null;
+        
+        return caseObj.get(0);
     }
 
     public Case getCaseFromAbbr(Abbreviation abbr, Session session) {
