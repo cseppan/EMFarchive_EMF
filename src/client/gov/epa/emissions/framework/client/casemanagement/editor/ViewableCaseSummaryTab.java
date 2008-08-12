@@ -94,6 +94,8 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
     private EditCaseSummaryTabPresenter presenter;
 
     private TextField modelVersionField;
+    
+    private TextField numMetLayers, numEmissionLayers;
 
     public ViewableCaseSummaryTab(Case caseObj, EmfSession session,
             EmfConsole parentConsole) {
@@ -116,6 +118,18 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         isTemplate.setEnabled(false);
         startDate.setEditable(false);
         endDate.setEditable(false);
+        modelToRunCombo.setEnabled(false);
+        modRegionsCombo.setEnabled(false);
+        abbreviationsCombo.setEnabled(false);
+        airQualityModelsCombo.setEnabled(false);
+        emissionsYearCombo.setEnabled(false);
+        gridCombo.setEnabled(false);
+        meteorlogicalYearCombo.setEnabled(false);
+        speciationCombo.setEnabled(false);
+        gridResolutionCombo.setEnabled(false);
+        runStatusCombo.setEnabled(false);
+        numMetLayers.setEditable(false);
+        numEmissionLayers.setEditable(false);
     }
 
 
@@ -202,9 +216,10 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
         layoutGenerator.addLabelWidgetPair("Model & Version:", modelToRun(), panel);
         layoutGenerator.addLabelWidgetPair("Modeling Region:", modRegions(), panel);
-        layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
+        //layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
         layoutGenerator.addLabelWidgetPair("Grid Name:", grids(), panel);
         layoutGenerator.addLabelWidgetPair("Grid Resolution:", gridResolution(), panel);
+        layoutGenerator.addLabelWidgetPair("Met/Emis Layers:", metEmisLayers(), panel);
         layoutGenerator.addLabelWidgetPair("Start Date & Time: ", startDate(), panel);
 
         layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 5, 10);
@@ -340,15 +355,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         gridResolutionCombo.setPreferredSize(defaultDimension);
 
         return gridResolutionCombo;
-    }
-
-    private ComboBox controlRegions() throws EmfException {
-        controlRegionsCombo = new ComboBox(presenter.getRegions());
-        controlRegionsCombo.setSelectedItem(caseObj.getControlRegion());
-        controlRegionsCombo.setPreferredSize(defaultDimension);
-        //changeablesList.addChangeable(controlRegionsCombo);
-
-        return controlRegionsCombo;
     }
 
     private ComboBox abbreviations() throws EmfException {
@@ -585,6 +591,27 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         if (!reloaded.isLocked(session.user()))
             throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
                     + " has it now.");
+    }
+    
+    private JPanel metEmisLayers() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        // panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
+        numMetLayers = new TextField("Num Met Layers", 11);
+        numEmissionLayers = new TextField("Num Emis Layers", 11);
+
+        numMetLayers.setText(caseObj.getNumMetLayers() != null ? caseObj.getNumMetLayers() + "" : "");
+        numMetLayers.setToolTipText("Enter # of met layers");
+        numMetLayers.setPreferredSize(defaultDimension); // new Dimension(255, 22));
+
+        numEmissionLayers.setText(caseObj.getNumEmissionsLayers() != null ? caseObj.getNumEmissionsLayers() + "" : "");
+        numEmissionLayers.setToolTipText("Enter # of emission layers");
+        numEmissionLayers.setPreferredSize(defaultDimension);
+
+        panel.add(numMetLayers);
+        panel.add(new Label("empty", "  "));
+        panel.add(numEmissionLayers);
+        return panel;
     }
 
 }
