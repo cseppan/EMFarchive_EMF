@@ -343,6 +343,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         modelVersionField = new TextField("modelVersion", fieldWidth / 2);
         modelVersionField.setText(caseObj.getModelVersion());
+        modelVersionField.setEditable(false);
         modelVersionField.setToolTipText("Input model version.");
         modelVersionField.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
