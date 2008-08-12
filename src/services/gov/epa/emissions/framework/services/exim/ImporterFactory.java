@@ -58,9 +58,13 @@ public class ImporterFactory {
     private Importer create(EmfDataset dataset, File folder, String[] filePatterns) throws ImporterException {
         try {
             return doCreate(dataset, folder, filePatterns);
+        } catch (ClassNotFoundException e) {
+            log.error("Failed to create importer.", e);
+            throw new ImporterException("Importer class not found (either from database or commons.jar)--" + e.getMessage());
         } catch (Exception e) {
-            log.error("Failed to create importer. Cause: " + e.getCause().getMessage(), e.getCause());
-            throw new ImporterException(e.getCause().getMessage());
+            e.printStackTrace();
+            log.error("Failed to create importer.", e);
+            throw new ImporterException(e.getMessage());
         }
     }
 
