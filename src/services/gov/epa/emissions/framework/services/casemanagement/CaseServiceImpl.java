@@ -690,4 +690,22 @@ public class CaseServiceImpl implements CaseService {
             session.close();
         }
     }
+
+    public Case[] getCasesByOutputDatasets(int[] datasetIds) {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getCasesByOutputDatasets(datasetIds, session).toArray(new Case[0]);
+        } finally {
+            session.close();
+        }
+    }
+
+    public Case[] getCasesByInputDataset(int datasetId) {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getCasesByInputDataset(datasetId, session).toArray(new Case[0]);
+        } finally {
+            session.close();
+        }
+    }
 }

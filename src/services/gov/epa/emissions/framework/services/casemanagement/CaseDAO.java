@@ -460,7 +460,6 @@ public class CaseDAO {
         String sql = "select new gov.epa.emissions.framework.services.casemanagement.Case(cs.id, cs.name) from Case cs where cs.id in (select distinct cO.caseId from CaseInput as cI, CaseOutput as cO where cI.dataset.id = cO.datasetId and cI.caseID = :caseId)";
         Query query = session.createQuery(sql)
             .setInteger("caseId", caseId);
-        query.setCacheable(false);
         return query.list();
     }
 
@@ -468,7 +467,20 @@ public class CaseDAO {
         String sql = "select new gov.epa.emissions.framework.services.casemanagement.Case(cs.id, cs.name) from Case cs where cs.id in (select distinct cI.caseID from CaseOutput as cO, CaseInput as cI where cI.dataset.id = cO.datasetId and cO.caseId = :caseId)";
         Query query = session.createQuery(sql)
             .setInteger("caseId", caseId);
-        query.setCacheable(false);
+        return query.list();
+    }
+
+    public List<Case> getCasesByOutputDatasets(int[] datasetIds, Session session) {
+        String idList = "";
+        for (int id : datasetIds) idList += (idList.length() > 0 ? "," : "") + id;
+        String sql = "select new gov.epa.emissions.framework.services.casemanagement.Case(cs.id, cs.name) from Case cs where cs.id in (select distinct cO.caseId from CaseOutput as cO where cO.datasetId in (" + idList + "))";
+        Query query = session.createQuery(sql);
+        return query.list();
+    }
+
+    public List<Case> getCasesByInputDataset(int datasetId, Session session) {
+        String sql = "select new gov.epa.emissions.framework.services.casemanagement.Case(cs.id, cs.name) from Case cs where cs.id in (select distinct cI.caseID from CaseInput as cI where cI.dataset.id = :datasetId)";
+        Query query = session.createQuery(sql).setInteger("datasetId", datasetId);
         return query.list();
     }
 

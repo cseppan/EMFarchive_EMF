@@ -1127,5 +1127,25 @@ public class CaseServiceTransport implements CaseService {
         return (Case[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
 
+    public Case[] getCasesByOutputDatasets(int[] datasetIds) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCasesByOutputDatasets");
+        call.addIntArrayParam();
+        call.setReturnType(caseMappings.cases());
+
+        return (Case[]) call.requestResponse(new Object[] { datasetIds });
+    }
+
+    public Case[] getCasesByInputDataset(int datasetId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCasesByInputDataset");
+        call.addIntegerParam("datasetId");
+        call.setReturnType(caseMappings.cases());
+
+        return (Case[]) call.requestResponse(new Object[] { new Integer(datasetId) });
+    }
+
 
 }
