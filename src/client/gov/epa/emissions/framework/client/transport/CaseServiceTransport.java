@@ -1107,6 +1107,17 @@ public class CaseServiceTransport implements CaseService {
     
     }
 
+    public synchronized void printCase(String folder, int caseId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("printCase");
+        call.addStringParam("folder");
+        call.addIntegerParam("caseId");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { folder, new Integer(caseId) });
+    }
+
     public Case[] getCasesThatInputToOtherCases(int caseId) throws EmfException {
         EmfCall call = call();
 

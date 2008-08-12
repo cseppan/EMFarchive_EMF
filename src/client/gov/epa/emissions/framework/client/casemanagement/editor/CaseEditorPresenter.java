@@ -40,5 +40,5 @@ public interface CaseEditorPresenter {
     Case getCaseFromName(String caseName) throws EmfException;
     
     void doView(CaseViewerView caseView, Case caseObj) throws EmfException;
-    
+
 }

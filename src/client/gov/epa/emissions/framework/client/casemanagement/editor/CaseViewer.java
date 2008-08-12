@@ -189,6 +189,14 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         });
         buttonsPanel.add(refresh);
         refresh.setToolTipText("Refresh only the current tab with focus.");
+        
+        Button printCaseButton = new Button("Print", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                printCase();
+            }
+        });
+        buttonsPanel.add(printCaseButton);
+        printCaseButton.setToolTipText("Print case summary, jobs, inputs and outputs into a csv file.");
 
         Button viewParent = new Button("View Parent", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -219,6 +227,12 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         }
     }
 
+    private void printCase() {
+        PrintCaseDialog printCase = new PrintCaseDialog("Print Case " + caseObj.getName(), this, parentConsole, session);
+        PrintCasePresenter printPresenter = new PrintCasePresenter(session, caseObj);
+        printPresenter.display(printCase);
+    }
+    
     public void observe(CaseViewerPresenter presenter) {
         this.presenter = presenter;
     }

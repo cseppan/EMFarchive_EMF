@@ -205,6 +205,9 @@ public interface CaseService {
     Case[] getSensitivityCases(int parentCaseId) throws EmfException;
     
     String[] getJobGroups(int caseId) throws EmfException;
+
+    void printCase(String folder, int caseId) throws EmfException;
+
     
     Case[] getCasesThatInputToOtherCases(int caseId) throws EmfException;
     

@@ -41,8 +41,12 @@ import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.TaskManagerFactory;
 import gov.epa.emissions.framework.tasks.TaskSubmitter;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -4616,6 +4620,205 @@ public class ManagedCaseService {
         }
 
         return theInput;
+    }
+
+    public void printCase(String folder, int caseId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        Case  currentCase = null;
+
+        try {
+            currentCase = dao.getCase(caseId, session);
+            
+            if (currentCase == null)
+                throw new EmfException("Cannot retrieve current case.");
+            
+            List<CaseJob> jobs = dao.getCaseJobs(caseId);
+            List<CaseInput> inputs = dao.getCaseInputs(caseId, session);
+            List<CaseParameter> parameters = dao.getCaseParameters(caseId, session);
+            
+            String prefix = currentCase.getName() + "_" + currentCase.getAbbreviation().getName() + "_";
+            String sumParamFile = prefix + "Summary_Parameters.csv";
+            String inputsFile = prefix + "Inputs.csv";
+            String jobsFile = prefix + "Jobs.csv";
+            
+            printCaseSumParams(currentCase, parameters, jobs, folder, sumParamFile);
+            printCaseInputs(inputs, jobs, folder, inputsFile, session);
+            printCaseJobs(jobs, folder, jobsFile, session);
+        } catch (Exception e) {
+            log.error("Could not print case " + (currentCase == null ? " (id = " + caseId + ")." : currentCase.getName() + "."), e);
+            throw new EmfException("Could not print case " + (currentCase == null ? " (id = " + caseId + ")." : currentCase.getName() + "."));
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
+
+    private synchronized void printCaseSumParams(Case currentCase, List<CaseParameter> parameters, List<CaseJob> jobs, String folder, String sumParamFile) throws IOException{
+        String ls = System.getProperty("line.separator");
+        String model = (currentCase.getModel() == null) ? "" : currentCase.getModel().getName();
+        String modelRegion = (currentCase.getModelingRegion() == null) ? "" : currentCase.getModelingRegion().getName();
+        String gridName = (currentCase.getGrid() == null) ? "" : currentCase.getGrid().getName();
+        String gridResolution = (currentCase.getGridResolution() == null) ? "" : currentCase.getGridResolution().getName();
+        String dstrModel = (currentCase.getAirQualityModel() == null) ? "" : currentCase.getAirQualityModel().getName();
+        String speciation = (currentCase.getSpeciation() == null) ? "" : currentCase.getSpeciation().getName();
+        String metYear = (currentCase.getMeteorlogicalYear() == null) ? "" : currentCase.getMeteorlogicalYear().getName();
+        String startDate = (currentCase.getStartDate() == null) ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(currentCase.getStartDate());
+        String endDate = (currentCase.getEndDate() == null) ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(currentCase.getEndDate());
+        
+        String summary = "\"#EMF_CASE_NAME=" + currentCase.getName() + "\"" + ls +
+        "\"#EMF_CASE_ABBREVIATION=" + currentCase.getAbbreviation().getName() + "\"" + ls +
+        "\"#EMF_CASE_DESCRIPTION=" + currentCase.getDescription() + "\"" + ls +
+        "\"#EMF_CASE_CATEGORY=" + currentCase.getCaseCategory().getName() + "\"" + ls +
+        "\"#EMF_PROJECT=" + currentCase.getProject() + "\"" + ls +
+        "\"#EMF_SECTORS=" + getSectors(currentCase.getSectors()) + "\"" + ls +
+        "\"#EMF_CASE_COPIED_FROM=" + currentCase.getTemplateUsed() + "\"" + ls +
+        "\"#EMF_LAST_MODIFIED=" + currentCase.getLastModifiedBy().getName() + " on " + CustomDateFormat.format_MM_DD_YYYY_HH_mm(currentCase.getLastModifiedDate()) + "\"" + ls +
+        "\"#EMF_IS_FINAL=" + currentCase.getIsFinal() + " \""+ ls +
+        "\"#EMF_IS_TEMPLATE=" +currentCase.isCaseTemplate() + "\""+ ls +
+        "Tab,Parameter,Order,Envt. Var.,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose" + ls +
+        "Summary,Model to Run,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,\"" + model + "\",String,TRUE,TRUE,,," + ls +
+        "Summary,Model Version,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,\"" + currentCase.getModelVersion() + "\",String,TRUE,TRUE,,," + ls +
+        "Summary,Modeling Region,0,,All sectors,All jobs for sector,All programs," + modelRegion + "\",String,TRUE,TRUE,,," + ls +
+        "Summary,Grid Name,0,IOAPI_GRIDNAME_1,All sectors,All jobs for sector,All programs,\"" + gridName + "\",String,TRUE,TRUE,,," + ls +
+        "Summary,Grid Resolution,0,EMF_GRID,All sectors,All jobs for sector,All programs,\"" + gridResolution + "\",String,TRUE,TRUE,,," + ls +
+        "Summary,Met Layers,0,,All sectors,All jobs for sector,All programs," + currentCase.getNumMetLayers() + ",Integer,TRUE,TRUE,,," + ls +
+        "Summary,Emission Layers,0,,All sectors,All jobs for sector,All programs," + currentCase.getNumEmissionsLayers() + ",Integer,TRUE,TRUE,,," + ls +
+        "Summary,Downstream Model,0,EMF_AQM,All sectors,All jobs for sector,All programs,\"" + dstrModel + "\",String,TRUE,TRUE,,," + ls +
+        "Summary,Speciation,0,EMF_SPC,All sectors,All jobs for sector,All programs,\"" + speciation + "\",String,TRUE,TRUE,,," + ls +
+        "Summary,Meteorological Year,0,,All sectors,All jobs for sector,All programs," + metYear + ",String,TRUE,TRUE,,," + ls +
+        "Summary,Base Year,0,BASE_YEAR,All sectors,All jobs for sector,All programs," + currentCase.getBaseYear() + ",String,TRUE,TRUE,,," + ls +
+        "Summary,Future Year,0,FUTURE_YEAR,All sectors,All jobs for sector,All programs," + currentCase.getFutureYear() + ",String,TRUE,TRUE,,," + ls +
+        "Summary,Start Date & Time,0,EPI_STDATE_TIME,All sectors,All jobs for sector,All programs," + startDate + ",Date,TRUE,TRUE,,," + ls +
+        "Summary,End Date & Time,0,EPI_ENDATE_TIME,All sectors,All jobs for sector,All programs," + endDate + ",Date,TRUE,TRUE,,," + ls;
+
+        StringBuffer sb = new StringBuffer(summary);
+        
+        for (Iterator<CaseParameter> iter = parameters.iterator(); iter.hasNext();) {
+            CaseParameter param = iter.next();
+            String name = param.getName();
+            String order = param.getOrder() + "";
+            String envVar = param.getEnvVar() + "";
+            String sector = (param.getSector() == null) ? "All sectors" : param.getSector() + "";
+            String job = getJobName(param.getJobId(), jobs);
+            String prog = param.getProgram() + "";
+            String value = param.getValue();
+            String type = param.getType() + "";
+            String reqrd = param.isRequired() + "";
+            String local = param.isLocal() + "";
+            String lstMod = param.getLastModifiedDate() == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(param.getLastModifiedDate());
+            String notes = param.getNotes();
+            String purpose = param.getPurpose();
+            
+            sb.append("Parameters,\"" + name + "\"," + order + ",\"" + envVar + "\",\"" + sector + "\",\"" + job + "\",\"" + prog + "\",\"" + value + "\", " + type + "," + reqrd + "," + local + "," + lstMod + ",\"" + notes + "\", \"" + purpose + "\"" + ls);
+        }
+        
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, sumParamFile))));
+        writer.println(sb.toString());
+        writer.close();
+    }
+
+    private String getSectors(Sector[] sectors) {
+        StringBuffer sb = new StringBuffer();
+        
+        for (Sector sector : sectors)
+            sb.append(sector.getName() + "&");
+            
+        int lastAmp = sb.lastIndexOf("&");
+        
+        return lastAmp < 0 ? sb.toString() : sb.toString().substring(0, lastAmp);
+    }
+    
+    private String getJobName(int jobId, List<CaseJob> jobs) {
+        for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            
+            if (jobId == 0)
+                return "All jobs for sector";
+            
+            if (jobId == job.getId())
+                return job.getName();
+        }
+        
+        return "";
+    }
+    
+    private String getDependsOnJobsString(DependentJob[] dependentJobs, Session session) {
+        StringBuffer sb = new StringBuffer();
+        
+        for (DependentJob job : dependentJobs) {
+            CaseJob depJob = dao.getCaseJob(job.getJobId(), session);
+            sb.append(depJob != null ? depJob.getName() + "&" : "");
+        }
+        
+        int lastAmp = sb.lastIndexOf("&");
+            
+        return lastAmp < 0 ? sb.toString() : sb.toString().substring(0, lastAmp);
+    }
+
+    private synchronized void printCaseInputs(List<CaseInput> inputs, List<CaseJob> jobs, String folder, String inputsFile, Session session) throws IOException {
+        String ls = System.getProperty("line.separator");
+        String columns = "Tab,Inputname,Envt Variable,Sector,Job,Program,Dataset,Version,QA status,DS Type,Reqd?,Local?,Subdir,Last Modified,Parentcase" + ls;
+        
+        StringBuffer sb = new StringBuffer(columns);
+        
+        for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
+            CaseInput input = iter.next();
+            String name = input.getName();
+            String envVar = input.getEnvtVars() + "";
+            String sector = (input.getSector() == null) ? "All sectors" : input.getSector() + "";
+            String job = getJobName(input.getCaseJobID(), jobs);
+            String prog = input.getProgram() + "";
+            String dsName = input.getDataset() == null ? "" : input.getDataset().getName();
+            String dsVersion = input.getVersion() == null ? "" : input.getVersion().getVersion() + "";
+            String qaStatus = "";
+            String dsType = input.getDatasetType() == null ? "" : input.getDatasetType().getName();
+            String reqrd = input.isRequired() + "";
+            String local = input.isLocal() + "";
+            String subdir = input.getSubdirObj() == null ? "" : input.getSubdirObj() + "";
+            String lstMod = input.getLastModifiedDate() == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(input.getLastModifiedDate());
+            Case parent = (input.getParentCaseId() > 0) ? dao.getCase(input.getParentCaseId(), session) : null;
+            String parentName = parent != null ? parent.getName() : "";
+            
+            sb.append("Inputs,\"" + name + "\"," + envVar + "\",\"" + sector + "\",\"" + job + "\",\"" + prog + "\",\"" + dsName + "\", " + dsVersion + "," + qaStatus + ",\"" + dsType + "\"" + reqrd + "," + local + "," + subdir + "," + lstMod + ",\"" + parentName + "\"" + ls);
+        }
+        
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, inputsFile))));
+        writer.println(sb.toString());
+        writer.close();
+    }
+
+    private synchronized void printCaseJobs(List<CaseJob> jobs, String folder, String jobsFile, Session session) throws IOException {
+        String ls = System.getProperty("line.separator");
+        String columns = "Tab,jobname,order,sector,runstatus,startdate,completiondate,executable,arguments,path,queueoptions,jobgroup,local,queueID,User,Host,Purpose,DependsOn" + ls;
+        
+        StringBuffer sb = new StringBuffer(columns);
+        
+        for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            String name = job.getName();
+            String order = job.getOrder() + "";
+            String sector = (job.getSector() == null) ? "All sectors" : job.getSector() + "";
+            String status = job.getRunstatus() + "";
+            String start = job.getRunStartDate() == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(job.getRunStartDate());
+            String end = job.getRunCompletionDate() == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(job.getRunCompletionDate());
+            String exec = job.getExecutable() + "";
+            String args = job.getArgs();
+            String path = job.getPath();
+            String qOptns = job.getQueOptions();
+            String jobGrp = job.getJobGroup();
+            String local = job.isLocal() + "";
+            String qId = job.getIdInQueue();
+            String user = job.getUser().getName();
+            String host = job.getHost() + "";
+            String purpose = job.getPurpose();
+            String dependsOn = getDependsOnJobsString(job.getDependentJobs(), session);
+            
+            sb.append("Jobs,\"" + name + "\"," + order + ",\"" + sector + "\"," + status + "," + start + "," + end + "," + exec + ",\"" + args + "\"," + path + ",\"" + qOptns + "\",\"" + jobGrp + "\"," + local + ",\"" + qId + "\",\"" + user + "\", " + host + ",\"" + purpose + "\",\"" + dependsOn + "\"" + ls);
+        }
+        
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, jobsFile))));
+        writer.println(sb.toString());
+        writer.close();
     }
 
 }

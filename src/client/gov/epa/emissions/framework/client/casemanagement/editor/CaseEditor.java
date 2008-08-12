@@ -47,9 +47,9 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private String tabTitle;
 
     private JTabbedPane tabbedPane;
-    
-    private Case caseObj; 
-    
+
+    private Case caseObj;
+
     public CaseEditor(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("Case Editor", new Dimension(820, 580), desktopManager);
         this.session = session;
@@ -155,8 +155,8 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         super.setLabel("Case Editor: " + caseObj);
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
-        
-        this.caseObj=caseObj;
+
+        this.caseObj = caseObj;
 
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
@@ -194,6 +194,14 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         buttonsPanel.add(refresh);
         refresh.setToolTipText("Refresh only the current tab with focus.");
 
+        Button printCaseButton = new Button("Print", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                printCase();
+            }
+        });
+        buttonsPanel.add(printCaseButton);
+        printCaseButton.setToolTipText("Print case summary, jobs, inputs and outputs into a csv file.");
+
         Button save = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
@@ -207,7 +215,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
                 viewParentCase();
             }
         });
-        //viewParent.setEnabled(false);
+        // viewParent.setEnabled(false);
         buttonsPanel.add(viewParent);
 
         Button close = new CloseButton(new AbstractAction() {
@@ -229,7 +237,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
             tab.doRefresh();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
-        } 
+        }
     }
 
     public void observe(CaseEditorPresenter presenter) {
@@ -278,15 +286,21 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         }
     }
 
+    private void printCase() {
+        PrintCaseDialog printCase = new PrintCaseDialog("Print Case " + caseObj.getName(), this, parentConsole, session);
+        PrintCasePresenter printPresenter = new PrintCasePresenter(session, caseObj);
+        printPresenter.display(printCase);
+    }
+
     public void showLockingMsg(String msg) {
         InfoDialog dialog = new InfoDialog(parentConsole, "Message", msg);
         dialog.confirm();
     }
-    
+
     private void viewParentCase() {
         try {
             Case parentCase = presenter.getCaseFromName(caseObj.getTemplateUsed());
-            if (parentCase ==null){
+            if (parentCase == null) {
                 showRemindingMessage("No parent case is available. ");
                 return;
             }
