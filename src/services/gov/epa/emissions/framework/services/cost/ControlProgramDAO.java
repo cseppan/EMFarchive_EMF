@@ -111,7 +111,14 @@ public class ControlProgramDAO {
         return hibernateFacade.exists(id, clazz, session);
     }
 
-    public void remove(ControlProgram controlProgram, Session session) {
+    public void remove(ControlProgram controlProgram, Session session) throws EmfException {
+        //see if control strategy is using the program, if so throw an error...
+        List list = session.createQuery("select cS.name " +
+                "from ControlStrategy cS " +
+                "where cS.controlPrograms.id = :id").setInteger("id", controlProgram.getId()).list();
+        if (list.size() > 0)
+            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
+
         hibernateFacade.remove(controlProgram, session);
     }
 
