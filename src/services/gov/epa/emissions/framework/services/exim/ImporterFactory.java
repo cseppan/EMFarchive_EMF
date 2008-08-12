@@ -60,7 +60,7 @@ public class ImporterFactory {
             return doCreate(dataset, folder, filePatterns);
         } catch (ClassNotFoundException e) {
             log.error("Failed to create importer.", e);
-            throw new ImporterException("Importer class not found (either from database or commons.jar)--" + e.getMessage());
+            throw new ImporterException("Importer class name not found (either from database or commons.jar)--" + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Failed to create importer.", e);
@@ -70,6 +70,10 @@ public class ImporterFactory {
 
     private Importer doCreate(EmfDataset dataset, File folder, String[] fileNames) throws Exception {
         String importerClassName = dataset.getDatasetType().getImporterClassName();
+        
+        if (importerClassName == null || importerClassName.trim().isEmpty())
+            throw new Exception("Importer class name not specified with this dataset type.");
+        
         Class importerClass = Class.forName(importerClassName);
 
         Class[] classParams = new Class[] { File.class, String[].class, Dataset.class, DbServer.class,

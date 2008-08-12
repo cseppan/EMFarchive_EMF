@@ -32,6 +32,9 @@ public class VersionedExporterFactory {
     public Exporter create(Dataset dataset, Version version) throws EmfException {
         try {
             String exporterName = dataset.getDatasetType().getExporterClassName();
+            
+            if (exporterName == null || exporterName.trim().isEmpty())
+                throw new Exception("Exporter class name not specified with this dataset type.");
 
             Class exporterClass = Class.forName(exporterName);
 
@@ -44,7 +47,7 @@ public class VersionedExporterFactory {
             return (Exporter) exporterConstructor.newInstance(params);
         } catch (ClassNotFoundException e) {
             log.error("Failed to create exporter.", e);
-            throw new EmfException("Exporter class not found (either from database or commons.jar)--" + e.getMessage());
+            throw new EmfException("Exporter class name not found (either from database or commons.jar)--" + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not create Exporter", e);
