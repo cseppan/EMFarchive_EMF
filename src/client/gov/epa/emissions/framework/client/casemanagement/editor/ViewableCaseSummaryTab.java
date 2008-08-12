@@ -118,18 +118,9 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         isTemplate.setEnabled(false);
         startDate.setEditable(false);
         endDate.setEditable(false);
-        modelToRunCombo.setEnabled(false);
-        modRegionsCombo.setEnabled(false);
-        abbreviationsCombo.setEnabled(false);
-        airQualityModelsCombo.setEnabled(false);
-        emissionsYearCombo.setEnabled(false);
-        gridCombo.setEnabled(false);
-        meteorlogicalYearCombo.setEnabled(false);
-        speciationCombo.setEnabled(false);
-        gridResolutionCombo.setEnabled(false);
-        runStatusCombo.setEnabled(false);
         numMetLayers.setEditable(false);
         numEmissionLayers.setEditable(false);
+        description.setEditable(false);
     }
 
 
@@ -250,7 +241,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
     private ScrollableComponent description() {
         description = new TextArea("description", caseObj.getDescription(), fieldWidth, 3);
-        //changeablesList.addChangeable(description);
  
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(description);
         descScrollableTextArea.setPreferredSize(new Dimension(255,80));
@@ -262,7 +252,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         name.setText(caseObj.getName());
         name.setPreferredSize(defaultDimension);
         name.setToolTipText(caseObj.getName());
-        //changeablesList.addChangeable(name);
+        name.setEditable(false);
 
         return name;
     }
@@ -271,8 +261,8 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
     private TextField futureYear() {
         futureYear = new TextField("Future Year", fieldWidth);
         futureYear.setText(caseObj.getFutureYear() + "");
-        //changeablesList.addChangeable(futureYear);
         futureYear.setPreferredSize(defaultDimension);
+        futureYear.setEditable(false);
 
         return futureYear;
     }
@@ -311,14 +301,25 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         return projectsCombo;
     }
 
-//    private ComboBox modelToRun() throws EmfException {
-//        modelToRunCombo = new ComboBox(presenter.getModelToRuns());
-//        modelToRunCombo.setSelectedItem(caseObj.getModel());
-//        modelToRunCombo.setPreferredSize(defaultDimension);
-//        addPopupMenuListener(modelToRunCombo, "modeltoruns");
-//
-//        return modelToRunCombo;
-//    }
+    private JPanel metEmisLayers() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        numMetLayers = new TextField("Num Met Layers", fieldWidth / 2);
+        numEmissionLayers = new TextField("Num Emis Layers", fieldWidth / 2);
+
+        numMetLayers.setText(caseObj.getNumMetLayers() != null ? caseObj.getNumMetLayers() + "" : "");
+        numMetLayers.setToolTipText("Enter # of met layers");
+        numMetLayers.setPreferredSize(new Dimension(122, 22));
+
+        numEmissionLayers.setText(caseObj.getNumEmissionsLayers() != null ? caseObj.getNumEmissionsLayers() + "" : "");
+        numEmissionLayers.setToolTipText("Enter # of emission layers");
+        numEmissionLayers.setPreferredSize(new Dimension(122, 22));
+
+        panel.add(numMetLayers);
+        panel.add(new Label("empty", "  "));
+        panel.add(numEmissionLayers);
+        return panel;
+    }
     
     private JComponent modelToRun() throws EmfException {
         JPanel panel = new JPanel(); 
@@ -362,7 +363,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         abbreviationsCombo.setSelectedItem(caseObj.getAbbreviation());
         abbreviationsCombo.setPreferredSize(defaultDimension);
         addPopupMenuListener(abbreviationsCombo, "abbreviations");
-        //changeablesList.addChangeable(abbreviationsCombo);
 
         return abbreviationsCombo;
     }
@@ -372,8 +372,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         airQualityModelsCombo.setSelectedItem(caseObj.getAirQualityModel());
         airQualityModelsCombo.setPreferredSize(defaultDimension);
 
-        //changeablesList.addChangeable(airQualityModelsCombo);
-
         return airQualityModelsCombo;
     }
 
@@ -382,7 +380,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         categoriesCombo.setSelectedItem(caseObj.getCaseCategory());
         categoriesCombo.setPreferredSize(defaultDimension);
         addPopupMenuListener(categoriesCombo, "categories");
-        //changeablesList.addChangeable(categoriesCombo);
 
         return categoriesCombo;
     }
@@ -398,7 +395,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         emissionsYearCombo = new ComboBox(presenter.getEmissionsYears());
         emissionsYearCombo.setSelectedItem(caseObj.getEmissionsYear());
         emissionsYearCombo.setPreferredSize(defaultDimension);
-        //changeablesList.addChangeable(emissionsYearCombo);
 
         return emissionsYearCombo;
     }
@@ -407,7 +403,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         gridCombo = new ComboBox(presenter.getGrids());
         gridCombo.setSelectedItem(caseObj.getGrid());
         gridCombo.setPreferredSize(defaultDimension);
-        //changeablesList.addChangeable(gridCombo);
 
         return gridCombo;
     }
@@ -416,7 +411,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         meteorlogicalYearCombo = new ComboBox(presenter.getMeteorlogicalYears());
         meteorlogicalYearCombo.setSelectedItem(caseObj.getMeteorlogicalYear());
         meteorlogicalYearCombo.setPreferredSize(defaultDimension);
-        //changeablesList.addChangeable(meteorlogicalYearCombo);
 
         return meteorlogicalYearCombo;
     }
@@ -425,8 +419,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         speciationCombo = new ComboBox(presenter.getSpeciations());
         speciationCombo.setSelectedItem(caseObj.getSpeciation());
         speciationCombo.setPreferredSize(defaultDimension);
-
-        //changeablesList.addChangeable(speciationCombo);
 
         return speciationCombo;
     }
@@ -439,7 +431,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         } else {
             runStatusCombo.setSelectedItem(caseObj.getRunStatus());
         }
-        //changeablesList.addChangeable(runStatusCombo);
 
         return runStatusCombo;
     }
@@ -447,7 +438,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
     private TextField startDate() {
         startDate = new TextField("Start Date", fieldWidth);
         startDate.setText(format(caseObj.getStartDate()) + "");
-        //changeablesList.addChangeable(startDate);
         startDate.setPreferredSize(defaultDimension);
         startDate.setToolTipText("Date in format MM/dd/yyyy HH:mm");
 
@@ -457,7 +447,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
     private TextField endDate() {
         endDate = new TextField("End Date", fieldWidth);
         endDate.setText(format(caseObj.getEndDate()) + "");
-        //changeablesList.addChangeable(endDate);
         endDate.setPreferredSize(defaultDimension);
         endDate.setToolTipText("Date in format MM/dd/yyyy HH:mm");
 
@@ -581,37 +570,9 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
     public void doRefresh() throws EmfException {
         super.removeAll();
+        this.caseObj = session.caseService().reloadCase(caseObj.getId());
         setLayout();
-        checkIfLockedByCurrentUser();
-    }
-
-    public void checkIfLockedByCurrentUser() throws EmfException {
-        Case reloaded = session.caseService().reloadCase(caseObj.getId());
-
-        if (!reloaded.isLocked(session.user()))
-            throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
-                    + " has it now.");
-    }
-    
-    private JPanel metEmisLayers() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        // panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
-        numMetLayers = new TextField("Num Met Layers", 11);
-        numEmissionLayers = new TextField("Num Emis Layers", 11);
-
-        numMetLayers.setText(caseObj.getNumMetLayers() != null ? caseObj.getNumMetLayers() + "" : "");
-        numMetLayers.setToolTipText("Enter # of met layers");
-        numMetLayers.setPreferredSize(defaultDimension); // new Dimension(255, 22));
-
-        numEmissionLayers.setText(caseObj.getNumEmissionsLayers() != null ? caseObj.getNumEmissionsLayers() + "" : "");
-        numEmissionLayers.setToolTipText("Enter # of emission layers");
-        numEmissionLayers.setPreferredSize(defaultDimension);
-
-        panel.add(numMetLayers);
-        panel.add(new Label("empty", "  "));
-        panel.add(numEmissionLayers);
-        return panel;
+        viewOnly();
     }
 
 }

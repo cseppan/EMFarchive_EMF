@@ -80,12 +80,12 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
     private ComboBox categoryCombox;
 
-    private JTextArea description;
+    private JTextArea information;
 
     private Dimension preferredSize = new Dimension(300, 20);
 
     public SensitivityWindow(DesktopManager desktopManager, EmfConsole parentConsole, List<CaseCategory> categories) {
-        super("Sensitivity", new Dimension(540, 600), desktopManager);
+        super("Sensitivity", new Dimension(540, 640), desktopManager);
         super.setName(title);
         this.parentConsole = parentConsole;
         this.categories.addAll(categories);
@@ -205,11 +205,11 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                 messagePanel.clear();
             }
         });
+        layoutGenerator.addLabelWidgetPair("Information: ", builtTemplateDesc(), panel);
         layoutGenerator.addLabelWidgetPair("Job Group:", jobGroup, panel);
-        layoutGenerator.addLabelWidgetPair("Description: ", builtTemplateDesc(), panel);
         layoutGenerator.addLabelWidgetPair("Grid Filter: ", buildGridsPanel(), panel);
         layoutGenerator.addLabelWidgetPair("Sector Filter: ", buildSectorsPanel(), panel);
-        //layoutGenerator.addLabelWidgetPair("Sensitivity Jobs: ", buildjobsPanel(), panel);
+        // layoutGenerator.addLabelWidgetPair("Sensitivity Jobs: ", buildjobsPanel(), panel);
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 10, 10, // initialX, initialY
@@ -251,62 +251,58 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         Collections.sort(templateCases);
     }
 
-   private JScrollPane builtTemplateDesc() {
-       description = new JTextArea();
-       description.setWrapStyleWord(true);
-       description.setLineWrap(true);
-       description.setText("");
-       JScrollPane scrollPane = new JScrollPane(description);
-       scrollPane.setPreferredSize(new Dimension(300, 50));
-       return scrollPane; 
-   }
-   
-   private JScrollPane buildGridsPanel(){
-       grids = new JList();
-       grids.setListData(new Grid[] {new Grid("Select All"), new Grid("Grid 1"), new Grid("Grid 2"), new Grid("Grid 3")});
-       grids.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-       JScrollPane scrollPane = new JScrollPane(grids, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-               JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-       scrollPane.setPreferredSize(new Dimension(300, 100));
-       return scrollPane;
-   }
-    
-   private JScrollPane buildSectorsPanel(){
-       sectors = new JList();
-       sectors.setListData(new Sector[]{});
-       sectors.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-       JScrollPane scrollPane = new JScrollPane(sectors, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-               JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-       scrollPane.setPreferredSize(new Dimension(300, 100));
-       return scrollPane;
-   }
+    private JScrollPane builtTemplateDesc() {
+        information = new JTextArea();
+        information.setWrapStyleWord(true);
+        information.setLineWrap(true);
+        information.setEditable(false);
+        information.setText("");
+        JScrollPane scrollPane = new JScrollPane(information);
+        scrollPane.setPreferredSize(new Dimension(300, 80));
+        return scrollPane;
+    }
 
-    private void refreshSensInfo(){
+    private JScrollPane buildGridsPanel() {
+        grids = new JList();
+        grids.setListData(new Grid[] { new Grid("Select All"), new Grid("Grid 1"), new Grid("Grid 2"),
+                new Grid("Grid 3") });
+        grids.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        JScrollPane scrollPane = new JScrollPane(grids, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setPreferredSize(new Dimension(300, 100));
+        return scrollPane;
+    }
+
+    private JScrollPane buildSectorsPanel() {
+        sectors = new JList();
+        sectors.setListData(new Sector[] {});
+        sectors.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        JScrollPane scrollPane = new JScrollPane(sectors, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setPreferredSize(new Dimension(300, 100));
+        return scrollPane;
+    }
+
+    private void refreshSensInfo() {
         selectedTem = (Case) senTypeCombox.getSelectedItem();
         if (selectedTem == null) {
-            description.setText("");
-            sectors.setListData(new Sector[]{});
+            information.setText("");
+            sectors.setListData(new Sector[] {});
             return;
         }
-        description.setText(selectedTem.getDescription());
-//        try {
-            refreshSectors(parentCase.getId(), selectedTem.getId());
-//        } catch (EmfException e) {
-//            e.printStackTrace();
-//            messagePanel.setError("Could not get sectors " + e.getMessage());
+        information.setText(selectedTem.getDescription());
+        refreshSectors(parentCase.getId(), selectedTem.getId());
     }
 
-    private void refreshSectors(int parentCaseId, int templateCaseId ) {
+    private void refreshSectors(int parentCaseId, int templateCaseId) {
         sectors.setListData(getCommonSectors());
-        //sectors.setListData(presenter.getSectors(parentCaseId, templateCaseId));
     }
-    
-    private Sector[] getCommonSectors(){
-        List<Sector> commonSectors=new ArrayList<Sector>(); 
-        //Sector[] pSectors = parentCase.getSectors();
+
+    private Sector[] getCommonSectors() {
+        List<Sector> commonSectors = new ArrayList<Sector>();
         List<Sector> tSectors = Arrays.asList(selectedTem.getSectors());
         commonSectors.add(new Sector("Select All", "Select All"));
-        for (Sector pSector: parentCase.getSectors()){
+        for (Sector pSector : parentCase.getSectors()) {
             if (tSectors.contains(pSector))
                 commonSectors.add(pSector);
         }
@@ -348,18 +344,20 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         messagePanel.clear();
         messagePanel.setMessage("Server is processing sensitivity case...");
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        //messagePanel.setMessage("Server is processing sensitivity case...");
+        // messagePanel.setMessage("Server is processing sensitivity case...");
 
         try {
-            //validateFields();
+            // validateFields();
             Case sensitivityCase = null;
 
             if (newRadioButton.isSelected())
-                sensitivityCase = presenter.doSave(parentCase.getId(), ((Case) senTypeCombox.getSelectedItem())
-                        .getId(), jobIds(selectedJobs), getJobGroup(), setSensitivityCase());
+                sensitivityCase = presenter.doSave(parentCase.getId(),
+                        ((Case) senTypeCombox.getSelectedItem()).getId(), jobIds(selectedJobs), getJobGroup(),
+                        setSensitivityCase());
             else
                 sensitivityCase = presenter.addSensitivities(parentCase.getId(), ((Case) senTypeCombox
-                        .getSelectedItem()).getId(), jobIds(selectedJobs), getJobGroup(), (Case) senName.getSelectedItem());
+                        .getSelectedItem()).getId(), jobIds(selectedJobs), getJobGroup(), (Case) senName
+                        .getSelectedItem());
 
             if (sensitivityCase == null) {
                 messagePanel.setError("Failed processing sensitivity case.");
@@ -371,7 +369,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
             CaseEditor view = new CaseEditor(parentConsole, presenter.getSession(), desktopManager);
             parentPresenter.doEdit(view, sensitivityCase);
             disposeView();
-            //messagePanel.clear();
+            // messagePanel.clear();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         } finally {
@@ -394,7 +392,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         senCaseAbrev.setText("");
         categoryCombox.setEnabled(true);
         jobGroup.removeAllItems();
-        jobGroup.resetModel(new String[]{""});
+        jobGroup.resetModel(new String[] { "" });
         jobGroup.validate();
     }
 
@@ -490,20 +488,21 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
         return action;
     }
-    
+
     private Action setJobsAction(final SensitivityWindow view) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 messagePanel.clear();
                 try {
                     validateFields();
-                    CaseJob[] filteredJobs = presenter.getCaseJobs(selectedTem, getSelectedGrids(), getSelectedSectors());
-                    if (filteredJobs == null || filteredJobs.length == 0 ){
+                    CaseJob[] filteredJobs = presenter.getCaseJobs(selectedTem, getSelectedGrids(),
+                            getSelectedSectors());
+                    if (filteredJobs == null || filteredJobs.length == 0) {
                         messagePanel.setMessage("There is no jobs for the selected grids and sectors");
-                        return; 
+                        return;
                     }
                     JobsChooserDialog dialog = new JobsChooserDialog(view, parentConsole);
-                    dialog.display(filteredJobs);                  
+                    dialog.display(filteredJobs);
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
                 }
@@ -518,25 +517,23 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         messagePanel.clear();
         messagePanel.setMessage("Server is processing sensitivity case...");
         this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        //messagePanel.setMessage("Server is processing sensitivity case...");
 
         try {
-            //validateFields();
             Case sensCase = null;
-            List<CaseInput> existingInputs = null; 
-            List<CaseParameter> existingParas = null; 
+            List<CaseInput> existingInputs = null;
+            List<CaseParameter> existingParas = null;
             int temCaseId = ((Case) senTypeCombox.getSelectedItem()).getId();
 
             if (newRadioButton.isSelected())
-                sensCase = presenter.doSave(parentCase.getId(), temCaseId, 
-                        jobIds(selectedJobs), getJobGroup(), setSensitivityCase());
-            else{
-                existingInputs = Arrays.asList(presenter.getCaseInput(((Case)senName.getSelectedItem()).getId(), new Sector("All", "All"), false));
-                existingParas = Arrays.asList(presenter.getCaseParameters(((Case)senName.getSelectedItem()).getId(), new Sector("All", "All"), false));
-                //System.out.println(existingInputs==null? "inputs is null, ": existingInputs.length); 
-                //System.out.println(existingParas==null? "parameterss is null," : existingInputs.length);
-                sensCase = presenter.addSensitivities(parentCase.getId(), temCaseId, 
-                        jobIds(selectedJobs), getJobGroup(), (Case) senName.getSelectedItem());
+                sensCase = presenter.doSave(parentCase.getId(), temCaseId, jobIds(selectedJobs), getJobGroup(),
+                        setSensitivityCase());
+            else {
+                existingInputs = Arrays.asList(presenter.getCaseInput(((Case) senName.getSelectedItem()).getId(),
+                        new Sector("All", "All"), false));
+                existingParas = Arrays.asList(presenter.getCaseParameters(((Case) senName.getSelectedItem()).getId(),
+                        new Sector("All", "All"), false));
+                sensCase = presenter.addSensitivities(parentCase.getId(), temCaseId, jobIds(selectedJobs),
+                        getJobGroup(), (Case) senName.getSelectedItem());
             }
             if (sensCase == null) {
                 messagePanel.setError("Failed processing sensitivity case.");
@@ -545,8 +542,6 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
             resetChanges();
             setCaseView(sensCase, existingInputs, existingParas);
-                
-            //messagePanel.clear();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         } finally {
@@ -559,7 +554,8 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
             presenter.doClose();
     }
 
-    private void setCaseView(Case newCase, List<CaseInput> existingInputs, List<CaseParameter> existingParas) throws EmfException {
+    private void setCaseView(Case newCase, List<CaseInput> existingInputs, List<CaseParameter> existingParas)
+            throws EmfException {
         if (newCase == null)
             throw new EmfException("The new sensitivity case is null.");
 
@@ -568,11 +564,11 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                 existingInputs, existingParas);
         presenter.doClose();
     }
-    
-    private Grid[] getSelectedGrids(){
-        
+
+    private Grid[] getSelectedGrids() {
+
         List<Grid> list = new ArrayList<Grid>(grids.getSelectedValues().length);
-        for (int i = 0; i < grids.getSelectedValues().length; i++){
+        for (int i = 0; i < grids.getSelectedValues().length; i++) {
             Grid grid = (Grid) grids.getSelectedValues()[i];
             if (!grid.getName().equalsIgnoreCase("Select All"))
                 list.add((Grid) grids.getSelectedValues()[i]);
@@ -580,9 +576,9 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         return list.toArray(new Grid[0]);
     }
 
-    private Sector[] getSelectedSectors(){
+    private Sector[] getSelectedSectors() {
         List<Sector> list = new ArrayList<Sector>(sectors.getSelectedValues().length);
-        for (int i = 0; i < sectors.getSelectedValues().length; i++){
+        for (int i = 0; i < sectors.getSelectedValues().length; i++) {
             Sector sector = (Sector) sectors.getSelectedValues()[i];
             if (!sector.getName().equalsIgnoreCase("Select All"))
                 list.add((Sector) sectors.getSelectedValues()[i]);

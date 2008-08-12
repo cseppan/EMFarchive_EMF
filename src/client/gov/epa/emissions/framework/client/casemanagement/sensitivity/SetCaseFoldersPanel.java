@@ -74,7 +74,7 @@ public class SetCaseFoldersPanel extends JPanel{
                 "Select the base Input Folder for the Case"), panel);
         layoutGenerator.addLabelWidgetPair("Output Job Scripts Folder:", getFolderChooserPanel(outputDir,
         "Select the base Output Job Scripts Folder for the Case"), panel);
-        layoutGenerator.addLabelWidgetPair("Description:    ", description(), panel);
+        layoutGenerator.addLabelWidgetPair("Sens. Case Description:", description(), panel);
         layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 50, // initialX, initialY
                 5, 20);// xPad, yPad

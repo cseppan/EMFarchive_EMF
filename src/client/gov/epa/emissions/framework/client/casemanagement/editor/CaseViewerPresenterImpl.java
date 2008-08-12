@@ -31,8 +31,6 @@ public class CaseViewerPresenterImpl implements CaseViewerPresenter {
 
     private ViewableOutputsTabPresenterImpl outputPresenter;
 
-//    private ViewableCaseSummaryTabPresenter summaryPresenter;
-
     private ViewableHistoryTabPresenter historyPresenter;
 
     private boolean inputsLoaded = false;
@@ -64,14 +62,6 @@ public class CaseViewerPresenterImpl implements CaseViewerPresenter {
         
         String jobSummaryMsg = service.getJobStatusMessage(caseObj.getId());
         view.display(caseObj, jobSummaryMsg);
-        
-        //caseObj = service.obtainLocked(session.user(), caseObj);
-
-        //if (!caseObj.isLocked(session.user())) {// view mode, locked by another user
-        //    view.showMsg("Current case object is locked by user " + caseObj.getLockOwner() + ".");
-        //} else {
-//            service.releaseLocked(session.user(), caseObj);
-//        }
     }
 
     public void doClose(){
@@ -84,22 +74,18 @@ public class CaseViewerPresenterImpl implements CaseViewerPresenter {
 
     public void set(ViewableInputsTab inputsView) {
         inputPresenter = new ViewableInputsTabPresenterImpl(session, inputsView, caseObj);
-//        presenters.add(inputPresenter);
     }
 
     public void set(ViewableJobsTab jobsView) {
         jobsPresenter = new ViewableJobsTabPresenterImpl(session, jobsView, caseObj);
-//        presenters.add(jobsPresenter);
     }
 
     public void set(ViewableOutputsTab OutputsView) {
         outputPresenter = new ViewableOutputsTabPresenterImpl(session, OutputsView, caseObj);
-//        presenters.add(outputPresenter);
     }
 
     public void set(ViewableParametersTab parameterview) {
         parametersPresenter = new ViewableParametersTabPresenterImpl(session, parameterview, caseObj);
-//        presenters.add(parametersPresenter);
     }
 
     public void set(ViewableHistoryTab caseHistoryView) {
