@@ -85,6 +85,7 @@ public class PrintCaseDialog extends JDialog {
         folder.setName("folder");
         Button button = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
+                clearMessagePanel();
                 selectFolder();
             }
         });
