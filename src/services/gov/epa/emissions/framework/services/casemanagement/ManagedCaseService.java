@@ -4225,12 +4225,15 @@ public class ManagedCaseService {
         sensitivityCase.setGridResolution(parent.getGridResolution());
         sensitivityCase.setMeteorlogicalYear(parent.getMeteorlogicalYear());
         sensitivityCase.setModel(parent.getModel());
+        sensitivityCase.setModelVersion(parent.getModelVersion());
         sensitivityCase.setModelingRegion(parent.getModelingRegion());
         sensitivityCase.setProject(parent.getProject());
         sensitivityCase.setSpeciation(parent.getSpeciation());
         sensitivityCase.setStartDate(parent.getStartDate());
         sensitivityCase.setEndDate(parent.getEndDate());
         sensitivityCase.setTemplateUsed(parent.getName());
+        sensitivityCase.setNumEmissionsLayers(parent.getNumEmissionsLayers());
+        sensitivityCase.setNumMetLayers(parent.getNumMetLayers());
     }
 
     private CaseJob[] getJobs2Copy(int[] jobIds) throws EmfException {
