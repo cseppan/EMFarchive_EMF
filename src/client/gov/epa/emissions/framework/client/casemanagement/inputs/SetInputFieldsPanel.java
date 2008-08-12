@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.Changeable;
 import gov.epa.emissions.commons.gui.ComboBox;
@@ -11,9 +12,12 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -35,12 +39,12 @@ import javax.swing.SpringLayout;
 public class SetInputFieldsPanel extends InputFieldsPanel{
 
     private TextField dataset;
-
+    
     private Dimension preferredSize = new Dimension(380, 20);
     
     public SetInputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList,
-            EmfConsole parentConsole) {
-        super(messagePanel, changeablesList, parentConsole);
+            EmfConsole parentConsole, DesktopManager desktopManager) {
+        super(messagePanel, changeablesList, parentConsole, desktopManager);
     }
 
     public void display(CaseInput input, JComponent container, int modelToRunId, EmfSession session) throws EmfException {
@@ -91,7 +95,7 @@ public class SetInputFieldsPanel extends InputFieldsPanel{
 
     private JPanel datasetPanel() {
 
-        dataset = new TextField("dataset", 29);
+        dataset = new TextField("dataset", 26);
         dataset.setEditable(false);
         EmfDataset inputDataset = input.getDataset();
         if(inputDataset!= null )
@@ -101,11 +105,12 @@ public class SetInputFieldsPanel extends InputFieldsPanel{
         dataset.setToolTipText("Press select button to choose from a dataset list.");
         Button selectButton = new AddButton("Select", selectAction());
         selectButton.setMargin(new Insets(1, 2, 1, 2));
-
+        Button viewButton = new BorderlessButton("View", viewDatasetAction());
         JPanel invPanel = new JPanel(new BorderLayout(5,0));
 
         invPanel.add(dataset, BorderLayout.LINE_START);
         invPanel.add(selectButton);
+        invPanel.add(viewButton, BorderLayout.LINE_END );
         return invPanel;
     }
     
@@ -119,6 +124,32 @@ public class SetInputFieldsPanel extends InputFieldsPanel{
                 }
             }
         };
+    }
+    
+    private Action viewDatasetAction() {
+        return new AbstractAction(){
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    viewAction();
+                } catch (EmfException e) {
+                    messagePanel.setError("Error viewing dataset: " + e.getMessage());
+                }
+            }
+        };
+    }
+    
+    protected void viewAction() throws EmfException {
+        messagePanel.clear();
+
+        if (input.getDataset() == null) {
+            messagePanel.setMessage("Dataset is not available.");
+            return;
+        }
+
+        PropertiesViewPresenter datasetViewPresenter = new PropertiesViewPresenter(
+                presenter.getDataset(input.getDataset().getId()), session);
+        DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
+        datasetViewPresenter.doDisplay(view);
     }
     protected void doAddWindow() throws Exception {
         DatasetType type = input.getDatasetType();

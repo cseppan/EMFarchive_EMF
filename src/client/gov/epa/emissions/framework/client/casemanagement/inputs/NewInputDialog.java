@@ -55,7 +55,7 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this, parentConsole);
+        this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this, parentConsole, null);
 
         try {
             presenter.doAddInputFields(panel, inputFieldsPanel, newInput);

@@ -144,4 +144,8 @@ public class InputFieldsPanelPresenter {
         return job.getName();
     }
     
+    public EmfDataset getDataset(int id) throws EmfException {
+        return session.dataService().getDataset(id);
+    }
+    
 }

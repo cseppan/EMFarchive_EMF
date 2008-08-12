@@ -34,9 +34,12 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     
     private EmfConsole parentConsole; 
     
+    private DesktopManager desktopManager;
+    
     public EditCaseInputWindow(String title, DesktopManager desktopManager, EmfConsole parentConsole) {
         super(title, new Dimension(610, 540), desktopManager);
         this.parentConsole = parentConsole;
+        this.desktopManager = desktopManager;
     }
 
     public void display(CaseInput input) throws EmfException {
@@ -53,7 +56,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this, parentConsole );
+        this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this, parentConsole, desktopManager );
         presenter.doAddInputFields(panel, inputFieldsPanel);
         panel.add(buttonsPanel());
 

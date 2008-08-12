@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
@@ -80,13 +81,16 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     
     private int modelToRunId;
     
+    protected DesktopManager desktopManager;
+    
     private Dimension preferredSize = new Dimension(450, 25);
 
     public InputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList, 
-           EmfConsole parentConsole) {
+           EmfConsole parentConsole, DesktopManager desktopManager) {
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
         this.parentConsole = parentConsole;
+        this.desktopManager = desktopManager;
     }
 
     public void display(CaseInput input, JComponent container, int modelToRunId, EmfSession session) throws EmfException {

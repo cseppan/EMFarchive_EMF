@@ -175,7 +175,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     
     private JPanel displayInput(CaseInput input) throws EmfException {
         JPanel panel = new JPanel();
-        this.setInputFieldsPanel = new SetInputFieldsPanel(messagePanel, this, parentConsole);
+        this.setInputFieldsPanel = new SetInputFieldsPanel(messagePanel, this, parentConsole, desktopManager);
         presenter.doAddInputFields(input, panel, setInputFieldsPanel);
         return panel;
     }
