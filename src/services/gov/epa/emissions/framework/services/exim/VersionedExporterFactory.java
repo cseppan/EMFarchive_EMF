@@ -42,7 +42,11 @@ public class VersionedExporterFactory {
 
             Constructor exporterConstructor = exporterClass.getDeclaredConstructor(classParams);
             return (Exporter) exporterConstructor.newInstance(params);
+        } catch (ClassNotFoundException e) {
+            log.error("Failed to create exporter.", e);
+            throw new EmfException("Exporter class not found (either from database or commons.jar)--" + e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not create Exporter", e);
             throw new EmfException("Could not create Exporter for Dataset Type: " + dataset.getDatasetTypeName());
         }
