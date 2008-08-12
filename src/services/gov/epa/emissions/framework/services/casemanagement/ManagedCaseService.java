@@ -4789,7 +4789,7 @@ public class ManagedCaseService {
 
     private synchronized void printCaseJobs(List<CaseJob> jobs, String folder, String jobsFile, Session session) throws IOException {
         String ls = System.getProperty("line.separator");
-        String columns = "Tab,jobname,order,sector,runstatus,startdate,completiondate,executable,arguments,path,queueoptions,jobgroup,local,queueID,User,Host,Purpose,DependsOn" + ls;
+        String columns = "Tab,JobName,Order,Sector,RunStatus,StartDate,CompletionDate,Executable,Arguments,Path,QueueOptions,JobGroup,Local,QueueID,User,Host,Purpose,DependsOn" + ls;
         
         StringBuffer sb = new StringBuffer(columns);
         
