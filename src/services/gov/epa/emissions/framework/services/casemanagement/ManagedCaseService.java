@@ -4676,35 +4676,35 @@ public class ManagedCaseService {
                 .getEndDate());
 
         String summary = "\"#EMF_CASE_NAME="
-                + currentCase.getName()
+                + clean(currentCase.getName())
                 + "\""
                 + ls
                 + "\"#EMF_CASE_ABBREVIATION="
-                + currentCase.getAbbreviation().getName()
+                + clean(currentCase.getAbbreviation() == null ? "" : currentCase.getAbbreviation().getName())
                 + "\""
                 + ls
                 + "\"#EMF_CASE_DESCRIPTION="
-                + currentCase.getDescription()
+                + clean(currentCase.getDescription() == null ? "" : currentCase.getDescription())
                 + "\""
                 + ls
                 + "\"#EMF_CASE_CATEGORY="
-                + currentCase.getCaseCategory().getName()
+                + clean(currentCase.getCaseCategory() == null ? "" : currentCase.getCaseCategory().getName())
                 + "\""
                 + ls
                 + "\"#EMF_PROJECT="
-                + currentCase.getProject()
+                + clean(currentCase.getProject() == null ? "" : currentCase.getProject().getName())
                 + "\""
                 + ls
                 + "\"#EMF_SECTORS="
-                + getSectors(currentCase.getSectors())
+                + clean(getSectors(currentCase.getSectors()))
                 + "\""
                 + ls
                 + "\"#EMF_CASE_COPIED_FROM="
-                + currentCase.getTemplateUsed()
+                + clean(currentCase.getTemplateUsed())
                 + "\""
                 + ls
                 + "\"#EMF_LAST_MODIFIED="
-                + currentCase.getLastModifiedBy().getName()
+                + clean(currentCase.getLastModifiedBy() == null ? "" : currentCase.getLastModifiedBy().getName())
                 + " on "
                 + CustomDateFormat.format_MM_DD_YYYY_HH_mm(currentCase.getLastModifiedDate())
                 + "\""
@@ -4718,22 +4718,22 @@ public class ManagedCaseService {
                 + "\""
                 + ls
                 + "Tab,Parameter,Order,Envt. Var.,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose"
-                + ls + "Summary,Model to Run,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,\"" + model
+                + ls + "Summary,Model to Run,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,\"" + clean(model)
                 + "\",String,TRUE,TRUE,,," + ls
                 + "Summary,Model Version,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,\""
-                + currentCase.getModelVersion() + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Modeling Region,0,,All sectors,All jobs for sector,All programs," + modelRegion
+                + clean(currentCase.getModelVersion()) + "\",String,TRUE,TRUE,,," + ls
+                + "Summary,Modeling Region,0,,All sectors,All jobs for sector,All programs,\"" + clean(modelRegion)
                 + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Grid Name,0,IOAPI_GRIDNAME_1,All sectors,All jobs for sector,All programs,\"" + gridName
+                + "Summary,Grid Name,0,IOAPI_GRIDNAME_1,All sectors,All jobs for sector,All programs,\"" + clean(gridName)
                 + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Grid Resolution,0,EMF_GRID,All sectors,All jobs for sector,All programs,\"" + gridResolution
+                + "Summary,Grid Resolution,0,EMF_GRID,All sectors,All jobs for sector,All programs,\"" + clean(gridResolution)
                 + "\",String,TRUE,TRUE,,," + ls + "Summary,Met Layers,0,,All sectors,All jobs for sector,All programs,"
                 + currentCase.getNumMetLayers() + ",Integer,TRUE,TRUE,,," + ls
                 + "Summary,Emission Layers,0,,All sectors,All jobs for sector,All programs,"
                 + currentCase.getNumEmissionsLayers() + ",Integer,TRUE,TRUE,,," + ls
-                + "Summary,Downstream Model,0,EMF_AQM,All sectors,All jobs for sector,All programs,\"" + dstrModel
+                + "Summary,Downstream Model,0,EMF_AQM,All sectors,All jobs for sector,All programs,\"" + clean(dstrModel)
                 + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Speciation,0,EMF_SPC,All sectors,All jobs for sector,All programs,\"" + speciation
+                + "Summary,Speciation,0,EMF_SPC,All sectors,All jobs for sector,All programs,\"" + clean(speciation)
                 + "\",String,TRUE,TRUE,,," + ls
                 + "Summary,Meteorological Year,0,,All sectors,All jobs for sector,All programs," + metYear
                 + ",String,TRUE,TRUE,,," + ls
@@ -4752,22 +4752,22 @@ public class ManagedCaseService {
             CaseParameter param = iter.next();
             String name = param.getName();
             String order = param.getOrder() + "";
-            String envVar = param.getEnvVar() + "";
+            String envVar = param.getEnvVar() == null ? "" : param.getEnvVar() + "";
             String sector = (param.getSector() == null) ? "All sectors" : param.getSector() + "";
             String job = getJobName(param.getJobId(), jobs);
-            String prog = param.getProgram() + "";
-            String value = param.getValue();
-            String type = param.getType() + "";
+            String prog = param.getProgram() == null ? "" : param.getProgram() + "";
+            String value = param.getValue() == null ? "" : param.getValue();
+            String type = param.getType() == null ? "" : param.getType() + "";
             String reqrd = param.isRequired() + "";
             String local = param.isLocal() + "";
             String lstMod = param.getLastModifiedDate() == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(param
                     .getLastModifiedDate());
-            String notes = param.getNotes();
-            String purpose = param.getPurpose();
+            String notes = param.getNotes() == null ? "" : param.getNotes();
+            String purpose = param.getPurpose() == null ? "" : param.getPurpose();
 
-            sb.append("Parameters,\"" + name + "\"," + order + ",\"" + envVar + "\",\"" + sector + "\",\"" + job
-                    + "\",\"" + prog + "\",\"" + value + "\", " + type + "," + reqrd + "," + local + "," + lstMod
-                    + ",\"" + notes + "\", \"" + purpose + "\"" + ls);
+            sb.append("Parameters,\"" + clean(name) + "\"," + order + ",\"" + clean(envVar) + "\",\"" + clean(sector) + "\",\"" + clean(job)
+                    + "\",\"" + clean(prog) + "\",\"" + clean(value) + "\"," + clean(type) + "," + reqrd + "," + local + "," + lstMod
+                    + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\"" + ls);
         }
 
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, sumParamFile))));
@@ -4824,10 +4824,10 @@ public class ManagedCaseService {
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
             String name = input.getName();
-            String envVar = input.getEnvtVars() + "";
+            String envVar = input.getEnvtVars() == null ? "" : input.getEnvtVars() + "";
             String sector = (input.getSector() == null) ? "All sectors" : input.getSector() + "";
             String job = getJobName(input.getCaseJobID(), jobs);
-            String prog = input.getProgram() + "";
+            String prog = input.getProgram() == null ? "" : input.getProgram() + "";
             String dsName = input.getDataset() == null ? "" : input.getDataset().getName();
             String dsVersion = input.getVersion() == null ? "" : input.getVersion().getVersion() + "";
             String qaStatus = "";
@@ -4840,9 +4840,9 @@ public class ManagedCaseService {
             Case parent = (input.getParentCaseId() > 0) ? dao.getCase(input.getParentCaseId(), session) : null;
             String parentName = parent != null ? parent.getName() : "";
 
-            sb.append("Inputs,\"" + name + "\"," + envVar + "\",\"" + sector + "\",\"" + job + "\",\"" + prog + "\",\""
-                    + dsName + "\", " + dsVersion + "," + qaStatus + ",\"" + dsType + "\"" + reqrd + "," + local + ","
-                    + subdir + "," + lstMod + ",\"" + parentName + "\"" + ls);
+            sb.append("Inputs,\"" + clean(name) + "\"," + clean(envVar) + "\",\"" + clean(sector) + "\",\"" + clean(job) + "\",\"" + clean(prog) + "\",\""
+                    + clean(dsName) + "\"," + dsVersion + "," + clean(qaStatus) + ",\"" + clean(dsType) + "\"," + reqrd + "," + local + ","
+                    + clean(subdir) + "," + lstMod + ",\"" + clean(parentName) + "\"" + ls);
         }
 
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, inputsFile))));
@@ -4853,7 +4853,7 @@ public class ManagedCaseService {
     private synchronized void printCaseJobs(List<CaseJob> jobs, String folder, String jobsFile, Session session)
             throws IOException {
         String ls = System.getProperty("line.separator");
-        String columns = "Tab,JobName,Order,Sector,RunStatus,StartDate,CompletionDate,Executable,Arguments,Path,QueueOptions,JobGroup,Local,QueueID,User,Host,Purpose,DependsOn"
+        String columns = "Tab,JobName,Order,Sector,RunStatus,StartDate,CompletionDate,Executable,Arguments,Path,QueueOptions,JobGroup,Local,QueueID,User,Host,Notes,Purpose,DependsOn"
                 + ls;
 
         StringBuffer sb = new StringBuffer(columns);
@@ -4863,31 +4863,41 @@ public class ManagedCaseService {
             String name = job.getName();
             String order = job.getOrder() + "";
             String sector = (job.getSector() == null) ? "All sectors" : job.getSector() + "";
-            String status = job.getRunstatus() + "";
+            String status = job.getRunstatus() == null ? "" : job.getRunstatus() + "";
             String start = job.getRunStartDate() == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(job
                     .getRunStartDate());
             String end = job.getRunCompletionDate() == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(job
                     .getRunCompletionDate());
-            String exec = job.getExecutable() + "";
-            String args = job.getArgs();
-            String path = job.getPath();
-            String qOptns = job.getQueOptions();
+            String exec = job.getExecutable() == null ? "" : job.getExecutable() + "";
+            String args = job.getArgs() == null ? "" : job.getArgs();
+            String path = job.getPath() == null ? "" : job.getPath();
+            String qOptns = job.getQueOptions() == null ? "" : job.getQueOptions();
             String jobGrp = job.getJobGroup();
             String local = job.isLocal() + "";
-            String qId = job.getIdInQueue();
-            String user = job.getUser().getName();
-            String host = job.getHost() + "";
-            String purpose = job.getPurpose();
+            String qId = job.getIdInQueue() == null ? "" : job.getIdInQueue();
+            String user = job.getUser() == null ? "" : job.getUser().getName();
+            String host = job.getHost() == null ? "" : job.getHost() + "";
+            String notes = job.getRunNotes() == null ? "" : job.getRunNotes();
+            String purpose = job.getPurpose() == null ? "" : job.getPurpose();
             String dependsOn = getDependsOnJobsString(job.getDependentJobs(), session);
 
-            sb.append("Jobs,\"" + name + "\"," + order + ",\"" + sector + "\"," + status + "," + start + "," + end
-                    + "," + exec + ",\"" + args + "\"," + path + ",\"" + qOptns + "\",\"" + jobGrp + "\"," + local
-                    + ",\"" + qId + "\",\"" + user + "\", " + host + ",\"" + purpose + "\",\"" + dependsOn + "\"" + ls);
+            sb.append("Jobs,\"" + clean(name) + "\"," + order + ",\"" + clean(sector) + "\"," + clean(status) + "," + start + "," + end
+                    + "," + clean(exec) + ",\"" + clean(args) + "\"," + clean(path) + ",\"" + clean(qOptns) + "\",\"" + clean(jobGrp) + "\"," + local
+                    + ",\"" + clean(qId) + "\",\"" + clean(user) + "\", " + clean(host) + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\",\"" + clean(dependsOn) + "\"" + ls);
         }
 
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, jobsFile))));
         writer.println(sb.toString());
         writer.close();
+    }
+    
+    private String clean(String toClean) {
+        if (toClean == null || toClean.trim().isEmpty())
+            return "";
+        
+        String temp = toClean.replace('"', '\'');
+        
+        return temp.replaceAll("\\\\", "/");
     }
 
 }
