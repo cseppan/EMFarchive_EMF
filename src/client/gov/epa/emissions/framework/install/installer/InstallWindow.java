@@ -350,7 +350,8 @@ public class InstallWindow extends JFrame implements InstallView {
                     checkUpdates();
                 else {
                     load.setText(Constants.EMF_INSTALL_MESSAGE);
-                    startDownload();
+                    preDownload();
+                    presenter.startDownload();
                 }
             }
         }
@@ -456,15 +457,17 @@ public class InstallWindow extends JFrame implements InstallView {
         if (selectedValue == "Reinstall") {
             INSTALL_MODE = RE_INSTALL;
             load.setText(Constants.EMF_REINSTALL_MESSAGE);
-            startDownload();
+            preDownload();
+            presenter.startDownload();
         } else if (selectedValue == "Update") {
             INSTALL_MODE = UPDATE;
             load.setText(Constants.EMF_UPDATE_MESSAGE);
+            preDownload();
             startUpdates();
         }
     }
 
-    private void startDownload() {
+    private void preDownload() {
         String javahome = javaHomeDirField.getText();
         String outputdir = outputDirField.getText();
         String inputdir = inputDirField.getText();
@@ -474,7 +477,6 @@ public class InstallWindow extends JFrame implements InstallView {
         CardLayout cl = (CardLayout) (cards.getLayout());
         cl.show(cards, DOWNLOAD_PAGE);
         presenter.writePreference(website, inputdir, outputdir, javahome, installhome, server);
-        presenter.startDownload();
     }
 
     private void startUpdates() {
