@@ -50,7 +50,13 @@ public class ModelToRun implements Serializable, Comparable<ModelToRun> {
     }
 
     public int compareTo(ModelToRun other) {
-        return name.compareToIgnoreCase((other).getName());
+        if (id < other.getId())
+            return -1;
+        
+        if (id == other.getId())
+            return 0;
+        
+        return 1;
     }
 
 }
