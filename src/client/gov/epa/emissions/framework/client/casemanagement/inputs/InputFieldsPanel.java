@@ -62,7 +62,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     private CheckBox required;
 
     private CheckBox localBox;
-    
+
     private Button selectButton;
 
     protected MessagePanel messagePanel;
@@ -78,24 +78,25 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     protected EmfSession session;
 
     protected EmfConsole parentConsole;
-    
+
     private int modelToRunId;
-    
+
     protected DesktopManager desktopManager;
-    
+
     private Dimension preferredSize = new Dimension(450, 25);
 
-    public InputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList, 
-           EmfConsole parentConsole, DesktopManager desktopManager) {
+    public InputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList, EmfConsole parentConsole,
+            DesktopManager desktopManager) {
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
     }
 
-    public void display(CaseInput input, JComponent container, int modelToRunId, EmfSession session) throws EmfException {
+    public void display(CaseInput input, JComponent container, int modelToRunId, EmfSession session)
+            throws EmfException {
         this.input = input;
-        this.session = session; 
+        this.session = session;
         this.modelToRunId = modelToRunId;
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -104,7 +105,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         inputName.setSelectedItem(input.getInputName());
         addPopupMenuListener(inputName, "inputnames");
         changeablesList.addChangeable(inputName);
-        //inputName.setPrototypeDisplayValue(width);
+        // inputName.setPrototypeDisplayValue(width);
         inputName.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("Input Name:", inputName, panel);
 
@@ -150,10 +151,10 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         version = new ComboBox(new Version[] { input.getVersion() });
         fillVersions(input.getDataset());
-        
+
         if (input.getVersion() != null)
             version.setSelectedItem(input.getVersion());
-        
+
         changeablesList.addChangeable(version);
         version.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
@@ -182,7 +183,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         localBox.setSelected(input.isLocal());
         changeablesList.addChangeable(localBox);
         layoutGenerator.addLabelWidgetPair("Local?", localBox, panel);
-        
+
         layoutGenerator.addLabelWidgetPair("Parent case ID:", new JLabel("" + this.input.getParentCaseId()), panel);
 
         // Lay out the panel.
@@ -192,13 +193,13 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         container.add(panel);
     }
-    
+
     private JPanel datasetPanel() {
 
         dataset = new TextField("dataset", 38);
         dataset.setEditable(false);
         EmfDataset inputDataset = input.getDataset();
-        if(inputDataset!= null )
+        if (inputDataset != null)
             dataset.setText(input.getDataset().getName());
 
         changeablesList.addChangeable(dataset);
@@ -206,13 +207,13 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         selectButton = new AddButton("Select", selectAction());
         selectButton.setMargin(new Insets(1, 2, 1, 2));
 
-        JPanel invPanel = new JPanel(new BorderLayout(5,0));
+        JPanel invPanel = new JPanel(new BorderLayout(5, 0));
 
         invPanel.add(dataset, BorderLayout.LINE_START);
         invPanel.add(selectButton);
         return invPanel;
     }
-    
+
     private Action selectAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -225,25 +226,32 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             }
         };
     }
-    
+
     private void doAddWindow() throws Exception {
         DatasetType type = (DatasetType) dsType.getSelectedItem();
-        
+
         if (type == null)
             throw new EmfException("Please select a valid dataset type.");
-        
-        DatasetType[] datasetTypes = new DatasetType[]{type};
-        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, changeablesList);
+
+        DatasetType[] datasetTypes = new DatasetType[] { type };
+        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog(parentConsole, changeablesList);
         InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypes);
         if (datasetTypes.length == 1)
             presenter.display(datasetTypes[0], true);
         else
             presenter.display(null, true);
-        if (view.shouldCreate())
-            setDatasets(presenter.getDatasets());
+
+        setDatasets(presenter.getDatasets());
     }
-    
-    private void setDatasets(EmfDataset [] datasets) {
+
+    private void setDatasets(EmfDataset[] datasets) {
+        if (datasets == null || datasets.length == 0) {
+            dataset.setText("");
+            updateDataset(null);
+            fillVersions(null);
+            return;
+        }
+
         dataset.setText(datasets[0].getName());
         updateDataset(datasets[0]);
         fillVersions(datasets[0]);
@@ -302,14 +310,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         jobs.setSelectedIndex(presenter.getJobIndex(input.getCaseJobID(), jobArray));
     }
 
-
     protected void fillVersions(EmfDataset dataset) {
         version.setEnabled(true);
-//        version.removeAllItems();
-//        if (dataset == null ){
-//            version.removeAllItems();
-//            return; 
-//        }
+        
         try {
             Version[] versions = presenter.getVersions(dataset);
             version.removeAllItems();
@@ -338,7 +341,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         updateEnvtVar();
         updateSector();
         input.setDatasetType((DatasetType) dsType.getSelectedItem());
-        //updateDataset();
+        // updateDataset();
         updateVersion();
         updateSubdir();
         input.setRequired(required.isSelected());
@@ -439,7 +442,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     private void clearMsgPanel() {
         this.messagePanel.clear();
     }
-    
+
     public void validateFields() throws EmfException {
         Object selectedProg = program.getSelectedItem();
         if (inputName.getSelectedItem() == null)
@@ -450,8 +453,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         setFields();
     }
-    
-    public void viewOnly(){
+
+    public void viewOnly() {
         program.setEditable(false);
         program.setEnabled(false);
         inputName.setEnabled(false);
