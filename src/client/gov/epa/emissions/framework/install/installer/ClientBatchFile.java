@@ -19,10 +19,11 @@ public class ClientBatchFile {
     }
     
     public void create(String preference, String javahome, String server) throws Exception{
+        String rhome = System.getProperty("R_HOME");
         writer.println("@echo off" + sep);
         writer.println("::  Batch file to start the EMF Client" + sep  + sep);
         writer.println("set EMF_HOME=\"" + batchFile.getParent() + "\""+ sep);
-        writer.println("set R_HOME=C:\\Program Files\\R\\rw2000\\bin" + sep);
+        writer.println("set R_HOME=" + (rhome == null || rhome.isEmpty() ? "C:\\Program Files\\R\\rw2000\\bin" : rhome) + sep);
         writer.println("set JAVA_EXE=\"" + javahome + "\\bin\\java\"" + sep);
         writer.println("::  add bin directory to search path" + sep); 
         writer.println("set PATH=%PATH%;%R_HOME%" + sep);
@@ -32,7 +33,7 @@ public class ClientBatchFile {
         writer.println(sep + sep + "@echo on" + sep + sep);
         writer.println("%JAVA_EXE% -Xmx400M -DUSER_PREFERENCES=" + 
                 "\"" + System.getProperty("user.home") + "\\" + preference + "\" " +
-                "-DEMF_HOME=%EMF_HOME% " + 
+                "-DEMF_HOME=%EMF_HOME% " + "-DR_HOME=%R_HOME% " +
                 "-classpath %CLASSPATH% gov.epa.emissions.framework.client.EMFClient " +
                 server + sep);
         writer.close();

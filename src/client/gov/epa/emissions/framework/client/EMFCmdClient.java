@@ -148,14 +148,22 @@ public class EMFCmdClient {
         int typeIndex = args.indexOf("-t");
         int logIntervalIndex = args.indexOf("-l");
         int resendTimesIndex = args.indexOf("-r");
-        int outputFileIndex = args.indexOf("-F");
-        int outputFolderIndex = args.indexOf("-D");
-        int outputPatternIndex = args.indexOf("-P");
+        int singleFileIndex = args.indexOf("-F");
+        int fileFolderIndex = args.indexOf("-D");
+        int filePatternIndex = args.indexOf("-P");
         int outputTypeIndex = args.indexOf("-T");
         int outputDatasetNameIndex = args.indexOf("-N");
         int outputNameIndex = args.indexOf("-O");
+        int relocationIndex = args.indexOf("-M");
 
-        String jobkey = (keyIndex < 0) ? "" : args.get(++keyIndex);
+        String authKey = (keyIndex < 0) ? "" : args.get(++keyIndex);
+        String singleFile = (singleFileIndex < 0) ? "" : args.get(++singleFileIndex);
+        String fileFolder = (fileFolderIndex < 0) ? "" : args.get(++fileFolderIndex);
+        String filePattern = (filePatternIndex < 0) ? "" : args.get(++filePatternIndex);
+        
+        if (relocationIndex >= 0)
+            relocateFiles(args, authKey, singleFile, fileFolder, filePattern);
+            
         String execPath = (execIndex < 0) ? "" : args.get(++execIndex);
         String period = (periodIndex < 0) ? "" : args.get(++periodIndex);
         String message = (msgIndex < 0) ? "" : args.get(++msgIndex);
@@ -163,9 +171,6 @@ public class EMFCmdClient {
         String type = (typeIndex < 0) ? "" : args.get(++typeIndex);
         int logInterval = (logIntervalIndex < 0) ? 0 : Integer.parseInt(args.get(++logIntervalIndex));
         int resendTimes = (resendTimesIndex < 0) ? 1 : Integer.parseInt(args.get(++resendTimesIndex));
-        String outputFile = (outputFileIndex < 0) ? "" : args.get(++outputFileIndex);
-        String outputFolder = (outputFolderIndex < 0) ? "" : args.get(++outputFolderIndex);
-        String outputPattern = (outputPatternIndex < 0) ? "" : args.get(++outputPatternIndex);
         String outputType = (outputTypeIndex < 0) ? "" : args.get(++outputTypeIndex);
         String outputDatasetName = (outputDatasetNameIndex < 0) ? "" : args.get(++outputDatasetNameIndex);
         String outputName = (outputNameIndex < 0) ? "" : args.get(++outputNameIndex);
@@ -173,7 +178,7 @@ public class EMFCmdClient {
         String loggerDir = System.getenv("EMF_LOGGERDIR");
         String jobName = createSafeName(System.getenv("EMF_JOBNAME"));
         String caseName = createSafeName(System.getenv("CASE"));
-        String logFile = loggerDir + File.separator + jobName + "_" + caseName + "_" + jobkey + ".csv";
+        String logFile = loggerDir + File.separator + jobName + "_" + caseName + "_" + authKey + ".csv";
 
         if (execPath.startsWith("-") || period.startsWith("-") || message.startsWith("-") || status.startsWith("-"))
             throw new Exception("Please specify valid values for options.");
@@ -192,17 +197,17 @@ public class EMFCmdClient {
         jobMsg.setReceivedTime(new Date());
 
         CaseOutput output = new CaseOutput(outputName);
-        output.setDatasetFile(outputFile);
+        output.setDatasetFile(singleFile);
         output.setDatasetName(outputDatasetName);
-        output.setPath(outputFolder);
+        output.setPath(fileFolder);
         output.setDatasetType(outputType);
-        output.setPattern(outputPattern);
+        output.setPattern(filePattern);
         // output = setOutputEmptyProp(output);
 
         if (loggerDir == null || loggerDir.isEmpty())
-            sendMessage(args, jobkey, jobMsg, output);
+            sendMessage(args, authKey, jobMsg, output);
         else
-            writeToLogger(args, logFile, logInterval, resendTimes, jobkey, jobMsg, output);
+            writeToLogger(args, logFile, logInterval, resendTimes, authKey, jobMsg, output);
     }
 
     private static void runFromFile(List<String> args) throws Exception {
@@ -653,6 +658,26 @@ public class EMFCmdClient {
         }
 
         return safeName;
+    }
+    
+    private static void relocateFiles(List<String> args, String authKey, String singleFile, String fileFolder, String filePattern) throws Exception {
+        try {
+            if (DEBUG)
+                System.out.println("EMF Command Client starts relocating external files on server at: " + new Date());
+
+            CaseAssistService service = getService(args);
+            System.out.println("Test assisant service on relocating external files: " + service.toString());
+
+            if (DEBUG) {
+                System.out.println("EMF command client relocated external files successfully.");
+                System.out.println("EMF Command Client exited successfully on " + new Date());
+            }
+        } catch (Exception e) {
+            System.out.println("EMF Command Client encountered a problem on " + new Date() + "\nThe error was: "
+                    + e.getMessage());
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
     }
 
 }
