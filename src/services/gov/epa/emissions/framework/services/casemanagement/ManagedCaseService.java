@@ -2051,6 +2051,8 @@ public class ManagedCaseService {
         copied.setName(getUniqueNewName("Copy of " + toCopy.getName()));
         copied.setTemplateUsed(toCopy.getName());
         copied.setAbbreviation(null);
+        copied.setLastModifiedBy(user);
+        copied.setLastModifiedDate(new Date());
         Case loaded = addCopiedCase(copied, user);
         copyCaseJobs(toCopy.getId(), loaded.getId(), user); // copy job first for references in input and parameter
         copyCaseInputs(user, toCopy.getId(), loaded.getId());
