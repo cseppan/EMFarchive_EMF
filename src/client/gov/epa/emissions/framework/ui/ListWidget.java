@@ -35,8 +35,10 @@ public class ListWidget extends JList implements Changeable {
 
     private DefaultListModel model(Object[] items) {
         DefaultListModel model = new DefaultListModel();
-        for (int i = 0; i < items.length; i++) {
-            model.addElement(items[i]);
+        if (items != null && items.length >0){
+            for (int i = 0; i < items.length; i++) {
+                model.addElement(items[i]);
+            }
         }
         return model;
     }
