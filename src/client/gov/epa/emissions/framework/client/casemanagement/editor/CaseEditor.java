@@ -215,8 +215,14 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
                 viewParentCase();
             }
         });
-        // viewParent.setEnabled(false);
         buttonsPanel.add(viewParent);
+        
+        Button viewRelated = new Button("View Related", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                viewRelatedCase();
+            }
+        });
+        buttonsPanel.add(viewRelated);
 
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -311,5 +317,19 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         }
 
     }
+    
+    private void viewRelatedCase() {
+        try {
+            Case[] produceInputCases = presenter.getCasesThatInputToOtherCases();
+            Case[] useAsOutputCases  = presenter.getCasesThatOutputToOtherCases();
+                
+            String title = "View Related Cases: " + caseObj.getName();
+            RelatedCaseView view = new RelatedCaseWindow(title, session, parentConsole, desktopManager);
+            presenter.doViewRelated(view, produceInputCases, useAsOutputCases);
+        } catch (EmfException e) {
+            showError(e.getMessage());
+        }
+
+    } 
 
 }

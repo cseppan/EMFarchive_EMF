@@ -206,6 +206,13 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         //viewParent.setEnabled(false);
         buttonsPanel.add(viewParent);  
         
+        Button viewRelated = new Button("View Related", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                viewRelatedCase();
+            }
+        });
+        buttonsPanel.add(viewRelated);
+        
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
@@ -277,7 +284,18 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
         } catch (EmfException e) {
             showError(e.getMessage());
         }
-
     }
-
+    
+    private void viewRelatedCase() {
+        try {
+            Case[] produceInputCases = presenter.getCasesThatInputToOtherCases();
+            Case[] useAsOutputCases  = presenter.getCasesThatOutputToOtherCases();
+                
+            String title = "View Related Cases: " + caseObj.getName();
+            RelatedCaseView view = new RelatedCaseWindow(title, session, parentConsole, desktopManager);
+            presenter.doViewRelated(view, produceInputCases, useAsOutputCases);
+        } catch (EmfException e) {
+            showError(e.getMessage());
+        }
+    }
 }

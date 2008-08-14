@@ -219,5 +219,18 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         CaseViewerPresenter presenter = new CaseViewerPresenterImpl(caseObj, session, caseView);
         presenter.doDisplay();
     }
+    
+    public Case[] getCasesThatInputToOtherCases() throws EmfException{
+        return service().getCasesThatInputToOtherCases(caseObj.getId());
+    }
+    
+    public Case[] getCasesThatOutputToOtherCases() throws EmfException{
+        return service().getCasesThatOutputToOtherCases(caseObj.getId());
+    }
+
+    public void doViewRelated(RelatedCaseView view, Case[] inputCases, Case[] outputCases) {
+        RelatedCasePresenter presenter = new RelatedCasePresenter(view, session);
+        presenter.doDisplay(inputCases, outputCases);
+    }
 
 }
