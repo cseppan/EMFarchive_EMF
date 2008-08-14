@@ -630,6 +630,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         super.removeAll();
         setLayout();
         checkIfLockedByCurrentUser();
+        changeablesList.resetChanges();
     }
 
     public void checkIfLockedByCurrentUser() throws EmfException {
