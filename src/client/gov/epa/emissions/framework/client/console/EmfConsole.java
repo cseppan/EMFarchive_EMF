@@ -50,7 +50,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     public EmfConsole(EmfSession session) {
         super("EMF Console", "Emissions Modeling Framework (EMF):  " + session.user().getName() + " ("
-                + session.user().getUsername() + ")");
+                + session.user().getUsername() + ")," + "          Server (" + System.getProperty("emf.remote.host") + ")");
         this.session = session;
 
         setProperties();
