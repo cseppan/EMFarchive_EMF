@@ -1,22 +1,26 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
-import javax.swing.JComponent;
-
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
+import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
+import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
-import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
+
+import javax.swing.JComponent;
 
 public class InputFieldsPanelPresenter {
 
@@ -146,6 +150,13 @@ public class InputFieldsPanelPresenter {
     
     public EmfDataset getDataset(int id) throws EmfException {
         return session.dataService().getDataset(id);
+    }
+    
+    public void viewDataset(int datasetId, EmfConsole parentConsole, DesktopManager desktopManager) throws EmfException{
+        PropertiesViewPresenter datasetViewPresenter = new PropertiesViewPresenter(
+                getDataset(datasetId), session);
+        DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
+        datasetViewPresenter.doDisplay(view);
     }
     
 }

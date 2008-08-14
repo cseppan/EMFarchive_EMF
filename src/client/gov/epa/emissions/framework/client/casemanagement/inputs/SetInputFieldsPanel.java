@@ -16,8 +16,6 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
-import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
-import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -146,12 +144,9 @@ public class SetInputFieldsPanel extends InputFieldsPanel{
             return;
         }
 
-        PropertiesViewPresenter datasetViewPresenter = new PropertiesViewPresenter(
-                presenter.getDataset(input.getDataset().getId()), session);
-        DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
-        datasetViewPresenter.doDisplay(view);
+        presenter.viewDataset(input.getDataset().getId(), parentConsole, desktopManager);
     }
-    protected void doAddWindow() throws Exception {
+    private void doAddWindow() throws Exception {
         DatasetType type = input.getDatasetType();
         if (type == null)
             throw new EmfException("Dataset Type doesn't exist. ");
