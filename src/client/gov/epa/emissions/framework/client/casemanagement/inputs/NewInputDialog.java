@@ -124,4 +124,9 @@ public class NewInputDialog extends Dialog implements NewInputView, ManageChange
         // NOTE Auto-generated method stub
     }
 
+    public void resetChanges() {
+        // NOTE Auto-generated method stub
+        
+    }
+
 }

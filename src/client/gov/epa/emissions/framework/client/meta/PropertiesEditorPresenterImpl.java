@@ -35,6 +35,8 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
     private EmfSession session;
 
     private List presenters;
+    
+    private EditableKeywordsTabPresenterImpl keywordsPresenter;
 
     public PropertiesEditorPresenterImpl(EmfDataset dataset, DatasetPropertiesEditorView view, EmfSession session) {
         this.dataset = dataset;
@@ -86,12 +88,16 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
     }
 
     public void set(EditableKeywordsTabView keywordsView) throws EmfException {
-        EditableKeywordsTabPresenterImpl keywordsPresenter = new EditableKeywordsTabPresenterImpl(keywordsView, dataset);
+        keywordsPresenter = new EditableKeywordsTabPresenterImpl(keywordsView, dataset);
 
         Keywords keywords = new Keywords(session.dataCommonsService().getKeywords());
         keywordsPresenter.display(keywords);
 
         presenters.add(keywordsPresenter);
+    }
+    
+    public EditableKeywordsTabPresenterImpl getKeywordsPresenter() {
+        return keywordsPresenter;
     }
 
     public void set(EditNotesTabView view) throws EmfException {
@@ -126,8 +132,8 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
         presenter.display(view);
     }
 
-    public void set(InfoTabView view) {
-        InfoTabPresenter presenter = new InfoTabPresenter(view, dataset, session);
+    public void set(InfoTabView infoView) {
+        InfoTabPresenter presenter = new InfoTabPresenter(infoView, dataset, session);
         presenter.doDisplay();
         presenters.add(presenter);
     }

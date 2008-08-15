@@ -134,4 +134,9 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
         this.messagePanel.clear();
     }
 
+    public void resetChanges() {
+        // NOTE Auto-generated method stub
+        
+    }
+
 }

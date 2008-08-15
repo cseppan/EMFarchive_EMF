@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.meta.info;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -27,14 +29,15 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 public class ExternalSourceUpdateWindow extends JDialog {
 
     private SingleLineMessagePanel messagePanel;
 
-    private JTextField folder;
+    private TextField folder;
+    
+    private ManageChangeables changeablesList;
 
     private ExternalSourceUpdatePresenter presenter;
 
@@ -46,12 +49,13 @@ public class ExternalSourceUpdateWindow extends JDialog {
 
     private DataCommonsService service;
 
-    public ExternalSourceUpdateWindow(String title, EmfConsole parentConsole, EmfSession session) {
+    public ExternalSourceUpdateWindow(String title, EmfConsole parentConsole, ManageChangeables changeablesList, EmfSession session) {
         super(parentConsole);
-        super.setTitle(title);
-        super.setLocation(ScreenUtils.getPointToCenter(parentConsole));
-        super.setModal(true);
+        setTitle(title);
+        setLocation(ScreenUtils.getCascadedLocation(parentConsole, this.getLocation(), 200, 200));
+        setModal(true);
 
+        this.changeablesList = changeablesList;
         this.parentConsole = parentConsole;
         this.service = session.dataCommonsService();
         this.getContentPane().add(createLayout());
@@ -83,8 +87,9 @@ public class ExternalSourceUpdateWindow extends JDialog {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // folder
-        folder = new JTextField(40);
-        folder.setName("folder");
+        folder = new TextField("updateSoureFolder", 40);
+        changeablesList.addChangeable(folder);
+        
         Button button = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 selectFolder();
@@ -156,7 +161,7 @@ public class ExternalSourceUpdateWindow extends JDialog {
 
     private Action cancelAction() {
         return new AbstractAction() {
-            public void actionPerformed(ActionEvent e){ 
+            public void actionPerformed(ActionEvent e){
                 dispose();
             }
         };

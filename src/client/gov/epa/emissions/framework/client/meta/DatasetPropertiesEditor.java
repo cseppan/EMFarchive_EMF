@@ -44,6 +44,8 @@ import javax.swing.event.ChangeListener;
 public class DatasetPropertiesEditor extends DisposableInteralFrame implements DatasetPropertiesEditorView {
 
     private PropertiesEditorPresenter presenter;
+    
+    //private EditableKeywordsTabPresenterImpl keywordsPresenter;
 
     private MessagePanel messagePanel;
 
@@ -84,7 +86,14 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 localMsgPanel.clear();
-                //loadComponents();
+
+//                int tabIndex = tabbedPane.getSelectedIndex();
+//                String tabTitle = tabbedPane.getTitleAt(tabIndex);
+//                
+//                if (tabTitle.equals("Keywords")){
+//                    
+//                }
+//                    //keywordsPresenter.refreshView();
             }
         });
 
@@ -122,7 +131,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private JPanel createInfoTab(EmfDataset dataset, EmfConsole parentConsole) {
-        InfoTab view = new InfoTab(parentConsole, false);
+        InfoTab view = new InfoTab(this, parentConsole, false);
         
         try {
             presenter.set(view);
@@ -136,8 +145,10 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private JPanel createKeywordsTab() {
         keywordsTab = new EditableKeywordsTab(this, parentConsole);
+        
         try {
             presenter.set(keywordsTab);
+//            keywordsPresenter = presenter.getKeywordsPresenter();
             return keywordsTab;
         } catch (EmfException e) {
             showError("Could not load Keyword Tab." + e.getMessage());

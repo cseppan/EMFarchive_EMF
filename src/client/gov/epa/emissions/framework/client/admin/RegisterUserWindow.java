@@ -59,4 +59,9 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView, Ch
         changeablesList.add(changeable);
     }
 
+    public void resetChanges() {
+        // NOTE Auto-generated method stub
+        
+    }
+
 }

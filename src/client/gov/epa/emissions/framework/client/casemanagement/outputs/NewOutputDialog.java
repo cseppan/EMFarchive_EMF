@@ -116,4 +116,9 @@ public class NewOutputDialog extends Dialog implements NewOutputView, ManageChan
         // NOTE Auto-generated method stub
     }
 
+    public void resetChanges() {
+        // NOTE Auto-generated method stub
+        
+    }
+
 }

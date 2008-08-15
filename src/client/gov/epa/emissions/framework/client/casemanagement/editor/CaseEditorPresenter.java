@@ -41,4 +41,10 @@ public interface CaseEditorPresenter {
     
     void doView(CaseViewerView caseView, Case caseObj) throws EmfException;
 
+    Case[] getCasesThatInputToOtherCases()throws EmfException;
+
+    Case[] getCasesThatOutputToOtherCases()throws EmfException;
+
+    void doViewRelated(RelatedCaseView view, Case[] produceInputCases, Case[] useAsOutputCases)throws EmfException;
+
 }

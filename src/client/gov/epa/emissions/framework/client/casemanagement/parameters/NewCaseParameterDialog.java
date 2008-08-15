@@ -122,4 +122,9 @@ public class NewCaseParameterDialog extends Dialog implements NewCaseParameterVi
         // NOTE Auto-generated method stub
     }
 
+    public void resetChanges() {
+        // NOTE Auto-generated method stub
+        
+    }
+
 }

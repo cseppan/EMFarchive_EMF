@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.info;
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -24,13 +25,16 @@ public class InfoTab extends JPanel implements InfoTabView {
     private JPanel sourcesPanel;
     
     private boolean forViewer;
+    
+    private ManageChangeables changeablesList;
 
     private InfoTabPresenter sourceTabPresenter;
     
-    public InfoTab(EmfConsole parentConsole, boolean forViewer) {
+    public InfoTab(ManageChangeables changeablesList, EmfConsole parentConsole, boolean forViewer) {
         setName("infoTab");
         this.parentConsole = parentConsole;
         this.forViewer = forViewer;
+        this.changeablesList = changeablesList;
 
         super.setLayout(new BorderLayout());
 
@@ -93,7 +97,7 @@ public class InfoTab extends JPanel implements InfoTabView {
         EmfDataset dataset = sourceTabPresenter.getDataset();
         EmfSession session = sourceTabPresenter.getSession();
         String title = "Update Dataset External Source for Dataset: " + dataset.getName();
-        ExternalSourceUpdateWindow view = new ExternalSourceUpdateWindow(title, parentConsole, session);
+        ExternalSourceUpdateWindow view = new ExternalSourceUpdateWindow(title, parentConsole, changeablesList, session);
         ExternalSourceUpdatePresenter updatePresenter = new ExternalSourceUpdatePresenter(sourceTabPresenter);
         updatePresenter.display(view);
     }

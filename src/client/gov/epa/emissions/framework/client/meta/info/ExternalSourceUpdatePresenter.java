@@ -18,8 +18,6 @@ public class ExternalSourceUpdatePresenter {
 
     private InfoTabPresenter sourceTabPresenter;
 
-    private static String lastFolder = null;
-
     public ExternalSourceUpdatePresenter(InfoTabPresenter sourceTabPresenter) {
         this.dataset = sourceTabPresenter.getDataset();
         this.session = sourceTabPresenter.getSession();
@@ -28,13 +26,7 @@ public class ExternalSourceUpdatePresenter {
 
     public void display(ExternalSourceUpdateWindow view) {
         view.observe(this);
-        view.setMostRecentUsedFolder(getFolder());
-
         view.display();
-    }
-
-    private String getFolder() {
-        return (lastFolder != null) ? lastFolder : getDefaultFolder();
     }
 
     public void update(String folder, boolean isMassLoc) throws EmfException {
@@ -129,12 +121,6 @@ public class ExternalSourceUpdatePresenter {
         }
 
         dataset.setExternalSources(sources);
-    }
-
-    private String getDefaultFolder() {
-        ExternalSource[] sources = dataset.getExternalSources();
-
-        return new File(sources[0].getDatasource()).getParent();
     }
 
     public void updateDatasetSource() {

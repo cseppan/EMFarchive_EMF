@@ -28,6 +28,8 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
     private ManageChangeables changeablesList;
 
     private EmfConsole parent;
+    
+    private EmfDataset dataset;
 
     private SingleLineMessagePanel messagePanel;
 
@@ -40,6 +42,7 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
 
     public void display(EmfDataset dataset, Keywords masterKeywords) {
         super.removeAll();
+        this.dataset = dataset;
         messagePanel = new SingleLineMessagePanel();
         super.add(messagePanel);
         super.add(createDSTypeKeywordsPanel(dataset.getDatasetType().getKeyVals()));
@@ -73,6 +76,10 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
 
     public void commit() {
         editableKeywordsPanel.commit();
+    }
+    
+    public EmfDataset getDataset() {
+        return this.dataset;
     }
 
 }
