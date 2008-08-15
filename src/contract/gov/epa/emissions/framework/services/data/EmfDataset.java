@@ -324,6 +324,14 @@ public class EmfDataset implements Dataset, Lockable {
         
         this.keyValsList = keyVals.toArray(new KeyVal[0]);
     }
+    
+    public void addKeyVal(KeyVal[] newKeyvals) {
+        List<KeyVal> keyVals = new ArrayList<KeyVal>();
+        keyVals.addAll(Arrays.asList(this.keyValsList));
+        keyVals.addAll(Arrays.asList(newKeyvals));
+        
+        this.keyValsList = keyVals.toArray(new KeyVal[0]);
+    }
 
     public KeyVal[] getKeyVals() {
         return this.keyValsList;

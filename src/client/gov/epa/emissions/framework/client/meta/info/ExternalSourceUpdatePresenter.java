@@ -124,6 +124,6 @@ public class ExternalSourceUpdatePresenter {
     }
 
     public void updateDatasetSource() {
-        this.sourceTabPresenter.updateExternalSources(dataset.getKeyVals(), dataset.getExternalSources());
+        this.sourceTabPresenter.updateExternalSources();
     }
 }

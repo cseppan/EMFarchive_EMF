@@ -12,6 +12,8 @@ public class EditableKeywordsTabPresenterImpl implements EditableKeywordsTabPres
     private EditableKeywordsTabView view;
 
     private EmfDataset dataset;
+    
+    private Keywords masterKeywords;
 
     public EditableKeywordsTabPresenterImpl(EditableKeywordsTabView view, EmfDataset dataset) {
         this.view = view;
@@ -19,6 +21,11 @@ public class EditableKeywordsTabPresenterImpl implements EditableKeywordsTabPres
     }
 
     public void display(Keywords masterKeywords) {
+        this.masterKeywords = masterKeywords;
+        view.display(dataset, masterKeywords);
+    }
+    
+    public void refreshView() {
         view.display(dataset, masterKeywords);
     }
 

@@ -70,8 +70,10 @@ public class InfoTab extends JPanel implements InfoTabView {
 
         SelectableSortFilterWrapper table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
         tablePanel.add(table, BorderLayout.CENTER);
+        
+        EmfDataset dataset = sourceTabPresenter.getDataset();
 
-        if (external && !forViewer)
+        if (external && !forViewer && dataset.getExternalSources() != null && dataset.getExternalSources().length > 0)
             tablePanel.add(controlPanel(), BorderLayout.PAGE_END);
 
         return tablePanel;

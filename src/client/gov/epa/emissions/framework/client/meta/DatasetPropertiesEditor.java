@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.client.exim.ExportPresenterImpl;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.info.InfoTab;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.logs.LogsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTab;
@@ -44,8 +45,8 @@ import javax.swing.event.ChangeListener;
 public class DatasetPropertiesEditor extends DisposableInteralFrame implements DatasetPropertiesEditorView {
 
     private PropertiesEditorPresenter presenter;
-    
-    //private EditableKeywordsTabPresenterImpl keywordsPresenter;
+
+    private EditableKeywordsTabPresenterImpl keywordsPresenter;
 
     private MessagePanel messagePanel;
 
@@ -56,8 +57,10 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private EditableKeywordsTab keywordsTab;
 
     private JTabbedPane tabbedPane;
-    
+
     private EmfDataset dataset;
+
+    private int previousTab = 0; // NOTE: assuming the default tab shown is Summary tab.
 
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
@@ -80,23 +83,29 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         tabbedPane.addTab("QA", createQATab());
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        
+
         final MessagePanel localMsgPanel = this.messagePanel;
 
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 localMsgPanel.clear();
 
-//                int tabIndex = tabbedPane.getSelectedIndex();
-//                String tabTitle = tabbedPane.getTitleAt(tabIndex);
-//                
-//                if (tabTitle.equals("Keywords")){
-//                    
-//                }
-//                    //keywordsPresenter.refreshView();
+                int tabIndex = tabbedPane.getSelectedIndex();
+
+                if (tabIndex == 2) // Keywords tab
+                    keywordsPresenter.refreshView();
+
+                if (previousTab == 2 && tabIndex != 2 && DatasetPropertiesEditor.this.hasChanges()) {
+                    try {
+                        keywordsPresenter.doSave(); // so the keywords changed be carried on to other tabs
+                    } catch (EmfException e1) {
+                        messagePanel.setError(e1.getMessage());
+                    }
+                }
+
+                previousTab = tabIndex;
             }
         });
-
 
         return tabbedPane;
     }
@@ -112,7 +121,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
             return createErrorTab("Could not load Summary Tab." + e.getMessage());
         }
     }
-    
+
     private JPanel createDataTab(EmfConsole parentConsole) {
         DataTab view = new DataTab(parentConsole, desktopManager);
         presenter.set(view);
@@ -132,7 +141,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private JPanel createInfoTab(EmfDataset dataset, EmfConsole parentConsole) {
         InfoTab view = new InfoTab(this, parentConsole, false);
-        
+
         try {
             presenter.set(view);
         } catch (EmfException e) {
@@ -145,10 +154,10 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private JPanel createKeywordsTab() {
         keywordsTab = new EditableKeywordsTab(this, parentConsole);
-        
+
         try {
             presenter.set(keywordsTab);
-//            keywordsPresenter = presenter.getKeywordsPresenter();
+            keywordsPresenter = presenter.getKeywordsPresenter();
             return keywordsTab;
         } catch (EmfException e) {
             showError("Could not load Keyword Tab." + e.getMessage());
@@ -178,7 +187,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
             return createErrorTab("Could not load Revisions tab. Failed communication with remote EMF Services.");
         }
     }
-    
+
     private JPanel createLogsTab(EmfDataset dataset, EmfConsole parentConsole) {
         try {
             LogsTab view = new LogsTab(parentConsole);
@@ -204,7 +213,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     public void display(EmfDataset dataset, Version[] versions) {
         super.setTitle("Dataset Properties Editor: " + dataset.getName());
         super.setName("datasetPropertiesEditor:" + dataset.getId());
-        this.dataset=dataset;
+        this.dataset = dataset;
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 
@@ -234,7 +243,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
             }
         });
         buttonsPanel.add(save);
-        
+
         Button exportButton = new ExportButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 exportDataset(dataset);
@@ -289,7 +298,6 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         }
     }
 
-    
     private void doSave() {
         keywordsTab.commit();
         try {
@@ -303,9 +311,9 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     public void setDefaultTab(int index) {
         this.tabbedPane.setSelectedIndex(index);
     }
-    
+
     private void exportDataset(EmfDataset dataset) {
-        EmfDataset[] emfDatasets = {dataset};
+        EmfDataset[] emfDatasets = { dataset };
 
         ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager, parentConsole, session);
         getDesktopPane().add(exportView);

@@ -77,6 +77,7 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
             PropertiesEditorTabPresenter element = (PropertiesEditorTabPresenter) iter.next();
             element.doSave();
         }
+        
         service.updateDataset(dataset);
 
         view.disposeView();
