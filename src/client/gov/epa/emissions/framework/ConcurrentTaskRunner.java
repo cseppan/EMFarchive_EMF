@@ -36,7 +36,7 @@ public class ConcurrentTaskRunner implements TaskRunner {
                 while (alive) {
                     try {
                         // FIXME: what's a reasonable polling time ?
-                        long pollInterval = 1 * 15 * 1000;
+                        long pollInterval = 1 * 60 * 1000;
                         mutex.wait(pollInterval);
                     } catch (InterruptedException e) {
                         alive = false;

@@ -145,7 +145,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
     }
 
     public void update(Status[] statuses) {
-        messagePanel.setMessage("Last Update : " + CustomDateFormat.format_YYYY_MM_DD_HH_MM(new Date()), Color.GRAY);
+        messagePanel.setMessage("Last Update : " + CustomDateFormat.format_MM_DD_YYYY_HH_mm_ss(new Date()), Color.GRAY);
         statusTableModel.refresh(statuses);
 
         super.revalidate();
