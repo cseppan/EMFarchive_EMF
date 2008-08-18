@@ -82,7 +82,13 @@ public class ImporterFactory {
                 new VersionedDataFormatFactory(null, dataset) };
 
         Constructor importerConstructor = importerClass.getDeclaredConstructor(classParams);
-        return (Importer) importerConstructor.newInstance(params);
+        
+        try {
+            Importer theImporter = (Importer) importerConstructor.newInstance(params);
+            return theImporter;
+        } catch (RuntimeException e) {
+            throw new Exception(e.getMessage());
+        }
     }
     
     public void closeDbConnection() throws Exception {
