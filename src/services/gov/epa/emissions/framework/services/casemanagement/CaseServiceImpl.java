@@ -712,4 +712,5 @@ public class CaseServiceImpl implements CaseService {
             session.close();
         }
     }
+    
 }

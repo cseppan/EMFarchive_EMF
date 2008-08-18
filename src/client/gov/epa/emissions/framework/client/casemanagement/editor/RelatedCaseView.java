@@ -8,4 +8,6 @@ public interface RelatedCaseView {
     void display(Case[] inputCases, Case[] outputCases);
 
     void observe(RelatedCasePresenter presenter);    
+    
+    
 }

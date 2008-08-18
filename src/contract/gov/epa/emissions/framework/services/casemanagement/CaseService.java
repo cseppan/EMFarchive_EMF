@@ -216,4 +216,5 @@ public interface CaseService {
     Case[] getCasesByOutputDatasets(int[] datasetIds) throws EmfException;
     
     Case[] getCasesByInputDataset(int datasetId) throws EmfException;
+    
  }

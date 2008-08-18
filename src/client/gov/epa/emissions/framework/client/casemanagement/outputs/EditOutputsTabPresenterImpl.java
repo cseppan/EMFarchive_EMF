@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.casemanagement.outputs;
 
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.editor.RelatedCasePresenter;
+import gov.epa.emissions.framework.client.casemanagement.editor.RelatedCaseView;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -108,5 +110,18 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
         if (!reloaded.isLocked(session.user()))
             throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
                     + " has it now.");
+    }
+    
+    public Case[] getCasesByInputDataset(int datasetId) throws EmfException{
+        return service().getCasesByInputDataset(datasetId);
+    }
+    
+    public Case[] getCasesByOutputDatasets(int[] datasetIds) throws EmfException{
+        return service().getCasesByOutputDatasets(datasetIds);
+    }
+    
+    public void doViewRelated(RelatedCaseView view, Case[] casesByInputDataset, Case[] casesByOutputDataset) {
+        RelatedCasePresenter presenter = new RelatedCasePresenter(view, session);
+        presenter.doDisplay(casesByInputDataset, casesByOutputDataset);
     }
 }

@@ -32,5 +32,7 @@ public class RelatedCasePresenter {
         CaseViewerPresenter presenter = new CaseViewerPresenterImpl(caseObj, session, caseView);
         presenter.doDisplay();
     }
+    
+    
 
 }

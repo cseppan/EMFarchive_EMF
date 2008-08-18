@@ -26,17 +26,17 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class RelatedCaseWindow extends DisposableInteralFrame implements RelatedCaseView {
+public class FindCaseWindow extends DisposableInteralFrame implements RelatedCaseView {
 
     private EmfConsole parentConsole;
     
-    private Case[] inputCases;
+    private Case[] caseProduceThisDataset;
 
-    private Case[] outputCases;
+    private Case[] casesUseThisDataset;
     
-    private ListWidget inputCaseListwidget;
+    private ListWidget produceListWidget;
 
-    private ListWidget outputCaseListWidget;
+    private ListWidget useListWidget;
     
     private RelatedCasePresenter presenter; 
     
@@ -44,7 +44,7 @@ public class RelatedCaseWindow extends DisposableInteralFrame implements Related
     
     private EmfSession session;
 
-    public RelatedCaseWindow(String title, EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
+    public FindCaseWindow(String title, EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super(title, new Dimension(550, 400), desktopManager);
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
@@ -52,8 +52,8 @@ public class RelatedCaseWindow extends DisposableInteralFrame implements Related
     }
 
     public void display(Case[] inputCases, Case[] outputCases) {
-        this.inputCases = inputCases;
-        this.outputCases = outputCases;
+        this.caseProduceThisDataset = inputCases;
+        this.casesUseThisDataset = outputCases;
         
         JPanel layout = createLayout();
         
@@ -83,9 +83,9 @@ public class RelatedCaseWindow extends DisposableInteralFrame implements Related
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout(5, 5));
         panel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        panel.add(new JLabel("Cases that Produce Inputs: "), BorderLayout.NORTH);
-        inputCaseListwidget = new ListWidget(inputCases);
-        JScrollPane pane = new JScrollPane(inputCaseListwidget);
+        panel.add(new JLabel("Case that Produced Dataset: "), BorderLayout.NORTH);
+        produceListWidget = new ListWidget(caseProduceThisDataset);
+        JScrollPane pane = new JScrollPane(produceListWidget);
         panel.add(pane);
         return panel;
     }
@@ -94,9 +94,9 @@ public class RelatedCaseWindow extends DisposableInteralFrame implements Related
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout(5, 5));
         panel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        panel.add(new JLabel("Cases that Use Outputs: "), BorderLayout.NORTH);
-        outputCaseListWidget = new ListWidget(outputCases);
-        JScrollPane pane = new JScrollPane(outputCaseListWidget);
+        panel.add(new JLabel("Cases that Use Dataset: "), BorderLayout.NORTH);
+        useListWidget = new ListWidget(casesUseThisDataset);
+        JScrollPane pane = new JScrollPane(useListWidget);
         panel.add(pane);
         return panel;
     }
@@ -131,8 +131,8 @@ public class RelatedCaseWindow extends DisposableInteralFrame implements Related
     }
 
     private Case[] getSelectedValues() {
-        Object[] valuesIn = inputCaseListwidget.getSelectedValues();
-        Object[] valuesout = outputCaseListWidget.getSelectedValues();
+        Object[] valuesIn = produceListWidget.getSelectedValues();
+        Object[] valuesout = useListWidget.getSelectedValues();
         List<Object> values = new ArrayList<Object>();
         if (valuesIn !=null && valuesIn.length > 0){
             for (int i = 0; i < valuesIn.length; i++) {
