@@ -35,7 +35,7 @@ import javax.swing.SpringLayout;
 public class ImportInputPanel extends JPanel {
 
     private MessagePanel messagePanel;
-    
+
     private ImportPresenter presenter;
 
     private DataCommonsService service;
@@ -51,16 +51,20 @@ public class ImportInputPanel extends JPanel {
     private JCheckBox isMultipleDatasets;
 
     private static String lastFolder = null;
-    
+
     JComboBox datasetTypesComboBox = null;
-    
+
+    private DatasetType defaultDSType;
+
     private EmfConsole parent;
 
-    public ImportInputPanel(DataCommonsService service, MessagePanel messagePanel, EmfConsole parent) throws EmfException {
+    public ImportInputPanel(DataCommonsService service, MessagePanel messagePanel, EmfConsole parent, DatasetType dsType)
+            throws EmfException {
         this.messagePanel = messagePanel;
         this.service = service;
         this.parent = parent;
-        
+        this.defaultDSType = dsType;
+
         initialize();
     }
 
@@ -71,21 +75,20 @@ public class ImportInputPanel extends JPanel {
         datasetTypesComboBox = typesComboBox();
         layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesComboBox, this);
 
-        JPanel chooser = new JPanel(new BorderLayout(2,0));
+        JPanel chooser = new JPanel(new BorderLayout(2, 0));
         folder = new TextField("folder", 35);
         chooser.add(folder, BorderLayout.LINE_START);
         chooser.add(importFileButton(), BorderLayout.LINE_END);
         layoutGenerator.addLabelWidgetPair("Folder", chooser, this);
 
-        JPanel apply = new JPanel(new BorderLayout(2,0));
+        JPanel apply = new JPanel(new BorderLayout(2, 0));
         pattern = new TextField("pattern", 35);
         apply.add(pattern, BorderLayout.LINE_START);
         apply.add(applyPatternButton(), BorderLayout.LINE_END);
         layoutGenerator.addLabelWidgetPair("Pattern", apply, this);
 
         filenames = new TextArea("filenames", "", 35, 6);
-        JScrollPane fileTextArea = new JScrollPane(filenames,
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+        JScrollPane fileTextArea = new JScrollPane(filenames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         layoutGenerator.addLabelWidgetPair("Filenames", fileTextArea, this);
 
@@ -111,7 +114,11 @@ public class ImportInputPanel extends JPanel {
         datasetTypesModel = new DefaultComboBoxModel(allTypesWithMessage);
         JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
         datasetTypesComboBox.setName("datasetTypes");
-        
+
+        if (this.defaultDSType != null && !defaultDSType.getName().equalsIgnoreCase("Select one")
+                && !defaultDSType.getName().equalsIgnoreCase("All"))
+            datasetTypesComboBox.setSelectedItem(defaultDSType);
+
         datasetTypesComboBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 clear();
@@ -166,7 +173,7 @@ public class ImportInputPanel extends JPanel {
 
         return button;
     }
-    
+
     public void register(ImportPresenter presenter) {
         this.presenter = presenter;
     }
@@ -189,7 +196,7 @@ public class ImportInputPanel extends JPanel {
 
     private void selectFile() {
         EmfFileInfo[] files = getSelectedFiles();
-        
+
         if (files == null || files.length == 0)
             return;
 
@@ -203,25 +210,25 @@ public class ImportInputPanel extends JPanel {
             singleFile(files[0]);
         }
     }
-    
+
     private EmfFileInfo[] getSelectedFiles() {
         EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
-        
+
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(service));
-        chooser.setTitle("Select the "+datasetTypesComboBox.getSelectedItem()+" files to import into Datasets");
+        chooser.setTitle("Select the " + datasetTypesComboBox.getSelectedItem() + " files to import into Datasets");
         chooser.setDirectoryAndFileMode();
-        
+
         int option = chooser.showDialog(parent, "Select a file");
 
         EmfFileInfo[] files = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedFiles() : null;
         EmfFileInfo dir = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
-        
+
         if (dir != null && !dir.getAbsolutePath().equals(lastFolder)) {
             folder.setText(dir.getAbsolutePath());
             lastFolder = dir.getAbsolutePath();
             clearfilenames();
         }
-        
+
         return files != null ? files : null;
     }
 

@@ -236,7 +236,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void importDataset() throws EmfException {
-        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktopManager, parentConsole);
+        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktopManager, parentConsole, getSelectedDSType());
 
         ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session, session.user(), session
                 .eximService(), session.dataService(), this);

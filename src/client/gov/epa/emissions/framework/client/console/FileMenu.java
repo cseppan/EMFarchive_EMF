@@ -83,7 +83,7 @@ public class FileMenu extends JMenu {
     }
 
     protected void displayImport(EmfSession session, EmfConsole parent) throws EmfException, Exception {
-        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktopManager, parent);
+        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktopManager, parent, null);
         ImportPresenter presenter = new ImportPresenter(session, session.user(), session.eximService());
         presenter.display(importView);
     }
