@@ -36,6 +36,8 @@ DECLARE
 	has_sic_column boolean := false; 
 	has_naics_column boolean := false;
 	has_target_pollutant integer := 0;
+	has_latlong_columns boolean := false;
+	has_plant_column boolean := false;
 	get_strategt_cost_sql character varying;
 	has_rpen_column boolean := false;
 	get_strategt_cost_inner_sql character varying;
@@ -100,63 +102,25 @@ BEGIN
 		discount_rate;
 
 	-- see if there are point specific columns in the inventory
-	SELECT count(1) = 4
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname in ('plantid','pointid','stackid','segment')
-		AND a.attnum > 0
-	into is_point_table;
+	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
 
 	-- see if there is a sic column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'sic'
-		AND a.attnum > 0
-	into has_sic_column;
+	has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
 
 	-- see if there is a naics column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'naics'
-		AND a.attnum > 0
-	into has_naics_column;
+	has_naics_column := public.check_table_for_columns(inv_table_name, 'naics', ',');
 
 	-- see if there is a rpen column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'rpen'
-		AND a.attnum > 0
-	into has_rpen_column;
+	has_rpen_column := public.check_table_for_columns(inv_table_name, 'rpen', ',');
 
-	SELECT count(1) = 3
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname in ('design_capacity','design_capacity_unit_numerator','design_capacity_unit_denominator')
-		AND a.attnum > 0
-	into has_design_capacity_columns;
+	-- see if there is design capacity columns in the inventory
+	has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',');
+
+	-- see if there is lat & long columns in the inventory
+	has_latlong_columns := public.check_table_for_columns(inv_table_name, 'xloc,yloc', ',');
+
+	-- see if there is lat & long columns in the inventory
+	has_plant_column := public.check_table_for_columns(inv_table_name, 'plant', ',');
 
 	-- get strategy constraints
 	SELECT csc.max_emis_reduction,
@@ -366,6 +330,9 @@ BEGIN
 		cs_id,
 		cm_id,
 		equation_type,
+		xloc,
+		yloc,
+		plant,
 		"comment"
 		)
 	select DISTINCT ON (inv.fips, inv.scc, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id) 
@@ -402,11 +369,17 @@ BEGIN
 		' || control_strategy_id || '::integer,
 		er.control_measures_id,
 		' || get_strategt_cost_sql || '.actual_equation_type as equation_type,
+		' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
+		' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
 		''''
 	FROM emissions.' || inv_table_name || ' inv
 
 		inner join emf.pollutants p
 		on p.name = inv.poll
+
+		' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
+		on fipscode.state_county_fips = inv.fips
+		and fipscode.country_num = ''0''' else '' end || '
 
 		inner join (
 			-- second pass, gets rid of ties for a paticular source

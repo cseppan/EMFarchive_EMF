@@ -589,3 +589,59 @@ CREATE INDEX control_strategy_programs_control_strategy_id
 
 insert into emf.strategy_types values(DEFAULT,'Project Future Year Inventory','Project Future Year Inventory', '', 'gov.epa.emissions.framework.services.cost.analysis.projectFutureYearInventory.StrategyTask');
 insert into emf.strategy_result_types (name) select 'Projected Future Year Inventory';
+
+
+insert into emf.control_program_types values (DEFAULT, 'Control', 'Control',3);
+
+
+-- Summarize by Plant and Pollutant - ORL Point Inventory (PTINV)
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select fips, 
+	plantid as plant_id, 
+	plant as plant_name, 
+	poll as pollutant, 
+	avg(xloc) as longitude, 
+	avg(yloc) as latitude, 
+	max(stkhgt) as max_stack_height, 
+	max(stkdiam) as max_stack_diameter, 
+	max(stktemp) as max_stack_temperature, 
+	max(stkflow) as max_stack_flow, 
+	max(stkvel) as max_stack_velocity, 
+	sum(ann_emis) as avg_annual_emissions, 
+	sum(avd_emis) as avg_daily_emissions
+from $TABLE[1] e
+group by fips,
+	plantid,
+	plant,
+	poll
+order by fips, 
+	plantid, 
+	poll'
+where name = 'Summarize by Plant and Pollutant'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Point Inventory (PTINV)'));
+
+-- Summarize by Plant and Pollutant - ORL Merged Inventory
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select fips, 
+	plantid as plant_id, 
+	plant as plant_name, 
+	poll as pollutant, 
+	sum(ann_emis) as avg_annual_emissions, 
+	sum(avd_emis) as avg_daily_emissions
+from $TABLE[1] e
+group by fips,
+	plantid,
+	plant,
+	poll
+order by fips, 
+	plantid, 
+	poll'
+where name = 'Summarize by Plant and Pollutant'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Merged Inventory'));
+

@@ -111,6 +111,7 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         cols.add(new Column("Control_Program", types.stringType(255), 255, new StringFormatter(255)));
         cols.add(new Column("XLOC", types.realType(), new RealFormatter()));
         cols.add(new Column("YLOC", types.realType(), new RealFormatter()));
+        cols.add(new Column("PLANT", types.stringType(255), 255, new StringFormatter(255)));
         cols.add(new Column("Comment", types.stringType(128), new StringFormatter(128)));
         
         return cols.toArray(new Column[0]);

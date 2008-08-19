@@ -35,6 +35,8 @@ DECLARE
 	has_sic_column boolean := false; 
 	has_naics_column boolean := false;
 	has_rpen_column boolean := false;
+	has_latlong_columns boolean := false;
+	has_plant_column boolean := false;
 	gimme_count integer := 0;
 	min_emis_reduction_constraint real := null;
 	min_control_efficiency_constraint real := null;
@@ -142,68 +144,27 @@ BEGIN
 	where id = target_pollutant_id
 	into target_pollutant;
 
-	-- see if there are point specific columns to be indexed
-	SELECT count(1) = 4
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname in ('plantid','pointid','stackid','segment')
-		AND a.attnum > 0
-	into is_point_table;
+	-- see if there are point specific columns in the inventory
+	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
 
 	-- see if there is a sic column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'sic'
-		AND a.attnum > 0
-	into has_sic_column;
+	has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
 
 	-- see if there is a naics column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'naics'
-		AND a.attnum > 0
-	into has_naics_column;
+	has_naics_column := public.check_table_for_columns(inv_table_name, 'naics', ',');
 
 	-- see if there is a rpen column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'rpen'
-		AND a.attnum > 0
-	into has_rpen_column;
+	has_rpen_column := public.check_table_for_columns(inv_table_name, 'rpen', ',');
 
-	IF is_point_table THEN
-		-- see if there is a design capacity columns in the inventory
-		SELECT count(1) = 3
-		FROM pg_class c
-			inner join pg_attribute a
-			on a.attrelid = c.oid
-			inner join pg_type t
-			on t.oid = a.atttypid
-		WHERE c.relname = inv_table_name
-			and a.attname in ('design_capacity','design_capacity_unit_numerator','design_capacity_unit_denominator')
-			AND a.attnum > 0
-		into has_design_capacity_columns;
-	END IF;
-	
+	-- see if there is design capacity columns in the inventory
+	has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',');
+
+	-- see if there is lat & long columns in the inventory
+	has_latlong_columns := public.check_table_for_columns(inv_table_name, 'xloc,yloc', ',');
+
+	-- see if there is lat & long columns in the inventory
+	has_plant_column := public.check_table_for_columns(inv_table_name, 'plant', ',');
+
 	-- get month of the dataset, 0 (Zero) indicates an annual inventory
 	select public.get_dataset_month(input_dataset_id)
 	into dataset_month;
@@ -364,7 +325,11 @@ BEGIN
 		cs_id,
 		cm_id,
 		original_dataset_id,
-		sector) 
+		sector,
+		xloc,
+		yloc,
+		plant
+		) 
 	select 	
 		' || detailed_result_dataset_id || '::integer,
 		cm_abbrev,
@@ -394,7 +359,10 @@ BEGIN
 		' || control_strategy_id || '::integer,
 		cm_id,
 		original_dataset_id,
-		sector
+		sector,
+		xloc,
+		yloc,
+		plant
 	from (
 
 

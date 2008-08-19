@@ -32,6 +32,8 @@ DECLARE
 	has_naics_column boolean := false;
 	has_rpen_column boolean := false;
 	has_merged_columns boolean := false;
+	has_latlong_columns boolean := false;
+	has_plant_column boolean := false;
 	gimme_count integer := 0;
 	min_emis_reduction_constraint real := null;
 	min_control_efficiency_constraint real := null;
@@ -132,79 +134,29 @@ BEGIN
 	where id = target_pollutant_id
 	into target_pollutant;
 
-	-- see if there are point specific columns to be indexed
-	SELECT count(1) = 4
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname in ('plantid','pointid','stackid','segment')
-		AND a.attnum > 0
-	into is_point_table;
+	-- see if there are point specific columns in the inventory
+	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
 
 	-- see if there is a sic column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'sic'
-		AND a.attnum > 0
-	into has_sic_column;
+	has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
 
 	-- see if there is a naics column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'naics'
-		AND a.attnum > 0
-	into has_naics_column;
+	has_naics_column := public.check_table_for_columns(inv_table_name, 'naics', ',');
 
 	-- see if there is a rpen column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'rpen'
-		AND a.attnum > 0
-	into has_rpen_column;
+	has_rpen_column := public.check_table_for_columns(inv_table_name, 'rpen', ',');
 
-	IF is_point_table THEN
-		-- see if there is a design capacity columns in the inventory
-		SELECT count(1) = 3
-		FROM pg_class c
-			inner join pg_attribute a
-			on a.attrelid = c.oid
-			inner join pg_type t
-			on t.oid = a.atttypid
-		WHERE c.relname = inv_table_name
-			and a.attname in ('design_capacity','design_capacity_unit_numerator','design_capacity_unit_denominator')
-			AND a.attnum > 0
-		into has_design_capacity_columns;
-	END IF;
-	
+	-- see if there is design capacity columns in the inventory
+	has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',');
+
+	-- see if there is lat & long columns in the inventory
+	has_latlong_columns := public.check_table_for_columns(inv_table_name, 'xloc,yloc', ',');
+
+	-- see if there is lat & long columns in the inventory
+	has_plant_column := public.check_table_for_columns(inv_table_name, 'plant', ',');
+
 	-- see if this a merged orl inventory
-	SELECT count(1) = 2
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname in ('original_dataset_id','sector')
-		AND a.attnum > 0
-	into has_merged_columns;
+	has_merged_columns := public.check_table_for_columns(inv_table_name, 'original_dataset_id,sector', ',');
 
 	-- get sector of the inventory if this is not a merged orl inventory
 	IF not has_merged_columns THEN
@@ -489,7 +441,10 @@ BEGIN
 			equation_type,
 			original_dataset_id,
 			sector,
-			source) 
+			source,
+			xloc,
+			yloc,
+			plant) 
 	select *
 	from (
 		select DISTINCT ON (inv.record_id, er.control_measures_id) 
@@ -546,7 +501,7 @@ BEGIN
 			' || get_strategt_cost_inner_sql || '.actual_equation_type as equation_type,
 			' || case when not has_merged_columns then 'null::integer as original_dataset_id, ' || quote_literal(sector) || '::text as sector' else 'inv.original_dataset_id, inv.sector' end || '
 			,
-			sources.id as source
+			sources.id as source,
 
 /*(select sources.id from emf.sources where sources.scc = inv.scc
 			and sources.fips = inv.fips
@@ -561,8 +516,14 @@ BEGIN
 			and sources.stackid = inv.stackid
 			and sources.segment = inv.segment
 			' end || ') as source
-*/			
+*/
+			' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
+			' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || '
 		FROM emissions.' || inv_table_name || ' inv
+			' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
+			on fipscode.state_county_fips = inv.fips
+			and fipscode.country_num = ''0''' else '' end || '
+
 			inner join emf.sources
 
 			on sources.source = inv.scc || inv.fips || ' || case when is_point_table = false then 'repeat('' '', 60) ' else 'rpad(coalesce(inv.plantid, ''''), 15) || rpad(coalesce(inv.pointid, ''''), 15) || rpad(coalesce(inv.stackid, ''''), 15) || rpad(coalesce(inv.segment, ''''), 15)' end || '
@@ -704,7 +665,10 @@ BEGIN
 			equation_type,
 			original_dataset_id,
 			sector,
-			source) 
+			source,
+			xloc,
+			yloc,
+			plant) 
 	select DISTINCT ON (inv.record_id, er.control_measures_id) 
 		' || worksheet_dataset_id || ',
 		m.abbreviation,
@@ -758,8 +722,15 @@ BEGIN
 		case when coalesce(' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, 0) != 0 then coalesce(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.annual_cost / ' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, 0.0) else 0.0 end as marginal,
 		' || get_strategt_cost_inner_sql || '.actual_equation_type as equation_type,
 		' || case when not has_merged_columns then 'null::integer as original_dataset_id, ' || quote_literal(sector) || '::character varying as sector' else 'inv.original_dataset_id, inv.sector' end || ',
-		/*null::integer*/sources.id as source
+		/*null::integer*/sources.id as source,
+		' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
+		' || case when has_plant_column then 'inv.plant' else 'null::character varying as plant' end || '
+
 	FROM emissions.' || inv_table_name || ' inv
+		' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
+		on fipscode.state_county_fips = inv.fips
+		and fipscode.country_num = ''0''' else '' end || '
+
 		inner join emf.sources
 		on sources.source = inv.scc || inv.fips || ' || case when is_point_table = false then 'repeat('' '', 60) ' else 'rpad(coalesce(inv.plantid, ''''), 15) || rpad(coalesce(inv.pointid, ''''), 15) || rpad(coalesce(inv.stackid, ''''), 15) || rpad(coalesce(inv.segment, ''''), 15)' end || '
 /*		on sources.scc = inv.scc

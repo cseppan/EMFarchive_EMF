@@ -260,7 +260,7 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         } else if (strategyType != null && strategyType.getName().equals(StrategyType.leastCostCurve)) {
             leastCostPanelContainer.add(leastCostCurvePanel, BorderLayout.NORTH);
             replacementControlMinEfficiencyDiff.setEnabled(true);
-        } else if (strategyType != null && strategyType.getName().equals(StrategyType.maxEmissionsReduction)) {
+        } else if (strategyType != null && (strategyType.getName().equals(StrategyType.maxEmissionsReduction) || strategyType.getName().equals(StrategyType.projectFutureYearInventory))) {
             replacementControlMinEfficiencyDiff.setEnabled(true);
         } else {
             replacementControlMinEfficiencyDiff.setEnabled(false);

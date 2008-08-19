@@ -65,10 +65,12 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private EditControlStrategySummaryTab summaryTabView;
     
-    private JPanel programsTab;
+    private JPanel programsTab, measuresTab;
     
     final private JTabbedPane tabbedPane = new JTabbedPane();
-
+    
+    private StrategyType lastStrategyType;
+    
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
         super("Edit Control Strategy", new Dimension(700, 580), desktopManager);
 //        this.setMinimumSize(new Dimension(700, 300));
@@ -86,7 +88,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         super.setLabel(super.getTitle() + ": " + controlStrategy.getName());
 
         this.controlStrategy = controlStrategy;
-
+        this.lastStrategyType = controlStrategy.getStrategyType();
         doLayout(controlStrategy, controlStrategyResults);
 //        pack();
         super.display();
@@ -119,12 +121,14 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         // These are just added to illustrate what is coming later
         tabbedPane.addTab("Inventories", createInventoryFilterTab(controlStrategy));
 //        tabbedPane.addTab("Pollutants", createPollutantsTab(controlStrategy));
-        tabbedPane.addTab("Measures", createMeasuresTab(controlStrategy));
+        measuresTab = createMeasuresTab(controlStrategy);
         programsTab = createProgramsTab(controlStrategy);
         if (controlStrategy.getStrategyType()!= null && 
            controlStrategy.getStrategyType().getName().equals(StrategyType.projectFutureYearInventory)) 
         {
             tabbedPane.addTab("Programs", programsTab);
+        } else {
+            tabbedPane.addTab("Measures", measuresTab);
         }
         tabbedPane.addTab("Constraints", createAppliedMeasuresTab(controlStrategy));
         tabbedPane.addTab("Outputs", outputPanel(controlStrategyResults));
@@ -476,16 +480,19 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     public void notifyStrategyTypeChange(StrategyType strategyType) {
         if (strategyType != null) {
-            if (strategyType.getName().equals(strategyType.projectFutureYearInventory)) {
+            if (strategyType.getName().equals(StrategyType.projectFutureYearInventory)) {
                 if (tabbedPane.getTabCount() == 5) {
-                    //tabbedPane.setTabComponentAt(3, programsTab);
-                    tabbedPane.insertTab("Programs", null, programsTab, null, 3);
+                    tabbedPane.removeTabAt(2);
+                    tabbedPane.insertTab("Programs", null, programsTab, null, 2);
                 }
-            } else {
-                if (tabbedPane.getTabCount() == 6) {
-                    tabbedPane.removeTabAt(3);
+            } 
+            if (lastStrategyType.getName().equals(StrategyType.projectFutureYearInventory)) {
+                if (tabbedPane.getTabCount() == 5) {
+                    tabbedPane.removeTabAt(2);
+                    tabbedPane.insertTab("Measures", null, measuresTab, null, 2);
                 }
             }
         }
+        lastStrategyType = strategyType;
     }
 }

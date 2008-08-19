@@ -70,7 +70,9 @@ insert into emf.control_measure_classes values (DEFAULT, 'Obsolete', 'Obsolete')
 --emf.control_measure_classes
 
 --emf.control_program_types
-insert into emf.control_program_types values (DEFAULT, 'Plant Closure', 'Plant Closure');
+insert into emf.control_program_types values (DEFAULT, 'Plant Closure', 'Plant Closure',0);
+insert into emf.control_program_types values (DEFAULT, 'Projection', 'Projection',2);
+insert into emf.control_program_types values (DEFAULT, 'Control', 'Control',3);
 --emf.control_program_types
 
 --emf.equation_types

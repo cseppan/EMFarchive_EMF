@@ -28,6 +28,8 @@ DECLARE
 	has_sic_column boolean := false; 
 	has_naics_column boolean := false;
 	has_rpen_column boolean := false;
+	has_latlong_columns boolean := false;
+	has_plant_column boolean := false;
 	dataset_month smallint := 0;
 	no_days_in_month smallint := 31;
 	run_status character varying;
@@ -90,68 +92,28 @@ BEGIN
 		use_cost_equations,
 		discount_rate;
 
-	-- see if there are point specific columns to be indexed
-	SELECT count(1) = 4
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname in ('plantid','pointid','stackid','segment')
-		AND a.attnum > 0
-	into is_point_table;
+
+	-- see if there are point specific columns in the inventory
+	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
 
 	-- see if there is a sic column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'sic'
-		AND a.attnum > 0
-	into has_sic_column;
+	has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
 
 	-- see if there is a naics column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'naics'
-		AND a.attnum > 0
-	into has_naics_column;
+	has_naics_column := public.check_table_for_columns(inv_table_name, 'naics', ',');
 
 	-- see if there is a rpen column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'rpen'
-		AND a.attnum > 0
-	into has_rpen_column;
+	has_rpen_column := public.check_table_for_columns(inv_table_name, 'rpen', ',');
 
-	IF is_point_table THEN
-		-- see if there is a design capacity columns in the inventory
-		SELECT count(1) = 3
-		FROM pg_class c
-			inner join pg_attribute a
-			on a.attrelid = c.oid
-			inner join pg_type t
-			on t.oid = a.atttypid
-		WHERE c.relname = inv_table_name
-			and a.attname in ('design_capacity','design_capacity_unit_numerator','design_capacity_unit_denominator')
-			AND a.attnum > 0
-		into has_design_capacity_columns;
-	END IF;
-	
+	-- see if there is design capacity columns in the inventory
+	has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',');
+
+	-- see if there is lat & long columns in the inventory
+	has_latlong_columns := public.check_table_for_columns(inv_table_name, 'xloc,yloc', ',');
+
+	-- see if there is lat & long columns in the inventory
+	has_plant_column := public.check_table_for_columns(inv_table_name, 'plant', ',');
+
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
 		county_dataset_filter_sql := ' and fips in (SELECT fips
@@ -281,7 +243,10 @@ BEGIN
 		source_id,
 		input_ds_id,
 		cs_id,
-		cm_id
+		cm_id,
+		xloc,
+		yloc,
+		plant
 		)
 	select 	' || detailed_result_dataset_id || '::integer,
 		abbreviation,
@@ -313,7 +278,10 @@ BEGIN
 		source_id,
 		' || input_dataset_id || '::integer,
 		' || control_strategy_id || '::integer,
-		cm_id
+		cm_id,
+		xloc,
+		yloc,
+		plant
 	from (
 		select DISTINCT ON (inv.scc, inv.fips, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id, er.control_measures_id) 
 			m.abbreviation,
@@ -345,11 +313,17 @@ BEGIN
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ' as naics,
 			inv.record_id::integer as source_id,
 			er.control_measures_id as cm_id,
-			' || case when measures_count > 0 then 'csm.apply_order ' else '1.0' end || ' as apply_order
+			' || case when measures_count > 0 then 'csm.apply_order ' else '1.0' end || ' as apply_order,
+			' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
+			' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || '
 		FROM emissions.' || inv_table_name || ' inv
 
 			inner join emf.pollutants p
 			on p.name = inv.poll
+
+			' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
+			on fipscode.state_county_fips = inv.fips
+			and fipscode.country_num = ''0''' else '' end || '
 
 			inner join emf.control_measure_sccs scc
 			on scc.name = inv.scc

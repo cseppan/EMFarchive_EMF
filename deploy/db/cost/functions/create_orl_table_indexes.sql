@@ -2,7 +2,7 @@
 
 -- DROP FUNCTION emf.create_orl_table_indexes(table_name character varying);
 
-CREATE OR REPLACE FUNCTION create_orl_table_indexes(table_name character varying)
+CREATE OR REPLACE FUNCTION public.create_orl_table_indexes(table_name character varying)
   RETURNS void AS
 $BODY$
 DECLARE
@@ -10,44 +10,25 @@ DECLARE
 	is_point_table boolean := false;
 	has_poll_column boolean := false;
 	has_scc_column boolean := false;
+	has_mact_column boolean := false;
+	has_sic_column boolean := false;
 BEGIN
 
 	-- see if there are point specific columns to be indexed
-	SELECT count(1) = 4
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = lower(table_name)
-		and a.attname in ('plantid','pointid','stackid','segment')
-		AND a.attnum > 0
-	into is_point_table;
+	is_point_table := public.check_table_for_columns(table_name, 'plantid,pointid,stackid,segment', ',');
 
 	-- see if there are poll column to be indexed
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = lower(table_name)
-		and a.attname in ('poll')
-		AND a.attnum > 0
-	into has_poll_column;
+	has_poll_column := public.check_table_for_columns(table_name, 'poll', ',');
 
 	-- see if there are scc column to be indexed
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = lower(table_name)
-		and a.attname in ('scc')
-		AND a.attnum > 0
-	into has_scc_column;
+	has_scc_column := public.check_table_for_columns(table_name, 'scc', ',');
 
+	-- see if there is a mact column in the inventory
+	has_mact_column := public.check_table_for_columns(table_name, 'mact', ',');
+
+	-- see if there is a sic column in the inventory
+	has_sic_column := public.check_table_for_columns(table_name, 'sic', ',');
+					
 	-- Create Indexes....
 
 	-- create fips btree index
@@ -134,10 +115,35 @@ BEGIN
 				(segment)';
 	END IF;
 
+	IF has_mact_column THEN
+		-- create poll btree index
+		IF length('poll_' || table_name) >= 63 - 5 THEN
+			index_name := 'mact_' || substr(table_name, 6, 63);
+		ELSE
+			index_name := 'mact_' || table_name;
+		END IF;
+		execute 'CREATE INDEX ' || index_name || '
+				ON emissions.' || table_name || '
+				USING btree
+				(mact)';
+	END IF;
+
+	IF has_sic_column THEN
+		-- create poll btree index
+		IF length('sic_' || table_name) >= 63 - 4 THEN
+			index_name := 'sic_' || substr(table_name, 5, 63);
+		ELSE
+			index_name := 'sic_' || table_name;
+		END IF;
+		execute 'CREATE INDEX ' || index_name || '
+				ON emissions.' || table_name || '
+				USING btree
+				(sic)';
+	END IF;
+
 END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE;
 ALTER FUNCTION public.create_orl_table_indexes(table_name character varying) OWNER TO emf;
 
---select public.create_orl_table_indexes('csdr_1081_v0_20071107011535p2020_annualsum_25oct2007_v0_orl_txt');
-
+select public.create_orl_table_indexes('ds_ptinv_ptnonipm_2020cc_1068478967');vacuum analyze emissions.ds_ptinv_ptnonipm_2020cc_1068478967

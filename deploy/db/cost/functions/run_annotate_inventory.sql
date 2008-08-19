@@ -54,7 +54,7 @@ DECLARE
 	has_control_measures_col boolean := false;
 	has_pct_reduction_col boolean := false;
 BEGIN
-	SET work_mem TO '256MB';
+--	SET work_mem TO '256MB';
 
 	-- get the input dataset info
 	select lower(i.table_name)
@@ -109,87 +109,26 @@ BEGIN
 		discount_rate;
 
 	-- see if there are point specific columns in the inventory
-	SELECT count(1) = 4
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname in ('plantid','pointid','stackid','segment')
-		AND a.attnum > 0
-	into is_point_table;
+	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
 
 	-- see if there is a sic column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'sic'
-		AND a.attnum > 0
-	into has_sic_column;
+	has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
 
 	-- see if there is a naics column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'naics'
-		AND a.attnum > 0
-	into has_naics_column;
+	has_naics_column := public.check_table_for_columns(inv_table_name, 'naics', ',');
 
 	-- see if there is a rpen column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'rpen'
-		AND a.attnum > 0
-	into has_rpen_column;
+	has_rpen_column := public.check_table_for_columns(inv_table_name, 'rpen', ',');
 
 	-- see if there is a cpri column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'cpri'
-		AND a.attnum > 0
-	into has_cpri_column;
+	has_cpri_column := public.check_table_for_columns(inv_table_name, 'cpri', ',');
 
 	-- see if there is a primary_device_type_code column in the inventory
-	SELECT count(1) = 1
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname = 'primary_device_type_code'
-		AND a.attnum > 0
-	into has_primary_device_type_code_column;
+	has_primary_device_type_code_column := public.check_table_for_columns(inv_table_name, 'primary_device_type_code', ',');
 
-	SELECT count(1) = 3
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = inv_table_name
-		and a.attname in ('design_capacity','design_capacity_unit_numerator','design_capacity_unit_denominator')
-		AND a.attnum > 0
-	into has_design_capacity_columns;
+	-- see if there is design capacity columns in the inventory
+	has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',');
+
 
 	-- get strategy constraints
 	SELECT max_emis_reduction,

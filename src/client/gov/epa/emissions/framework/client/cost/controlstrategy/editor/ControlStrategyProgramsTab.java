@@ -146,7 +146,7 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
       
         mainPanel.removeAll();
-        mainPanel.add(new JLabel("Technologies to Include:"), BorderLayout.NORTH);
+        mainPanel.add(new JLabel("Programs to Include:"), BorderLayout.NORTH);
         mainPanel.add(tablePanel());
         mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
         return mainPanel; 

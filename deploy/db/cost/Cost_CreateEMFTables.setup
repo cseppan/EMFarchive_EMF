@@ -581,7 +581,7 @@ CREATE TABLE emf.control_programs
   name varchar(255) NOT NULL UNIQUE,
   description text,
   start_date timestamp NOT NULL,
-  end_date timestamp NOT NULL,
+  end_date timestamp,
   control_program_type_id int4 NOT NULL REFERENCES emf.control_program_types (id),
   dataset_id int4 NOT NULL REFERENCES emf.datasets (id),
   dataset_version int4 NOT NULL,
