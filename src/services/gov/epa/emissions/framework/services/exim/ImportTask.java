@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.exim;
 
 import java.io.File;
+import java.util.Date;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.importer.Importer;
@@ -101,7 +102,7 @@ public class ImportTask extends Task {
         } catch (Exception e) {
             errorMsg += e.getMessage();
             // this doesn't give the full path for some reason
-            logError("Failed to import file(s) : " + filesList(), e);
+            logError("File(s) import failed for user (" + user.getUsername() + ") at " + new Date().toString() + "--" + filesList(), e);
             removeDataset(dataset);
         } finally {
             if (isDone) {
@@ -137,6 +138,7 @@ public class ImportTask extends Task {
 
     protected String filesList() {
         StringBuffer fileList = new StringBuffer(files[0]);
+        fileList.append("Path: " + path.getAbsolutePath() + "; File(s): ");
 
         if (files.length > 1)
             for (int i = 1; i < files.length; i++)
