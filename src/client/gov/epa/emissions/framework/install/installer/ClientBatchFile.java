@@ -18,12 +18,11 @@ public class ClientBatchFile {
         writer = new PrintWriter(new BufferedWriter( new FileWriter(fileName)));
     }
     
-    public void create(String preference, String javahome, String server) throws Exception{
-        String rhome = System.getProperty("R_HOME");
+    public void create(String preference, String javahome, String rhome, String server) throws Exception{
         writer.println("@echo off" + sep);
         writer.println("::  Batch file to start the EMF Client" + sep  + sep);
         writer.println("set EMF_HOME=\"" + batchFile.getParent() + "\""+ sep);
-        writer.println("set R_HOME=" + (rhome == null || rhome.isEmpty() ? "C:\\Program Files\\R\\rw2000\\bin" : rhome) + sep);
+        writer.println("set R_HOME=\"" + rhome + "\"" + sep);
         writer.println("set JAVA_EXE=\"" + javahome + "\\bin\\java\"" + sep);
         writer.println("::  add bin directory to search path" + sep); 
         writer.println("set PATH=%PATH%;%R_HOME%" + sep);

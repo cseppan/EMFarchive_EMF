@@ -10,11 +10,9 @@ public class InstallPreferences {
 
     private static final String DEFAULT_OUTPUT_FOLDER = "default.output.folder";
 
-    private static final String LOCAL_OUTPUT_DRIVE = "local.output.drive";
-
-    private static final String LOCAL_INPUT_DRIVE = "local.input.drive";
-    
     private static final String EMF_INSTALL_FOLDER = "emf.install.folder";
+    
+    private static final String R_HOME = "r.home";
     
     private static final String EMF_SERVER_ADDRESS = "server.address";
     
@@ -56,13 +54,15 @@ public class InstallPreferences {
     }
 
     public String inputFolder() {
-        return property(LOCAL_INPUT_DRIVE).replace('/', '\\') + 
-            property(DEFAULT_INPUT_FOLDER).replace('/', '\\');
+        return property(DEFAULT_INPUT_FOLDER);
     }
 
     public String outputFolder() {
-        return property(LOCAL_OUTPUT_DRIVE).replace('/', '\\') +
-            property(DEFAULT_OUTPUT_FOLDER).replace('/', '\\');
+        return property(DEFAULT_OUTPUT_FOLDER);
+    }
+    
+    public String rHome() {
+        return property(R_HOME);
     }
     
     public String emfInstallFolder() {

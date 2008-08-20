@@ -56,7 +56,7 @@ public class Tools {
         }
     }
 
-    public static void writePreference(String website, String input, String output, String javahome, String emfhome,
+    public static void writePreference(String website, String input, String output, String javahome, String rhome, String emfhome,
             String server) throws Exception {
         String separator = Constants.SEPARATOR;
         
@@ -67,11 +67,11 @@ public class Tools {
                 + "#legal options: Standard_Notation,Scientific_Notation, Dollars, Percentage, Custom" + separator
                 + "format.double.significant_digits=4";
 
-        String emfPrefString = "local.input.drive=" + input.charAt(0) + ":/" + separator + "local.output.drive="
-                + output.charAt(0) + ":/" + separator + "remote.input.drive=/data/" + separator
-                + "remote.output.drive=/data/" + separator + "default.input.folder="
-                + input.substring(3).replace('\\', '/') + separator + "default.output.folder="
-                + output.substring(3).replace('\\', '/') + separator + "server.address=" + server + separator;
+        String emfPrefString = "local.input.drive=" + separator + "local.output.drive="
+                + separator + "remote.input.drive=" + separator
+                + "remote.output.drive=" + separator + "default.input.folder="
+                + input + separator + "default.output.folder="
+                + output + separator + "server.address=" + server + separator;
 
         String towrite = "#EMF Client Installer - Preferences" + separator + "#comments '#'" + separator
                 + "#preference specified by key,value pair separted by '='" + separator + "#case sensitive" + separator
@@ -79,7 +79,7 @@ public class Tools {
                 + "#If the value aren't specified then default value will be empty string" + separator
                 + "#Use '/' for path separator for file names" + separator + separator + "web.site=" + website
                 + separator + "emf.install.folder=" + emfhome.replace('\\', '/') + separator + emfPrefString
-                + "java.home=" + javahome.replace('\\', '/') + separator;
+                + "java.home=" + javahome.replace('\\', '/') + separator + "r.home=" + rhome.replace('\\', '/') + separator;
 
         PrintWriter userPrefWriter = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.home")
                 + "\\" + Constants.INSTALLER_PREFERENCES_FILE)));
