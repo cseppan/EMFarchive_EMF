@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.editor.RelatedCasePresenter;
+import gov.epa.emissions.framework.client.casemanagement.editor.RelatedCaseView;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -112,5 +114,19 @@ public class ViewableInputsTabPresenterImpl {
 
         return all.toArray(new Sector[0]);
     }
+    
+    public Case[] getCasesByInputDataset(int datasetId) throws EmfException{
+        return service().getCasesByInputDataset(datasetId);
+    }
+    
+    public Case[] getCasesByOutputDatasets(int[] datasetIds) throws EmfException{
+        return service().getCasesByOutputDatasets(datasetIds);
+    }
+    
+    public void doViewRelated(RelatedCaseView view, Case[] casesByInputDataset, Case[] casesByOutputDataset) {
+        RelatedCasePresenter presenter = new RelatedCasePresenter(view, session);
+        presenter.doDisplay(casesByInputDataset, casesByOutputDataset);
+    }
+
     
 }

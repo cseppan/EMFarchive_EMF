@@ -228,7 +228,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
                 viewCasesReleatedToDataset();
             }
         });
-        export.setMargin(insets);
+        findRelated.setMargin(insets);
         container.add(findRelated);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -397,7 +397,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
     private void viewCasesReleatedToDataset() {
         List outputlist = table.selected();
         if (outputlist == null || outputlist.size() != 1 ){
-            messagePanel.setMessage("Please select one input. ");
+            messagePanel.setMessage("Please select one output.");
             return; 
         }
         
@@ -412,7 +412,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
             Case[] casesByOutputDataset  = presenter.getCasesByOutputDatasets(new int[] {datasetId});
             String title = "Find Uses of Dataset: " + caseObj.getName();
             RelatedCaseView view = new FindCaseWindow(title, session, parentConsole, desktopManager);
-            presenter.doViewRelated(view, casesByInputDataset, casesByOutputDataset);
+            presenter.doViewRelated(view, casesByOutputDataset, casesByInputDataset);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

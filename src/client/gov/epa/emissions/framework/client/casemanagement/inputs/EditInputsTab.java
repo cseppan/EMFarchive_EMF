@@ -300,7 +300,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
                 viewCasesReleatedToDataset();
             }
         });
-        export.setMargin(insets);
+        findRelated.setMargin(insets);
         container.add(findRelated);
 
         showAll = new JCheckBox("Show All", false);
@@ -664,7 +664,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             Case[] casesByOutputDataset  = presenter.getCasesByOutputDatasets(new int[] {dataset.getId()});
             String title = "Find Uses of Dataset: " + caseObj.getName();
             RelatedCaseView view = new FindCaseWindow(title, session, parentConsole, desktopManager);
-            presenter.doViewRelated(view, casesByInputDataset, casesByOutputDataset);
+            presenter.doViewRelated(view, casesByOutputDataset, casesByInputDataset);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

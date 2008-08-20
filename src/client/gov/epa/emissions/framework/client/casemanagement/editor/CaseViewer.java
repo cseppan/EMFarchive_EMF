@@ -293,7 +293,7 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
                 
             String title = "View Related Cases: " + caseObj.getName();
             RelatedCaseView view = new RelatedCaseWindow(title, session, parentConsole, desktopManager);
-            presenter.doViewRelated(view, useAsOutputCases, produceInputCases);
+            presenter.doViewRelated(view, produceInputCases, useAsOutputCases);
         } catch (EmfException e) {
             showError(e.getMessage());
         }

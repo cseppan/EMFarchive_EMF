@@ -8,6 +8,8 @@ import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.casemanagement.editor.FindCaseWindow;
+import gov.epa.emissions.framework.client.casemanagement.editor.RelatedCaseView;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
@@ -211,6 +213,14 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
         export.setMargin(insets);
         export.setEnabled(false);
         container.add(export);
+        
+        Button findRelated = new Button("Find", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                viewCasesReleatedToDataset();
+            }
+        });
+        findRelated.setMargin(insets);
+        container.add(findRelated);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
@@ -319,4 +329,29 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
     public void clearMessage() {
         messagePanel.clear();
     }
+    
+    private void viewCasesReleatedToDataset() {
+        List outputlist = table.selected();
+        if (outputlist == null || outputlist.size() != 1 ){
+            messagePanel.setMessage("Please select one output. ");
+            return; 
+        }
+        
+        int datasetId = ((CaseOutput)outputlist.get(0)).getDatasetId();
+        if (datasetId == 0 ){
+            messagePanel.setMessage("No dataset available. ");
+            return; 
+        }
+        
+        try {
+            Case[] casesByInputDataset = presenter.getCasesByInputDataset(datasetId);
+            Case[] casesByOutputDataset  = presenter.getCasesByOutputDatasets(new int[] {datasetId});
+            String title = "Find Uses of Dataset: " + caseObj.getName();
+            RelatedCaseView view = new FindCaseWindow(title, session, parentConsole, desktopManager);
+            presenter.doViewRelated(view, casesByOutputDataset, casesByInputDataset);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+
+    } 
 }
