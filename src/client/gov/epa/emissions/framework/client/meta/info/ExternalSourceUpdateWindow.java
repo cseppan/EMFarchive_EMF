@@ -8,7 +8,6 @@ import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -149,7 +148,7 @@ public class ExternalSourceUpdateWindow extends JDialog {
                 
                 try {
                     presenter.update(folder.getText(), massLoc.isSelected());
-                } catch (EmfException e1) {
+                } catch (Exception e1) {
                     e1.printStackTrace();
                     messagePanel.setError(e1.getMessage());
                 }

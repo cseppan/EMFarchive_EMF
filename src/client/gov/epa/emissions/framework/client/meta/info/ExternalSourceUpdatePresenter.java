@@ -5,10 +5,7 @@ import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-
-import java.io.File;
 
 public class ExternalSourceUpdatePresenter {
 
@@ -17,6 +14,8 @@ public class ExternalSourceUpdatePresenter {
     private EmfSession session;
 
     private InfoTabPresenter sourceTabPresenter;
+    
+    private String fs = "/";
 
     public ExternalSourceUpdatePresenter(InfoTabPresenter sourceTabPresenter) {
         this.dataset = sourceTabPresenter.getDataset();
@@ -29,13 +28,16 @@ public class ExternalSourceUpdatePresenter {
         view.display();
     }
 
-    public void update(String folder, boolean isMassLoc) throws EmfException {
+    public void update(String folder, boolean isMassLoc) throws Exception {
+        if (Character.isLetter(folder.charAt(0)))
+            fs = "\\";
+        
         ExternalSource[] sources = dataset.getExternalSources();
         KeyVal[] keys = dataset.getKeyVals();
         Keywords keywords = new Keywords(session.dataCommonsService().getKeywords());
         Keyword massLocKeyword = keywords.get("MASS_STORAGE_LOCATION");
         Keyword prevLocKeyword = keywords.get("PREVIOUS_LOCATION");
-        String existLoc = new File(sources[0].getDatasource()).getParent();
+        String existLoc = getFileInfo(sources[0], false);
 
         int massLoc = -1;
         int prevLoc = -1;
@@ -114,16 +116,27 @@ public class ExternalSourceUpdatePresenter {
             dataset.addKeyVal(new KeyVal(massLocKeyword, folder));
     }
 
-    private void updateExternalSources(String folder, ExternalSource[] sources) {
-        for (int i = 0; i < sources.length; i++) {
-            String temp = folder + File.separator + new File(sources[i].getDatasource()).getName();
-            sources[i].setDatasource(temp);
-        }
+    private void updateExternalSources(String folder, ExternalSource[] sources) throws Exception {
+        try {
+            for (int i = 0; i < sources.length; i++)
+                sources[i].setDatasource(folder + fs + getFileInfo(sources[i], true));
 
-        dataset.setExternalSources(sources);
+            dataset.setExternalSources(sources);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 
     public void updateDatasetSource() {
         this.sourceTabPresenter.updateExternalSources();
+    }
+
+    private String getFileInfo(ExternalSource ext, boolean name) {
+        String source = ext.getDatasource();
+
+        if (name)
+            return source.substring(source.lastIndexOf(fs) + 1);
+        
+        return source.substring(0, source.lastIndexOf(fs));
     }
 }
