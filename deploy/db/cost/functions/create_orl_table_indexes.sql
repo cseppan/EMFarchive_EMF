@@ -31,6 +31,17 @@ BEGIN
 					
 	-- Create Indexes....
 
+	-- create record_id btree index
+	IF length('fips_' || table_name) >= 63 - 9 THEN
+		index_name := 'recordid_' || substr(table_name, 10, 63);
+	ELSE
+		index_name := 'recordid_' || table_name;
+	END IF;
+	execute 'CREATE INDEX ' || index_name || '
+			ON emissions.' || table_name || '
+			USING btree
+			(record_id)';
+
 	-- create fips btree index
 	IF length('fips_' || table_name) >= 63 - 5 THEN
 		index_name := 'fips_' || substr(table_name, 6, 63);
@@ -146,4 +157,4 @@ $BODY$
   LANGUAGE 'plpgsql' VOLATILE;
 ALTER FUNCTION public.create_orl_table_indexes(table_name character varying) OWNER TO emf;
 
-select public.create_orl_table_indexes('ds_ptinv_ptnonipm_2020cc_1068478967');vacuum analyze emissions.ds_ptinv_ptnonipm_2020cc_1068478967
+--select public.create_orl_table_indexes('ds_ptinv_ptnonipm_2020cc_1068478967');vacuum analyze emissions.ds_ptinv_ptnonipm_2020cc_1068478967

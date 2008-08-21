@@ -590,7 +590,8 @@ BEGIN
 		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 			and p.id = ' || target_pollutant_id || '::integer
 			and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0) <> 100.0
-			and er.efficiency - coalesce(inv.ceff, 0) >= ' || replacement_control_min_eff_diff_constraint || '
+			and (inv.ceff is null or er.efficiency - coalesce(inv.ceff, 0) >= ' || replacement_control_min_eff_diff_constraint || ')
+--			and er.efficiency - coalesce(inv.ceff, 0) >= ' || replacement_control_min_eff_diff_constraint || '
 			and ' || annual_emis_sql || ' <> 0.0
 			-- measure region filter
 			' || case when measure_with_region_count > 0 then '

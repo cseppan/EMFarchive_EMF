@@ -1,6 +1,6 @@
 -- Function: get_dataset_month(dataset_id integer)
 
--- DROP FUNCTION get_dataset_month(dataset_id integer);
+-- DROP FUNCTION select get_dataset_month(dataset_id integer);
 
 CREATE OR REPLACE FUNCTION public.get_dataset_month(dataset_id integer)
   RETURNS smallint AS
