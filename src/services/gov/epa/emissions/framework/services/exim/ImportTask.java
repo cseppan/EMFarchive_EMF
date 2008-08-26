@@ -102,7 +102,7 @@ public class ImportTask extends Task {
         } catch (Exception e) {
             errorMsg += e.getMessage();
             // this doesn't give the full path for some reason
-            logError("File(s) import failed for user (" + user.getUsername() + ") at " + new Date().toString() + "--" + filesList(), e);
+            logError("File(s) import failed for user (" + user.getUsername() + ") at " + new Date().toString() + " -- " + filesList(), e);
             removeDataset(dataset);
         } finally {
             if (isDone) {
@@ -137,14 +137,17 @@ public class ImportTask extends Task {
     }
 
     protected String filesList() {
-        StringBuffer fileList = new StringBuffer(files[0]);
+        StringBuffer fileList = new StringBuffer();
         fileList.append("Path: " + path.getAbsolutePath() + "; File(s): ");
 
-        if (files.length > 1)
-            for (int i = 1; i < files.length; i++)
-                fileList.append(", " + files[i]);
-
-        return fileList.toString();
+        if (files.length > 0)
+            for (int i = 0; i < files.length; i++)
+                fileList.append(files[i] + ", ");
+        
+        String ret = fileList.toString();
+        int idx = ret.lastIndexOf(",");
+        
+        return idx > 0 ? ret.substring(0, idx) : ret;
     }
 
     protected void addDataset(EmfDataset dataset, Session session) throws EmfException {
