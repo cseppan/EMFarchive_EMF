@@ -4842,7 +4842,7 @@ public class ManagedCaseService {
             Case parent = (input.getParentCaseId() > 0) ? dao.getCase(input.getParentCaseId(), session) : null;
             String parentName = parent != null ? parent.getName() : "";
 
-            sb.append("Inputs,\"" + clean(name) + "\"," + clean(envVar) + "\",\"" + clean(sector) + "\",\"" + clean(job) + "\",\"" + clean(prog) + "\",\""
+            sb.append("Inputs,\"" + clean(name) + "\",\"" + clean(envVar) + "\",\"" + clean(sector) + "\",\"" + clean(job) + "\",\"" + clean(prog) + "\",\""
                     + clean(dsName) + "\"," + dsVersion + "," + clean(qaStatus) + ",\"" + clean(dsType) + "\"," + reqrd + "," + local + ","
                     + clean(subdir) + "," + lstMod + ",\"" + clean(parentName) + "\"" + ls);
         }
