@@ -338,6 +338,7 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
         }
         
         int datasetId = ((CaseOutput)outputlist.get(0)).getDatasetId();
+        
         if (datasetId == 0 ){
             messagePanel.setMessage("No dataset available. ");
             return; 
@@ -346,7 +347,8 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
         try {
             Case[] casesByInputDataset = presenter.getCasesByInputDataset(datasetId);
             Case[] casesByOutputDataset  = presenter.getCasesByOutputDatasets(new int[] {datasetId});
-            String title = "Find Uses of Dataset: " + caseObj.getName();
+            String datasetName = presenter.getDataset(datasetId).getName();
+            String title = "Find Uses of Dataset: " + datasetName;
             RelatedCaseView view = new FindCaseWindow(title, session, parentConsole, desktopManager);
             presenter.doViewRelated(view, casesByOutputDataset, casesByInputDataset);
         } catch (EmfException e) {

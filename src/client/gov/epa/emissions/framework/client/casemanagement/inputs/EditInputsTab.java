@@ -662,7 +662,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         try {
             Case[] casesByInputDataset = presenter.getCasesByInputDataset(dataset.getId());
             Case[] casesByOutputDataset  = presenter.getCasesByOutputDatasets(new int[] {dataset.getId()});
-            String title = "Find Uses of Dataset: " + caseObj.getName();
+            String title = "Find Uses of Dataset: " + dataset.getName();
             RelatedCaseView view = new FindCaseWindow(title, session, parentConsole, desktopManager);
             presenter.doViewRelated(view, casesByOutputDataset, casesByInputDataset);
         } catch (EmfException e) {
