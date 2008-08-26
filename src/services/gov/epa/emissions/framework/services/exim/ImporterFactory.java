@@ -63,7 +63,7 @@ public class ImporterFactory {
             throw new ImporterException("Importer class name not found (either from database or commons.jar)--" + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("Failed to create importer.", e);
+            log.error("Failed to create importer: " + e.getMessage(), e);
             throw new ImporterException(e.getMessage());
         }
     }
@@ -86,9 +86,20 @@ public class ImporterFactory {
         try {
             Importer theImporter = (Importer) importerConstructor.newInstance(params);
             return theImporter;
-        } catch (RuntimeException e) {
+        }
+        catch (java.lang.reflect.InvocationTargetException ite)
+        {
+            Throwable cause = ite.getCause();
+            if (cause != null)
+            {
+                throw new Exception(cause.getMessage());
+            }       
+        } 
+        catch (Exception e) {
             throw new Exception(e.getMessage());
         }
+        
+        return null;
     }
     
     public void closeDbConnection() throws Exception {
