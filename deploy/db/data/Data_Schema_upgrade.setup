@@ -427,3 +427,7 @@ where dataset_type_id in (
 -- 8/1/2008 added two more keywords to dataset
 insert INTO emf.keywords VALUES (DEFAULT, 'PREVIOUS_LOCATION');
 insert INTO emf.keywords VALUES (DEFAULT, 'MASS_STORAGE_LOCATION');
+
+-- emf.qa_programs 8/21/08 
+insert into emf.qa_programs values(DEFAULT,'Compare Control Strategies','gov.epa.emissions.framework.services.qa.SQLQACompareControlStrategiesQueryRunner');
+
