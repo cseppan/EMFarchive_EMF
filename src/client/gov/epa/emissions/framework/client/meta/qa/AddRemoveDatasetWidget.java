@@ -129,6 +129,7 @@ public class AddRemoveDatasetWidget extends JPanel {
 
     private void doAddWindow(String program) {
         List<DatasetType> datasetTypeList = new ArrayList<DatasetType>();
+        boolean selectSingle = false; 
         try {
             // FIXME: really, we don't want to contact the server to get the dataset types - could be slow
             DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes();
@@ -137,6 +138,13 @@ public class AddRemoveDatasetWidget extends JPanel {
                 for (int i = 0; i < allDatasetTypes.length; i++) {
                     //only get dataset "Fire Data Summary (Day-specific)"
                     if (allDatasetTypes[i].getName().startsWith("ORL Day-Specific Fire"))
+                        datasetTypeList.add(allDatasetTypes[i]);
+                }
+            }else if (program.toLowerCase().startsWith("compare control strategies")){
+                selectSingle =true; 
+                for (int i = 0; i < allDatasetTypes.length; i++) {
+                    //get all dataset types that start with ORL
+                    if (allDatasetTypes[i].getName().startsWith("Control Strategy") )
                         datasetTypeList.add(allDatasetTypes[i]);
                 }
             }else{   
@@ -154,7 +162,7 @@ public class AddRemoveDatasetWidget extends JPanel {
             // to that of the datasets retrieved from the presenter.
             InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, changeables);
             InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypeList.toArray(new DatasetType[0]));
-            presenter.display(getDatasetType(0), false);
+            presenter.display(getDatasetType(0), selectSingle);
             setDatasets(presenter.getDatasets());
 
         } catch (Exception e) {

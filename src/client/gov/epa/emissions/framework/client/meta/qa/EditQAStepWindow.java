@@ -151,6 +151,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private static final String MultiInvRepProgram = "Multi-inventory column report";
 
     private static final String MultiInvDifRepProgram = "Multi-inventory difference report";
+    private static final String CompareControlStrategies = "Compare Control Strategies";
     
     private static final String sqlProgram = "SQL";
     
@@ -593,7 +594,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 check = false;
                 throw new EmfException(" SQL is not start with SELECT ");
             }
-        }else if (MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+        }else if (MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())
+                || CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
             check = checkMultiInvDiff(programSwitches) ;
             if (!check)
                 throw new EmfException (" Both base and compare inventories are needed ");
@@ -733,6 +735,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     showAvgDayToAnnualWindow();
                 } else if (MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showMultiInvDiffWindow();
+                } else if (CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
+                    showMultiInvDiffWindow();
                 }else{
                     doSetWindow();
                 }
@@ -769,20 +773,25 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 getSummaryType(programSwitches, sumTypeIndex);
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
-            }finally {
-                EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invCompare, invTables,
-                        summaryType);
-                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
-                presenter.display(origDataset, step);
+//            }finally {
+//                EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invCompare, invTables,
+//                        summaryType);
+//                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+//                presenter.display(origDataset, step);
             }
         }
-        EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invCompare, invTables,
-                summaryType);
-        EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
-        presenter.display(origDataset, step);
-
+        if (CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
+            EditControlDetailedDiffWindow view = new EditControlDetailedDiffWindow(desktopManager, programVal, session, invBase, invCompare, summaryType);
+            EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+            presenter.display(origDataset, step);
+        }else{
+            EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invCompare, invTables,
+                    summaryType);
+            EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+            presenter.display(origDataset, step);
+        }
     }
-    
+
     private void showAvgDaySummaryWindow() {
         // When there is no data in window, set button causes new window to pop up,
         // with the warning message to also show up. When data in window is invalid, a new window still
