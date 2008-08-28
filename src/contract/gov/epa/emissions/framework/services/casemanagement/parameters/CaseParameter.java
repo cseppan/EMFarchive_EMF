@@ -39,6 +39,8 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
     private int parentCaseId;
     
     private Date lastModifiedDate;
+
+    private String jobName;
     
     public CaseParameter() {
         // NOTE Auto-generated constructor stub
@@ -222,6 +224,14 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
 
     public void setParentCaseId(int parentCaseId) {
         this.parentCaseId = parentCaseId;
+    }
+
+    public void setJobName(String name) {
+        this.jobName = name;
+    }
+    
+    public String getJobName() {
+        return this.jobName;
     }
 
 }

@@ -200,7 +200,7 @@ public class CaseDAO {
         addObject(object, session);
     }
 
-    private void addObject(Object obj, Session session) {
+    public void addObject(Object obj, Session session) {
         hibernateFacade.add(obj, session);
     }
 
@@ -220,6 +220,12 @@ public class CaseDAO {
 
     public List getCaseCategories(Session session) {
         return hibernateFacade.getAll(CaseCategory.class, Order.asc("name"), session);
+    }
+    
+    public CaseCategory getCaseCategory(String name, Session session) {
+        Criterion crit = Restrictions.eq("name", name);
+        
+        return (CaseCategory)hibernateFacade.load(CaseCategory.class, crit, session);
     }
 
     public List getEmissionsYears(Session session) {

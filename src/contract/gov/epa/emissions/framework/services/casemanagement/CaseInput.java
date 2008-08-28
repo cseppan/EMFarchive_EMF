@@ -15,8 +15,12 @@ public class CaseInput implements Serializable, Comparable {
     private int caseID;
     
     private int parentCaseId;
+    
+    private String parentCase;
 
     private int caseJobID;
+    
+    private String jobName;
     
     private InputName inputName;
     
@@ -222,6 +226,22 @@ public class CaseInput implements Serializable, Comparable {
 
     public void setParentCaseId(int parentCaseId) {
         this.parentCaseId = parentCaseId;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
+    public void setParentCase(String parent) {
+        this.parentCase = parent;
+    }
+    
+    public String getParentCase() {
+        return this.parentCase;
     }
 
 }

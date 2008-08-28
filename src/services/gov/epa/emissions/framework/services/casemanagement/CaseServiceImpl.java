@@ -46,6 +46,8 @@ public class CaseServiceImpl implements CaseService {
     private DbServerFactory dbFactory;
 
     private ManagedCaseService caseService;
+    
+    private CaseAssistanceService assistanceService;
 
     public CaseServiceImpl() {
         this(HibernateSessionFactory.get(), DbServerFactory.get());
@@ -90,6 +92,20 @@ public class CaseServiceImpl implements CaseService {
         return this.caseService;
     }
 
+    private synchronized CaseAssistanceService getCaseAssistanceService() {
+        log.info("CaseServiceImpl::getCaseAssistanceService");
+
+        if (assistanceService == null) {
+            try {
+                assistanceService = new CaseAssistanceService(sessionFactory);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return this.assistanceService;
+    }
+    
     public Case addCase(User user, Case element) throws EmfException {
         return getCaseService().addCase(user, element);
     }
@@ -711,6 +727,10 @@ public class CaseServiceImpl implements CaseService {
         } finally {
             session.close();
         }
+    }
+    
+    public void importCase(String[] files, User user) throws EmfException {
+        getCaseAssistanceService().importCase(files, user);
     }
     
 }

@@ -1,15 +1,15 @@
-package gov.epa.emissions.framework.client.casemanagement;
+package gov.epa.emissions.framework.services.casemanagement;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RunStatuses {
- 
+    
     private static final String [] statusList;
     
     static
     {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
 
         list.add("Not Started");
         list.add("Running");

@@ -74,7 +74,7 @@ public class DefaultUserPreferences implements UserPreference {
             return new File(property);
 
         return new File(System.getProperty("user.home"),
-                gov.epa.emissions.framework.install.installer.Constants.EMF_CLIENT_PREFERENCES_FILE);
+                gov.epa.emissions.framework.install.installer.Constants.EMF_PREFERENCES_FILE);
     }
 
     public boolean checkFile(String fileName) {
