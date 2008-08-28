@@ -31,7 +31,6 @@ public class CaseAssistanceServiceTest extends ServiceTestCase {
         dropAll(Abbreviation.class);
         dropAll(MeteorlogicalYear.class);
         dropAll(Project.class);
-        dropAll(ModelToRun.class);
         dropAll(Region.class);
         dropAll(Grid.class);
         dropAll(GridResolution.class);
