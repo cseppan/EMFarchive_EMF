@@ -56,14 +56,13 @@ public class EditControlDetailedDiffWindow extends DisposableInteralFrame implem
         this.resultBase = invBase;
         this.resultCompare = invCompare;
         this.summaryType =summaryType;
-        this.getContentPane().add(createLayout());
-        
     }
 
 
     public void display(EmfDataset dataset, QAStep qaStep) {
         super.setTitle("Setup "+qaStep.getName()+": " + dataset.getName() + "_" + qaStep.getId() );
         super.display();
+        this.getContentPane().add(createLayout(dataset));
     }
 
     public void observe(EditQAEmissionsPresenter presenter) {
@@ -74,14 +73,14 @@ public class EditControlDetailedDiffWindow extends DisposableInteralFrame implem
     // A Text Field for Adding the Inventory Table with a Select button
     // OK and Cancel buttons.
 
-    private JPanel createLayout() {
+    private JPanel createLayout(EmfDataset dataset) {
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         JPanel content = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
        
-        layoutGenerator.addLabelWidgetPair("Base Result:", emisinvBase(), content);
+        layoutGenerator.addLabelWidgetPair("Base Result:", emisinvBase(dataset), content);
         layoutGenerator.addLabelWidgetPair("Compare Result:", emisinvCompare(), content);
         summaryTypeCombo();
         layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
@@ -96,11 +95,13 @@ public class EditControlDetailedDiffWindow extends DisposableInteralFrame implem
         return layout;
     }
     
-    private JPanel emisinvBase() {
+    private JPanel emisinvBase(EmfDataset dataset) {
         datasetWidgetBase = new AddRemoveDatasetWidget(this, program, parentConsole, session);
         datasetWidgetBase.setPreferredSize(new Dimension(350,250));
         if(resultBase != null && resultBase.length > 0)
             datasetWidgetBase.setDatasetsFromStepWindow(resultBase);
+        else 
+            datasetWidgetBase.setDatasetsFromStepWindow(new EmfDataset[] {dataset});
         return datasetWidgetBase;
     }
     
