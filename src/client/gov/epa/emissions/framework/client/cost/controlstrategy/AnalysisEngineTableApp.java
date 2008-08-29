@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.googleearth.kml.gui.PointSourceGeneratorFrame;
 import gov.epa.mims.analysisengine.gui.DefaultUserInteractor;
 import gov.epa.mims.analysisengine.gui.UserInteractor;
 import gov.epa.mims.analysisengine.table.SpecialTableModel;
@@ -33,18 +34,22 @@ import java.util.StringTokenizer;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+// import google earth data file producer
 
-public class AnalysisEngineTableApp extends DisposableInteralFrame {
+public class AnalysisEngineTableApp extends DisposableInteralFrame
+// implements google earth data file producer
+{
 
     private JTabbedPane mainTabbedPane;
     
-    private JMenuItem exportMenuItem;
+    private JMenuItem googleEarth;
 
     private JMenuItem closeMenuItem;
     
@@ -71,7 +76,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
     }
 
     private void setLayout(String[] fileNames) throws Exception {
-        JPanel menuPanel = createMenuPanel();
+        JPanel menuPanel = createMenuPanel(fileNames);
         mainTabbedPane = new JTabbedPane();
         String[] tabNames = createTabNames(1, 40, fileNames);
         importFiles(fileNames, tabNames, FileImportGUI.GENERIC_FILE, ",");
@@ -347,7 +352,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
         return lines.toString();
     }
     
-    private JPanel createMenuPanel() {
+    private JPanel createMenuPanel(String[] fileNames) {
         JPanel menuPanel = new JPanel(new BorderLayout());
         menuPanel.setBorder(BorderFactory.createEtchedBorder());
         JMenuBar menuBar = new JMenuBar();
@@ -375,19 +380,23 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
 //                return;
 //            }
 //        });
-        exportMenuItem = createExportMenuItem();
-        exportMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.ALT_MASK));
-        fileMenu.add(exportMenuItem);
-        exportMenuItem.setEnabled(false);
+        googleEarth = createGoogleMenuItem(fileNames);
+        googleEarth.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.ALT_MASK));
+        fileMenu.add(googleEarth);
+        //exportMenuItem.setEnabled(false);
+        
+        // Add call to Google earth generator
+        // button should be called 'Google Earth'
+        // 
 
         closeMenuItem = createCloseMenuItem();
         closeMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.ALT_MASK));
         fileMenu.add(closeMenuItem);
         closeMenuItem.setEnabled(false);
 
-        JMenuItem quitMenuItem = new JMenuItem("Quit");
-        quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK));
-        fileMenu.add(quitMenuItem);
+//        JMenuItem quitMenuItem = new JMenuItem("Quit");
+//        quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK));
+//        fileMenu.add(quitMenuItem);
 //        quitMenuItem.addActionListener(new ActionListener() {
 //            public void actionPerformed(ActionEvent e) {
 //                try {
@@ -410,17 +419,19 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
         menuPanel.add(menuBar, BorderLayout.WEST);
         return menuPanel;
     }
-    private JMenuItem createExportMenuItem() {
-        JMenuItem exportMenu = new JMenuItem("Export");
+    
+    private JMenuItem createGoogleMenuItem(final String[] fileNames) {
+        JMenuItem exportMenu = new JMenuItem("Google Earth");
         exportMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int size = mainTabbedPane.getTabCount();
-                // if nothing in the tabbed pane then nothing to import!
-                if (size == 0) {
-                    return;
-                }// if(size == 0)
-//                new FileExportGUI(TableApp.this, filesInTabbedPane.getAllTabUniqueNames(), mainTabbedPane
-//                        .getSelectedIndex(), currentDirectory);
+                //TablePanel table = (TablePanel) mainTabbedPane.getComponentAt(0);
+                int index = mainTabbedPane.getSelectedIndex();
+                PointSourceGeneratorFrame frame = new PointSourceGeneratorFrame(new File(fileNames[index]));
+                        //"C:\\DOCUME~1\\CEPUSER\\LOCALS~1\\Temp\\QA_DSID243_V0_20080826140114Summarize_by_Plant.csv"));
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.pack();
+                frame.centerFrame();
+                frame.setVisible(true);
             }// actionPerformed()
         });
         // create a file chooser
