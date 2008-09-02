@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.io.importer.CommaDelimitedTokenizer;
 import gov.epa.emissions.commons.io.importer.DelimitedFileReader;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -119,6 +120,13 @@ public class CaseFileParser {
             
             for (record = reader.read(); !record.isEnd(); record = reader.read())
                 processSummary(record.getTokens());
+        } catch (ParseException e) {
+            Throwable ex = e.getCause();
+            
+            if (ex != null)
+                throw new EmfException("Field not in correct format: " + ex.getMessage());
+            
+            throw e;
         } catch (Exception e) {
             throw e;
         }

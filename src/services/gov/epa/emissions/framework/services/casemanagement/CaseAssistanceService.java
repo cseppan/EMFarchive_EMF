@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
+import java.io.File;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -45,8 +46,6 @@ public class CaseAssistanceService {
 
     private HibernateSessionFactory sessionFactory;
 
-    private String eol = System.getProperty("line.separator");
-
     public CaseAssistanceService(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         this.caseDao = new CaseDAO();
@@ -65,10 +64,10 @@ public class CaseAssistanceService {
         log.info("Session factory null? " + (sessionFactory == null));
     }
 
-    public synchronized void importCase(String[] files, User user) throws EmfException {
+    public synchronized void importCase(String folder, String[] files, User user) throws EmfException {
         Session session = sessionFactory.getSession();
         CaseDaoHelper helper = CaseDaoHelper.getCaseObjectManager(sessionFactory, caseDao, dataDao);
-        String[][] cases = sortCaseFiles(files);
+        String[][] cases = sortCaseFiles(getFiles(folder, files));
 
         Case newCase = null;
 
@@ -92,7 +91,7 @@ public class CaseAssistanceService {
                     throw new EmfException("Case (" + newCase.getName()
                             + ") to import has a duplicate name in cases table.");
 
-                resetCaseValues(newCase, session);
+                resetCaseValues(user, newCase, session);
                 caseDao.add(newCase, session);
                 
                 Case loadedCase = caseDao.getCaseFromName(newCase.getName(), session);
@@ -102,10 +101,28 @@ public class CaseAssistanceService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not inmport case", e);
-            throw new EmfException("Could not import case: " + newCase.getName() + eol);
+            
+            if (e instanceof EmfException)
+                throw (EmfException)e;
+            
+            Throwable ex = e.getCause();
+            
+            if (ex != null)
+                throw new EmfException(ex.getMessage());
+            
+            throw new EmfException(e.getMessage());
         } finally {
             session.close();
         }
+    }
+
+    private String[] getFiles(String folder, String[] files) {
+        String[] fullPathFiles = new String[files.length];
+        
+        for (int i = 0; i < files.length; i++)
+            fullPathFiles[i] = folder + File.separator + files[i];
+        
+        return fullPathFiles;
     }
 
     private String[][] sortCaseFiles(String[] files) throws EmfException {
@@ -119,15 +136,30 @@ public class CaseAssistanceService {
 
         // NOTE: needs to expand to support multiple cases import
         for (int i = 0; i < numCases; i++) {
-            caseFiles[i][0] = files[0];
-            caseFiles[i][1] = files[1];
-            caseFiles[i][2] = files[2];
+            caseFiles[i][0] = getCorrectFile(files, "Summary");
+            caseFiles[i][1] = getCorrectFile(files, "Input");
+            caseFiles[i][2] = getCorrectFile(files, "Job");
         }
 
         return caseFiles;
     }
 
-    private void resetCaseValues(Case newCase, Session session) {
+    private String getCorrectFile(String[] files, String fileType) {
+        for (String file : files) {
+            if (file.endsWith("_Summary_Parameters.csv") && fileType.equals("Summary"))
+                return file;
+            
+            if (file.endsWith("_Inputs.csv") && fileType.equals("Input"))
+                return file;
+            
+            if (file.endsWith("_Jobs.csv") && fileType.equals("Job"))
+                return file;
+        }
+        
+        return null;
+    }
+
+    private void resetCaseValues(User user, Case newCase, Session session) {
         Abbreviation abbr = newCase.getAbbreviation();
         
         if (abbr == null)
@@ -161,6 +193,9 @@ public class CaseAssistanceService {
 
         MeteorlogicalYear metYear = newCase.getMeteorlogicalYear();
         loadNSetObject(newCase, metYear, MeteorlogicalYear.class, metYear == null ? "" : metYear.getName(), session);
+        
+        newCase.setLastModifiedBy(user);
+        newCase.setLastModifiedDate(new Date());
     }
 
     private synchronized void loadNSetObject(Case newCase, Object obj, Class<?> clazz, String name, Session session) {
@@ -170,7 +205,8 @@ public class CaseAssistanceService {
         Object temp = caseDao.load(clazz, name, session);
         
         if (temp != null && temp instanceof Abbreviation) {
-            String uniqueName = name + "_" + Math.random();
+            String random = Math.random() + "";
+            String uniqueName = name + "_" + random.substring(2);
             ((Abbreviation)obj).setName(uniqueName);
             caseDao.addObject(obj, session);
             temp = caseDao.load(clazz, uniqueName, session);

@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.CopyButton;
+import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -117,10 +118,6 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
         createCategoriesComboBox();
         setupTableModel(cases);
-        // model = new EmfTableModel(tableData);
-        // selectModel = new SortFilterSelectModel(model);
-        // SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        // sortFilterSelectPanel.sort(sortCriteria());
         createLayout(layout, mainPanel(parentConsole));
     }
 
@@ -132,7 +129,6 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         this.mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
-        // JScrollPane sortFilterPane = sortFilterPane(parentConsole);
         table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
         mainPanel.add(table);
 
@@ -182,9 +178,6 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         layout.removeAll();
         layout.setLayout(new BorderLayout());
 
-        // JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
-        // sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
-
         layout.add(createTopPanel(), BorderLayout.NORTH);
         layout.add(table, BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
@@ -218,6 +211,14 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         JPanel crudPanel = createCrudPanel();
 
         JPanel closePanel = new JPanel();
+        Button importButton = new ImportButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                importCase();
+            }
+        });
+        importButton.setToolTipText("Import a case");
+        closePanel.add(importButton);
+        
         Button closeButton = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
@@ -468,6 +469,13 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         cases.addAll(Arrays.asList(tableData.sources()));
         cases.add(newCase);
         refresh(cases.toArray(new Case[0]));
+    }
+    
+    private void importCase() {
+        ImportCaseView importView = new ImportCaseWindow(session.dataCommonsService(), desktopManager, parentConsole);
+
+        ImportCasePresenter importPresenter = new ImportCasePresenter(session);
+        importPresenter.display(importView);
     }
 
 }

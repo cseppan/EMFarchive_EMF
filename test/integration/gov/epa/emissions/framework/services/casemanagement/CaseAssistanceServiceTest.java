@@ -8,8 +8,6 @@ import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.io.File;
-
 public class CaseAssistanceServiceTest extends ServiceTestCase {
 
     private CaseAssistanceService service;
@@ -49,12 +47,12 @@ public class CaseAssistanceServiceTest extends ServiceTestCase {
 
     public void testShouldImportACase() throws Exception {
         String folder = "test/data/case-management";
-        String inputsFile = new File(folder, "2002ac V3 CAP for EMF training_2002acT_Inputs.csv").getAbsolutePath();
-        String jobsFile = new File(folder, "2002ac V3 CAP for EMF training_2002acT_Jobs.csv").getAbsolutePath();
-        String sumParamsFile = new File(folder, "2002ac V3 CAP for EMF training_2002acT_Summary_Parameters.csv").getAbsolutePath();
+        String inputsFile = "2002ac V3 CAP for EMF training_2002acT_Inputs.csv";
+        String jobsFile = "2002ac V3 CAP for EMF training_2002acT_Jobs.csv";
+        String sumParamsFile = "2002ac V3 CAP for EMF training_2002acT_Summary_Parameters.csv";
         
         try {
-            service.importCase(new String[] {sumParamsFile, inputsFile, jobsFile}, user);
+            service.importCase(folder, new String[] {sumParamsFile, inputsFile, jobsFile}, user);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

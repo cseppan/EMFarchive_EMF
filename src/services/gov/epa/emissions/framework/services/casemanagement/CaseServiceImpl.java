@@ -729,8 +729,8 @@ public class CaseServiceImpl implements CaseService {
         }
     }
     
-    public void importCase(String[] files, User user) throws EmfException {
-        getCaseAssistanceService().importCase(files, user);
+    public void importCase(String folder, String[] files, User user) throws EmfException {
+        getCaseAssistanceService().importCase(folder, files, user);
     }
     
 }

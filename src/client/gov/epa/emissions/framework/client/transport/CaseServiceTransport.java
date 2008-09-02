@@ -1158,16 +1158,16 @@ public class CaseServiceTransport implements CaseService {
         return (Case[]) call.requestResponse(new Object[] { new Integer(datasetId) });
     }
 
-    public void importCase(String[] files, User user) throws EmfException {
+    public void importCase(String folder, String[] files, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("importCase");
+        call.addStringParam("folder");
         call.addParam("files", caseMappings.strings());
         call.addParam("user", dataMappings.user());
         call.setVoidReturnType();
-        call.setTimeOut(40000); // set time out in milliseconds to terminate if service doesn't response
 
-        call.request(new Object[] {files, user });
+        call.request(new Object[] {folder, files, user });
     }
 
 
