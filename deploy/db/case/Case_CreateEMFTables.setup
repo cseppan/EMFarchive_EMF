@@ -260,7 +260,7 @@ CREATE TABLE cases.cases_caseinputs
   version_id int4  REFERENCES emissions.versions(id),
   dataset_type_id int4  REFERENCES emf.dataset_types(id),
   subdir_id int4  REFERENCES cases.subdirs(id),
-  UNIQUE (case_id,input_name_id,sector_id,program_id) 
+  UNIQUE (case_id, input_name_id, sector_id, program_id, case_job_id)
 ) 
 WITHOUT OIDS;
 -- cases.cases_caseinputs
