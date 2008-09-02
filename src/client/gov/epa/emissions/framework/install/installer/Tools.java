@@ -56,39 +56,38 @@ public class Tools {
         }
     }
 
-    public static void writePreference(String website, String input, String output, String javahome, String rhome, String emfhome,
-            String server) throws Exception {
+    public static void writePreference(String website, String input, String output, String javahome, String rhome,
+            String emfhome, String tmpDir, String server) throws Exception {
         String separator = Constants.SEPARATOR;
-        
+
+        String header = "#EMF Client/Installer - Preferences" + separator 
+                + "#comments '#'" + separator
+                + "#preference specified by key,value pair separted by '='" + separator 
+                + "#case sensitive" + separator
+                + "#white spaces and line terminators can be escaped by '\'" + separator
+                + "#If the value aren't specified then default value will be empty string" + separator
+                + "#Use '/' for path separator for file names" + separator + separator;
+
+        String emfPrefString = "web.site=" + website 
+                + separator + "emf.install.folder=" + emfhome.replace('\\', '/')
+                + separator + "server.import.folder=" + input.replace('\\', '/')
+                + separator + "server.export.folder=" + output.replace('\\', '/')
+                + separator + "server.address=" + server 
+                + separator + "java.home=" + javahome.replace('\\', '/')
+                + separator + "local.temp.dir=" + tmpDir.replace('\\', '/')
+                + separator + "r.home=" + rhome.replace('\\', '/') + separator;
+
         String analysisEnginePrefString = separator + separator 
-                + "#Analysis Engine Preferences" + separator 
-                + "format.double.decimal_places=2"
-                + separator + "format.double.option=Standard_Notation" + separator
+                + "#Analysis Engine Preferences" + separator
+                + "format.double.decimal_places=2" + separator 
+                + "format.double.option=Standard_Notation" + separator
                 + "#legal options: Standard_Notation,Scientific_Notation, Dollars, Percentage, Custom" + separator
                 + "format.double.significant_digits=4";
 
-        String emfPrefString = "local.input.drive=" + separator + "local.output.drive="
-                + separator + "remote.input.drive=" + separator
-                + "remote.output.drive=" + separator + "default.input.folder="
-                + input + separator + "default.output.folder="
-                + output + separator + "server.address=" + server + separator;
-
-        String towrite = "#EMF Client Installer - Preferences" + separator + "#comments '#'" + separator
-                + "#preference specified by key,value pair separted by '='" + separator + "#case sensitive" + separator
-                + "#white spaces and line terminators can be escaped by '\'" + separator
-                + "#If the value aren't specified then default value will be empty string" + separator
-                + "#Use '/' for path separator for file names" + separator + separator + "web.site=" + website
-                + separator + "emf.install.folder=" + emfhome.replace('\\', '/') + separator + emfPrefString
-                + "java.home=" + javahome.replace('\\', '/') + separator + "r.home=" + rhome.replace('\\', '/') + separator;
-
         PrintWriter userPrefWriter = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.home")
-                + "\\" + Constants.INSTALLER_PREFERENCES_FILE)));
-        PrintWriter emfPrefWriter = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.home")
-                + "\\" + Constants.EMF_CLIENT_PREFERENCES_FILE)));
-        userPrefWriter.write(towrite);
-        emfPrefWriter.write(emfPrefString + analysisEnginePrefString);
+                + "\\" + Constants.EMF_PREFERENCES_FILE)));
+        userPrefWriter.write(header + emfPrefString + analysisEnginePrefString);
         userPrefWriter.close();
-        emfPrefWriter.close();
     }
 
 }

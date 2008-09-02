@@ -38,16 +38,18 @@ public class CreateDownloadFilesList {
             throw new Exception("The '" + dir + "' is not a directory");
         }
 
-        List jarRefFiles = new ArrayList();
+        List<File> jarRefFiles = new ArrayList<File>();
         File[] jarFiles = getFiles(dir);
         File[] refFiles = getRefFiles(Constants.REFERENCE_PATH);
+        File[] prefFiles = getRefFiles(Constants.PREFERENCE_PATH);
         jarRefFiles.addAll(Arrays.asList(jarFiles));
         jarRefFiles.addAll(Arrays.asList(refFiles));
+        jarRefFiles.addAll(Arrays.asList(prefFiles));
         
         printer = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.dir") + File.separatorChar
                 + "deploy" + File.separatorChar + "client" + File.separatorChar + Constants.FILE_LIST)));
         printHeader();
-        createFilesList((File[])jarRefFiles.toArray(new File[0]));
+        createFilesList(jarRefFiles.toArray(new File[0]));
         print(clientJarFile);
         printer.close();
     }
@@ -138,6 +140,9 @@ public class CreateDownloadFilesList {
         
         if(parentPath.equalsIgnoreCase(Constants.REFERENCE_PATH))
             relativePath = "/config/ref/delimited/" + file.getName();
+        
+        if(parentPath.equalsIgnoreCase(Constants.PREFERENCE_PATH))
+            relativePath = "/config/preferences/" + file.getName();
         
         if(absFilePath.equalsIgnoreCase(Constants.CLIENT_JAR_FILE))
             relativePath = File.separatorChar + file.getName();

@@ -2,21 +2,23 @@ package gov.epa.emissions.framework.install.installer;
 
 
 public class Constants {
-	public static final String VERSION = "8/14/2008";
+	public static final String VERSION = "9/2/2008";
 	public static final String SEPARATOR = System.getProperty("line.separator");
     public static final String WORK_DIR = System.getProperty("user.dir");
+    public static final String USER_HOME = System.getProperty("user.home");
 	
 	public static final String TIME_FORMAT = "MM/dd/yyyy hh:mmaaa";
     public static final String EMF_URL = "http://www.ie.unc.edu/cempd/projects/emf/install/";
 	public static final String SERVER_ADDRESS = "http://orchid.nesc.epa.gov:8080/emf/services";
     
-	public static final String INSTALLER_PREFERENCES_FILE = "EMFUserInstallPrefs.ini";
-    public static final String EMF_CLIENT_PREFERENCES_FILE = "EMFPrefs.txt";
+	public static final String INSTALLER_PREFERENCES_FILE = "EMFPrefsTemplate.txt";
+    public static final String EMF_PREFERENCES_FILE = "EMFPrefs.txt";
 	public static final String FILE_LIST = "files.txt";
 	public static final String UPDATE_FILE = "update.dat";
     public static final String EMF_BATCH_FILE = "EMFClient.bat";
     public static final String CLIENT_JAR_FILE = WORK_DIR + "\\deploy\\client\\emf-client.jar";
     public static final String REFERENCE_PATH = WORK_DIR + "\\config\\ref\\delimited";
+    public static final String PREFERENCE_PATH = WORK_DIR + "\\config\\preferences";
     public static final String SCC_FILE = REFERENCE_PATH + "\\scc.txt";
     
     public static final String REMOTE_INPUT_DIR = "T:\\emf_data\\input";

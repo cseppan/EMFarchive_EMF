@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.install.installer;
 
 import java.awt.Cursor;
+import java.io.File;
+import java.io.InputStream;
 
 public class InstallPresenter {
     private InstallView view;
@@ -49,9 +51,9 @@ public class InstallPresenter {
     }
 
     public void writePreference(String website, String input, String output, String javahome, String rhome, String emfhome,
-            String server) {
+            String tmpDir, String server) {
         try {
-            Tools.writePreference(website, input, output, javahome, rhome, emfhome, server);
+            Tools.writePreference(website, input, output, javahome, rhome, emfhome, tmpDir, server);
         } catch (Exception e) {
             view.displayErr("Creating EMF client preference file failed.");
         }
@@ -83,6 +85,26 @@ public class InstallPresenter {
 
     public void createShortcut() {
         model.createShortcut();
+    }
+    
+    public InstallPreferences getUserPreference() throws Exception {
+        File userPreference = new File(Constants.USER_HOME, Constants.EMF_PREFERENCES_FILE);
+        
+        if (userPreference.exists())
+            return new InstallPreferences(userPreference);
+        
+        File preferenceTemplate = new File(Constants.USER_HOME, Constants.INSTALLER_PREFERENCES_FILE);
+        
+        if (preferenceTemplate.exists())
+            return new InstallPreferences(preferenceTemplate);
+        
+        InputStream ins = Object.class.getClass().getResource("/" + Constants.INSTALLER_PREFERENCES_FILE).openStream();
+        
+        return new InstallPreferences(ins);
+    }
+    
+    public boolean windowsOS() {
+        return System.getProperty("os.name").toLowerCase().contains("windows");
     }
 
 }

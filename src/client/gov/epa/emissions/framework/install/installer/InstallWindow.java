@@ -8,10 +8,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -38,59 +38,39 @@ public class InstallWindow extends JFrame implements InstallView {
     final static int RE_INSTALL = 1;
 
     final static int UPDATE = 2;
+    
+    private boolean windowsOS = true;
 
     private int INSTALL_MODE = INSTALL;
 
     private InstallPresenter presenter;
 
-    private JPanel cards; // a panel that uses CardLayout
+    private JFrame installFrame;
 
-    JFrame installFrame;
+    private JPanel directoryPage, downloadPage, statusPanel, cards;
 
-    JPanel directoryPage, downloadPage;
+    private Box updatePage;
 
-    Box updatePage;
+    private JTextField url, javaHomeDirField, rHomeField, inputDirField, outputDirField, installDirField, serverField, tmpDirField;
 
-    JPanel installPanel;
+    private JLabel urlLabel, javaHomeLabel, rHomeLabel, inputLabel, outputLabel, installHomeLabel, tmpDirLabel;
 
-    JPanel installPanelNorth, installPanelSouth, installPanelEast, installPanelWest;
+    private JLabel statusLabel, load, serverLabel, holderLabel;
 
-    JPanel nextPanel, statusPanel;
+    private JButton installButton, exitInstallButton, cancel;
 
-    JTextField url, javaHomeDirField, rHomeField, inputDirField, outputDirField, installDirField, serverField;
-
-    JLabel urlLabel, javaHomeLabel, rHomeLabel, inputLabel, outputLabel, installHomeLabel;
-
-    JLabel holderLabel1, holderLabel2, holderLabel3;
-
-    JLabel sqlUserLabel, sqlPassLabel;
-
-    JLabel statusLabel, load, serverLabel;
-
-    JButton installButton, exitInstallButton, javaHomeBrowser, rHomeBrowser, inputDirBrowser, outputDirBrowser;
-
-    JButton installDirBrowser;
-
-    JButton holderButton1, holderButton2, cancel;
-
-    GridBagLayout gridbag;
-
-    GridBagConstraints c;
-
-    JFileChooser chooser1, chooser2, chooser3, chooser4, chooserRHome;
+    private JButton installDirBrowser, javaHomeBrowser, rHomeBrowser, inputDirBrowser, outputDirBrowser, tmpDirBrowser;
 
     static boolean installFinished = false;
 
-    HashMap names = new HashMap();
-
-    HashMap hm = new HashMap();
-
     public InstallWindow() {
-        installFrame = this;
+        super("EMF Client Installer -- " + Constants.VERSION);
+        super.setIconImage(Toolkit.getDefaultToolkit().getImage(Object.class.getClass().getResource("/logo.JPG")));
+    }
 
-        // Create GridBagLayout.
-        gridbag = new GridBagLayout();
-        c = new GridBagConstraints();
+    public void initialize() {
+        windowsOS = presenter.windowsOS();
+        installFrame = this;
 
         // Create widgets.
         url = new JTextField(30);
@@ -99,18 +79,18 @@ public class InstallWindow extends JFrame implements InstallView {
         inputDirField = new JTextField(30);
         outputDirField = new JTextField(30);
         installDirField = new JTextField(30);
+        tmpDirField = new JTextField(30);
         serverField = new JTextField(30);
         urlLabel = new JLabel("EMF Download URL", SwingConstants.RIGHT);
         javaHomeLabel = new JLabel("Java Home Directory", SwingConstants.RIGHT);
         rHomeLabel = new JLabel("R Home Directory", SwingConstants.RIGHT);
-        inputLabel = new JLabel("Server Input Directory", SwingConstants.RIGHT);
-        outputLabel = new JLabel("Server Output Directory", SwingConstants.RIGHT);
+        inputLabel = new JLabel("Server Import Directory", SwingConstants.RIGHT);
+        outputLabel = new JLabel("Server Export Directory", SwingConstants.RIGHT);
         installHomeLabel = new JLabel("Client Home Directory", SwingConstants.RIGHT);
+        tmpDirLabel = new JLabel("Local Temp Directory", SwingConstants.RIGHT);
         serverLabel = new JLabel("Server Address", SwingConstants.RIGHT);
         statusLabel = new JLabel();
-        holderLabel1 = new JLabel();
-        holderLabel2 = new JLabel();
-        holderLabel3 = new JLabel();
+        holderLabel = new JLabel();
         load = new JLabel();
 
         javaHomeBrowser = new JButton("Browse...");
@@ -118,6 +98,7 @@ public class InstallWindow extends JFrame implements InstallView {
         inputDirBrowser = new JButton("Browse...");
         outputDirBrowser = new JButton("Browse...");
         installDirBrowser = new JButton("Browse...");
+        tmpDirBrowser = new JButton("Browse...");
         installButton = new JButton("Install");
         exitInstallButton = new JButton(" Exit  ");
         cancel = new JButton("Cancel");
@@ -136,13 +117,13 @@ public class InstallWindow extends JFrame implements InstallView {
         cancel.addActionListener(new CancelButtonListener());
         javaHomeBrowser.addActionListener(new Browse1Listener());
         rHomeBrowser.addActionListener(new BrowseRHomeListener());
-        inputDirBrowser.addActionListener(new Browse2Listener());
-        outputDirBrowser.addActionListener(new Browse3Listener());
+        inputDirBrowser.addActionListener(new ServerImportBrowserListener());
+        outputDirBrowser.addActionListener(new ServerExportBrowserListener());
         installDirBrowser.addActionListener(new InstallDirBrowserListener());
+        tmpDirBrowser.addActionListener(new TmpDirBrowseListener());
 
         // first look in the user home directory for the preferences file
-        File preference = new File(System.getProperty("user.home"), Constants.INSTALLER_PREFERENCES_FILE);
-        getUserPreferences(preference);
+        getUserPreferences();
 
         // Set the default button.
         getRootPane().setDefaultButton(installButton);
@@ -151,6 +132,7 @@ public class InstallWindow extends JFrame implements InstallView {
         directoryPage = createFirstPage();
         downloadPage = createSecondPage();
         updatePage = new UpdateFilesPage(cards);
+        ((UpdateFilesPage) updatePage).observe(presenter);
 
         // Create the panel that contains the "cards".
         cards.add(directoryPage, DIRECTORY_PAGE);
@@ -159,29 +141,36 @@ public class InstallWindow extends JFrame implements InstallView {
 
         getContentPane().add(cards, BorderLayout.CENTER);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(new Dimension(600, 800));
-        setTitle("EMF Client Installer -- " + Constants.VERSION);
         pack();
     }
 
-    private void getUserPreferences(File preference) {
+    private void getUserPreferences() {
         try {
-            InstallPreferences up = preference.exists() ? new InstallPreferences() : null;
-            String urlString = up == null ? Constants.EMF_URL : up.emfWebSite();
-            String serverString = up == null ? Constants.SERVER_ADDRESS : up.emfServer();
-            String inputString = up == null ? "" : up.inputFolder();
-            String outputString = up == null ? "" : up.outputFolder();
-            String installString = up == null ? "" : up.emfInstallFolder().replace('/', '\\');
-            String rhome = up == null ? "" : up.rHome();
+            InstallPreferences up = presenter.getUserPreference();
+            
+            if (up == null) {
+                url.setText(Constants.EMF_URL);
+                serverField.setText(Constants.SERVER_ADDRESS);
+                return;
+            }
+            
+            String urlString = up.emfWebSite();
+            String serverString = up.emfServer();
+            String inputString = up.inputFolder();
+            String outputString = up.outputFolder();
+            String installString = up.emfInstallFolder();
+            String localTmpDir = up.localTempDir();
+            String rhome = up.rHome();
             
             url.setText(urlString);
             inputDirField.setText(inputString);
             outputDirField.setText(outputString);
-            installDirField.setText(installString);
-            rHomeField.setText(rhome);
+            installDirField.setText(windowsOS ? installString.replace('/', '\\') : installString);
+            rHomeField.setText(windowsOS ? rhome.replace('/', '\\') : rhome);
+            tmpDirField.setText(windowsOS ? localTmpDir.replace('/', '\\') : localTmpDir);
             serverField.setText(serverString);
         } catch (Exception e) {
-            presenter.displayErr("Cann't get user preferences.");
+            presenter.displayErr(e.getMessage());
         }
     }
 
@@ -199,13 +188,13 @@ public class InstallWindow extends JFrame implements InstallView {
     }
 
     public void display() {
+        initialize();
         setLookAndFeel();
         setVisible(true);
     }
 
     public void observe(InstallPresenter presenter) {
         this.presenter = presenter;
-        ((UpdateFilesPage) updatePage).observe(presenter);
     }
 
     public void close() {
@@ -235,6 +224,9 @@ public class InstallWindow extends JFrame implements InstallView {
     }
 
     private JPanel createFirstPage() {
+        // Create GridBagLayout.
+        GridBagLayout gridbag = new GridBagLayout();
+        GridBagConstraints c = new GridBagConstraints();
         JPanel installPanel = new JPanel(gridbag);
         JPanel installPanelNorth = new JPanel();
         JPanel installPanelEast = new JPanel();
@@ -247,10 +239,10 @@ public class InstallWindow extends JFrame implements InstallView {
         gridbag.setConstraints(urlLabel, c);
         gridbag.setConstraints(url, c);
         c.gridwidth = GridBagConstraints.REMAINDER; // end row
-        gridbag.setConstraints(holderLabel1, c);
+        gridbag.setConstraints(holderLabel, c);
         installPanel.add(urlLabel);
         installPanel.add(url);
-        installPanel.add(holderLabel1);
+        installPanel.add(holderLabel);
 
         c.gridwidth = 1; // next-to-last in row
         //c.insets = new Insets(7, 1, 7, 5);
@@ -298,6 +290,15 @@ public class InstallWindow extends JFrame implements InstallView {
         installPanel.add(installHomeLabel);
         installPanel.add(installDirField);
         installPanel.add(installDirBrowser);
+        
+        c.gridwidth = 1; // next-to-last in row
+        gridbag.setConstraints(tmpDirLabel, c);
+        gridbag.setConstraints(tmpDirField, c);
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        gridbag.setConstraints(tmpDirBrowser, c);
+        installPanel.add(tmpDirLabel);
+        installPanel.add(tmpDirField);
+        installPanel.add(tmpDirBrowser);
 
         c.gridwidth = 1; // next-to-last in row
         gridbag.setConstraints(serverLabel, c);
@@ -385,21 +386,27 @@ public class InstallWindow extends JFrame implements InstallView {
         }
     }
 
-    private class Browse2Listener implements ActionListener {
+    private class ServerImportBrowserListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            browse("Remote Input Drive", inputDirField);
+            browse("Server Import Directory", inputDirField);
         }
     }
 
-    private class Browse3Listener implements ActionListener {
+    private class ServerExportBrowserListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            browse("Remote Output Drive", outputDirField);
+            browse("Server Export Directory", outputDirField);
         }
     }
 
     private class InstallDirBrowserListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             browse("Install Directory", installDirField);
+        }
+    }
+    
+    private class TmpDirBrowseListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            browse("Local Temporary Directory", tmpDirField);
         }
     }
 
@@ -423,7 +430,7 @@ public class InstallWindow extends JFrame implements InstallView {
 
     public void displayErr(String err) {
         presenter.stopDownload();
-        JOptionPane.showMessageDialog(this, err, "EMF client installation Error", JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this, err, "EMF Client Installation Error", JOptionPane.WARNING_MESSAGE);
     }
 
     public void setFinish() {
@@ -431,7 +438,7 @@ public class InstallWindow extends JFrame implements InstallView {
         String installhome = installDirField.getText();
         String server = serverField.getText();
         String rhome = rHomeField.getText();
-        presenter.createBatchFile(installhome + "\\" + Constants.EMF_BATCH_FILE, Constants.EMF_CLIENT_PREFERENCES_FILE,
+        presenter.createBatchFile(installhome + "\\" + Constants.EMF_BATCH_FILE, Constants.EMF_PREFERENCES_FILE,
                 javahome, rhome, server);
         if (INSTALL_MODE == INSTALL) {
             presenter.createShortcut();
@@ -496,11 +503,12 @@ public class InstallWindow extends JFrame implements InstallView {
         String outputdir = outputDirField.getText();
         String inputdir = inputDirField.getText();
         String installhome = installDirField.getText();
+        String tmpDir = tmpDirField.getText();
         String website = url.getText();
         String server = serverField.getText();
         CardLayout cl = (CardLayout) (cards.getLayout());
         cl.show(cards, DOWNLOAD_PAGE);
-        presenter.writePreference(website, inputdir, outputdir, javahome, rhome, installhome, server);
+        presenter.writePreference(website, inputdir, outputdir, javahome, rhome, installhome, tmpDir, server);
     }
 
     private void startUpdates() {

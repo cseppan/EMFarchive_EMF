@@ -14,21 +14,21 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Download extends Thread {
-	private String urlbase;
-    
-	private String installhome;
-    
+    private String urlbase;
+
+    private String installhome;
+
     private String filelist;
-    
+
     private InstallPresenter presenter;
-    
-    private volatile Thread  blinker;
-    
+
+    private volatile Thread blinker;
+
     private int numFiles2Download;
-    
+
     private File2Download[] todownload;
 
-	public void initialize(String url, String filelist, String installhome) throws InstallException {
+    public void initialize(String url, String filelist, String installhome) throws InstallException {
         this.urlbase = url;
         this.installhome = installhome;
         this.filelist = filelist;
@@ -40,23 +40,23 @@ public class Download extends Thread {
             throw new InstallException("Downloading files list failed.");
         }
         this.todownload = getFiles2Download();
-    }	
-    
+    }
+
     public void start() {
         blinker.start();
     }
-    
+
     public void stopDownload() {
         presenter.setCursor(Cursor.getDefaultCursor());
         blinker = null;
     }
 
-	public void run() {
+    public void run() {
         Thread thisThread = Thread.currentThread();
         presenter.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        try{
-            for(int x=0; x<numFiles2Download; x++){
-                if(blinker == thisThread) {
+        try {
+            for (int x = 0; x < numFiles2Download; x++) {
+                if (blinker == thisThread) {
                     String temp = todownload[x].getPath();
                     File file2save = getSingleDownloadFile(temp);
                     HttpURLConnection conn = getConnection(temp);
@@ -64,178 +64,182 @@ public class Download extends Thread {
                     saveFile(file2save, conn);
                 }
             }
-            
-            if(blinker == thisThread) {
+
+            if (blinker == thisThread) {
                 Tools.updateFileModTime(installhome, todownload);
                 saveCurrentFilesInfo();
                 presenter.setStatus("Downloads Complete.");
                 presenter.setFinish();
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             setErrMsg("Downloading files failed.");
         } finally {
             stopDownload();
         }
-	}
-    
+    }
+
     public void setFile2Download(File2Download[] todownload) {
         this.numFiles2Download = todownload.length;
         this.todownload = todownload;
     }
-	
-	public void createShortcut() {
+
+    public void createShortcut() {
         File bat = new File(installhome, "shortcut.bat");
         File inf = new File(installhome, "shortcut.inf");
         createShortcutBatchFile(bat, inf);
-		
-		try {
+
+        try {
 
             String[] cmd = getCommands();
-            
+
             /*
              * Only creates a shortcut on Windows start menu.
              */
-			if(System.getProperty("os.name").indexOf("Windows") >= 0){
-				Process p = Runtime.getRuntime().exec(cmd);
-				p.waitFor();
-			}
-			
-			bat.delete();
-			inf.delete();
-		} catch (IOException e) {
+            if (System.getProperty("os.name").indexOf("Windows") >= 0) {
+                Process p = Runtime.getRuntime().exec(cmd);
+                p.waitFor();
+            }
+
+            bat.delete();
+            inf.delete();
+        } catch (IOException e) {
             setErrMsg("Creating shortcut failed.");
-		} catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             setErrMsg("Windows runtime error while creating EMF client shortcut.");
         }
-	}
-    
+    }
+
     private void createShortcutBatchFile(File bat, File inf) {
         String separator = Constants.SEPARATOR;
-        
-        String battext = "\n@echo off & setlocal" + separator +
-                         "\nset inf=rundll32 setupapi,InstallHinfSection DefaultInstall" + separator +
-                         "\nstart/w %inf% 132 " + installhome.replace('\\', '/') + "/shortcut.inf" + separator +
-                         "\nendlocal" + separator;
-                         
-        String inftext = "[version]" + separator +
-                         "signature=$chicago$" + separator +
-                         "[DefaultInstall]" + separator +
-                         "UpdateInis=Addlink" + separator +
-                         "[Addlink]" + separator +
-                         "setup.ini, progman.groups,, \"\"group200=\"EMF\"\"\"" + separator +
-                         "setup.ini, group200,, \"\"\"EMF Client\"\",\"\"\"\"\"\"" + installhome.replace('\\', '/') + 
-                         "/" + Constants.EMF_BATCH_FILE + "\"\"\"\"\"\"" + separator;
-        
-        try{
+
+        String battext = "\n@echo off & setlocal" + separator
+                + "\nset inf=rundll32 setupapi,InstallHinfSection DefaultInstall" + separator + "\nstart/w %inf% 132 "
+                + installhome.replace('\\', '/') + "/shortcut.inf" + separator + "\nendlocal" + separator;
+
+        String inftext = "[version]" + separator + "signature=$chicago$" + separator + "[DefaultInstall]" + separator
+                + "UpdateInis=Addlink" + separator + "[Addlink]" + separator
+                + "setup.ini, progman.groups,, \"\"group200=\"EMF\"\"\"" + separator
+                + "setup.ini, group200,, \"\"\"EMF Client\"\",\"\"\"\"\"\"" + installhome.replace('\\', '/') + "/"
+                + Constants.EMF_BATCH_FILE + "\"\"\"\"\"\"" + separator;
+
+        try {
             FileWriter fw1 = new FileWriter(bat);
             FileWriter fw2 = new FileWriter(inf);
             fw1.write(battext);
             fw2.write(inftext);
             fw1.close();
             fw2.close();
-        }catch(IOException e){
+        } catch (IOException e) {
             setErrMsg("Creating shortcut files failed.");
         }
     }
-    
+
     private String[] getCommands() {
         String[] cmd = new String[3];
         String os = System.getProperty("os.name");
-        
-        if(os.equalsIgnoreCase("Windows 98") || os.equalsIgnoreCase("Windows 95")){
-            cmd[0] = "command.com" ;
+
+        if (os.equalsIgnoreCase("Windows 98") || os.equalsIgnoreCase("Windows 95")) {
+            cmd[0] = "command.com";
         } else {
-            cmd[0] = "cmd.exe" ;
+            cmd[0] = "cmd.exe";
         }
-        
-        cmd[1] = "/C" ;
+
+        cmd[1] = "/C";
         cmd[2] = installhome.replace('\\', '/') + "/shortcut.bat";
-        
+
         return cmd;
     }
-    
+
     public void downloadFileList() throws IOException {
         File dir = new File(installhome);
         dir.mkdirs();
         File download = new File(dir, filelist);
-        
+
         HttpURLConnection conn = getConnection(filelist);
         String s = "";
         String out = "";
-        
+
         InputStream is = conn.getInputStream();
-        BufferedReader content = new  BufferedReader(new InputStreamReader(is));
+        BufferedReader content = new BufferedReader(new InputStreamReader(is));
         FileWriter fw = new FileWriter(download);
-        while((s = content.readLine()) != null){
-            out += s + Constants.SEPARATOR;   
+        while ((s = content.readLine()) != null) {
+            out += s + Constants.SEPARATOR;
         }
         is.close();
         fw.write(out);
         fw.close();
     }
-    
+
     public File2Download[] getFiles2Download() {
         File list = new File(installhome, filelist);
-        if(list.exists()){
+        if (list.exists()) {
             TextParser parser = new TextParser(list, ";");
             parser.parse();
             numFiles2Download = parser.getNumDownloadFiles();
             return parser.getDownloadFiles();
         }
-        
+
         return null;
     }
-    
+
     private File getSingleDownloadFile(String name) {
-        if(name.endsWith("/")){
+        String refTemplate = "";
+        
+        if (name.endsWith("/")) {
             File f = new File(installhome, name);
             f.mkdirs();
-        }else{
+        } else {
             int index = name.lastIndexOf("/");
+            
+            //NOTE: to catch the install reference template
+            refTemplate = name.substring(index + 1);
 
-            //Get the subdir
+            // Get the subdir
             String sub = name.substring(0, index);
             File subdir = new File(installhome, sub);
-            subdir.mkdirs();
+
+            if (!subdir.exists())
+                subdir.mkdirs();
         }
-            
+        
+        if (refTemplate.equals(Constants.INSTALLER_PREFERENCES_FILE))
+            return new File(Constants.USER_HOME, refTemplate);
+
         return new File(installhome, name);
     }
-    
+
     private HttpURLConnection getConnection(String name) throws IOException {
-        URL url = new URL(urlbase + "/" + name);        
-        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+        URL url = new URL(urlbase + "/" + name);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.connect();
-        
+
         return conn;
     }
-    
+
     private void writeStatus(int n, String name) {
-        String status = "Status: Downloading " + (n+1) + " out of " + numFiles2Download
-            + " files:   " + name;
+        String status = "Status: Downloading " + (n + 1) + " out of " + numFiles2Download + " files:   " + name;
         presenter.setStatus(status);
     }
-    
+
     private void saveFile(File file, HttpURLConnection conn) throws IOException {
-        if(!file.isDirectory()){
+        if (!file.isDirectory()) {
             InputStream is = conn.getInputStream();
             BufferedInputStream bis = new BufferedInputStream(is);
             FileOutputStream fos = new FileOutputStream(file);
-            
-            int res = 0;    
+
+            int res = 0;
             while ((res = bis.read()) != -1) {
                 fos.write(res);
             }
-            
-            is.close(); 
+
+            is.close();
             fos.close();
         }
     }
-    
+
     private void saveCurrentFilesInfo() {
         try {
-            FileOutputStream fos = new FileOutputStream(new File(installhome, 
-                    Constants.UPDATE_FILE));
+            FileOutputStream fos = new FileOutputStream(new File(installhome, Constants.UPDATE_FILE));
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(getFiles2Download());
             oos.close();
@@ -243,13 +247,13 @@ public class Download extends Thread {
             setErrMsg("Saving files info failed.");
         }
     }
-    
+
     private void setErrMsg(String msg) {
         presenter.displayErr(msg);
     }
-    
+
     public void addObserver(InstallPresenter presenter) {
         this.presenter = presenter;
     }
-    
+
 }
