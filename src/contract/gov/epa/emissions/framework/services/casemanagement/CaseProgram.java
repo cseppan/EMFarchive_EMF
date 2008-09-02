@@ -50,8 +50,8 @@ public class CaseProgram implements Serializable, Comparable {
             return false;
 
         boolean eqID = (id == ((CaseProgram)other).id);
-        boolean eqName = ((CaseProgram) other).name.equals(this.name);
-        boolean eqModel2Run = (((CaseProgram) other).modelToRunId == this.modelToRunId);
+        boolean eqName = ((CaseProgram) other).getName().equals(this.name);
+        boolean eqModel2Run = (((CaseProgram) other).getModelToRunId() == this.modelToRunId);
 
         return  eqID || (eqName && eqModel2Run);
     }

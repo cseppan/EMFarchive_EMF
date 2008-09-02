@@ -50,8 +50,8 @@ public class InputName implements Serializable, Comparable {
             return false;
         
         boolean eqID = (id == ((InputName)other).id);
-        boolean eqName = ((InputName) other).name.equals(this.name);
-        boolean eqModel2Run = (((InputName) other).modelToRunId == this.modelToRunId);
+        boolean eqName = ((InputName) other).getName().equals(this.name);
+        boolean eqModel2Run = (((InputName) other).getModelToRunId() == this.modelToRunId);
 
         return  eqID || (eqName && eqModel2Run);
     }

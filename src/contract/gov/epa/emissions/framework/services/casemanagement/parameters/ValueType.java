@@ -40,7 +40,7 @@ public class ValueType implements Serializable, Comparable<ValueType> {
         if (other == null || !(other instanceof ValueType))
             return false;
 
-        return ((ValueType) other).name.equals(this.name) || ((ValueType)other).id == id;
+        return ((ValueType) other).getName().equals(this.name) || ((ValueType)other).id == id;
     }
 
     public int hashCode() {

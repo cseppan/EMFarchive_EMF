@@ -1580,7 +1580,7 @@ public class ManagedCaseService {
                         "The combination of 'Parameter Name', 'Sector', 'Program', and 'Job' should be unique.");
 
             dao.addParameter(param, session);
-            return (CaseParameter) dao.loadCaseParameter(param, session);
+            return dao.loadCaseParameter(param, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new case parameter '" + param.getName() + "'\n" + e.getMessage());
@@ -2181,7 +2181,7 @@ public class ManagedCaseService {
         }
 
         try {
-            CaseParameter loaded = (CaseParameter) dao.loadCaseParameter(parameter, localSession);
+            CaseParameter loaded = dao.loadCaseParameter(parameter, localSession);
 
             if (loaded != null && loaded.getId() != parameter.getId())
                 throw new EmfException("Case parameter uniqueness check failed (" + loaded.getId() + ","

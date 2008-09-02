@@ -84,6 +84,10 @@ public class CaseFileParser {
         return this.params;
     }
     
+    public List<CaseInput> getInputs() {
+        return this.inputs;
+    }
+    
     public List<ParameterEnvVar> getParamEnvVars() {
         return this.pEnvVars;
     }

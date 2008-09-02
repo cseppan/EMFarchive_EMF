@@ -377,7 +377,56 @@ public class CaseDAO {
         Criterion criterion = Restrictions.eq("id", new Integer(id));
         return hibernateFacade.load(clazz, criterion, session);
     }
+    
+    public ParameterEnvVar loadParamEnvVar(ParameterEnvVar envVar, Session session) {
+        Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(envVar.getModelToRunId()));
+        Criterion crit2 = Restrictions.eq("name", envVar.getName());
 
+        return (ParameterEnvVar) this.load(ParameterEnvVar.class, new Criterion[] {crit1, crit2}, session);
+    }
+    
+    public CaseProgram loadCaseProgram(CaseProgram prog, Session session) {
+        Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(prog.getModelToRunId()));
+        Criterion crit2 = Restrictions.eq("name", prog.getName());
+
+        return (CaseProgram) this.load(CaseProgram.class, new Criterion[] {crit1, crit2}, session);
+    }
+    
+    public SubDir loadCaseSubdir(SubDir subdir, Session session) {
+        Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(subdir.getModelToRunId()));
+        Criterion crit2 = Restrictions.eq("name", subdir.getName());
+
+        return (SubDir) this.load(SubDir.class, new Criterion[] {crit1, crit2}, session);
+    }
+    
+    public Object loadParameterName(ParameterName paramName, Session session) {
+        Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(paramName.getModelToRunId()));
+        Criterion crit2 = Restrictions.eq("name", paramName.getName());
+
+        return this.load(ParameterName.class, new Criterion[] {crit1, crit2}, session);
+    }
+    
+    public Object loadParameterEnvVar(ParameterEnvVar envVar, Session session) {
+        Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(envVar.getModelToRunId()));
+        Criterion crit2 = Restrictions.eq("name", envVar.getName());
+
+        return this.load(ParameterEnvVar.class, new Criterion[] {crit1, crit2}, session);
+    }
+    
+    public InputName loadInputName(InputName inputName, Session session) {
+        Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(inputName.getModelToRunId()));
+        Criterion crit2 = Restrictions.eq("name", inputName.getName());
+
+        return (InputName) this.load(InputName.class, new Criterion[] {crit1, crit2}, session);
+    }
+    
+    public InputEnvtVar loadInputEnvtVar(InputEnvtVar envVar, Session session) {
+        Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(envVar.getModelToRunId()));
+        Criterion crit2 = Restrictions.eq("name", envVar.getName());
+
+        return (InputEnvtVar) this.load(InputEnvtVar.class, new Criterion[] {crit1, crit2}, session);
+    }
+    
     public Object loadCaseInput(CaseInput input, Session session) {
         Criterion[] criterions = uniqueCaseInputCriteria(input.getCaseID(), input);
 
@@ -798,13 +847,13 @@ public class CaseDAO {
         addObject(param, session);
     }
 
-    public Object loadCaseParameter(CaseParameter param, Session session) {
+    public CaseParameter loadCaseParameter(CaseParameter param, Session session) {
         Criterion[] criterions = uniqueCaseParameterCriteria(param.getCaseID(), param);
 
-        return hibernateFacade.load(CaseParameter.class, criterions, session);
+        return (CaseParameter)hibernateFacade.load(CaseParameter.class, criterions, session);
     }
 
-    public CaseParameter loadCaseParameter(int caseId, CaseParameter param, Session session) {
+    public CaseParameter loadCaseParameter4Sensitivity(int caseId, CaseParameter param, Session session) {
         Criterion[] criterions = sensitivityCaseParameterCriteria(caseId, param, session);
 
         return (CaseParameter) hibernateFacade.load(CaseParameter.class, criterions, session);
@@ -819,7 +868,7 @@ public class CaseDAO {
         CaseProgram program = param.getProgram();
         Integer jobID = new Integer(param.getJobId());
 
-        CaseJob job = this.getCaseJob(jobID);
+        CaseJob job = this.getCaseJob(jobID, session);
         CaseJob parentJob = (job == null) ? null : this.getCaseJob(caseId, job, session);
 
         Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));

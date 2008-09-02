@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserServiceImpl;
+import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
@@ -27,6 +28,8 @@ public class CaseAssistanceServiceTest extends ServiceTestCase {
     }
 
     protected void doTearDown() throws Exception {
+        dropAll(CaseParameter.class);
+        dropAll(CaseInput.class);
         dropAll(Case.class);
         dropAll(Abbreviation.class);
         dropAll(MeteorlogicalYear.class);
@@ -53,7 +56,9 @@ public class CaseAssistanceServiceTest extends ServiceTestCase {
         try {
             service.importCase(new String[] {sumParamsFile, inputsFile, jobsFile}, user);
         } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Hi, EMF User, this service is under construction..."));
-        } 
+            e.printStackTrace();
+        } finally {
+            doTearDown();
+        }
     }
 }

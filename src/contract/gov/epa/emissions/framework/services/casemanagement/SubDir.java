@@ -50,8 +50,8 @@ public class SubDir implements Serializable, Comparable {
             return false;
 
         boolean eqID = (id == ((SubDir)other).id);
-        boolean eqName = ((SubDir) other).name.equals(this.name);
-        boolean eqModel2Run = (((SubDir) other).modelToRunId == this.modelToRunId);
+        boolean eqName = ((SubDir) other).getName().equals(this.name);
+        boolean eqModel2Run = (((SubDir) other).getModelToRunId() == this.modelToRunId);
 
         return  eqID || (eqName && eqModel2Run);
     }

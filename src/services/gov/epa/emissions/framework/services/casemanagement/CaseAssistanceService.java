@@ -1,13 +1,22 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
+import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +40,8 @@ public class CaseAssistanceService {
     }
 
     private CaseDAO caseDao;
+    
+    private DataCommonsDAO dataDao;
 
     private HibernateSessionFactory sessionFactory;
 
@@ -39,6 +50,7 @@ public class CaseAssistanceService {
     public CaseAssistanceService(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         this.caseDao = new CaseDAO();
+        this.dataDao = new DataCommonsDAO();
 
         if (DebugLevels.DEBUG_9)
             System.out.println("In ManagedCaseService constructor: Is the session Factory null? "
@@ -55,6 +67,7 @@ public class CaseAssistanceService {
 
     public synchronized void importCase(String[] files, User user) throws EmfException {
         Session session = sessionFactory.getSession();
+        CaseDaoHelper helper = CaseDaoHelper.getCaseObjectManager(sessionFactory, caseDao, dataDao);
         String[][] cases = sortCaseFiles(files);
 
         Case newCase = null;
@@ -81,6 +94,10 @@ public class CaseAssistanceService {
 
                 resetCaseValues(newCase, session);
                 caseDao.add(newCase, session);
+                
+                Case loadedCase = caseDao.getCaseFromName(newCase.getName(), session);
+                insertParameters(loadedCase.getId(), loadedCase.getModel().getId(), caseParser.getParameters(), helper);
+                insertInputs(loadedCase.getId(), loadedCase.getModel().getId(), caseParser.getInputs(), helper);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -213,5 +230,80 @@ public class CaseAssistanceService {
             newCase.setMeteorlogicalYear((MeteorlogicalYear)temp);
             return;
         }
+    }
+    
+    private void insertParameters(int caseId, int model2RunId, List<CaseParameter> parameters, CaseDaoHelper helper) throws Exception {
+        for (Iterator<CaseParameter> iter = parameters.iterator(); iter.hasNext();) {
+            CaseParameter param = iter.next();
+            param.setCaseID(caseId);
+            
+            ParameterName name = param.getParameterName();
+            name.setModelToRunId(model2RunId);
+            name = helper.getParameterName(name);
+            param.setParameterName(name);
+            
+            ParameterEnvVar envVar = param.getEnvVar();
+            envVar.setModelToRunId(model2RunId);
+            envVar = helper.getParameterEnvVar(envVar);
+            param.setEnvVar(envVar);
+            
+            ValueType type = param.getType();
+            type = helper.getValueType(type);
+            param.setType(type);
+            
+            Sector sector = param.getSector();
+            sector = helper.getSector(sector);
+            param.setSector(sector);
+            
+            CaseProgram prog = param.getProgram();
+            prog.setModelToRunId(model2RunId);
+            prog = helper.getCaseProgram(prog);
+            param.setProgram(prog);
+            
+            helper.insertCaseParameter(param);
+        }
+        
+    }
+    
+    private void insertInputs(int caseId, int model2RunId, List<CaseInput> inputs, CaseDaoHelper helper) throws Exception {
+        for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
+            CaseInput input = iter.next();
+            input.setCaseID(caseId);
+            
+            InputName name = input.getInputName();
+            name.setModelToRunId(model2RunId);
+            name = helper.getInputName(name);
+            input.setInputName(name);
+            
+            InputEnvtVar envVar = input.getEnvtVars();
+            envVar.setModelToRunId(model2RunId);
+            envVar = helper.getInputEnvVar(envVar);
+            input.setEnvtVars(envVar);
+            
+            Sector sector = input.getSector();
+            sector = helper.getSector(sector);
+            input.setSector(sector);
+            
+            CaseProgram prog = input.getProgram();
+            prog.setModelToRunId(model2RunId);
+            prog = helper.getCaseProgram(prog);
+            input.setProgram(prog);
+            
+            DatasetType type = input.getDatasetType();
+            type = helper.getDatasetType(type);
+            input.setDatasetType(type);
+            
+            SubDir subDir = input.getSubdirObj();
+            subDir.setModelToRunId(model2RunId);
+            subDir = helper.getSubDir(subDir);
+            input.setSubdirObj(subDir);
+            
+            //NOTE: temporarily set to null to make input insertion to work 
+            input.setDataset(null);
+            input.setVersion(null);
+            
+            helper.insertCaseInput(input);
+        }
+        
     }
 }

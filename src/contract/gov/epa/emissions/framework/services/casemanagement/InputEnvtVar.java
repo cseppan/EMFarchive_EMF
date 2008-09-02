@@ -50,8 +50,8 @@ public class InputEnvtVar implements Serializable, Comparable {
             return false;
 
         boolean eqID = (id == ((InputEnvtVar)other).id);
-        boolean eqName = ((InputEnvtVar) other).name.equals(this.name);
-        boolean eqModel2Run = (((InputEnvtVar) other).modelToRunId == this.modelToRunId);
+        boolean eqName = ((InputEnvtVar) other).getName().equals(this.name);
+        boolean eqModel2Run = (((InputEnvtVar) other).getModelToRunId() == this.modelToRunId);
 
         return  eqID || (eqName && eqModel2Run);
     }
