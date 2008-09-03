@@ -48,6 +48,14 @@ public class ControlProgramPresenterImpl implements ControlProgramPresenter {
         this.controlProgramManagerPresenter = controlProgramManagerPresenter;
     }
 
+    public ControlProgramPresenterImpl(ControlProgram controlProgram, EmfSession session, 
+            ControlProgramView view) {
+        this.controlProgram = controlProgram;
+        this.session = session;
+        this.view = view;
+        this.presenters = new ArrayList<ControlProgramTabPresenter>();
+    }
+    
     public void doDisplay() throws EmfException {
         view.observe(this);
         

@@ -1,11 +1,17 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlprogram.editor.ControlProgramView;
+import gov.epa.emissions.framework.client.cost.controlprogram.editor.ControlProgramWindow;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlProgram;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
@@ -39,17 +45,23 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
     private ControlStrategyProgramTableData tableData;
 
     private EmfConsole parent;
+    
+    private DesktopManager desktopManager;
+    
+    private ControlStrategyProgramsTabPresenter presenter;
 
     private Button addButton = new AddButton(addAction());
     
     private EmfSession session;
     
     public ControlStrategyProgramsTab(ControlStrategy controlStrategy, ManageChangeables changeablesList,
-            SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) {
+            SingleLineMessagePanel messagePanel, EmfConsole parentConsole, DesktopManager desktopManager, 
+            EmfSession session) {
 //        this.controlProgram = controlProgram;
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
         this.parent = parentConsole;
+        this.desktopManager = desktopManager;
         this.session = session;
     }
 
@@ -77,12 +89,18 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
     }
 
     private JPanel buttonPanel() {
+        String message = "You have asked to open a lot of windows. Do you want proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);        
+        
         JPanel panel = new JPanel();
         addButton.setMargin(new Insets(2, 5, 2, 5));
         panel.add(addButton);
         Button removeButton = new RemoveButton(removeAction());
         removeButton.setMargin(new Insets(2, 5, 2, 5));
         panel.add(removeButton);
+        SelectAwareButton viewButton = new SelectAwareButton("view", viewAction(), table, confirmDialog);
+        removeButton.setMargin(new Insets(2, 5, 2, 5));
+        panel.add(viewButton);
 
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);
@@ -112,6 +130,14 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 remove();
+            }
+        };
+    }
+    
+    private Action viewAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                editControlPrograms();
             }
         };
     }
@@ -172,7 +198,7 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
     }
 
     public void observe(ControlStrategyProgramsTabPresenter presenter) {
-        //
+        this.presenter = presenter;
     }
 
     public void notifyStrategyTypeChange(StrategyType strategyType) {
@@ -202,6 +228,29 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
             refresh();
 
         }
+    }
+    
+    private void editControlPrograms() {
+        List controlPrograms = selected();
+        if (controlPrograms.isEmpty()) {
+            messagePanel.setMessage("Please select one or more Control Programs");
+            return;
+        }
+        for (int i = 0; i < controlPrograms.size(); i++) {
+            ControlProgram controlProgram = (ControlProgram) controlPrograms.get(i);
+            ControlProgramView view = new ControlProgramWindow(desktopManager, session, parent, controlProgram.getControlMeasures());
+            //ControlProgramManagerPresenter presenter = ControlProgramManagerPresenter(session, view);
+            //editControlProgramViewList.add(view);
+            try {
+                presenter.doEdit(view, controlProgram);
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+            }
+        }
+    }
+    
+    private List selected() {
+        return table.selected();
     }
 
     public void notifyStrategyRun(ControlStrategy controlStrategy) {

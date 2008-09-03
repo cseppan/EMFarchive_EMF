@@ -1,6 +1,9 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.cost.controlprogram.editor.ControlProgramPresenter;
+import gov.epa.emissions.framework.client.cost.controlprogram.editor.ControlProgramPresenterImpl;
+import gov.epa.emissions.framework.client.cost.controlprogram.editor.ControlProgramView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlProgram;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -44,4 +47,10 @@ public class ControlStrategyProgramsTabPresenter implements EditControlStrategyT
     public void doSave(ControlStrategy controlStrategy) {
         view.save(controlStrategy);
     }
+    
+    public void doEdit(ControlProgramView view, ControlProgram controlProgram) throws EmfException {
+        ControlProgramPresenter presenter = new ControlProgramPresenterImpl(controlProgram, session, view);
+        presenter.doDisplay();
+    }
+    
 }

@@ -207,7 +207,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
     
     private JPanel createProgramsTab(ControlStrategy controlStrategy) {
-        programsTabView = new ControlStrategyProgramsTab(controlStrategy, this,  messagePanel, parentConsole, session);
+        programsTabView = new ControlStrategyProgramsTab(controlStrategy, this,  messagePanel, parentConsole, desktopManager, session);
         this.presenter.set(programsTabView);
         return programsTabView;
     }
