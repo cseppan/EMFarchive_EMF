@@ -97,7 +97,7 @@ public class EditControlDetailedDiffWindow extends DisposableInteralFrame implem
     
     private JPanel emisinvBase(EmfDataset dataset) {
         datasetWidgetBase = new AddRemoveDatasetWidget(this, program, parentConsole, session);
-        datasetWidgetBase.setPreferredSize(new Dimension(350,250));
+        datasetWidgetBase.setPreferredSize(new Dimension(420,250));
         if(resultBase != null && resultBase.length > 0)
             datasetWidgetBase.setDatasetsFromStepWindow(resultBase);
         else 
@@ -107,7 +107,7 @@ public class EditControlDetailedDiffWindow extends DisposableInteralFrame implem
     
     private JPanel emisinvCompare() {
         datasetWidgetCompare = new AddRemoveDatasetWidget(this, program, parentConsole, session);
-        datasetWidgetCompare.setPreferredSize(new Dimension(350,250));
+        datasetWidgetCompare.setPreferredSize(new Dimension(420,250));
         if(resultCompare != null && resultCompare.length > 0)
             datasetWidgetCompare.setDatasetsFromStepWindow(resultCompare);
         return datasetWidgetCompare;
@@ -117,7 +117,7 @@ public class EditControlDetailedDiffWindow extends DisposableInteralFrame implem
         String [] values = null; 
         values= new String[]{"Plant", "State", "County", "SCC"};
         summaryTypes = new ComboBox("Not Selected", values);
-        summaryTypes.setPreferredSize(new Dimension(350, 25));
+        summaryTypes.setPreferredSize(new Dimension(420, 25));
         if(!(summaryType==null) && (summaryType.trim().length()>0))
             summaryTypes.setSelectedItem(summaryType);
 
@@ -150,7 +150,7 @@ public class EditControlDetailedDiffWindow extends DisposableInteralFrame implem
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 if (!validateValues()){
-                    messagePanel.setError("Please select one base, one compare and summary type");
+                    messagePanel.setError("Please specify one base result, one result for comparison, and the summary type");
                     return; 
                 }
                 presenter.updateInventories(datasetWidgetBase.getDatasets(),datasetWidgetCompare.getDatasets(),new Object[]{}, getSummaryType() );

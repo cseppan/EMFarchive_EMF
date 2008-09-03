@@ -144,7 +144,7 @@ public class AddRemoveDatasetWidget extends JPanel {
                 selectSingle =true; 
                 for (int i = 0; i < allDatasetTypes.length; i++) {
                     //get all dataset types that start with ORL
-                    if (allDatasetTypes[i].getName().startsWith("Control Strategy") )
+                    if (allDatasetTypes[i].getName().startsWith("Control Strategy Detailed Result") )
                         datasetTypeList.add(allDatasetTypes[i]);
                 }
             }else{   
