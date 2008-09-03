@@ -34,7 +34,7 @@ import java.util.StringTokenizer;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JFrame;
+//import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -428,7 +428,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
                 int index = mainTabbedPane.getSelectedIndex();
                 PointSourceGeneratorFrame frame = new PointSourceGeneratorFrame(new File(fileNames[index]));
                         //"C:\\DOCUME~1\\CEPUSER\\LOCALS~1\\Temp\\QA_DSID243_V0_20080826140114Summarize_by_Plant.csv"));
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.pack();
                 frame.centerFrame();
                 frame.setVisible(true);
