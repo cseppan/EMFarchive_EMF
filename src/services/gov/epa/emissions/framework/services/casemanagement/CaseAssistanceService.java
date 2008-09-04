@@ -41,7 +41,7 @@ public class CaseAssistanceService {
     }
 
     private CaseDAO caseDao;
-    
+
     private DataCommonsDAO dataDao;
 
     private HibernateSessionFactory sessionFactory;
@@ -78,7 +78,7 @@ public class CaseAssistanceService {
 
                 if (newCase == null)
                     throw new EmfException("Case not properly parsed.");
-                
+
                 if (newCase.getName() == null || newCase.getName().trim().isEmpty())
                     throw new EmfException("Case name not specified.");
 
@@ -91,11 +91,13 @@ public class CaseAssistanceService {
                     throw new EmfException("Case (" + newCase.getName()
                             + ") to import has a duplicate name in cases table.");
 
+                session.clear();
                 resetCaseValues(user, newCase, session);
-                session.clear(); //NOTE: to clear up the old object images
-                caseDao.add(newCase, session);
-                
-                session.clear(); //NOTE: to clear up the old object images
+                session.clear(); // NOTE: to clear up the old object images
+                session.flush();
+                addNewCaseObject(newCase);
+
+                session.clear(); // NOTE: to clear up the old object images
                 Case loadedCase = caseDao.getCaseFromName(newCase.getName(), session);
                 insertParameters(loadedCase.getId(), loadedCase.getModel().getId(), caseParser.getParameters(), helper);
                 insertInputs(loadedCase.getId(), loadedCase.getModel().getId(), caseParser.getInputs(), helper);
@@ -103,16 +105,28 @@ public class CaseAssistanceService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not inmport case", e);
-            
+
             if (e instanceof EmfException)
-                throw (EmfException)e;
-            
+                throw (EmfException) e;
+
             Throwable ex = e.getCause();
-            
+
             if (ex != null)
                 throw new EmfException(ex.getMessage());
-            
+
             throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
+    private void addNewCaseObject(Case newCase) throws Exception {
+        Session session = sessionFactory.getSession();
+
+        try {
+            caseDao.add(newCase, session);
+        } catch (Exception e) {
+            throw e;
         } finally {
             session.close();
         }
@@ -120,10 +134,10 @@ public class CaseAssistanceService {
 
     private String[] getFiles(String folder, String[] files) {
         String[] fullPathFiles = new String[files.length];
-        
+
         for (int i = 0; i < files.length; i++)
             fullPathFiles[i] = folder + File.separator + files[i];
-        
+
         return fullPathFiles;
     }
 
@@ -150,31 +164,31 @@ public class CaseAssistanceService {
         for (String file : files) {
             if (file.endsWith("_Summary_Parameters.csv") && fileType.equals("Summary"))
                 return file;
-            
+
             if (file.endsWith("_Inputs.csv") && fileType.equals("Input"))
                 return file;
-            
+
             if (file.endsWith("_Jobs.csv") && fileType.equals("Job"))
                 return file;
         }
-        
+
         return null;
     }
 
     private void resetCaseValues(User user, Case newCase, Session session) {
         Abbreviation abbr = newCase.getAbbreviation();
-        
+
         if (abbr == null)
             abbr = new Abbreviation(newCase.getName());
-        
+
         loadNSetObject(newCase, abbr, Abbreviation.class, abbr.getName(), session);
-        
+
         CaseCategory cat = newCase.getCaseCategory();
         loadNSetObject(newCase, cat, CaseCategory.class, cat == null ? "" : cat.getName(), session);
 
         Project proj = newCase.getProject();
         loadNSetObject(newCase, proj, Project.class, proj == null ? "" : proj.getName(), session);
-        
+
         ModelToRun model = newCase.getModel();
         loadNSetObject(newCase, model, ModelToRun.class, model == null ? "" : model.getName(), session);
 
@@ -195,154 +209,172 @@ public class CaseAssistanceService {
 
         MeteorlogicalYear metYear = newCase.getMeteorlogicalYear();
         loadNSetObject(newCase, metYear, MeteorlogicalYear.class, metYear == null ? "" : metYear.getName(), session);
-        
+
         newCase.setLastModifiedBy(user);
         newCase.setLastModifiedDate(new Date());
         newCase.setCreator(user);
     }
 
     private synchronized void loadNSetObject(Case newCase, Object obj, Class<?> clazz, String name, Session session) {
-        if (obj == null || name == null || name.isEmpty())
-            return;
+        Object temp = null;
 
+        if (obj != null && name != null && !name.isEmpty())
+            temp = checkDB(obj, clazz, name, session);
+
+        if (obj instanceof Abbreviation) {
+            newCase.setAbbreviation((Abbreviation) temp);
+            return;
+        }
+
+        if (obj instanceof CaseCategory) {
+            newCase.setCaseCategory((CaseCategory) temp);
+            return;
+        }
+
+        if (obj instanceof Project) {
+            newCase.setProject((Project) temp);
+            return;
+        }
+
+        if (obj instanceof ModelToRun) {
+            newCase.setModel((ModelToRun) temp);
+            return;
+        }
+
+        if (obj instanceof Region) {
+            newCase.setModelingRegion((Region) temp);
+            return;
+        }
+
+        if (obj instanceof Grid) {
+            newCase.setGrid((Grid) temp);
+            return;
+        }
+
+        if (obj instanceof GridResolution) {
+            newCase.setGridResolution((GridResolution) temp);
+            return;
+        }
+
+        if (obj instanceof AirQualityModel) {
+            newCase.setAirQualityModel((AirQualityModel) temp);
+            return;
+        }
+
+        if (obj instanceof Speciation) {
+            newCase.setSpeciation((Speciation) temp);
+            return;
+        }
+
+        if (obj instanceof MeteorlogicalYear) {
+            newCase.setMeteorlogicalYear((MeteorlogicalYear) temp);
+            return;
+        }
+    }
+
+    private Object checkDB(Object obj, Class<?> clazz, String name, Session session) {
+        session.clear();
+        session.flush();
         Object temp = caseDao.load(clazz, name, session);
-        
+
         if (temp != null && temp instanceof Abbreviation) {
             String random = Math.random() + "";
             String uniqueName = name + "_" + random.substring(2);
-            ((Abbreviation)obj).setName(uniqueName);
+            ((Abbreviation) obj).setName(uniqueName);
+            session.clear();
+            session.flush();
             caseDao.addObject(obj, session);
+            session.clear();
+            session.flush();
             temp = caseDao.load(clazz, uniqueName, session);
         }
 
         if (temp == null) {
+            session.clear();
+            session.flush();
             caseDao.addObject(obj, session);
+            session.clear();
+            session.flush();
             temp = caseDao.load(clazz, name, session);
         }
-        
-        if (temp instanceof Abbreviation) {
-            newCase.setAbbreviation((Abbreviation)temp);
-            return;
-        }
-        
-        if (temp instanceof CaseCategory) {
-            newCase.setCaseCategory((CaseCategory)temp);
-            return;
-        }
-        
-        if (temp instanceof Project) {
-            newCase.setProject((Project)temp);
-            return;
-        }
-        
-        if (temp instanceof ModelToRun) {
-            newCase.setModel((ModelToRun)temp);
-            return;
-        }
-        
-        if (temp instanceof Region) {
-            newCase.setModelingRegion((Region)temp);
-            return;
-        }
-        
-        if (temp instanceof Grid) {
-            newCase.setGrid((Grid)temp);
-            return;
-        }
-        
-        if (temp instanceof GridResolution) {
-            newCase.setGridResolution((GridResolution)temp);
-            return;
-        }
-        
-        if (temp instanceof AirQualityModel) {
-            newCase.setAirQualityModel((AirQualityModel)temp);
-            return;
-        }
-        
-        if (temp instanceof Speciation) {
-            newCase.setSpeciation((Speciation)temp);
-            return;
-        }
-        
-        if (temp instanceof MeteorlogicalYear) {
-            newCase.setMeteorlogicalYear((MeteorlogicalYear)temp);
-            return;
-        }
+
+        return temp;
     }
-    
-    private void insertParameters(int caseId, int model2RunId, List<CaseParameter> parameters, CaseDaoHelper helper) throws Exception {
+
+    private void insertParameters(int caseId, int model2RunId, List<CaseParameter> parameters, CaseDaoHelper helper)
+            throws Exception {
         for (Iterator<CaseParameter> iter = parameters.iterator(); iter.hasNext();) {
             CaseParameter param = iter.next();
             param.setCaseID(caseId);
-            
+
             ParameterName name = param.getParameterName();
             name.setModelToRunId(model2RunId);
             name = helper.getParameterName(name);
             param.setParameterName(name);
-            
+
             ParameterEnvVar envVar = param.getEnvVar();
             envVar.setModelToRunId(model2RunId);
             envVar = helper.getParameterEnvVar(envVar);
             param.setEnvVar(envVar);
-            
+
             ValueType type = param.getType();
             type = helper.getValueType(type);
             param.setType(type);
-            
+
             Sector sector = param.getSector();
             sector = helper.getSector(sector);
             param.setSector(sector);
-            
+
             CaseProgram prog = param.getProgram();
             prog.setModelToRunId(model2RunId);
             prog = helper.getCaseProgram(prog);
             param.setProgram(prog);
-            
+
             helper.insertCaseParameter(param);
         }
-        
+
     }
-    
-    private void insertInputs(int caseId, int model2RunId, List<CaseInput> inputs, CaseDaoHelper helper) throws Exception {
+
+    private void insertInputs(int caseId, int model2RunId, List<CaseInput> inputs, CaseDaoHelper helper)
+            throws Exception {
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
             input.setCaseID(caseId);
-            
+
             InputName name = input.getInputName();
             name.setModelToRunId(model2RunId);
             name = helper.getInputName(name);
             input.setInputName(name);
-            
+
             InputEnvtVar envVar = input.getEnvtVars();
             envVar.setModelToRunId(model2RunId);
             envVar = helper.getInputEnvVar(envVar);
             input.setEnvtVars(envVar);
-            
+
             Sector sector = input.getSector();
             sector = helper.getSector(sector);
             input.setSector(sector);
-            
+
             CaseProgram prog = input.getProgram();
             prog.setModelToRunId(model2RunId);
             prog = helper.getCaseProgram(prog);
             input.setProgram(prog);
-            
+
             DatasetType type = input.getDatasetType();
             type = helper.getDatasetType(type);
             input.setDatasetType(type);
-            
+
             SubDir subDir = input.getSubdirObj();
             subDir.setModelToRunId(model2RunId);
             subDir = helper.getSubDir(subDir);
             input.setSubdirObj(subDir);
-            
-            //NOTE: temporarily set to null to make input insertion to work 
+
+            // NOTE: temporarily set to null to make input insertion to work
             input.setDataset(null);
             input.setVersion(null);
-            
+
             helper.insertCaseInput(input);
         }
-        
+
     }
 }
