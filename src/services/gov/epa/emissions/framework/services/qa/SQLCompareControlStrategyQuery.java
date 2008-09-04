@@ -104,16 +104,24 @@ public class SQLCompareControlStrategyQuery {
              //if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
          }
          String diffQuery = "select @@!, " 
-             +	" \n sum(a.final_emissions) - sum(b.final_emissions) as diff_annual_emissions, " 
-             +  " \n sum(a.emis_reduction) - sum(b.emis_reduction) as diff_emissions_reduction, " 
+             +  " \n sum(a.final_emissions) as base_ann_emis, " 
+             +  " \n sum(b.final_emissions) as comp_ann_emis, " 
+             +  " \n sum(a.final_emissions) - sum(b.final_emissions) as diff_ann_emis, " 
+             +  " \n sum(a.emis_reduction) as base_emis_red, " 
+             +  " \n sum(b.emis_reduction) as comp_emis_red, " 
+             +  " \n sum(a.emis_reduction) - sum(b.emis_reduction) as diff_emis_red, " 
              + " \n case when coalesce(sum(a.inv_emissions),0) <> 0 then sum(a.emis_reduction) / sum(a.inv_emissions) * 100 else null end "
-             + " \n- case when coalesce(sum(b.inv_emissions),0) <> 0 then sum(b.emis_reduction) / sum(b.inv_emissions) * 100 else null end as diff_percent_reduction, "
-             + " \n sum(a.annual_cost) - sum(b.annual_cost) as diff_annual_cost, "
-             + " \n sum(a.annual_oper_maint_cost) - sum(b.annual_oper_maint_cost) as diff_op_and_maint_cost,  "
-             + " \n sum(a.annualized_capital_cost) - sum(b.annualized_capital_cost) as diff_annualized_capital_cost, "
-             + " \n sum(a.total_capital_cost) - sum(b.total_capital_cost) as diff_annual_capital_cost, "
+             + " \n- case when coalesce(sum(b.inv_emissions),0) <> 0 then sum(b.emis_reduction) / sum(b.inv_emissions) * 100 else null end as diff_pct_red, "
+             + " \n sum(a.annual_cost) as base_ann_cost, "
+             + " \n sum(b.annual_cost) as comp_ann_cost, "
+             + " \n sum(a.annual_cost) - sum(b.annual_cost) as diff_ann_cost, "
+             + " \n case when coalesce(sum(a.emis_reduction),0) <> 0 then sum(a.annual_cost) / sum(a.emis_reduction) else null end as base_cpt, " 
+             + " \n case when coalesce(sum(b.emis_reduction),0) <> 0 then sum(b.annual_cost) / sum(b.emis_reduction) else null end as comp_cpt, " 
              + " \n case when coalesce(sum(a.emis_reduction),0) <> 0 then sum(a.annual_cost) / sum(a.emis_reduction) else null end "
-             + " \n- case when coalesce(sum(b.emis_reduction),0) <> 0 then sum(b.annual_cost) / sum(b.emis_reduction) else null end as diff_cost_per_ton " 
+             + " \n- case when coalesce(sum(b.emis_reduction),0) <> 0 then sum(b.annual_cost) / sum(b.emis_reduction) else null end as diff_cpt, " 
+             + " \n sum(a.annual_oper_maint_cost) - sum(b.annual_oper_maint_cost) as diff_opmaint_cost,  "
+             + " \n sum(a.annualized_capital_cost) - sum(b.annualized_capital_cost) as diff_annualized_cap_cost, "
+             + " \n sum(a.total_capital_cost) - sum(b.total_capital_cost) as diff_ann_cap_cost "
              
              + " \nfrom $DATASET_TABLE[\"" + baseDatasetNames.get(0)+"\", 1] a "
              + " \nfull outer join $DATASET_TABLE[\""+compareDatasetNames.get(0) + "\", 1] b "
@@ -129,17 +137,25 @@ public class SQLCompareControlStrategyQuery {
        
      //replace @@! symbol with main columns in outer select statement
        if (summaryTypeToken.equals("Plant")) 
-           sql = "coalesce(a.plantid, b.plantid) as plant_id, coalesce(a.plant, b.plant) as plant_name, " 
-               + "coalesce(a.poll, b.poll) as pollutant, coalesce(avg(a.xloc), avg(b.xloc)) as longitude, coalesce(avg(a.yloc), avg(b.yloc)) as latitude ";
+           sql = "coalesce(a.plantid, b.plantid) as plant_id, "
+               + "coalesce(a.plant, b.plant) as plant_name, " 
+               + "coalesce(a.poll, b.poll) as pollutant, "
+               + "coalesce(avg(a.xloc), avg(b.xloc)) as longitude, "
+               + "coalesce(avg(a.yloc), avg(b.yloc)) as latitude ";
        else if (summaryTypeToken.equals("State")) 
-           sql = "substring(coalesce(a.fips, b.fips), 1, 2) as fipsst, fipscode.state_name, "
-               + "coalesce(a.poll, b.poll) as pollutant, avg(fipscode.state_maxlon - fipscode.state_minlon) as longitude, "
+           sql = "substring(coalesce(a.fips, b.fips), 1, 2)::character varying(2) as fipsst, "
+               + "fipscode.state_name, "
+               + "coalesce(a.poll, b.poll) as pollutant, "
+               + "avg(fipscode.state_maxlon - fipscode.state_minlon) as longitude, "
                + "avg(fipscode.state_maxlat - fipscode.state_minlat) as latitude ";
        else if (summaryTypeToken.equals("County")) 
            sql = "coalesce(a.fips, b.fips) as fips, fipscode.state_county_fips_code_desc, "
-               + "coalesce(a.poll, b.poll) as pollutant, coalesce(avg(a.xloc), avg(b.xloc)) as longitude, coalesce(avg(a.yloc), avg(b.yloc)) as latitude ";
+               + "coalesce(a.poll, b.poll) as pollutant, "
+               + "fipscode.centerlon as longitude, "
+               + "fipscode.centerlat as latitude ";
        else if (summaryTypeToken.equals("SCC")) 
-           sql = "coalesce(a.scc, b.scc) as scc, coalesce(a.poll, b.poll) as pollutant ";
+           sql = "coalesce(a.scc, b.scc) as scc, "
+               + "coalesce(a.poll, b.poll) as pollutant ";
        diffQuery = diffQuery.replaceAll("@@!", sql);
 
        //replace !!! symbol with conditions when join table base with compare   
@@ -155,12 +171,15 @@ public class SQLCompareControlStrategyQuery {
 
        //replace @@@ symbol with group by columns in outer select statement
        if (summaryTypeToken.equals("Plant")) 
-           sql =  "coalesce(a.fips, b.fips), coalesce(a.plantid, b.plantid), "
+           sql =  "coalesce(a.fips, b.fips), "
+               + "coalesce(a.plantid, b.plantid), "
                + "coalesce(a.plant, b.plant) ";
        else if (summaryTypeToken.equals("State")) 
-           sql = "substring(coalesce(a.fips, b.fips), 1, 2), fipscode.state_name";
+           sql = "substring(coalesce(a.fips, b.fips), 1, 2), "
+               + "fipscode.state_name";
        else if (summaryTypeToken.equals("County")) 
-           sql = "coalesce(a.fips, b.fips), fipscode.state_county_fips_code_desc";
+           sql = "coalesce(a.fips, b.fips), fipscode.centerlon, fipscode.centerlat, "
+               + "fipscode.state_county_fips_code_desc";
        else if (summaryTypeToken.equals("SCC")) 
            sql = "coalesce(a.scc, b.scc) ";
        
