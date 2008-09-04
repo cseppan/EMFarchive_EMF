@@ -85,6 +85,7 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         cols.add(new Column("Rule_Pen", types.realType(), new RealFormatter()));
         cols.add(new Column("Rule_Eff", types.realType(), new RealFormatter()));
         cols.add(new Column("Percent_Reduction", types.realType(), new RealFormatter()));
+        cols.add(new Column("Adj_Factor", types.realType(), new RealFormatter()));
         cols.add(new Column("Inv_Ctrl_Eff", types.realType(), new RealFormatter()));
         cols.add(new Column("Inv_Rule_Pen", types.realType(), new RealFormatter()));
         cols.add(new Column("Inv_Rule_Eff", types.realType(), new RealFormatter()));
