@@ -52,7 +52,7 @@ public class CaseAssistanceService {
         this.dataDao = new DataCommonsDAO();
 
         if (DebugLevels.DEBUG_9)
-            System.out.println("In ManagedCaseService constructor: Is the session Factory null? "
+            System.out.println("In CaseAssistanceService constructor: Is the session Factory null? "
                     + (sessionFactory == null));
 
         myTag();
@@ -60,13 +60,13 @@ public class CaseAssistanceService {
         if (DebugLevels.DEBUG_1)
             System.out.println(">>>> " + myTag());
 
-        log.info("ManagedCaseService");
+        log.info("CaseAssistanceService");
         log.info("Session factory null? " + (sessionFactory == null));
     }
 
     public synchronized void importCase(String folder, String[] files, User user) throws EmfException {
         Session session = sessionFactory.getSession();
-        CaseDaoHelper helper = CaseDaoHelper.getCaseObjectManager(sessionFactory, caseDao, dataDao);
+        CaseDaoHelper helper = new CaseDaoHelper(sessionFactory, caseDao, dataDao);
         String[][] cases = sortCaseFiles(getFiles(folder, files));
 
         Case newCase = null;
@@ -92,8 +92,10 @@ public class CaseAssistanceService {
                             + ") to import has a duplicate name in cases table.");
 
                 resetCaseValues(user, newCase, session);
+                session.clear(); //NOTE: to clear up the old object images
                 caseDao.add(newCase, session);
                 
+                session.clear(); //NOTE: to clear up the old object images
                 Case loadedCase = caseDao.getCaseFromName(newCase.getName(), session);
                 insertParameters(loadedCase.getId(), loadedCase.getModel().getId(), caseParser.getParameters(), helper);
                 insertInputs(loadedCase.getId(), loadedCase.getModel().getId(), caseParser.getInputs(), helper);

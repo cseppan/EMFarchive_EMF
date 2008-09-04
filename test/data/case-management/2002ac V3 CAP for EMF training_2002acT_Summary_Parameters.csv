@@ -9,7 +9,7 @@
 "#EMF_IS_FINAL=false "
 "#EMF_IS_TEMPLATE=false"
 Tab,Parameter,Order,Envt. Var.,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose
-Summary,Model to Run,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,"SMOKE 2.3.2",String,TRUE,TRUE,,,
+Summary,Model to Run,0,MODEL_LABEL,,All jobs for sector,All programs,"SMOKE 2.3.2",String,TRUE,TRUE,,,
 Summary,Model Version,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,"",String,TRUE,TRUE,,,
 Summary,Modeling Region,0,,All sectors,All jobs for sector,All programs,"National",String,TRUE,TRUE,,,
 Summary,Grid Name,0,IOAPI_GRIDNAME_1,All sectors,All jobs for sector,All programs,"US36KM_148X112",String,TRUE,TRUE,,,

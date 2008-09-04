@@ -17,8 +17,6 @@ import org.hibernate.Session;
 
 public class CaseDaoHelper {
 
-    private static CaseDaoHelper com = null;
-    
     private int currentCaseId = -1; //NOTE: an non-exist case id for initial value
     
     private List<CaseParameter> parameters;
@@ -51,13 +49,7 @@ public class CaseDaoHelper {
 
     private HibernateSessionFactory sessionFactory;
 
-    public static CaseDaoHelper getCaseObjectManager(HibernateSessionFactory sessionFactory, CaseDAO caseDao, DataCommonsDAO dataDao) {
-        if (com == null)
-            com = new CaseDaoHelper(sessionFactory, caseDao, dataDao);
-        return com;
-    }
-
-    private CaseDaoHelper(HibernateSessionFactory sessionFactory, CaseDAO caseDao, DataCommonsDAO dataDao) {
+    public CaseDaoHelper(HibernateSessionFactory sessionFactory, CaseDAO caseDao, DataCommonsDAO dataDao) {
         this.sessionFactory = sessionFactory;
         this.caseDao = caseDao;
         this.dataDao = dataDao;
