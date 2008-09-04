@@ -233,6 +233,10 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
             if (constraint.getReplacementControlMinEfficiencyDiff() == null || constraint.getReplacementControlMinEfficiencyDiff() <= 0.0D) 
                 throw new EmfException("Constraints Tab: Please specify a replacement control minimum control efficiencny difference for the Max Emissions Reduction strategy type.");
         }
+        if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.projectFutureYearInventory)) {
+            if (constraint.getReplacementControlMinEfficiencyDiff() == null || constraint.getReplacementControlMinEfficiencyDiff() <= 0.0D) 
+                throw new EmfException("Constraints Tab: Please specify a replacement control minimum control efficiencny difference for the Max Emissions Reduction strategy type.");
+        }
         presenter.setConstraint(constraint);
     }
 
@@ -260,7 +264,9 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         } else if (strategyType != null && strategyType.getName().equals(StrategyType.leastCostCurve)) {
             leastCostPanelContainer.add(leastCostCurvePanel, BorderLayout.NORTH);
             replacementControlMinEfficiencyDiff.setEnabled(true);
-        } else if (strategyType != null && (strategyType.getName().equals(StrategyType.maxEmissionsReduction) || strategyType.getName().equals(StrategyType.projectFutureYearInventory))) {
+        } else if (strategyType != null && strategyType.getName().equals(StrategyType.maxEmissionsReduction)) {
+            replacementControlMinEfficiencyDiff.setEnabled(true);
+        } else if (strategyType != null && strategyType.getName().equals(StrategyType.projectFutureYearInventory)) {
             replacementControlMinEfficiencyDiff.setEnabled(true);
         } else {
             replacementControlMinEfficiencyDiff.setEnabled(false);

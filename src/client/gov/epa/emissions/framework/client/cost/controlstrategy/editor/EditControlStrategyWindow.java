@@ -356,8 +356,10 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 //                    validatePath(outputTabView.getExportFolder());
                     controlStrategy.setDeleteResults(deleteResults);
                     controlStrategy.setExportDirectory(outputTabView.getExportFolder());
+                    controlStrategy.setRunStatus("Waiting");
                     save();
                     controlStrategy.setStartDate(new Date());
+                    
                     presenter.setResults(controlStrategy);
                     presenter.runStrategy();
                     outputTabView.notifyStrategyRun(controlStrategy);
@@ -486,7 +488,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                     tabbedPane.insertTab("Programs", null, programsTab, null, 2);
                 }
             } 
-            if (lastStrategyType.getName().equals(StrategyType.projectFutureYearInventory)) {
+            if (lastStrategyType != null && lastStrategyType.getName().equals(StrategyType.projectFutureYearInventory)) {
                 if (tabbedPane.getTabCount() == 5) {
                     tabbedPane.removeTabAt(2);
                     tabbedPane.insertTab("Measures", null, measuresTab, null, 2);
