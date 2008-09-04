@@ -45,17 +45,14 @@ public class StrategySummaryResultTableFormat implements TableFormat {
     }
     
     private Column[] versionCols() {
-        Column recordId = recordID(types);
-        Column datasetId = new Column("Dataset_Id", types.longType(), new LongFormatter(), "NOT NULL");
-        Column version = new Column("Version", types.intType(), new NullFormatter(), "NULL DEFAULT 0");
-        Column deleteVersions = new Column("Delete_Versions", types.text(), new NullFormatter(), "DEFAULT ''::text");
+        List<Column> cols = new ArrayList<Column>();
 
-        return new Column[] { 
-                recordId, 
-                datasetId,  
-                version, 
-                deleteVersions
-                };
+        cols.add(recordID(types));
+        cols.add(new Column("Dataset_Id", types.longType(), new LongFormatter(), "NOT NULL"));
+        cols.add(new Column("Version", types.intType(), new NullFormatter(), "NULL DEFAULT 0"));
+        cols.add(new Column("Delete_Versions", types.text(), new NullFormatter(), "DEFAULT ''::text"));
+
+        return cols.toArray(new Column[0]);
     }
 
     private Column recordID(SqlDataTypes types) {
@@ -66,27 +63,22 @@ public class StrategySummaryResultTableFormat implements TableFormat {
     }
 
     private Column[] baseCols() {
-        Column sector = new Column("SECTOR", types.stringType(64), 64, new StringFormatter(255));
-        Column fips = new Column("FIPS", types.stringType(6), new StringFormatter(6));
-        Column scc = new Column("SCC", types.stringType(10), new StringFormatter(10));
-        Column pollutant = new Column("Poll", types.stringType(20), new StringFormatter(20));
-        Column controlTechnology = new Column("Control_Technology", types.stringType(128), new StringFormatter(128));
-        Column annualCost = new Column("Annual_Cost", types.realType(), new RealFormatter());
-        Column avgAnnualCostPerTon = new Column("Avg_Ann_Cost_per_Ton", types.realType(), new RealFormatter());
-        Column emissionsReduction = new Column("Emis_Reduction", types.realType(), new RealFormatter());
-        Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
+        List<Column> cols = new ArrayList<Column>();
 
-        return new Column[] { 
-                sector, 
-                fips, 
-                scc, 
-                pollutant, 
-                controlTechnology, 
-                annualCost, 
-                avgAnnualCostPerTon,
-                emissionsReduction, 
-                comment 
-                };
+        cols.add(new Column("SECTOR", types.stringType(64), 64, new StringFormatter(255)));
+        cols.add(new Column("FIPS", types.stringType(6), new StringFormatter(6)));
+        cols.add(new Column("SCC", types.stringType(10), new StringFormatter(10)));
+        cols.add(new Column("Poll", types.stringType(20), new StringFormatter(20)));
+        cols.add(new Column("Control_Measure_Abbreviation", types.stringType(10), new StringFormatter(10)));
+        cols.add(new Column("Control_Measure", types.stringType(255), new StringFormatter(255)));
+        cols.add(new Column("Control_Technology", types.stringType(128), new StringFormatter(128)));
+        cols.add(new Column("source_group", types.stringType(255), new StringFormatter(255)));
+        cols.add(new Column("Annual_Cost", types.realType(), new RealFormatter()));
+        cols.add(new Column("Avg_Ann_Cost_per_Ton", types.realType(), new RealFormatter()));
+        cols.add(new Column("Emis_Reduction", types.realType(), new RealFormatter()));
+        cols.add(new Column("Comment", types.stringType(128), new StringFormatter(128)));
+
+        return cols.toArray(new Column[0]);
     }
 
     public int getBaseLength() {

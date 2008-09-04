@@ -227,9 +227,11 @@ public abstract class AbstractStrategyTask implements Strategy {
     
     private void populateStrategySummaryResultDataset(ControlStrategyResult[] results, ControlStrategyResult summaryResult) throws EmfException {
         if (results.length > 0) {
+            
+            
             //SET work_mem TO '512MB';
-            String sql = "INSERT INTO " + qualifiedEmissionTableName(summaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, scc, poll, Control_Technology, avg_ann_cost_per_ton, Annual_Cost, Emis_Reduction) " 
-            + "select " + summaryResult.getDetailedResultDataset().getId() + ", 0, summary.sector, summary.fips, summary.scc, summary.poll, ct.name as Control_Technology, "
+            String sql = "INSERT INTO " + qualifiedEmissionTableName(summaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, scc, poll, Control_Measure_Abbreviation, Control_Measure, Control_Technology, source_group, avg_ann_cost_per_ton, Annual_Cost, Emis_Reduction) " 
+            + "select " + summaryResult.getDetailedResultDataset().getId() + ", 0, summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name as Control_Technology, sg.name, "
             + "case when sum(summary.Emis_Reduction) <> 0 then sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) else null end as avg_cost_per_ton, " 
             + "sum(summary.Annual_Cost) as Annual_Cost, "
             + "sum(summary.Emis_Reduction) as Emis_Reduction " 
@@ -248,10 +250,12 @@ public abstract class AbstractStrategyTask implements Strategy {
             sql += ") summary "
                 + "inner join emf.control_measures cm "
                 + "on cm.id = summary.cm_id "
-                + "inner join emf.control_technologies ct "
+                + "left outer join emf.control_technologies ct "
                 + "on ct.id = cm.control_technology "
-                + "group by summary.sector, summary.fips, summary.scc, summary.poll, ct.name "
-                + "order by summary.sector, summary.fips, summary.scc, summary.poll, ct.name";
+                + "left outer join emf.source_groups sg "
+                + "on sg.id = cm.source_group "
+                + "group by summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name, sg.name "
+                + "order by summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name, sg.name";
             try {
                 datasource.query().execute(sql);
             } catch (SQLException e) {
