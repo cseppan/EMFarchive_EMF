@@ -196,10 +196,11 @@ public class CaseAssistanceService {
         
         newCase.setLastModifiedBy(user);
         newCase.setLastModifiedDate(new Date());
+        newCase.setCreator(user);
     }
 
     private synchronized void loadNSetObject(Case newCase, Object obj, Class<?> clazz, String name, Session session) {
-        if (obj == null)
+        if (obj == null || name == null || name.isEmpty())
             return;
 
         Object temp = caseDao.load(clazz, name, session);

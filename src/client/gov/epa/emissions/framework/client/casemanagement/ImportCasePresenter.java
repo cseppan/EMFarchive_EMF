@@ -36,6 +36,11 @@ public class ImportCasePresenter {
     }
 
     public void importCase(String folder, String[] files) throws EmfException {
+        if (files == null || files.length == 0)
+            throw new EmfException("Please select case files to import the case.");
+        
+        if (files.length % 3 != 0)
+            throw new EmfException("Three case files should be selected.");
         
         session.caseService().importCase(folder, files, session.user());
     }
