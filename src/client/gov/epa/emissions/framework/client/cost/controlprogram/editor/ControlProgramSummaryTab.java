@@ -269,6 +269,12 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
 
     public void save(ControlProgram controlProgram) throws EmfException {
         messagePanel.clear();
+        if (name.getText().trim().length() ==0)
+            throw new EmfException("The name is missing.");
+
+        if (controlProgram.getDataset() == null)
+            throw new EmfException("The control program dataset is missing.");
+
         controlProgram.setName(name.getText());
         controlProgram.setDescription(description.getText());
         Version v = (Version)version.getSelectedItem();
