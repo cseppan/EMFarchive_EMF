@@ -149,6 +149,9 @@ public class CaseDaoHelper {
         } else if (selected instanceof ParameterName) {
             param = (ParameterName) selected;
         }
+        
+        if (param.getName() == null || param.getName().trim().isEmpty())
+            return null;
 
         if (parameterNames == null || parameterNames.isEmpty())
             parameterNames = getParameterNames(); // make sure Parameters have been retrieved
@@ -199,6 +202,9 @@ public class CaseDaoHelper {
             envVar = (ParameterEnvVar) selected;
         }
         
+        if (envVar.getName() == null || envVar.getName().trim().isEmpty())
+            return null;
+        
         if (parameterEnvtVars == null || parameterEnvtVars.isEmpty())
             parameterEnvtVars = getParameterEnvVars(); // make sure ParameterEnvVar have been retrieved
 
@@ -247,6 +253,9 @@ public class CaseDaoHelper {
         } else if (selected instanceof ValueType) {
             type = (ValueType) selected;
         }
+        
+        if (type.getName() == null || type.getName().trim().isEmpty())
+            return null;
 
         if (parameterValueTypes == null || parameterValueTypes.isEmpty())
             parameterValueTypes = getValueTypes(); // make sure ValueType have been retrieved
@@ -296,6 +305,9 @@ public class CaseDaoHelper {
         } else if (selected instanceof Sector) {
             sector = (Sector) selected;
         }
+        
+        if (sector.getName() == null || sector.getName().trim().isEmpty())
+            return null;
 
         if (sectors == null || sectors.isEmpty())
             sectors = getSectors(); // make sure Sector have been retrieved
@@ -346,6 +358,9 @@ public class CaseDaoHelper {
             prog = (CaseProgram) selected;
         }
 
+        if (prog.getName() == null || prog.getName().trim().isEmpty())
+            return null;
+        
         if (programs == null || programs.isEmpty())
             programs = getCasePrograms(); // make sure CaseProgram have been retrieved
 
@@ -394,6 +409,9 @@ public class CaseDaoHelper {
         } else if (selected instanceof InputName) {
             name = (InputName) selected;
         }
+        
+        if (name.getName() == null || name.getName().trim().isEmpty())
+            return null;
 
         if (inputNames == null || inputNames.isEmpty())
             inputNames = getInputNames(); // make sure InputName have been retrieved
@@ -445,6 +463,9 @@ public class CaseDaoHelper {
             envVar = (InputEnvtVar) selected;
         }
         
+        if (envVar.getName() == null || envVar.getName().trim().isEmpty())
+            return null;
+        
         if (inputEnvVars == null || inputEnvVars.isEmpty())
             inputEnvVars = getInputEnvtVars(); // make sure InputEnvtVar have been retrieved
 
@@ -480,6 +501,9 @@ public class CaseDaoHelper {
         } else if (selected instanceof DatasetType) {
             type = (DatasetType) selected;
         }
+        
+        if (type.getName() == null || type.getName().trim().isEmpty())
+            return null;
         
         if (dataSetTypes == null || dataSetTypes.isEmpty())
             dataSetTypes = getDatasetTypes(); // make sure DatasetType have been retrieved
@@ -530,6 +554,9 @@ public class CaseDaoHelper {
         } else if (selected instanceof SubDir) {
             subdir = (SubDir) selected;
         }
+        
+        if (subdir.getName() == null || subdir.getName().trim().isEmpty())
+            return null;
 
         if (subDirs == null || subDirs.isEmpty())
             subDirs = getSubDirs(); // make sure SubDir have been retrieved

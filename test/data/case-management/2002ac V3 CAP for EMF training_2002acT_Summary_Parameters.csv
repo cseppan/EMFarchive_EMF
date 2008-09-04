@@ -14,7 +14,7 @@ Summary,Model Version,0,MODEL_LABEL,All sectors,All jobs for sector,All programs
 Summary,Modeling Region,0,,All sectors,All jobs for sector,All programs,"National",String,TRUE,TRUE,,,
 Summary,Grid Name,0,IOAPI_GRIDNAME_1,All sectors,All jobs for sector,All programs,"US36KM_148X112",String,TRUE,TRUE,,,
 Summary,Grid Resolution,0,EMF_GRID,All sectors,All jobs for sector,All programs,"36km",String,TRUE,TRUE,,,
-Summary,Met Layers,0,,All sectors,All jobs for sector,All programs,14,Integer,TRUE,TRUE,,,
+Summary,Met Layers,0,,All sectors,All jobs for sector,All programs,null,Integer,TRUE,TRUE,,,
 Summary,Emission Layers,0,,All sectors,All jobs for sector,All programs,10,Integer,TRUE,TRUE,,,
 Summary,Downstream Model,0,EMF_AQM,All sectors,All jobs for sector,All programs,"CMAQ",String,TRUE,TRUE,,,
 Summary,Speciation,0,EMF_SPC,All sectors,All jobs for sector,All programs,"cmaq_cb05pm",String,TRUE,TRUE,,,

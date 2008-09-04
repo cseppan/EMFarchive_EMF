@@ -10,7 +10,6 @@ import gov.epa.emissions.commons.io.importer.CommaDelimitedTokenizer;
 import gov.epa.emissions.commons.io.importer.DelimitedFileReader;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -33,21 +32,21 @@ public class CaseFileParser {
     private File inputs_file;
 
     private File jobs_file;
-    
+
     private String[] paramColNames = new String[0];
-    
+
     private String[] inputColNames = new String[0];
-    
+
     private String[] jobColNames = new String[0];
 
     private List<CaseParameter> params = new ArrayList<CaseParameter>();
-    
+
     private List<ParameterEnvVar> pEnvVars = new ArrayList<ParameterEnvVar>();
-    
+
     private List<CaseInput> inputs = new ArrayList<CaseInput>();
-    
+
     private List<InputEnvtVar> inEnvVars = new ArrayList<InputEnvtVar>();
-    
+
     private List<CaseJob> jobs = new ArrayList<CaseJob>();
 
     private Case caseObj = new Case();
@@ -64,31 +63,31 @@ public class CaseFileParser {
     public Case getCase() {
         return this.caseObj;
     }
-    
+
     public Abbreviation getCaseAbbreviation() {
         return this.caseObj.getAbbreviation();
     }
-    
+
     public String[] getParamColNames() {
         return this.paramColNames;
     }
-    
+
     public String[] getJobColNames() {
         return this.jobColNames;
     }
-    
+
     public String[] getInputColNames() {
         return this.inputColNames;
     }
-    
+
     public List<CaseParameter> getParameters() {
         return this.params;
     }
-    
+
     public List<CaseInput> getInputs() {
         return this.inputs;
     }
-    
+
     public List<ParameterEnvVar> getParamEnvVars() {
         return this.pEnvVars;
     }
@@ -96,7 +95,7 @@ public class CaseFileParser {
     public String[] getRecordFields(String line, String delimiter) {
         List<String> fields = new ArrayList<String>();
         StringTokenizer st = new StringTokenizer(line, delimiter);
-        
+
         while (st.hasMoreTokens())
             fields.add(st.nextToken().trim());
 
@@ -117,16 +116,11 @@ public class CaseFileParser {
         try {
             DelimitedFileReader reader = new DelimitedFileReader(file, new CommaDelimitedTokenizer());
             Record record = null;
-            
+
             for (record = reader.read(); !record.isEnd(); record = reader.read())
                 processSummary(record.getTokens());
         } catch (ParseException e) {
-            Throwable ex = e.getCause();
-            
-            if (ex != null)
-                throw new EmfException("Field not in correct format: " + ex.getMessage());
-            
-            throw e;
+            throw new Exception("Field not in correct format: " + e.getMessage());
         } catch (Exception e) {
             throw e;
         }
@@ -136,9 +130,11 @@ public class CaseFileParser {
         try {
             DelimitedFileReader reader = new DelimitedFileReader(file, new CommaDelimitedTokenizer());
             Record record = null;
-            
+
             for (record = reader.read(); !record.isEnd(); record = reader.read())
                 processInputs(record.getTokens());
+        } catch (ParseException e) {
+            throw new Exception("Field not in correct format: " + e.getMessage());
         } catch (Exception e) {
             throw e;
         }
@@ -148,9 +144,11 @@ public class CaseFileParser {
         try {
             DelimitedFileReader reader = new DelimitedFileReader(file, new CommaDelimitedTokenizer());
             Record record = null;
-            
+
             for (record = reader.read(); !record.isEnd(); record = reader.read())
                 processJobs(record.getTokens());
+        } catch (ParseException e) {
+            throw new Exception("Field not in correct format: " + e.getMessage());
         } catch (Exception e) {
             throw e;
         }
@@ -164,7 +162,7 @@ public class CaseFileParser {
 
         if (line.startsWith("\"") && line.endsWith("\""))
             line = line.substring(1, line.length() - 1);
-        
+
         if (line.startsWith("#")) {
             populateCaseMainFields(line);
             return;
@@ -179,7 +177,7 @@ public class CaseFileParser {
             populateCase(data);
             return;
         }
-        
+
         if (line.startsWith("Parameters")) {
             addParameter(data);
             return;
@@ -229,83 +227,87 @@ public class CaseFileParser {
             return;
         }
     }
-    
+
     private void populateCase(String[] values) throws ParseException {
         // NOTE: the order of fields:
         // Tab,Parameter,Order,Envt. Var.,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose
         // pEnvVars.add(new ParameterEnvVar(values[3]));
         String value = values[7];
-        
+
         if (values[1].equalsIgnoreCase("Model to Run")) {
             caseObj.setModel(new ModelToRun(value));
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("Model Version")) {
             caseObj.setModelVersion(value);
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("Modeling Region")) {
             caseObj.setModelingRegion(new Region(value));
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("Grid Name")) {
             caseObj.setGrid(new Grid(value));
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("Grid Resolution")) {
             caseObj.setGridResolution(new GridResolution(value));
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("Met Layers")) {
-            caseObj.setNumMetLayers(new Integer(value));
+            caseObj.setNumMetLayers(value == null || value.equalsIgnoreCase("null") ? null : new Integer(value));
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("Emission Layers")) {
-            caseObj.setNumEmissionsLayers(new Integer(value));
+            caseObj.setNumEmissionsLayers(value == null || value.equalsIgnoreCase("null") ? null : new Integer(value));
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("Downstream Model")) {
             caseObj.setAirQualityModel(new AirQualityModel(value));
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("Speciation")) {
             caseObj.setSpeciation(new Speciation(value));
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("Meteorological Year")) {
             caseObj.setMeteorlogicalYear(new MeteorlogicalYear(value));
             return;
         }
-           
+
         if (values[1].equalsIgnoreCase("Base Year")) {
-            caseObj.setBaseYear(Integer.parseInt(value));
+            if (value != null && !value.trim().isEmpty())
+                caseObj.setBaseYear(Integer.parseInt(value));
+
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("Future Year")) {
-            caseObj.setFutureYear(Integer.parseInt(value));
+            if (value != null && !value.trim().isEmpty())
+                caseObj.setFutureYear(Integer.parseInt(value));
+            
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("Start Date & Time")) {
             caseObj.setStartDate(CustomDateFormat.parse_MM_DD_YYYY_HH_mm(value));
             return;
         }
-        
+
         if (values[1].equalsIgnoreCase("End Date & Time")) {
             caseObj.setEndDate(CustomDateFormat.parse_MM_DD_YYYY_HH_mm(value));
             return;
         }
-            
+
     }
 
     private void addParameter(String[] fields) throws Exception {
@@ -329,7 +331,7 @@ public class CaseFileParser {
         newParam.setLastModifiedDate(CustomDateFormat.parse_MM_DD_YYYY_HH_mm(fields[11]));
         newParam.setNotes(fields[12]);
         newParam.setPurpose(fields[13]);
-        
+
         this.params.add(newParam);
     }
 
@@ -338,12 +340,13 @@ public class CaseFileParser {
             inputColNames = data;
             return;
         }
-        
+
         CaseInput input = new CaseInput();
-        
+
         // NOTE: the order of fields:
-        // Tab,Inputname,Envt Variable,Sector,Job,Program,Dataset,Version,QA status,DS Type,Reqd?,Local?,Subdir,Last Modified,Parentcase
-        
+        // Tab,Inputname,Envt Variable,Sector,Job,Program,Dataset,Version,QA status,DS Type,Reqd?,Local?,Subdir,Last
+        // Modified,Parentcase
+
         input.setInputName(new InputName(data[1]));
         InputEnvtVar envVar = new InputEnvtVar(data[2]);
         this.inEnvVars.add(envVar);
@@ -352,14 +355,16 @@ public class CaseFileParser {
         input.setJobName(data[4].equalsIgnoreCase("All jobs for sector") ? "" : data[4]);
         input.setProgram(new CaseProgram(data[5]));
         input.setDataset(new EmfDataset(0, data[6], 0, 0, data[9]));
-        input.setVersion(new Version(Integer.parseInt(data[7])));
+        Version version = (data[7] == null || data[7].equalsIgnoreCase("null") || data[7].trim().isEmpty()) ? null
+                : new Version(Integer.parseInt(data[7]));
+        input.setVersion(version);
         input.setDatasetType(new DatasetType(data[9]));
         input.setRequired(data[10].equalsIgnoreCase("TRUE"));
         input.setLocal(data[11].equalsIgnoreCase("TRUE"));
         input.setSubdirObj(new SubDir(data[12]));
         input.setLastModifiedDate(data[13].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[13]));
         input.setParentCase(data[14]);
-        
+
         this.inputs.add(input);
     }
 
@@ -368,12 +373,12 @@ public class CaseFileParser {
             jobColNames = data;
             return;
         }
-        
+
         CaseJob job = new CaseJob();
-        
-        //NOTE: the order of fields:
-        //Tab,JobName,Order,Sector,RunStatus,StartDate,CompletionDate,Executable,Arguments,Path,QueueOptions,JobGroup,Local,QueueID,User,Host,Notes,Purpose,DependsOn
-        
+
+        // NOTE: the order of fields:
+        // Tab,JobName,Order,Sector,RunStatus,StartDate,CompletionDate,Executable,Arguments,Path,QueueOptions,JobGroup,Local,QueueID,User,Host,Notes,Purpose,DependsOn
+
         job.setName(data[1]);
         job.setOrder(Integer.parseInt(data[2]));
         job.setSector(new Sector(data[3], data[3].equalsIgnoreCase("All sectors") ? "" : data[3]));
@@ -391,7 +396,7 @@ public class CaseFileParser {
         job.setHost(new Host(data[14]));
         job.setRunNotes(data[15]);
         job.setPurpose(data[16]);
-        
+
         this.jobs.add(job);
     }
 
