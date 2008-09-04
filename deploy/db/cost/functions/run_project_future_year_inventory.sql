@@ -16,11 +16,11 @@ DECLARE
 	region RECORD;
 	control_program RECORD;
 	target_pollutant_id integer := 0;
-	control_program_measures_count integer := 0;
-	control_program_technologies_count integer := 0;
 	measures_count integer := 0;
 	measure_with_region_count integer := 0;
 	measure_classes_count integer := 0;
+	control_program_technologies_count integer := 0;
+	control_program_measures_count integer := 0;
 	county_dataset_filter_sql text := '';
 	control_program_dataset_filter_sql text := '';
 	cost_year integer := null;
@@ -95,6 +95,27 @@ BEGIN
 		where control_strategy_classes.control_strategy_id = control_strategy_id
 		INTO measure_classes_count;
 	END IF;
+
+	-- see if control strategy program have specific measures or technologies specified
+	select count(cptech.id),
+		count(cpm.id)
+	 from emf.control_strategy_programs csp
+		inner join emf.control_programs cp
+		on cp.id = csp.control_program_id
+
+		inner join emf.control_program_types cpt
+		on cpt.id = cp.control_program_type_id
+
+		left outer join emf.control_program_technologies cptech
+		on cptech.control_program_id = cp.id
+		
+		left outer join emf.control_program_measures cpm
+		on cpm.control_program_id = cp.id
+		
+	where csp.control_strategy_id = control_strategy_id
+		and cpt."name" = 'Control'
+	into control_program_technologies_count, 
+		control_program_measures_count;
 
 	-- get target pollutant, inv filter, and county dataset info if specified
 	SELECT cs.pollutant_id,
@@ -209,59 +230,6 @@ BEGIN
 
 	chained_gdp_adjustment_factor := cost_year_chained_gdp / ref_cost_year_chained_gdp;
 
-	-- if strategy have measures, then store these in a temp table for later use...
-	IF measure_with_region_count > 0 THEN
-		EXECUTE '
-			CREATE TEMP TABLE measures (control_measure_id integer NOT NULL, region_id integer NOT NULL, region_version integer NOT NULL) ON COMMIT DROP;
-			CREATE TEMP TABLE measure_regions (region_id integer NOT NULL, region_version integer NOT NULL, fips character varying(6) NOT NULL) ON COMMIT DROP;
-
---			CREATE TABLE measures (control_measure_id integer NOT NULL, region_id integer NOT NULL, region_version integer NOT NULL);
---			CREATE TABLE measure_regions (region_id integer NOT NULL, region_version integer NOT NULL, fips character varying(6) NOT NULL);
-
-			CREATE INDEX measure_regions_measure_id ON measures USING btree (control_measure_id);
-			CREATE INDEX measure_regions_region ON measures USING btree (region_id, region_version);
-			CREATE INDEX regions_region ON measure_regions USING btree (region_id, region_version);
-			CREATE INDEX regions_fips ON measure_regions USING btree (fips);';
-
-		FOR region IN EXECUTE 
-			'SELECT m.control_measure_id, i.table_name, m.region_dataset_id, m.region_dataset_version
-			FROM emf.control_strategy_measures m
-				inner join emf.internal_sources i
-				on m.region_dataset_id = i.dataset_id
-			where m.control_strategy_id = ' || control_strategy_id || '
-				and m.region_dataset_id is not null'
-		LOOP
-			EXECUTE 'insert into measures (control_measure_id, region_id, region_version)
-			SELECT ' || region.control_measure_id || ', ' || region.region_dataset_id || ', ' || region.region_dataset_version || ';';
-
-			EXECUTE 'select count(1)
-			from measure_regions
-			where region_id = ' || region.region_dataset_id || '
-				and region_version = ' || region.region_dataset_version || ''
-			into gimme_count;
-
-			IF gimme_count = 0 THEN
-				EXECUTE 'insert into measure_regions (region_id, region_version, fips)
-				SELECT ' || region.region_dataset_id || ', ' || region.region_dataset_version || ', fips
-				FROM emissions.' || region.table_name || '
-				where ' || public.build_version_where_filter(region.region_dataset_id, region.region_dataset_version);
-			END IF;
-		END LOOP;
-	END IF;
-
-	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
-	IF county_dataset_id is not null THEN
-		county_dataset_filter_sql := ' and inv.fips in (SELECT fips
-			FROM emissions.' || (SELECT table_name FROM emf.internal_sources where dataset_id = county_dataset_id) || '
-			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
-	END IF;
-	-- build version info into where clause filter
-	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
-
-	raise notice '%', 'start ' || clock_timestamp();
-
---	annual_emis_sql := case when dataset_month != 0 then 'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' else 'inv.ann_emis' end;
---	annualized_emis_sql := case when dataset_month != 0 then 'coalesce(inv.avd_emis * 365, inv.ann_emis)' else 'inv.ann_emis' end;
 	annual_emis_sql := 
 			case 
 				when dataset_month != 0 then 
@@ -276,33 +244,17 @@ BEGIN
 				else 
 					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
 			end;
-	percent_reduction_sql := 'er.efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' / 100 / 100';
-	get_strategt_cost_sql := '(public.get_strategy_costs(' || case when use_cost_equations then 'true' else 'false' end || '::boolean, m.control_measures_id, 
-			abbreviation, ' || discount_rate|| ', 
-			m.equipment_life, er.cap_ann_ratio, 
-			er.cap_rec_factor, er.ref_yr_cost_per_ton, 
-			' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ' || ref_cost_year_chained_gdp || ' / cast(chained_gdp as double precision), 
-			' || case when use_cost_equations then 
-			'et.name, 
-			eq.value1, eq.value2, 
-			eq.value3, eq.value4, 
-			eq.value5, eq.value6, 
-			eq.value7, eq.value8, 
-			eq.value9, eq.value10, 
-			' || case when not is_point_table then 'null' else 'inv.stkflow' end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity' end end || ', 
-			' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_numerator' end end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_denominator' end end 
-			else
-			'null, 
-			null, null, 
-			null, null, 
-			null, null, 
-			null, null, 
-			null, null, 
-			null, null, 
-			null, null'
-			end
-			|| '))';
-	get_strategt_cost_inner_sql := replace(get_strategt_cost_sql,'m.control_measures_id','m.id');
+
+	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
+	IF county_dataset_id is not null THEN
+		county_dataset_filter_sql := ' and inv.fips in (SELECT fips
+			FROM emissions.' || (SELECT table_name FROM emf.internal_sources where dataset_id = county_dataset_id) || '
+			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
+	END IF;
+	-- build version info into where clause filter
+	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
+
+	raise notice '%', 'first lets do plant closures ' || clock_timestamp();
 
 
 	-- need to process based on processing_order of the program, i.e., first do plant closures, next do growth, then apply controls
@@ -325,6 +277,7 @@ BEGIN
 			on i.dataset_id = cp.dataset_id
 		where csp.control_strategy_id = ' || control_strategy_id || '
 			and cpt."name" = ''Plant Closure''
+			and ''12/31/' || inventory_year || '''::timestamp without time zone between cp.start_date and coalesce(cp.end_date, ''12/31/' || inventory_year || '''::timestamp without time zone)
 		order by processing_order'
 	LOOP
 		-- apply plant closure control program
@@ -385,10 +338,10 @@ BEGIN
 				null::double precision as capital_cost,
 				null::double precision as ann_cost,
 				null::double precision as computed_cost_per_ton,
-				100.0 as efficiency,
-				100.0 as rule_pen,
-				100.0 as rule_eff,
-				100.0 as percent_reduction,
+				null::double precision as control_eff,
+				null::double precision as rule_pen,
+				null::double precision as rule_eff,
+				null::double precision as percent_reduction,
 				inv.ceff,
 				' || case when is_point_table = false then 'inv.rpen' else '100' end || ',
 				inv.reff,
@@ -421,7 +374,10 @@ BEGIN
 				and coalesce(pc.stackid, inv.stackid) = inv.stackid
 				and coalesce(pc.segment, inv.segment) = inv.segment
 				' else '' end || '
-				and pc.effective_date::timestamp without time zone < ''12/31/' || inventory_year || '''::timestamp without time zone
+
+				-- make sure and keep even if in the same year, they might not have closed, and dont worry about prorating...
+				and date_part(''year'', pc.effective_date::timestamp without time zone) < ' || inventory_year || '
+
 				and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'pc') || '
 
 				' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
@@ -438,8 +394,10 @@ BEGIN
 				' end || '';
 
 		END IF;
-	
+
 	END LOOP;
+
+	raise notice '%', 'next lets process projections ' || clock_timestamp();
 
 	-- next lets process projections, need to union the the various program tables together, so we can make sure and get the most source specific projection
   	FOR control_program IN EXECUTE 
@@ -464,6 +422,7 @@ BEGIN
 			on dt.id = d.dataset_type
 		where csp.control_strategy_id = ' || control_strategy_id || '
 			and cpt."name" = ''Projection''
+			and ''12/31/' || inventory_year || '''::timestamp without time zone between cp.start_date and coalesce(cp.end_date, ''12/31/' || inventory_year || '''::timestamp without time zone)
 		order by processing_order'
 	LOOP
 		-- make sure the dataset type is right...
@@ -479,7 +438,7 @@ BEGIN
 			sql := sql || '
 			select distinct on (record_id)
 				record_id,proj_factor,
-				' || quote_literal(control_program.control_program_name) || ' as control_program_name
+				' || quote_literal(control_program.control_program_name) || ' as control_program_name, ranking
 			from (
 				--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
 				select 
@@ -1322,8 +1281,7 @@ BEGIN
 					and proj.mact is null
 					and ' || control_program_dataset_filter_sql || '
 					and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-			) tbl
-			order by record_id, ranking';
+			) tbl';
 
 /*
 			sql := sql || '
@@ -1347,8 +1305,8 @@ BEGIN
 --		raise notice '%', sql;
 
 	IF length(sql) > 0 THEN
+		sql := sql || ' order by record_id, ranking';
 		-- make sure the apply order is 1, this should be the first thing happening to a source....this is important when the controlled inventpory is created.
-		-- the apply order will dictate how the 
 		execute 
 		--raise notice '%', 
 			'insert into emissions.' || detailed_result_table_name || ' 
@@ -1368,6 +1326,7 @@ BEGIN
 			rule_pen,
 			rule_eff,
 			percent_reduction,
+			adj_factor,
 			inv_ctrl_eff,
 			inv_rule_pen,
 			inv_rule_eff,
@@ -1404,10 +1363,11 @@ BEGIN
 			null::double precision as capital_cost,
 			null::double precision as ann_cost,
 			null::double precision as computed_cost_per_ton,
-			proj.PROJ_FACTOR * 100 as control_eff,
+			null::double precision as control_eff,
 			null::double precision as rule_pen,
 			null::double precision as rule_eff,
-			proj.proj_factor * 100 as percent_reduction,
+			null::double precision as percent_reduction,
+			proj.PROJ_FACTOR as adj_factor,
 			inv.ceff,
 			' || case when is_point_table = false then 'inv.rpen' else '100' end || ',
 			inv.reff,
@@ -1446,9 +1406,11 @@ BEGIN
 	-- next lets process controls, need to union the the various program tables together, so we can make sure and get the most source specific controls
 	sql := ''; --reset
   	FOR control_program IN EXECUTE 
-		'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
+		'select cp.id as control_program_id, cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
 			cp.start_date, cp.end_date, 
-			cp.dataset_id, cp.dataset_version, dt."name" as dataset_type
+			cp.dataset_id, cp.dataset_version, dt."name" as dataset_type,
+			(select count(*) from emf.control_program_technologies cptech where cptech.control_program_id = cp.id) as control_program_technologies_count,
+			(select count(*) from emf.control_program_measures cpm where cpm.control_program_id = cp.id) as control_program_measures_count
 		 from emf.control_strategy_programs csp
 
 			inner join emf.control_programs cp
@@ -1465,8 +1427,10 @@ BEGIN
 
 			inner join emf.dataset_types dt
 			on dt.id = d.dataset_type
+
 		where csp.control_strategy_id = ' || control_strategy_id || '
 			and cpt."name" = ''Control''
+			and ''12/31/' || inventory_year || '''::timestamp without time zone between cp.start_date and coalesce(cp.end_date, ''12/31/' || inventory_year || '''::timestamp without time zone)
 		order by processing_order'
 	LOOP
 		-- make sure the dataset type is right...
@@ -1482,7 +1446,9 @@ BEGIN
 			sql := sql || '
 			select distinct on (record_id)
 				record_id,ceff,rpen,reff,pri_cm_abbrev,
-				' || quote_literal(control_program.control_program_name) || ' as control_program_name
+				' || quote_literal(control_program.control_program_name) || ' as control_program_name, ' || control_program.control_program_id || ' as control_program_id,
+				' || control_program.control_program_technologies_count || ' as control_program_technologies_count, ' || control_program.control_program_measures_count || ' as control_program_measures_count, 
+				ranking
 			from (
 				--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
 				select 
@@ -2357,14 +2323,43 @@ BEGIN
 					and ' || control_program_dataset_filter_sql || '
 					and application_control = ''Y'' 
 					and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-			) tbl
-			order by record_id, ranking';
+			) tbl';
 		END IF;
 
 	END LOOP;
 --		raise notice '%', sql;
 
 	IF length(sql) > 0 THEN
+		raise notice '%', 'next lets do controls ' || clock_timestamp();
+		sql := sql || ' order by record_id, ranking';
+		percent_reduction_sql := 'cont.ceff * coalesce(cont.reff, 100) * coalesce(cont.rpen, 100) / 100 / 100';
+		get_strategt_cost_sql := '(public.get_strategy_costs(' || case when use_cost_equations then 'true' else 'false' end || '::boolean, m.id, 
+				abbreviation, ' || discount_rate|| ', 
+				m.equipment_life, er.cap_ann_ratio, 
+				er.cap_rec_factor, er.ref_yr_cost_per_ton, 
+				' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ' || ref_cost_year_chained_gdp || ' / cast(chained_gdp as double precision), 
+				' || case when use_cost_equations then 
+				'et.name, 
+				eq.value1, eq.value2, 
+				eq.value3, eq.value4, 
+				eq.value5, eq.value6, 
+				eq.value7, eq.value8, 
+				eq.value9, eq.value10, 
+				' || case when not is_point_table then 'null' else 'inv.stkflow' end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity' end end || ', 
+				' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_numerator' end end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_denominator' end end 
+				else
+				'null, 
+				null, null, 
+				null, null, 
+				null, null, 
+				null, null, 
+				null, null, 
+				null, null, 
+				null, null'
+				end
+				|| '))';
+
+
 		-- make sure the apply order is 1, this should be the first thing happening to a source....this is important when the controlled inventpory is created.
 		-- the apply order will dictate how the 
 		execute 
@@ -2389,6 +2384,7 @@ BEGIN
 			inv_ctrl_eff,
 			inv_rule_pen,
 			inv_rule_eff,
+			adj_factor,
 			final_emissions,
 			emis_reduction,
 			inv_emissions,
@@ -2412,25 +2408,34 @@ BEGIN
 			)
 		select distinct on (inv.record_id)
 			' || detailed_result_dataset_id || '::integer,
-			coalesce(cont.pri_cm_abbrev, case when cont.ceff <> 0 and abs(cont.ceff - er.efficiency) / cont.ceff <= ' || replacement_control_min_eff_diff_constraint || ' then cm.abbreviation else null::character varying end, ''UNKNOWNMSR'') as abbreviation,
+			coalesce(cont.pri_cm_abbrev, case when cont.ceff <> 0 and abs(cont.ceff - er.efficiency) / cont.ceff * 100 <= ' || replacement_control_min_eff_diff_constraint || ' then m.abbreviation else null::character varying end, ''UNKNOWNMSR'') as abbreviation,
 			inv.poll,
 			inv.scc,
 			inv.fips,
 			' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
+			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(cont.ceff - er.efficiency) / cont.ceff * 100 <= ' || replacement_control_min_eff_diff_constraint || '::double precision then TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.operation_maintenance_cost, ''FM999999999999999990'')::double precision else null::double precision end as operation_maintenance_cost,
+			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(cont.ceff - er.efficiency) / cont.ceff * 100 <= ' || replacement_control_min_eff_diff_constraint || '::double precision then TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annualized_capital_cost, ''FM999999999999999990'')::double precision else null::double precision end as annualized_capital_cost,
+			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(cont.ceff - er.efficiency) / cont.ceff * 100 <= ' || replacement_control_min_eff_diff_constraint || '::double precision then TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.capital_cost, ''FM999999999999999990'')::double precision else null::double precision end as capital_cost,
+			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(cont.ceff - er.efficiency) / cont.ceff * 100 <= ' || replacement_control_min_eff_diff_constraint || '::double precision then TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annual_cost, ''FM999999999999999990'')::double precision else null::double precision end as ann_cost,
+			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(cont.ceff - er.efficiency) / cont.ceff * 100 <= ' || replacement_control_min_eff_diff_constraint || '::double precision then TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.computed_cost_per_ton, ''FM999999999999999990'')::double precision else null::double precision end as computed_cost_per_ton,
+/*
+
 			null::double precision as operation_maintenance_cost,
 			null::double precision as annualized_capital_cost,
 			null::double precision as capital_cost,
 			null::double precision as ann_cost,
 			null::double precision as computed_cost_per_ton,
+*/			
 			cont.ceff as control_eff,
-			cont.rpen as rule_pen,
-			cont.reff as rule_eff,
-			cont.ceff * cont.rpen * cont.reff / 100 / 100 as percent_reduction,
+			coalesce(cont.rpen, 100) as rule_pen,
+			coalesce(cont.reff, 100) as rule_eff,
+			cont.ceff * coalesce(cont.rpen, 100) * coalesce(cont.reff, 100) / 100 / 100 as percent_reduction,
 			inv.ceff,
 			' || case when is_point_table = false then 'inv.rpen' else '100' end || ',
 			inv.reff,
-			' || annual_emis_sql || ' * cont.ceff * cont.rpen * cont.reff / 100 / 100 / 100 as final_emissions,
-			' || annual_emis_sql || ' - ' || annual_emis_sql || ' * cont.ceff * cont.rpen * cont.reff / 100 / 100 / 100 as emis_reduction,
+			cont.ceff * coalesce(cont.rpen, 100) * coalesce(cont.reff, 100) / 100 / 100 / 100 as adj_factor,
+			' || annual_emis_sql || ' * (1 - cont.ceff * coalesce(cont.rpen, 100) * coalesce(cont.reff, 100) / 100 / 100 / 100) as final_emissions,
+			' || annual_emis_sql || ' * cont.ceff * coalesce(cont.rpen, 100) * coalesce(cont.reff, 100) / 100 / 100 / 100 as emis_reduction,
 			' || annual_emis_sql || ' as inv_emissions,
 	--				' || annual_emis_sql || ' as input_emis,
 	--				0.0 as output_emis,
@@ -2459,27 +2464,9 @@ BEGIN
 
 			inner join (' || sql || ') cont
 			on cont.record_id = inv.record_id
-/*
-			' || case when is_point_table then '
-			and (coalesce(cont.plantid, '''') = inv.plantid or coalesce(cont.plantid, '''') = '''')
-			and (coalesce(cont.pointid, '''') = inv.pointid or coalesce(cont.pointid, '''') = '''')
-			and (coalesce(cont.stackid, '''') = inv.stackid or coalesce(cont.stackid, '''') = '''')
-			and (coalesce(cont.segment, '''') = inv.segment or coalesce(cont.segment, '''') = '''')
-			' else '
-			and cont.plantid is null
-			and cont.pointid is null
-			and cont.stackid is null
-			and cont.segment is null
-			' end || '
-			and (coalesce(cont.scc, '''') = inv.scc or coalesce(cont.scc, '''') = '''')
-			and (coalesce(cont.poll, '''') = inv.poll or coalesce(cont.poll, '''') = '''')
-			' || case when has_sic_column then 'and (coalesce(cont.sic, '''') = inv.sic or coalesce(cont.sic, '''') = '''')' else '' end || '
-			' || case when has_mact_column then 'and (coalesce(cont.mact, '''') = inv.mact or coalesce(cont.mact, '''') = '''')' else '' end || '
-*/
 
 			-- tables for predicting measure
 			left outer join emf.control_measure_efficiencyrecords er
---			on er.control_measures_id = cm.control_measures_id
 			-- poll filter
 			on er.pollutant_id = p.id
 			-- min and max emission filter
@@ -2489,51 +2476,37 @@ BEGIN
 			-- effecive date filter
 			and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)		
 
-			left outer join emf.control_measures cm
-			on cm.id = er.control_measures_id
 
-			left outer join emf.control_measure_nei_devices cmnd
-			on cmnd.control_measure_id = er.id
-			' || 
-			case 
-				when has_cpri_column or has_primary_device_type_code_column then 
-					case 
-						when has_cpri_column then 'and cmnd.nei_device_code = inv.cpri'
-						else 'and cmnd.nei_device_code = inv.primary_device_type_code'
-					end
-				else ''
-			end || '
+			left outer join emf.control_measures m
+			on m.id = er.control_measures_id
 			
+
+			left outer join emf.control_measure_equations eq
+			on eq.control_measure_id = m.id
+			and eq.pollutant_id = p.id
+
+			left outer join emf.equation_types et
+			on et.id = eq.equation_type_id
+
+			left outer join reference.gdplev
+			on gdplev.annual = eq.cost_year
+
 		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-			-- measure region filter
-			' || case when measure_with_region_count > 0 then '
-			and 
-			(
-				csm.region_dataset_id is null 
-				or
-				(
-					csm.region_dataset_id is not null 
-					and exists (
-						select 1
-						from measures mr
-							inner join measure_regions r
-							on r.region_id = mr.region_id
-							and r.region_version = mr.region_version
-						where mr.control_measure_id = m.id
-							and r.fips = inv.fips
-					)
-					and exists (
-						select 1 
-						from measures mr
-						where mr.control_measure_id = m.id
-					)
-				)
-			)					
+			-- control program measure and technology filter
+			' || case when control_program_measures_count > 0 and control_program_technologies_count > 0  then '
+			and (
+				(cont.control_program_measures_count > 0 and exists (select 1 from emf.control_program_measures cpm where cpm.control_measure_id = m.id))
+				or 
+				(cont.control_program_technologies_count > 0 and exists (select 1 from emf.control_program_technologies cpt where cpt.control_program_id = cont.control_program_id and cpt.control_technology_id = m.control_technology))
+			)
+			' when control_program_measures_count > 0 then '
+			and cont.control_program_measures_count > 0 and exists (select 1 from emf.control_program_measures cpm where cpm.control_measure_id = m.id)
+			' when control_program_technologies_count > 0 then '
+			and cont.control_program_technologies_count > 0 and exists (select 1 from emf.control_program_technologies cpt where cpt.control_program_id = cont.control_program_id and cpt.control_technology_id = m.control_technology)
 			' else '' end || '
+			and cont.ceff >= coalesce(inv.ceff, 0.0)
 		order by inv.record_id,
---			ranking,
 			case when length(er.locale) = 5 then 0 when length(er.locale) = 2 then 1 else 2 end, 	
-			case when cmnd.id is not null then 0 else 1 end,
 			abs(cont.ceff - er.efficiency)';
 		END IF;
 

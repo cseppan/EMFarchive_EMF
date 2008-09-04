@@ -431,3 +431,284 @@ insert INTO emf.keywords VALUES (DEFAULT, 'MASS_STORAGE_LOCATION');
 -- emf.qa_programs 8/21/08 
 insert into emf.qa_programs values(DEFAULT,'Compare Control Strategies','gov.epa.emissions.framework.services.qa.SQLQACompareControlStrategiesQueryRunner');
 
+
+-- 8/26/08 updated relevant QA steps to include a lat and long to be used in map generation
+
+-- Summarize by U.S. County and Pollutant with Descriptions - ORL Types
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select e.fips, coalesce(fips.county,''AN UNSPECIFIED COUNTY NAME'') as county, 
+coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, 
+e.POLL, coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, 
+coalesce(p.name,''AN UNSPECIFIED DESCRIPTION'') as smoke_name, p.factor, 
+p.voctog, p.species, 
+fips.centerlon as longitude, fips.centerlat as latitude,
+coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis 
+from $TABLE[1] e 
+left outer join reference.invtable p 
+on e.POLL=p.cas 
+left outer join reference.fips 
+on fips.state_county_fips = e.FIPS 
+and fips.country_num = ''0''
+group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.POLL, p.descrptn, p.name, p.factor, p.voctog, p.species, e.fips, fips.county, fips.centerlon, fips.centerlat
+order by e.fips, e.POLL'
+where name = 'Summarize by U.S. County and Pollutant with Descriptions'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory'));
+
+
+-- Summarize by Sector, U.S. County and Pollutant with Descriptions - ORL Merged Inventory
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select e.sector, e.fips, 
+coalesce(fips.county,''AN UNSPECIFIED COUNTY NAME'') as county, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, 
+coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, e.POLL, 
+coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.name,''AN UNSPECIFIED DESCRIPTION'') as smoke_name, 
+p.factor,p.voctog, 
+p.species, 
+fips.centerlon as longitude, fips.centerlat as latitude,
+coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis 
+from $TABLE[1] e 
+left outer join reference.invtable p 
+on e.POLL=p.cas 
+left outer join reference.fips 
+on fips.state_county_fips = e.FIPS 
+where fips.country_num = ''0'' 
+group by e.sector, fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.POLL, p.descrptn, p.name, p.factor, p.voctog, p.species, e.fips, fips.county, fips.centerlon, fips.centerlat 
+order by e.sector, e.fips, e.POLL'
+where name = 'Summarize by Sector, U.S. County and Pollutant with Descriptions'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Merged Inventory'));
+
+
+-- Summarize by Mact Code, U.S. State and Pollutant with Descriptions - ORL Types
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, 
+coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, coalesce(e.mact, ''AN UNSPECIFIED MACT CODE'') as mact_code, 
+coalesce(m.mact_source_category, ''AN UNSPECIFIED CATEGORY NAME'') as mact_source_category, e.POLL, 
+coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name, 
+p.factor, p.voctog, 
+p.species, 
+(fips.state_maxlon + fips.state_minlon) / 2 as longitude, 
+(fips.state_maxlat + fips.state_minlat) / 2 as latitude, 
+coalesce(sum(ann_emis), 0) as ann_emis, 
+coalesce(sum(avd_emis), 0) as avd_emis 
+from $TABLE[1] e 
+left outer join reference.invtable p 
+on e.POLL=p.cas 
+left outer join reference.fips 
+on fips.state_county_fips = e.FIPS 
+and fips.country_num = ''0'' 
+left outer join reference.mact_codes m 
+on m.mact_code = e.mact 
+group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.POLL, p.descrptn, p.name, p.factor, p.voctog, p.species, e.mact, m.mact_source_category, fips.state_maxlon, fips.state_minlon, fips.state_maxlat, fips.state_minlat 
+order by e.mact, substr(e.fips, 1, 2), e.POLL'
+where name = 'Summarize by Mact Code, U.S. State and Pollutant with Descriptions'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Point Inventory (PTINV)'));
+
+
+-- List Data Source Codes and U.S. State with Descriptions - ORL Types
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, 
+coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, e.data_source, 
+coalesce(d.description,''AN UNSPECIFIED DESCRIPTION'') as datasource_desc, 
+(fips.state_maxlon + fips.state_minlon) / 2 as longitude, 
+(fips.state_maxlat + fips.state_minlat) / 2 as latitude, 
+count(1) as count 
+from $TABLE[1] e 
+	left outer join reference.datasource_codes d 
+	on e.data_source=d.code 
+	left outer join reference.fips 
+	on fips.state_county_fips = e.FIPS 
+	and fips.country_num = ''0''
+group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.data_source, d.description, fips.state_maxlon, fips.state_minlon, fips.state_maxlat, fips.state_minlat
+order by substr(e.fips, 1, 2), e.data_source'
+where name = 'List Data Source Codes and U.S. State with Descriptions'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)'));
+
+-- Summarize by Data Source Code, U.S. State and Pollutant with Descriptions - ORL Types
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, 
+coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, e.data_source, 
+coalesce(d.description,''AN UNSPECIFIED DESCRIPTION'') as datasource_desc, e.POLL, 
+coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name, 
+(fips.state_maxlon + fips.state_minlon) / 2 as longitude, 
+(fips.state_maxlat + fips.state_minlat) / 2 as latitude, 
+coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis 
+from $TABLE[1] e 
+left outer join reference.datasource_codes d 
+on e.data_source=d.code 
+left outer join reference.invtable p 
+on e.POLL=p.cas 
+left outer join reference.fips 
+on fips.state_county_fips = e.FIPS 
+and fips.country_num = ''0'' 
+group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.poll, e.data_source, d.description, d.description, p.descrptn, p.name, fips.state_maxlon, fips.state_minlon, fips.state_maxlat, fips.state_minlat
+order by substr(e.fips, 1, 2), e.data_source'
+where name = 'Summarize by Data Source Code, U.S. State and Pollutant with Descriptions'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)'));
+
+-- Summarize by U.S. State and Pollutant with Descriptions - ORL Types
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, 
+coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, e.POLL, 
+coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name, 
+p.factor, p.voctog, 
+p.species, 
+(fips.state_maxlon + fips.state_minlon) / 2 as longitude, 
+(fips.state_maxlat + fips.state_minlat) / 2 as latitude, 
+coalesce(sum(ann_emis), 0) as ann_emis, 
+coalesce(sum(avd_emis), 0) as avd_emis 
+from $TABLE[1] e 
+left outer join reference.invtable p 
+on e.POLL=p.cas 
+left outer join reference.fips 
+on fips.state_county_fips = e.FIPS 
+and fips.country_num = ''0'' 
+group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.POLL, p.descrptn, p.name, p.factor, p.voctog, p.species, fips.state_maxlon, fips.state_minlon, fips.state_maxlat, fips.state_minlat
+order by substr(e.fips, 1, 2)'
+where name = 'Summarize by U.S. State and Pollutant with Descriptions'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory'));
+
+-- Summarize by Sector, U.S. State and Pollutant with Descriptions - ORL Merged Inventory
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select e.sector, substr(e.fips, 1, 2) as fipsst, 
+coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, 
+e.POLL, coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, 
+coalesce(p.name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name, p.factor, 
+p.voctog, p.species, 
+(fips.state_maxlon + fips.state_minlon) / 2 as longitude, 
+(fips.state_maxlat + fips.state_minlat) / 2 as latitude, 
+coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis 
+from $TABLE[1] e 
+left outer join reference.invtable p 
+on e.POLL=p.cas 
+left outer join reference.fips 
+on fips.state_county_fips = e.FIPS 
+and fips.country_num = ''0'' 
+group by e.sector, fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), e.POLL, p.descrptn, p.name, p.factor, p.voctog, p.species, fips.state_maxlon, fips.state_minlon, fips.state_maxlat, fips.state_minlat
+order by e.sector, substr(e.fips, 1, 2)'
+where name = 'Summarize by Sector, U.S. State and Pollutant with Descriptions'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Merged Inventory'));
+
+-- Summarize by U.S. State, SCC and Pollutant with Descriptions - ORL Types
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, 
+coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, e.SCC, 
+coalesce(s.scc_description,''AN UNSPECIFIED DESCRIPTION'') as scc_description, e.POLL, 
+coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, coalesce(p.name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name, 
+p.factor, p.voctog, 
+p.species, 
+(fips.state_maxlon + fips.state_minlon) / 2 as longitude, 
+(fips.state_maxlat + fips.state_minlat) / 2 as latitude, 
+coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis 
+from $TABLE[1] e
+left outer join reference.invtable p 
+on e.POLL=p.cas 
+left outer join reference.scc s 
+on e.SCC=s.scc 
+left outer join reference.fips 
+on fips.state_county_fips = e.FIPS 
+and fips.country_num = ''0'' 
+group by substr(e.fips, 1, 2), fips.state_abbr, fips.state_name, e.SCC,e.POLL,p.descrptn,s.scc_description, p.name, p.factor,p.voctog, p.species, fips.state_maxlon, fips.state_minlon, fips.state_maxlat, fips.state_minlat
+order by substr(e.fips, 1, 2), e.SCC, e.POLL'
+where name = 'Summarize by U.S. State, SCC and Pollutant with Descriptions'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory'));
+
+-- Summarize by Sector, U.S. State, SCC and Pollutant with Descriptions - ORL Merged Inventory
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select e.sector, substr(e.fips, 1, 2) as fipsst, 
+coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, 
+e.SCC, coalesce(s.scc_description,''AN UNSPECIFIED DESCRIPTION'') as scc_description, 
+e.POLL, coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'') as pollutant_code_desc, 
+coalesce(p.name,''AN UNSPECIFIED SMOKE NAME'') as smoke_name, p.factor,
+p.voctog, p.species, 
+(fips.state_maxlon + fips.state_minlon) / 2 as longitude, 
+(fips.state_maxlat + fips.state_minlat) / 2 as latitude, 
+coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis 
+from $TABLE[1] e
+left outer join reference.invtable p 
+on e.POLL=p.cas 
+left outer join reference.scc s 
+on e.SCC=s.scc 
+left outer join reference.fips 
+on fips.state_county_fips = e.FIPS 
+where fips.country_num = ''0''
+group by e.sector, substr(e.fips, 1, 2), fips.state_abbr, fips.state_name, e.SCC,e.POLL,p.descrptn,s.scc_description, p.name, p.factor,p.voctog, p.species, fips.state_maxlon, fips.state_minlon, fips.state_maxlat, fips.state_minlat
+order by e.sector, substr(e.fips, 1, 2), e.SCC, e.POLL'
+where name = 'Summarize by Sector, U.S. State, SCC and Pollutant with Descriptions'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Merged Inventory'));
+
+-- Summarize by U.S. State and SMOKE Pollutant Name - ORL Types
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select substr(e.fips, 1, 2) as fipsst, coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, 
+coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, r.name, 
+r.species, r.voctog, 
+(fips.state_maxlon + fips.state_minlon) / 2 as longitude, 
+(fips.state_maxlat + fips.state_minlat) / 2 as latitude, 
+coalesce(sum(cast(r.factor as double precision) * ann_emis), 0) as ann_emis, coalesce(sum(cast(r.factor as double precision) * avd_emis), 0) as avd_emis 
+from $TABLE[1] e
+left outer join reference.fips 
+on fips.state_county_fips = e.FIPS 
+inner join reference.invtable r on e.poll = r.cas 
+and fips.country_num = ''0'' 
+group by fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), r.name, r.voctog, r.species, fips.state_maxlon, fips.state_minlon, fips.state_maxlat, fips.state_minlat
+order by substr(e.fips, 1, 2),  r.species, r.voctog, r.name'
+where name = 'Summarize by U.S. State and SMOKE Pollutant Name'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory'));
+
+-- Summarize by Sector, U.S. State and SMOKE Pollutant Name - ORL Merged Inventory
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select e.sector, substr(e.fips, 1, 2) as fipsst, 
+coalesce(fips.state_name, ''AN UNSPECIFIED STATE NAME'') as state_name, coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'') as state_abbr, 
+r.name, r.species, 
+r.voctog, 
+(fips.state_maxlon + fips.state_minlon) / 2 as longitude, 
+(fips.state_maxlat + fips.state_minlat) / 2 as latitude, 
+coalesce(sum(cast(r.factor as double precision) * ann_emis), 0) as ann_emis, 
+coalesce(sum(cast(r.factor as double precision) * avd_emis), 0) as avd_emis 
+from $TABLE[1] e
+left outer join reference.fips 
+on fips.state_county_fips = e.FIPS 
+and fips.country_num = ''0'' 
+inner join reference.invtable r 
+on e.poll = r.cas 
+group by e.sector, fips.state_name, fips.state_abbr, substr(e.fips, 1, 2), r.name, r.voctog, r.species, fips.state_maxlon, fips.state_minlon, fips.state_maxlat, fips.state_minlat
+order by e.sector, substr(e.fips, 1, 2),  r.species, r.voctog, r.name'
+where name = 'Summarize by Sector, U.S. State and SMOKE Pollutant Name'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Merged Inventory'));
+
+
+
+-- emf.qa_programs 8/21/08 
+insert into emf.qa_programs values(DEFAULT,'Compare Control Strategies','gov.epa.emissions.framework.services.qa.SQLQACompareControlStrategiesQueryRunner');
+

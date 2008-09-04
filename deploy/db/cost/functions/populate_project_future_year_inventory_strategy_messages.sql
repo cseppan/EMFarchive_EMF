@@ -1,3 +1,5 @@
+--SELECT public.populate_project_future_year_inventory_strategy_messages(89, 952, 0, 3135)
+
 CREATE OR REPLACE FUNCTION public.populate_project_future_year_inventory_strategy_messages(
 	control_strategy_id integer, 
 	input_dataset_id integer, 
@@ -20,6 +22,7 @@ DECLARE
 	measure_with_region_count integer := 0;
 	measure_classes_count integer := 0;
 	county_dataset_filter_sql text := '';
+	control_program_dataset_filter_sql text := '';
 	cost_year integer := null;
 	inventory_year integer := null;
 	is_point_table boolean := false;
@@ -40,6 +43,7 @@ DECLARE
 	has_design_capacity_columns boolean := false; 
 	has_sic_column boolean := false; 
 	has_naics_column boolean := false;
+	has_mact_column boolean := false;
 	has_target_pollutant integer := 0;
 	has_rpen_column boolean := false;
 	has_cpri_column boolean := false;
@@ -47,6 +51,7 @@ DECLARE
 	column_name character varying;
 	has_control_measures_col boolean := false;
 	has_pct_reduction_col boolean := false;
+	sql character varying := '';
 BEGIN
 
 	-- get the input dataset info
@@ -104,6 +109,9 @@ BEGIN
 	-- see if there are point specific columns in the inventory
 	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
 	
+	-- see if there is a mact column in the inventory
+	has_mact_column := public.check_table_for_columns(inv_table_name, 'mact', ',');
+
 	-- see if there is a sic column in the inventory
 	has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
 
@@ -182,46 +190,6 @@ BEGIN
 
 	chained_gdp_adjustment_factor := cost_year_chained_gdp / ref_cost_year_chained_gdp;
 
-	-- if strategy have measures, then store these in a temp table for later use...
-	IF measure_with_region_count > 0 THEN
-		EXECUTE '
-			CREATE TEMP TABLE measures (control_measure_id integer NOT NULL, region_id integer NOT NULL, region_version integer NOT NULL) ON COMMIT DROP;
-			CREATE TEMP TABLE measure_regions (region_id integer NOT NULL, region_version integer NOT NULL, fips character varying(6) NOT NULL) ON COMMIT DROP;
-
---			CREATE TABLE measures (control_measure_id integer NOT NULL, region_id integer NOT NULL, region_version integer NOT NULL);
---			CREATE TABLE measure_regions (region_id integer NOT NULL, region_version integer NOT NULL, fips character varying(6) NOT NULL);
-
-			CREATE INDEX measure_regions_measure_id ON measures USING btree (control_measure_id);
-			CREATE INDEX measure_regions_region ON measures USING btree (region_id, region_version);
-			CREATE INDEX regions_region ON measure_regions USING btree (region_id, region_version);
-			CREATE INDEX regions_fips ON measure_regions USING btree (fips);';
-
-		FOR region IN EXECUTE 
-			'SELECT m.control_measure_id, i.table_name, m.region_dataset_id, m.region_dataset_version
-			FROM emf.control_strategy_measures m
-				inner join emf.internal_sources i
-				on m.region_dataset_id = i.dataset_id
-			where m.control_strategy_id = ' || control_strategy_id || '
-				and m.region_dataset_id is not null'
-		LOOP
-			EXECUTE 'insert into measures (control_measure_id, region_id, region_version)
-			SELECT ' || region.control_measure_id || ', ' || region.region_dataset_id || ', ' || region.region_dataset_version || ';';
-
-			EXECUTE 'select count(1)
-			from measure_regions
-			where region_id = ' || region.region_dataset_id || '
-				and region_version = ' || region.region_dataset_version || ''
-			into gimme_count;
-
-			IF gimme_count = 0 THEN
-				EXECUTE 'insert into measure_regions (region_id, region_version, fips)
-				SELECT ' || region.region_dataset_id || ', ' || region.region_dataset_version || ', fips
-				FROM emissions.' || region.table_name || '
-				where ' || public.build_version_where_filter(region.region_dataset_id, region.region_dataset_version);
-			END IF;
-		END LOOP;
-	END IF;
-
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
 		county_dataset_filter_sql := ' and inv.fips in (SELECT fips
@@ -231,20 +199,11 @@ BEGIN
 	-- build version info into where clause filter
 	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
 
-	raise notice '%', 'start ' || clock_timestamp();
-
-	-- populate the new inventory...work off of new data
-
-
-
-
-	-- need to process based on processing_order of the program, i.e., first do plant closures, next do growth, then apply control 
-	-- to various sources
-
   	FOR control_program IN EXECUTE 
 		'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
 			cp.start_date, cp.end_date, 
-			cp.dataset_id, cp.dataset_version
+			cp.dataset_id, cp.dataset_version,
+			dt."name" as dataset_type
 		 from emf.control_strategy_programs csp
 
 			inner join emf.control_programs cp
@@ -255,26 +214,18 @@ BEGIN
 
 			inner join emf.internal_sources i
 			on i.dataset_id = cp.dataset_id
+
+			inner join emf.datasets d
+			on d.id = i.dataset_id
+
+			inner join emf.dataset_types dt
+			on dt.id = d.dataset_type
 		where csp.control_strategy_id = ' || control_strategy_id || '
 		order by processing_order'
 	LOOP
+
+		-- see if there any issues with the plant closure file
 		IF control_program.type = 'Plant Closure' THEN
-/*
-			execute 
-			--raise notice '%', 
-			'delete from emissions.' || strategy_messages_table_name || ' as inv
-			using emissions.' || control_program.table_name || ' pc
-			where pc.fips = inv.fips
-				and pc.plantid = inv.plantid
-				and coalesce(pc.pointid, inv.pointid) = inv.pointid
-				and coalesce(pc.stackid, inv.stackid) = inv.stackid
-				and coalesce(pc.segment, inv.segment) = inv.segment
-				and pc.effective_date <  ''12/31/' || inventory_year || '''
-				and ' || replace(replace(replace(public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version), 'version ', 'pc.version '), 'delete_versions ', 'pc.delete_versions '), 'dataset_id', 'pc.dataset_id');
-
-*/
-
-
 
 			execute
 			--raise notice '%',
@@ -323,7 +274,8 @@ BEGIN
 
 
 			where 	
-				pc.effective_date::timestamp without time zone < ''12/31/' || inventory_year || '''::timestamp without time zone
+				-- make sure and keep even if in the same year, they might not have closed...
+				date_part(''year'', pc.effective_date::timestamp without time zone) < ' || inventory_year || '
 				' || case when not is_point_table then '
 --				and pc.plantid is null
 --				and pc.pointid is null
@@ -334,7 +286,820 @@ BEGIN
 				and ' || replace(replace(replace(public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version), 'version ', 'pc.version '), 'delete_versions ', 'pc.delete_versions '), 'dataset_id', 'pc.dataset_id') || '
 				and inv.record_id is null';
 
+		-- see if there any issues with the projection packet
+		ELSIF control_program.type = 'Projection' THEN
+
+			-- make sure the dataset type is right...
+			IF control_program.dataset_type = 'Projection Packet' THEN
+				--store control dataset version filter in variable
+				select public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'proj')
+				into control_program_dataset_filter_sql;
+				
+				--see http://www.smoke-model.org/version2.4/html/ch06s02.html for source matching hierarchy
+--				raise notice '%', 
+				execute
+				'insert into emissions.' || strategy_messages_table_name || ' 
+					(
+					dataset_id, 
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					status,
+					control_program,
+					message
+					)
+				select 
+					' || strategy_messages_dataset_id || '::integer,
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					''Warning''::character varying(11) as status,
+					' || quote_literal(control_program.control_program_name) || ' as control_program_name,
+					message
+					
+				from (
+					--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
+					select 
+						null::character varying as fips,null::character varying as plantid,null::character varying as pointid,null::character varying as stackid,null::character varying as segment,null::character varying as scc,null::character varying as poll,null::character varying as message
+					where 1 = 0
+
+					' || case when is_point_table then '
+					--1
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						and proj.plantid = inv.plantid
+						and proj.pointid = inv.pointid
+						and proj.stackid = inv.stackid
+						and proj.segment = inv.segment
+						and proj.scc = inv.scc
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is not null 
+						and proj.stackid is not null 
+						and proj.segment is not null 
+						and proj.scc is not null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is null
+
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--2
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						
+						and proj.plantid = inv.plantid
+						and proj.pointid = inv.pointid
+						and proj.stackid = inv.stackid
+						and proj.segment = inv.segment
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is not null 
+						and proj.stackid is not null 
+						and proj.segment is not null 
+						and proj.scc is null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--3
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						
+						and proj.plantid = inv.plantid
+						and proj.pointid = inv.pointid
+						and proj.stackid = inv.stackid
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is not null 
+						and proj.stackid is not null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--4
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						
+						and proj.plantid = inv.plantid
+						and proj.pointid = inv.pointid
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is not null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--5
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						
+						and proj.plantid = inv.plantid
+						and proj.scc = inv.scc
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is not null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--6
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						
+						and proj.plantid = inv.plantid
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--7
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						
+						and proj.plantid = inv.plantid
+						and proj.pointid = inv.pointid
+						and proj.stackid = inv.stackid
+						and proj.segment = inv.segment
+						and proj.scc = inv.scc
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is not null 
+						and proj.stackid is not null 
+						and proj.segment is not null 
+						and proj.scc is not null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--8
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						
+						and proj.plantid = inv.plantid
+						and proj.pointid = inv.pointid
+						and proj.stackid = inv.stackid
+						and proj.segment = inv.segment
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is not null 
+						and proj.stackid is not null 
+						and proj.segment is not null 
+						and proj.scc is null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--9
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						
+						and proj.plantid = inv.plantid
+						and proj.pointid = inv.pointid
+						and proj.stackid = inv.stackid
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is not null 
+						and proj.stackid is not null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--10
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						
+						and proj.plantid = inv.plantid
+						and proj.pointid = inv.pointid
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is not null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--11
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						
+						and proj.plantid = inv.plantid
+						and proj.scc = inv.scc
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is not null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--12
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.fips = inv.fips
+						
+						and proj.plantid = inv.plantid
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is not null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+					' else '' end || '
+					
+					' || case when has_mact_column then '
+					--13,15
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						
+						and proj.mact = inv.mact
+						and proj.scc = inv.scc
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is not null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is not null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--14,16
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						
+						and proj.mact = inv.mact
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is not null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--17
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.mact = inv.mact
+						and proj.scc = inv.scc
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is not null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is not null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--18
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.mact = inv.mact
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is not null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--19,21
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						
+						and proj.mact = inv.mact
+						and proj.scc = inv.scc
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is not null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is not null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--20,22
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						
+						and proj.mact = inv.mact
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is not null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--23
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.mact = inv.mact
+						and proj.scc = inv.scc
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is not null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is not null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--24
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.mact = inv.mact
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is not null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+					' else '' end || '
+
+					' || case when has_sic_column then '
+					--25,27
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. sic = '' || proj.sic as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						and proj.sic = inv.sic
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is not null
+						and proj.sic is not null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--29
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. sic = '' || proj.sic as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.sic = inv.sic
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is not null
+						and proj.sic is not null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--31,33
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. sic = '' || proj.sic as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						and proj.sic = inv.sic
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is null
+						and proj.sic is not null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--35
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. sic = '' || proj.sic as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.sic = inv.sic
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is null
+						and proj.sic is not null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+					' else '' end || '
+
+					--37,41
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						and proj.scc = inv.scc
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is not null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--45
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.scc = inv.scc
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is not null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--49,53
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						and proj.scc = inv.scc
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is not null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--57
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.scc = inv.scc
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is not null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--61,63
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						and proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--62,64
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is not null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+
+					--65
+					union all
+					select 
+						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' proj
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on proj.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where proj.fips is null 
+						and proj.plantid is null 
+						and proj.pointid is null 
+						and proj.stackid is null 
+						and proj.segment is null 
+						and proj.scc is null 
+						and proj.poll is not null
+						and proj.sic is null
+						and proj.mact is null
+						and ' || control_program_dataset_filter_sql || '
+						and inv.record_id is null
+				) tbl';
+
+			END IF;
 		END IF;
+
 
 	END LOOP;
 

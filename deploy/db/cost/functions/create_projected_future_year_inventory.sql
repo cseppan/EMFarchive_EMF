@@ -448,18 +448,27 @@ BEGIN
 			select_column_list_sql := select_column_list_sql || ',' || case when has_cumulative_cost_col then 'cumulative_cost' else 'null::double precision as cumulative_cost' end;
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'control_measures' THEN
-			select_column_list_sql := select_column_list_sql || ',' || case when has_control_measures_col then 'case when control_measures is null or length(control_measures) = 0 then case when proj.cm_abbrev_list is not null and cont.cm_abbrev_list is not null then proj.cm_abbrev_list || ''&'' || cont.cm_abbrev_list when proj.cm_abbrev_list is null and cont.cm_abbrev_list is not null then cont.cm_abbrev_list when proj.cm_abbrev_list is not null and cont.cm_abbrev_list is null then proj.cm_abbrev_list else ''''::character varying end else control_measures || coalesce(''&'' || proj.cm_abbrev_list, '''') || coalesce(''&'' || cont.cm_abbrev_list, '''') end' else 'case when proj.cm_abbrev_list is not null and cont.cm_abbrev_list is not null then proj.cm_abbrev_list || ''&'' || cont.cm_abbrev_list when proj.cm_abbrev_list is null and cont.cm_abbrev_list is not null then cont.cm_abbrev_list when proj.cm_abbrev_list is not null and cont.cm_abbrev_list is null then proj.cm_abbrev_list else ''''::character varying end ' end || ' as control_measures';
+			select_column_list_sql := select_column_list_sql || ',' || case when has_control_measures_col then 'case when control_measures is null or length(control_measures) = 0 then case when proj.cm_abbrev is not null and cont.cm_abbrev is not null then proj.cm_abbrev || ''&'' || cont.cm_abbrev when proj.cm_abbrev is null and cont.cm_abbrev is not null then cont.cm_abbrev when proj.cm_abbrev is not null and cont.cm_abbrev is null then proj.cm_abbrev else ''''::character varying end else control_measures || coalesce(''&'' || proj.cm_abbrev, '''') || coalesce(''&'' || cont.cm_abbrev, '''') end' else 'case when proj.cm_abbrev is not null and cont.cm_abbrev is not null then proj.cm_abbrev || ''&'' || cont.cm_abbrev when proj.cm_abbrev is null and cont.cm_abbrev is not null then cont.cm_abbrev when proj.cm_abbrev is not null and cont.cm_abbrev is null then proj.cm_abbrev else ''''::character varying end ' end || ' as control_measures';
 --			select_column_list_sql := select_column_list_sql || ', case when control_measures is null or length(control_measures) = 0 then abbreviation else control_measures || ''&'' || abbreviation end as control_measures';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'pct_reduction' THEN
-			select_column_list_sql := select_column_list_sql || ',' || case when has_pct_reduction_col then 'case when pct_reduction is null or length(pct_reduction) = 0 then case when proj.percent_reduction_list is not null and cont.percent_reduction_list is not null then proj.percent_reduction_list || ''&'' || cont.percent_reduction_list when proj.percent_reduction_list is null and cont.percent_reduction_list is not null then cont.percent_reduction_list when proj.percent_reduction_list is not null and cont.percent_reduction_list is null then proj.percent_reduction_list else ''''::character varying end else pct_reduction || coalesce(''&'' || proj.percent_reduction_list, '''') || coalesce(''&'' || cont.percent_reduction_list, '''') end' else 'case when proj.percent_reduction_list is not null and cont.percent_reduction_list is not null then proj.percent_reduction_list || ''&'' || cont.percent_reduction_list when proj.percent_reduction_list is null and cont.percent_reduction_list is not null then cont.percent_reduction_list when proj.percent_reduction_list is not null and cont.percent_reduction_list is null then proj.percent_reduction_list else ''''::character varying end ' end || ' as pct_reduction';
+			select_column_list_sql := select_column_list_sql || ',' || case when has_pct_reduction_col then 'case when pct_reduction is null or length(pct_reduction) = 0 then case when proj.adj_factor is not null and cont.percent_reduction is not null then proj.adj_factor || ''&'' || cont.percent_reduction when proj.adj_factor is null and cont.percent_reduction is not null then cont.percent_reduction when proj.adj_factor is not null and cont.percent_reduction is null then proj.adj_factor else ''''::character varying end else pct_reduction || coalesce(''&'' || proj.adj_factor, '''') || coalesce(''&'' || cont.percent_reduction, '''') end' else 'case when proj.adj_factor is not null and cont.percent_reduction is not null then proj.adj_factor || ''&'' || cont.percent_reduction when proj.adj_factor is null and cont.percent_reduction is not null then cont.percent_reduction when proj.adj_factor is not null and cont.percent_reduction is null then proj.adj_factor else ''''::character varying end ' end || ' as pct_reduction';
 --			select_column_list_sql := select_column_list_sql || ', case when pct_reduction is null or length(pct_reduction) = 0 then efficiency::text else pct_reduction || ''&'' || efficiency::text end as pct_reduction';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'avd_emis' THEN
-			select_column_list_sql := select_column_list_sql || ', case when proj.source_id is not null and cont.source_id is not null then cont.percent_reduction_list::double precision / 100 * proj.final_emissions / ' || case when dataset_month <> 0 then no_days_in_month else '365' end || ' when proj.source_id is not null and cont.source_id is null then proj.final_emissions / ' || case when dataset_month <> 0 then no_days_in_month else '365' end || ' when proj.source_id is null and cont.source_id is not null then cont.final_emissions / ' || case when dataset_month <> 0 then no_days_in_month else '365' end || ' else avd_emis end as avd_emis';
+			select_column_list_sql := select_column_list_sql || ', case when proj.source_id is not null and cont.source_id is not null then cont.percent_reduction::double precision / 100 * proj.final_emissions / ' || case when dataset_month <> 0 then no_days_in_month else '365' end || ' when proj.source_id is not null and cont.source_id is null then proj.final_emissions / ' || case when dataset_month <> 0 then no_days_in_month else '365' end || ' when proj.source_id is null and cont.source_id is not null then cont.final_emissions / ' || case when dataset_month <> 0 then no_days_in_month else '365' end || ' else avd_emis end as avd_emis';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'ann_emis' THEN
-			select_column_list_sql := select_column_list_sql || ', case when proj.source_id is not null and cont.source_id is not null then cont.percent_reduction_list::double precision / 100 * proj.final_emissions when proj.source_id is not null and cont.source_id is null then proj.final_emissions when proj.source_id is null and cont.source_id is not null then cont.final_emissions else ann_emis end as ann_emis';
+			select_column_list_sql := select_column_list_sql || ', case when proj.source_id is not null and cont.source_id is not null then cont.percent_reduction::double precision / 100 * proj.final_emissions when proj.source_id is not null and cont.source_id is null then proj.final_emissions when proj.source_id is null and cont.source_id is not null then cont.final_emissions else ann_emis end as ann_emis';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'ceff' THEN
+			select_column_list_sql := select_column_list_sql || ', case when cont.source_id is not null then cont.percent_reduction::double precision else ceff end as ceff';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'reff' THEN
+			select_column_list_sql := select_column_list_sql || ', case when cont.source_id is not null then 100.0::double precision else reff end as reff';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'rpen' THEN
+			select_column_list_sql := select_column_list_sql || ', case when cont.source_id is not null then 100.0::double precision else rpen end as rpen';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSE
 			select_column_list_sql := select_column_list_sql || ',' || column_name;
@@ -511,38 +520,30 @@ BEGIN
 		' || select_column_list_sql || ' 
 	from emissions.' || inv_table_name || ' inv
 
-		-- deal with projections...
+		-- deal with projections, an apply order of 1 delineates a projection...
 		left outer join (
 
 			SELECT source_id, 
-			max(final_emissions) as final_emissions, 
-			sum(annual_cost) as annual_cost, 
-			public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list, 
-			public.concatenate_with_ampersand(TO_CHAR(percent_reduction, ''FM990.099'')) as percent_reduction_list 
-			FROM (select source_id, final_emissions, annual_cost, cm_abbrev, percent_reduction 
-				FROM emissions.' || detailed_result_table_name || '
-				where apply_order = 1
-				order by source_id, apply_order 
-				) tbl 
-			group by source_id
+				final_emissions, 
+				annual_cost, 
+				cm_abbrev, 
+				TO_CHAR(adj_factor, ''FM990.099'') as adj_factor
+			FROM emissions.' || detailed_result_table_name || '
+			where apply_order = 1
 
 		) proj
 		on inv.record_id = proj.source_id
 
-		-- deal with controls...
+		-- deal with controls, an apply order of 2 delineates a control...
 		left outer join (
 
 			SELECT source_id, 
-			max(final_emissions) as final_emissions, 
-			sum(annual_cost) as annual_cost, 
-			public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list, 
-			public.concatenate_with_ampersand(TO_CHAR(percent_reduction, ''FM990.099'')) as percent_reduction_list 
-			FROM (select source_id, final_emissions, annual_cost, cm_abbrev, percent_reduction 
-				FROM emissions.' || detailed_result_table_name || '
-				where apply_order = 2
-				order by source_id, apply_order 
-				) tbl 
-			group by source_id
+				final_emissions, 
+				annual_cost, 
+				cm_abbrev, 
+				TO_CHAR(percent_reduction, ''FM990.099'') as percent_reduction
+			FROM emissions.' || detailed_result_table_name || '
+			where apply_order = 2
 
 		) cont
 		on inv.record_id = cont.source_id
