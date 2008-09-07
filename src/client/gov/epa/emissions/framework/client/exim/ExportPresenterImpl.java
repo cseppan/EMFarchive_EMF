@@ -79,9 +79,9 @@ public class ExportPresenterImpl implements ExportPresenter {
 
     private String getDefaultFolder() {
         String folder = session.preferences().outputFolder();
-        //TODO: really need to check on the server side
-//        if (!new File(folder).isDirectory())
-//            folder = "";// default, if unspecified
+        
+        if (folder == null || folder.trim().isEmpty())
+            folder = "";// default, if unspecified
 
         return folder;
     }

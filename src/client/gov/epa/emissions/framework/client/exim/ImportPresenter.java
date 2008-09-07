@@ -58,15 +58,11 @@ public class ImportPresenter {
 
     private String getDefaultBaseFolder() {
         String folder = session.preferences().inputFolder();
-//        if (!new File(folder).isDirectory())
-//            folder = "";// default, if unspecified
+        if (folder == null || folder.trim().isEmpty())
+            folder = "";// default, if unspecified
 
         return folder;
     }
-
-//    private String mapToRemote(String dir) {
-//        return session.preferences().mapLocalInputPathToRemote(dir);
-//    }
 
     public void importDataset(String directory, String[] files, DatasetType type, String datasetName, ImportView view)
             throws EmfException {
