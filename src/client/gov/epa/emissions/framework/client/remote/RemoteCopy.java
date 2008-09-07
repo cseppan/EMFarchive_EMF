@@ -33,7 +33,6 @@ public class RemoteCopy {
 
     public RemoteCopy(UserPreference pref, User user) throws EmfException {
         os = System.getProperty("os.name");
-        this.program = pref.remoteCopyProgram();
         this.tempDir = pref.localTempDir();
         this.host = System.getProperty("emf.remote.host");
         this.userName = user.getUsername();

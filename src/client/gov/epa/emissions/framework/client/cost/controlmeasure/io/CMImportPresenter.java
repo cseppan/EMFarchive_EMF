@@ -70,13 +70,9 @@ public class CMImportPresenter {
         return folder;
     }
 
-    private String mapToRemote(String dir) {
-        return session.preferences().mapLocalInputPathToRemote(dir);
-    }
-
     // TODO: move the getFileNamesFromPattern () to a common service
     public String[] getFilesFromPatten(String folder, String pattern) throws EmfException {
-        return session.eximService().getFilenamesFromPattern(mapToRemote(folder), pattern);
+        return session.eximService().getFilenamesFromPattern(folder, pattern);
     }
 
     public Status[] getImportStatus() throws EmfException {

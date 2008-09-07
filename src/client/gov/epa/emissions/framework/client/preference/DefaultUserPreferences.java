@@ -11,23 +11,13 @@ import org.apache.commons.logging.LogFactory;
 
 public class DefaultUserPreferences implements UserPreference {
 
-    private static final String DEFAULT_INPUT_FOLDER = "default.input.folder";
+    private static final String DEFAULT_INPUT_FOLDER = "server.import.folder";
 
-    private static final String REMOTE_OUTPUT_DRIVE = "remote.output.drive";
-
-    private static final String DEFAULT_OUTPUT_FOLDER = "default.output.folder";
-
-    private static final String LOCAL_OUTPUT_DRIVE = "local.output.drive";
-
-    private static final String REMOTE_INPUT_DRIVE = "remote.input.drive";
-
-    private static final String LOCAL_INPUT_DRIVE = "local.input.drive";
+    private static final String DEFAULT_OUTPUT_FOLDER = "server.export.folder";
 
     private static final String DEFAULT_USER_NAME = "user.name";
     
     private static final String DEFAULT_USER_PASSWORD = "user.password";
-    
-    private static final String REMOTE_COPY_PROGRAM = "remote.copy.program";
     
     private static final String LOCAL_TEMP_DIR = "local.temp.dir";
 
@@ -87,35 +77,11 @@ public class DefaultUserPreferences implements UserPreference {
     }
 
     public String inputFolder() {
-        return property(LOCAL_INPUT_DRIVE) + property(DEFAULT_INPUT_FOLDER);
+        return property(DEFAULT_INPUT_FOLDER);
     }
 
     public String outputFolder() {
-        return property(LOCAL_OUTPUT_DRIVE) + property(DEFAULT_OUTPUT_FOLDER);
-    }
-
-    public String mapLocalInputPathToRemote(String localPath) {
-        String local = property(LOCAL_INPUT_DRIVE);
-        String remote = property(REMOTE_INPUT_DRIVE);
-
-        String path = remote + localPath.substring(local.length());
-        return path.replace('\\', '/');
-    }
-
-    public String mapLocalOutputPathToRemote(String localPath) {
-        String local = property(LOCAL_OUTPUT_DRIVE);
-        String remote = property(REMOTE_OUTPUT_DRIVE);
-
-        String path = remote + localPath.substring(local.length());
-        return path.replace('\\', '/');
-    }
-    
-    public String mapRemoteOutputPathToLocal(String remotePath) {
-        String remote = property(REMOTE_OUTPUT_DRIVE);
-        String local = property(LOCAL_OUTPUT_DRIVE);
-        
-        String path = local + remotePath.substring(remote.length());
-        return path.replace('/', '\\');
+        return property(DEFAULT_OUTPUT_FOLDER);
     }
 
     public String userName() {
@@ -124,10 +90,6 @@ public class DefaultUserPreferences implements UserPreference {
 
     public String userPassword() {
         return property(DEFAULT_USER_PASSWORD);
-    }
-    
-    public String remoteCopyProgram() {
-        return property(REMOTE_COPY_PROGRAM);
     }
     
     public String localTempDir() {

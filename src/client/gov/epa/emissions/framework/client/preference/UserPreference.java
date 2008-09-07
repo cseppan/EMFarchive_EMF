@@ -8,17 +8,9 @@ public interface UserPreference {
 
     String outputFolder();
 
-    String mapLocalInputPathToRemote(String localPath);
-
-    String mapLocalOutputPathToRemote(String localPath);
-    
-    String mapRemoteOutputPathToLocal(String remotePath);
-    
     String userName();
     
     String userPassword();
-    
-    String remoteCopyProgram();
     
     String localTempDir();
     
