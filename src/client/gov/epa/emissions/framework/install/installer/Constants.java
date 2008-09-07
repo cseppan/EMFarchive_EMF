@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.install.installer;
 
 
 public class Constants {
-	public static final String VERSION = "9/2/2008";
+	public static final String VERSION = "9/6/2008";
 	public static final String SEPARATOR = System.getProperty("line.separator");
     public static final String WORK_DIR = System.getProperty("user.dir");
     public static final String USER_HOME = System.getProperty("user.home");
@@ -20,11 +20,14 @@ public class Constants {
     public static final String REFERENCE_PATH = WORK_DIR + "\\config\\ref\\delimited";
     public static final String PREFERENCE_PATH = WORK_DIR + "\\config\\preferences";
     public static final String SCC_FILE = REFERENCE_PATH + "\\scc.txt";
+    public static final String EMF_ICON = "/config/preferences/logo.ico";
     
     public static final String REMOTE_INPUT_DIR = "T:\\emf_data\\input";
     public static final String REMOTE_OUTPUT_DIR = "T:\\emf_data\\output";
     public static final String JAVA_HOME = System.getProperty("java.home");
     public static final String INSTALL_HOME = "C:\\Program Files\\EMFClient";
+    public static final String UNINSTALL_DESKTOP = USER_HOME + "\\Desktop\\EMF Client Installer.lnk";
+    public static final String UNINSTALL_START = USER_HOME + "\\Start Menu\\Programs\\EMF Cliet Installer";
 	
     // TBD: finish removing these 
 	public static final String[] BAT_FILES = {"runmims"};

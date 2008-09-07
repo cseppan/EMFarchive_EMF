@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.install.installer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -88,6 +89,76 @@ public class Tools {
                 + "\\" + Constants.EMF_PREFERENCES_FILE)));
         userPrefWriter.write(header + emfPrefString + analysisEnginePrefString);
         userPrefWriter.close();
+    }
+    
+    public static void createShortcut(String installhome) throws IOException, InterruptedException {
+        File bat = new File(installhome, "shortcut.bat");
+        File inf = new File(installhome, "shortcut.inf");
+        Tools.createShortcutBatchFile(installhome, bat, inf);
+
+        try {
+
+            String[] cmd = Tools.getCommands(installhome);
+
+            /*
+             * Only creates a shortcut on Windows start menu.
+             */
+            if (System.getProperty("os.name").indexOf("Windows") >= 0) {
+                Process p = Runtime.getRuntime().exec(cmd);
+                p.waitFor();
+            }
+
+            bat.delete();
+            inf.delete();
+        } catch (IOException e) {
+            throw e;
+        } catch (InterruptedException e) {
+            throw e;
+        }
+    }
+
+    private static void createShortcutBatchFile(String installhome, File bat, File inf) throws IOException {
+        String separator = Constants.SEPARATOR;
+
+        String battext = "\n@echo off & setlocal" + separator
+                + "\nset inf=rundll32 setupapi,InstallHinfSection DefaultInstall" + separator + "\nstart/w %inf% 132 "
+                + installhome.replace('\\', '/') + "/shortcut.inf" + separator + "\nendlocal" + separator;
+
+        String inftext = "[version]" + separator + "signature=$chicago$" + separator + "[DefaultInstall]" + separator
+                + "UpdateInis=Addlink" + separator + "[Addlink]" + separator
+                + "setup.ini, progman.groups,, \"group200=\"\"EMF\"\"\"" + separator
+                + "setup.ini, group200,, \"\"\"EMF Client\"\",\"\"" + installhome.replace('\\', '/') + "/"
+                + Constants.EMF_BATCH_FILE + "\"\",\"\""
+                + installhome.replace('\\', '/') + Constants.EMF_ICON + "\"\",0\"" + separator;
+
+        FileWriter fw1 = new FileWriter(bat);
+        FileWriter fw2 = new FileWriter(inf);
+        
+        try {
+            fw1.write(battext);
+            fw2.write(inftext);
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            fw1.close();
+            fw2.close();
+        }
+    }
+    
+    private static String[] getCommands(String installhome) {
+        String[] cmd = new String[3];
+        String os = System.getProperty("os.name");
+
+        if (os.equalsIgnoreCase("Windows 98") || os.equalsIgnoreCase("Windows 95")) {
+            cmd[0] = "command.com";
+        } else {
+            cmd[0] = "cmd.exe";
+        }
+
+        cmd[1] = "/C";
+        cmd[2] = installhome.replace('\\', '/') + "/shortcut.bat";
+
+        return cmd;
     }
 
 }

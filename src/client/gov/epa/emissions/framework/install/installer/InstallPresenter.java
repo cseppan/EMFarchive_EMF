@@ -93,14 +93,9 @@ public class InstallPresenter {
         if (userPreference.exists())
             return new InstallPreferences(userPreference);
         
-        File preferenceTemplate = new File(Constants.USER_HOME, Constants.INSTALLER_PREFERENCES_FILE);
+        InputStream templateInputStream = Object.class.getClass().getResource("/" + Constants.INSTALLER_PREFERENCES_FILE).openStream();
         
-        if (preferenceTemplate.exists())
-            return new InstallPreferences(preferenceTemplate);
-        
-        InputStream ins = Object.class.getClass().getResource("/" + Constants.INSTALLER_PREFERENCES_FILE).openStream();
-        
-        return new InstallPreferences(ins);
+        return new InstallPreferences(templateInputStream);
     }
     
     public boolean windowsOS() {

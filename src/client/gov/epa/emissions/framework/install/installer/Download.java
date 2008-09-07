@@ -54,6 +54,7 @@ public class Download extends Thread {
     public void run() {
         Thread thisThread = Thread.currentThread();
         presenter.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        
         try {
             for (int x = 0; x < numFiles2Download; x++) {
                 if (blinker == thisThread) {
@@ -118,9 +119,10 @@ public class Download extends Thread {
 
         String inftext = "[version]" + separator + "signature=$chicago$" + separator + "[DefaultInstall]" + separator
                 + "UpdateInis=Addlink" + separator + "[Addlink]" + separator
-                + "setup.ini, progman.groups,, \"\"group200=\"EMF\"\"\"" + separator
-                + "setup.ini, group200,, \"\"\"EMF Client\"\",\"\"\"\"\"\"" + installhome.replace('\\', '/') + "/"
-                + Constants.EMF_BATCH_FILE + "\"\"\"\"\"\"" + separator;
+                + "setup.ini, progman.groups,, \"group200=\"\"EMF\"\"\"" + separator
+                + "setup.ini, group200,, \"\"\"EMF Client\"\",\"\"" + installhome.replace('\\', '/') + "/"
+                + Constants.EMF_BATCH_FILE + "\"\",\"\""
+                + installhome.replace('\\', '/') + Constants.EMF_ICON + "\"\",0\"" + separator;
 
         try {
             FileWriter fw1 = new FileWriter(bat);
@@ -182,18 +184,13 @@ public class Download extends Thread {
         return null;
     }
 
-    private File getSingleDownloadFile(String name) {
-        String refTemplate = "";
-        
+    public File getSingleDownloadFile(String name) {
         if (name.endsWith("/")) {
             File f = new File(installhome, name);
             f.mkdirs();
         } else {
             int index = name.lastIndexOf("/");
             
-            //NOTE: to catch the install reference template
-            refTemplate = name.substring(index + 1);
-
             // Get the subdir
             String sub = name.substring(0, index);
             File subdir = new File(installhome, sub);
@@ -201,9 +198,6 @@ public class Download extends Thread {
             if (!subdir.exists())
                 subdir.mkdirs();
         }
-        
-        if (refTemplate.equals(Constants.INSTALLER_PREFERENCES_FILE))
-            return new File(Constants.USER_HOME, refTemplate);
 
         return new File(installhome, name);
     }
@@ -216,12 +210,12 @@ public class Download extends Thread {
         return conn;
     }
 
-    private void writeStatus(int n, String name) {
+    public void writeStatus(int n, String name) {
         String status = "Status: Downloading " + (n + 1) + " out of " + numFiles2Download + " files:   " + name;
         presenter.setStatus(status);
     }
 
-    private void saveFile(File file, HttpURLConnection conn) throws IOException {
+    public void saveFile(File file, HttpURLConnection conn) throws IOException {
         if (!file.isDirectory()) {
             InputStream is = conn.getInputStream();
             BufferedInputStream bis = new BufferedInputStream(is);
@@ -235,6 +229,8 @@ public class Download extends Thread {
             is.close();
             fos.close();
         }
+        
+        conn.disconnect();
     }
 
     private void saveCurrentFilesInfo() {
