@@ -72,14 +72,13 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
         this.invCompare = invCompare;
         this.invTables = invTables;
         this.summaryType =summaryType;
-        this.getContentPane().add(createLayout());
-        
     }
 
 
     public void display(EmfDataset dataset, QAStep qaStep) {
         super.setTitle("Setup "+qaStep.getName()+": " + dataset.getName() + "_" + qaStep.getId() );
         super.display();
+        this.getContentPane().add(createLayout(dataset));
     }
 
     public void observe(EditQAEmissionsPresenter presenter) {
@@ -90,14 +89,14 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
     // A Text Field for Adding the Inventory Table with a Select button
     // OK and Cancel buttons.
 
-    private JPanel createLayout() {
+    private JPanel createLayout(EmfDataset dataset) {
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         JPanel content = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
        
-        layoutGenerator.addLabelWidgetPair("Base inventories:", emisinvBase(), content);
+        layoutGenerator.addLabelWidgetPair("Base inventories:", emisinvBase(dataset), content);
         layoutGenerator.addLabelWidgetPair("Compare inventories:", emisinvCompare(), content);
         layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
         summaryTypeCombo();
@@ -113,11 +112,13 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
         return layout;
     }
     
-    private JPanel emisinvBase() {
+    private JPanel emisinvBase(EmfDataset dataset) {
         datasetWidgetBase = new AddRemoveDatasetWidget(this, program, parentConsole, session);
         datasetWidgetBase.setPreferredSize(new Dimension(350,250));
         if(invBase != null && invBase.length > 0)
             datasetWidgetBase.setDatasetsFromStepWindow(invBase);
+        else 
+            datasetWidgetBase.setDatasetsFromStepWindow(new EmfDataset[] {dataset});
         return datasetWidgetBase;
     }
     

@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.casemanagement.jobs.ExportSelectionDialog;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
@@ -528,6 +529,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             public void actionPerformed(ActionEvent e) {
                 try {
                     boolean result = checkDatasets();
+                    //checkExportFolder();
                     if (result) {
                         clear();
                         runQAStep();
@@ -619,6 +621,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         }
         return false; 
     }
+    
+    private void checkExportFolder() throws EmfException{
+        if (exportFolder.getText().trim().isEmpty())
+            throw new EmfException (" Please specify the export folder. ");
+    }
 
     private void getInventories(String programSwitches, int beginIndex, int endIndex) throws EmfException {
         List<EmfDataset> inventoryList= new ArrayList<EmfDataset>();
@@ -700,6 +707,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 doExport();
             }
         });
+        export.setToolTipText("Export Results to CSV or Shapefile");
         return export;
     }
 
@@ -1009,9 +1017,17 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     protected void doExport() {
         try {
-            messagePanel.setMessage("Started Export. Please monitor the Status window "
-                    + "to track your export request.");
-            presenter.export(step, qaStepResult, exportFolder.getText());
+            checkExportFolder();
+            ExportSelectionDialog dialog = new ExportSelectionDialog(parentConsole);
+            dialog.display();
+            if(dialog.shouldCreateCSV()) {
+                messagePanel.setMessage("Started Export. Please monitor the Status window "
+                        + "to track your export request.");
+                presenter.export(step, qaStepResult, exportFolder.getText());
+            }
+            if (dialog.shouldCreateShapeFile()){
+                //
+            }
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

@@ -68,14 +68,13 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         this.inventories = inventories;
         this.invTables = invTables;
         this.summaryType =summaryType;
-        this.getContentPane().add(createLayout());
-        
     }
 
 
     public void display(EmfDataset dataset, QAStep qaStep) {
         super.setTitle("Setup "+qaStep.getName()+": " + dataset.getName() + "_" + qaStep.getId() );
         super.display();
+        this.getContentPane().add(createLayout(dataset));
     }
 
     public void observe(EditQAEmissionsPresenter presenter1) {
@@ -86,14 +85,14 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     // A Text Field for Adding the Inventory Table with a Select button
     // OK and Cancel buttons.
 
-    private JPanel createLayout() {
+    private JPanel createLayout(EmfDataset dataset) {
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         JPanel content = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
        
-        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(), content);
+        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(dataset), content);
         layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
         summaryTypeCombo();
         layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
@@ -108,11 +107,13 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         return layout;
     }
     
-    protected JPanel emisinv() {
+    protected JPanel emisinv(EmfDataset dataset) {
         datasetWidget = new AddRemoveDatasetWidget(this, program, parentConsole, session);
         datasetWidget.setPreferredSize(new Dimension(350,250));
         if(inventories != null && inventories.length > 0)
             datasetWidget.setDatasetsFromStepWindow(inventories);
+        else 
+            datasetWidget.setDatasetsFromStepWindow(new EmfDataset[] {dataset});
         return datasetWidget;
     }
     

@@ -29,28 +29,27 @@ public class EditQAEmissionsColumnBasedWindow extends EditQAEmissionsWindow impl
             EmfDataset[] inventories, EmfDataset [] invTables, String summaryType, String emissionType) {
         super(desktopManager, program, session, inventories, invTables, summaryType);
         this.emissionType = emissionType; 
-        this.getContentPane().add(createLayout());
-        
     }
 
 
     public void display(EmfDataset dataset, QAStep qaStep) {
         super.setTitle("Setup "+qaStep.getName()+": " + dataset.getName() + "_" + qaStep.getId() );
         super.display();
+        this.getContentPane().add(createLayout(dataset));
     }
     
     // A JList with Add and Remove buttons for the Emission Inventories.
     // A Text Field for Adding the Inventory Table with a Select button
     // OK and Cancel buttons.
 
-    private JPanel createLayout() {
+    private JPanel createLayout(EmfDataset dataset) {
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         JPanel content = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
        
-        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(), content);
+        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(dataset), content);
         layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
         emissionTypeCombo();
         layoutGenerator.addLabelWidgetPair("Emission Type:", emissionTypes, content);

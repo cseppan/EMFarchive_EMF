@@ -44,8 +44,6 @@ public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, String pro
         this.program = program; 
         this.session = session;
         this.datasets = datasets;
-        this.getContentPane().add(createLayout());
-        
     }
 
 //public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, EmfSession session) {
@@ -61,6 +59,7 @@ public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, String pro
     public void display(EmfDataset dataset, QAStep qaStep) {
         super.setTitle("Set Inventories: " + qaStep.getName()+ "_" + qaStep.getId()+" ("+dataset.getName()+")");
         super.display();
+        this.getContentPane().add(createLayout(dataset));
     }
 
     public void observe(EditQANonsummaryEmissionsPresenter presenter1) {
@@ -71,14 +70,14 @@ public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, String pro
     // A Text Field for Adding the Inventory Table with a Select button
     // OK and Cancel buttons.
     
-    private JPanel createLayout(){
+    private JPanel createLayout(EmfDataset dataset){
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         JPanel content = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
        
-        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(), content);
+        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(dataset), content);
         layoutGenerator.makeCompactGrid(content, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad*/
@@ -90,11 +89,13 @@ public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, String pro
         return layout;
     }
     
-    private JPanel emisinv() {
+    private JPanel emisinv(EmfDataset dataset) {
         datasetWidget = new AddRemoveDatasetWidget(this, program, parentConsole, session);
         datasetWidget.setPreferredSize(new Dimension(350,250));
         if(!(datasets==null) && (datasets.length > 0))
             datasetWidget.setDatasetsFromStepWindow(datasets);
+        else 
+            datasetWidget.setDatasetsFromStepWindow(new EmfDataset[] {dataset});
         return datasetWidget;
     }
     
