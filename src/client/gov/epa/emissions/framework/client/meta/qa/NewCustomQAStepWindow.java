@@ -119,6 +119,10 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
 
         versionsSelection = new ComboBox("Select one", versionsSet.nameAndNumbers());
+        if (versionsSelection.getModel().getSize()==2)
+        {
+            versionsSelection.setSelectedIndex(1);
+        }
         layoutGenerator.addLabelWidgetPair("Version:", versionsSelection, panel);
 
         // Lay out the panel.

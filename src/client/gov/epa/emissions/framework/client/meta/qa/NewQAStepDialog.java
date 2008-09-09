@@ -84,6 +84,10 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         versionsSelection = new ComboBox("Select one", versionsSet.nameAndNumbers());
+        if (versionsSelection.getModel().getSize()==2)
+        {
+            versionsSelection.setSelectedIndex(1);
+        }
         //First try at resizing the version selection combo box, did not work as expected
         //Added next line later -- may be useful
         //versionsModel = new DefaultComboBoxModel(versionNames(versions));
