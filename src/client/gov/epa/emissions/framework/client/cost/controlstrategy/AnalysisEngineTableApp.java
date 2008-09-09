@@ -362,24 +362,6 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
         fileMenu.setMnemonic('F');
         menuBar.add(fileMenu);
 
-
-//        loadConfigMenu(fileMenu);
-//        saveConfiguredPlotsMenuItem = new JMenuItem("Save Configuration");
-//        fileMenu.add(saveConfiguredPlotsMenuItem);
-//        saveConfiguredPlotsMenuItem.setEnabled(false);
-//        saveConfiguredPlotsMenuItem.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                if (mainTabbedPane.getTabCount() == 0) {
-//                    new GUIUserInteractor().notify(TableApp.this, "Save Configuration", "No "
-//                            + " table is currently being analyzed", UserInteractor.WARNING);
-//                    return;
-//                }
-//                TablePanel panel = ((TablePanel) mainTabbedPane.getSelectedComponent());
-//
-//                (panel.tablePanel).showSaveConfigGUI();
-//                return;
-//            }
-//        });
         googleEarth = createGoogleMenuItem(fileNames);
         googleEarth.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.ALT_MASK));
         fileMenu.add(googleEarth);
@@ -394,28 +376,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
         fileMenu.add(closeMenuItem);
         closeMenuItem.setEnabled(false);
 
-//        JMenuItem quitMenuItem = new JMenuItem("Quit");
-//        quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.ALT_MASK));
-//        fileMenu.add(quitMenuItem);
-//        quitMenuItem.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                try {
-//                    history.saveHistory();
-//                } catch (java.io.IOException ie) {
-//                    new GUIUserInteractor().notify(TableApp.this, "Error", "Error saving the file history. "
-//                            + ie.getMessage(), UserInteractor.ERROR);
-//                }
-//                Runtime.getRuntime().gc();
-//                Runtime.getRuntime().runFinalization();
-//                if (standAlone) {
-//                    dispose();
-//                    System.exit(0);
-//                } else {
-//                    setVisible(false);
-//                    dispose();
-//                }
-//            }
-//        });
+
         menuPanel.add(menuBar, BorderLayout.WEST);
         return menuPanel;
     }
@@ -426,7 +387,8 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
             public void actionPerformed(ActionEvent e) {
                 //TablePanel table = (TablePanel) mainTabbedPane.getComponentAt(0);
                 int index = mainTabbedPane.getSelectedIndex();
-                PointSourceGeneratorFrame frame = new PointSourceGeneratorFrame(new File(fileNames[index]));
+                String[] tabNames = createTabNames(1, 40, fileNames);
+                PointSourceGeneratorFrame frame = new PointSourceGeneratorFrame(new File(fileNames[index]), tabNames[index]);
                         //"C:\\DOCUME~1\\CEPUSER\\LOCALS~1\\Temp\\QA_DSID243_V0_20080826140114Summarize_by_Plant.csv"));
                 //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.pack();
