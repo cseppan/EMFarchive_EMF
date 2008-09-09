@@ -128,8 +128,6 @@ public class ExportSelectionDialog extends Dialog {
             public void actionPerformed(ActionEvent e) {
                 cleareMsg();
                 exportFile();
-                setVisible(false);
-                dispose();
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -154,6 +152,8 @@ public class ExportSelectionDialog extends Dialog {
                 shouldCreateCSV = true; 
             if (shapeFileFormat.isSelected())
                 shouldCreateShapeFile = true; 
+            setVisible(false);
+            dispose();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

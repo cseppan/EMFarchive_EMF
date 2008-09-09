@@ -1141,7 +1141,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     // Modified length in Dimension to make View window ful size
     public void displayResultsTable(String qaStepName, String exportedFileName) {
-        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QA Step \"" + qaStepName + "\" results ",
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QA Step Results: " + qaStepName,
                 new Dimension(800, 500), desktopManager, parentConsole);
         app.display(new String[] { exportedFileName });
     }

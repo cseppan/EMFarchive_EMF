@@ -66,7 +66,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
         super(controlStrategyName + counter++, dimension, desktopManager);
         this.dimension = dimension;
         this.parentConsole = parentConsole;
-        this.title = controlStrategyName;
+        this.title = controlStrategyName.substring(controlStrategyName.indexOf(":")==-1? 0: controlStrategyName.indexOf(":")+1);
     }
 
     public void display(String[] fileNames) {
@@ -391,7 +391,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
                 //TablePanel table = (TablePanel) mainTabbedPane.getComponentAt(0);
                 int index = mainTabbedPane.getSelectedIndex();
                 String[] tabNames = createTabNames(1, 40, fileNames);
-                String subtitle = "Create Google Earth file for QA Step:" + tabNames[index]+ "/" + title ;
+                String subtitle = "Create Google Earth file: " + tabNames[index]+ "/" + title ;
                 PointSourceGeneratorFrame frame = new PointSourceGeneratorFrame(new File(fileNames[index]), subtitle);
                         //"C:\\DOCUME~1\\CEPUSER\\LOCALS~1\\Temp\\QA_DSID243_V0_20080826140114Summarize_by_Plant.csv"));
                 //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
