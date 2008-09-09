@@ -31,6 +31,7 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
@@ -289,7 +290,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         }
     }
 
-    protected void viewAction() throws EmfException {
+    private void viewAction() throws EmfException {
         messagePanel.clear();
         List selected = table.selected();
 
@@ -305,8 +306,22 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             presenter.doDisplay(view);
         }
     }
-
-
+    
+    private void viewCountyDataset() throws EmfException{
+        messagePanel.clear();
+        EmfDataset countyDataset = (EmfDataset) dataset.getSelectedItem();
+        if (countyDataset == null){
+            messagePanel.setError("Please select an item to view.");
+            return;
+        }
+        PropertiesViewPresenter presenter = new PropertiesViewPresenter(countyDataset, session);
+                //editControlStrategyPresenter.getDataset(countyDataset.getId()), session);
+        DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
+        presenter.doDisplay(view);
+        
+    }
+    
+    
     private JPanel createMiddleSection(ControlStrategy controlStrategy) throws EmfException {
         JPanel middlePanel = new JPanel(new SpringLayout());
         middlePanel.setBorder(new Border("Filters"));
@@ -328,10 +343,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 //        Dimension size=new Dimension(500, 13);
         
         dataset = new ComboBox("Not selected", datasets);
-//        dataset.setPrototypeDisplayValue(width);
         if (controlStrategy.getCountyDataset() != null) dataset.setSelectedItem(controlStrategy.getCountyDataset());
-//        dataset.setPrototypeDisplayValue(size);
-//        dataset.setToolTipText("Browse to find a CSV file with a column named FIPS that lists the counties to which the strategy should apply");
 
         dataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -354,7 +366,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         }
         if (controlStrategy.getCountyDataset() != null) version.setSelectedItem(controlStrategy.getCountyDatasetVersion());
         
-        layoutGenerator.addLabelWidgetPair("County Dataset:", dataset, middlePanel);
+        layoutGenerator.addLabelWidgetPair("County Dataset:", datasetPanel(), middlePanel);
         layoutGenerator.addLabelWidgetPair("County Dataset Version:", version, middlePanel);
 
         layoutGenerator.makeCompactGrid(middlePanel, 3, 2, // rows, cols
@@ -362,6 +374,30 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
                 10, 5);// xPad, yPad
 
         return middlePanel;
+    }
+    
+    private JPanel datasetPanel() {
+
+        changeablesList.addChangeable(dataset);
+        dataset.setToolTipText("Press select button to choose from a dataset list.");
+        Button viewButton = new BorderlessButton("View", viewDatasetAction()); 
+        JPanel invPanel = new JPanel(new BorderLayout(5,0));
+
+        invPanel.add(dataset, BorderLayout.LINE_START);
+        invPanel.add(viewButton, BorderLayout.LINE_END );
+        return invPanel;
+    }
+    
+    private Action viewDatasetAction() {
+        return new AbstractAction(){
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    viewCountyDataset();
+                } catch (EmfException e) {
+                    messagePanel.setError("Error viewing dataset: " + e.getMessage());
+                }
+            }
+        };
     }
     
     public void save(ControlStrategy controlStrategy) throws EmfException {
