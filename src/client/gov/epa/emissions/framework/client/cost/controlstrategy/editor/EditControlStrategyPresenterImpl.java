@@ -253,4 +253,9 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         view.notifyStrategyTypeChange(strategyType);
     }
 
+    public void resetButtons(boolean enable) {
+        view.enableButtons(enable);
+        
+    }
+
 }

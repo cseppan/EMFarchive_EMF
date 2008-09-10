@@ -383,7 +383,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 //        }
 //    }
 //
-    private void enableButtons(boolean enable) {
+    public void enableButtons(boolean enable) {
         saveButton.setEnabled(enable);
         runButton.setEnabled(enable);
     }

@@ -24,4 +24,7 @@ public interface EditControlStrategyView extends ManagedView {
     void signalChanges();
 
     void stopRun();
+    
+    void enableButtons(boolean enable);
+    
 }

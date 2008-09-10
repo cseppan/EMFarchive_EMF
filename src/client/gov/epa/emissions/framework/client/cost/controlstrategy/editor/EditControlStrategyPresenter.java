@@ -56,4 +56,6 @@ public interface EditControlStrategyPresenter {
     
     void doChangeStrategyType(StrategyType strategyType);
     
+    void resetButtons(boolean enable); 
+    
 }

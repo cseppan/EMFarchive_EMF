@@ -422,6 +422,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         messagePanel.clear();
         updateSummaryResultPanel(controlStrategy, controlStrategyResults);
+        
+        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
+        String runStatus = summary.getRunStatus();
+        if ( runStatus.indexOf("Running") == -1 )
+            presenter.resetButtons(true);
     }
 
     private void updateSummaryResultPanel(ControlStrategy controlStrategy,
