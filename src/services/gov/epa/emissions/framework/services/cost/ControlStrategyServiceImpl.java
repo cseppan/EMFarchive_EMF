@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -283,7 +284,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             if (runStatus.equals("Cancelled")) return;
             
             ControlStrategy strategy = getById(controlStrategyId);
-            
+            validateSectors(strategy);
             //make sure a valid server-side export path was specified
             validateExportPath(strategy.getExportDirectory());
             
@@ -301,6 +302,17 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             session.close();
         }
     }
+    
+    private void validateSectors(ControlStrategy strategy) throws EmfException {
+        ControlStrategyInputDataset[] inputDatasets = strategy.getControlStrategyInputDatasets(); 
+        if ( inputDatasets==null || inputDatasets.length == 0 )
+            throw new EmfException ("Input Dataset does not exist. " );
+        for (ControlStrategyInputDataset dataset : inputDatasets ){
+            Sector[] sectors= dataset.getInputDataset().getSectors();
+            if ( sectors==null || sectors.length ==0 )
+                throw new EmfException ("Please use Edit Properties to select a sector for: " + dataset.getInputDataset().getName());  
+        }
+    }
 
     private void validateExportPath(String folderPath) throws EmfException {
         File file = new File(folderPath);
@@ -308,6 +320,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         if (!file.exists() || !file.isDirectory()) {
             throw new EmfException ("Export folder does not exist: " + folderPath);
         }
+        
     }
 
     public List<ControlStrategy> getControlStrategiesByRunStatus(String runStatus) throws EmfException {
