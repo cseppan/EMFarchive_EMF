@@ -328,6 +328,9 @@ public class DataServiceImpl implements DataService {
         DbServer dbServer = DbServerFactory.get().getDbServer();
 
         try {
+            if (user.isAdmin())
+                dao.removeEmptyDatasets(user, dbServer, session);
+            
             List<EmfDataset> list = dao.deletedDatasets(user, session);
             dao.deleteDatasets(list.toArray(new EmfDataset[0]), dbServer, session);
         } catch (Exception e) {

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.db.DataQuery;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
@@ -54,6 +55,10 @@ public class DatasetDAO {
     private HibernateFacade hibernateFacade;
 
     private DbServerFactory dbServerFactory;
+    
+    private List strategyList = null;
+    
+    private List controlProgList = null;
 
     public DatasetDAO() {
         lockingScheme = new LockingScheme();
@@ -601,72 +606,68 @@ public class DatasetDAO {
     }
 
     public void checkIfUsedByStrategies(int[] datasetIDs, Session session) throws EmfException {
-        List list = null;
-
         // check if dataset is an input inventory for some strategy (via the StrategyInputDataset table)
-        list = session.createQuery(
+        strategyList = session.createQuery(
                 "select cS.name from ControlStrategy as cS inner join cS.controlStrategyInputDatasets "
                         + "as iDs inner join iDs.inputDataset as iD with (iD.id = "
                         + getAndOrClause(datasetIDs, "iD.id") + ")").list();
 
-        if (list != null && list.size() > 0)
-            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
+        if (strategyList != null && strategyList.size() > 0)
+            throw new EmfException("Error: dataset used by control strategy " + strategyList.get(0) + ".");
 
         // check if dataset is an input inventory for some strategy (via the StrategyResult table, could be here for
         // historical reasons)
-        list = session.createQuery(
+        strategyList = session.createQuery(
                 "select cS.name from ControlStrategyResult sR, ControlStrategy cS where "
                         + "sR.controlStrategyId = cS.id and (sR.inputDataset.id = "
                         + getAndOrClause(datasetIDs, "sR.inputDataset.id") + ")").list();
 
-        if (list != null && list.size() > 0)
-            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
+        if (strategyList != null && strategyList.size() > 0)
+            throw new EmfException("Error: dataset used by control strategy " + strategyList.get(0) + ".");
 
-//        // check if dataset is a detailed result dataset for some strategy
-//        list = session.createQuery(
-//                "select cS.name from ControlStrategyResult sR, ControlStrategy cS where sR.controlStrategyId = cS.id "
-//                        + "and (sR.detailedResultDataset.id = "
-//                        + getAndOrClause(datasetIDs, "sR.detailedResultDataset.id") + ")").list();
-//
-//        if (list != null && list.size() > 0)
-//            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
-//
-//        // check if dataset is a controlled inventory for some strategy
-//        list = session.createQuery(
-//                "select cS.name from ControlStrategyResult sR, ControlStrategy cS where sR.controlStrategyId = cS.id "
-//                        + "and (sR.controlledInventoryDataset.id = "
-//                        + getAndOrClause(datasetIDs, "sR.controlledInventoryDataset.id") + ")").list();
-//
-//        if (list != null && list.size() > 0)
-//            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
+        // // check if dataset is a detailed result dataset for some strategy
+        // list = session.createQuery(
+        // "select cS.name from ControlStrategyResult sR, ControlStrategy cS where sR.controlStrategyId = cS.id "
+        // + "and (sR.detailedResultDataset.id = "
+        // + getAndOrClause(datasetIDs, "sR.detailedResultDataset.id") + ")").list();
+        //
+        // if (list != null && list.size() > 0)
+        // throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
+        //
+        // // check if dataset is a controlled inventory for some strategy
+        // list = session.createQuery(
+        // "select cS.name from ControlStrategyResult sR, ControlStrategy cS where sR.controlStrategyId = cS.id "
+        // + "and (sR.controlledInventoryDataset.id = "
+        // + getAndOrClause(datasetIDs, "sR.controlledInventoryDataset.id") + ")").list();
+        //
+        // if (list != null && list.size() > 0)
+        // throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
 
         // check if dataset is used as a region/county dataset for specific strategy measures
-        list = session.createQuery(
+        strategyList = session.createQuery(
                 "select cS.name from ControlStrategy as cS inner join cS.controlMeasures as cM inner join "
                         + "cM.regionDataset as rD with (rD.id = " + getAndOrClause(datasetIDs, "rD.id") + ")").list();
 
-        if (list != null && list.size() > 0)
-            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
+        if (strategyList != null && strategyList.size() > 0)
+            throw new EmfException("Error: dataset used by control strategy " + strategyList.get(0) + ".");
 
         // check if dataset is used as a region/county dataset for specific strategy
-        list = session.createQuery(
+        strategyList = session.createQuery(
                 "select cS.name from ControlStrategy cS where (cS.countyDataset.id = "
                         + getAndOrClause(datasetIDs, "cS.countyDataset.id") + ")").list();
 
-        if (list != null && list.size() > 0)
-            throw new EmfException("Dataset used by control strategy " + list.get(0) + ".");
+        if (strategyList != null && strategyList.size() > 0)
+            throw new EmfException("Dataset used by control strategy " + strategyList.get(0) + ".");
     }
 
     public void checkIfUsedByControlPrograms(int[] datasetIDs, Session session) throws EmfException {
-        List list = null;
-
         // check if dataset is an input inventory for some control program (via the control_programs table)
-        list = session.createQuery(
+        controlProgList = session.createQuery(
                 "select cP.name from ControlProgram as cP inner join cP.dataset as d with (d.id = "
                         + getAndOrClause(datasetIDs, "d.id") + ")").list();
 
-        if (list != null && list.size() > 0)
-            throw new EmfException("Error: dataset used by control program " + list.get(0) + ".");
+        if (controlProgList != null && controlProgList.size() > 0)
+            throw new EmfException("Error: dataset used by control program " + controlProgList.get(0) + ".");
 
     }
 
@@ -792,7 +793,8 @@ public class DatasetDAO {
 
         try {
             if (type.contains("A/M/PTPRO") || type.contains("TEMPORAL PROFILE") || type.contains("COSTCY")
-                    || type.contains("COUNTRY, STATE, AND COUNTY") || type.contains("SMOKE REPORT") || type.contains("SMKREPORT"))
+                    || type.contains("COUNTRY, STATE, AND COUNTY") || type.contains("SMOKE REPORT")
+                    || type.contains("SMKREPORT"))
                 tableTool.deleteRecords(table, source.getCols()[1], "integer", "" + dsID); // 2nd column: dataset_id
             else {
                 if (DebugLevels.DEBUG_16)
@@ -894,9 +896,128 @@ public class DatasetDAO {
     public List<EmfDataset> deletedDatasets(User user, Session session) {
         Criterion statusCrit = Restrictions.eq("status", "Deleted");
         Criterion nameCrit = Restrictions.eq("creator", user.getUsername());
-        Criterion criterion = Restrictions.and(statusCrit, nameCrit);
+        Criterion criterion = statusCrit;
+        
+        if (!user.isAdmin())
+            criterion = Restrictions.and(statusCrit, nameCrit);
 
         return hibernateFacade.get(EmfDataset.class, criterion, session);
+    }
+
+    public void removeEmptyDatasets(User user, DbServer dbServer, Session session) throws EmfException {
+        int[] dsIDsWithNoEmisData = getAllDatasetsWithNoEmissionData(dbServer);
+        deleteControlStrategies(dsIDsWithNoEmisData, session);
+        decoupleDSFromCases(dsIDsWithNoEmisData, session);
+        setDSAsDeleted(dsIDsWithNoEmisData, session);
+        deleteFromInternalSources(dbServer);
+    }
+
+    private int[] getAllDatasetsWithNoEmissionData(DbServer dbServer) throws EmfException {
+        Datasource emf = dbServer.getEmfDatasource();
+        DataQuery dataQuery = emf.query();
+        String query = "SELECT dataset_id from emf.internal_sources where table_name NOT IN (select tablename from pg_tables WHERE schemaname='emissions')";
+        int[] ids = null;
+
+        try {
+            ResultSet resultSet = dataQuery.executeQuery(query);
+            resultSet.last();
+            int size = resultSet.getRow();
+            resultSet.beforeFirst();
+            ids = new int[size];
+            int i = 0;
+
+            while (resultSet.next())
+                ids[i++] = resultSet.getInt("dataset_id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOG.error(e);
+            throw new EmfException(e.getMessage());
+        }
+
+        return ids;
+    }
+    
+    private void deleteFromInternalSources(DbServer dbServer) throws EmfException {
+        Datasource emf = dbServer.getEmfDatasource();
+        DataQuery dataQuery = emf.query();
+        String deleteQuery = "DELETE from emf.internal_sources where table_name NOT IN (select tablename from pg_tables WHERE schemaname='emissions')";
+
+        try {
+            dataQuery.execute(deleteQuery);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            LOG.error(e);
+            throw new EmfException(e.getMessage());
+        }
+    }
+
+    private void deleteControlStrategies(int[] dsIDsWithNoEmisData, Session session) throws EmfException {
+        try {
+            checkIfUsedByStrategies(dsIDsWithNoEmisData, session);
+            checkIfUsedByControlPrograms(dsIDsWithNoEmisData, session);
+        } catch (Exception e) {
+            String name = "";
+            
+            if (strategyList != null && strategyList.size() > 0)
+                name = strategyList.get(0).toString();
+            
+            if (controlProgList != null && controlProgList.size() > 0)
+                name = controlProgList.get(0).toString();
+            
+            throw new EmfException("Please delete control strategies/programs before purge: " + name);
+        } 
+    }
+
+    private void decoupleDSFromCases(int[] dsIDsWithNoEmisData, Session session) throws EmfException {
+        int updatedItems = 0;
+
+        try {
+            Transaction tx = session.beginTransaction();
+
+            String firstPart = "UPDATE " + CaseInput.class.getSimpleName() + " obj SET obj.dataset = null";
+            String secondPart = " WHERE obj.dataset.id = " + getAndOrClause(dsIDsWithNoEmisData, "obj.dataset.id");
+            String updateQuery = firstPart + secondPart;
+
+            if (DebugLevels.DEBUG_16)
+                System.out.println("hql update string: " + updateQuery);
+
+            updatedItems = session.createQuery(updateQuery).executeUpdate();
+            tx.commit();
+
+            if (DebugLevels.DEBUG_16)
+                System.out.println(updatedItems + " items updated.");
+        } catch (HibernateException e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            if (DebugLevels.DEBUG_16)
+                LOG.warn(updatedItems + " items updated from " + EmfDataset.class.getName() + " table.");
+        }
+    }
+
+    private void setDSAsDeleted(int[] dsIDsWithNoEmisData, Session session) throws EmfException {
+        int updatedItems = 0;
+
+        try {
+            Transaction tx = session.beginTransaction();
+
+            String firstPart = "UPDATE " + EmfDataset.class.getSimpleName() + " obj SET ";
+            String secondPart = " WHERE obj.id = " + getAndOrClause(dsIDsWithNoEmisData, "obj.id");
+            String updateQuery = firstPart + "obj.status = :sts" + secondPart;
+
+            if (DebugLevels.DEBUG_16)
+                System.out.println("hql update string: " + updateQuery);
+
+            updatedItems = session.createQuery(updateQuery).setString("sts", "Deleted").executeUpdate();
+            tx.commit();
+
+            if (DebugLevels.DEBUG_16)
+                System.out.println(updatedItems + " items updated.");
+        } catch (HibernateException e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            if (DebugLevels.DEBUG_16)
+                LOG.warn(updatedItems + " items updated from " + EmfDataset.class.getName() + " table.");
+        }
     }
 
 }

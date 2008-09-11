@@ -236,7 +236,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void importDataset() throws EmfException {
-        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktopManager, parentConsole, getSelectedDSType());
+        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktopManager, parentConsole,
+                getSelectedDSType());
 
         ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session, session.user(), session
                 .eximService(), session.dataService(), this);
@@ -265,16 +266,16 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         });
         exportButton.setToolTipText("Export existing dataset(s)");
         panel.add(exportButton);
-        
+
         Button purgeButton = new Button("Purge", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     purgeDelectedDatasets();
                 } catch (EmfException e) {
-                    if (e.getMessage().length()>100)
-                       messagePanel.setMessage(e.getMessage().substring(0,100) + "...");
+                    if (e.getMessage().length() > 100)
+                        messagePanel.setMessage(e.getMessage().substring(0, 100) + "...");
                     else
-                       messagePanel.setMessage(e.getMessage());
+                        messagePanel.setMessage(e.getMessage());
                 }
             }
         });
@@ -295,7 +296,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     protected void exportSelectedDatasets() {
         // NOTE: get selected dataset will give you all the dataset selected in the base model of sort filter table
         // model
-//        EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets()); //export external datasets allowed now
+        // EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets()); //export external datasets allowed
+        // now
         EmfDataset[] emfDatasets = getSelectedDatasets().toArray(new EmfDataset[0]);
 
         ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager, parentConsole, session);
@@ -304,23 +306,34 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         ExportPresenter exportPresenter = new ExportPresenterImpl(session);
         presenter.doExport(exportView, exportPresenter, emfDatasets);
     }
-    
+
     protected void purgeDelectedDatasets() throws EmfException {
         int numDelDatasets = presenter.getNumOfDeletedDatasets();
         String ls = System.getProperty("line.separator");
-        
-        String message = "You have " + numDelDatasets 
-            + " dataset"+ (numDelDatasets > 0 ? "s " : " ") 
-            + "marked as deleted." + (numDelDatasets > 0 ? ls 
-            + "Are you sure you want to remove them pamernantly?" : "");
-        
-        if (numDelDatasets == 0) {
-            JOptionPane.showMessageDialog(parentConsole, message);
-            return;
+
+        String message = "You have " + numDelDatasets + " dataset" + (numDelDatasets > 0 ? "s " : " ")
+                + "marked as deleted."
+                + (numDelDatasets > 0 ? ls + "Are you sure you want to remove them pamernantly?" : "");
+
+        int selection;
+
+        if (presenter.isAdminUser()) {
+            message = "As an admin user, purge datasets will clear up all the datasets that do not have emissions data."
+                    + ls + "Are you sure you want to remove them pamernantly?";
+            selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+        } else {
+            if (numDelDatasets == 0) {
+                JOptionPane.showMessageDialog(parentConsole, message);
+                return;
+            }
+            
+            selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
         }
         
-        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
+        if (selection == JOptionPane.NO_OPTION)
+            return;
 
         if (selection == JOptionPane.YES_OPTION) {
             Thread populateThread = new Thread(new Runnable() {
@@ -331,7 +344,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             populateThread.start();
         }
     }
-    
+
     private synchronized void waitOnPurgingDatasets() {
         try {
             messagePanel.setMessage("Please wait while purging all datasets...");
@@ -341,10 +354,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             setCursor(Cursor.getDefaultCursor());
         } catch (Exception e) {
             String msg = e.getMessage();
-            
+
             if (msg != null && msg.length() > 100)
                 msg = msg.substring(0, 100);
-            
+
             messagePanel.setError("Error purging datasets: " + msg);
             setCursor(Cursor.getDefaultCursor());
         }
