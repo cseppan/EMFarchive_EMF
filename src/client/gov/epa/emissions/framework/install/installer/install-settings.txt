@@ -19,9 +19,9 @@ $targetdir$\runinstaller.bat
 
 Shortcut:
 
-$startmenu$\EMF Cliet Installer\Installer.lnk
+$startmenu$\EMF Client Installer\Installer.lnk
 
-$startmenu$\EMF Cliet Installer\Uninstall.lnk
+$startmenu$\EMF Client Installer\Uninstall.lnk
 
 $desktop$\EMF Client Installer.lnk
 

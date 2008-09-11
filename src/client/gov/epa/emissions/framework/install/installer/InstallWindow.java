@@ -52,11 +52,11 @@ public class InstallWindow extends JFrame implements InstallView {
     private Box updatePage;
 
     private JTextField url, javaHomeDirField, rHomeField, inputDirField, outputDirField, installDirField, serverField,
-            tmpDirField;
+            tmpDirField, preferencesText;
 
     private JLabel urlLabel, javaHomeLabel, rHomeLabel, inputLabel, outputLabel, installHomeLabel, tmpDirLabel;
 
-    private JLabel statusLabel, load, serverLabel, holderLabel, inputDirBrowser, outputDirBrowser, prefFileLabel;
+    private JLabel statusLabel, load, serverLabel, holderLabel, inputDirBrowser, outputDirBrowser, prefFileLabel, serverHolderLabel;
 
     private JButton installButton, exitInstallButton, cancel;
 
@@ -97,6 +97,10 @@ public class InstallWindow extends JFrame implements InstallView {
 
         serverField = new JTextField(30);
         serverField.setToolTipText("EMF service site URL");
+        
+        preferencesText = new JTextField(30);
+        preferencesText.setText(Constants.USER_HOME + "\\" + Constants.EMF_PREFERENCES_FILE);
+        preferencesText.setEditable(false);
 
         urlLabel = new JLabel("EMF Download URL", SwingConstants.RIGHT);
         javaHomeLabel = new JLabel("Java Home Directory", SwingConstants.RIGHT);
@@ -106,8 +110,8 @@ public class InstallWindow extends JFrame implements InstallView {
         installHomeLabel = new JLabel("Client Home Directory", SwingConstants.RIGHT);
         tmpDirLabel = new JLabel("Local Temp Directory", SwingConstants.RIGHT);
         serverLabel = new JLabel("Server Address", SwingConstants.RIGHT);
-        prefFileLabel = new JLabel("* User preference file (" + Constants.EMF_PREFERENCES_FILE + ") will be saved to "
-                + Constants.USER_HOME + " directory.");
+        serverHolderLabel = new JLabel();
+        prefFileLabel = new JLabel("Output Preferences File", SwingConstants.RIGHT);
         statusLabel = new JLabel();
         holderLabel = new JLabel();
         new JLabel();
@@ -194,7 +198,7 @@ public class InstallWindow extends JFrame implements InstallView {
     }
 
     private void setLookAndFeel() {
-        String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
+        String lookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
 
         try {
             UIManager.setLookAndFeel(lookAndFeel);
@@ -247,7 +251,6 @@ public class InstallWindow extends JFrame implements InstallView {
 
     private JPanel createFirstPage() {
         // Create GridBagLayout.
-        Box centerPanel = new Box(BoxLayout.Y_AXIS);
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         JPanel installPanel = new JPanel(gridbag);
@@ -327,13 +330,17 @@ public class InstallWindow extends JFrame implements InstallView {
         gridbag.setConstraints(serverLabel, c);
         gridbag.setConstraints(serverField, c);
         c.gridwidth = GridBagConstraints.REMAINDER;
+        gridbag.setConstraints(serverHolderLabel, c);
         installPanel.add(serverLabel);
         installPanel.add(serverField);
-
-        centerPanel.add(installPanel);
-        JPanel prefPanel = new JPanel(new BorderLayout());
-        prefPanel.add(prefFileLabel, BorderLayout.LINE_END);
-        centerPanel.add(prefPanel);
+        installPanel.add(serverHolderLabel);
+        
+        c.gridwidth = 1; // next-to-last in row
+        gridbag.setConstraints(prefFileLabel, c);
+        gridbag.setConstraints(preferencesText, c);
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        installPanel.add(prefFileLabel);
+        installPanel.add(preferencesText);
 
         installPanelSouth.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 80));
         installPanelSouth.add(Box.createHorizontalGlue());
@@ -342,7 +349,7 @@ public class InstallWindow extends JFrame implements InstallView {
         installPanelSouth.add(exitInstallButton);
 
         // Assemble the panels
-        directoryPage.add(centerPanel, BorderLayout.CENTER);
+        directoryPage.add(installPanel, BorderLayout.CENTER);
         directoryPage.add(installPanelNorth, BorderLayout.NORTH);
         directoryPage.add(installPanelSouth, BorderLayout.SOUTH);
         directoryPage.add(installPanelEast, BorderLayout.EAST);
@@ -417,7 +424,7 @@ public class InstallWindow extends JFrame implements InstallView {
 
     private class BrowseRHomeListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            browse("R Home Directory", rHomeField, false);
+            browse("R Bin Directory", rHomeField, false);
         }
     }
 

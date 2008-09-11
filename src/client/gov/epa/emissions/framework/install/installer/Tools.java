@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -60,37 +61,41 @@ public class Tools {
     public static void writePreference(String website, String input, String output, String javahome, String rhome,
             String emfhome, String tmpDir, String server) throws Exception {
         String separator = Constants.SEPARATOR;
+        InstallPreferences up = Tools.getUserPreference();
+        int sigDigits = 0;
+        int deciPlace = 2;
+        String doubleOption = up.doubleOption();
 
-        String header = "#EMF Client/Installer - Preferences" + separator 
-                + "#comments '#'" + separator
-                + "#preference specified by key,value pair separted by '='" + separator 
-                + "#case sensitive" + separator
+        try {
+            sigDigits = Integer.parseInt(up.significantDigits());
+            deciPlace = Integer.parseInt(up.decimalPlaces());
+        } catch (Exception e) {
+            // NOTE cat parse exception, but do nothing
+        }
+
+        String header = "#EMF Client/Installer - Preferences" + separator + "#comments '#'" + separator
+                + "#preference specified by key,value pair separted by '='" + separator + "#case sensitive" + separator
                 + "#white spaces and line terminators can be escaped by '\'" + separator
                 + "#If the value aren't specified then default value will be empty string" + separator
                 + "#Use '/' for path separator for file names" + separator + separator;
 
-        String emfPrefString = "web.site=" + website 
-                + separator + "emf.install.folder=" + emfhome.replace('\\', '/')
-                + separator + "server.import.folder=" + input.replace('\\', '/')
-                + separator + "server.export.folder=" + output.replace('\\', '/')
-                + separator + "server.address=" + server 
-                + separator + "java.home=" + javahome.replace('\\', '/')
-                + separator + "local.temp.dir=" + tmpDir.replace('\\', '/')
-                + separator + "r.home=" + rhome.replace('\\', '/') + separator;
+        String emfPrefString = "web.site=" + website + separator + "emf.install.folder=" + emfhome.replace('\\', '/')
+                + separator + "server.import.folder=" + input.replace('\\', '/') + separator + "server.export.folder="
+                + output.replace('\\', '/') + separator + "server.address=" + server + separator + "java.home="
+                + javahome.replace('\\', '/') + separator + "local.temp.dir=" + tmpDir.replace('\\', '/') + separator
+                + "r.home=" + rhome.replace('\\', '/') + separator;
 
-        String analysisEnginePrefString = separator + separator 
-                + "#Analysis Engine Preferences" + separator
-                + "format.double.decimal_places=2" + separator 
-                + "format.double.option=Standard_Notation" + separator
+        String analysisEnginePrefString = separator + separator + "#Analysis Engine Preferences" + separator
+                + "format.double.decimal_places=" + deciPlace + separator + "format.double.option=" + doubleOption + separator
                 + "#legal options: Standard_Notation,Scientific_Notation, Dollars, Percentage, Custom" + separator
-                + "format.double.significant_digits=4";
+                + "format.double.significant_digits=" + sigDigits;
 
         PrintWriter userPrefWriter = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.home")
                 + "\\" + Constants.EMF_PREFERENCES_FILE)));
         userPrefWriter.write(header + emfPrefString + analysisEnginePrefString);
         userPrefWriter.close();
     }
-    
+
     public static void createShortcut(String installhome) throws IOException, InterruptedException {
         File bat = new File(installhome, "shortcut.bat");
         File inf = new File(installhome, "shortcut.inf");
@@ -128,12 +133,12 @@ public class Tools {
                 + "UpdateInis=Addlink" + separator + "[Addlink]" + separator
                 + "setup.ini, progman.groups,, \"group200=\"\"EMF\"\"\"" + separator
                 + "setup.ini, group200,, \"\"\"EMF Client\"\",\"\"" + installhome.replace('\\', '/') + "/"
-                + Constants.EMF_BATCH_FILE + "\"\",\"\""
-                + installhome.replace('\\', '/') + Constants.EMF_ICON + "\"\",0\"" + separator;
+                + Constants.EMF_BATCH_FILE + "\"\",\"\"" + installhome.replace('\\', '/') + Constants.EMF_ICON
+                + "\"\",0\"" + separator;
 
         FileWriter fw1 = new FileWriter(bat);
         FileWriter fw2 = new FileWriter(inf);
-        
+
         try {
             fw1.write(battext);
             fw2.write(inftext);
@@ -144,7 +149,7 @@ public class Tools {
             fw2.close();
         }
     }
-    
+
     private static String[] getCommands(String installhome) {
         String[] cmd = new String[3];
         String os = System.getProperty("os.name");
@@ -159,6 +164,18 @@ public class Tools {
         cmd[2] = installhome.replace('\\', '/') + "/shortcut.bat";
 
         return cmd;
+    }
+
+    public static InstallPreferences getUserPreference() throws Exception {
+        File userPreference = new File(Constants.USER_HOME, Constants.EMF_PREFERENCES_FILE);
+
+        if (userPreference.exists())
+            return new InstallPreferences(userPreference);
+
+        InputStream templateInputStream = Object.class.getClass().getResource(
+                "/" + Constants.INSTALLER_PREFERENCES_FILE).openStream();
+
+        return new InstallPreferences(templateInputStream);
     }
 
 }

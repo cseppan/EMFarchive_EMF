@@ -25,6 +25,12 @@ public class InstallPreferences {
     private static final String REMOTE_HOST = "remote.host";
     
     private static final String SORT_FILTER_PAGE_SIZE = "table.page.size";
+    
+    private static final String SIGNIFICANT_DIGITS = "format.double.significant_digits";
+    
+    private static final String DECIMAL_PLACES = "format.double.decimal_places";
+    
+    private static final String DOUBLE_OPTION = "format.double.option";
 
     public static final String EMF_PREFERENCE = "USER_PREFERENCES";
 
@@ -132,6 +138,18 @@ public class InstallPreferences {
     
     public String sortFilterPageSize() {
         return property(SORT_FILTER_PAGE_SIZE);
+    }
+    
+    public String significantDigits() {
+        return property(SIGNIFICANT_DIGITS);
+    }
+    
+    public String decimalPlaces() {
+        return property(DECIMAL_PLACES);
+    }
+    
+    public String doubleOption() {
+        return property(DOUBLE_OPTION);
     }
 
 }
