@@ -133,7 +133,7 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
         session.flush();
         session.clear();
         List all = dao.getControlStrategiesByRunStatus("Running", session);
-        dao.setControlStrategyRunStatus(element2.getId(), "Waiting", session);
+        dao.setControlStrategyRunStatus(element2.getId(), "Waiting", null, session);
         session.flush();
         session.clear();
        try {

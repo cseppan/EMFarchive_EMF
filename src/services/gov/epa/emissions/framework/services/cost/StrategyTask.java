@@ -67,10 +67,13 @@ public class StrategyTask implements Runnable {
             } finally {
 //                    closeConnection();
                 
+//                strategy.getControlStrategy().setRunStatus(completeStatus);
+//                strategy.getControlStrategy().setCompletionDate(new Date());
+
                 //check to see if there is another strategy to run...
                 List<ControlStrategy> waitingStrategies;
                 try {
-                    setRunStatus(completeStatus);
+                    setRunStatusAndCompletionDate(completeStatus, new Date());
                     waitingStrategies = csService.getControlStrategiesByRunStatus("Waiting");
                     if (waitingStrategies.size() > 0) {
                         runningCount = getControlStrategyRunningCount();
@@ -101,16 +104,18 @@ public class StrategyTask implements Runnable {
     private void prepare() throws EmfException {
         ControlStrategy controlStrategy = strategy.getControlStrategy();
         controlStrategy = csService.obtainLocked(controlStrategy.getCreator(), controlStrategy.getId());
+        controlStrategy.setStartDate(new Date());
         controlStrategy.setRunStatus("Running");
         csService.updateControlStrategyWithLock(controlStrategy);
         addStartStatus();
     }
 
-    private void setRunStatus(String completeStatus) throws EmfException {
+    private void setRunStatusAndCompletionDate(String completeStatus, Date completionDate) throws EmfException {
         strategy.getControlStrategy().setRunStatus(completeStatus);
         strategy.getControlStrategy().setLastModifiedDate(new Date());
+        strategy.getControlStrategy().setCompletionDate(completionDate);
 //        updateStrategy();
-        csService.setControlStrategyRunStatus(strategy.getControlStrategy().getId(), completeStatus);
+        csService.setControlStrategyRunStatusAndCompletionDate(strategy.getControlStrategy().getId(), completeStatus, completionDate);
     }
 
 //    private void updateStrategy() {

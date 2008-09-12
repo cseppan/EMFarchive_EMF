@@ -35,6 +35,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -419,14 +420,16 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         updateSummaryPanelValuesExceptStartDate("Running", "", "", "");
     }
 
-    public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-        messagePanel.clear();
+    public synchronized void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         updateSummaryResultPanel(controlStrategy, controlStrategyResults);
         
         ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
         String runStatus = summary.getRunStatus();
-        if ( runStatus.indexOf("Running") == -1 )
+        if ( runStatus.indexOf("Running") == -1 
+                && runStatus.indexOf("Waiting") == -1 ){
+            messagePanel.clear();
             presenter.resetButtons(true);
+        }
     }
 
     private void updateSummaryResultPanel(ControlStrategy controlStrategy,
@@ -437,19 +440,26 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
             return;
         }
         ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
-        String runStatus = summary.getRunStatus();
-        String completionTime = runStatus.indexOf("Cancelled") == -1 ? (runStatus.indexOf("Failed") == -1 ? summary.getCompletionTime() : "Failed") : "Cancelled";
+        summary.getCompletionTime();
+        
+        String runStatus = controlStrategy.getRunStatus(); //summary.getRunStatus();
+        String completionTime; 
+        if (runStatus.indexOf("Finished") == -1 )
+            completionTime = runStatus;     
+        else 
+            completionTime = CustomDateFormat.format_MM_DD_YYYY_HH_mm_ss(controlStrategy.getCompletionDate());
         String userName =controlStrategy.getCreator().getName();
 //        String userName= summary.getUser().getName()== null ? summary.getUser().getName() : "";
-        String startTime = summary.getStartTime()== null ||summary.getStartTime().trim()==""? "":summary.getStartTime();
-//        String startTime = controlStrategy.getStartDate();
+        Date startTime = controlStrategy.getStartDate()== null? null:controlStrategy.getStartDate();
         updateStartDate(startTime);
+        
         updateSummaryPanelValuesExceptStartDate(""+completionTime, "" + userName , "" + summary.getStrategyTotalCost(), 
                 ""+ summary.getStrategyTotalReduction());
     }
 
-    private void updateStartDate(String startTime) {
-        startDate.setText(startTime);
+    private void updateStartDate(Date startTime) {
+        String time = startTime == null? "": CustomDateFormat.format_MM_DD_YYYY_HH_mm_ss(startTime); 
+        startDate.setText(time);
     }
 
     private void updateStartDate(ControlStrategy controlStrategy) {

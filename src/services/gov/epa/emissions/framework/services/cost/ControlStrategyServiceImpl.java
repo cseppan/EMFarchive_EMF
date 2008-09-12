@@ -93,11 +93,11 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         return csId;
     }
 
-    public synchronized void setControlStrategyRunStatus(int id,
-            String runStatus) throws EmfException {
+    public synchronized void setControlStrategyRunStatusAndCompletionDate(int id,
+            String runStatus, Date completionDate) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.setControlStrategyRunStatus(id, runStatus, session);
+            dao.setControlStrategyRunStatusAndCompletionDate(id, runStatus, completionDate, session);
         } catch (RuntimeException e) {
             LOG.error("Could not set Control Strategy run status: " + id, e);
             throw new EmfException("Could not add Control Strategy run status: " + id);
@@ -289,7 +289,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             validateExportPath(strategy.getExportDirectory());
             
             //queue up the strategy to be run, by setting runStatus to Waiting
-            dao.setControlStrategyRunStatus(controlStrategyId, "Waiting", session);
+            dao.setControlStrategyRunStatusAndCompletionDate(controlStrategyId, "Waiting", null, session);
             
             StrategyFactory factory = new StrategyFactory();
             validatePath(strategy.getExportDirectory());
@@ -357,7 +357,10 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     public synchronized void stopRunStrategy(int controlStrategyId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.setControlStrategyRunStatus(controlStrategyId, "Cancelled", session);
+            //look at the current status, if waiting or running, then update to Cancelled.
+            String status = dao.getControlStrategyRunStatus(controlStrategyId, session);
+            if (status.toLowerCase().startsWith("waiting") || status.toLowerCase().startsWith("running"))
+                dao.setControlStrategyRunStatusAndCompletionDate(controlStrategyId, "Cancelled", null, session);
         } catch (RuntimeException e) {
             LOG.error("Could not set Control Strategy run status: " + controlStrategyId, e);
             throw new EmfException("Could not add Control Strategy run status: " + controlStrategyId);

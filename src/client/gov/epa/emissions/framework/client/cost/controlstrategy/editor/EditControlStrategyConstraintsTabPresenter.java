@@ -32,10 +32,12 @@ public class EditControlStrategyConstraintsTabPresenter  implements EditControlS
     }
 
     public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
+        this.strategy = controlStrategy;
         view.refresh(controlStrategy, controlStrategyResults);
     }
 
     public void doSave(ControlStrategy controlStrategy) throws EmfException {
+        this.strategy = controlStrategy;
         view.save(controlStrategy);
     }
 

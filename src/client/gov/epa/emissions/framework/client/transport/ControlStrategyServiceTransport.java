@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import java.util.Date;
 import java.util.List;
 
 import gov.epa.emissions.commons.security.User;
@@ -249,13 +250,14 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return null;
     }
 
-    public void setControlStrategyRunStatus(int id, String runStatus) {
-        // NOTE Auto-generated method stub
-        
-    }
-
     public Long getControlStrategyRunningCount() {
         // NOTE Auto-generated method stub
         return null;
+    }
+
+    public void setControlStrategyRunStatusAndCompletionDate(int id, String runStatus, Date completionDate)
+            {
+        // NOTE Auto-generated method stub
+        
     }
 }

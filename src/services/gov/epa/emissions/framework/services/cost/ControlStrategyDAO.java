@@ -80,11 +80,16 @@ public class ControlStrategyDAO {
         return session.createQuery("select new ControlStrategy(cS.id, cS.name) from ControlStrategy cS where cS.runStatus = :runStatus order by cS.lastModifiedDate").setString("runStatus", runStatus).list();
     }
 
-    public void setControlStrategyRunStatus(int controlStrategyId, String runStatus, Session session) {
+    public void setControlStrategyRunStatusAndCompletionDate(int controlStrategyId, String runStatus, Date completionDate, Session session) {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            session.createQuery("update ControlStrategy set runStatus = :status, lastModifiedDate = :date where id = :id").setString("status", runStatus).setTimestamp("date", new Date()).setInteger("id", controlStrategyId).executeUpdate();
+            session.createQuery("update ControlStrategy set runStatus = :status, lastModifiedDate = :date, completionDate = :completionDate where id = :id")
+            .setString("status", runStatus)
+            .setTimestamp("date", new Date())
+            .setTimestamp("completionDate", completionDate)
+            .setInteger("id", controlStrategyId)
+            .executeUpdate();
             tx.commit();
         } catch (HibernateException e) {
             tx.rollback();
@@ -438,6 +443,11 @@ public class ControlStrategyDAO {
         if (datasets.size()>0)
             return datasets.toArray(new EmfDataset[0]);
         return null; 
+    }
+
+    public void setControlStrategyRunStatus(int id, String runStatus, Date completionDate, Session session) {
+        // NOTE Auto-generated method stub
+        
     }
 
 }

@@ -366,7 +366,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                     messagePanel
                             .setMessage("Running strategy. Monitor the status window for progress, and refresh this window after completion to see results");
                     enableButtons(false);
-                    stopButton.setEnabled(true);
+                    //stopButton.setEnabled(true);
                 } catch (EmfException e) {
                     enableButtons(true);
                     messagePanel.setError("Error running strategy: " + e.getMessage());
@@ -386,6 +386,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     public void enableButtons(boolean enable) {
         saveButton.setEnabled(enable);
         runButton.setEnabled(enable);
+        stopButton.setEnabled(!enable);
     }
 
     protected void save() throws EmfException {

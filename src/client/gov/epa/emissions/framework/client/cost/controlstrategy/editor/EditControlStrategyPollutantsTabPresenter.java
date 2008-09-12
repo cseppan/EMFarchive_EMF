@@ -35,11 +35,11 @@ public class EditControlStrategyPollutantsTabPresenter  implements EditControlSt
     }
 
     public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-        // NOTE Auto-generated method stub
-        
+        this.strategy = controlStrategy;
     }
 
     public void doSave(ControlStrategy controlStrategy) throws EmfException {
+        this.strategy = controlStrategy;
         view.save(controlStrategy);
     }
 

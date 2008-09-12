@@ -132,6 +132,10 @@ public abstract class AbstractStrategyTask implements Strategy {
                         strategyResultList.add(result);
                         addStatus(controlStrategyInputDatasets[i]);
                     }
+                    //see if there was an error, if so, make sure and propogate to the calling method.
+                    if (status.startsWith("Failed"))
+                        throw new EmfException(status);
+                            
                     //make sure somebody hasn't cancelled this run.
                     if (isRunStatusCancelled()) {
 //                        status = "Cancelled. Strategy run was cancelled: " + controlStrategy.getName();
