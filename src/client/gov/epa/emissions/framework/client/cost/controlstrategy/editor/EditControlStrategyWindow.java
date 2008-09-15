@@ -478,7 +478,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     public void stopRun()  {
-        stopButton.setEnabled(false);
+        enableButtons(true);
+        //stopButton.setEnabled(false);
     }
 
     public void notifyStrategyTypeChange(StrategyType strategyType) {

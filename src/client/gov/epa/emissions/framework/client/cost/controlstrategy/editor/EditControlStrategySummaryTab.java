@@ -420,11 +420,13 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         updateSummaryPanelValuesExceptStartDate("Running", "", "", "");
     }
 
-    public synchronized void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
+    public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         updateSummaryResultPanel(controlStrategy, controlStrategyResults);
         
-        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
-        String runStatus = summary.getRunStatus();
+        //ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
+        //String runStatus = summary.getRunStatus();
+        String runStatus = controlStrategy.getRunStatus();
+        
         if ( runStatus.indexOf("Running") == -1 
                 && runStatus.indexOf("Waiting") == -1 ){
             messagePanel.clear();
@@ -434,15 +436,16 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private void updateSummaryResultPanel(ControlStrategy controlStrategy,
             ControlStrategyResult[] controlStrategyResults) {
+        
+        String runStatus = controlStrategy.getRunStatus(); //summary.getRunStatus();
         if (controlStrategyResults == null || controlStrategyResults.length == 0) {
             updateStartDate(controlStrategy);
-            updateSummaryPanelValuesExceptStartDate("", "", "", "");
+            updateSummaryPanelValuesExceptStartDate(""+runStatus, "", "", "");
             return;
         }
         ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
         summary.getCompletionTime();
         
-        String runStatus = controlStrategy.getRunStatus(); //summary.getRunStatus();
         String completionTime; 
         if (runStatus.indexOf("Finished") == -1 )
             completionTime = runStatus;     

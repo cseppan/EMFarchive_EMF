@@ -40,11 +40,11 @@ public class ControlStrategyProgramsTabPresenter implements EditControlStrategyT
     }
 
     public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-        // NOTE Auto-generated method stub
-        
+         this.controlStrategy = controlStrategy;
     }
 
     public void doSave(ControlStrategy controlStrategy) {
+        this.controlStrategy = controlStrategy;
         view.save(controlStrategy);
     }
     
