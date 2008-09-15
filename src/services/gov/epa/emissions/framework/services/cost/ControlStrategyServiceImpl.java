@@ -40,7 +40,8 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         init(HibernateSessionFactory.get(), DbServerFactory.get());
     }
 
-    public ControlStrategyServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
+    public ControlStrategyServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory)
+            throws Exception {
         init(sessionFactory, dbServerFactory);
     }
 
@@ -93,8 +94,8 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         return csId;
     }
 
-    public synchronized void setControlStrategyRunStatusAndCompletionDate(int id,
-            String runStatus, Date completionDate) throws EmfException {
+    public synchronized void setControlStrategyRunStatusAndCompletionDate(int id, String runStatus, Date completionDate)
+            throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.setControlStrategyRunStatusAndCompletionDate(id, runStatus, completionDate, session);
@@ -123,30 +124,28 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-//FIXME
-//    public void releaseLocked(ControlStrategy locked) throws EmfException {
-//        Session session = sessionFactory.getSession();
-//        try {
-//            dao.releaseLocked(locked, session);
-//        } catch (RuntimeException e) {
-//            LOG.error(
-//                    "Could not release lock for Control Strategy : " + locked + " by owner: " + locked.getLockOwner(),
-//                    e);
-//            throw new EmfException("Could not release lock for Control Strategy: " + locked + " by owner: "
-//                    + locked.getLockOwner());
-//        } finally {
-//            session.close();
-//        }
-//    }
+    // FIXME
+    // public void releaseLocked(ControlStrategy locked) throws EmfException {
+    // Session session = sessionFactory.getSession();
+    // try {
+    // dao.releaseLocked(locked, session);
+    // } catch (RuntimeException e) {
+    // LOG.error(
+    // "Could not release lock for Control Strategy : " + locked + " by owner: " + locked.getLockOwner(),
+    // e);
+    // throw new EmfException("Could not release lock for Control Strategy: " + locked + " by owner: "
+    // + locked.getLockOwner());
+    // } finally {
+    // session.close();
+    // }
+    // }
 
     public synchronized void releaseLocked(User user, int id) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.releaseLocked(user, id, session);
         } catch (RuntimeException e) {
-            LOG.error(
-                    "Could not release lock for Control Strategy id: " + id,
-                    e);
+            LOG.error("Could not release lock for Control Strategy id: " + id, e);
             throw new EmfException("Could not release lock for Control Strategy id: " + id);
         } finally {
             session.close();
@@ -179,7 +178,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             ControlStrategy csWithLock = dao.updateWithLock(element, session);
 
             return csWithLock;
-//            return dao.getById(csWithLock.getId(), session);
+            // return dao.getById(csWithLock.getId(), session);
         } catch (RuntimeException e) {
             LOG.error("Could not update Control Strategy: " + element, e);
             throw new EmfException("Could not update ControlStrategy: " + element);
@@ -188,20 +187,20 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-//    public void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException {
-//        try {
-//            for (int i = 0; i < elements.length; i++) {
-//                if (!user.equals(elements[i].getCreator()))
-//                    throw new EmfException("Only the creator of " + elements[i].getName()
-//                            + " can remove it from the database.");
-//                remove(elements[i]);
-//            }
-//
-//        } catch (RuntimeException e) {
-//            LOG.error("Could not update Control Strategy: " + elements, e);
-//            throw new EmfException("Could not update ControlStrategy: " + elements);
-//        }
-//    }
+    // public void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException {
+    // try {
+    // for (int i = 0; i < elements.length; i++) {
+    // if (!user.equals(elements[i].getCreator()))
+    // throw new EmfException("Only the creator of " + elements[i].getName()
+    // + " can remove it from the database.");
+    // remove(elements[i]);
+    // }
+    //
+    // } catch (RuntimeException e) {
+    // LOG.error("Could not update Control Strategy: " + elements, e);
+    // throw new EmfException("Could not update ControlStrategy: " + elements);
+    // }
+    // }
 
     public synchronized void removeControlStrategies(int[] ids, User user) throws EmfException {
         Session session = sessionFactory.getSession();
@@ -210,20 +209,21 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             for (int i = 0; i < ids.length; i++) {
                 ControlStrategy cs = dao.getById(ids[i], session);
                 session.clear();
-                
-                //check if admin user, then allow it to be removed.
-                if (user.equals(cs.getCreator())||user.isAdmin()){
+
+                // check if admin user, then allow it to be removed.
+                if (user.equals(cs.getCreator()) || user.isAdmin()) {
                     if (cs.isLocked())
-                        exception += "The control strategy, " + cs.getName() + ", is in edit mode and can not be removed. ";
+                        exception += "The control strategy, " + cs.getName()
+                                + ", is in edit mode and can not be removed. ";
                     else
                         remove(cs);
-                }
-                else{
+                } else {
                     exception += "Permission denied to the strategy: " + cs.getName() + ". ";
                 }
             }
-            
-            if (exception.length() > 0) throw new EmfException(exception);
+
+            if (exception.length() > 0)
+                throw new EmfException(exception);
         } catch (RuntimeException e) {
             LOG.error("Could not remove Control Strategy", e);
             throw new EmfException("Could not remove ControlStrategy");
@@ -252,12 +252,12 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             session.close();
         }
     }
-    
+
     public synchronized void removeResultDatasets(Integer[] ids, User user) throws EmfException {
         Session session = sessionFactory.getSession();
         DatasetDAO dsDao = new DatasetDAO();
         try {
-            for (Integer id : ids ) {
+            for (Integer id : ids) {
                 EmfDataset dataset = dsDao.getDataset(session, id);
 
                 if (dataset != null) {
@@ -266,7 +266,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
                     } catch (EmfException e) {
                         if (DebugLevels.DEBUG_12)
                             System.out.println(e.getMessage());
-                        
+
                         throw new EmfException(e.getMessage());
                     }
                 }
@@ -279,22 +279,23 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     public synchronized void runStrategy(User user, int controlStrategyId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            //first see if the strategy has been canceled, is so don't run it...
+            // first see if the strategy has been canceled, is so don't run it...
             String runStatus = dao.getControlStrategyRunStatus(controlStrategyId, session);
-            if (runStatus.equals("Cancelled")) return;
-            
+            if (runStatus.equals("Cancelled"))
+                return;
+
             ControlStrategy strategy = getById(controlStrategyId);
             validateSectors(strategy);
-            //make sure a valid server-side export path was specified
+            // make sure a valid server-side export path was specified
             validateExportPath(strategy.getExportDirectory());
-            
-            //queue up the strategy to be run, by setting runStatus to Waiting
+
+            // queue up the strategy to be run, by setting runStatus to Waiting
             dao.setControlStrategyRunStatusAndCompletionDate(controlStrategyId, "Waiting", null, session);
-            
+
             StrategyFactory factory = new StrategyFactory();
             validatePath(strategy.getExportDirectory());
-            RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, 
-                    dbServerFactory, threadPool);
+            RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, dbServerFactory,
+                    threadPool);
             runStrategy.run(user, strategy, this);
         } catch (EmfException e) {
             throw new EmfException(e.getMessage());
@@ -302,15 +303,16 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             session.close();
         }
     }
-    
+
     private void validateSectors(ControlStrategy strategy) throws EmfException {
-        ControlStrategyInputDataset[] inputDatasets = strategy.getControlStrategyInputDatasets(); 
-        if ( inputDatasets==null || inputDatasets.length == 0 )
-            throw new EmfException ("Input Dataset does not exist. " );
-        for (ControlStrategyInputDataset dataset : inputDatasets ){
-            Sector[] sectors= dataset.getInputDataset().getSectors();
-            if ( sectors==null || sectors.length ==0 )
-                throw new EmfException ("Please use Edit Properties to select a sector for: " + dataset.getInputDataset().getName());  
+        ControlStrategyInputDataset[] inputDatasets = strategy.getControlStrategyInputDatasets();
+        if (inputDatasets == null || inputDatasets.length == 0)
+            throw new EmfException("Input Dataset does not exist. ");
+        for (ControlStrategyInputDataset dataset : inputDatasets) {
+            Sector[] sectors = dataset.getInputDataset().getSectors();
+            if (sectors == null || sectors.length == 0)
+                throw new EmfException("Please use Edit Properties to select a sector for: "
+                        + dataset.getInputDataset().getName());
         }
     }
 
@@ -318,9 +320,9 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         File file = new File(folderPath);
 
         if (!file.exists() || !file.isDirectory()) {
-            throw new EmfException ("Export folder does not exist: " + folderPath);
+            throw new EmfException("Export folder does not exist: " + folderPath);
         }
-        
+
     }
 
     public List<ControlStrategy> getControlStrategiesByRunStatus(String runStatus) throws EmfException {
@@ -333,6 +335,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             session.close();
         }
     }
+
     public Long getControlStrategyRunningCount() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -357,7 +360,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     public synchronized void stopRunStrategy(int controlStrategyId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            //look at the current status, if waiting or running, then update to Cancelled.
+            // look at the current status, if waiting or running, then update to Cancelled.
             String status = dao.getControlStrategyRunStatus(controlStrategyId, session);
             if (status.toLowerCase().startsWith("waiting") || status.toLowerCase().startsWith("running"))
                 dao.setControlStrategyRunStatusAndCompletionDate(controlStrategyId, "Cancelled", null, session);
@@ -382,13 +385,12 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public synchronized void createInventories(User user, ControlStrategy controlStrategy, 
+    public synchronized void createInventories(User user, ControlStrategy controlStrategy,
             ControlStrategyResult[] controlStrategyResults) throws EmfException {
         try {
-            ControlStrategyInventoryOutputTask task = new ControlStrategyInventoryOutputTask(user, controlStrategy, 
-                    controlStrategyResults, sessionFactory, 
-                    dbServerFactory);
-            if(task.shouldProceed())
+            ControlStrategyInventoryOutputTask task = new ControlStrategyInventoryOutputTask(user, controlStrategy,
+                    controlStrategyResults, sessionFactory, dbServerFactory);
+            if (task.shouldProceed())
                 threadPool.execute(new GCEnforcerTask("Create Inventories: " + controlStrategy.getName(), task));
         } catch (Exception e) {
             LOG.error("Error running control strategy: " + controlStrategy.getName(), e);
@@ -408,7 +410,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    //returns control strategy Id for the given name
+    // returns control strategy Id for the given name
     public synchronized int isDuplicateName(String name) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -425,33 +427,33 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     public synchronized int copyControlStrategy(int id, User creator) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            //get cs to copy
+            // get cs to copy
             ControlStrategy cs = dao.getById(id, session);
-            
+
             ControlStrategyConstraint constraint = cs.getConstraint();
-            
+
             session.clear();// clear to flush current
 
             String name = "Copy of " + cs.getName();
-            //make sure this won't cause duplicate issues...
+            // make sure this won't cause duplicate issues...
             if (isDuplicate(name))
                 throw new EmfException("A control strategy named '" + name + "' already exists.");
 
-            //do a deep copy
-            ControlStrategy coppied = (ControlStrategy)DeepCopy.copy(cs);
-            //change to applicable values
+            // do a deep copy
+            ControlStrategy coppied = (ControlStrategy) DeepCopy.copy(cs);
+            // change to applicable values
             coppied.setName(name);
             coppied.setCreator(creator);
             coppied.setLastModifiedDate(new Date());
             coppied.setRunStatus("Not started");
-            if (coppied.isLocked()){
+            if (coppied.isLocked()) {
                 coppied.setLockDate(null);
                 coppied.setLockOwner(null);
             }
-                       
+
             dao.add(coppied, session);
             int csId = coppied.getId();
-//FIXME:  something is not right with the hibernate mapping, constraint should be added automatically.
+            // FIXME: something is not right with the hibernate mapping, constraint should be added automatically.
             if (constraint != null) {
                 constraint.setControlStrategyId(csId);
                 dao.add(constraint, session);

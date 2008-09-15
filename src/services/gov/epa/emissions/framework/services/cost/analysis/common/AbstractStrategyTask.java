@@ -138,10 +138,12 @@ public abstract class AbstractStrategyTask implements Strategy {
                             
                     //make sure somebody hasn't cancelled this run.
                     if (isRunStatusCancelled()) {
-//                        status = "Cancelled. Strategy run was cancelled: " + controlStrategy.getName();
-//                        setStatus(status);
-                        throw new EmfException("Strategy run was cancelled.");
+                        status = "Cancelled. Strategy run was cancelled: " + controlStrategy.getName();
+                        setStatus(status);
+                        return;
+//                        throw new EmfException("Strategy run was cancelled.");
                     }
+                    //
                 }
             }
             
