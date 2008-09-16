@@ -490,7 +490,7 @@ public class ManagedImportService {
 
             throw new EmfException("No files found for pattern '" + pattern + "'");
         } catch (ImporterException e) {
-            throw new EmfException("Cannot apply pattern.");
+            throw new EmfException("Cannot apply pattern: " + pattern);
         }
     }
 
