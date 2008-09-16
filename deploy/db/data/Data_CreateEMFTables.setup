@@ -384,3 +384,14 @@ CREATE TABLE emf.table_consolidations
 ) 
 WITHOUT OIDS;
 -- emf.table_consolidations
+
+-- reference.rsm_inv_sectors
+CREATE TABLE reference.rsm_inv_sectors
+(
+  id SERIAL PRIMARY KEY,
+  rsm_sector varchar(255) NOT NULL,
+  pollutant varchar(255) NOT NULL,
+  inv_sector text NOT NULL
+) 
+WITHOUT OIDS;
+-- reference.rsm_inv_sectors

@@ -909,3 +909,39 @@ order by fips,
 	poll', false, 1, ''
 from emf.dataset_types dt
 where name in ('Control Strategy Detailed Result');
+
+-- reference.rsm_inv_sectors
+insert into reference.rsm_inv_sectors values(DEFAULT, 'egu', 'NOX', 'ptipm');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'egu', 'SO2', 'ptipm');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'egu_negu', 'PM2_5', 'ptipm');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'egu_negu', 'PM2_5', 'ptnonipm');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'negu_area', 'NOX', 'ptnonipm');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'negu_area', 'NOX', 'nonpt');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'negu_pt', 'SO2', 'ptnonipm');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NOX', 'onroad');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NOX', 'nonroad');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NOX', 'alm');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NH3', 'onroad');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NH3', 'nonroad');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NH3', 'alm');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'PM2_5', 'onroad');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'PM2_5', 'nonroad');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'PM2_5', 'alm');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'SO2', 'nonpt');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'SO2', 'afdust');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'SO2', 'ag');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'NH3', 'nonpt');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'NH3', 'afdust');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'NH3', 'ag');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'PM2_5', 'nonpt');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'PM2_5', 'afdust');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'PM2_5', 'ag');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'nonpt');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'ptnonipm');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'ptimp');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'onroad');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'nonroad');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'alm');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'afdust');
+insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'ag');
+
