@@ -573,6 +573,8 @@ public class DatasetDAO {
         }
 
         try {
+            session.clear();
+            session.flush();
             hibernateFacade.remove(deletableDatasets, session);
         } catch (Exception e) {
             LOG.error(e);
@@ -904,22 +906,22 @@ public class DatasetDAO {
         return hibernateFacade.get(EmfDataset.class, criterion, session);
     }
 
-    public void removeEmptyDatasets(User user, DbServer dbServer, Session session) throws EmfException {
+    public void removeEmptyDatasets(User user, DbServer dbServer, Session session) throws EmfException, SQLException {
         int[] dsIDsWithNoEmisData = getAllDatasetsWithNoEmissionData(dbServer);
         deleteControlStrategies(dsIDsWithNoEmisData, session);
         decoupleDSFromCases(dsIDsWithNoEmisData, session);
         setDSAsDeleted(dsIDsWithNoEmisData, session);
-        deleteFromInternalSources(dbServer);
     }
 
-    private int[] getAllDatasetsWithNoEmissionData(DbServer dbServer) throws EmfException {
+    private int[] getAllDatasetsWithNoEmissionData(DbServer dbServer) throws EmfException, SQLException {
         Datasource emf = dbServer.getEmfDatasource();
         DataQuery dataQuery = emf.query();
         String query = "SELECT dataset_id from emf.internal_sources where table_name NOT IN (select tablename from pg_tables WHERE schemaname='emissions')";
         int[] ids = null;
+        ResultSet resultSet = null;
 
         try {
-            ResultSet resultSet = dataQuery.executeQuery(query);
+            resultSet = dataQuery.executeQuery(query);
             resultSet.last();
             int size = resultSet.getRow();
             resultSet.beforeFirst();
@@ -932,25 +934,14 @@ public class DatasetDAO {
             e.printStackTrace();
             LOG.error(e);
             throw new EmfException(e.getMessage());
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
         }
 
         return ids;
     }
     
-    private void deleteFromInternalSources(DbServer dbServer) throws EmfException {
-        Datasource emf = dbServer.getEmfDatasource();
-        DataQuery dataQuery = emf.query();
-        String deleteQuery = "DELETE from emf.internal_sources where table_name NOT IN (select tablename from pg_tables WHERE schemaname='emissions')";
-
-        try {
-            dataQuery.execute(deleteQuery);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            LOG.error(e);
-            throw new EmfException(e.getMessage());
-        }
-    }
-
     private void deleteControlStrategies(int[] dsIDsWithNoEmisData, Session session) throws EmfException {
         try {
             checkIfUsedByStrategies(dsIDsWithNoEmisData, session);
@@ -974,7 +965,7 @@ public class DatasetDAO {
         try {
             Transaction tx = session.beginTransaction();
 
-            String firstPart = "UPDATE " + CaseInput.class.getSimpleName() + " obj SET obj.dataset = null";
+            String firstPart = "UPDATE " + CaseInput.class.getSimpleName() + " obj SET obj.dataset = null, SET obj.version = null";
             String secondPart = " WHERE obj.dataset.id = " + getAndOrClause(dsIDsWithNoEmisData, "obj.dataset.id");
             String updateQuery = firstPart + secondPart;
 
