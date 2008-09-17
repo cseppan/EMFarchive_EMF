@@ -227,7 +227,7 @@ public class ControlStrategyDAO {
     }
 
     public StrategyResultType getSummaryStrategyResultType(Session session) {
-        return getStrategyResultType(StrategyResultType.strategySummaryResult, session);
+        return getStrategyResultType(StrategyResultType.strategyMeasureSummary, session);
     }
 
     public ControlStrategyResult getControlStrategyResult(int controlStrategyId, int inputDatasetId, 

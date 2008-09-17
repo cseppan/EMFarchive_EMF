@@ -93,7 +93,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
         StrategyResultType resultType = null;
         Session session = sessionFactory.getSession();
         try {
-            resultType = new ControlStrategyDAO().getStrategyResultType(StrategyResultType.annotatedInventoryResult, session);
+            resultType = new ControlStrategyDAO().getStrategyResultType(StrategyResultType.annotatedInventory, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not get detailed strategy result type");
         } finally {

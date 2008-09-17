@@ -181,7 +181,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         if (controlStrategyDetailedResultDatasetType == null) {
             Session session = sessionFactory.getSession();
             try {
-                controlStrategyDetailedResultDatasetType = new DatasetTypesDAO().get("Control Strategy Detailed Result", session);
+                controlStrategyDetailedResultDatasetType = new DatasetTypesDAO().get(DatasetType.strategyDetailedResult, session);
             } finally {
                 session.close();
             }
@@ -235,6 +235,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
+            e.printStackTrace();
             //supress all errors, the indexes might already be on the table...
         } finally {
             //

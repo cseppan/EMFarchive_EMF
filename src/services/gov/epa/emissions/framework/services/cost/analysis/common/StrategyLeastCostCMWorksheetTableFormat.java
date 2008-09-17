@@ -25,7 +25,7 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
     }
 
     public String identify() {
-        return "Strategy " + StrategyResultType.leastCostControlMeasureWorksheetResult;
+        return "Strategy " + StrategyResultType.leastCostControlMeasureWorksheet;
     }
     
     public String key() {

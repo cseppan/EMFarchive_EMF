@@ -44,6 +44,7 @@ DECLARE
 	annualized_emis_sql character varying;
 	annual_emis_sql character varying;
 	percent_reduction_sql character varying;
+	inventory_sectors character varying := '';
 BEGIN
 	SET work_mem TO '256MB';
 --	SET enable_seqscan TO 'off';
@@ -64,6 +65,14 @@ BEGIN
 	where sr.id = strategy_result_id
 	into detailed_result_dataset_id,
 		detailed_result_table_name;
+
+	--get the inventory sector(s)
+	select public.concatenate_with_ampersand(distinct name)
+	from emf.sectors s
+		inner join emf.datasets_sectors ds
+		on ds.sector_id = s.id
+	where ds.dataset_id = input_dataset_id
+	into inventory_sectors;
 
 	-- see if control strategy has only certain measures specified
 	SELECT count(id), 
@@ -331,6 +340,7 @@ BEGIN
 		cs_id,
 		cm_id,
 		equation_type,
+		sector,
 		xloc,
 		yloc,
 		plant,
@@ -370,6 +380,7 @@ BEGIN
 		' || control_strategy_id || '::integer,
 		er.control_measures_id,
 		' || get_strategt_cost_sql || '.actual_equation_type as equation_type,
+		' || quote_literal(inventory_sectors) || ' as sector,
 		' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
 		' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
 		''''

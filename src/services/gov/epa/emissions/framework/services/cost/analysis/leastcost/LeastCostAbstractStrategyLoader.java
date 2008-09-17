@@ -156,7 +156,7 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
         StrategyResultType resultType = null;
         Session session = sessionFactory.getSession();
         try {
-            resultType = new ControlStrategyDAO().getStrategyResultType(StrategyResultType.leastCostControlMeasureWorksheetResult, session);
+            resultType = new ControlStrategyDAO().getStrategyResultType(StrategyResultType.leastCostControlMeasureWorksheet, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not get detailed strategy result type");
         } finally {
@@ -169,7 +169,7 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
         StrategyResultType resultType = null;
         Session session = sessionFactory.getSession();
         try {
-            resultType = new ControlStrategyDAO().getStrategyResultType(StrategyResultType.leastCostCurveSummaryResult, session);
+            resultType = new ControlStrategyDAO().getStrategyResultType(StrategyResultType.leastCostCurveSummary, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not get detailed strategy result type");
         } finally {

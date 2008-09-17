@@ -89,9 +89,9 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
             leastCostCurveSummaryResult = loader.loadLeastCostCurveSummaryResult();
         } else {
             for (ControlStrategyResult result : results) {
-                if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostControlMeasureWorksheetResult)) {
+                if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostControlMeasureWorksheet)) {
                     leastCostCMWorksheetResult = result;
-                } else if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostCurveSummaryResult)) {
+                } else if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostCurveSummary)) {
                     leastCostCurveSummaryResult = result;
                 }
             }

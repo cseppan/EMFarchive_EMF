@@ -13,18 +13,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class StrategySummaryResultTableFormat implements TableFormat {
+public class StrategyCountySummaryTableFormat implements TableFormat {
     private SqlDataTypes types;
     
     private Column[] cols;
 
-    public StrategySummaryResultTableFormat(SqlDataTypes types) {
+    public StrategyCountySummaryTableFormat(SqlDataTypes types) {
         this.types = types;
         this.cols = createCols();
     }
 
     public String identify() {
-        return StrategyResultType.strategySummaryResult;
+        return StrategyResultType.strategyCountySummary;
     }
     
     public String key() {
@@ -65,17 +65,19 @@ public class StrategySummaryResultTableFormat implements TableFormat {
     private Column[] baseCols() {
         List<Column> cols = new ArrayList<Column>();
 
+        //could be multiple strat summaries
         cols.add(new Column("SECTOR", types.stringType(64), 64, new StringFormatter(255)));
         cols.add(new Column("FIPS", types.stringType(6), new StringFormatter(6)));
-        cols.add(new Column("SCC", types.stringType(10), new StringFormatter(10)));
         cols.add(new Column("Poll", types.stringType(20), new StringFormatter(20)));
-        cols.add(new Column("Control_Measure_Abbreviation", types.stringType(10), new StringFormatter(10)));
-        cols.add(new Column("Control_Measure", types.stringType(255), new StringFormatter(255)));
-        cols.add(new Column("Control_Technology", types.stringType(128), new StringFormatter(128)));
-        cols.add(new Column("source_group", types.stringType(255), new StringFormatter(255)));
-        cols.add(new Column("Annual_Cost", types.realType(), new RealFormatter()));
-        cols.add(new Column("Avg_Ann_Cost_per_Ton", types.realType(), new RealFormatter()));
+        cols.add(new Column("Uncontrolled_Emis", types.realType(), new RealFormatter()));
         cols.add(new Column("Emis_Reduction", types.realType(), new RealFormatter()));
+        cols.add(new Column("Remaining_Emis", types.realType(), new RealFormatter()));
+        cols.add(new Column("Pct_Red", types.realType(), new RealFormatter()));
+        cols.add(new Column("Annual_Cost", types.realType(), new RealFormatter()));
+        cols.add(new Column("Annual_Oper_Maint_Cost", types.realType(), new RealFormatter()));
+        cols.add(new Column("Annualized_Capital_Cost", types.realType(), new RealFormatter()));
+        cols.add(new Column("Total_Capital_Cost", types.realType(), new RealFormatter()));
+        cols.add(new Column("Avg_Ann_Cost_per_Ton", types.realType(), new RealFormatter()));
         cols.add(new Column("Comment", types.stringType(128), new StringFormatter(128)));
 
         return cols.toArray(new Column[0]);

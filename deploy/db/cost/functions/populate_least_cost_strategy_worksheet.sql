@@ -61,7 +61,7 @@ DECLARE
 	annualized_emis_sql character varying;
 	annual_emis_sql character varying;
 	percent_reduction_sql character varying;
-	sector character varying(64);
+	sector character varying := '';
 	strategy_type character varying(255);
 BEGIN
 	SET work_mem TO '256MB';
@@ -159,13 +159,13 @@ BEGIN
 	has_merged_columns := public.check_table_for_columns(inv_table_name, 'original_dataset_id,sector', ',');
 
 	-- get sector of the inventory if this is not a merged orl inventory
-	IF not has_merged_columns THEN
-		select name
-		from emf.sectors
-		where id in (select sector_id from emf.datasets_sectors where dataset_id = input_dataset_id limit 1)
-		into sector;
-		sector := coalesce(sector, '');
-	END IF;
+	--get the inventory sector(s)
+	select public.concatenate_with_ampersand(distinct name)
+	from emf.sectors s
+		inner join emf.datasets_sectors ds
+		on ds.sector_id = s.id
+	where ds.dataset_id = input_dataset_id
+	into sector;
 
 	-- get strategy constraints
 	SELECT csc.max_emis_reduction,

@@ -288,6 +288,12 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             validateSectors(strategy);
             // make sure a valid server-side export path was specified
             validateExportPath(strategy.getExportDirectory());
+            
+            //make the runner of the strategy is the owner of the strategy...
+            //NEED TO TALK TO ALISON ABOUT ISSUES, LOCEKD owner might not be the creator of resulting datsets,
+            //hence a exception when trying to purge/delete the resulting datasets
+            //if (control);
+            
 
             // queue up the strategy to be run, by setting runStatus to Waiting
             dao.setControlStrategyRunStatusAndCompletionDate(controlStrategyId, "Waiting", null, session);

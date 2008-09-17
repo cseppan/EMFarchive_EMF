@@ -6,7 +6,6 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Date;
@@ -63,8 +62,11 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
                 }
             }
             
-            //now create the summary detailed result based on the results from the strategy run...
-            createStrategySummaryResult();
+            //now create the measure summary result based on the results from the strategy run...
+            generateStrategyMeasureSummaryResult();
+
+            //now create the county summary result based on the results from the strategy run...
+            generateStrategyCountySummaryResult();
             
         } catch (Exception e) {
             status = "Failed. Error processing input dataset";
@@ -93,18 +95,18 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
         //populate the Sources Table
         populateSourcesTable();
 
-        ControlStrategyResult[] results = getControlStrategyResults();
+//        ControlStrategyResult[] results = getControlStrategyResults();
         //create the worksheet (strat result), if needed, maybe they don't want to recreate these...
-        if (controlStrategy.getDeleteResults() || results.length == 0) {
+//        if (controlStrategy.getDeleteResults() || results.length == 0) {
             leastCostCMWorksheetResult = loader.loadLeastCostCMWorksheetResult();
-        } else {
-            for (ControlStrategyResult result : results ) {
-                if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostControlMeasureWorksheetResult)) {
-                    leastCostCMWorksheetResult = result;
-                    break;
-                }
-            }
-        }
+//        } else {
+//            for (ControlStrategyResult result : results ) {
+//                if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostControlMeasureWorksheet)) {
+//                    leastCostCMWorksheetResult = result;
+//                    break;
+//                }
+//            }
+//        }
         //create just in case these don't exist, maybe the strategy type was changed...
         if (leastCostCMWorksheetResult == null) leastCostCMWorksheetResult = loader.loadLeastCostCMWorksheetResult();
         mergeInventoryDatasets();

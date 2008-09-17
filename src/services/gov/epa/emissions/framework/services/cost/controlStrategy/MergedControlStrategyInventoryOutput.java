@@ -220,7 +220,7 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
         StrategyResultType strategyResultType = null;
         Session session = sessionFactory.getSession();
         try {
-            strategyResultType = new ControlStrategyDAO().getStrategyResultType(StrategyResultType.controlledInventoryResult, session);
+            strategyResultType = new ControlStrategyDAO().getStrategyResultType(StrategyResultType.controlledInventory, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not get strategy result type");
         } finally {

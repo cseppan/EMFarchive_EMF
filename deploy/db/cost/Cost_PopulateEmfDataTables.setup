@@ -8,13 +8,14 @@ insert into emf.strategy_types values(DEFAULT,'Project Future Year Inventory','P
 -- emf.strategy_types
 
 -- emf.strategy_result_types
-insert into emf.strategy_result_types values(DEFAULT,'Detailed Strategy Result');
+insert into emf.strategy_result_types values(DEFAULT,'Strategy Detailed Result');
 insert into emf.strategy_result_types (name) select 'Strategy Summary';
 insert into emf.strategy_result_types (name) select 'Least Cost Control Measure Worksheet';
 insert into emf.strategy_result_types (name) select 'Controlled Inventory';
 insert into emf.strategy_result_types (name) select 'Least Cost Curve Summary';
 insert into emf.strategy_result_types (name) select 'Annotated Inventory';
 insert into emf.strategy_result_types (name) select 'Strategy Messages';
+insert into emf.strategy_result_types (name) select 'Strategy Region Summary';
 -- emf.strategy_result_types
 
 --emf.control_technologies

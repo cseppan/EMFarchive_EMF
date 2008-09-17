@@ -38,6 +38,7 @@ DECLARE
 	annualized_emis_sql character varying;
 	annual_emis_sql character varying;
 	percent_reduction_sql character varying;
+	inventory_sectors character varying := '';
 BEGIN
 --	SET work_mem TO '512MB';
 --	SET enable_seqscan TO 'off';
@@ -57,6 +58,14 @@ BEGIN
 	where sr.id = strategy_result_id
 	into detailed_result_dataset_id,
 		detailed_result_table_name;
+
+	--get the inventory sector(s)
+	select public.concatenate_with_ampersand(distinct name)
+	from emf.sectors s
+		inner join emf.datasets_sectors ds
+		on ds.sector_id = s.id
+	where ds.dataset_id = input_dataset_id
+	into inventory_sectors;
 
 	-- see if control strategy has only certain measures specified
 	SELECT count(id)
@@ -246,7 +255,8 @@ BEGIN
 		cm_id,
 		xloc,
 		yloc,
-		plant
+		plant,
+		sector
 		)
 	select 	' || detailed_result_dataset_id || '::integer,
 		abbreviation,
@@ -281,7 +291,8 @@ BEGIN
 		cm_id,
 		xloc,
 		yloc,
-		plant
+		plant,
+		' || quote_literal(inventory_sectors) || ' as sector
 	from (
 		select DISTINCT ON (inv.scc, inv.fips, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id, er.control_measures_id) 
 			m.abbreviation,

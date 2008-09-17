@@ -375,8 +375,8 @@ BEGIN
 					and ap.cm_id = tp.cm_id
 				where tp.status is null 
 					and ap.status is null 
-					and ap.apply_order <= ' || coalesce(apply_order + 1, record_count) || '
-					and ap.poll = ' || quote_literal(target_pollutant) || '
+					and tp.apply_order <= ' || coalesce(apply_order + 1, record_count) || '
+					and tp.poll = ' || quote_literal(target_pollutant) || '
 				ORDER BY ap.source, ap.poll
 	) as tbl
 	order by apply_order';

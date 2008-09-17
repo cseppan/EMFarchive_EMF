@@ -8,7 +8,6 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
-import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
@@ -65,7 +64,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     
     private Keywords keywords;
 
-    private TableFormat tableFormat;
+//    private TableFormat tableFormat;
     
     protected List<ControlStrategyResult> strategyResultList;
 
@@ -80,7 +79,6 @@ public abstract class AbstractStrategyTask implements Strategy {
         this.user = user;
         this.statusDAO = new StatusDAO(sessionFactory);
         this.controlStrategyDAO = new ControlStrategyDAO(dbServerFactory, sessionFactory);
-        this.tableFormat = new StrategySummaryResultTableFormat(dbServer.getSqlDataTypes());
         this.keywords = new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords());
         this.creator = new DatasetCreator(controlStrategy, user, 
                 sessionFactory, dbServerFactory,
@@ -146,10 +144,13 @@ public abstract class AbstractStrategyTask implements Strategy {
                     //
                 }
             }
-            
-            //now create the summary detailed result based on the results from the strategy run...
-            createStrategySummaryResult();
-            
+
+            //now create the measure summary result based on the results from the strategy run...
+            generateStrategyMeasureSummaryResult();
+
+            //now create the county summary result based on the results from the strategy run...
+            generateStrategyCountySummaryResult();
+
         } catch (Exception e) {
             status = "Failed. Error processing input dataset";
             e.printStackTrace();
@@ -213,29 +214,46 @@ public abstract class AbstractStrategyTask implements Strategy {
             }
         }
     }
-    
-    protected void createStrategySummaryResult() throws EmfException {
+
+    protected void generateStrategyMeasureSummaryResult() throws EmfException {
         //now create the summary detailed result based on the results from the strategy run...
         if (strategyResultList.size() > 0) {
             //create dataset and strategy summary result 
-            ControlStrategyResult summaryResult = createSummaryStrategyResult();
+            ControlStrategyResult measureSummaryResult = createStrategyMeasureSummaryResult();
             //now populate the summary result with data...
-            populateStrategySummaryResultDataset(strategyResultList.toArray(new ControlStrategyResult[0]), summaryResult);
+            populateStrategyMeasureSummaryDataset(strategyResultList.toArray(new ControlStrategyResult[0]), measureSummaryResult);
             
             //finalize the result, update completion time and run status...
-            summaryResult.setCompletionTime(new Date());
-            summaryResult.setRunStatus("Completed.");
-            setSummaryResultCount(summaryResult);
-            saveControlStrategySummaryResult(summaryResult);
-            runSummaryQASteps((EmfDataset)summaryResult.getDetailedResultDataset(), 0);
+            measureSummaryResult.setCompletionTime(new Date());
+            measureSummaryResult.setRunStatus("Completed.");
+            setSummaryResultCount(measureSummaryResult);
+            saveControlStrategySummaryResult(measureSummaryResult);
+            runSummaryQASteps((EmfDataset)measureSummaryResult.getDetailedResultDataset(), 0);
         }
     }
     
-    private void populateStrategySummaryResultDataset(ControlStrategyResult[] results, ControlStrategyResult summaryResult) throws EmfException {
+    protected void generateStrategyCountySummaryResult() throws EmfException {
+        //now create the summary detailed result based on the results from the strategy run...
+        if (strategyResultList.size() > 0) {
+            //create dataset and strategy region summary result 
+            ControlStrategyResult countySummaryResult = createStrategyCountySummaryResult();
+            //now populate the summary result with data...
+            populateStrategyCountySummaryDataset(strategyResultList.toArray(new ControlStrategyResult[0]), countySummaryResult);
+            
+            //finalize the result, update completion time and run status...
+            countySummaryResult.setCompletionTime(new Date());
+            countySummaryResult.setRunStatus("Completed.");
+            setSummaryResultCount(countySummaryResult);
+            saveControlStrategySummaryResult(countySummaryResult);
+            runSummaryQASteps((EmfDataset)countySummaryResult.getDetailedResultDataset(), 0);
+        }
+    }
+
+    private void populateStrategyMeasureSummaryDataset(ControlStrategyResult[] results, ControlStrategyResult summaryResult) throws EmfException {
         if (results.length > 0) {
-            
-            
             //SET work_mem TO '512MB';
+            
+            //NOTE:  Still need to  support mobile monthly files
             String sql = "INSERT INTO " + qualifiedEmissionTableName(summaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, scc, poll, Control_Measure_Abbreviation, Control_Measure, Control_Technology, source_group, avg_ann_cost_per_ton, Annual_Cost, Emis_Reduction) " 
             + "select " + summaryResult.getDetailedResultDataset().getId() + ", 0, summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name as Control_Technology, sg.name, "
             + "case when sum(summary.Emis_Reduction) <> 0 then sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) else null end as avg_cost_per_ton, " 
@@ -262,6 +280,84 @@ public abstract class AbstractStrategyTask implements Strategy {
                 + "on sg.id = cm.source_group "
                 + "group by summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name, sg.name "
                 + "order by summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name, sg.name";
+            try {
+                datasource.query().execute(sql);
+            } catch (SQLException e) {
+                throw new EmfException("Error occured when inserting data to strategy summary table" + "\n" + e.getMessage());
+            }
+        }
+    }
+
+    private void populateStrategyCountySummaryDataset(ControlStrategyResult[] results, ControlStrategyResult countySummaryResult) throws EmfException {
+        if (results.length > 0) {
+            ControlStrategyInputDataset[] inventories = controlStrategy.getControlStrategyInputDatasets();
+
+            //SET work_mem TO '512MB';
+            //NOTE:  Still need to  support mobile monthly files
+            String sql = "INSERT INTO " + qualifiedEmissionTableName(countySummaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, poll, Uncontrolled_Emis, Emis_Reduction, Remaining_Emis, Pct_Red, Annual_Cost, Annual_Oper_Maint_Cost, Annualized_Capital_Cost, Total_Capital_Cost, Avg_Ann_Cost_per_Ton) " 
+            + "select " + countySummaryResult.getDetailedResultDataset().getId() + ", 0, sector, fips, poll, Uncontrolled_Emis, Emis_Reduction, Remaining_Emis, Pct_Red, Annual_Cost, Annual_Oper_Maint_Cost, Annualized_Capital_Cost, Total_Capital_Cost, Avg_Ann_Cost_per_Ton " 
+            + "from (";
+            int count = 0;
+            
+            EmfDataset mergedInventory = null;
+            //we need to create a controlled inventory for each invnentory, except the merged inventory
+            for (int i = 0; i < inventories.length; i++) {
+                if (inventories[i].getInputDataset().getDatasetType().getName().equals(DatasetType.orlMergedInventory))
+                    mergedInventory = inventories[i].getInputDataset();
+            }
+            //if merged inventory, then there is only one result
+            if (controlStrategy.getMergeInventories() && mergedInventory != null) {
+                for (int i = 0; i < inventories.length; i++) {
+//                      EmfDataset inventory = inventories[i].getInputDataset();
+                  EmfDataset inventory = inventories[i].getInputDataset();
+                  if (!inventory.getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
+                      for (int j = 0; j < results.length; j++) {
+                          if (results[j].getDetailedResultDataset() != null 
+                              && results[j].getInputDataset() != null) {
+                              String detailedresultTableName = qualifiedEmissionTableName(results[j].getDetailedResultDataset());
+                              String inventoryTableName = qualifiedEmissionTableName(inventory);
+                              String sector = inventory.getSectors().length > 0 ? inventory.getSectors()[0].getName() : "";
+                              sql += (count > 0 ? " union all " : "") 
+                                  + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(i.ann_emis) as Uncontrolled_Emis, sum(e.Emis_Reduction) as Emis_Reduction, sum(i.ann_emis) - sum(e.Emis_Reduction) as Remaining_Emis, sum(e.Emis_Reduction) / sum(i.ann_emis) * 100.0 as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
+                                  + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
+                                  + "sum(e.Annualized_Capital_Cost) as Annualized_Capital_Cost, "
+                                  + "sum(e.Total_Capital_Cost) as Total_Capital_Cost, "
+                                  + "case when sum(e.Emis_Reduction) <> 0 then sum(e.Annual_Cost) / sum(e.Emis_Reduction) else null::double precision end as Avg_Ann_Cost_per_Ton "
+                                  + "from " + inventoryTableName + " i "
+                                  + "left outer join " + detailedresultTableName + " e "
+                                  + "on e.source_id = i.record_id "
+                                  + "and e.ORIGINAL_DATASET_ID = " + inventory.getId() + " "
+                                  + "group by i.fips, i.poll ";
+                              ++count;
+                              }
+                          }
+                      }
+                }
+            //not a merged inventory, then there could be multiple results
+            } else {
+
+                for (int i = 0; i < results.length; i++) {
+                    if (results[i].getDetailedResultDataset() != null && results[i].getInputDataset() != null) {
+                        String detailedresultTableName = qualifiedEmissionTableName(results[i].getDetailedResultDataset());
+                        String inventoryTableName = qualifiedEmissionTableName(results[i].getInputDataset());
+                        String sector = results[i].getInputDataset().getSectors().length > 0 ? results[i].getInputDataset().getSectors()[0].getName() : "";
+                        sql += (count > 0 ? " union all " : "") 
+                            + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(i.ann_emis) as Uncontrolled_Emis, sum(e.Emis_Reduction) as Emis_Reduction, sum(i.ann_emis) - sum(e.Emis_Reduction) as Remaining_Emis, sum(e.Emis_Reduction) / sum(i.ann_emis) * 100.0 as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
+                            + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
+                            + "sum(e.Annualized_Capital_Cost) as Annualized_Capital_Cost, "
+                            + "sum(e.Total_Capital_Cost) as Total_Capital_Cost, "
+                            + "case when sum(e.Emis_Reduction) <> 0 then sum(e.Annual_Cost) / sum(e.Emis_Reduction) else null::double precision end as Avg_Ann_Cost_per_Ton "
+                            + "from " + inventoryTableName + " i "
+                            + "left outer join " + detailedresultTableName + " e "
+                            + "on e.source_id = i.record_id "
+                            + "group by i.fips, i.poll ";
+                        ++count;
+                    }
+                }
+            }
+            sql += ") summary ";
+            
+            System.out.println(sql);
             try {
                 datasource.query().execute(sql);
             } catch (SQLException e) {
@@ -332,14 +428,14 @@ public abstract class AbstractStrategyTask implements Strategy {
         return datasource.getName() + "." + table;
     }
 
-    private ControlStrategyResult createSummaryStrategyResult() throws EmfException {
+    private ControlStrategyResult createStrategyMeasureSummaryResult() throws EmfException {
         ControlStrategyResult result = new ControlStrategyResult();
         result.setControlStrategyId(controlStrategy.getId());
-        EmfDataset summaryResultDataset = createSummaryResultDataset();
+        EmfDataset summaryResultDataset = createMeasureSummaryDataset();
         
         result.setDetailedResultDataset(summaryResultDataset);
         
-        result.setStrategyResultType(getSummaryStrategyResultType());
+        result.setStrategyResultType(getStrategyResultType(StrategyResultType.strategyMeasureSummary));
         result.setStartTime(new Date());
         result.setRunStatus("Start processing summary result");
 
@@ -348,11 +444,27 @@ public abstract class AbstractStrategyTask implements Strategy {
         return result;
     }
 
-    private StrategyResultType getSummaryStrategyResultType() throws EmfException {
+    private ControlStrategyResult createStrategyCountySummaryResult() throws EmfException {
+        ControlStrategyResult result = new ControlStrategyResult();
+        result.setControlStrategyId(controlStrategy.getId());
+        EmfDataset summaryResultDataset = createCountySummaryDataset();
+        
+        result.setDetailedResultDataset(summaryResultDataset);
+        
+        result.setStrategyResultType(getStrategyResultType(StrategyResultType.strategyCountySummary));
+        result.setStartTime(new Date());
+        result.setRunStatus("Start processing summary result");
+
+        //persist result
+        saveControlStrategySummaryResult(result);
+        return result;
+    }
+
+    private StrategyResultType getStrategyResultType(String name) throws EmfException {
         StrategyResultType resultType = null;
         Session session = sessionFactory.getSession();
         try {
-            resultType = controlStrategyDAO.getSummaryStrategyResultType(session);
+            resultType = controlStrategyDAO.getStrategyResultType(name, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not get detailed strategy result type");
         } finally {
@@ -361,11 +473,11 @@ public abstract class AbstractStrategyTask implements Strategy {
         return resultType;
     }
 
-    private DatasetType getControlStrategySummaryResultDatasetType() {
+    private DatasetType getDatasetType(String name) {
         DatasetType datasetType = null;
         Session session = sessionFactory.getSession();
         try {
-            datasetType = new DatasetTypesDAO().get("Control Strategy Result Summary", session);
+            datasetType = new DatasetTypesDAO().get(name, session);
         } finally {
             session.close();
         }
@@ -383,15 +495,20 @@ public abstract class AbstractStrategyTask implements Strategy {
         return results;
     }
 
-    private EmfDataset createSummaryResultDataset() throws EmfException {
-        //"Summary_", 
-        return creator.addDataset("CSSR_", 
-                DatasetCreator.createDatasetName("Strat_Sum_"), getControlStrategySummaryResultDatasetType(), 
-                tableFormat, summaryResultDatasetDescription());
+    private EmfDataset createMeasureSummaryDataset() throws EmfException {
+        return creator.addDataset("CSMS_", 
+                DatasetCreator.createDatasetName("Strat_Meas_Sum_"), getDatasetType(DatasetType.strategyMeasureSummary), 
+                new StrategyMeasureSummaryTableFormat(dbServer.getSqlDataTypes()), summaryResultDatasetDescription(DatasetType.strategyMeasureSummary));
     }
 
-    private String summaryResultDatasetDescription() {
-        return "#Control strategy summary result\n" + 
+    private EmfDataset createCountySummaryDataset() throws EmfException {
+        return creator.addDataset("CSCS_", 
+                DatasetCreator.createDatasetName("Strat_County_Sum_"), getDatasetType(DatasetType.strategyCountySummary), 
+                new StrategyCountySummaryTableFormat(dbServer.getSqlDataTypes()), summaryResultDatasetDescription(DatasetType.strategyCountySummary));
+    }
+
+    private String summaryResultDatasetDescription(String datasetTypeName) {
+        return "#" + datasetTypeName + " result\n" + 
             "#Implements control strategy: " + controlStrategy.getName() + "\n#";
     }
 
