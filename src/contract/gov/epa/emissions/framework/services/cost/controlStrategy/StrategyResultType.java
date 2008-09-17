@@ -8,19 +8,21 @@ public class StrategyResultType implements Serializable {
     
     private String name;
     
-    public static final String strategySummaryResult = "Strategy Summary";
+    public static final String strategyMeasureSummary = "Strategy Measure Summary";
     
-    public static final String detailedStrategyResult = "Detailed Strategy Result";
+    public static final String strategyCountySummary = "Strategy County Summary";
     
-    public static final String leastCostControlMeasureWorksheetResult = "Least Cost Control Measure Worksheet";
+    public static final String detailedStrategyResult = "Strategy Detailed Result";
     
-    public static final String leastCostCurveSummaryResult = "Least Cost Curve Summary";
+    public static final String leastCostControlMeasureWorksheet = "Least Cost Control Measure Worksheet";
     
-    public static final String controlledInventoryResult = "Controlled Inventory";
+    public static final String leastCostCurveSummary = "Least Cost Curve Summary";
     
-    public static final String annotatedInventoryResult = "Annotated Inventory";
+    public static final String controlledInventory = "Controlled Inventory";
     
-    public static final String strategyMessagesResult = "Strategy Messages";
+    public static final String annotatedInventory = "Annotated Inventory";
+    
+    public static final String strategyMessages = "Strategy Messages";
     
     public StrategyResultType(){
         //
