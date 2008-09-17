@@ -4,12 +4,14 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
@@ -448,6 +450,14 @@ public class ControlStrategyDAO {
     public void setControlStrategyRunStatus(int id, String runStatus, Date completionDate, Session session) {
         // NOTE Auto-generated method stub
         
+    }
+
+    public String getDefaultExportDirectory(Session session) {
+        EmfProperty tmpDir = new EmfPropertiesDAO().getProperty("ImportExportTempDir", session);
+        String dir = "";
+        if (tmpDir != null)
+            dir = tmpDir.getValue();
+        return dir;
     }
 
 }

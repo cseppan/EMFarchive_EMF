@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.services.cost;
 
-import java.util.Date;
-import java.util.List;
-
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EMFService;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+
+import java.util.Date;
+import java.util.List;
 
 public interface ControlStrategyService extends EMFService {
 
@@ -55,4 +55,6 @@ public interface ControlStrategyService extends EMFService {
     //StrategyType[] getEquaitonTypes();
     
     Long getControlStrategyRunningCount() throws EmfException;
+
+    public String getDefaultExportDirectory() throws EmfException;
 }

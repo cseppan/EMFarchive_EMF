@@ -260,4 +260,13 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         // NOTE Auto-generated method stub
         
     }
+
+    public synchronized String getDefaultExportDirectory() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getDefaultExportDirectory");
+        call.setReturnType(mappings.string());
+
+        return (String) call.requestResponse(new Object[] {  });
+    }
 }

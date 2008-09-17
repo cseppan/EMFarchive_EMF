@@ -507,4 +507,17 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             session.close();
         }
     }
+
+    public synchronized String getDefaultExportDirectory() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            String dir = dao.getDefaultExportDirectory(session);
+            return dir;
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve default export directory.", e);
+            throw new EmfException("Could not retrieve default export directory.");
+        } finally {
+            session.close();
+        }
+    }
 }

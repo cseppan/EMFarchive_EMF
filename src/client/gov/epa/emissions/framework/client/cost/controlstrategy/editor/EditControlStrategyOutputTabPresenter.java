@@ -14,8 +14,6 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
 
-import java.io.File;
-
 public class EditControlStrategyOutputTabPresenter implements EditControlStrategyTabPresenter {
 
     private EmfSession session;
@@ -39,7 +37,7 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         if(datasets.length==0){
             throw new EmfException("Please select one or more result datasets");
         }
-        validateFolder(folder);
+//        validateFolder(folder);
         session.setMostRecentExportFolder(folder);
         ExImService service = session.eximService();
         Version[] versions = new Version [datasets.length];
@@ -67,11 +65,11 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         view.displayAnalyzeTable(controlStrategyName,fileNames);
     }
 
-    private void validateFolder(String folder) throws EmfException {
-        File dir = new File(folder);
-        if (!dir.isDirectory()) 
-            throw new EmfException("Please specify a directory to export");
-    }
+//    private void validateFolder(String folder) throws EmfException {
+//        File dir = new File(folder);
+//        if (!dir.isDirectory()) 
+//            throw new EmfException("Please specify a directory to export");
+//    }
 
     public void doDisplay(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) throws EmfException {
         view.observe(this);
@@ -84,16 +82,18 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
     }
 
     public String folder() {
-        return (lastFolder != null) ? lastFolder : defaultFolder();
+        String dir = "";
+        try {
+            dir = (lastFolder != null) ? lastFolder : defaultFolder();
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+        return dir;
     }
 
-    private String defaultFolder() {
-        String folder = session.preferences().outputFolder();
-        if (folder == null) return "";
-        if (!new File(folder).isDirectory())
-            folder = "";// default, if unspecified
-
-        return folder;
+    private String defaultFolder() throws EmfException {
+        return session.controlStrategyService().getDefaultExportDirectory();
     }
 
     public void doInventory(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) throws EmfException {
