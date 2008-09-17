@@ -189,6 +189,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
         String[][] colHeader = new String[1][];
         colHeader[0] = reader.getCols();
 
+        
         Class<?>[] colClasses = getColumnClass(reader.comments(), reader.getCols().length);
 
         ArrayList<ArrayList<?>> tableData = getTableData(reader, colClasses);
@@ -242,7 +243,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
         for (Iterator<String> iter = comments.iterator(); iter.hasNext();) {
             String line = iter.next().toUpperCase();
 
-            if (line.contains("TYPES")) {
+            if (line.contains("#COLUMN_TYPES=")) {
                 int index = line.indexOf("=");
 
                 if (index < 0)
@@ -257,7 +258,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
                 break;
             }
         }
-
+        
         if (colTypes.size() == 0) {
             for (int i = 0; i < numOfCols; i++)
                 colClasses.add(String.class);
