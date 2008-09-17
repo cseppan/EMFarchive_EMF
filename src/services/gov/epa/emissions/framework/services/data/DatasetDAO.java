@@ -986,15 +986,15 @@ public class DatasetDAO {
     private void deleteControlStrategies(int[] dsIDsWithNoEmisData, Session session) throws EmfException {
         try {
             checkIfUsedByStrategies(dsIDsWithNoEmisData, session);
-            checkIfUsedByControlPrograms(dsIDsWithNoEmisData, session);
+            //checkIfUsedByControlPrograms(dsIDsWithNoEmisData, session);
         } catch (Exception e) {
             String name = "";
 
             if (strategyList != null && strategyList.size() > 0)
                 name = strategyList.get(0).toString();
 
-//            if (controlProgList != null && controlProgList.size() > 0)
-//                name = controlProgList.get(0).toString();
+            if (controlProgList != null && controlProgList.size() > 0)
+                name = controlProgList.get(0).toString();
 
             throw new EmfException("Please delete control strategies/programs before purge: " + name);
         }
