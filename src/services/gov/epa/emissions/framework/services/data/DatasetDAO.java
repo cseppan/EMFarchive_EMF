@@ -830,12 +830,10 @@ public class DatasetDAO {
         }
     }
 
-    private void dropQAStepResultTable(int[] datasetIDs, TableCreator tableTool, Session session) throws EmfException {
+    private void dropQAStepResultTable(int[] datasetIDs, TableCreator tableTool, Session session) {
         List tables = session.createQuery(
                 "SELECT obj.table from " + QAStepResult.class.getSimpleName() + " as obj WHERE obj.datasetId = "
                         + getAndOrClause(datasetIDs, "obj.datasetId")).list();
-
-        Exception exception = null;
 
         for (Iterator<String> iter = tables.iterator(); iter.hasNext();) {
             String table = iter.next();
@@ -850,15 +848,8 @@ public class DatasetDAO {
                     System.out.println("QA step result table " + table + " dropped.");
             } catch (Exception e) {
                 LOG.error(e);
-                exception = e;
-
-                if (DebugLevels.DEBUG_16)
-                    e.printStackTrace();
             }
         }
-
-        if (exception != null)
-            throw new EmfException(exception.getMessage());
     }
 
     private String getAndOrClause(int[] datasetIDs, String attrName) {
