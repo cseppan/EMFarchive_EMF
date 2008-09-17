@@ -208,8 +208,8 @@ public class ControlProgramServiceImpl implements ControlProgramService {
 
             dao.remove(element, session);
         } catch (RuntimeException e) {
-            LOG.error("Could not remove control strategy: " + element, e);
-            throw new EmfException("Could not remove control strategy: " + element.getName());
+            LOG.error("Could not remove control program: " + element, e);
+            throw new EmfException("Could not remove control program: " + element.getName());
         } finally {
             session.close();
         }

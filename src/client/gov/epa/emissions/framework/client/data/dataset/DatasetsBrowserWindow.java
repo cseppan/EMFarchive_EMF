@@ -313,13 +313,13 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         String message = "You have " + numDelDatasets + " dataset" + (numDelDatasets > 0 ? "s " : " ")
                 + "marked as deleted."
-                + (numDelDatasets > 0 ? ls + "Are you sure you want to remove them pamernantly?" : "");
+                + (numDelDatasets > 0 ? ls + "Are you sure you want to remove them permanently?" : "");
 
         int selection;
 
         if (presenter.isAdminUser()) {
             message = "As an admin user, purge datasets will clear up all the datasets that do not have emissions data."
-                    + ls + "Are you sure you want to remove them pamernantly?";
+                    + ls + "Are you sure you want to remove them permanently?";
             selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
         } else {
@@ -359,6 +359,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 msg = msg.substring(0, 100);
 
             messagePanel.setError("Error purging datasets: " + msg);
+            e.printStackTrace();
             setCursor(Cursor.getDefaultCursor());
         }
     }
