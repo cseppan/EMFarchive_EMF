@@ -55,9 +55,9 @@ public class DatasetDAO {
     private HibernateFacade hibernateFacade;
 
     private DbServerFactory dbServerFactory;
-    
+
     private List strategyList = null;
-    
+
     private List controlProgList = null;
 
     public DatasetDAO() {
@@ -552,44 +552,62 @@ public class DatasetDAO {
             return;
 
         Exception exception = null;
-        int[] datasetIDs = getIDs(deletableDatasets);
+        int[] ids = getIDs(deletableDatasets);
         Datasource datasource = dbServer.getEmissionsDatasource();
         TableCreator emissionTableTool = new TableCreator(datasource);
 
-        // Need to search all the items associated with datasets and remove them properly
-        // before remove the underlying datasets
-        try {
-            deleteFromOutputsTable(datasetIDs, session);
-        } catch (Exception e) {
-            LOG.error(e);
-            exception = e;
-        }
+        int[] datasetIDs;
+        int len = ids.length;
+        int remainder = len % 600;
+        int loop = len / 600;
 
-        try {
-            deleteFromEmfTables(datasetIDs, emissionTableTool, session);
-        } catch (Exception e) {
-            LOG.error(e);
-            exception = e;
-        }
+        if (remainder > 0)
+            loop++;
 
-        try {
-            session.clear();
-            session.flush();
-            hibernateFacade.remove(deletableDatasets, session);
-        } catch (Exception e) {
-            LOG.error(e);
-            exception = e;
-        }
+        for (int i = 0; i < loop; i++) {
+            int start = i * 599 + i;
+            int end = start + 599;
 
-        try {
-            dropDataTables(deletableDatasets, emissionTableTool);
-        } catch (Exception e) {
-            LOG.error(e);
-            exception = e;
-        }
+            if (i < loop - 1)
+                datasetIDs = subArray(ids, start, end);
+            else
+                datasetIDs = subArray(ids, start, len - 1);
 
-        if (exception != null)
-            throw new EmfException(exception.getMessage());
+            // Need to search all the items associated with datasets and remove them properly
+            // before remove the underlying datasets
+            try {
+                deleteFromOutputsTable(datasetIDs, session);
+            } catch (Exception e) {
+                LOG.error(e);
+                exception = e;
+            }
+
+            try {
+                deleteFromEmfTables(datasetIDs, emissionTableTool, session);
+            } catch (Exception e) {
+                LOG.error(e);
+                exception = e;
+            }
+
+            try {
+                session.clear();
+                session.flush();
+                hibernateFacade.remove(deletableDatasets, session);
+            } catch (Exception e) {
+                LOG.error(e);
+                exception = e;
+            }
+
+            try {
+                dropDataTables(deletableDatasets, emissionTableTool);
+            } catch (Exception e) {
+                LOG.error(e);
+                exception = e;
+            }
+
+            if (exception != null)
+                throw new EmfException(exception.getMessage());
+        }
     }
 
     public void checkIfUsedByCases(int[] datasetIDs, Session session) throws EmfException {
@@ -899,7 +917,7 @@ public class DatasetDAO {
         Criterion statusCrit = Restrictions.eq("status", "Deleted");
         Criterion nameCrit = Restrictions.eq("creator", user.getUsername());
         Criterion criterion = statusCrit;
-        
+
         if (!user.isAdmin())
             criterion = Restrictions.and(statusCrit, nameCrit);
 
@@ -908,9 +926,38 @@ public class DatasetDAO {
 
     public void removeEmptyDatasets(User user, DbServer dbServer, Session session) throws EmfException, SQLException {
         int[] dsIDsWithNoEmisData = getAllDatasetsWithNoEmissionData(dbServer);
-        deleteControlStrategies(dsIDsWithNoEmisData, session);
-        decoupleDSFromCases(dsIDsWithNoEmisData, session);
-        setDSAsDeleted(dsIDsWithNoEmisData, session);
+        int len = dsIDsWithNoEmisData.length;
+        int remainder = len % 600;
+        int loop = len / 600;
+
+        if (remainder > 0)
+            loop++;
+
+        for (int i = 0; i < loop; i++) {
+            int[] tempIds;
+            int start = i * 599 + i;
+            int end = start + 599;
+
+            if (i < loop - 1)
+                tempIds = subArray(dsIDsWithNoEmisData, start, end);
+            else
+                tempIds = subArray(dsIDsWithNoEmisData, start, len - 1);
+
+            deleteControlStrategies(tempIds, session);
+            decoupleDSFromCases(tempIds, session);
+            setDSAsDeleted(tempIds, session);
+
+        }
+    }
+
+    private int[] subArray(int[] ids, int start, int end) {
+        int len = end - start + 1;
+        int[] tempIds = new int[len];
+
+        for (int i = 0; i < len; i++)
+            tempIds[i] = ids[i + start];
+
+        return tempIds;
     }
 
     private int[] getAllDatasetsWithNoEmissionData(DbServer dbServer) throws EmfException, SQLException {
@@ -941,22 +988,22 @@ public class DatasetDAO {
 
         return ids;
     }
-    
+
     private void deleteControlStrategies(int[] dsIDsWithNoEmisData, Session session) throws EmfException {
         try {
             checkIfUsedByStrategies(dsIDsWithNoEmisData, session);
             checkIfUsedByControlPrograms(dsIDsWithNoEmisData, session);
         } catch (Exception e) {
             String name = "";
-            
+
             if (strategyList != null && strategyList.size() > 0)
                 name = strategyList.get(0).toString();
-            
+
             if (controlProgList != null && controlProgList.size() > 0)
                 name = controlProgList.get(0).toString();
-            
+
             throw new EmfException("Please delete control strategies/programs before purge: " + name);
-        } 
+        }
     }
 
     private void decoupleDSFromCases(int[] dsIDsWithNoEmisData, Session session) throws EmfException {
@@ -965,7 +1012,8 @@ public class DatasetDAO {
         try {
             Transaction tx = session.beginTransaction();
 
-            String firstPart = "UPDATE " + CaseInput.class.getSimpleName() + " obj SET obj.dataset = null, SET obj.version = null";
+            String firstPart = "UPDATE " + CaseInput.class.getSimpleName()
+                    + " obj SET obj.dataset = null, obj.version = null";
             String secondPart = " WHERE obj.dataset.id = " + getAndOrClause(dsIDsWithNoEmisData, "obj.dataset.id");
             String updateQuery = firstPart + secondPart;
 
@@ -981,7 +1029,7 @@ public class DatasetDAO {
             throw new EmfException(e.getMessage());
         } finally {
             if (DebugLevels.DEBUG_16)
-                LOG.warn(updatedItems + " items updated from " + EmfDataset.class.getName() + " table.");
+                LOG.warn(updatedItems + " items updated from " + CaseInput.class.getName() + " table.");
         }
     }
 
