@@ -182,7 +182,9 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     }
 
     public boolean isAdminUser() {
-        return session.user().isAdmin();
+        User user = session.user();
+        
+        return user.getUsername().equals("admin") && user.isAdmin();
     }
     
 }
