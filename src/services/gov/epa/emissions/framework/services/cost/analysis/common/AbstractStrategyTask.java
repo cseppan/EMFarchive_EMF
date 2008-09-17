@@ -228,7 +228,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             measureSummaryResult.setRunStatus("Completed.");
             setSummaryResultCount(measureSummaryResult);
             saveControlStrategySummaryResult(measureSummaryResult);
-            runSummaryQASteps((EmfDataset)measureSummaryResult.getDetailedResultDataset(), 0);
+//            runSummaryQASteps((EmfDataset)measureSummaryResult.getDetailedResultDataset(), 0);
         }
     }
     
@@ -245,7 +245,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             countySummaryResult.setRunStatus("Completed.");
             setSummaryResultCount(countySummaryResult);
             saveControlStrategySummaryResult(countySummaryResult);
-            runSummaryQASteps((EmfDataset)countySummaryResult.getDetailedResultDataset(), 0);
+//            runSummaryQASteps((EmfDataset)countySummaryResult.getDetailedResultDataset(), 0);
         }
     }
 
@@ -576,10 +576,10 @@ public abstract class AbstractStrategyTask implements Strategy {
         return controlStrategy;
     }
 
-    protected void runQASteps(ControlStrategyResult strategyResult) throws EmfException {
-        EmfDataset resultDataset = (EmfDataset)strategyResult.getDetailedResultDataset();
+    protected void runQASteps(ControlStrategyResult strategyResult) {
+//        EmfDataset resultDataset = (EmfDataset)strategyResult.getDetailedResultDataset();
         if (recordCount > 0) {
-            runSummaryQASteps(resultDataset, 0);
+//            runSummaryQASteps(resultDataset, 0);
         }
 //        excuteSetAndRunQASteps(inputDataset, controlStrategy.getDatasetVersion());
     }

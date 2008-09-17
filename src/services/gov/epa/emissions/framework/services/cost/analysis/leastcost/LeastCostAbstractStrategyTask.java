@@ -83,7 +83,7 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractStrategyTask
         leastCostCMWorksheetResult.setRunStatus("Completed.");
         setSummaryResultCount(leastCostCMWorksheetResult);
         saveControlStrategySummaryResult(leastCostCMWorksheetResult);
-        runSummaryQASteps((EmfDataset)leastCostCMWorksheetResult.getDetailedResultDataset(), 0);
+//        runSummaryQASteps((EmfDataset)leastCostCMWorksheetResult.getDetailedResultDataset(), 0);
     }
         
     protected void finalizeCostCuveSummaryResult() throws EmfException {
@@ -92,7 +92,7 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractStrategyTask
         leastCostCurveSummaryResult.setRunStatus("Completed.");
         setSummaryResultCount(leastCostCurveSummaryResult);
         saveControlStrategySummaryResult(leastCostCurveSummaryResult);
-        runSummaryQASteps((EmfDataset)leastCostCurveSummaryResult.getDetailedResultDataset(), 0);
+//        runSummaryQASteps((EmfDataset)leastCostCurveSummaryResult.getDetailedResultDataset(), 0);
     }
         
     protected ControlStrategyInputDataset getInventory() {
