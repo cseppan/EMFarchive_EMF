@@ -556,7 +556,6 @@ public class DatasetDAO {
         Datasource datasource = dbServer.getEmissionsDatasource();
         TableCreator emissionTableTool = new TableCreator(datasource);
 
-        int[] datasetIDs;
         int len = ids.length;
         int remainder = len % 600;
         int loop = len / 600;
@@ -565,6 +564,7 @@ public class DatasetDAO {
             loop++;
 
         for (int i = 0; i < loop; i++) {
+            int[] datasetIDs;
             int start = i * 599 + i;
             int end = start + 599;
 
@@ -604,10 +604,10 @@ public class DatasetDAO {
                 LOG.error(e);
                 exception = e;
             }
-
-            if (exception != null)
-                throw new EmfException(exception.getMessage());
         }
+        
+        if (exception != null)
+            throw new EmfException(exception.getMessage());
     }
 
     public void checkIfUsedByCases(int[] datasetIDs, Session session) throws EmfException {
