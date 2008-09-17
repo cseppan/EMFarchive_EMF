@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
@@ -108,6 +109,7 @@ public class DataMappings extends Mappings {
         bean(call, QAStep.class, qaStep());
         bean(call, QAProgram.class, program());
         bean(call, QAStepResult.class, qaStepResult());
+        bean(call, ProjectionShapeFile.class, projectionShapeFile());
 
         bean(call, TableMetadata.class, tablemetadata());
         bean(call, ColumnMetaData.class, columnmetadata());
@@ -180,6 +182,7 @@ public class DataMappings extends Mappings {
 
         array(call, QAStepTemplate[].class, qaStepTemplates());
         array(call, QAStep[].class, qaSteps());
+        array(call, ProjectionShapeFile[].class, projectionShapeFiles());
         array(call, QAProgram[].class, programs());
 
         array(call, ControlMeasure[].class, controlMeasures());
@@ -372,6 +375,14 @@ public class DataMappings extends Mappings {
 
     public QName qaSteps() {
         return qname("QASteps");
+    }
+
+    public QName projectionShapeFile() {
+        return qname("ProjectionShapeFile");
+    }
+
+    public QName projectionShapeFiles() {
+        return qname("ProjectionShapeFiles");
     }
 
     public QName tablemetadata() {

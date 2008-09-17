@@ -187,6 +187,10 @@
 		qname="ns1:QAStepResult" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 	
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.commons.data.ProjectionShapeFile"
+		qname="ns1:ProjectionShapeFile" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+	
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.editor.Revision"
 		qname="ns1:Revision" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
@@ -696,6 +700,11 @@
 	<arrayMapping qname="ns1:QASteps" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.data.QAStep[]"
 		innerType="ns1:QAStep"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<arrayMapping qname="ns1:ProjectionShapeFiles" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.commons.data.ProjectionShapeFile[]"
+		innerType="ns1:ProjectionShapeFile"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<arrayMapping qname="ns1:Revisions" xmlns:ns1="urn:gov.epa.services.EmfService"

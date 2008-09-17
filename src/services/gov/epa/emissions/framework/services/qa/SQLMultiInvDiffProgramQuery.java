@@ -189,9 +189,9 @@ public class SQLMultiInvDiffProgramQuery {
        
          //replace @!@ symbol with main columns in outer select statement
          if (summaryTypeToken.equals("State+SCC")) 
-             sql = "coalesce(b.fipsst, c.fipsst) as fipsst, coalesce(b.scc, c.scc) as scc";
+             sql = "coalesce(b.fipsst, c.fipsst)::character varying(6) as fipsst, coalesce(b.scc, c.scc) as scc";
          else if (summaryTypeToken.equals("State")) 
-             sql = "coalesce(b.fipsst, c.fipsst) as fipsst";
+             sql = "coalesce(b.fipsst, c.fipsst)::character varying(6) as fipsst";
          else if (summaryTypeToken.equals("County")) 
              sql = "coalesce(b.fips, c.fips) as fips";
          else if (summaryTypeToken.equals("County+SCC")) 

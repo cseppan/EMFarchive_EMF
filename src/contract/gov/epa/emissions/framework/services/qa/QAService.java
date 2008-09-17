@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.qa;
 
+import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -21,8 +23,12 @@ public interface QAService {
 
     public void exportQAStep(QAStep step, User user, String dirName) throws EmfException;
 
+    public void exportShapeFileQAStep(QAStep step, User user, String dirName, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException;
+
     QAStepResult getQAStepResult(QAStep step) throws EmfException;
 
     QAProgram addQAProgram(QAProgram program) throws EmfException;
+
+    ProjectionShapeFile[] getProjectionShapeFiles() throws EmfException;
 
 }

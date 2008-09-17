@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.qa;
 
+import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -49,6 +50,11 @@ public class QADAO {
         List list = hibernateFacade.getAll(QAProgram.class, session);
         Collections.sort(list);
         return (QAProgram[]) list.toArray(new QAProgram[0]);
+    }
+
+    public ProjectionShapeFile[] getProjectionShapeFiles(Session session) {
+        List<ProjectionShapeFile> list = hibernateFacade.getAll(ProjectionShapeFile.class, session);
+        return list.toArray(new ProjectionShapeFile[0]);
     }
 
     public QAStepResult qaStepResult(QAStep step, Session session) {

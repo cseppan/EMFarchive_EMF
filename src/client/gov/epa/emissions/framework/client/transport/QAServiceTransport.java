@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -82,6 +84,20 @@ public class QAServiceTransport implements QAService {
         call.request(new Object[] { step, user, dirName });
     }
 
+    public synchronized void exportShapeFileQAStep(QAStep step, User user, String dirName, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("exportShapeFileQAStep");
+        call.addParam("step", mappings.qaStep());
+        call.addParam("user", mappings.user());
+        call.addStringParam("dirName");
+        call.addParam("projectionShapeFile", mappings.projectionShapeFile());
+        call.addParam("pollutant", mappings.pollutant());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { step, user, dirName, projectionShapeFile, pollutant });
+    }
+
     public synchronized QAStepResult getQAStepResult(QAStep step) throws EmfException {
         EmfCall call = call();
 
@@ -112,6 +128,15 @@ public class QAServiceTransport implements QAService {
         call.setReturnType(mappings.program());
         
         return (QAProgram) call.requestResponse(new Object[] { program });
+    }
+
+    public ProjectionShapeFile[] getProjectionShapeFiles() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getProjectionShapeFiles");
+        call.setReturnType(mappings.projectionShapeFiles());
+
+        return (ProjectionShapeFile[]) call.requestResponse(new Object[] {});
     }
 
 }

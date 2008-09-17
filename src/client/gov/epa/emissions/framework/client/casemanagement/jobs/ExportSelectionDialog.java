@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
+import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.framework.client.Label;
@@ -35,20 +37,25 @@ public class ExportSelectionDialog extends Dialog {
 
     private JCheckBox shapeFileFormat;
     
-    private TextField pollutantName;
+    private ComboBox pollutant;
     
-    private TextField shapeFileName;
+    private ComboBox projectionShapeFile;
     
 //    private EmfConsole parent;
 //    
 //    private EmfSession session;
     
+    private ProjectionShapeFile[] projectionShapeFiles;
     
-    public ExportSelectionDialog(EmfConsole parent) {
+    private Pollutant[] pollutants;
+    
+    public ExportSelectionDialog(EmfConsole parent, ProjectionShapeFile[] projectionShapeFiles, Pollutant[] pollutants) {
         super("Export QA Step Results " , parent);
         super.setSize(new Dimension(450, 260));
         super.center();
         setModal(true);
+        this.projectionShapeFiles = projectionShapeFiles;
+        this.pollutants = pollutants;
 //        this.parent = parent;
 //        this.session = session;
     }
@@ -89,12 +96,12 @@ public class ExportSelectionDialog extends Dialog {
         shapeFileFormat.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 if (shapeFileFormat.isSelected()){
-                    pollutantName.setEnabled(true);
-                    shapeFileName.setEnabled(true);
+                    pollutant.setEnabled(true);
+                    projectionShapeFile.setEnabled(true);
                 }
                 if (!shapeFileFormat.isSelected()){
-                    pollutantName.setEnabled(false);
-                    shapeFileName.setEnabled(false);
+                    pollutant.setEnabled(false);
+                    projectionShapeFile.setEnabled(false);
                 }
             }
         });
@@ -107,12 +114,14 @@ public class ExportSelectionDialog extends Dialog {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        pollutantName = new TextField("Pollutant", "", 20);
-        pollutantName.setEnabled(false);
-        layoutGenerator.addLabelWidgetPair("Pollutant to Include: ", pollutantName, panel);
-        shapeFileName = new TextField("Output Shapefile Name ", "", 20);
-        shapeFileName.setEnabled(false);
-        layoutGenerator.addLabelWidgetPair("Output Shapefile Name:", shapeFileName, panel);
+        pollutant = new ComboBox(pollutants);
+        pollutant.setEnabled(false);
+        pollutant.setSelectedIndex(0);
+        layoutGenerator.addLabelWidgetPair("Pollutant to Include: ", pollutant, panel);
+        projectionShapeFile = new ComboBox(projectionShapeFiles);
+        projectionShapeFile.setEnabled(false);
+        projectionShapeFile.setSelectedIndex(0);
+        layoutGenerator.addLabelWidgetPair("Output Shapefile Name:", projectionShapeFile, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
@@ -147,7 +156,12 @@ public class ExportSelectionDialog extends Dialog {
 
     private void exportFile() {
         try {
-            checkShapeFileName();
+            if (shapeFileFormat.isSelected()) {
+                if (projectionShapeFile.getSelectedItem() == null)
+                    throw new EmfException("Shape file must be specified");
+                if (pollutant.getSelectedItem() == null)
+                    throw new EmfException("Pollutant must be specified");
+            }
             if (csvFormat.isSelected())
                 shouldCreateCSV = true; 
             if (shapeFileFormat.isSelected())
@@ -159,10 +173,10 @@ public class ExportSelectionDialog extends Dialog {
         }
     }
 
-    private void checkShapeFileName() throws EmfException{
-        if (shapeFileName.getText().contains("/"))
-            throw new EmfException("Shape file name can't contain /");
-    }
+//    private void checkShapeFileName() throws EmfException{
+//        if (projectionShapeFile.getSelectedItem() == null)
+//            throw new EmfException("Shape file must be specified");
+//    }
 
     private void cleareMsg() {
         this.messagePanel.clear();
@@ -176,4 +190,11 @@ public class ExportSelectionDialog extends Dialog {
        return shouldCreateShapeFile;
    }
 
+   public Pollutant getPollutant() {
+       return (Pollutant)pollutant.getSelectedItem();
+   }
+
+   public ProjectionShapeFile getProjectionShapeFile() {
+       return (ProjectionShapeFile)projectionShapeFile.getSelectedItem();
+   }
 }

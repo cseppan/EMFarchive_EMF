@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.qa;
 
+import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
@@ -159,6 +161,18 @@ public class QAServiceImpl implements QAService {
         }
     }
 
+    public synchronized void exportShapeFileQAStep(QAStep step, User user, 
+            String dirName, ProjectionShapeFile projectionShapeFile, 
+            Pollutant pollutant) throws EmfException {
+        try {
+            ExportShapeFileQAStep exportQATask = new ExportShapeFileQAStep(step, dbServerFactory, user, sessionFactory, threadPool, true, pollutant);
+            exportQATask.export(dirName, projectionShapeFile);
+        } catch (Exception e) {
+            LOG.error("Could not export QA step", e);
+            throw new EmfException("Could not export QA step: " + e.getMessage());
+        }
+    }
+
     private synchronized void checkRestrictions(QAStep step) throws EmfException {
         QAProgram program = step.getProgram();
         if (program == null)
@@ -255,4 +269,15 @@ public class QAServiceImpl implements QAService {
         }
     }
 
+    public ProjectionShapeFile[] getProjectionShapeFiles() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getProjectionShapeFiles(session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get Projection Shape Files", e);
+            throw new EmfException("Could not get Projection Shape Files");
+        } finally {
+            session.close();
+        }
+    }
 }

@@ -54,6 +54,7 @@
         <mapping resource="gov/epa/emissions/framework/services/qa/QAStep.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/qa/QAProgram.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/qa/QAStepResult.hbm.xml"/>
+        <mapping resource="gov/epa/emissions/framework/services/qa/ProjectionShapeFile.hbm.xml"/>
 		
 		<!-- Mappings : Case Management -->
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Abbreviation.hbm.xml"/>
