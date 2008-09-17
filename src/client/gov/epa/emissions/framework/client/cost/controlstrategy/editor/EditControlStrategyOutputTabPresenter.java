@@ -89,6 +89,7 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
 
     private String defaultFolder() {
         String folder = session.preferences().outputFolder();
+        if (folder == null) return "";
         if (!new File(folder).isDirectory())
             folder = "";// default, if unspecified
 
