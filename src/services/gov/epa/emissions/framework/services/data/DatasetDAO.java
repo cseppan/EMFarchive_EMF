@@ -839,6 +839,9 @@ public class DatasetDAO {
 
         for (Iterator<String> iter = tables.iterator(); iter.hasNext();) {
             String table = iter.next();
+            
+            if (table == null || table.trim().isEmpty())
+                continue;
 
             try {
                 tableTool.drop(table);
@@ -999,8 +1002,8 @@ public class DatasetDAO {
             if (strategyList != null && strategyList.size() > 0)
                 name = strategyList.get(0).toString();
 
-            if (controlProgList != null && controlProgList.size() > 0)
-                name = controlProgList.get(0).toString();
+//            if (controlProgList != null && controlProgList.size() > 0)
+//                name = controlProgList.get(0).toString();
 
             throw new EmfException("Please delete control strategies/programs before purge: " + name);
         }
