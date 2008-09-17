@@ -712,6 +712,57 @@ where name in ('ORL Merged Inventory'));
 -- emf.qa_programs 8/21/08 
 insert into emf.qa_programs values(DEFAULT,'Compare Control Strategies','gov.epa.emissions.framework.services.qa.SQLQACompareControlStrategiesQueryRunner');
 
+
+
+-- 9/15/08 new qa step to summarize the all control measures
+-- Summarize all Control Measures - Control Strategy Detailed Result
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize all Control Measures', 1, 'select cm.name as CMName, 
+	cm.abbreviation as CMabbrev, 
+	ct.name as control_technology, 
+	s.name as sector, 
+	sg.name as source_group, 
+	p.name as pollutant, 
+	aer.min_efficiency as min_ce, 
+	aer.avg_efficiency as mean_ce, 
+	aer.max_efficiency as max_ce, 
+	aer.min_cost_per_ton as min_cpt, 
+	aer.avg_cost_per_ton as mean_cpt, 
+	aer.max_cost_per_ton as max_cpt, 
+	aer.avg_rule_effectiveness as mean_re, 
+	aer.avg_rule_penetration as mean_rp
+from emf.control_measures cm 
+	left outer join emf.control_measure_sectors cms 
+	on cms.control_measure_id = cm.id 
+	left outer join emf.sectors s 
+	on s.id = cms.sector_id 
+	left outer join emf.control_technologies ct 
+	on ct.id = cm.control_technology 
+	left outer join emf.source_groups sg 
+	on sg.id = cm.source_group 
+	left outer join emf.aggregrated_efficiencyrecords aer 
+	on aer.control_measures_id = cm.id 
+	left outer join emf.pollutants p 
+	on p.id = aer.pollutant_id 
+order by cm.name, p.name', false, 1, ''
+from emf.dataset_types dt
+where name in ('Control Strategy Detailed Result');
+
+
+--9/15/08 rename some datset type names
+update emf.dataset_types
+set name = 'Strategy Measure Summary',
+description = 'Strategy Measure Summary'
+where name = 'Control Strategy Result Summary';
+update emf.dataset_types
+set name = 'Strategy County Summary',
+description = 'Strategy County Summary'
+where name = 'Control Strategy Result Region Summary';
+update emf.dataset_types
+set name = 'Strategy County Summary',
+description = 'Strategy County Summary'
+where name = 'Control Strategy Result Region Summary';
+
 -- Create a relationship between rsm sectors and inventory sectors 9/12/2008
 -- reference.rsm_inv_sectors
 CREATE TABLE reference.rsm_inv_sectors
