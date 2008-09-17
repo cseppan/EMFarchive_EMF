@@ -65,9 +65,6 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
             //now create the measure summary result based on the results from the strategy run...
             generateStrategyMeasureSummaryResult();
 
-            //now create the county summary result based on the results from the strategy run...
-            generateStrategyCountySummaryResult();
-            
         } catch (Exception e) {
             status = "Failed. Error processing input dataset";
             e.printStackTrace();
@@ -89,6 +86,10 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
 
     public void afterRun() throws EmfException {
         super.finalizeCMWorksheetResult();
+
+        //now create the county summary result based on the results from the strategy run...
+        generateStrategyCountySummaryResult(strategyResultList.toArray(new ControlStrategyResult[0]));
+        
     }
 
     public void beforeRun() throws EmfException {

@@ -36,7 +36,6 @@ public class StrategyLoader extends LeastCostAbstractStrategyLoader {
         ControlStrategyResult detailedResult = createStrategyResult(inputDataset, controlStrategyInputDataset.getVersion());
 //        populateWorksheet(controlStrategyInputDataset);
         //setup result
-System.out.println("chaka");
 //        if (controlStrategy.getDeleteResults() || results.length == 0)
             populateWorksheet(controlStrategyInputDataset);
 //        else {
@@ -46,12 +45,9 @@ System.out.println("chaka");
 //                }
 //            }
 //        }
-System.out.println("chaka");
 
         double targetEmissionReduction = getTargetEmissionReduction();
-        System.out.println("chaka");
         populateDetailedResult(controlStrategyInputDataset, detailedResult, targetEmissionReduction);
-        System.out.println("chaka");
 
         //still need to calculate the total cost and reduction...
         setResultTotalCostTotalReductionAndCount(detailedResult);
@@ -64,9 +60,7 @@ System.out.println("chaka");
 
     // return ControlStrategies orderby name
     public Double getTargetEmissionReduction() throws EmfException {
-        System.out.println("chaka");
         Session session = sessionFactory.getSession();
-        System.out.println("chaka");
         try {
             return (Double)session.createQuery("select cS.domainWideEmisReduction " +
                     "from ControlStrategyConstraint cS " +

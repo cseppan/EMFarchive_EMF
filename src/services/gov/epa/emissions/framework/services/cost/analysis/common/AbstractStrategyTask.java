@@ -148,8 +148,8 @@ public abstract class AbstractStrategyTask implements Strategy {
             //now create the measure summary result based on the results from the strategy run...
             generateStrategyMeasureSummaryResult();
 
-            //now create the county summary result based on the results from the strategy run...
-            generateStrategyCountySummaryResult();
+//            //now create the county summary result based on the results from the strategy run...
+//            generateStrategyCountySummaryResult();
 
         } catch (Exception e) {
             status = "Failed. Error processing input dataset";
@@ -232,13 +232,13 @@ public abstract class AbstractStrategyTask implements Strategy {
         }
     }
     
-    protected void generateStrategyCountySummaryResult() throws EmfException {
+    protected void generateStrategyCountySummaryResult(ControlStrategyResult[] results) throws EmfException {
         //now create the summary detailed result based on the results from the strategy run...
-        if (strategyResultList.size() > 0) {
+        if (results.length > 0) {
             //create dataset and strategy region summary result 
             ControlStrategyResult countySummaryResult = createStrategyCountySummaryResult();
             //now populate the summary result with data...
-            populateStrategyCountySummaryDataset(strategyResultList.toArray(new ControlStrategyResult[0]), countySummaryResult);
+            populateStrategyCountySummaryDataset(results, countySummaryResult);
             
             //finalize the result, update completion time and run status...
             countySummaryResult.setCompletionTime(new Date());
@@ -302,8 +302,10 @@ public abstract class AbstractStrategyTask implements Strategy {
             EmfDataset mergedInventory = null;
             //we need to create a controlled inventory for each invnentory, except the merged inventory
             for (int i = 0; i < inventories.length; i++) {
-                if (inventories[i].getInputDataset().getDatasetType().getName().equals(DatasetType.orlMergedInventory))
+                if (inventories[i].getInputDataset().getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
                     mergedInventory = inventories[i].getInputDataset();
+                    break;
+                }
             }
             //if merged inventory, then there is only one result
             if (controlStrategy.getMergeInventories() && mergedInventory != null) {

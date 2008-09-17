@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.analysis.common.AbstractStrategyTask;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 public class StrategyTask extends AbstractStrategyTask {
@@ -23,8 +24,9 @@ public class StrategyTask extends AbstractStrategyTask {
         super.run(loader);
     }
 
-    public void afterRun() {
-        // NOTE Auto-generated method stub
+    public void afterRun() throws EmfException {
+        //now create the county summary result based on the results from the strategy run...
+        generateStrategyCountySummaryResult(strategyResultList.toArray(new ControlStrategyResult[0]));
         
     }
 
