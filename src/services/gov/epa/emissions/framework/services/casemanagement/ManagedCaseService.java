@@ -1946,6 +1946,8 @@ public class ManagedCaseService {
                 for (int k = 0; k < params.length; k++)
                     if (params[k].getJobId() == jobs[i].getId())
                         params[k].setJobId(0);
+                
+                jobs[i].setDependentJobs(null);
             }
         } catch (RuntimeException e) {
             e.printStackTrace();
