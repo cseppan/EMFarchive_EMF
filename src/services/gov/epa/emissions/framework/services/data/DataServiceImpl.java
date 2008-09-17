@@ -334,8 +334,14 @@ public class DataServiceImpl implements DataService {
             List<EmfDataset> list = dao.deletedDatasets(user, session);
             dao.deleteDatasets(list.toArray(new EmfDataset[0]), dbServer, session);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException(e.getMessage());
-        } finally {
+        } catch (Throwable t)
+        {
+            t.printStackTrace();
+            throw new EmfException(t.getMessage());
+        }
+        finally {
             session.close();
             closeDB(dbServer);
         }
