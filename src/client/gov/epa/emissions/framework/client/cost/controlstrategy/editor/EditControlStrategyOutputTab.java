@@ -119,7 +119,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                     } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
                         if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
                             datasetList.add((EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
-                        } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventoryResult) && controlStrategyResults[i].getDetailedResultDataset() != null) {
+                        } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventory) && controlStrategyResults[i].getDetailedResultDataset() != null) {
                             datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
                         } else
                             messagePanel.setError("Please create controled inventory first.");
@@ -151,7 +151,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                     else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
                         if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
                             datasetList.add((EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
-                        } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventoryResult) && controlStrategyResults[i].getDetailedResultDataset() != null) {
+                        } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventory) && controlStrategyResults[i].getDetailedResultDataset() != null) {
                             datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
                         } else
                             messagePanel.setError("Please create controled inventory first.");
@@ -184,7 +184,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                 return;
             }
             if (controlStrategyResults.length == 1 && (!controlStrategyResults[0].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult) 
-                    && !controlStrategyResults[0].getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult))) {
+                    && !controlStrategyResults[0].getStrategyResultType().getName().equals(StrategyResultType.annotatedInventory))) {
                 messagePanel.setError("Please select at least one item that has a controlled inventory.");
                 return;
             }
@@ -192,7 +192,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             boolean hasControllableInventory = false;
             for (ControlStrategyResult result : controlStrategyResults) {
                 if (result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)
-                        || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult)) {
+                        || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventory)) {
                     hasControllableInventory = true;
                 }
                 if (hasControllableInventory) break;
@@ -204,9 +204,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             //see if there is already a controlled inventory for this strategy.
             boolean hasControlledInventories = false;
             for (ControlStrategyResult result : controlStrategyResults) {
-                if (result.getStrategyResultType().getName().equals(StrategyResultType.controlledInventoryResult)) {
+                if (result.getStrategyResultType().getName().equals(StrategyResultType.controlledInventory)) {
                     hasControlledInventories = true;
-                } else if ((result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult) || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult)) && result.getControlledInventoryDataset() != null) {
+                } else if ((result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult) || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventory)) && result.getControlledInventoryDataset() != null) {
                     hasControlledInventories = true;
                 }
                 if (hasControlledInventories) break;
@@ -380,7 +380,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                     if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
                         presenter.doDisplayPropertiesEditor(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
                         counter++;
-                    } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventoryResult) && controlStrategyResults[i].getDetailedResultDataset() != null) {
+                    } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventory) && controlStrategyResults[i].getDetailedResultDataset() != null) {
                         presenter.doDisplayPropertiesEditor(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
                         counter++;
                     }
@@ -418,14 +418,14 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             boolean hasControlledInventories = false;
             boolean hasControllableInventory = false;
             for (ControlStrategyResult result : controlStrategyResults) {
-                if (result.getStrategyResultType().getName().equals(StrategyResultType.controlledInventoryResult)) {
+                if (result.getStrategyResultType().getName().equals(StrategyResultType.controlledInventory)) {
                     hasControlledInventories = true;
                 } else if ((result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)
-                        || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult)) && result.getControlledInventoryDataset() != null) {
+                        || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventory)) && result.getControlledInventoryDataset() != null) {
                     hasControlledInventories = true;
                 }
                 if (result.getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)
-                        || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventoryResult)) {
+                        || result.getStrategyResultType().getName().equals(StrategyResultType.annotatedInventory)) {
                     hasControllableInventory = true;
                 }
                 if (hasControllableInventory && hasControlledInventories) break;
@@ -547,7 +547,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                     } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
                         if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
                             presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
-                        } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventoryResult) && controlStrategyResults[i].getDetailedResultDataset() != null) {
+                        } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventory) && controlStrategyResults[i].getDetailedResultDataset() != null) {
                             presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
                         }
                     }
