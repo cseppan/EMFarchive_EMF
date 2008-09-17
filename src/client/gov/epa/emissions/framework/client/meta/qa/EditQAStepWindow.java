@@ -1018,7 +1018,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     protected void doExport() {
         try {
             checkExportFolder();
-            ExportSelectionDialog dialog = new ExportSelectionDialog(parentConsole);
+            ExportSelectionDialog dialog = new ExportSelectionDialog(parentConsole, presenter.getProjectionShapeFiles(), presenter.getPollutants());
             dialog.display();
             if(dialog.shouldCreateCSV()) {
                 messagePanel.setMessage("Started Export. Please monitor the Status window "
@@ -1026,7 +1026,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 presenter.export(step, qaStepResult, exportFolder.getText());
             }
             if (dialog.shouldCreateShapeFile()){
-                //
+                messagePanel.setMessage("Started Exporting Shape File. Please monitor the Status window "
+                        + "to track your export request.");
+                presenter.exportToShapeFile(step, qaStepResult, exportFolder.getText(), dialog.getProjectionShapeFile(), dialog.getPollutant());
             }
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());

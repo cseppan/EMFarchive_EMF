@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -82,6 +84,21 @@ public class EditQAStepPresenter {
         qaStep.setOutputFolder(dirName);
         session.qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
         session.qaService().exportQAStep(qaStep, session.user(), dirName);
+    }
+
+    public void exportToShapeFile(QAStep qaStep, 
+            QAStepResult stepResult, 
+            String dirName, 
+            ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
+        lastFolder = dirName;
+
+        if (stepResult == null || stepResult.getTable() == null)
+            throw new EmfException("You must have run the QA step successfully before exporting ");
+
+        qaStep.setOutputFolder(dirName);
+        session.qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
+//        ProjectionShapeFile projectionShapeFile = session.qaService().getProjectionShapeFiles()[1];
+        session.qaService().exportShapeFileQAStep(qaStep, session.user(), dirName, projectionShapeFile, pollutant);
     }
 
     private String getFolder() {
@@ -193,5 +210,13 @@ public class EditQAStepPresenter {
 
     public long getTableRecordCount(QAStepResult stepResult) throws EmfException {
         return session.dataService().getTableRecordCount("emissions." + stepResult.getTable());
+    }
+    
+    public ProjectionShapeFile[] getProjectionShapeFiles() throws EmfException {
+        return session.qaService().getProjectionShapeFiles();       
+    }
+    
+    public Pollutant[] getPollutants() throws EmfException {
+        return session.dataCommonsService().getPollutants();       
     }
 }
