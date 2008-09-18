@@ -78,25 +78,26 @@ public class SQLQAAnnualNonsummaryQuery {
             //String year = "";
             String month = "";
             EmfDataset dataset;
+           
             try {
-            dataset = getDataset(allDatasetNames.get(j).toString().trim());
+                dataset = getDataset(allDatasetNames.get(j).toString().trim());
             } catch(EmfException ex){
                 throw new EmfException("The dataset named " + allDatasetNames.get(j).toString().trim() + " does not exist");
             }
             
             // New String Tokenizers for the StartDate and StopDate values.
             // They are compared to determine if they fall in the same month.
-            
+            if ( dataset.getStartDateTime()==null )
+                throw new EmfException("The start date is not set for dataset:" + dataset.getName() );
             StringTokenizer tokenizer5 = new StringTokenizer(dataset.getStartDateTime().toString());
-            
             String yearMonthDay = tokenizer5.nextToken();
             StringTokenizer tokenizer8 = new StringTokenizer(yearMonthDay, "-");
-            
             String startYear = tokenizer8.nextToken();
             String startMonth = tokenizer8.nextToken();
             
+            if ( dataset.getStopDateTime()==null )
+                throw new EmfException("The stop date is not set for dataset:" + dataset.getName() );
             StringTokenizer tokenizer6 = new StringTokenizer(dataset.getStopDateTime().toString());
-            
             String yearMonthDay2 = tokenizer6.nextToken();
             StringTokenizer tokenizer9 = new StringTokenizer(yearMonthDay2, "-");
             

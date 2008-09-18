@@ -125,19 +125,20 @@ public class SQLQAAnnualQuery {
             String month = "";
             EmfDataset dataset;
             try {
-            dataset = getDataset(allDatasetNames.get(j).toString().trim());
+                //System.out.println("allDatasetNames.size() = " + allDatasetNames.size());
+                dataset = getDataset(allDatasetNames.get(j).toString().trim());
             } catch(EmfException ex){
                 throw new EmfException("The dataset name " + allDatasetNames.get(j).toString().trim() + " is not valid");
             }
-            
-            
+                        
             // The names and/or properties of the dataset are to be checked to determine year and month that 
             // the dataset is for. If there is more than one file for a month, it must be put in its own list
             // with other such files.
             
             // New String Tokenizers for the StartDate and StopDate values.
             // They are compared to determine if they fall in the same month.
-            
+            if ( dataset.getStartDateTime()==null )
+                throw new EmfException("The start date is not set for dataset: " + dataset.getName() );
             StringTokenizer tokenizer5 = new StringTokenizer(dataset.getStartDateTime().toString());
             
             String yearMonthDay = tokenizer5.nextToken();
@@ -146,6 +147,8 @@ public class SQLQAAnnualQuery {
             String startYear = tokenizer8.nextToken();
             String startMonth = tokenizer8.nextToken();
             
+            if ( dataset.getStopDateTime()==null )
+                throw new EmfException("The stop date is not set for dataset: " + dataset.getName() );
             StringTokenizer tokenizer6 = new StringTokenizer(dataset.getStopDateTime().toString());
             
             String yearMonthDay2 = tokenizer6.nextToken();
@@ -325,7 +328,7 @@ public class SQLQAAnnualQuery {
         }
         
         private EmfDataset getDataset(String dsName) throws EmfException {
-            //System.out.println("Database name = \n" + dsName + "\n");
+            System.out.println("Database name = \n" + dsName + "\n");
             DatasetDAO dao = new DatasetDAO();
             try {
                 return dao.getDataset(sessionFactory.getSession(), dsName);
