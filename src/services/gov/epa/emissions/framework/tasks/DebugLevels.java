@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.tasks;
 
 public class DebugLevels {
 
-    public static final boolean DEBUG_0 = true;
+    public static final boolean DEBUG_0 = false;
 	public static final boolean DEBUG_1 = false;
 	public static final boolean DEBUG_2 = false;
 	public static final boolean DEBUG_3 = false;
@@ -17,7 +17,7 @@ public class DebugLevels {
     public static final boolean DEBUG_12 = false; //to trace DAO classes
     public static final boolean DEBUG_14 = false; //to trace job run issues
     public static final boolean DEBUG_15 = false; //to trace export job submitter issues
-    public static final boolean DEBUG_16 = true; //to trace dataset deletion
+    public static final boolean DEBUG_16 = false; //to trace dataset deletion
     public static final boolean DEBUG_17 = false; //to trace new method for case output registration
     public static final boolean DEBUG_18 = false; //to trace timing in various functions
 }

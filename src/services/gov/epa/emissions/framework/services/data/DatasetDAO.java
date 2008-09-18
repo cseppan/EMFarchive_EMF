@@ -957,7 +957,7 @@ public class DatasetDAO {
     private int[] getAllDatasetsWithNoEmissionData(DbServer dbServer) throws EmfException, SQLException {
         Datasource emf = dbServer.getEmfDatasource();
         DataQuery dataQuery = emf.query();
-        String query = "SELECT dataset_id from emf.internal_sources where table_name NOT IN (select tablename from pg_tables WHERE schemaname='emissions')";
+        String query = "SELECT dataset_id from emf.internal_sources where lower(table_name) NOT IN (select tablename from pg_tables WHERE schemaname='emissions')";
         int[] ids = null;
         ResultSet resultSet = null;
 
