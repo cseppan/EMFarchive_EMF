@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import java.io.File;
+
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditorView;
@@ -83,17 +85,16 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
 
     public String folder() {
         String dir = "";
-        try {
-            dir = (lastFolder != null) ? lastFolder : defaultFolder();
-        } catch (EmfException e) {
-            // NOTE Auto-generated catch block
-            e.printStackTrace();
-        }
+        dir = (lastFolder != null) ? lastFolder : defaultFolder();
         return dir;
     }
 
-    private String defaultFolder() throws EmfException {
-        return session.controlStrategyService().getDefaultExportDirectory();
+    private String defaultFolder() {
+        String folder = session.preferences().outputFolder();
+        if ( folder ==null ||!new File(folder).isDirectory())
+            folder = "";// default, if unspecified
+
+        return folder;
     }
 
     public void doInventory(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) throws EmfException {

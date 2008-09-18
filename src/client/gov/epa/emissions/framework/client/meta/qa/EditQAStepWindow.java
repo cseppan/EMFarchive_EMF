@@ -647,10 +647,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         while (tokenizer2.hasMoreTokens()) {
             try {
                 nextDataset = tokenizer2.nextToken().trim();
-                inventoryList.add(presenter.getDataset(nextDataset));
+                //System.out.println("----"+ nextDataset);
+                if (!nextDataset.isEmpty())
+                    inventoryList.add(presenter.getDataset(nextDataset));
             } catch (EmfException ex) {
                 //messagePanel.setError("The dataset name " + nextDataset + " is not valid");
-                 throw new EmfException("The dataset name " + nextDataset + " is not valid");
+                 throw new EmfException("The dataset name " + nextDataset + " is not valid. ");
             }
         }
         return inventoryList;
