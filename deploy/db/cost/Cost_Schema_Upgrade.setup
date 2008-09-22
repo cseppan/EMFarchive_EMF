@@ -645,3 +645,8 @@ and dataset_type_id in
 from emf.dataset_types dt
 where name in ('ORL Merged Inventory'));
 
+-- added new column
+ALTER TABLE emf.strategy_result_types
+   ADD COLUMN optional boolean;
+ALTER TABLE emf.strategy_result_types
+   ALTER COLUMN optional SET DEFAULT false;

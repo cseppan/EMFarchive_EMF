@@ -8,14 +8,22 @@ insert into emf.strategy_types values(DEFAULT,'Project Future Year Inventory','P
 -- emf.strategy_types
 
 -- emf.strategy_result_types
-insert into emf.strategy_result_types values(DEFAULT,'Strategy Detailed Result');
-insert into emf.strategy_result_types (name) select 'Strategy Summary';
-insert into emf.strategy_result_types (name) select 'Least Cost Control Measure Worksheet';
-insert into emf.strategy_result_types (name) select 'Controlled Inventory';
-insert into emf.strategy_result_types (name) select 'Least Cost Curve Summary';
-insert into emf.strategy_result_types (name) select 'Annotated Inventory';
-insert into emf.strategy_result_types (name) select 'Strategy Messages';
-insert into emf.strategy_result_types (name) select 'Strategy Region Summary';
+insert into emf.strategy_result_types (name, optional) select 'Strategy Detailed Result', false;
+insert into emf.strategy_result_types (name, optional) select 'Strategy Summary', false;
+insert into emf.strategy_result_types (name, optional) select 'Least Cost Control Measure Worksheet', false;
+insert into emf.strategy_result_types (name, optional) select 'Controlled Inventory', false;
+insert into emf.strategy_result_types (name, optional) select 'Least Cost Curve Summary', false;
+insert into emf.strategy_result_types (name, optional) select 'Annotated Inventory', false;
+insert into emf.strategy_result_types (name, optional) select 'Strategy Messages', false;
+insert into emf.strategy_result_types (name, optional) select 'Strategy County Summary', false;
+insert into emf.strategy_result_types (name, optional) select 'RSM Impact Summary', true;
+
+
+ALTER TABLE emf.strategy_result_types
+   ADD COLUMN optional boolean;
+ALTER TABLE emf.strategy_result_types
+   ALTER COLUMN optional SET DEFAULT false;
+
 -- emf.strategy_result_types
 
 --emf.control_technologies
