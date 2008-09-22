@@ -320,7 +320,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                               String inventoryTableName = qualifiedEmissionTableName(inventory);
                               String sector = inventory.getSectors().length > 0 ? inventory.getSectors()[0].getName() : "";
                               sql += (count > 0 ? " union all " : "") 
-                                  + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(i.ann_emis) as Uncontrolled_Emis, sum(e.Emis_Reduction) as Emis_Reduction, sum(i.ann_emis) - sum(e.Emis_Reduction) as Remaining_Emis, sum(e.Emis_Reduction) / sum(i.ann_emis) * 100.0 as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
+                                  + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(i.ann_emis) as Uncontrolled_Emis, sum(e.Emis_Reduction) as Emis_Reduction, sum(i.ann_emis) - sum(e.Emis_Reduction) as Remaining_Emis, case when sum(i.ann_emis) <> 0 then sum(e.Emis_Reduction) / sum(i.ann_emis) * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
                                   + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
                                   + "sum(e.Annualized_Capital_Cost) as Annualized_Capital_Cost, "
                                   + "sum(e.Total_Capital_Cost) as Total_Capital_Cost, "
@@ -344,7 +344,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                         String inventoryTableName = qualifiedEmissionTableName(results[i].getInputDataset());
                         String sector = results[i].getInputDataset().getSectors().length > 0 ? results[i].getInputDataset().getSectors()[0].getName() : "";
                         sql += (count > 0 ? " union all " : "") 
-                            + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(i.ann_emis) as Uncontrolled_Emis, sum(e.Emis_Reduction) as Emis_Reduction, sum(i.ann_emis) - sum(e.Emis_Reduction) as Remaining_Emis, sum(e.Emis_Reduction) / sum(i.ann_emis) * 100.0 as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
+                            + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(i.ann_emis) as Uncontrolled_Emis, sum(e.Emis_Reduction) as Emis_Reduction, sum(i.ann_emis) - sum(e.Emis_Reduction) as Remaining_Emis, case when sum(i.ann_emis) <> 0 then sum(e.Emis_Reduction) / sum(i.ann_emis) * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
                             + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
                             + "sum(e.Annualized_Capital_Cost) as Annualized_Capital_Cost, "
                             + "sum(e.Total_Capital_Cost) as Total_Capital_Cost, "

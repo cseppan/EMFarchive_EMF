@@ -59,7 +59,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private JPanel tablePanel; 
 
-    private Button analysisButton, view, exportButton, createButton, editButton;
+    private Button analysisButton, view, exportButton, createButton, editButton, summarizeButton;
     
     private EmfSession session;
 
@@ -176,6 +176,19 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         return action;
     }
 
+    private Action summarizeAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doSummarize();
+            }
+
+        };
+        return action;
+    }
+    protected void doSummarize() {
+        //
+    }
+    
     protected void doInventory() {
         try {
             ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
@@ -309,6 +322,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         editButton = new Button("Edit", editAction());
         createButton = new Button("Create", createOutputAction());
         createButton.setEnabled(false);
+        summarizeButton = new Button("Summarize", summarizeAction());
+        
 //        editButton.setEnabled(false);
         
         detailButton = new JRadioButton("Result");
@@ -337,6 +352,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         buttonPanel.add(exportButton);
         buttonPanel.add(analysisButton);
         buttonPanel.add(createButton);
+        buttonPanel.add(summarizeButton);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
         return mainPanel;

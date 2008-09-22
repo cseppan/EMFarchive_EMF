@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EMFService;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 
 import java.util.Date;
 import java.util.List;
@@ -33,7 +34,9 @@ public interface ControlStrategyService extends EMFService {
     ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException;
     
     void runStrategy (User user, int controlStrategyId) throws EmfException;
-    
+
+    void summarizeStrategy(User user, int controlStrategyId, StrategyResultType strategyResultType) throws EmfException;
+
     List<ControlStrategy> getControlStrategiesByRunStatus(String runStatus) throws EmfException;
     
     void stopRunStrategy(int controlStrategyId) throws EmfException;

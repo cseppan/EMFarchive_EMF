@@ -6,8 +6,11 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
+import gov.epa.emissions.framework.services.cost.analysis.SummarizeStrategy;
+import gov.epa.emissions.framework.services.cost.analysis.StrategySummaryFactory;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -303,6 +306,27 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, dbServerFactory,
                     threadPool);
             runStrategy.run(user, strategy, this);
+        } catch (EmfException e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
+    public synchronized void summarizeStrategy(User user, int controlStrategyId, StrategyResultType strategyResultType) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+
+            ControlStrategy strategy = getById(controlStrategyId);
+
+            // make sure a valid server-side export path was specified
+            validateExportPath(strategy.getExportDirectory());
+            
+            StrategySummaryFactory factory = new StrategySummaryFactory();
+
+            SummarizeStrategy runStrategyResult = new SummarizeStrategy(factory, sessionFactory, dbServerFactory,
+                    threadPool);
+            runStrategyResult.run(user, strategy, strategyResultType);
         } catch (EmfException e) {
             throw new EmfException(e.getMessage());
         } finally {

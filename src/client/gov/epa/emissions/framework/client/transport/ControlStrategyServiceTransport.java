@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 
 public class ControlStrategyServiceTransport implements ControlStrategyService {
     private CallFactory callFactory;
@@ -134,6 +135,18 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.setVoidReturnType();
 
         call.request(new Object[] { user, new Integer(controlStrategyId) });
+    }
+
+    public synchronized void summarizeStrategy(User user, int controlStrategyId, StrategyResultType strategyResultType) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("summarizeStrategy");
+        call.addParam("user", mappings.user());
+        call.addIntegerParam("controlStrategyId");
+        call.addParam("strategyResultType", mappings.strategyResultType());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, new Integer(controlStrategyId), strategyResultType });
     }
 
     public synchronized StrategyType[] getStrategyTypes() throws EmfException {
