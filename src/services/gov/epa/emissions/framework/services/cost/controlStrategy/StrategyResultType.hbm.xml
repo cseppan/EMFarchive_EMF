@@ -8,9 +8,10 @@
         <id name="id" type="integer" column="id">
             <generator class="identity"/>
         </id>
-          
+
         <property name="name" column="name" type="java.lang.String" not-null="true"/>
-            
+        <property name="optional" column="optional" type="java.lang.Boolean" not-null="false"/>
+
     </class>
 </hibernate-mapping>  
 

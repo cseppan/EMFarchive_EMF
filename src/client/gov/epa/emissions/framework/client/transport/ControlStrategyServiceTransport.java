@@ -137,16 +137,18 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.request(new Object[] { user, new Integer(controlStrategyId) });
     }
 
-    public synchronized void summarizeStrategy(User user, int controlStrategyId, StrategyResultType strategyResultType) throws EmfException {
+    public synchronized void summarizeStrategy(User user, int controlStrategyId, 
+            String exportDirectory, StrategyResultType strategyResultType) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("summarizeStrategy");
         call.addParam("user", mappings.user());
         call.addIntegerParam("controlStrategyId");
+        call.addStringParam("exportDirectory");
         call.addParam("strategyResultType", mappings.strategyResultType());
         call.setVoidReturnType();
 
-        call.request(new Object[] { user, new Integer(controlStrategyId), strategyResultType });
+        call.request(new Object[] { user, new Integer(controlStrategyId), exportDirectory, strategyResultType });
     }
 
     public synchronized StrategyType[] getStrategyTypes() throws EmfException {
@@ -281,5 +283,14 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.setReturnType(mappings.string());
 
         return (String) call.requestResponse(new Object[] {  });
+    }
+
+    public StrategyResultType[] getOptionalStrategyResultTypes() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getOptionalStrategyResultTypes");
+        call.setReturnType(mappings.strategyResultTypes());
+
+        return (StrategyResultType[]) call.requestResponse(new Object[] { });
     }
 }

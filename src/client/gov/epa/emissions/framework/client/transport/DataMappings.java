@@ -199,6 +199,7 @@ public class DataMappings extends Mappings {
         array(call, EfficiencyRecord[].class, efficiencyRecords());
         array(call, SumEffRec[].class, sumEffRecs());
         array(call, Scc[].class, sccs());
+        array(call, StrategyResultType[].class, strategyResultTypes());
         array(call, ControlMeasureClass[].class, controlMeasureClasses());
         array(call, EquationType[].class, equationTypes());
         array(call, EquationTypeVariable[].class, equationTypeVariables());
@@ -551,6 +552,10 @@ public class DataMappings extends Mappings {
 
     public QName strategyResultType() {
         return qname("StrategyResultType");
+    }
+
+    public QName strategyResultTypes() {
+        return qname("StrategyResultTypes");
     }
 
     public QName pollutant() {

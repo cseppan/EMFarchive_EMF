@@ -18,14 +18,14 @@ public class StrategySummaryFactory {
         //
     }
 
-    public StrategySummaryTask create(ControlStrategy controlStrategy, User user, 
+    public IStrategySummaryTask create(ControlStrategy controlStrategy, User user, 
             StrategyResultType strategyResultType, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory)
             throws EmfException {
         try {
-            if (strategyResultType.getName().equals(StrategyResultType.strategyCountySummary))
+//            if (strategyResultType.getName().equals(StrategyResultType.strategyCountySummary))
                     return new StrategyCountySummaryTask(controlStrategy, user, 
                             dbServerFactory, sessionFactory);
-            return null;
+//            return null;
         } catch (Exception e) {
             log.error("Failed to create strategy. Cause: " + e.getMessage());
             throw new EmfException("Failed to create strategy." + e.getMessage());

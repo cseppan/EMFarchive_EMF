@@ -8,6 +8,8 @@ public class StrategyResultType implements Serializable {
     
     private String name;
     
+    private Boolean optional;
+    
     public static final String strategyMeasureSummary = "Strategy Measure Summary";
     
     public static final String strategyCountySummary = "Strategy County Summary";
@@ -46,4 +48,15 @@ public class StrategyResultType implements Serializable {
         this.name = name;
     }
 
+    public void setOptional(Boolean optional) {
+        this.optional = optional;
+    }
+
+    public Boolean getOptional() {
+        return optional;
+    }
+
+    public String toString() {
+        return this.name;
+    }
 }

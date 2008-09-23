@@ -40,14 +40,17 @@ public class SummarizeStrategy {
         this.services = services();
     }
 
-    public void run(User user, ControlStrategy controlStrategy, StrategyResultType strategyResultType) throws EmfException {
+    public void run(User user, ControlStrategy controlStrategy, 
+            StrategyResultType strategyResultType) throws EmfException {
+        
         currentLimitations(controlStrategy);
         try {
-            StrategySummaryTask strategyResult = factory.create(controlStrategy, user, 
+            IStrategySummaryTask strategyResult = factory.create(controlStrategy, user, 
                     strategyResultType, sessionFactory, 
                     dbServerFactory);
-            StrategyResultTask task = new StrategyResultTask(strategyResult, user, 
-                    services, sessionFactory);
+            StrategySummaryTask task = new StrategySummaryTask(strategyResult, strategyResultType,
+                    user, services, 
+                    sessionFactory);
             threadPool.execute(new GCEnforcerTask("Run StrategyResult: " + controlStrategy.getName(), task));
         } catch (Exception e) {
             log.error("Error running control strategy result: " + controlStrategy.getName(), e);

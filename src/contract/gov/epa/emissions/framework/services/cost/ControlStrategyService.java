@@ -17,6 +17,8 @@ public interface ControlStrategyService extends EMFService {
     
     StrategyType[] getStrategyTypes() throws EmfException;
     
+    StrategyResultType[] getOptionalStrategyResultTypes() throws EmfException;
+    
     int addControlStrategy(ControlStrategy element) throws EmfException;
     
 //    void removeControlStrategies(ControlStrategy[] elements, User user) throws EmfException;
@@ -35,7 +37,7 @@ public interface ControlStrategyService extends EMFService {
     
     void runStrategy (User user, int controlStrategyId) throws EmfException;
 
-    void summarizeStrategy(User user, int controlStrategyId, StrategyResultType strategyResultType) throws EmfException;
+    void summarizeStrategy(User user, int controlStrategyId, String exportDirectory, StrategyResultType strategyResultType) throws EmfException;
 
     List<ControlStrategy> getControlStrategiesByRunStatus(String runStatus) throws EmfException;
     

@@ -313,20 +313,24 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    public synchronized void summarizeStrategy(User user, int controlStrategyId, StrategyResultType strategyResultType) throws EmfException {
+    public synchronized void summarizeStrategy(User user, int controlStrategyId, 
+            String exportDirectory, StrategyResultType strategyResultType) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
 
             ControlStrategy strategy = getById(controlStrategyId);
 
             // make sure a valid server-side export path was specified
-            validateExportPath(strategy.getExportDirectory());
+            validateExportPath(exportDirectory);
             
             StrategySummaryFactory factory = new StrategySummaryFactory();
 
-            SummarizeStrategy runStrategyResult = new SummarizeStrategy(factory, sessionFactory, dbServerFactory,
-                    threadPool);
-            runStrategyResult.run(user, strategy, strategyResultType);
+            SummarizeStrategy runStrategyResult = new SummarizeStrategy(factory, sessionFactory, 
+                    dbServerFactory, threadPool);
+
+            runStrategyResult.run(user, strategy, 
+                    strategyResultType);
+
         } catch (EmfException e) {
             throw new EmfException(e.getMessage());
         } finally {
@@ -347,12 +351,15 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     }
 
     private void validateExportPath(String folderPath) throws EmfException {
+        
+        
+        if (folderPath == null || folderPath.trim().length() == 0) 
+            throw new EmfException("Missing export folder");
+        
         File file = new File(folderPath);
 
-        if (!file.exists() || !file.isDirectory()) {
+        if (!file.exists() || !file.isDirectory()) 
             throw new EmfException("Export folder does not exist: " + folderPath);
-        }
-
     }
 
     public List<ControlStrategy> getControlStrategiesByRunStatus(String runStatus) throws EmfException {
@@ -540,6 +547,18 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve default export directory.", e);
             throw new EmfException("Could not retrieve default export directory.");
+        } finally {
+            session.close();
+        }
+    }
+
+    public synchronized StrategyResultType[] getOptionalStrategyResultTypes() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getOptionalStrategyResultTypes(session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve strategy result types.", e);
+            throw new EmfException("Could not retrieve strategy result types.");
         } finally {
             session.close();
         }

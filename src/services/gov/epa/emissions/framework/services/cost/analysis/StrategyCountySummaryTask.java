@@ -32,6 +32,8 @@ public class StrategyCountySummaryTask extends AbstractStrategySummaryTask {
 
     private DbServer dbServer;
 
+    private ControlStrategyResult countySummaryResult;
+    
     public StrategyCountySummaryTask(ControlStrategy controlStrategy, User user, 
             DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws EmfException {
         super(controlStrategy, user, dbServerFactory, sessionFactory);
@@ -59,27 +61,28 @@ public class StrategyCountySummaryTask extends AbstractStrategySummaryTask {
         String status = "";
         try {
 
-            ControlStrategyResult countySummaryResult = null;
+            countySummaryResult = null;
             try {
                 //create new result
                 countySummaryResult = createStrategyCountySummaryResult();
                 
                 populateStrategyCountySummaryDataset(getControlStrategyResults(), countySummaryResult);
-                
+                status = "Completed.";
             } catch (Exception e) {
                 e.printStackTrace();
-                status = "Failed. Error processing input dataset: . " + e.getMessage();
+                status = "Failed. Error processing strategy summary: . " + e.getMessage();
                 setStatus(status);
             } finally {
                 //update result ending info...
                 if (countySummaryResult != null) {
+                    setSummaryResultCount(countySummaryResult);
                     countySummaryResult.setCompletionTime(new Date());
                     countySummaryResult.setRunStatus(status);
                     saveControlStrategyResult(countySummaryResult);
                     addStatus(countySummaryResult);
                 }
             }
-            
+
         } catch (Exception e) {
             status = "Failed. Error processing input dataset";
             e.printStackTrace();
@@ -108,7 +111,7 @@ public class StrategyCountySummaryTask extends AbstractStrategySummaryTask {
 
     public ControlStrategyResult getStrategyResult() {
         // NOTE Auto-generated method stub
-        return null;
+        return countySummaryResult;
     }
 
     private EmfDataset createCountySummaryDataset() throws EmfException {

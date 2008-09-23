@@ -185,8 +185,20 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         };
         return action;
     }
+
     protected void doSummarize() {
-        //
+        StrategySummarySelectionView view = new StrategySummarySelectionDialog(parentConsole);
+        StrategySummarySelectionPresenter presenter = new StrategySummarySelectionPresenter(view, session);
+        try {
+            presenter.display();
+            StrategyResultType[] strategyResultTypes = presenter.getStrategyResultTypes();
+            for (int i = 0; i < strategyResultTypes.length; i++) {
+                session.controlStrategyService().summarizeStrategy(session.user(), controlStrategy.getId(), 
+                        folder.getText(), strategyResultTypes[i]);
+            }
+        } catch (Exception exp) {
+            messagePanel.setError(exp.getMessage());
+        }
     }
     
     protected void doInventory() {

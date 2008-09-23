@@ -228,6 +228,10 @@ public class ControlStrategyDAO {
         return (StrategyResultType)hibernateFacade.load(StrategyResultType.class, critName, session);
     }
 
+    public StrategyResultType[] getOptionalStrategyResultTypes(Session session) {
+        return (StrategyResultType[]) session.createCriteria(StrategyResultType.class).add(Restrictions.eq("optional", true)).list().toArray(new StrategyResultType[0]);
+    }
+
     public StrategyResultType getSummaryStrategyResultType(Session session) {
         return getStrategyResultType(StrategyResultType.strategyMeasureSummary, session);
     }

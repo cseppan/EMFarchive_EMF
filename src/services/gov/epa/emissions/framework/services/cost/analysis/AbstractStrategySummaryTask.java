@@ -33,7 +33,7 @@ import java.util.Date;
 import org.hibernate.Session;
 
 
-public abstract class AbstractStrategySummaryTask implements StrategySummaryTask {
+public abstract class AbstractStrategySummaryTask implements IStrategySummaryTask {
     
     protected ControlStrategy controlStrategy;
 
