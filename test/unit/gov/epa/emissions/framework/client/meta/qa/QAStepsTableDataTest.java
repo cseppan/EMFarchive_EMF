@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.Date;
@@ -43,7 +44,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         step2.setStatus("status2");
         step2.setConfiguration("dataset two");
 
-        data = new QAStepsTableData(new QAStep[] { step1, step2 });
+        data = new QAStepsTableData(new QAStep[] { step1, step2 }, new QAStepResult[] {null, null});
     }
 
     private QAProgram program(String name) {

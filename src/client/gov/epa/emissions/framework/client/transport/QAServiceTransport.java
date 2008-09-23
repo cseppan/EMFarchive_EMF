@@ -40,6 +40,17 @@ public class QAServiceTransport implements QAService {
 
         return (QAStep[]) call.requestResponse(params);
     }
+    
+    public synchronized QAStepResult[] getQAStepResults(EmfDataset dataset) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getQAStepResults");
+        call.addParam("dataset", mappings.dataset());
+        call.setReturnType(mappings.qaStepResults());
+        Object[] params = new Object[] { dataset };
+
+        return (QAStepResult[]) call.requestResponse(params);
+    }
 
     public synchronized void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
         EmfCall call = call();

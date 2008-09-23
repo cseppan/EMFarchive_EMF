@@ -71,6 +71,19 @@ public class QAServiceImpl implements QAService {
             session.close();
         }
     }
+    
+    public synchronized QAStepResult[] getQAStepResults(EmfDataset dataset) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            QAStepResult[] results = dao.qaRsults(dataset, session);
+            return results;
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve QA Step Results for dataset: " + dataset.getName(), e);
+            throw new EmfException("Could not retrieve QA Step Results for dataset: " + dataset.getName());
+        } finally {
+            session.close();
+        }
+    }
 
     public synchronized QAProgram[] getQAPrograms() throws EmfException {
         Session session = sessionFactory.getSession();

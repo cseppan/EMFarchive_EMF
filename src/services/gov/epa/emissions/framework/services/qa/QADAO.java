@@ -28,6 +28,13 @@ public class QADAO {
         List steps = session.createCriteria(QAStep.class).add(criterion).list();
         return (QAStep[]) steps.toArray(new QAStep[0]);
     }
+    
+    public QAStepResult[] qaRsults(EmfDataset dataset, Session session) {
+        Criterion criterion = Restrictions.eq("datasetId", new Integer(dataset.getId()));
+
+        List results = session.createCriteria(QAStepResult.class).add(criterion).list();
+        return (QAStepResult[]) results.toArray(new QAStepResult[0]);
+    }
 
     public void update(QAStep[] steps, Session session) {
         hibernateFacade.update(steps, session);

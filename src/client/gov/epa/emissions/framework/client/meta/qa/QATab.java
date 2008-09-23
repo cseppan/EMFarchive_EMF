@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
@@ -40,16 +41,16 @@ public class QATab extends JPanel implements QATabView {
         this.desktopManager = desktopManager;
     }
 
-    public void display(QAStep[] steps, EmfSession session) {
+    public void display(QAStep[] steps, QAStepResult[] results, EmfSession session) {
         this.session = session;
         super.setLayout(new BorderLayout());
-        super.add(tablePanel(steps), BorderLayout.CENTER);
+        super.add(tablePanel(steps, results), BorderLayout.CENTER);
         super.add(createButtonsSection(), BorderLayout.PAGE_END);
     }
     
-    public void display(QAStep[] steps) {
+    public void display(QAStep[] steps, QAStepResult[] results) {
         super.setLayout(new BorderLayout());
-        super.add(tablePanel(steps), BorderLayout.CENTER);
+        super.add(tablePanel(steps, results), BorderLayout.CENTER);
         super.add(createButtonsSection(), BorderLayout.PAGE_END);
     }
 
@@ -57,9 +58,9 @@ public class QATab extends JPanel implements QATabView {
         this.presenter = presenter;
     }
 
-    private JPanel tablePanel(QAStep[] steps) {
+    private JPanel tablePanel(QAStep[] steps, QAStepResult[] results) {
         JPanel container = new JPanel(new BorderLayout());
-        table = new SelectableSortFilterWrapper(parentConsole, new QAStepsTableData(steps), sortCriteria());
+        table = new SelectableSortFilterWrapper(parentConsole, new QAStepsTableData(steps, results), sortCriteria());
         container.add(table, BorderLayout.CENTER);
         return container;
     }

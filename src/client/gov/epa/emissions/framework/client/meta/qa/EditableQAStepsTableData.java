@@ -2,11 +2,13 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,23 +17,28 @@ public class EditableQAStepsTableData extends AbstractTableData {
     private List rows;
 
     private QASteps steps;
+    
+    private List qaStepResults;
 
-    public EditableQAStepsTableData(QAStep[] steps) {
+    public EditableQAStepsTableData(QAStep[] steps, QAStepResult[] qaStepResults) {
         this.steps = new QASteps(steps);
-        this.rows = createRows(this.steps);
+        this.qaStepResults = new ArrayList();
+        this.qaStepResults.addAll(Arrays.asList(qaStepResults));
+        this.rows = createRows(this.steps, this.qaStepResults);
     }
 
     public void refresh() {
-        this.rows = createRows(steps);
+        this.rows = createRows(steps, qaStepResults);
     }
 
-    public void add(QAStep step) {
+    public void add(QAStep step, QAStepResult qaStepResult) {
         steps.add(step);
-        rows.add(row(step));
+        qaStepResults.add(qaStepResult);
+        rows.add(row(step, qaStepResult));
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Version", "Required", "Order", "Status", "When", "Who", "Comment", "Program",
+        return new String[] { "Name", "Version", "Required", "Order", "QA Status", "Run Status", "When", "Who", "Comment", "Program",
                 "Arguments", "Configuration" };
     }
 
@@ -43,16 +50,27 @@ public class EditableQAStepsTableData extends AbstractTableData {
         return (col == 0) ? true : false;
     }
 
-    private List createRows(QASteps steps) {
+    private List createRows(QASteps steps, List qaStepResults) {
         List rows = new ArrayList();
         for (int i = 0; i < steps.size(); i++)
-            rows.add(row(steps.get(i)));
+            rows.add(row(steps.get(i), findMatchedResult(steps.get(i).getId())));
 
         return rows;
     }
+    
+    private QAStepResult findMatchedResult(int stepId){
+        if ( qaStepResults==null || qaStepResults.size() ==0) return null;
+        for (int i=0; i<qaStepResults.size(); i++){
+            QAStepResult result=(QAStepResult) qaStepResults.get(i);
+            if (result.getQaStepId() == stepId)
+                return result;
+        }
+        return null; 
+    }
 
-    private EditableRow row(QAStep step) {
-        RowSource source = new QAStepRowSource(step);
+
+    private EditableRow row(QAStep step, QAStepResult qaStepResult ) {
+        RowSource source = new QAStepRowSource(step, qaStepResult);
         return new EditableRow(source);
     }
 

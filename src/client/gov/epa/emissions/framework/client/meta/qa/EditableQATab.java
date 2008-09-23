@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
@@ -50,18 +51,18 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         this.messagePanel = messagePanel;
     }
 
-    public void display(Dataset dataset, QAStep[] steps, Version[] versions) {
+    public void display(Dataset dataset, QAStep[] steps, QAStepResult[] qaStepResults, Version[] versions) {
         this.datasetID = dataset.getId(); // for uniqueness of window naming
         this.versions = new VersionsSet(versions);
         super.setLayout(new BorderLayout());
-        super.add(tablePanel(steps), BorderLayout.CENTER);
+        super.add(tablePanel(steps, qaStepResults), BorderLayout.CENTER);
         super.add(createButtonsSection(), BorderLayout.PAGE_END);
 
         super.setSize(new Dimension(700, 300));
     }
 
-    protected JPanel tablePanel(QAStep[] steps) {
-        setupTableModel(steps);
+    protected JPanel tablePanel(QAStep[] steps, QAStepResult[] qaStepResults) {
+        setupTableModel(steps, qaStepResults);
 
         tablePanel = new JPanel(new BorderLayout());
         table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
@@ -70,8 +71,8 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         return tablePanel;
     }
     
-    private void setupTableModel(QAStep[] steps) {
-        tableData = new EditableQAStepsTableData(steps);
+    private void setupTableModel(QAStep[] steps, QAStepResult[] qaStepResults) {
+        tableData = new EditableQAStepsTableData(steps, qaStepResults);
     }
 
     private SortCriteria sortCriteria() {
@@ -110,6 +111,13 @@ public class EditableQATab extends JPanel implements EditableQATabView {
             }
         });
         container.add(status);
+        
+        Button runStatus = new BorderlessButton("Run", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                runStatus();
+            }
+        });
+        container.add(runStatus);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
@@ -143,7 +151,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         clearMessage();
 
         List selected = table.selected();
-        if (selected.size() == 0) {
+        if (selected == null || selected.size() == 0) {
             messagePanel.setMessage("Please select a QA step.");
             return;
         }
@@ -190,7 +198,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     
     private void addNewStepsToTable(QAStep[] newSteps) {
         for (int i = 0; i < newSteps.length; i++)
-            tableData.add(newSteps[i]);
+            tableData.add(newSteps[i], null);
         refresh();
     }
 
@@ -207,7 +215,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         super.validate();
     }
 
-    public void doSetStatus() {
+    private void doSetStatus() {
         clearMessage();
 
         List selected = table.selected();
@@ -216,6 +224,30 @@ public class EditableQATab extends JPanel implements EditableQATabView {
             presenter.doSetStatus(new SetQAStatusWindow(desktop, datasetID), steps);
         else
             messagePanel.setMessage("Please select a QA step.");
+    }
+    
+    private void runStatus() {
+        clearMessage();
+
+        List selected = table.selected();
+        QAStep[] steps = (QAStep[]) selected.toArray(new QAStep[0]);
+        if (steps==null ||steps.length == 0) {
+            messagePanel.setMessage("Please select a QA step.");
+            return; 
+        }
+        if (steps.length > 3 ){
+            messagePanel.setMessage("You may only run three at the same time.");
+            return;
+        }
+        for (int i=0; i<steps.length; i++){
+            try {
+                messagePanel.setMessage("Started " + (steps.length==1? " One Run. " : steps.length+" Runs. ")+" Please monitor the Status Window. ");
+                 presenter.runStatus(steps[i]);
+            } catch (EmfException e) {
+                messagePanel.setMessage(e.getMessage());
+                e.printStackTrace();
+            }
+        }
     }
 
     public void informLackOfTemplatesForAddingNewSteps(DatasetType type) {

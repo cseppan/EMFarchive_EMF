@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.Date;
@@ -10,9 +11,12 @@ import java.util.Date;
 public class QAStepRowSource implements RowSource {
 
     private QAStep source;
+    
+    private QAStepResult qaStepResult;
 
-    public QAStepRowSource(QAStep source) {
+    public QAStepRowSource(QAStep source, QAStepResult qaStepResult) {
         this.source = source;
+        this.qaStepResult = qaStepResult;
     }
 
     public Object[] values() {
@@ -21,12 +25,12 @@ public class QAStepRowSource implements RowSource {
             comments = comments.substring(0, 45) + "  ...";
 
         return new Object[] { source.getName(), new Integer(source.getVersion()), Boolean.valueOf(source.isRequired()),
-                new Float(source.getOrder()), source.getStatus(), format(source.getDate()), source.getWho(), comments,
+                new Float(source.getOrder()), source.getStatus(), getStepResult(), format(source.getDate()), source.getWho(), comments,
                 program(source.getProgram()), getShortenedProgramArguments(source.getProgramArguments()), 
                 source.getConfiguration() };
     }
     
-    public String getShortenedProgramArguments(String programArguments) {
+    private String getShortenedProgramArguments(String programArguments) {
         if (programArguments == null)
            return programArguments;
         else if (programArguments.length() > 70)
@@ -35,6 +39,10 @@ public class QAStepRowSource implements RowSource {
            return programArguments;
     }
 
+    private String getStepResult(){
+        if (qaStepResult ==null) return "";
+        return qaStepResult.getTableCreationStatus();
+    }
 
     private String program(QAProgram program) {
         return (program != null) ? program.getName() : "";

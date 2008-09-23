@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.Date;
@@ -37,7 +38,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         step2.setOrder(2);
         step2.setConfiguration("dataset two");
 
-        data = new EditableQAStepsTableData(new QAStep[] { step1, step2 });
+        data = new EditableQAStepsTableData(new QAStep[] { step1, step2 }, new QAStepResult[] {null, null});
     }
 
     public void testShouldHaveTenColumns() {
@@ -123,7 +124,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         step3.setRequired(false);
         step3.setOrder(3);
 
-        data.add(step3);
+        data.add(step3, null);
         assertEquals(3, data.rows().size());
         assertEquals(3, data.sources().length);
         
@@ -142,7 +143,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         step3.setRequired(false);
         step3.setOrder(3);
         
-        data.add(step3);
+        data.add(step3, null);
         data.refresh();
         assertEquals(3, data.rows().size());
         assertEquals(3, data.sources().length);

@@ -434,6 +434,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
     protected void doExport() {
         try {
+            checkExportFolder();
             QAStepResult result = presenter.getStepResult(step);
             resetRunStatus(result);
             messagePanel.setMessage("Started Export. Please monitor the Status window "
@@ -442,6 +443,11 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+    }
+    
+    private void checkExportFolder() throws EmfException{
+        if (exportFolder.getText().trim().isEmpty())
+            throw new EmfException (" Please specify the export folder. ");
     }
 
     private Button viewResultsButton() {

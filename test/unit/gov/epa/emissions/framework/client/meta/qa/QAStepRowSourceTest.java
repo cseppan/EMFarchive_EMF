@@ -24,7 +24,7 @@ public class QAStepRowSourceTest extends TestCase {
         step.setStatus("status");
         step.setConfiguration("dataset one");
 
-        QAStepRowSource source = new QAStepRowSource(step);
+        QAStepRowSource source = new QAStepRowSource(step, null);
 
         Object[] values = source.values();
         assertEquals(11, values.length);
@@ -45,7 +45,7 @@ public class QAStepRowSourceTest extends TestCase {
 
     public void testShouldTrackOriginalSource() {
         QAStep step = new QAStep();
-        QAStepRowSource source = new QAStepRowSource(step);
+        QAStepRowSource source = new QAStepRowSource(step, null);
 
         assertEquals(step, source.source());
     }

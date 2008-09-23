@@ -4,10 +4,11 @@ import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 
 public interface EditableQATabView {
 
-    void display(Dataset dataset, QAStep[] steps, Version[] versions);
+    void display(Dataset dataset, QAStep[] steps, QAStepResult[] qaStepResults, Version[] versions);
 
     void observe(EditableQATabPresenter presenter);
 

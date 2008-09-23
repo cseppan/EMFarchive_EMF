@@ -12,6 +12,8 @@ import gov.epa.emissions.framework.services.data.QAStepResult;
 public interface QAService {
 
     QAStep[] getQASteps(EmfDataset dataset) throws EmfException;
+    
+    QAStepResult[] getQAStepResults(EmfDataset dataset) throws EmfException; 
 
     QAProgram[] getQAPrograms() throws EmfException;
 
@@ -26,6 +28,8 @@ public interface QAService {
     public void exportShapeFileQAStep(QAStep step, User user, String dirName, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException;
 
     QAStepResult getQAStepResult(QAStep step) throws EmfException;
+    
+    //String getRunStatus(QAStep step) throws EmfException;
 
     QAProgram addQAProgram(QAProgram program) throws EmfException;
 
