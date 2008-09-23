@@ -182,6 +182,7 @@ public class DataMappings extends Mappings {
 
         array(call, QAStepTemplate[].class, qaStepTemplates());
         array(call, QAStep[].class, qaSteps());
+        array(call, QAStepResult[].class, qaStepResults());
         array(call, ProjectionShapeFile[].class, projectionShapeFiles());
         array(call, QAProgram[].class, programs());
 
@@ -596,6 +597,10 @@ public class DataMappings extends Mappings {
 
     public QName qaStepResult() {
         return qname("QAStepResult");
+    }
+    
+    public QName qaStepResults() {
+        return qname("QAStepResults");
     }
     
     public QName emfFileInfo() {
