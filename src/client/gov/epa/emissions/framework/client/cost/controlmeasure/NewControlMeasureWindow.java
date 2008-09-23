@@ -40,7 +40,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     private CostYearTable costYearTable;
 
     public NewControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager, CostYearTable costYearTable) {
-        super("New Control Measure", new Dimension(770, 475), desktopManager);
+        super("New Control Measure", new Dimension(770, 500), desktopManager); 
         this.desktopManager = desktopManager;
         this.session = session;
         this.parent = parent;
