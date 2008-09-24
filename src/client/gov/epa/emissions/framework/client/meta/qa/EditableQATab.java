@@ -198,10 +198,14 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     
     private void addNewStepsToTable(QAStep[] newSteps) {
         for (int i = 0; i < newSteps.length; i++)
-            tableData.add(newSteps[i], null);
+            tableData.add(newSteps[i]);
         refresh();
     }
 
+    public void refresh(QAStep step, QAStepResult result) {
+        tableData.add(step, result);
+        refresh();
+    }
     
     public void refresh() {
         tableData.refresh();

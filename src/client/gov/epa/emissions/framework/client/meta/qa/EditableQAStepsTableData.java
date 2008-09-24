@@ -18,23 +18,36 @@ public class EditableQAStepsTableData extends AbstractTableData {
 
     private QASteps steps;
     
-    private List qaStepResults;
+    private List<QAStepResult> qaStepResults;
 
     public EditableQAStepsTableData(QAStep[] steps, QAStepResult[] qaStepResults) {
         this.steps = new QASteps(steps);
         this.qaStepResults = new ArrayList();
         this.qaStepResults.addAll(Arrays.asList(qaStepResults));
-        this.rows = createRows(this.steps, this.qaStepResults);
+        this.rows = createRows(this.steps);
+    }
+    
+    public EditableQAStepsTableData(QAStep[] steps) {
+        this.steps = new QASteps(steps);
+        this.qaStepResults = new ArrayList();
+        this.rows = createRows(this.steps);
     }
 
     public void refresh() {
-        this.rows = createRows(steps, qaStepResults);
+        this.rows = createRows(steps);
+    }
+    
+    public void add(QAStep step, QAStepResult qaStepResult) {
+        steps.filterDuplicates(new QAStep[]{step});
+        QAStepResult result = findMatchedResult(step.getId());
+        if (result != null )
+            qaStepResults.remove(result);
+        qaStepResults.add(qaStepResult);
     }
 
-    public void add(QAStep step, QAStepResult qaStepResult) {
+    public void add(QAStep step) {
         steps.add(step);
-        qaStepResults.add(qaStepResult);
-        rows.add(row(step, qaStepResult));
+        rows.add(row(step, null));
     }
 
     public String[] columns() {
@@ -50,7 +63,7 @@ public class EditableQAStepsTableData extends AbstractTableData {
         return (col == 0) ? true : false;
     }
 
-    private List createRows(QASteps steps, List qaStepResults) {
+    private List createRows(QASteps steps) {
         List rows = new ArrayList();
         for (int i = 0; i < steps.size(); i++)
             rows.add(row(steps.get(i), findMatchedResult(steps.get(i).getId())));
@@ -59,10 +72,10 @@ public class EditableQAStepsTableData extends AbstractTableData {
     }
     
     private QAStepResult findMatchedResult(int stepId){
-        if ( qaStepResults==null || qaStepResults.size() ==0) return null;
+        if ( qaStepResults == null || qaStepResults.size() ==0) return null;
         for (int i=0; i<qaStepResults.size(); i++){
-            QAStepResult result=(QAStepResult) qaStepResults.get(i);
-            if (result.getQaStepId() == stepId)
+            QAStepResult result=qaStepResults.get(i);
+            if (result!=null && result.getQaStepId() == stepId)
                 return result;
         }
         return null; 

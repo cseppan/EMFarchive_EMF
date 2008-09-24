@@ -74,12 +74,13 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         presenter.display();
     }
 
-    public void runStatus(QAStep step) throws EmfException {
+    public synchronized void runStatus(QAStep step) throws EmfException {
         step.setStatus("In Progress");
         step.setDate(new Date());
         step.setWho(session.user().getUsername());
         session.qaService().runQAStep(step, session.user());
-        view.refresh();
+        //QAStepResult result = session.qaService().getQAStepResult(step);
+        //view.refresh(step, result);
     }
 
     public void doEdit(QAStep step, EditQAStepView performView, String versionName) throws EmfException {

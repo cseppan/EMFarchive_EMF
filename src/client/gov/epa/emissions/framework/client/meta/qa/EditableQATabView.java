@@ -21,5 +21,7 @@ public interface EditableQATabView {
     void informLackOfTemplatesForAddingNewSteps(DatasetType type);
 
     void refresh();
+    
+    void refresh(QAStep step, QAStepResult result);
 
 }

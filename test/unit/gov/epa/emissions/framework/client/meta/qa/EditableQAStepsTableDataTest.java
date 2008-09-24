@@ -124,7 +124,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         step3.setRequired(false);
         step3.setOrder(3);
 
-        data.add(step3, null);
+        data.add(step3);
         assertEquals(3, data.rows().size());
         assertEquals(3, data.sources().length);
         
@@ -143,7 +143,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         step3.setRequired(false);
         step3.setOrder(3);
         
-        data.add(step3, null);
+        data.add(step3);
         data.refresh();
         assertEquals(3, data.rows().size());
         assertEquals(3, data.sources().length);
