@@ -27,6 +27,8 @@ public class SQLQAAnnualQuery {
     private static final String invTableTag = "-invtable";
     
     private static final String summaryTypeTag = "-summaryType";
+    
+    //private boolean hasInvTableDataset;
 
     public SQLQAAnnualQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName, String tableName, QAStep qaStep) {
         
@@ -76,29 +78,45 @@ public class SQLQAAnnualQuery {
         
         String inventoriesToken = "";
         String invtableToken = "";
+        String summaryTypeToken = "State+SCC";
         String invTableDatasetName = "";
         
         int index1 = programArguments.indexOf(invTableTag);
         int index2 = programArguments.indexOf(summaryTypeTag);
         inventoriesToken = programArguments.substring(0, index1);
         invtableToken = programArguments.substring(index1 + invTableTag.length(),index2 == -1 ? programArguments.length() : index2 );
-        // System.out.println("The inventories are : \n" + inventoriesToken);
-        // System.out.println("The invtable is : \n" + invtableToken);
+
+        if (index2 != -1) {
+            summaryTypeToken = programArguments.substring(index2 + summaryTypeTag.length()).trim();
+        } 
+        
+      //default just in case...
+        if (summaryTypeToken.trim().length() == 0)
+            summaryTypeToken = "State+SCC";
+        
          StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken);
          tokenizer2.nextToken();
          while (tokenizer2.hasMoreTokens()) {
-             allDatasetNames.add(tokenizer2.nextToken());
-            }
+             String datasetName = tokenizer2.nextToken().trim();
+             System.out.println("The dataset name is : \n" + datasetName);
+             if (datasetName.length() > 0)
+                 allDatasetNames.add(datasetName);
+             else {
+                 //see if there are tables to build the query with, if not throw an exception
+                 throw new EmfException("There are no Onroad Inventory datasets specified.");
+             }
+         }
          StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
          while (tokenizer3.hasMoreTokens()) {
-             invTableDatasetName  = tokenizer3.nextToken();
-            }
-         
-        //System.out.println("TheArrayList is : \n" + allDatasetNames);
-        
+             invTableDatasetName  = tokenizer3.nextToken().trim();
+             //if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
+         }
+
+         System.out.println("TheArrayList is : \n" + allDatasetNames +allDatasetNames.size());
+
         //Create the outer query
         
-        String outerQuery = "select te.fipsst, i.name, sum(cast(i.factor as double precision) * mo_emis) as ann_emis from\n # as te left outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i on te.poll = i.cas  group by te.fipsst, i.name order by te.fipsst, i.name";
+        String outerQuery = "select @!@, i.name, sum(cast(i.factor as double precision) * mo_emis) as ann_emis from\n # as te left outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i on te.poll = i.cas  group by @@@, i.name order by @@@, i.name";
         
         //System.out.println("The input for the outer query is: \n" + outerQuery);
         String almostQuery = query(outerQuery, true);
@@ -123,12 +141,12 @@ public class SQLQAAnnualQuery {
             
             //String year = "";
             String month = "";
-            EmfDataset dataset;
+            EmfDataset dataset=null;
             try {
-                //System.out.println("allDatasetNames.size() = " + allDatasetNames.size());
+                System.out.println("allDatasetNames.size() = " + allDatasetNames.size() + "  "+allDatasetNames.get(j));
                 dataset = getDataset(allDatasetNames.get(j).toString().trim());
             } catch(EmfException ex){
-                throw new EmfException("The dataset name " + allDatasetNames.get(j).toString().trim() + " is not valid");
+                throw new EmfException("The dataset name " + allDatasetNames.get(j) + " is not valid");
             }
                         
             // The names and/or properties of the dataset are to be checked to determine year and month that 
@@ -270,7 +288,51 @@ public class SQLQAAnnualQuery {
         
         //Use pattern matching to remove the last and unrequired union all from the query
         String fullQuery = fullQuery1.replaceAll("poll  union all...as te", "poll ) as te");
+      //replace @!@ symbol with main columns in outer select statement
+        String sql = "";
+        if (summaryTypeToken.equals("State+SCC")) 
+            sql = "te.fipsst, te.scc";
+        else if (summaryTypeToken.equals("State")) 
+            sql = "te.fipsst";
+        else if (summaryTypeToken.equals("County")) 
+            sql = "te.fips";
+        else if (summaryTypeToken.equals("County+SCC")) 
+            sql = "te.fips, te.scc";
+        fullQuery = fullQuery.replaceAll("@!@", sql);
         
+      //replace @@@ symbol with group by columns in outer select statement
+        if (summaryTypeToken.equals("State+SCC")) 
+            sql = "te.fipsst, te.scc";
+        else if (summaryTypeToken.equals("State")) 
+            sql = "te.fipsst";
+        else if (summaryTypeToken.equals("County")) 
+            sql = "te.fips";
+        else if (summaryTypeToken.equals("County+SCC")) 
+            sql = "te.fips, te.scc";
+        fullQuery = fullQuery.replaceAll("@@@", sql);
+        
+      //replace !@! symbol with main columns in inner select statement
+        if (summaryTypeToken.equals("State+SCC")) 
+            sql = "substr(fips, 1, 2) as fipsst, scc";
+        else if (summaryTypeToken.equals("State")) 
+            sql = "substr(fips, 1, 2) as fipsst";
+        else if (summaryTypeToken.equals("County")) 
+            sql = "fips";
+        else if (summaryTypeToken.equals("County+SCC")) 
+            sql = "fips, scc";
+        fullQuery = fullQuery.replaceAll("!@!", sql);
+        
+      //replace !!! symbol with group by columns in inner select statement
+        if (summaryTypeToken.equals("State+SCC")) 
+            sql = "substr(fips, 1, 2), scc";
+        else if (summaryTypeToken.equals("State")) 
+            sql = "substr(fips, 1, 2)";
+        else if (summaryTypeToken.equals("County")) 
+            sql = "fips";
+        else if (summaryTypeToken.equals("County+SCC")) 
+            sql = "fips, scc";
+        fullQuery = fullQuery.replaceAll("!!!", sql);
+
         //System.out.println("The final query is : " + fullQuery);
         return fullQuery;
         //return query(fullQuery, true);
@@ -279,12 +341,12 @@ public class SQLQAAnnualQuery {
 
         private String createMonthlyQuery(int daysInMonth, ArrayList datasetNames) throws EmfException
 {
-           String monthlyQueryPrefix = "select substr(fips, 1, 2) as fipsst, poll, sum( avd_emis * ";
+           String monthlyQueryPrefix = "select !@!, poll, sum( avd_emis * ";
 
            String monthlyQueryMiddle = ") as mo_emis from\n $DATASET_TABLE[\"";
            //System.out.println("middle query: " + monthlyQueryMiddle);
            
-           String monthlyQuerySuffix = "\", 1] m group by substr(fips, 1, 2), poll ";
+           String monthlyQuerySuffix = "\", 1] m group by !!!, poll ";
            //System.out.println("end query: " + monthlyQuerySuffix);
 
            String fullMonthlyQuery = "";
@@ -297,7 +359,7 @@ public class SQLQAAnnualQuery {
            {
                //System.out.println("Dataset names: " + datasetNames );
                currentMonthlyQuery = monthlyQueryPrefix + daysInMonth + monthlyQueryMiddle + 
-                  datasetNames.get(i).toString() + monthlyQuerySuffix;
+                  datasetNames.get(i).toString().trim() + monthlyQuerySuffix;
 
                fullMonthlyQuery += query(currentMonthlyQuery, false);  // expand the intermediate query to 
                  // use the version info for the monthly inventory datasets 
