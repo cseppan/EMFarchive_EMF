@@ -74,7 +74,13 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
             setLayout(fileNames);
             super.display();
         } catch (Exception e) {
-            System.out.println("Error displaying analysis engine.");
+            for (int i = 0; i< fileNames.length; i++)
+            {
+                System.out.println("File "+i+"= "+fileNames[i]);
+            }
+            if (fileNames.length==0) System.out.println("No files provided");
+            e.printStackTrace();
+            System.out.println("Error displaying analysis engine table.");
         }
     }
 

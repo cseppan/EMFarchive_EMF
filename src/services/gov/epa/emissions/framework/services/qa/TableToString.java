@@ -50,7 +50,11 @@ public class TableToString {
                 for (int i = 1; i <= columnCount; i++) {
                     value = rs.getString(i);
                     if (value != null) {
-                        if (value.indexOf(",") > 0 || value.indexOf(";") > 0) value = "\"" + value + "\"";
+                        if (value.indexOf(",") > 0 || value.indexOf(";") > 0 || value.indexOf(" ") > 0) 
+                        {
+                            value = "\"" + value + "\"";
+                        }
+                        else if (value.length()==0) value="\"\"";
                     }
                     row += (i > 1 ? delimiter : "") + (!rs.wasNull() ? value : "\"\"");
                 }

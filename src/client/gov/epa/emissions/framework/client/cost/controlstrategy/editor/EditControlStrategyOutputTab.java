@@ -25,6 +25,7 @@ import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -136,34 +137,60 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     public void analyze() {
-        try {
-            ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
-            List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
-            for (int i = 0; i < controlStrategyResults.length; i++) {
-//                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
-                    if (buttonGroup.getSelection().equals(invButton.getModel())) {
-                        if (controlStrategyResults[i].getInputDataset() != null)
-                            datasetList.add(controlStrategyResults[i].getInputDataset());
-                    } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
-                        if (controlStrategyResults[i].getDetailedResultDataset() != null)
-                            datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
-                    } 
-                    else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
-                        if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
-                            datasetList.add((EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
-                        } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventory) && controlStrategyResults[i].getDetailedResultDataset() != null) {
-                            datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
-                        } else
-                            messagePanel.setError("Please create controled inventory first.");
+        clearMsgPanel();
+        Thread viewResultsThread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
+                    if ( controlStrategyResults==null || controlStrategyResults.length ==0)
+                        throw new EmfException("Please select a result. ");
+                    List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
+                    for (int i = 0; i < controlStrategyResults.length; i++) {
+//                      if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+                        if (buttonGroup.getSelection().equals(invButton.getModel())) {
+//                          if (controlStrategyResults[i].getInputDataset() != null)
+//                          datasetList.add(controlStrategyResults[i].getInputDataset());
+                        } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+                            if (controlStrategyResults[i].getDetailedResultDataset() != null)
+                                datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+                        } 
+//                      else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
+//                      if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
+//                      datasetList.add((EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
+//                      } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventory) && controlStrategyResults[i].getDetailedResultDataset() != null) {
+//                      datasetList.add((EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+//                      } else
+//                      messagePanel.setError("Please create controled inventory first.");
+//                      }
+//                      } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
+//                      datasetList.add(controlStrategyResults[i].getInputDataset());
+//                      }
                     }
-//                } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
-//                    datasetList.add(controlStrategyResults[i].getInputDataset());
-//                }
+                    
+                    if (datasetList.size() == 0)
+                        throw new EmfException("No dataset is selected. ");
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    
+                    if (presenter.getTableRecordCount(datasetList.get(0)) > 300000) {
+                        String title = "Warning";
+                        String message = "Are you sure you want to view the result, the table has over 300,000 records?  It could take several minutes to load the data.";
+                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title,
+                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+                        if (selection == JOptionPane.NO_OPTION) {
+                            return;
+                        }
+                    }
+                    
+                    presenter.doAnalyze(controlStrategy.getName(), datasetList.toArray(new EmfDataset[0]));
+                } catch (EmfException e) {
+                    messagePanel.setMessage(e.getMessage());
+                } finally {
+                    setCursor(Cursor.getDefaultCursor());
+                }
             }
-            presenter.doAnalyze(controlStrategy.getName(), datasetList.toArray(new EmfDataset[0]));
-        } catch (EmfException e) {
-            messagePanel.setMessage(e.getMessage());
-        }
+        });
+        viewResultsThread.start();
     }
 
     private Action createOutputAction() {
@@ -432,12 +459,12 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         if (buttonGroup.getSelection().equals(invButton.getModel()) ||buttonGroup.getSelection().equals(detailButton.getModel()) ){
             createButton.setEnabled(false);
             view.setEnabled(true);
-            analysisButton.setEnabled(true);
+            analysisButton.setEnabled(false);
             exportButton.setEnabled(true);
             editButton.setEnabled(true);
-            
-//                editButton.setEnabled(false);
         }
+        if (buttonGroup.getSelection().equals(detailButton.getModel()))
+            analysisButton.setEnabled(true);
         
         else if (buttonGroup.getSelection().equals(contInvButton.getModel())){
             ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
@@ -537,6 +564,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     public String getExportFolder() {
         return folder.getText();
     }
+    
     public void displayAnalyzeTable(String controlStrategyName, String[] fileNames) {
         AnalysisEngineTableApp app = new AnalysisEngineTableApp("Analyze Control Strategy: " + controlStrategyName, new Dimension(500, 500), desktopManager, parentConsole);
         app.display(fileNames);
