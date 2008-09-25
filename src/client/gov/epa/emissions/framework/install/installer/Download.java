@@ -120,9 +120,9 @@ public class Download extends Thread {
         String inftext = "[version]" + separator + "signature=$chicago$" + separator + "[DefaultInstall]" + separator
                 + "UpdateInis=Addlink" + separator + "[Addlink]" + separator
                 + "setup.ini, progman.groups,, \"group200=\"\"EMF\"\"\"" + separator
-                + "setup.ini, group200,, \"\"\"EMF Client\"\",\"\"" + installhome.replace('\\', '/') + "/"
-                + Constants.EMF_BATCH_FILE + "\"\",\"\""
-                + installhome.replace('\\', '/') + Constants.EMF_ICON + "\"\",0\"" + separator;
+                + "setup.ini, group200,, \"\"EMF Client\",\"\"\"\"\"\"" + installhome.replace('\\', '/') + "/"
+                + Constants.EMF_BATCH_FILE + "\"\"\"\"\"\",\""
+                + installhome.replace('\\', '/') + Constants.EMF_ICON + "\",0\"" + separator;
 
         try {
             FileWriter fw1 = new FileWriter(bat);
