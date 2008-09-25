@@ -221,7 +221,9 @@ public class ManagedImportService {
 
     private synchronized void setErrorMsgs(String folderPath, Exception e) {
         // don't need to log messages about importing to existing file
-        if (e.getMessage() != null && e.getMessage().indexOf("existing file") < 0)
+        if (e.getMessage() != null && e.getMessage().indexOf("existing file") < 0
+                && e.getMessage().indexOf("has been used") < 0)
+            // don't need to log the error if it's just an existing file or dataset
             log.error("ERROR starting to import to folder: " + folderPath, e);
     }
 
