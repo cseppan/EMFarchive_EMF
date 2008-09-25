@@ -104,7 +104,7 @@ public class CaseAssistanceService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("Could not inmport case", e);
+            log.error("Could not import case", e);
 
             if (e instanceof EmfException)
                 throw (EmfException) e;
