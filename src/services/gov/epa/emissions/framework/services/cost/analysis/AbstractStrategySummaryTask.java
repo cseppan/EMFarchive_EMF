@@ -32,9 +32,8 @@ import java.util.Date;
 
 import org.hibernate.Session;
 
-
 public abstract class AbstractStrategySummaryTask implements IStrategySummaryTask {
-    
+
     protected ControlStrategy controlStrategy;
 
     protected Datasource datasource;
@@ -46,23 +45,23 @@ public abstract class AbstractStrategySummaryTask implements IStrategySummaryTas
     protected DbServer dbServer;
 
     protected User user;
-    
+
     protected int recordCount;
-    
+
     protected int controlStrategyInputDatasetCount;
-    
+
     private StatusDAO statusDAO;
-    
+
     protected ControlStrategyDAO controlStrategyDAO;
-    
+
     protected DatasetCreator creator;
-    
+
     private Keywords keywords;
 
-//    private TableFormat tableFormat;
-    
-    public AbstractStrategySummaryTask(ControlStrategy controlStrategy, User user, 
-            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws EmfException {
+    // private TableFormat tableFormat;
+
+    public AbstractStrategySummaryTask(ControlStrategy controlStrategy, User user, DbServerFactory dbServerFactory,
+            HibernateSessionFactory sessionFactory) throws EmfException {
         this.controlStrategy = controlStrategy;
         this.controlStrategyInputDatasetCount = controlStrategy.getControlStrategyInputDatasets().length;
         this.dbServerFactory = dbServerFactory;
@@ -73,27 +72,24 @@ public abstract class AbstractStrategySummaryTask implements IStrategySummaryTas
         this.statusDAO = new StatusDAO(sessionFactory);
         this.controlStrategyDAO = new ControlStrategyDAO(dbServerFactory, sessionFactory);
         this.keywords = new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords());
-        this.creator = new DatasetCreator(controlStrategy, user, 
-                sessionFactory, dbServerFactory,
-                datasource, keywords);
-        //setup the strategy run
+        this.creator = new DatasetCreator(controlStrategy, user, sessionFactory, dbServerFactory, datasource, keywords);
+        // setup the strategy run
         setup();
     }
 
     private void setup() {
         //
     }
-    
+
     protected void setSummaryResultCount(ControlStrategyResult controlStrategyResult) throws EmfException {
-        String query = "SELECT count(1) as record_count "
-            + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
+        String query = "SELECT count(*) as record_count " + " FROM "
+                + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
         ResultSet rs = null;
-        System.out.println(System.currentTimeMillis() + " " + query);
+
         try {
             rs = datasource.query().executeQuery(query);
-            while (rs.next()) {
-                controlStrategyResult.setRecordCount(rs.getInt(1));
-            }
+            rs.next();
+            controlStrategyResult.setRecordCount(rs.getInt(1));
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
@@ -147,7 +143,8 @@ public abstract class AbstractStrategySummaryTask implements IStrategySummaryTas
         ControlStrategyResult[] results = new ControlStrategyResult[] {};
         Session session = sessionFactory.getSession();
         try {
-            results = controlStrategyDAO.getControlStrategyResults(controlStrategy.getId(), session).toArray(new ControlStrategyResult[0]);
+            results = controlStrategyDAO.getControlStrategyResults(controlStrategy.getId(), session).toArray(
+                    new ControlStrategyResult[0]);
         } finally {
             session.close();
         }
@@ -155,8 +152,8 @@ public abstract class AbstractStrategySummaryTask implements IStrategySummaryTas
     }
 
     protected String summaryResultDatasetDescription(String datasetTypeName) {
-        return "#" + datasetTypeName + " result\n" + 
-            "#Implements control strategy: " + controlStrategy.getName() + "\n#";
+        return "#" + datasetTypeName + " result\n" + "#Implements control strategy: " + controlStrategy.getName()
+                + "\n#";
     }
 
     protected void saveControlStrategyResult(ControlStrategyResult strategyResult) throws EmfException {
@@ -182,20 +179,22 @@ public abstract class AbstractStrategySummaryTask implements IStrategySummaryTas
     }
 
     protected void runQASteps(ControlStrategyResult strategyResult) {
-//        EmfDataset resultDataset = (EmfDataset)strategyResult.getDetailedResultDataset();
+        // EmfDataset resultDataset = (EmfDataset)strategyResult.getDetailedResultDataset();
         if (recordCount > 0) {
-//            runSummaryQASteps(resultDataset, 0);
+            // runSummaryQASteps(resultDataset, 0);
         }
-//        excuteSetAndRunQASteps(inputDataset, controlStrategy.getDatasetVersion());
+        // excuteSetAndRunQASteps(inputDataset, controlStrategy.getDatasetVersion());
     }
 
     protected void runSummaryQASteps(EmfDataset dataset, int version) throws EmfException {
         QAStepTask qaTask = new QAStepTask(dataset, version, user, sessionFactory, dbServerFactory);
-        //11/14/07 DCD instead of running the default qa steps specified in the property table, lets run all qa step templates...
+        // 11/14/07 DCD instead of running the default qa steps specified in the property table, lets run all qa step
+        // templates...
         QAStepTemplate[] qaStepTemplates = dataset.getDatasetType().getQaStepTemplates();
         if (qaStepTemplates != null) {
             String[] qaStepTemplateNames = new String[qaStepTemplates.length];
-            for (int i = 0; i < qaStepTemplates.length; i++) qaStepTemplateNames[i] = qaStepTemplates[i].getName();
+            for (int i = 0; i < qaStepTemplates.length; i++)
+                qaStepTemplateNames[i] = qaStepTemplates[i].getName();
             qaTask.runSummaryQAStepsAndExport(qaStepTemplateNames, controlStrategy.getExportDirectory());
         }
     }
@@ -207,15 +206,14 @@ public abstract class AbstractStrategySummaryTask implements IStrategySummaryTas
             throw new EmfException("Could not disconnect DbServer - " + e.getMessage());
         }
     }
-    
+
     public long getRecordCount() {
         return recordCount;
     }
 
     protected void addStatus(ControlStrategyResult controlStrategyResult) {
-        setStatus("Completed processing control strategy summary: " 
-                + controlStrategyResult.getStrategyResultType().getName() 
-                + ".");
+        setStatus("Completed processing control strategy summary: "
+                + controlStrategyResult.getStrategyResultType().getName() + ".");
     }
 
     protected void setStatus(String message) {
@@ -227,7 +225,7 @@ public abstract class AbstractStrategySummaryTask implements IStrategySummaryTas
 
         statusDAO.add(endStatus);
     }
-    
+
     protected Version version(ControlStrategyInputDataset controlStrategyInputDataset) {
         return version(controlStrategyInputDataset.getInputDataset().getId(), controlStrategyInputDataset.getVersion());
     }

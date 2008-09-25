@@ -234,7 +234,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             throw new EmfException("Please select a valid dataset type.");
 
         DatasetType[] datasetTypes = new DatasetType[] { type };
-        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog(parentConsole, changeablesList);
+        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog(parentConsole);
         InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypes);
         if (datasetTypes.length == 1)
             presenter.display(datasetTypes[0], true);

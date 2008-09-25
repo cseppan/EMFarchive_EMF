@@ -187,4 +187,8 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         return user.getUsername().equals("admin") && user.isAdmin();
     }
     
+    public EmfDataset[] getSelected() {
+        return view.getSelected();
+    }
+    
 }

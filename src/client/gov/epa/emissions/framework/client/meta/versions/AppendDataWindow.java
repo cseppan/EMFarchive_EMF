@@ -263,7 +263,7 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
         clearMsgPanel();
 
         DatasetType[] datasetTypes = new DatasetType[] { presenter.getDataset().getDatasetType() };
-        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog(parentConsole, this);
+        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog(parentConsole);
         InputDatasetSelectionPresenter srcDSPresenter = new InputDatasetSelectionPresenter(view,
                 presenter.getSession(), datasetTypes);
         srcDSPresenter.display(datasetTypes[0], true);

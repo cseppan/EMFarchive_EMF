@@ -19,5 +19,7 @@ public interface DatasetsBrowserView extends ManagedView {
     void clearMessage();
 
     void notifyLockFailure(EmfDataset dataset);
+    
+    EmfDataset[] getSelected();
 
 }

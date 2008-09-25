@@ -26,7 +26,7 @@ public class StrategyResultType implements Serializable {
     
     public static final String strategyMessages = "Strategy Messages";
     
-    public static final String rsmImpactSummary = "RSM Impact Summary";
+    public static final String strategyImpactSummary = "Strategy Impact Summary";
     
     public StrategyResultType(){
         //

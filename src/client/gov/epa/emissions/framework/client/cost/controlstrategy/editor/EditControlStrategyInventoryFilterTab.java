@@ -166,7 +166,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     }
 
     private void addAction() throws EmfException {
-        InputDatasetSelectionView view = new InputDatasetSelectionDialog(parentConsole, changeablesList);
+        InputDatasetSelectionView view = new InputDatasetSelectionDialog(parentConsole);
         InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session,
                 new DatasetType[] { 
                     editControlStrategyPresenter.getDatasetType(DatasetType.orlPointInventory),

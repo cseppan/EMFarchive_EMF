@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.data.dataset;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.ComboBox;
-import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
@@ -47,7 +46,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     
     private boolean shouldCreate = false;  
 
-    public InputDatasetSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
+    public InputDatasetSelectionDialog(EmfConsole parent) {
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
 //        this.parent = parent;

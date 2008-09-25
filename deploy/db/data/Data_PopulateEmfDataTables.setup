@@ -114,6 +114,7 @@ insert into emf.dataset_types values(DEFAULT,'Strategy Messages (CSV)','Strategy
 insert into emf.dataset_types values(DEFAULT,'Projection Packet','Projection Packet', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.ProjectionPacketImporter', 'gov.epa.emissions.commons.io.other.ProjectionPacketExporter');
 insert into emf.dataset_types values(DEFAULT,'Control Packet','Control Packet', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.ControlPacketImporter', 'gov.epa.emissions.commons.io.other.ControlPacketExporter');
 insert into emf.dataset_types values(DEFAULT,'Strategy County Summary','Strategy County Summary', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter');
+insert into emf.dataset_types values(DEFAULT,'Strategy Impact Summary','Strategy Impact Summary', '1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 -- emf.dataset_types
 --
 -- emf.intended_uses

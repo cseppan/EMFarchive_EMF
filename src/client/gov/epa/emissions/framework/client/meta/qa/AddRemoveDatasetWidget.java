@@ -38,11 +38,8 @@ public class AddRemoveDatasetWidget extends JPanel {
     
     private Button removeButton;
     
-    private ManageChangeables changeables;
-
     public AddRemoveDatasetWidget(ManageChangeables changeables, String program, EmfConsole parentConsole, EmfSession session) {
         this.parentConsole = parentConsole;
-        this.changeables = changeables;
         this.session = session;
         setupLayout(changeables, program);
 
@@ -160,7 +157,7 @@ public class AddRemoveDatasetWidget extends JPanel {
             // Make an object of the view and presenter of the dialog, and run the presenter's display ().
             // Set the list of datasets in the JList of this widget (which is part of the EditQAEmissionsWindow
             // to that of the datasets retrieved from the presenter.
-            InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, changeables);
+            InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole);
             InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypeList.toArray(new DatasetType[0]));
             presenter.display(getDatasetType(0), selectSingle);
             setDatasets(presenter.getDatasets());

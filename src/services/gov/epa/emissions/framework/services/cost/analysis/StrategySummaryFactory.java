@@ -11,21 +11,24 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class StrategySummaryFactory {
-    
+
     private static Log log = LogFactory.getLog(StrategySummaryFactory.class);
 
     public StrategySummaryFactory() {
         //
     }
 
-    public IStrategySummaryTask create(ControlStrategy controlStrategy, User user, 
-            StrategyResultType strategyResultType, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory)
-            throws EmfException {
+    public IStrategySummaryTask create(ControlStrategy controlStrategy, User user,
+            StrategyResultType strategyResultType, HibernateSessionFactory sessionFactory,
+            DbServerFactory dbServerFactory) throws EmfException {
         try {
-//            if (strategyResultType.getName().equals(StrategyResultType.strategyCountySummary))
-                    return new StrategyCountySummaryTask(controlStrategy, user, 
-                            dbServerFactory, sessionFactory);
-//            return null;
+            if (strategyResultType.getName().equals(StrategyResultType.strategyCountySummary))
+                return new StrategyCountySummaryTask(controlStrategy, user, dbServerFactory, sessionFactory);
+
+            if (strategyResultType.getName().equals(StrategyResultType.strategyImpactSummary))
+                return new StrategyCountyImpactSummaryTask(controlStrategy, user, dbServerFactory, sessionFactory);
+
+            return null;
         } catch (Exception e) {
             log.error("Failed to create strategy. Cause: " + e.getMessage());
             throw new EmfException("Failed to create strategy." + e.getMessage());

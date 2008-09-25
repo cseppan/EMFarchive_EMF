@@ -474,4 +474,13 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         clearMessage();
         showError("Cannot obtain a lock for dataset \"" + dataset.getName() + "\".");
     }
+
+    public EmfDataset[] getSelected() {
+        List<EmfDataset> selected = getSelectedDatasets();
+        
+        if (selected != null && selected.size() > 0)
+            selected.toArray(new EmfDataset[0]);
+            
+        return null;
+    }
 }

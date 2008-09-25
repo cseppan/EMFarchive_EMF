@@ -151,7 +151,7 @@ public class SetInputFieldsPanel extends InputFieldsPanel{
         if (type == null)
             throw new EmfException("Dataset Type doesn't exist. ");
         DatasetType[] datasetTypes = new DatasetType[]{type};
-        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole, changeablesList);
+        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole);
         InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, datasetTypes);
         presenter.display(datasetTypes[0], true);
         if (view.shouldCreate())

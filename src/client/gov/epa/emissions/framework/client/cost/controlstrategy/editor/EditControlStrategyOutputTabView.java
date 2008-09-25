@@ -19,4 +19,5 @@ public interface EditControlStrategyOutputTabView extends EditControlStrategyTab
     void clearMsgPanel();
     
     void display(ControlStrategy strategy, ControlStrategyResult[] controlStrategyResults) throws EmfException ;
+    
 }

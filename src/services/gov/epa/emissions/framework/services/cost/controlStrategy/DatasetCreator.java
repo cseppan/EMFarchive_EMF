@@ -303,7 +303,7 @@ public class DatasetCreator {
             }
         }
 
-        return table.trim().replaceAll(" ", "_") + "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date());
+        return table.trim().replaceAll(" ", "_");// + "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date());
     }
 
     private void add(EmfDataset dataset) throws EmfException {
