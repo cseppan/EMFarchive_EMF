@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.casemanagement.parameters;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
@@ -25,11 +26,14 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     private EmfSession session;
 
     private int defaultPageSize = 20;
+    
+    private CaseEditorPresenter parentPresenter;
 
-    public EditParametersTabPresenterImpl(EmfSession session, EditCaseParametersTabView view, Case caseObj) {
+    public EditParametersTabPresenterImpl(EmfSession session, EditCaseParametersTabView view, Case caseObj, CaseEditorPresenter caseEditorPresenterImpl) {
         this.caseObj = caseObj;
         this.view = view;
         this.session = session;
+        this.parentPresenter = caseEditorPresenterImpl;
 
         try {
             UserPreference pref = new DefaultUserPreferences();
@@ -58,6 +62,7 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         if (param.getCaseID() == caseObj.getId()) {
             view.addParameter(loaded);
             refreshView();
+            addSectorBacktoCase(loaded.getSector());
         }
     }
 
@@ -106,14 +111,18 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         service().removeCaseParameters(params);
     }
 
-    public Sector[] getAllSetcors() {
+    public Sector[] getAllSetcors(Case localCase) {
         List<Sector> all = new ArrayList<Sector>();
         all.add(new Sector("All", "All"));
-        all.addAll(Arrays.asList(caseObj.getSectors()));
+        all.addAll(Arrays.asList(localCase.getSectors()));
 
         return all.toArray(new Sector[0]);
     }
 
+    public Case reloadCaseObj() throws EmfException {
+        return session.caseService().reloadCase(caseObj.getId());
+    }
+    
     public Case getCaseObj() {
         return this.caseObj;
     }
@@ -132,6 +141,10 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
 
     public int getPageSize() {
         return this.defaultPageSize;
+    }
+    
+    public void addSectorBacktoCase(Sector updatedSector) {
+        parentPresenter.addSectorBacktoCase(updatedSector);
     }
 
 }

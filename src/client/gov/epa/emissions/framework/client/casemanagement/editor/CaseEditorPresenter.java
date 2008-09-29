@@ -35,7 +35,7 @@ public interface CaseEditorPresenter {
     
     void checkIfLockedByCurrentUser() throws EmfException;
     
-    void addSector(Sector sector);
+    void addSectorBacktoCase(Sector sector);
     
     Case getCaseFromName(String caseName) throws EmfException;
     

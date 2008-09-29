@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
@@ -19,6 +20,8 @@ public interface EditInputsTabView {
     int numberOfRecord();
 
     void clearMessage();
+
+    void addSectorBacktoCase(Sector updatedSector);
     
 //    void notifychanges();
 

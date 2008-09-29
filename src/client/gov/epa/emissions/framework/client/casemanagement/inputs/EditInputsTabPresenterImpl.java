@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.casemanagement.inputs;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.RelatedCasePresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.RelatedCaseView;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
@@ -26,15 +27,18 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     private Case caseObj;
 
     private EditInputsTabView view;
+    
+    private CaseEditorPresenter parentPresenter;
 
     private EmfSession session;
     
     private int defaultPageSize = 20;
 
-    public EditInputsTabPresenterImpl(EmfSession session, EditInputsTabView view, Case caseObj) {
+    public EditInputsTabPresenterImpl(EmfSession session, EditInputsTabView view, Case caseObj, CaseEditorPresenter caseEditorPresenterImpl) {
         this.caseObj = caseObj;
         this.view = view;
         this.session = session;
+        this.parentPresenter = caseEditorPresenterImpl;
         
         try {
             UserPreference pref = new DefaultUserPreferences();
@@ -66,6 +70,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         if (input.getCaseID() == caseObj.getId()) {
             view.addInput(loaded);
             refreshView();
+            addSectorBacktoCase(loaded.getSector());
         }
     }
 
@@ -154,6 +159,10 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     public Case getCaseObj() {
         return this.caseObj;
     }
+    
+    public Case reloadCaseObj() throws EmfException {
+        return session.caseService().reloadCase(caseObj.getId());
+    }
 
     public void checkIfLockedByCurrentUser() throws EmfException {
         Case reloaded = session.caseService().reloadCase(caseObj.getId());
@@ -163,10 +172,10 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
                     + " has it now.");
     }
 
-    public Sector[] getAllSetcors() {
+    public Sector[] getAllSetcors(Case localCase) {
         List<Sector> all = new ArrayList<Sector>();
         all.add(new Sector("All", "All"));
-        all.addAll(Arrays.asList(caseObj.getSectors()));
+        all.addAll(Arrays.asList(localCase.getSectors()));
 
         return all.toArray(new Sector[0]);
     }
@@ -190,6 +199,10 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     public void doViewRelated(RelatedCaseView view, Case[] casesByInputDataset, Case[] casesByOutputDataset) {
         RelatedCasePresenter presenter = new RelatedCasePresenter(view, session);
         presenter.doDisplay(casesByInputDataset, casesByOutputDataset);
+    }
+
+    public void addSectorBacktoCase(Sector updatedSector) {
+        parentPresenter.addSectorBacktoCase(updatedSector);
     }
 
 }

@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -117,6 +118,8 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     private void doRefresh(CaseParameter[] params) throws Exception {
         // super.removeAll();
+        Case freshCase = presenter.reloadCaseObj();
+        sectorsComboBox.setModel(new DefaultComboBoxModel(presenter.getAllSetcors(freshCase)));
         setupTableModel(params);
         table.refresh(tableData);
         panelRefresh();
@@ -156,7 +159,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     private JPanel createSectorPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors());
+        sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors(caseObj));
         sectorsComboBox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -448,6 +451,10 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
+    }
+
+    public void addSectorBacktoCase(Sector updatedSector) {
+        presenter.addSectorBacktoCase(updatedSector);
     }
 
 }

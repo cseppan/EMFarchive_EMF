@@ -43,6 +43,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -139,9 +140,13 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
     }
 
     private void doRefresh(CaseInput[] inputs) throws Exception {
+        Case freshCase = presenter.reloadCaseObj();
         String inputFileDir = caseObj.getInputFileDir();
+        
         if (!inputDir.getText().equalsIgnoreCase(inputFileDir))
             inputDir.setText(inputFileDir);
+        
+        sectorsComboBox.setModel(new DefaultComboBoxModel(presenter.getAllSetcors(freshCase)));
         setupTableModel(inputs);
         table.refresh(tableData);
         panelRefresh();
@@ -190,7 +195,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         layoutGenerator.addLabelWidgetPair("Input Folder:", getFolderChooserPanel(inputDir,
                 "Select the base Input Folder for the Case"), panel);
 
-        sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors());
+        sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors(caseObj));
         sectorsComboBox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -669,6 +674,10 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             messagePanel.setError(e.getMessage());
         }
 
+    }
+
+    public void addSectorBacktoCase(Sector updatedSector) {
+        presenter.addSectorBacktoCase(updatedSector);
     } 
 
 }

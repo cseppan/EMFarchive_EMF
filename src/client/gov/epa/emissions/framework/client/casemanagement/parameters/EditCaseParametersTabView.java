@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
@@ -17,6 +18,8 @@ public interface EditCaseParametersTabView {
     int numberOfRecord();
 
     void clearMessage();
+    
+    void addSectorBacktoCase(Sector updatedSector);
     
 //    void notifychanges();
 

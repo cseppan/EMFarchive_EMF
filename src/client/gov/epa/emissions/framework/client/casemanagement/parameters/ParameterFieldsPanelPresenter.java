@@ -24,6 +24,8 @@ public class ParameterFieldsPanelPresenter {
     private EmfSession session;
 
     private ParameterFieldsPanelView view;
+    
+    private CaseParameter currentParameter;
 
     private int caseId;
     
@@ -37,6 +39,7 @@ public class ParameterFieldsPanelPresenter {
     }
 
     public void display(CaseParameter param, int model_id, JComponent container) throws EmfException {
+        currentParameter = param;
         view.observe(this);
         view.display(param, model_id, container);
     }
@@ -100,8 +103,12 @@ public class ParameterFieldsPanelPresenter {
     }
 
     public void doSave() throws EmfException {
-        // view.setFields();
-        session.caseService().updateCaseParameter(session.user(), view.setFields());
+        currentParameter = view.setFields();
+        session.caseService().updateCaseParameter(session.user(), currentParameter);
+    }
+    
+    public Sector getUpdatedSector() {
+        return currentParameter.getSector();
     }
 
     public void doValidateFields() throws EmfException {

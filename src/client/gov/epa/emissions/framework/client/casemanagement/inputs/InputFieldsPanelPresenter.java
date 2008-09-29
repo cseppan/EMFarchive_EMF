@@ -29,11 +29,13 @@ public class InputFieldsPanelPresenter {
     private InputFieldsPanelView view;
 
     private int caseId;
-    
+
     public static final String ALL_FOR_SECTOR = "All jobs for sector";
-    
+
     private CaseObjectManager caseObjectManager = null;
-    
+
+    private CaseInput currentInput = null;
+
     public InputFieldsPanelPresenter(int caseId, InputFieldsPanelView inputFields, EmfSession session) {
         this.session = session;
         this.view = inputFields;
@@ -42,8 +44,9 @@ public class InputFieldsPanelPresenter {
     }
 
     public void display(CaseInput input, JComponent container, int modelToRunId) throws EmfException {
+        currentInput = input;
         view.observe(this);
-        view.display(input, container, modelToRunId , session);
+        view.display(input, container, modelToRunId, session);
     }
 
     public InputName[] getInputNames(int modelToRunId) throws EmfException {
@@ -55,7 +58,7 @@ public class InputFieldsPanelPresenter {
     }
 
     public CaseProgram[] getPrograms(int modelToRunId) throws EmfException {
-         return caseObjectManager.getPrograms(modelToRunId);
+        return caseObjectManager.getPrograms(modelToRunId);
     }
 
     public SubDir[] getSubdirs(int modelToRunId) throws EmfException {
@@ -66,25 +69,22 @@ public class InputFieldsPanelPresenter {
         return caseObjectManager.getInputEnvtVars(modelToRunId);
     }
 
-    public CaseJob[] getCaseJobs() throws EmfException 
-    {
+    public CaseJob[] getCaseJobs() throws EmfException {
         return caseObjectManager.getCaseJobsWithAll(caseId);
-   }
-    
-    public DatasetType[] getDSTypes() throws EmfException {
-       return caseObjectManager.getDatasetTypes();
     }
 
-    public EmfDataset[] getDatasets(DatasetType type) throws EmfException
-{
+    public DatasetType[] getDSTypes() throws EmfException {
+        return caseObjectManager.getDatasetTypes();
+    }
+
+    public EmfDataset[] getDatasets(DatasetType type) throws EmfException {
         if (type == null)
             return new EmfDataset[0];
 
         return dataService().getDatasets(type);
     }
 
-    public Version[] getVersions(EmfDataset dataset) throws EmfException 
-    {
+    public Version[] getVersions(EmfDataset dataset) throws EmfException {
         if (dataset == null) {
             return new Version[0];
         }
@@ -100,7 +100,12 @@ public class InputFieldsPanelPresenter {
     }
 
     public void doSave() throws EmfException {
-         session.caseService().updateCaseInput(session.user(), view.setFields());
+        this.currentInput = view.setFields();
+        session.caseService().updateCaseInput(session.user(), currentInput);
+    }
+
+    public Sector getUpdatedSector() {
+        return currentInput.getSector();
     }
 
     public void doValidateFields() throws EmfException {
@@ -123,40 +128,40 @@ public class InputFieldsPanelPresenter {
         return caseObjectManager.getOrAddSubDir(selected, modelToRunId);
     }
 
-    public int getJobIndex(int caseJobId, CaseJob [] jobs) //throws EmfException 
+    public int getJobIndex(int caseJobId, CaseJob[] jobs) // throws EmfException
     {
-        //CaseJob[] jobs = session.caseService().getCaseJobs(caseId);
+        // CaseJob[] jobs = session.caseService().getCaseJobs(caseId);
         // AME: don't go get the jobs from the server again!
         // QH: This will use the cached list of jobs and won't get the newest list of jobs for the session.
-        
-        if (caseJobId == 0) return 0;
-        
+
+        if (caseJobId == 0)
+            return 0;
+
         for (int i = 0; i < jobs.length; i++)
             if (jobs[i].getId() == caseJobId)
                 return i; // because of the default "All jobs" job is not in db
-        
+
         return 0;
     }
-    
+
     public String getJobName(int jobId) throws EmfException {
         if (jobId == 0)
             return "All jobs for sector";
-        
+
         CaseJob job = session.caseService().getCaseJob(jobId);
         if (job == null)
             throw new EmfException("Cannot retrieve job (id = " + jobId + ").");
         return job.getName();
     }
-    
+
     public EmfDataset getDataset(int id) throws EmfException {
         return session.dataService().getDataset(id);
     }
-    
-    public void viewDataset(int datasetId, EmfConsole parentConsole, DesktopManager desktopManager) throws EmfException{
-        PropertiesViewPresenter datasetViewPresenter = new PropertiesViewPresenter(
-                getDataset(datasetId), session);
+
+    public void viewDataset(int datasetId, EmfConsole parentConsole, DesktopManager desktopManager) throws EmfException {
+        PropertiesViewPresenter datasetViewPresenter = new PropertiesViewPresenter(getDataset(datasetId), session);
         DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
         datasetViewPresenter.doDisplay(view);
     }
-    
+
 }

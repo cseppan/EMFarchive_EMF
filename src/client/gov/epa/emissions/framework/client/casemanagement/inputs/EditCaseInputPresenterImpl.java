@@ -51,6 +51,7 @@ public class EditCaseInputPresenterImpl implements EditInputPresenter {
     
     public void doSave() throws EmfException {
         inputFieldsPresenter.doSave();
+        parentView.addSectorBacktoCase(inputFieldsPresenter.getUpdatedSector());
         parentView.refresh();
     }
 

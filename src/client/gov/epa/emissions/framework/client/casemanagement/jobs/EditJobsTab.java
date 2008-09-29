@@ -581,7 +581,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         if (sector == null)
             return;
         
-        parentPresenter.addSector(sector);
+        parentPresenter.addSectorBacktoCase(sector);
     }
 
 }

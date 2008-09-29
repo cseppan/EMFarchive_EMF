@@ -145,7 +145,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     public void set(EditInputsTabView inputsView) {
-        inputPresenter = new EditInputsTabPresenterImpl(session, inputsView, caseObj);
+        inputPresenter = new EditInputsTabPresenterImpl(session, inputsView, caseObj, this);
         presenters.add(inputPresenter);
     }
 
@@ -171,7 +171,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     public void set(EditCaseParametersTabView parameterview) {
-        parametersPresenter = new EditParametersTabPresenterImpl(session, parameterview, caseObj);
+        parametersPresenter = new EditParametersTabPresenterImpl(session, parameterview, caseObj, this);
         presenters.add(parametersPresenter);
     }
 
@@ -206,7 +206,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         }
     }
 
-    public void addSector(Sector sector) {
+    public void addSectorBacktoCase(Sector sector) {
         if (summaryPresenter != null && sector != null)
             summaryPresenter.addSector(sector);
     }
