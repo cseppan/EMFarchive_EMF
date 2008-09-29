@@ -183,7 +183,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         return new SortCriteria(columnNames, new boolean[] { true, true, true, true }, new boolean[] { false, false, false, false });
     }
 
-    private JPanel createFolderNSectorPanel() throws EmfException {
+    private JPanel createFolderNSectorPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 

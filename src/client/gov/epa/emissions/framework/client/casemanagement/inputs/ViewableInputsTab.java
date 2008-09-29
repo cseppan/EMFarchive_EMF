@@ -159,7 +159,7 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         tableData = new InputsTableData(inputs, session);
     }
 
-    private JPanel createFolderNSectorPanel() throws EmfException {
+    private JPanel createFolderNSectorPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 

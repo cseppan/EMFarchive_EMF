@@ -153,7 +153,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
                 false, false, false });
     }
 
-    private JPanel createSectorPanel() throws EmfException {
+    private JPanel createSectorPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors());

@@ -126,7 +126,7 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
         return layout;
     }
 
-    private JPanel createSectorPanel() throws EmfException {
+    private JPanel createSectorPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors());

@@ -106,10 +106,10 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         service().removeCaseParameters(params);
     }
 
-    public Sector[] getAllSetcors() throws EmfException {
+    public Sector[] getAllSetcors() {
         List<Sector> all = new ArrayList<Sector>();
         all.add(new Sector("All", "All"));
-        all.addAll(Arrays.asList(session.dataCommonsService().getSectors()));
+        all.addAll(Arrays.asList(caseObj.getSectors()));
 
         return all.toArray(new Sector[0]);
     }
