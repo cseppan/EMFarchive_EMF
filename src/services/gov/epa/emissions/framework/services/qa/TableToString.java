@@ -42,12 +42,17 @@ public class TableToString {
             ResultSet rs = datasource.query().executeQuery("select * from " + qualifiedTableName);
             ResultSetMetaData md = rs.getMetaData();
             int columnCount = md.getColumnCount();
-            writeHeaderRow(md, columnCount);
+            int startingColumn=1;
+            if (md.getColumnName(1).equalsIgnoreCase("record_id"))
+               startingColumn=5;
+            
+            writeHeaderRow(md, startingColumn, columnCount);
             String row = "";
             String value = "";
+                       
             while (rs.next()) {
                 row = "";
-                for (int i = 1; i <= columnCount; i++) {
+                for (int i = startingColumn; i <= columnCount; i++) {
                     value = rs.getString(i);
                     if (value != null) {
                         if (value.indexOf(",") > 0 || value.indexOf(";") > 0 || value.indexOf(" ") > 0) 
@@ -56,7 +61,7 @@ public class TableToString {
                         }
                         else if (value.length()==0) value="\"\"";
                     }
-                    row += (i > 1 ? delimiter : "") + (!rs.wasNull() ? value : "\"\"");
+                    row += (i > startingColumn ? delimiter : "") + (!rs.wasNull() ? value : "\"\"");
                 }
                 output.append(row + lineFeeder);
             }
@@ -65,13 +70,13 @@ public class TableToString {
         }
     }
 
-    private void writeHeaderRow(ResultSetMetaData md, int columnCount) throws SQLException {
+    private void writeHeaderRow(ResultSetMetaData md, int startingColumn, int columnCount) throws SQLException {
         String colTypes = "#COLUMN_TYPES=";
         String colNames = ""; 
         
-        for (int i = 1; i <= columnCount; i++) {
+        for (int i = startingColumn; i <= columnCount; i++) {
             colTypes += md.getColumnTypeName(i) + "(" + md.getPrecision(i) + ")" + (i < columnCount ? "|" : "");
-            colNames += (i > 1 ? delimiter : "") + md.getColumnName(i).toLowerCase();
+            colNames += (i > startingColumn ? delimiter : "") + md.getColumnName(i).toLowerCase();
         }
         
         output.append(colTypes + lineFeeder + colNames + lineFeeder);
