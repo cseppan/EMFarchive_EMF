@@ -28,7 +28,7 @@ public class SQLQAAnnualQuery {
     
     private static final String summaryTypeTag = "-summaryType";
     
-    //private boolean hasInvTableDataset;
+    private boolean hasInvTableDataset;
 
     public SQLQAAnnualQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName, String tableName, QAStep qaStep) {
         
@@ -109,14 +109,20 @@ public class SQLQAAnnualQuery {
          StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
          while (tokenizer3.hasMoreTokens()) {
              invTableDatasetName  = tokenizer3.nextToken().trim();
-             //if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
+             if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
          }
 
-         System.out.println("TheArrayList is : \n" + allDatasetNames +allDatasetNames.size());
+         //System.out.println("TheArrayList is : \n" + allDatasetNames +allDatasetNames.size());
 
         //Create the outer query
         
-        String outerQuery = "select @!@, i.name, sum(cast(i.factor as double precision) * mo_emis) as ann_emis from\n # as te left outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i on te.poll = i.cas  group by @@@, i.name order by @@@, i.name";
+        String outerQuery = "select @!@, coalesce(" + (hasInvTableDataset ? "i.name," : "") + "p.pollutant_code_desc, te.poll) as poll," //"select @!@, i.name, sum(coalesce(cast(i.factor as double precision)* mo_emis, 1.0*mo_emis)) as ann_emis from\n # as te left outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i on te.poll = i.cas  group by @@@, i.name order by @@@, i.name";
+            + "sum(" + (hasInvTableDataset ? "coalesce(cast(i.factor as double precision), 1.0)" : "1.0") + " * mo_emis) as ann_emis "
+            + "from\n # as te "
+            + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non te.poll = i.cas " : " ")
+            + " \nleft outer join reference.pollutant_codes p \non te.poll = p.pollutant_code "
+            + " \ngroup by @@@, coalesce(" + (hasInvTableDataset ? "i.name," : "") + "p.pollutant_code_desc, te.poll)"
+            + " \norder by @@@, coalesce(" + (hasInvTableDataset ? "i.name," : "") + "p.pollutant_code_desc, te.poll)";
         
         //System.out.println("The input for the outer query is: \n" + outerQuery);
         String almostQuery = query(outerQuery, true);
