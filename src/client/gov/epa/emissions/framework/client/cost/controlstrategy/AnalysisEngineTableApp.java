@@ -329,7 +329,6 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
 
         if (fileName == null)
             fileName = tabName;
-
         TablePanel panel = new TablePanel(parentConsole, model, fileName, tabName, fileType, mainTabbedPane);
 
         mainTabbedPane.addTab(tabName, null, panel, fileName);
