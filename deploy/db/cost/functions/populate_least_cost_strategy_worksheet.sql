@@ -430,6 +430,9 @@ BEGIN
 			rule_eff,
 			percent_reduction,
 			final_emissions,
+			Inv_Ctrl_Eff,
+			Inv_Rule_Pen,
+			Inv_Rule_Eff,
 			emis_reduction,
 			inv_emissions,
 			sic,
@@ -490,8 +493,23 @@ BEGIN
 			' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
 			' || percent_reduction_sql || ' as percent_reduction,
 			' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
-			' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 as emis_reduction,
-			' || annual_emis_sql || ' as inv_emissions,
+			inv.ceff,
+			' || case when has_rpen_column then 'coalesce(inv.rpen, 100.0::double precision)' else '100.0::double precision' end || ',
+			coalesce(inv.reff, 100.0::double precision),
+			' || case 
+				when dataset_month != 0 then 
+					'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' 
+				else 
+					'inv.ann_emis' 
+			end || ' - ' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as emis_reduction,
+--			' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 as emis_reduction,
+			' || case 
+				when dataset_month != 0 then 
+					'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' 
+				else 
+					'inv.ann_emis' 
+			end || ' as inv_emissions,
+--			' || annual_emis_sql || ' as inv_emissions,
 			' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 			' || case when not has_merged_columns then 'inv.record_id::integer' else 'inv.original_record_id::integer' end || ' as source_id,
@@ -655,6 +673,9 @@ BEGIN
 			rule_eff,
 			percent_reduction,
 			final_emissions,
+			Inv_Ctrl_Eff,
+			Inv_Rule_Pen,
+			Inv_Rule_Eff,
 			emis_reduction,
 			inv_emissions,
 			sic,
@@ -713,8 +734,23 @@ BEGIN
 		' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
 		' || percent_reduction_sql || ' as percent_reduction,
 		' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
-		' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 as emis_reduction,
-		' || annual_emis_sql || ' as inv_emissions,
+		inv.ceff,
+		' || case when has_rpen_column then 'coalesce(inv.rpen, 100.0::double precision)' else '100.0::double precision' end || ',
+		coalesce(inv.reff, 100.0::double precision),
+			' || case 
+				when dataset_month != 0 then 
+					'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' 
+				else 
+					'inv.ann_emis' 
+			end || ' - ' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as emis_reduction,
+--			' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 as emis_reduction,
+			' || case 
+				when dataset_month != 0 then 
+					'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' 
+				else 
+					'inv.ann_emis' 
+			end || ' as inv_emissions,
+--			' || annual_emis_sql || ' as inv_emissions,
 		' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
 		' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 		' || case when not has_merged_columns then 'inv.record_id::integer' else 'inv.original_record_id::integer' end || ' as source_id,
