@@ -219,9 +219,13 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         try {
             presenter.display();
             StrategyResultType[] strategyResultTypes = presenter.getStrategyResultTypes();
-            for (int i = 0; i < strategyResultTypes.length; i++) {
-                session.controlStrategyService().summarizeStrategy(session.user(), controlStrategy.getId(), 
-                        folder.getText(), strategyResultTypes[i]);
+            if (strategyResultTypes.length > 0) {
+                for (int i = 0; i < strategyResultTypes.length; i++) {
+                    session.controlStrategyService().summarizeStrategy(session.user(), controlStrategy.getId(), 
+                            folder.getText(), strategyResultTypes[i]);
+                }
+                messagePanel
+                    .setMessage("Running strategy summary. Monitor the status window for progress, and refresh this window after completion to see results");
             }
         } catch (Exception exp) {
             messagePanel.setError(exp.getMessage());
