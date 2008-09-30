@@ -8,6 +8,8 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -79,7 +81,6 @@ public class StrategyCountySummaryTask extends AbstractStrategySummaryTask {
                     countySummaryResult.setCompletionTime(new Date());
                     countySummaryResult.setRunStatus(status);
                     saveControlStrategyResult(countySummaryResult);
-                    addStatus(countySummaryResult);
                 }
             }
 
@@ -159,14 +160,17 @@ public class StrategyCountySummaryTask extends AbstractStrategySummaryTask {
             if (controlStrategy.getMergeInventories() && mergedInventory != null) {
                 for (int i = 0; i < inventories.length; i++) {
 //                      EmfDataset inventory = inventories[i].getInputDataset();
-                  EmfDataset inventory = inventories[i].getInputDataset();
-                  if (!inventory.getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
+                  ControlStrategyInputDataset inventory = inventories[i];
+                  if (!inventory.getInputDataset().getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
                       for (int j = 0; j < results.length; j++) {
                           if (results[j].getDetailedResultDataset() != null 
                               && results[j].getInputDataset() != null) {
                               String detailedresultTableName = qualifiedEmissionTableName(results[j].getDetailedResultDataset());
-                              String inventoryTableName = qualifiedEmissionTableName(inventory);
-                              String sector = inventory.getSectors().length > 0 ? inventory.getSectors()[0].getName() : "";
+                              String inventoryTableName = qualifiedEmissionTableName(inventory.getInputDataset());
+                              String sector = inventory.getInputDataset().getSectors().length > 0 ? inventory.getInputDataset().getSectors()[0].getName() : "";
+                              Version v = version(inventory);
+                              VersionedQuery versionedQuery = new VersionedQuery(v);
+
                               sql += (count > 0 ? " union all " : "") 
                                   + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(i.ann_emis) as Uncontrolled_Emis, sum(e.Emis_Reduction) as Emis_Reduction, sum(i.ann_emis) - sum(e.Emis_Reduction) as Remaining_Emis, sum(e.Emis_Reduction) / sum(i.ann_emis) * 100.0 as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
                                   + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
@@ -176,7 +180,8 @@ public class StrategyCountySummaryTask extends AbstractStrategySummaryTask {
                                   + "from " + inventoryTableName + " i "
                                   + "left outer join " + detailedresultTableName + " e "
                                   + "on e.source_id = i.record_id "
-                                  + "and e.ORIGINAL_DATASET_ID = " + inventory.getId() + " "
+                                  + "and e.ORIGINAL_DATASET_ID = " + inventory.getInputDataset().getId() + " "
+                                  + "where " + versionedQuery.query().replaceAll("delete_versions ", "i.delete_versions ").replaceAll("version ", "i.version ").replaceAll("dataset_id", "i.dataset_id")
                                   + "group by i.fips, i.poll ";
                               ++count;
                               }
@@ -191,6 +196,8 @@ public class StrategyCountySummaryTask extends AbstractStrategySummaryTask {
                         String detailedresultTableName = qualifiedEmissionTableName(results[i].getDetailedResultDataset());
                         String inventoryTableName = qualifiedEmissionTableName(results[i].getInputDataset());
                         String sector = results[i].getInputDataset().getSectors().length > 0 ? results[i].getInputDataset().getSectors()[0].getName() : "";
+                        Version v = version(results[i].getInputDataset().getId(), results[i].getInputDatasetVersion());
+                        VersionedQuery versionedQuery = new VersionedQuery(v);
                         sql += (count > 0 ? " union all " : "") 
                             + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(i.ann_emis) as Uncontrolled_Emis, sum(e.Emis_Reduction) as Emis_Reduction, sum(i.ann_emis) - sum(e.Emis_Reduction) as Remaining_Emis, sum(e.Emis_Reduction) / sum(i.ann_emis) * 100.0 as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
                             + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
@@ -200,13 +207,13 @@ public class StrategyCountySummaryTask extends AbstractStrategySummaryTask {
                             + "from " + inventoryTableName + " i "
                             + "left outer join " + detailedresultTableName + " e "
                             + "on e.source_id = i.record_id "
+                            + "where " + versionedQuery.query().replaceAll("delete_versions ", "i.delete_versions ").replaceAll("version ", "i.version ").replaceAll("dataset_id", "i.dataset_id")
                             + "group by i.fips, i.poll ";
                         ++count;
                     }
                 }
             }
             sql += ") summary ";
-            
             System.out.println(sql);
             try {
                 datasource.query().execute(sql);

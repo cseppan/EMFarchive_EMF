@@ -385,26 +385,15 @@ CREATE TABLE emf.table_consolidations
 WITHOUT OIDS;
 -- emf.table_consolidations
 
-CREATE TABLE projection_shapefiles
-(
-  id serial NOT NULL,
-  name character varying(255) NOT NULL,
-  table_schema character varying(64) NOT NULL,
-  table_name character varying(64) NOT NULL,
-  prj_text character varying(2048),
-  srid integer NOT NULL,
-  "type" character varying(30) NOT NULL,
-  CONSTRAINT projection_shapefiles_name_const UNIQUE (name)
-);
-ALTER TABLE projection_shapefiles OWNER TO emf;
-
 -- reference.rsm_inv_sectors
 CREATE TABLE reference.rsm_inv_sectors
 (
   id SERIAL PRIMARY KEY,
   rsm_sector varchar(255) NOT NULL,
   pollutant varchar(255) NOT NULL,
-  inv_sector text NOT NULL
+  inv_sector varchar(255) NOT NULL,
+  aa_rsm_factor varchar(4) NOT NULL,
+  inv_sector varchar(4) NOT NULL
 ) 
 WITHOUT OIDS;
 -- reference.rsm_inv_sectors

@@ -56,7 +56,6 @@ public class StrategyCountyImpactSummaryTask extends AbstractStrategySummaryTask
                 countyImpactSummaryResult.setCompletionTime(new Date());
                 countyImpactSummaryResult.setRunStatus(status);
                 saveControlStrategyResult(countyImpactSummaryResult);
-                addStatus(countyImpactSummaryResult);
             }
         }
     }

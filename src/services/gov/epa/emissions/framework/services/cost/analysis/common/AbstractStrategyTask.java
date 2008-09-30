@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.QAStepTask;
+import gov.epa.emissions.framework.services.basic.DateUtil;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -311,16 +312,24 @@ public abstract class AbstractStrategyTask implements Strategy {
             if (controlStrategy.getMergeInventories() && mergedInventory != null) {
                 for (int i = 0; i < inventories.length; i++) {
 //                      EmfDataset inventory = inventories[i].getInputDataset();
-                  EmfDataset inventory = inventories[i].getInputDataset();
-                  if (!inventory.getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
+                  ControlStrategyInputDataset inventory = inventories[i];
+                  if (!inventory.getInputDataset().getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
                       for (int j = 0; j < results.length; j++) {
                           if (results[j].getDetailedResultDataset() != null 
                               && results[j].getInputDataset() != null) {
                               String detailedresultTableName = qualifiedEmissionTableName(results[j].getDetailedResultDataset());
-                              String inventoryTableName = qualifiedEmissionTableName(inventory);
-                              String sector = inventory.getSectors().length > 0 ? inventory.getSectors()[0].getName() : "";
+                              String inventoryTableName = qualifiedEmissionTableName(inventory.getInputDataset());
+                              String sector = inventory.getInputDataset().getSectors().length > 0 ? inventory.getInputDataset().getSectors()[0].getName() : "";
+                              Version v = version(inventory);
+                              VersionedQuery versionedQuery = new VersionedQuery(v);
+                              int month = inventory.getInputDataset().applicableMonth();
+                              int noOfDaysInMonth = 31;
+                              if (month != -1) {
+                                  noOfDaysInMonth = getDaysInMonth(month);
+                              }
+                              String sqlAnnEmis = (month != -1 ? "coalesce(" + noOfDaysInMonth + " * i.avd_emis, i.ann_emis)" : "i.ann_emis");
                               sql += (count > 0 ? " union all " : "") 
-                                  + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(i.ann_emis) as Uncontrolled_Emis, sum(e.Emis_Reduction) as Emis_Reduction, sum(i.ann_emis) - sum(e.Emis_Reduction) as Remaining_Emis, case when sum(i.ann_emis) <> 0 then sum(e.Emis_Reduction) / sum(i.ann_emis) * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
+                                  + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(" + sqlAnnEmis + ") as Uncontrolled_Emis, sum(" + sqlAnnEmis + ") - sum(e.final_emissions) as Emis_Reduction, coalesce(sum(e.final_emissions), sum(" + sqlAnnEmis + ")) as Remaining_Emis, case when sum(" + sqlAnnEmis + ") <> 0 then (sum(" + sqlAnnEmis + ") - sum(e.final_emissions)) / sum(" + sqlAnnEmis + ") * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
                                   + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
                                   + "sum(e.Annualized_Capital_Cost) as Annualized_Capital_Cost, "
                                   + "sum(e.Total_Capital_Cost) as Total_Capital_Cost, "
@@ -328,7 +337,8 @@ public abstract class AbstractStrategyTask implements Strategy {
                                   + "from " + inventoryTableName + " i "
                                   + "left outer join " + detailedresultTableName + " e "
                                   + "on e.source_id = i.record_id "
-                                  + "and e.ORIGINAL_DATASET_ID = " + inventory.getId() + " "
+                                  + "and e.ORIGINAL_DATASET_ID = " + inventory.getInputDataset().getId() + " "
+                                  + "where " + versionedQuery.query().replaceAll("delete_versions ", "i.delete_versions ").replaceAll("version ", "i.version ").replaceAll("dataset_id", "i.dataset_id")
                                   + "group by i.fips, i.poll ";
                               ++count;
                               }
@@ -337,14 +347,22 @@ public abstract class AbstractStrategyTask implements Strategy {
                 }
             //not a merged inventory, then there could be multiple results
             } else {
-
+//case when " + (month != -1 ? "coalesce(avd_emis, ann_emis)" : "ann_emis") + " <> 0 then " + (month != -1 ? "b.final_emissions / " + noOfDaysInMonth + " / coalesce(avd_emis, ann_emis)" : "b.final_emissions / ann_emis") + " else 0.0 end as ceff
                 for (int i = 0; i < results.length; i++) {
                     if (results[i].getDetailedResultDataset() != null && results[i].getInputDataset() != null) {
                         String detailedresultTableName = qualifiedEmissionTableName(results[i].getDetailedResultDataset());
                         String inventoryTableName = qualifiedEmissionTableName(results[i].getInputDataset());
                         String sector = results[i].getInputDataset().getSectors().length > 0 ? results[i].getInputDataset().getSectors()[0].getName() : "";
+                        Version v = version(results[i].getInputDataset().getId(), results[i].getInputDatasetVersion());
+                        VersionedQuery versionedQuery = new VersionedQuery(v);
+                        int month = results[i].getInputDataset().applicableMonth();
+                        int noOfDaysInMonth = 31;
+                        if (month != -1) {
+                            noOfDaysInMonth = getDaysInMonth(month);
+                        }
+                        String sqlAnnEmis = (month != -1 ? "coalesce(" + noOfDaysInMonth + " * i.avd_emis, i.ann_emis)" : "i.ann_emis");
                         sql += (count > 0 ? " union all " : "") 
-                            + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(i.ann_emis) as Uncontrolled_Emis, sum(e.Emis_Reduction) as Emis_Reduction, sum(i.ann_emis) - sum(e.Emis_Reduction) as Remaining_Emis, case when sum(i.ann_emis) <> 0 then sum(e.Emis_Reduction) / sum(i.ann_emis) * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
+                            + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(" + sqlAnnEmis + ") as Uncontrolled_Emis, sum(" + sqlAnnEmis + ") - sum(e.final_emissions) as Emis_Reduction, coalesce(sum(e.final_emissions), sum(" + sqlAnnEmis + ")) as Remaining_Emis, case when sum(" + sqlAnnEmis + ") <> 0 then (sum(" + sqlAnnEmis + ") - sum(e.final_emissions)) / sum(" + sqlAnnEmis + ") * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
                             + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
                             + "sum(e.Annualized_Capital_Cost) as Annualized_Capital_Cost, "
                             + "sum(e.Total_Capital_Cost) as Total_Capital_Cost, "
@@ -352,6 +370,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                             + "from " + inventoryTableName + " i "
                             + "left outer join " + detailedresultTableName + " e "
                             + "on e.source_id = i.record_id "
+                            + "where " + versionedQuery.query().replaceAll("delete_versions ", "i.delete_versions ").replaceAll("version ", "i.version ").replaceAll("dataset_id", "i.dataset_id")
                             + "group by i.fips, i.poll ";
                         ++count;
                     }
@@ -366,6 +385,10 @@ public abstract class AbstractStrategyTask implements Strategy {
                 throw new EmfException("Error occured when inserting data to strategy summary table" + "\n" + e.getMessage());
             }
         }
+    }
+
+    protected int getDaysInMonth(int month) {
+        return month != - 1 ? DateUtil.daysInMonth(controlStrategy.getInventoryYear(), month) : 31;
     }
 
     protected void populateSourcesTable() throws EmfException {

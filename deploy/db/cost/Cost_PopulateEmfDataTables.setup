@@ -16,7 +16,8 @@ insert into emf.strategy_result_types (name, optional) select 'Least Cost Curve 
 insert into emf.strategy_result_types (name, optional) select 'Annotated Inventory', false;
 insert into emf.strategy_result_types (name, optional) select 'Strategy Messages', false;
 insert into emf.strategy_result_types (name, optional) select 'Strategy County Summary', false;
-insert into emf.strategy_result_types (name, optional) select 'RSM Impact Summary', true;
+insert into emf.strategy_result_types (name, optional) select 'Strategy Impact Summary', true;
+insert into emf.strategy_result_types (name, optional) select 'RSM Percent Reduction Summary', true;
 
 
 ALTER TABLE emf.strategy_result_types

@@ -230,7 +230,7 @@ public abstract class AbstractStrategySummaryTask implements IStrategySummaryTas
         return version(controlStrategyInputDataset.getInputDataset().getId(), controlStrategyInputDataset.getVersion());
     }
 
-    private Version version(int datasetId, int version) {
+    protected Version version(int datasetId, int version) {
         Session session = sessionFactory.getSession();
         try {
             Versions versions = new Versions();

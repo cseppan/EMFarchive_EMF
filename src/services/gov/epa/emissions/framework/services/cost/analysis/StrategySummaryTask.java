@@ -92,11 +92,11 @@ public class StrategySummaryTask implements Runnable {
 //    }
 
     private void addStartStatus() {
-        setStatus("Started creating control strategy summary result: " + strategyResultType.getName() + ".");
+        setStatus("Started creating control strategy summary: " + strategyResultType.getName() + ".");
     }
 
     private void addCompletedStatus() {
-        setStatus("Completed creating control strategy summary result: " + strategyResultType.getName() + ".");
+        setStatus("Completed creating control strategy summary: " + strategyResultType.getName() + ".");
     }
 
     private void setStatus(String message) {

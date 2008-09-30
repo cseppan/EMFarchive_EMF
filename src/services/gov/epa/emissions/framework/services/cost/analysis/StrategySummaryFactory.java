@@ -22,13 +22,19 @@ public class StrategySummaryFactory {
             StrategyResultType strategyResultType, HibernateSessionFactory sessionFactory,
             DbServerFactory dbServerFactory) throws EmfException {
         try {
-            if (strategyResultType.getName().equals(StrategyResultType.strategyCountySummary))
-                return new StrategyCountySummaryTask(controlStrategy, user, dbServerFactory, sessionFactory);
 
-            if (strategyResultType.getName().equals(StrategyResultType.strategyImpactSummary))
+            if (strategyResultType == null) 
+                throw new EmfException("Summary task is missing strategy result summary to run.");
+            
+            if (strategyResultType.getName().equalsIgnoreCase(StrategyResultType.rsmPercentReduction))
+                return new StrategyRSMPctRedSummaryTask(controlStrategy, user, 
+                        dbServerFactory, sessionFactory);
+
+            if (strategyResultType.getName().equalsIgnoreCase(StrategyResultType.strategyImpactSummary))
                 return new StrategyCountyImpactSummaryTask(controlStrategy, user, dbServerFactory, sessionFactory);
 
-            return null;
+            //Don't assume a summary task, throw an error.
+            throw new EmfException("Summary task can not be run for, " + strategyResultType.getName());
         } catch (Exception e) {
             log.error("Failed to create strategy. Cause: " + e.getMessage());
             throw new EmfException("Failed to create strategy." + e.getMessage());

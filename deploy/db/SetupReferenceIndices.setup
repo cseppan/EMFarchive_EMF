@@ -51,4 +51,23 @@ CREATE INDEX invtable_cas
   ON reference.invtable
   USING btree
   (cas);
+
+-- 9/25/2008 - indexes for reference.rsm_inv_sectors table
+CREATE INDEX idx_rsm_inv_sectors_inv_sector
+  ON reference.rsm_inv_sectors
+  USING btree
+  (inv_sector);
+
+CREATE INDEX idx_rsm_inv_sectors_poll
+  ON reference.rsm_inv_sectors
+  USING btree
+  (pollutant);
+
+-- 9/25/2008 - indexes for reference.rsm_naa_fips table
+CREATE INDEX idx_rsm_naa_fips_fips
+  ON reference.rsm_naa_fips
+  USING btree
+  (fips);
+
+  
   

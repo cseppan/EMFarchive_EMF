@@ -306,7 +306,7 @@ public class ControlStrategyDAO {
     }
 
     public List<ControlStrategyResult> getControlStrategyResults(int controlStrategyId, Session session) {
-        return session.createCriteria(ControlStrategyResult.class).add(Restrictions.eq("controlStrategyId", controlStrategyId)).list();
+        return session.createCriteria(ControlStrategyResult.class).add(Restrictions.eq("controlStrategyId", controlStrategyId)).addOrder(Order.desc("startTime")).list();
     }
     
     public void removeResultDatasets(EmfDataset[] datasets, User user, Session session, DbServer dbServer) throws EmfException {
