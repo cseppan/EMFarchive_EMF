@@ -44,7 +44,10 @@ public class TableToString {
             int columnCount = md.getColumnCount();
             int startingColumn=1;
             if (md.getColumnName(1).equalsIgnoreCase("record_id"))
+            {
+               // skip the first four columns from the dataset info and start at column 5
                startingColumn=5;
+            }
             
             writeHeaderRow(md, startingColumn, columnCount);
             String row = "";
@@ -65,8 +68,9 @@ public class TableToString {
                 }
                 output.append(row + lineFeeder);
             }
-        } catch (SQLException e) {
-            throw new ExporterException("could not export lines ", e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ExporterException("could not convert table to string ", e);
         }
     }
 
