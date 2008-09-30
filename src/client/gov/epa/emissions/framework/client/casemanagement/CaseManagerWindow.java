@@ -308,7 +308,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private void viewCases() {
         cases = selected();
         if (cases.isEmpty()) {
-            messagePanel.setMessage("Please select one or more Cases");
+            messagePanel.setMessage("Please select one or more Cases to view");
             return;
         }
 
@@ -326,7 +326,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private void editCases() {
         cases = selected();
         if (cases.isEmpty()) {
-            messagePanel.setMessage("Please select one or more Cases");
+            messagePanel.setMessage("Please select one or more Cases to edit");
             return;
         }
 
@@ -351,7 +351,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         cases = selected();
 
         if (cases.isEmpty() || cases.size() != 1) {
-            messagePanel.setMessage("Please select a single case");
+            messagePanel.setMessage("Please select a single case to use as the Parent Case for the sensitivity");
             return;
         }
 
@@ -421,7 +421,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         cases = selected();
 
         if (cases.isEmpty()) {
-            messagePanel.setMessage("Please select one or more Cases");
+            messagePanel.setMessage("Please select one or more Cases to copy");
             return;
         }
 
