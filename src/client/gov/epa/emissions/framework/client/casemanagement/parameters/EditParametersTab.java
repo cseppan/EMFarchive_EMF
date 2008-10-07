@@ -29,7 +29,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -62,6 +61,8 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     private DesktopManager desktopManager;
 
     private EmfSession session;
+
+    private Sector selectedSector;
 
     public EditParametersTab(EmfConsole parentConsole, MessagePanel messagePanel, DesktopManager desktopManager) {
         super.setName("editParametersTab");
@@ -118,8 +119,8 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     private void doRefresh(CaseParameter[] params) throws Exception {
         // super.removeAll();
-        Case freshCase = presenter.reloadCaseObj();
-        sectorsComboBox.setModel(new DefaultComboBoxModel(presenter.getAllSetcors(freshCase)));
+        sectorsComboBox.resetModel(presenter.getAllSetcors());
+        sectorsComboBox.setSelectedItem(this.selectedSector);
         setupTableModel(params);
         table.refresh(tableData);
         panelRefresh();
@@ -159,7 +160,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     private JPanel createSectorPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors(caseObj));
+        sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors());
         sectorsComboBox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -431,18 +432,15 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     }
     
     private CaseParameter[] listFreshParameters() throws EmfException {
-        CaseParameter[] freshList = presenter.getCaseParameters(caseId, getSelectedSector(), showAll.isSelected());
+        this.selectedSector = (Sector) sectorsComboBox.getSelectedItem();
+        CaseParameter[] freshList = presenter.getCaseParameters(caseId, selectedSector, showAll.isSelected());
         
-        if (getSelectedSector() == null && freshList.length == presenter.getPageSize())
+        if (selectedSector == null && freshList.length == presenter.getPageSize())
             setMessage("Please select a sector to see full list of parameters.");
         else
             messagePanel.clear();
         
         return freshList;
-    }
-
-    private Sector getSelectedSector() {
-        return (Sector) sectorsComboBox.getSelectedItem();
     }
 
     public void doRefresh() throws EmfException {

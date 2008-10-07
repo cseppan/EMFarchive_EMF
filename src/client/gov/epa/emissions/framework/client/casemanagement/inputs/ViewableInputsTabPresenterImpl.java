@@ -108,8 +108,14 @@ public class ViewableInputsTabPresenterImpl {
     }
     
     public Sector[] getAllSetcors() {
+        Sector total = new Sector("All", "All");
+        total.setId(-1); //NOTE: to differentiate from allNull
+        Sector allNull = new Sector("All Sectors", "All Sectors");
+        allNull.setId(-2); //NOTE: to differentiate from total
+        
         List<Sector> all = new ArrayList<Sector>();
-        all.add(new Sector("All", "All"));
+        all.add(total);
+        all.add(allNull);
         all.addAll(Arrays.asList(this.caseObj.getSectors()));
 
         return all.toArray(new Sector[0]);

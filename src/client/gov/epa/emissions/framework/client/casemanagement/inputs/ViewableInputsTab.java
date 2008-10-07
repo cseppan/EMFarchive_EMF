@@ -68,6 +68,8 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
     private EmfSession session;
 
+    private Sector selectedSector;
+
 
     public ViewableInputsTab(EmfConsole parentConsole, MessagePanel messagePanel,
             DesktopManager desktopManager) {
@@ -401,9 +403,10 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
     }
 
     private CaseInput[] listFreshInputs() throws EmfException {
-        CaseInput[] freshList = presenter.getCaseInput(caseId, getSelectedSector(), showAll.isSelected());
+        this.selectedSector = getSelectedSector();
+        CaseInput[] freshList = presenter.getCaseInput(caseId, selectedSector, showAll.isSelected());
         
-        if (getSelectedSector() == null && freshList.length == presenter.getPageSize())
+        if (selectedSector == null && freshList.length == presenter.getPageSize())
             setMessage("Please select a sector to see full list of inputs.");
         else
             messagePanel.clear();
