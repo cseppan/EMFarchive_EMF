@@ -71,6 +71,8 @@ public class StrategyRSMPctRedSummaryTableFormat implements TableFormat {
         cols.add(new Column("region", types.stringType(64), new StringFormatter(64)));
         cols.add(new Column("factor_type", types.stringType(4), new StringFormatter(4)));
         cols.add(new Column("factor", types.realType(), new RealFormatter()));
+        cols.add(new Column("comments", types.stringType(256), new StringFormatter(256)));
+
         return cols.toArray(new Column[0]);
     }
 

@@ -114,7 +114,7 @@ public class StrategyRSMPctRedSummaryTask extends AbstractStrategySummaryTask {
 
     private EmfDataset createCountySummaryDataset() throws EmfException {
         return creator.addDataset("CSCS_", 
-                DatasetCreator.createDatasetName("Strat_County_Sum_"), getDatasetType(DatasetType.rsmPercentReduction), 
+                DatasetCreator.createDatasetName("RSM_Pct_Red_" + controlStrategy.getName()), getDatasetType(DatasetType.rsmPercentReduction), 
                 new StrategyRSMPctRedSummaryTableFormat(dbServer.getSqlDataTypes()), summaryResultDatasetDescription(DatasetType.strategyCountySummary));
     }
 
@@ -184,7 +184,7 @@ public class StrategyRSMPctRedSummaryTask extends AbstractStrategySummaryTask {
 //                    order by substring(factor_type, 2, 4)::int
                     
                     sql += "select distinct on (substring(aa_rsm_factor, 2, 4)::int) 1::character varying(64) as scenario, " 
-                        + "'Base'::character varying(64) as name, "
+                        + "'Control'::character varying(64) as name, "
                         + "'all'::character varying(64) as region, "
                         + "aa_rsm_factor as factor_type, "
                         + "case "

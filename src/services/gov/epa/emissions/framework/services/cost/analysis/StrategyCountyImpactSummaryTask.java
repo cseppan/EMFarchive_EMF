@@ -99,7 +99,7 @@ public class StrategyCountyImpactSummaryTask extends AbstractStrategySummaryTask
     }
 
     private EmfDataset createCountyImpactSummaryDataset() throws EmfException {
-        return creator.addDataset("CSCIS_", DatasetCreator.createDatasetName("County_Impact_Sum_"),
+        return creator.addDataset("CSCIS_", DatasetCreator.createDatasetName("County_Impact_Sum_" + controlStrategy.getName()),
                 getDatasetType(DatasetType.strategyImpactSummary), new StrategyImpactSummaryTableFormat(dbServer
                         .getSqlDataTypes()), summaryResultDatasetDescription(DatasetType.strategyImpactSummary));
     }
