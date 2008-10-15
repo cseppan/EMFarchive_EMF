@@ -129,7 +129,6 @@ public class ExportShapeFileQAStepTask implements Runnable {
         String colNames = "";
         String sql = "";
         String poll = pollutant.getName();
-System.out.println(poll);
 
         try {
             dbServer = dbServerFactory.getDbServer();
@@ -167,9 +166,18 @@ System.out.println(poll);
                     pollCol = colName;
                 }
             }
-            if (!(hasPlantIdCol && ((hasLongitudeCol && hasLatitudeCol) || (hasLonCol && hasLatCol) || (hasXLocCol && hasYLocCol)))
-                    && ((hasFipsCol && projectionShapeFile.getType().equals("county")) || (hasFipsStCol && projectionShapeFile
-                            .getType().equals("state")))) {
+            if (!
+                    (
+                        hasPlantIdCol && 
+                        (
+                                (hasLongitudeCol && hasLatitudeCol) || (hasLonCol && hasLatCol) || (hasXLocCol && hasYLocCol)
+                        )
+                    )
+                    && (
+                            (hasFipsCol && projectionShapeFile.getType().equals("county")) 
+                            || (hasFipsStCol && projectionShapeFile.getType().equals("state"))
+                       )
+                    ) {
                 rs = dbServer.getEmissionsDatasource().query().executeQuery(
                         "select * from " + projectionShapeFile.getTableSchema() + "."
                                 + projectionShapeFile.getTableName() + " where 1 = 0");
@@ -196,14 +204,14 @@ System.out.println(poll);
         }
         // Make sure the right projection/shape file was specified
         // Also, make sure the point query has enough info to proceed...
-         if (hasPlantIdCol &&
-         !(
-             (hasLongitudeCol && hasLatitudeCol)
-             || (hasLonCol && hasLatCol)
-             || (hasXLocCol && hasYLocCol)
-         )
-         ) {
-             throw new ExporterException("The point query must have latitude and longitude columns.");
+         if (hasPlantIdCol) {
+             if (
+             !(
+                 (hasLongitudeCol && hasLatitudeCol)
+                 || (hasLonCol && hasLatCol)
+                 || (hasXLocCol && hasYLocCol)
+             )) 
+                 throw new ExporterException("The point query must have latitude and longitude columns.");
         // county level...
          } else if (hasFipsCol) {
             if (!projectionShapeFile.getType().equals("county"))
@@ -238,6 +246,7 @@ System.out.println(poll);
             throw new ExporterException(
                     "QA result does have a fips, fips state code, or plantid/latitude/longitude columns.");
         }
+        System.out.println(sql + " where " + pollCol + " = '" + poll + "'");
         return sql + " where " + pollCol + " = '" + poll + "'";
     }
 
