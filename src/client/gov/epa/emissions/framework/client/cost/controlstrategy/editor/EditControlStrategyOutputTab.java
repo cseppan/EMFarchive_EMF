@@ -225,7 +225,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                             folder.getText(), strategyResultTypes[i]);
                 }
                 messagePanel
-                    .setMessage("Running strategy summary. Monitor the status window for progress, and refresh this window after completion to see results");
+                    .setMessage("Running strategy summary. Monitor the status window, and refresh after completion to see results");
             }
         } catch (Exception exp) {
             messagePanel.setError(exp.getMessage());
