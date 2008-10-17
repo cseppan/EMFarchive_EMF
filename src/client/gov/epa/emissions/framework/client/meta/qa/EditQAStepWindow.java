@@ -1092,7 +1092,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private void saveQA() throws EmfException{
         if (hasChanges()){
             presenter.save();
-            messagePanel.setMessage("QA step is saved successfully. ");
+            messagePanel.setMessage("QA step has been saved successfully. ");
             resetChanges();
         }
     }
