@@ -76,14 +76,16 @@ public class DataViewCacheImpl implements DataViewCache {
 
     public void close(DataAccessToken token, Session session) throws SQLException {
         PageReader reader = (PageReader) readersMap.remove(token.key());
-        reader.close();
+        if (reader != null)
+            reader.close();
     }
 
     void closeReaders() throws SQLException {
         Collection all = readersMap.values();
         for (Iterator iter = all.iterator(); iter.hasNext();) {
             PageReader pageReader = (PageReader) iter.next();
-            pageReader.close();
+            if (pageReader != null)
+               pageReader.close();
         }
 
         readersMap.clear();
@@ -103,7 +105,8 @@ public class DataViewCacheImpl implements DataViewCache {
     private void cacheReader(DataAccessToken token, PageReader reader) throws SQLException {
         if (readersMap.containsKey(token.key())) {// close old/stale reader - performance enhancement
             PageReader oldReader = reader(token);
-            oldReader.close();
+            if (oldReader != null)
+               oldReader.close();
         }
 
         readersMap.put(token.key(), reader);
