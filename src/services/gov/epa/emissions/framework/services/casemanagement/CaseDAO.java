@@ -976,11 +976,15 @@ public class CaseDAO {
         return hibernateFacade.get(CaseParameter.class, crits, session);
     }
 
-    public ParameterEnvVar getParameterEnvVar(String envName, Session session) {
+    public ParameterEnvVar getParameterEnvVar(String envName, int model_to_run_id, Session session) {
         // Get parameter environmental variables from name
         Criterion crit1 = Restrictions.eq("name", envName);
+        Criterion crit2 = Restrictions.eq("modelToRunId", model_to_run_id);
+        Criterion[] crits = { crit1, crit2 };
+       
 
-        return (ParameterEnvVar) hibernateFacade.load(ParameterEnvVar.class, crit1, session);
+//        return hibernateFacade.get(ParameterEnvVar.class, crits, session);
+        return (ParameterEnvVar) hibernateFacade.load(ParameterEnvVar.class, crits, session);
     }
 
     private List<CaseParameter> getCaseParametersWithNullSector(boolean showAll, int caseId, Session session) {
@@ -1405,12 +1409,12 @@ public class CaseDAO {
         return sb.toString();
     }
 
-    public CaseParameter[] getCaseParametersFromEnvName(int caseId, String envName) throws EmfException {
+    public CaseParameter[] getCaseParametersFromEnvName(int caseId, String envName, int model_to_run_id) throws EmfException {
         // Get case parameters that match a specific environment variables name
         Session session = sessionFactory.getSession();
         try {
             // Get environmental variable corresponding to this name
-            ParameterEnvVar envVar = getParameterEnvVar(envName, session);
+            ParameterEnvVar envVar = getParameterEnvVar(envName, model_to_run_id, session);
             if (envVar == null) {
                 throw new EmfException("Could not get parameter environmental variable for " + envName);
 
@@ -1452,7 +1456,7 @@ public class CaseDAO {
         return envVars.toArray(new String[0]);
     }
 
-    public String replaceEnvVars(String input, String delimiter, int caseId, int jobId) throws EmfException {
+    public String replaceEnvVars(String input, String delimiter, int caseId, int jobId, int model_to_run_id) throws EmfException {
         // replace any environemental variables with their values
         // use the delimiter to separate out environment variables
         try {
@@ -1464,7 +1468,7 @@ public class CaseDAO {
                     for (String envName : envVarsStrs) {
                         // loop over env variable names, get the parameter,
                         // and replace the env name in input string w/ that value
-                        CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId);
+                        CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId, model_to_run_id);
 
                         // Replace exact matches of environmental variable name
 
@@ -1543,7 +1547,8 @@ public class CaseDAO {
 
             // replace any remaining environmental variables
             int caseId = caseObj.getId();
-            tempInput = replaceEnvVars(tempInput, delimiter, caseId, jobId);
+            int model_to_run_id = caseObj.getModel().getId();
+            tempInput = replaceEnvVars(tempInput, delimiter, caseId, jobId, model_to_run_id);
             return tempInput;
 
         } catch (Exception e) {
@@ -1551,18 +1556,18 @@ public class CaseDAO {
         }
     }
 
-    public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId) throws EmfException {
+    public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId, int model_to_run_id) throws EmfException {
         // Get case parameters that match a specific environment variables name
         // If more than 1 matches the environmental variable name, uses the job Id to find unique one
         try {
-            CaseParameter[] tempParams = getCaseParametersFromEnvName(caseId, envName);
+            CaseParameter[] tempParams = getCaseParametersFromEnvName(caseId, envName, model_to_run_id);
             List<CaseParameter> params = new ArrayList<CaseParameter>();
             if (tempParams.length == 1) {
                 params.add(tempParams[0]);
             } else if (tempParams.length > 1) {
                 // loop over params and find any that match jobId
                 for (CaseParameter param : tempParams) {
-                    if (param.getJobId() == jobId) {
+                    if (param.getJobId() == jobId){
                         params.add(param);
                     }
                 }
