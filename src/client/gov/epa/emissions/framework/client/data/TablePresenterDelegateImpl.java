@@ -91,9 +91,15 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
 
     Page applyConstraints(String rowFilter, String sortOrder) throws EmfException {
         validateColsInSortOrder(sortOrder);
+        validateRowFilterFormat(rowFilter);
         setRowAndSortFilter(rowFilter, sortOrder);
 
         return service.applyConstraints(token(), rowFilter, sortOrder);
+    }
+
+    private void validateRowFilterFormat(String rowFilter) throws EmfException {
+        if (rowFilter != null && rowFilter.contains("\""))
+            throw new EmfException("Invalid Row Filter: Please use single quotes instead of double quotes.");
     }
 
     public void setRowAndSortFilter(String rowFilter, String sortOrder) {

@@ -108,6 +108,11 @@ public class ManagedExportService {
 
     private File validatePath(String folderPath) throws EmfException {
         File file = new File(folderPath);
+        
+        if (!file.canWrite()) {
+            log.error("Folder " + folderPath + " is not writable by tomcat.");
+            throw new EmfException("Folder is not writable by tomcat: " + folderPath);
+        }
 
         if (!file.exists() || !file.isDirectory()) {
             log.error("Folder " + folderPath + " does not exist");

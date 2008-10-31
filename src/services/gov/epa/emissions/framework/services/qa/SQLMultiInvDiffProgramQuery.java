@@ -105,34 +105,36 @@ public class SQLMultiInvDiffProgramQuery {
          }
          String diffQuery = "select @@!, t.poll, t.base_ann_emis, t.compare_ann_emis, (t.compare_ann_emis-t.base_ann_emis) as diff_ann_emis, " 
              + " \nabs(t.compare_ann_emis-t.base_ann_emis) as abs_diff_ann, "
-             + " \ncase when t.base_ann_emis >0  then (t.compare_ann_emis-t.base_ann_emis/t.base_ann_emis) "
+             + " \ncase when t.base_ann_emis >0  then ((t.compare_ann_emis-t.base_ann_emis)/t.base_ann_emis)*100 "
              + " \nelse null "
              + " \nend as percent_diff_ann, "
-             + " \ncase when t.base_ann_emis >0  then (abs(t.compare_ann_emis-t.base_ann_emis)/t.base_ann_emis) "
+             + " \ncase when t.base_ann_emis >0  then (abs(t.compare_ann_emis-t.base_ann_emis)/t.base_ann_emis)*100 "
              + " \nelse null "
              + " \nend as abs_percent_diff_ann, "
              + " \nt.base_avd_emis, t.compare_avd_emis, (t.compare_avd_emis-t.base_avd_emis) as diff_avd_emis, " 
              + " \nabs(t.compare_avd_emis-t.base_avd_emis) as abs_diff_avd, "
-             + " \ncase when t.base_avd_emis >0  then (t.compare_avd_emis-t.base_avd_emis/t.base_avd_emis) "
+             + " \ncase when t.base_avd_emis >0  then (100*(t.compare_avd_emis-t.base_avd_emis)/t.base_avd_emis) "
              + " \nelse null "
              + " \nend as percent_diff_avd, "
-             + " \ncase when t.base_avd_emis >0  then (abs(t.compare_avd_emis-t.base_avd_emis)/t.base_avd_emis) "
+             + " \ncase when t.base_avd_emis >0  then (100*abs(t.compare_avd_emis-t.base_avd_emis)/t.base_avd_emis) "
              + " \nelse null "
              + " \nend as abs_percent_diff_avd "
-             + "\n from (select @!@, " 
-             + " \ncoalesce(b.poll, c.poll) as poll,"
-             + " \ncoalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as poll_desc, "
-             + " \ncoalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * b.ann_emis" : "null") + ", b.ann_emis) as base_ann_emis," 
-             + " \ncoalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * c.ann_emis" : "null") + ", c.ann_emis) as compare_ann_emis,"
+             //+ ",\ncoalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as poll_desc "
+             + "\n FROM (select @!@, " 
+             +     " \ncoalesce(b.poll, c.poll) as poll,"
+             +     " \ncoalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as poll_desc, "
+             +     " \ncoalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * b.ann_emis" : "null") + ", b.ann_emis) as base_ann_emis," 
+             +     " \ncoalesce(" + (hasInvTableDataset ? "cast(i.factor as double precision) * c.ann_emis" : "null") + ", c.ann_emis) as compare_ann_emis,"
 
-             + " \ncoalesce("+ (hasInvTableDataset ? "cast(i.factor as double precision) * b.avd_emis" : "null") + ", b.avd_emis) as base_avd_emis, " 
-             + " \ncoalesce("+ (hasInvTableDataset ? "cast(i.factor as double precision) * c.avd_emis" : "null") + ", c.avd_emis) as compare_avd_emis "
+             +     " \ncoalesce("+ (hasInvTableDataset ? "cast(i.factor as double precision) * b.avd_emis" : "null") + ", b.avd_emis) as base_avd_emis, " 
+             +     " \ncoalesce("+ (hasInvTableDataset ? "cast(i.factor as double precision) * c.avd_emis" : "null") + ", c.avd_emis) as compare_avd_emis "
 
-             + " \nfrom (#base) as b "
-             + " \nfull outer join (#compare) as c "
-             + " \non !!! and b.poll = c.poll "
-             + (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non coalesce(b.poll, c.poll) = i.cas " : "\nleft outer join reference.pollutant_codes p \non coalesce(b.poll, c.poll) = p.pollutant_code ") 
-//             + " \ngroup by @@@, " + "coalesce(b.poll, c.poll)," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
+             +     " \nfrom (#base) as b "
+             +     " \nfull outer join (#compare) as c "
+             +     " \non !!! and b.poll = c.poll "
+             +     (hasInvTableDataset ? "\nleft outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i \non coalesce(b.poll, c.poll) = i.cas " : "\nleft outer join reference.pollutant_codes p \non coalesce(b.poll, c.poll) = p.pollutant_code ")
+             //FIXME: why is group by commented out??
+//           + " \ngroup by @@@, " + "coalesce(b.poll, c.poll)," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')"
              + " \norder by @@@, " + "coalesce(b.poll, c.poll)," + "coalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION')) as t";
 
          diffQuery = query(diffQuery, true);
@@ -250,7 +252,9 @@ public class SQLMultiInvDiffProgramQuery {
     private String query(String partialQuery, boolean createClause) throws EmfException {
 
         SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
-        return parser.parse(partialQuery, createClause);
+        String fullQuery = parser.parse(partialQuery, createClause);
+        System.out.println("Full query=\n"+fullQuery);
+        return fullQuery;
     }
 
 }

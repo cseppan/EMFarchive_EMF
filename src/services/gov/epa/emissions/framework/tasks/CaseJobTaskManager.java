@@ -216,7 +216,7 @@ public class CaseJobTaskManager implements TaskManager {
         try {
 
             if ((status.equals("completed")) || (status.equals("failed"))) {
-                System.out.println("CaseJobTaskManager::updateRunStatus:  job completed or failed");
+                System.out.println("CaseJobTaskManager::updateRunStatus: " + status);
                 synchronized (runTable) {
                     cjt = (CaseJobTask) runTable.get(taskId);
 
