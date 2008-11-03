@@ -127,7 +127,7 @@ public class CaseJobTask extends Task {
             e.printStackTrace();
             
             status = "failed";
-            mesg="Failed to create  job script: " + this.jobFile;
+            mesg="Error creating job script " + this.jobFile + ": " + e.getMessage();
         }
 
         // Create an execution string and submit job to the queue,
@@ -170,10 +170,8 @@ public class CaseJobTask extends Task {
             log.error("Error executing job file: " + jobFile + " Execution string= " + executionStr);
             e.printStackTrace();
             status = "failed";
-            mesg="Failed to submit job to Host: " + hostName + " for job: " + this.jobFile;
-
+            mesg="Error submitting job (" + this.jobName + ") to " + hostName + ". Command: " + executionStr;
         }
-
 
         try {
             CaseJobTaskManager.callBackFromThread(this.taskId, this.submitterId, status, mesg);

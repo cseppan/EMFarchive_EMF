@@ -194,7 +194,7 @@ public class CaseJobTaskManager implements TaskManager {
         if (DebugLevels.DEBUG_0)
             System.out.println("***ABOVE*** In callback the sizes are shown ***ABOVE***");
 
-        if (updateRunStatus(taskId, status))
+        if (updateRunStatus(taskId, status, mesg))
             synchronized (waitTable) {
                 waitTable.remove(taskId);
             }
@@ -205,7 +205,7 @@ public class CaseJobTaskManager implements TaskManager {
         processTaskQueue();
     }
 
-    private static boolean updateRunStatus(String taskId, String status) throws EmfException {
+    private static boolean updateRunStatus(String taskId, String status, String mesg) throws EmfException {
         System.out.println("CaseJobTaskManager::updateRunStatus: " + taskId + " status= " + status);
 
         CaseJobTask cjt = null;
@@ -393,6 +393,7 @@ public class CaseJobTaskManager implements TaskManager {
             if (toUpdate) {
                 JobRunStatus jrStat = caseDAO.getJobRunStatuse(jobStatus);
                 caseJob.setRunstatus(jrStat);
+                caseJob.setRunLog(mesg);
                 caseDAO.updateCaseJob(caseJob);
 
             }
@@ -660,7 +661,7 @@ public class CaseJobTaskManager implements TaskManager {
 
             if (status.equals("completed")) {
                 cjt.setExportsSuccess(true);
-                if (updateRunStatus(cjtId, "export succeeded"))
+                if (updateRunStatus(cjtId, "export succeeded", mesg))
                     synchronized (waitTable) {
                         waitTable.remove(cjtId);
                     }
@@ -668,7 +669,7 @@ public class CaseJobTaskManager implements TaskManager {
 
             if (status.equals("failed")) {
                 cjt.setExportsSuccess(false);
-                if (updateRunStatus(cjtId, "export failed"))
+                if (updateRunStatus(cjtId, "export failed", mesg))
                     synchronized (waitTable) {
                         waitTable.remove(cjtId);
                     }
@@ -812,7 +813,7 @@ public class CaseJobTaskManager implements TaskManager {
                             User user = caseJob.getUser();
 
                             // set the CaseJob jobstatus (casejob table) to Failed
-                            if (updateRunStatus(cjt.getTaskId(), "failed"))
+                            if (updateRunStatus(cjt.getTaskId(), "failed", ""))
                                 tasks2Remove.add(cjt.getTaskId());
 
                             String message = "Job name= " + cjt.getJobName()
