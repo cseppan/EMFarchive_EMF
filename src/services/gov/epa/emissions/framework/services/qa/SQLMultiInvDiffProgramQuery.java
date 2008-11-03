@@ -119,6 +119,7 @@ public class SQLMultiInvDiffProgramQuery {
              + " \ncase when t.base_avd_emis >0  then (100*abs(t.compare_avd_emis-t.base_avd_emis)/t.base_avd_emis) "
              + " \nelse null "
              + " \nend as abs_percent_diff_avd "
+             //TODO: add the additional descriptive columns in the appropriate way
              //+ ",\ncoalesce(" + (hasInvTableDataset ? "i.name" : "p.pollutant_code_desc") + ", 'AN UNSPECIFIED DESCRIPTION') as poll_desc "
              + "\n FROM (select @!@, " 
              +     " \ncoalesce(b.poll, c.poll) as poll,"
@@ -253,7 +254,7 @@ public class SQLMultiInvDiffProgramQuery {
 
         SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
         String fullQuery = parser.parse(partialQuery, createClause);
-        System.out.println("Full query=\n"+fullQuery);
+//        System.out.println("Full query=\n"+fullQuery);
         return fullQuery;
     }
 
