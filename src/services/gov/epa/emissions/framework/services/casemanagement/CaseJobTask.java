@@ -216,6 +216,11 @@ public class CaseJobTask extends Task {
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e);
+            if (outFile != null && !outFile.canWrite())
+            {
+                throw new EmfException("EMF tomcat does not have permission to create the job file: "
+                    +outFile);
+            }
             throw new EmfException("In createJobFile: Error writing jobFile: " + jobFile);
         }
     }
