@@ -1170,5 +1170,17 @@ public class CaseServiceTransport implements CaseService {
         call.request(new Object[] {folder, files, user });
     }
 
+    public void loadCMAQCase(String path, int caseId, User user) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("loadCMAQCase");
+        call.addStringParam("path");
+        call.addIntegerParam("caseId");
+        call.addParam("user", dataMappings.user());
+        call.setVoidReturnType();
+
+        call.request(new Object[] {path, new Integer(caseId), user});
+    }
+
 
 }

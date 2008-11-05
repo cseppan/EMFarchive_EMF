@@ -194,6 +194,14 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         buttonsPanel.add(refresh);
         refresh.setToolTipText("Refresh only the current tab with focus.");
 
+        Button loadCaseButton = new Button("Load", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                loadCase();
+            }
+        });
+        buttonsPanel.add(loadCaseButton);
+        loadCaseButton.setToolTipText("Load case inputs, parameters, and outputs from case log file.");
+        
         Button printCaseButton = new Button("Print", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 printCase();
@@ -296,6 +304,12 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         PrintCaseDialog printCase = new PrintCaseDialog("Print Case " + caseObj.getName(), this, parentConsole, session);
         PrintCasePresenter printPresenter = new PrintCasePresenter(session, caseObj);
         printPresenter.display(printCase);
+    }
+
+    private void loadCase() {
+        LoadCaseDialog loadCaseView = new LoadCaseDialog("Load Data into Case \"" + caseObj.getName() + "\"", this, parentConsole, session);
+        LoadCasePresenter printPresenter = new LoadCasePresenter(session, caseObj);
+        printPresenter.display(loadCaseView);
     }
 
     public void showLockingMsg(String msg) {
