@@ -8,7 +8,6 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.io.CommonFileHeaderReader;
 import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
-import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -491,10 +490,11 @@ public class ManagedImportService {
             }
 
             throw new EmfException("No files found for pattern '" + pattern + "'");
-        } catch (ImporterException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Folder: " + folder + " Pattern:" + pattern);
-            throw new EmfException("Cannot apply pattern: " + e.getMessage());
+            throw new EmfException("No files found for pattern: "+pattern+" in folder "+
+                    folder);
         }
     }
 
