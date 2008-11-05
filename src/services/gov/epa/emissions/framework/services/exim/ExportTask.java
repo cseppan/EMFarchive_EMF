@@ -206,7 +206,15 @@ public class ExportTask extends Task {
     }
 
     private void setErrorStatus(Exception e, String message) {
-        log.error("Problem attempting to export file : " + file + " " + message, e);
+        if (log != null && file != null && e != null) 
+        {
+            log.error("Problem attempting to export file : " + file + " " + message, e);
+        }
+        else if (e!=null)
+        {
+            if (message != null) System.out.println("Message = "+message);
+            e.printStackTrace();
+        }        
         setStatus("failed", "Export failure. " + message + ((e == null) ? "" : e.getMessage()));
     }
 
