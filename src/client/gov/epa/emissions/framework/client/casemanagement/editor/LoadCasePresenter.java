@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.casemanagement.editor;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 
 public class LoadCasePresenter {
     private Case currentCase;
@@ -27,12 +28,17 @@ public class LoadCasePresenter {
         return (lastFolder != null) ? lastFolder : getDefaultFolder();
     }
 
-    public void printCase(String path) throws EmfException {
-        session.caseService().loadCMAQCase(path, currentCase.getId(), session.user());
+    public void loadCase(String path, CaseJob job) throws EmfException {
+        int jobId = (job == null) ? 0 : job.getId();
+        session.caseService().loadCMAQCase(path, jobId, currentCase.getId(), session.user());
     }
 
     private String getDefaultFolder() {
         return "";
+    }
+
+    public CaseJob[] getJobs() throws EmfException{
+        return session.caseService().getCaseJobs(currentCase.getId());
     }
 
 }

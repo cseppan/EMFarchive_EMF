@@ -219,6 +219,6 @@ public interface CaseService {
     
     void importCase(String folder, String[] files, User user) throws EmfException;
     
-    void loadCMAQCase(String path, int caseId, User user) throws EmfException;
+    void loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException;
     
  }

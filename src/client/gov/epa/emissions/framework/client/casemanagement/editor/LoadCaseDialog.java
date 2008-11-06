@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
+import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
@@ -17,6 +18,7 @@ import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -26,6 +28,7 @@ import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -36,6 +39,8 @@ public class LoadCaseDialog extends JDialog {
     private SingleLineMessagePanel messagePanel;
 
     private JTextField path;
+    
+    private JComboBox jobs;
 
     private LoadCasePresenter presenter;
 
@@ -53,10 +58,10 @@ public class LoadCaseDialog extends JDialog {
 
         this.parentConsole = parentConsole;
         this.service = session.dataCommonsService();
-        this.getContentPane().add(createLayout());
     }
     
     public void display() {
+        this.getContentPane().add(createLayout());
         this.pack();
         this.setVisible(true);
     }
@@ -82,7 +87,7 @@ public class LoadCaseDialog extends JDialog {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // folder
-        path = new JTextField(40);
+        path = new JTextField(30);
         path.setName("path");
         Button button = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
@@ -92,15 +97,23 @@ public class LoadCaseDialog extends JDialog {
         });
         Icon icon = new ImageResources().open("Open a file");
         button.setIcon(icon);
+        
+        try {
+            jobs = new JComboBox(presenter.getJobs());
+            jobs.setPreferredSize(new Dimension(334, 30));
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
 
         JPanel folderPanel = new JPanel(new BorderLayout(2, 0));
         folderPanel.add(path, BorderLayout.LINE_START);
         folderPanel.add(button, BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("File", folderPanel, panel);
+        layoutGenerator.addLabelWidgetPair("File:", folderPanel, panel);
+        layoutGenerator.addLabelWidgetPair("Case Job:", jobs, panel);
 
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
 
@@ -135,7 +148,7 @@ public class LoadCaseDialog extends JDialog {
                 
                 try {
                     checkFolderField();
-                    presenter.printCase(path.getText());
+                    presenter.loadCase(path.getText(), (CaseJob)jobs.getSelectedItem());
                     dispose();
                 } catch (Exception e1) {
                     messagePanel.setError(e1.getMessage());

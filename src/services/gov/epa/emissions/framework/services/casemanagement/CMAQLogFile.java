@@ -50,7 +50,10 @@ public class CMAQLogFile implements EMFCaseFile {
         return uniqAttributes.toArray(new String[0]);
     }
 
-    public void read() throws EmfException {
+    /***
+     * Read all the attributes and their values and put them in a hash map
+     */
+    public void readAll() throws EmfException {
         String tempAttr = "";
         List<String> tempValues = new ArrayList<String>();
 
@@ -95,6 +98,55 @@ public class CMAQLogFile implements EMFCaseFile {
         }
     }
 
+    /***
+     * Read specified attributes (parameters) only
+     */
+    public void read(List<String> parameters) throws EmfException {
+        String tempAttr = "";
+        List<String> tempValues = new ArrayList<String>();
+
+        try {
+            open();
+            String line = null;
+
+            while ((line = fileReader.readLine()) != null) {
+                int eqIndex = line.indexOf("=");
+
+                if (eqIndex < 0)
+                    continue;
+
+                String attrib = line.substring(0, eqIndex).trim();
+                String value = line.substring(eqIndex + 1).trim();
+                
+                if (!parameters.contains(attrib))
+                    continue;
+
+                if (attrib.equals(tempAttr)) {
+                    tempValues.add(value);
+                    continue;
+                }
+
+                addAttribValue(tempAttr, tempValues, data);
+                
+                if (tempAttr.isEmpty())
+                    uniqAttributes.add(tempAttr);
+                
+                tempAttr = attrib;
+                tempValues = new ArrayList<String>();
+                tempValues.add(value);
+            }
+
+            close();
+        } catch (UnsupportedEncodingException e) {
+            throw new EmfException("File " + path + " is not consistent with character encoding: "
+                    + inputStreamReader.getEncoding() + ".");
+        } catch (FileNotFoundException e) {
+            throw new EmfException("File " + path + " doesn't exist.");
+        } catch (IOException e) {
+            throw new EmfException("Cannot read file " + path + ".");
+        }
+    }
+    
     private void addAttribValue(String key, List<String> value, Map<String, List<String>> map) {
         if (key == null || key.isEmpty())
             return;

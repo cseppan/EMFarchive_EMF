@@ -4904,7 +4904,7 @@ public class ManagedCaseService {
         return temp.replaceAll("\\\\", "/");
     }
 
-    public void loadCMAQCase(String path, int caseId, User user) throws EmfException {
+    public void loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
 //        List<CaseJob> jobs = dao.getCaseJobs(caseId);
 //        
 //        EMFCaseFile caseFile = new CMAQLogFile(path);
