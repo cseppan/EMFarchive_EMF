@@ -21,7 +21,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -210,9 +209,6 @@ public class LoadCaseDialog extends JDialog {
         
         if (specified.charAt(0) != '/' && !Character.isLetter(specified.charAt(0)))
             throw new EmfException("Specified folder is not in a right format (ex. C:\\).");
-        
-        if (!new File(specified).isFile())
-            throw new EmfException("Specified file is invalid.");
     }
 
 }
