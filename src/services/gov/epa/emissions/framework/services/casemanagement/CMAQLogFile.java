@@ -9,7 +9,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,13 +23,20 @@ public class CMAQLogFile implements EMFCaseFile {
 
     private CustomCharSetInputStreamReader inputStreamReader;
 
-    private List<String> uniqAttributes = new ArrayList<String>();
-
-    private Map<String, List<String>> data = new HashMap<String, List<String>>();
+    private Map<String, String> data = new HashMap<String, String>();
+    
+    private StringBuffer sb = null;
+    
+    private static final String lineSep = System.getProperty("line.separator");
 
     public CMAQLogFile(String path) {
         this.path = path;
         this.file = new File(path);
+    }
+    
+    public CMAQLogFile(File file) {
+        this.path = file.getAbsolutePath();
+        this.file = file;
     }
 
     private void open() throws UnsupportedEncodingException, FileNotFoundException {
@@ -42,12 +48,8 @@ public class CMAQLogFile implements EMFCaseFile {
         fileReader.close();
     }
 
-    public String[] getAttributeValues(String attribute) {
-        return data.get(attribute).toArray(new String[0]);
-    }
-
-    public String[] getAttributes() {
-        return uniqAttributes.toArray(new String[0]);
+    public String getAttributeValue(String attribute) {
+        return data.get(attribute);
     }
 
     /***
@@ -55,8 +57,11 @@ public class CMAQLogFile implements EMFCaseFile {
      */
     public void readAll() throws EmfException {
         String tempAttr = "";
-        List<String> tempValues = new ArrayList<String>();
-
+        sb = new StringBuffer();
+        
+        if (!data.isEmpty())
+            data.clear();
+        
         try {
             open();
             String line = null;
@@ -71,20 +76,12 @@ public class CMAQLogFile implements EMFCaseFile {
                 String value = line.substring(eqIndex + 1).trim();
 
                 if (attrib.equals(tempAttr)) {
-                    tempValues.add(value);
+                    sb.append("WARNING: " + tempAttr + "--duplicate value: " + value + lineSep);
                     continue;
                 }
 
-                addAttribValue(tempAttr, tempValues, data);
-                
-                if (tempAttr.isEmpty())
-                    uniqAttributes.add(tempAttr);
-                
+                addAttribValue(attrib, value, data);
                 tempAttr = attrib;
-                tempValues = new ArrayList<String>();
-                tempValues.add(value);
-                
-                
             }
 
             close();
@@ -101,10 +98,16 @@ public class CMAQLogFile implements EMFCaseFile {
     /***
      * Read specified attributes (parameters) only
      */
-    public void read(List<String> parameters) throws EmfException {
+    public void read(List<String> attributes) throws EmfException {
+        if (attributes == null || attributes.size() == 0)
+            throw new EmfException("No attributes specified to read from log file.");
+        
         String tempAttr = "";
-        List<String> tempValues = new ArrayList<String>();
-
+        sb = new StringBuffer();
+        
+        if (!data.isEmpty())
+            data.clear();
+        
         try {
             open();
             String line = null;
@@ -118,22 +121,16 @@ public class CMAQLogFile implements EMFCaseFile {
                 String attrib = line.substring(0, eqIndex).trim();
                 String value = line.substring(eqIndex + 1).trim();
                 
-                if (!parameters.contains(attrib))
+                if (!attributes.contains(attrib))
                     continue;
 
                 if (attrib.equals(tempAttr)) {
-                    tempValues.add(value);
+                    sb.append("WARNING: " + tempAttr + "--duplicate value: " + value + lineSep);
                     continue;
                 }
 
-                addAttribValue(tempAttr, tempValues, data);
-                
-                if (tempAttr.isEmpty())
-                    uniqAttributes.add(tempAttr);
-                
+                addAttribValue(attrib, value, data);
                 tempAttr = attrib;
-                tempValues = new ArrayList<String>();
-                tempValues.add(value);
             }
 
             close();
@@ -147,19 +144,15 @@ public class CMAQLogFile implements EMFCaseFile {
         }
     }
     
-    private void addAttribValue(String key, List<String> value, Map<String, List<String>> map) {
+    private void addAttribValue(String key, String value, Map<String, String> map) {
         if (key == null || key.isEmpty())
             return;
 
-        if (map.containsKey(key)) {
-            List<String> values = map.get(key);
-            map.remove(key);
-            values.addAll(value);
-            map.put(key, values);
-            return;
-        }
-
         map.put(key, value);
+    }
+
+    public String getMessages() {
+        return (sb != null) ? sb.toString() : null;
     }
 
 }

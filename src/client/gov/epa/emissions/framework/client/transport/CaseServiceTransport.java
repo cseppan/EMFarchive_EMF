@@ -412,7 +412,7 @@ public class CaseServiceTransport implements CaseService {
 
         return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId) });
     }
-    
+
     public synchronized CaseInput[] getCaseInputs(int caseId, int[] jobIds) throws EmfException {
         EmfCall call = call();
 
@@ -421,7 +421,7 @@ public class CaseServiceTransport implements CaseService {
         call.addIntArrayParam();
         call.setReturnType(caseMappings.caseinputs());
 
-        return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId), jobIds});
+        return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId), jobIds });
     }
 
     public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll)
@@ -1011,9 +1011,8 @@ public class CaseServiceTransport implements CaseService {
         return (String[]) call.requestResponse(new Object[] {});
     }
 
-    public synchronized Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, 
-            String jobGroup, Case sensitivityCase)
-            throws EmfException {
+    public synchronized Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup,
+            Case sensitivityCase) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("mergeCases");
@@ -1031,12 +1030,12 @@ public class CaseServiceTransport implements CaseService {
 
     public synchronized String checkParentCase(Case caseObj) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("checkParentCase");
         call.addParam("caseObj", caseMappings.caseObject());
         call.setStringReturnType();
-        
-        return (String) call.requestResponse(new Object[]{caseObj});
+
+        return (String) call.requestResponse(new Object[] { caseObj });
     }
 
     public synchronized String validateNLInputs(int caseId) throws EmfException {
@@ -1048,7 +1047,7 @@ public class CaseServiceTransport implements CaseService {
 
         return (String) call.requestResponse(new Object[] { new Integer(caseId) });
     }
-    
+
     public synchronized String validateNLParameters(int caseId) throws EmfException {
         EmfCall call = call();
 
@@ -1059,8 +1058,8 @@ public class CaseServiceTransport implements CaseService {
         return (String) call.requestResponse(new Object[] { new Integer(caseId) });
     }
 
-    public synchronized Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup,
-            Case sensitivityCase) throws EmfException {
+    public synchronized Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds,
+            String jobGroup, Case sensitivityCase) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("addSensitivity2Case");
@@ -1078,12 +1077,12 @@ public class CaseServiceTransport implements CaseService {
 
     public synchronized Case[] getSensitivityCases(int parentCaseId) throws EmfException {
         EmfCall call = call();
-        
+
         call.setOperation("getSensitivityCases");
         call.addIntegerParam("parentCaseId");
         call.setReturnType(caseMappings.cases());
-        
-        return (Case[]) call.requestResponse(new Object[] {new Integer(parentCaseId)});
+
+        return (Case[]) call.requestResponse(new Object[] { new Integer(parentCaseId) });
     }
 
     public synchronized String[] getJobGroups(int caseId) throws EmfException {
@@ -1104,7 +1103,7 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.caseObject());
 
         return (Case) call.requestResponse(new Object[] { name });
-    
+
     }
 
     public synchronized void printCase(String folder, int caseId) throws EmfException {
@@ -1158,7 +1157,7 @@ public class CaseServiceTransport implements CaseService {
         return (Case[]) call.requestResponse(new Object[] { new Integer(datasetId) });
     }
 
-    public void importCase(String folder, String[] files, User user) throws EmfException {
+    public synchronized void importCase(String folder, String[] files, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("importCase");
@@ -1167,10 +1166,10 @@ public class CaseServiceTransport implements CaseService {
         call.addParam("user", dataMappings.user());
         call.setVoidReturnType();
 
-        call.request(new Object[] {folder, files, user });
+        call.request(new Object[] { folder, files, user });
     }
 
-    public void loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
+    public synchronized void loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("loadCMAQCase");
@@ -1180,8 +1179,7 @@ public class CaseServiceTransport implements CaseService {
         call.addParam("user", dataMappings.user());
         call.setVoidReturnType();
 
-        call.request(new Object[] {path, new Integer(jobId), new Integer(caseId), user});
+        call.request(new Object[] { path, new Integer(jobId), new Integer(caseId), user });
     }
-
 
 }

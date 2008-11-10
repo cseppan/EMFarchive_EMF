@@ -4904,14 +4904,102 @@ public class ManagedCaseService {
         return temp.replaceAll("\\\\", "/");
     }
 
-    public void loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
-//        List<CaseJob> jobs = dao.getCaseJobs(caseId);
-//        
-//        EMFCaseFile caseFile = new CMAQLogFile(path);
-//        caseFile.read();
-//        String[] attribs = caseFile.getAttributes();
+    public synchronized void loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
+        File logFile = new File(path);
         
-        throw new EmfException("Under construction...");
+        if (!logFile.exists() || !logFile.canRead())
+            throw new EmfException("CMAQ log file doesn't exist or is not readable by Tomcat: " + path + ".");
+        
+        if (!logFile.isFile())
+            throw new EmfException("Please specify a valid log file.");
+        
+        List<CaseParameter> paramObjects = getValidParameters(jobId, caseId);
+        List<String> paramEnvs = getEnvVars(paramObjects);
+        EMFCaseFile caseFile = new CMAQLogFile(logFile);
+        caseFile.read(paramEnvs);
+        
+        int numLoaded = 0;
+        
+        for(Iterator<CaseParameter> iter = paramObjects.iterator(); iter.hasNext();) {
+            CaseParameter param = iter.next();
+            ParameterEnvVar envVar = param.getEnvVar();
+            
+            if (envVar == null)
+                continue;
+            
+            String value = caseFile.getAttributeValue(envVar.getName());
+            
+            if (value == null || value.isEmpty()) 
+                continue;
+            
+            param.setValue(value);
+            updateCaseParameter(user, param);
+            numLoaded++;
+        }
+        
+        throw new EmfException(EmfException.MSG_TYPE + ":" + numLoaded + " parameter environment value" + (numLoaded > 0 ? "s" : "") + " loaded.");
+    }
+
+    private synchronized List<CaseParameter> getValidParameters(int jobId, int caseId) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            CaseJob job = dao.getCaseJob(jobId, session);
+            Sector sector = (job == null) ? null : job.getSector();
+            
+            List<CaseParameter> jobSpecParams = dao.getCaseParametersByJobId(caseId, jobId, session);
+            List<CaseParameter> sectorSpecParams = (sector != null) ? dao.getCaseParametersBySector(caseId, sector, session) : dao.getCaseParametersForAllSectors(caseId, session);
+            List<CaseParameter> params4AllSectorsAllJobs = dao.getCaseParametersForAllSectorsAllJobs(caseId, session);
+            
+            return selectValidParameters(jobSpecParams, sectorSpecParams, params4AllSectorsAllJobs);
+        } catch (Exception e) {
+            log.error("Error reading case parameters for case id = " + caseId + " and job id = " + jobId + ".", e);
+            throw new EmfException("Error reading case parameters for case id = " + caseId + " and job id = " + jobId + ".");
+        } finally {
+            if (session != null && session.isOpen())
+                session.close();
+        }
+    }
+    
+    private List<CaseParameter> selectValidParameters(List<CaseParameter> jobSpecParams,
+            List<CaseParameter> sectorSpecParams, List<CaseParameter> params4AllSectorsAllJobs) {
+        List<String> paramEnvs = getEnvVars(jobSpecParams);
+        
+        for (Iterator<CaseParameter> iter = sectorSpecParams.iterator(); iter.hasNext();) {
+            CaseParameter param = iter.next();
+            ParameterEnvVar envVar = param.getEnvVar();
+            int paramJobId = param.getJobId();
+            
+            if (!paramEnvs.contains(envVar.getName()) && paramJobId == 0) {
+                jobSpecParams.add(param);
+                paramEnvs.add(envVar.getName());
+            }
+        }
+        
+        for (Iterator<CaseParameter> iter = params4AllSectorsAllJobs.iterator(); iter.hasNext();) {
+            CaseParameter param = iter.next();
+            ParameterEnvVar envVar = param.getEnvVar();
+            
+            if (!paramEnvs.contains(envVar.getName())) {
+                jobSpecParams.add(param);
+                paramEnvs.add(envVar.getName());
+            }
+        }
+        
+        return jobSpecParams;
+    }
+
+    private synchronized List<String> getEnvVars(List<CaseParameter> paramObjects) {
+        List<String> envs = new ArrayList<String>();
+        
+        for (Iterator<CaseParameter> iter = paramObjects.iterator(); iter.hasNext();) {
+            ParameterEnvVar env = iter.next().getEnvVar();
+            
+            if (env != null && env.getName() != null && !env.getName().trim().isEmpty())
+                envs.add(env.getName());
+        }
+        
+        return envs;
     }
 
 }

@@ -8,9 +8,9 @@ public interface EMFCaseFile {
 
     void readAll() throws EmfException;
     
-    void read(List<String> parameters) throws EmfException;
+    void read(List<String> attributes) throws EmfException;
     
-    String[] getAttributes() throws EmfException;
+    String getAttributeValue(String attribute) throws EmfException;
     
-    String[] getAttributeValues(String attribute) throws EmfException;
+    String getMessages();
 }

@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.casemanagement.editor;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
-import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -26,7 +25,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -42,8 +40,6 @@ public class LoadCaseDialog extends JDialog {
     private JComboBox jobs;
 
     private LoadCasePresenter presenter;
-
-    private JButton loadButton;
 
     private EmfConsole parentConsole;
 
@@ -88,6 +84,8 @@ public class LoadCaseDialog extends JDialog {
         // folder
         path = new JTextField(30);
         path.setName("path");
+        this.setMostRecentUsedFolder(presenter.getDefaultBaseFolder());
+        
         Button button = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clearMessagePanel();
@@ -128,11 +126,11 @@ public class LoadCaseDialog extends JDialog {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        loadButton = new Button("Load", loadCase());
+        Button loadButton = new Button("Load", loadCase());
         container.add(loadButton);
         getRootPane().setDefaultButton(loadButton);
 
-        JButton cancelButton = new CancelButton(cancelAction());
+        Button cancelButton = new Button("Done", closeAction());
         container.add(cancelButton);
 
         panel.add(container, BorderLayout.EAST);
@@ -143,20 +141,23 @@ public class LoadCaseDialog extends JDialog {
     private Action loadCase() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e){
-                clearMessagePanel();
-                
                 try {
+                    messagePanel.setMessage(" ");
                     checkFolderField();
                     presenter.loadCase(path.getText(), (CaseJob)jobs.getSelectedItem());
-                    dispose();
-                } catch (Exception e1) {
-                    messagePanel.setError(e1.getMessage());
-                }
+                } catch (EmfException e1) {
+                    String msg = e1.getMessage();
+                    
+                    if (e1.isMessage())
+                        messagePanel.setMessage(msg.substring(msg.indexOf(":") + 1));
+                    else
+                        messagePanel.setError(msg);
+                } 
             }
         };
     }
 
-    private Action cancelAction() {
+    private Action closeAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e){ 
                 dispose();
@@ -175,7 +176,7 @@ public class LoadCaseDialog extends JDialog {
     }
 
     private void selectFile() {
-        EmfFileInfo initDir = new EmfFileInfo(path.getText(), true, false);
+        EmfFileInfo initDir = new EmfFileInfo(path.getText(), true, true);
 
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(service));
         chooser.setTitle("Select a case log file for loading data into case");
@@ -184,7 +185,7 @@ public class LoadCaseDialog extends JDialog {
 
         EmfFileInfo[] files = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedFiles() : null;
         
-        if (files == null)
+        if (files == null || files.length == 0)
             return;
 
         if (files.length > 1) {

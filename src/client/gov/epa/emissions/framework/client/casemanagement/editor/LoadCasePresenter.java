@@ -28,7 +28,7 @@ public class LoadCasePresenter {
         return (lastFolder != null) ? lastFolder : getDefaultFolder();
     }
 
-    public void loadCase(String path, CaseJob job) throws EmfException {
+    public void loadCase(String path, CaseJob job) throws EmfException  {
         int jobId = (job == null) ? 0 : job.getId();
         session.caseService().loadCMAQCase(path, jobId, currentCase.getId(), session.user());
     }
@@ -39,6 +39,14 @@ public class LoadCasePresenter {
 
     public CaseJob[] getJobs() throws EmfException{
         return session.caseService().getCaseJobs(currentCase.getId());
+    }
+    
+    public String getDefaultBaseFolder() {
+        String folder = session.preferences().inputFolder();
+        if (folder == null || folder.trim().isEmpty())
+            folder = "";// default, if unspecified
+
+        return folder;
     }
 
 }
