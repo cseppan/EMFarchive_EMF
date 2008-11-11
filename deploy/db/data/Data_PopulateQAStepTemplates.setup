@@ -412,7 +412,7 @@ where name in ('ORL Merged Inventory')
 	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Summarize by Sector, SCC and Pollutant with Descriptions');
 
 update emf.dataset_types_qa_step_templates 
-set program_arguments = 'select e.sector, e.SCC, coalesce(s.scc_description,''AN UNSPECIFIED DESCRIPTION'')::character varying(248) as scc_description, e.POLL, coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'')::character varying(11) as pollutant_code_desc, coalesce(p.name,''AN UNSPECIFIED SMOKE NAME'')::character varying(11) as smoke_name,p.factor, p.voctog, p.species, (coalesce(sum(ann_emis), 0)) as ann_emis, (coalesce(sum(avd_emis), 0)) as avd_emis from $TABLE[1] e left outer join reference.invtable p on e.POLL=p.cas left outer join reference.scc s on e.SCC=s.scc group by e.sector, e.SCC,e.POLL,p.descrptn,s.scc_description, p.name, p.factor,p.voctog, p.species order by e.sector, e.SCC, p.name
+set program_arguments = 'select e.sector, e.SCC, coalesce(s.scc_description,''AN UNSPECIFIED DESCRIPTION'')::character varying(248) as scc_description, e.POLL, coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'')::character varying(11) as pollutant_code_desc, coalesce(p.name,''AN UNSPECIFIED SMOKE NAME'')::character varying(11) as smoke_name,p.factor, p.voctog, p.species, coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis from $TABLE[1] e left outer join reference.invtable p on e.POLL=p.cas left outer join reference.scc s on e.SCC=s.scc group by e.sector, e.SCC,e.POLL,p.descrptn,s.scc_description, p.name, p.factor,p.voctog, p.species order by e.sector, e.SCC, p.name
 '
 where name = 'Summarize by Sector, SCC and Pollutant with Descriptions'
 and dataset_type_id in 
@@ -428,7 +428,7 @@ e.POLL, coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'')::character varying(1
 coalesce(p.name,''AN UNSPECIFIED DESCRIPTION'') as smoke_name, p.factor, 
 p.voctog, p.species, 
 TO_CHAR(fips.centerlon, ''FM990.000009'')::double precision as longitude, TO_CHAR(fips.centerlat, ''FM990.000009'')::double precision as latitude,
-(coalesce(sum(ann_emis), 0)) as ann_emis, (coalesce(sum(avd_emis), 0)) as avd_emis 
+coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis 
 from $TABLE[1] e 
 left outer join reference.invtable p 
 on e.POLL=p.cas 
@@ -448,7 +448,7 @@ e.POLL, coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'')::character varying(1
 coalesce(p.name,''AN UNSPECIFIED DESCRIPTION'') as smoke_name, p.factor, 
 p.voctog, p.species, 
 TO_CHAR(fips.centerlon, ''FM990.000009'')::double precision as longitude, TO_CHAR(fips.centerlat, ''FM990.000009'')::double precision as latitude,
-(coalesce(sum(ann_emis), 0)) as ann_emis, (coalesce(sum(avd_emis), 0)) as avd_emis 
+coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis 
 from $TABLE[1] e 
 left outer join reference.invtable p 
 on e.POLL=p.cas 
@@ -474,7 +474,7 @@ coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'')::character varying(11) as po
 p.factor,p.voctog, 
 p.species, 
 TO_CHAR(fips.centerlon, ''FM990.000009'')::double precision as longitude, TO_CHAR(fips.centerlat, ''FM990.000009'')::double precision as latitude,
-(coalesce(sum(ann_emis), 0)) as ann_emis, (coalesce(sum(avd_emis), 0)) as avd_emis 
+coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis 
 from $TABLE[1] e 
 left outer join reference.invtable p 
 on e.POLL=p.cas 
@@ -495,7 +495,7 @@ coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'')::character varying(11) as po
 p.factor,p.voctog, 
 p.species, 
 TO_CHAR(fips.centerlon, ''FM990.000009'')::double precision as longitude, TO_CHAR(fips.centerlat, ''FM990.000009'')::double precision as latitude,
-(coalesce(sum(ann_emis), 0)) as ann_emis, (coalesce(sum(avd_emis), 0)) as avd_emis 
+coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis 
 from $TABLE[1] e 
 left outer join reference.invtable p 
 on e.POLL=p.cas 
@@ -519,7 +519,7 @@ where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)',
 	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Summarize by Pollutant with Descriptions');
 
 update emf.dataset_types_qa_step_templates 
-set program_arguments = 'select e.POLL, coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'')::character varying(11) as pollutant_code_desc, coalesce(p.name,''AN UNSPECIFIED SMOKE NAME'')::character varying(11) as smoke_name, p.factor ,p.voctog, p.species, (coalesce(sum(ann_emis), 0)) as ann_emis, (coalesce(sum(avd_emis), 0)) as avd_emis from $TABLE[1] e left outer join reference.invtable p on e.POLL = p.cas group by e.POLL, p.descrptn, p.name, p.factor, p.voctog, p.species order by p.name
+set program_arguments = 'select e.POLL, coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'')::character varying(11) as pollutant_code_desc, coalesce(p.name,''AN UNSPECIFIED SMOKE NAME'')::character varying(11) as smoke_name, p.factor ,p.voctog, p.species, coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis from $TABLE[1] e left outer join reference.invtable p on e.POLL = p.cas group by e.POLL, p.descrptn, p.name, p.factor, p.voctog, p.species order by p.name
 '
 where name = 'Summarize by Pollutant with Descriptions'
 and dataset_type_id in 
@@ -539,7 +539,7 @@ where name in ('ORL Merged Inventory')
 update emf.dataset_types_qa_step_templates 
 set program_arguments = 'select e.sector, e.POLL, coalesce(p.descrptn,''AN UNSPECIFIED DESCRIPTION'')::character varying(11) as pollutant_code_desc, coalesce(p.name,''AN UNSPECIFIED SMOKE NAME'')::character varying(11) as smoke_name, p.factor ,p.voctog, p.species, coalesce(sum(ann_emis), 0) as ann_emis, coalesce(sum(avd_emis), 0) as avd_emis from $TABLE[1] e left outer join reference.invtable p on e.POLL = p.cas group by e.sector, e.POLL, p.descrptn, p.name, p.factor, p.voctog, p.species order by e.sector, p.name
 '
-where name = 'Summarize by Sector, Pollutant with Descriptions'
+where name = 'Summarize by Sector and Pollutant with Descriptions'
 and dataset_type_id in 
 (select id 
 from emf.dataset_types dt
@@ -833,7 +833,7 @@ where name = 'Summarize by U.S. State, SCC and Pollutant with Descriptions'
 and dataset_type_id in 
 (select id 
 from emf.dataset_types dt
-where name in ('ORL Merged Inventory'));
+where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)','ORL Point Inventory (PTINV)','ORL Merged Inventory'));
 
 -- Summarize by Sector, U.S. State, SCC and Pollutant with Descriptions - ORL Merged Inventory
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
@@ -894,7 +894,7 @@ coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'')::character varyi
 r.species, r.voctog, 
 TO_CHAR((fips.state_maxlon + fips.state_minlon) / 2, ''FM990.000009'')::double precision as longitude, 
 TO_CHAR((fips.state_maxlat + fips.state_minlat) / 2, ''FM990.000009'')::double precision as latitude, 
-(coalesce(sum(cast(r.factor as double precision) * ann_emis), 0)) as ann_emis, (coalesce(sum(cast(r.factor as double precision) * avd_emis), 0)) as avd_emis 
+coalesce(sum(cast(r.factor as double precision) * ann_emis), 0) as ann_emis, coalesce(sum(cast(r.factor as double precision) * avd_emis), 0) as avd_emis 
 from $TABLE[1] e
 left outer join reference.fips 
 on fips.state_county_fips = e.FIPS 
@@ -912,7 +912,7 @@ coalesce(fips.state_abbr,''AN UNSPECIFIED STATE ABBREVIATION'')::character varyi
 r.species, r.voctog, 
 TO_CHAR((fips.state_maxlon + fips.state_minlon) / 2, ''FM990.000009'')::double precision as longitude, 
 TO_CHAR((fips.state_maxlat + fips.state_minlat) / 2, ''FM990.000009'')::double precision as latitude, 
-(coalesce(sum(cast(r.factor as double precision) * ann_emis), 0)) as ann_emis, (coalesce(sum(cast(r.factor as double precision) * avd_emis), 0)) as avd_emis 
+coalesce(sum(cast(r.factor as double precision) * ann_emis), 0) as ann_emis, coalesce(sum(cast(r.factor as double precision) * avd_emis), 0) as avd_emis 
 from $TABLE[1] e
 left outer join reference.fips 
 on fips.state_county_fips = e.FIPS 
@@ -935,8 +935,8 @@ r.name, r.species,
 r.voctog, 
 TO_CHAR((fips.state_maxlon + fips.state_minlon) / 2, ''FM990.000009'')::double precision as longitude, 
 TO_CHAR((fips.state_maxlat + fips.state_minlat) / 2, ''FM990.000009'')::double precision as latitude, 
-(coalesce(sum(cast(r.factor as double precision) * ann_emis), 0)) as ann_emis, 
-(coalesce(sum(cast(r.factor as double precision) * avd_emis), 0)) as avd_emis 
+coalesce(sum(cast(r.factor as double precision) * ann_emis), 0) as ann_emis, 
+coalesce(sum(cast(r.factor as double precision) * avd_emis), 0) as avd_emis 
 from $TABLE[1] e
 left outer join reference.fips 
 on fips.state_county_fips = e.FIPS 
@@ -956,8 +956,8 @@ r.name, r.species,
 r.voctog, 
 TO_CHAR((fips.state_maxlon + fips.state_minlon) / 2, ''FM990.000009'')::double precision as longitude, 
 TO_CHAR((fips.state_maxlat + fips.state_minlat) / 2, ''FM990.000009'')::double precision as latitude, 
-(coalesce(sum(cast(r.factor as double precision) * ann_emis), 0)) as ann_emis, 
-(coalesce(sum(cast(r.factor as double precision) * avd_emis), 0)) as avd_emis 
+coalesce(sum(cast(r.factor as double precision) * ann_emis), 0) as ann_emis, 
+coalesce(sum(cast(r.factor as double precision) * avd_emis), 0) as avd_emis 
 from $TABLE[1] e
 left outer join reference.fips 
 on fips.state_county_fips = e.FIPS 
