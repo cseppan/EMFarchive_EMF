@@ -165,7 +165,6 @@ public class CaseJobTask extends Task {
             }
 
             status="completed";
-
         } catch (Exception e) {
             log.error("Error executing job file: " + jobFile + " Execution string= " + executionStr);
             e.printStackTrace();

@@ -4938,21 +4938,20 @@ public class ManagedCaseService {
                 continue;
             
             String value = caseFile.getAttributeValue(envVar.getName());
-            
-            if (value == null || value.isEmpty()) 
-                continue;
-            
             String existingVal = param.getValue();
             
-            if (existingVal != null)
-                sb.append("WARNING: parameter \'" + param.getName() + "\'--value replaced (preivous: " + existingVal + ")" + lineSep);
+            if (value == null || value.isEmpty() || value.equals(existingVal)) 
+                continue;
+            
+            if (existingVal != null && !existingVal.trim().isEmpty())
+                sb.append("WARNING: parameter \'" + param.getName() + "\'--value replaced (previous: " + existingVal + ")" + lineSep);
             
             param.setValue(value);
             updateCaseParameter(user, param);
             numLoaded++;
         }
         
-        String msg = numLoaded + " parameter value" + (numLoaded > 0 ? "s" : "") + " loaded." + lineSep;
+        String msg = numLoaded + " parameter value" + (numLoaded > 1 ? "s" : "") + " loaded." + lineSep;
         
         return msg + sb.toString() + caseFile.getMessages();
     }

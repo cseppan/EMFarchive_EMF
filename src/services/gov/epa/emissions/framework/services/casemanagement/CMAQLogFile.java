@@ -103,6 +103,7 @@ public class CMAQLogFile implements EMFCaseFile {
             throw new EmfException("No attributes specified to read from log file.");
         
         String tempAttr = "";
+        boolean recorded = false;
         sb = new StringBuffer();
         
         if (!data.isEmpty())
@@ -125,12 +126,17 @@ public class CMAQLogFile implements EMFCaseFile {
                     continue;
 
                 if (attrib.equals(tempAttr)) {
-                    sb.append("WARNING: environment variable\'" + tempAttr + "\'--duplicate value: " + value + lineSep);
+                    if (!recorded) {
+                        sb.append("WARNING: Variable \'" + tempAttr + "\' has duplicate values." + lineSep);
+                        recorded = true;
+                    }
+                    
                     continue;
                 }
 
                 addAttribValue(attrib, value, data);
                 tempAttr = attrib;
+                recorded = false;
             }
 
             close();
