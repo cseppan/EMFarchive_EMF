@@ -4907,11 +4907,14 @@ public class ManagedCaseService {
     public synchronized String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
         File logFile = new File(path);
         
-        if (!logFile.exists() || !logFile.canRead())
-            throw new EmfException("CMAQ log file doesn't exist or is not readable by Tomcat: " + path + ".");
+        if (!logFile.exists())
+            throw new EmfException("CMAQ log file doesn't exist: " + path + ".");
         
         if (!logFile.isFile())
             throw new EmfException("Please specify a valid log file.");
+        
+        if (!logFile.canRead())
+            throw new EmfException("CMAQ log file is not readable by Tomcat: " + path + ".");
         
         List<CaseParameter> paramObjects = getValidParameters(jobId, caseId);
         List<String> paramEnvs = getEnvVars(paramObjects);

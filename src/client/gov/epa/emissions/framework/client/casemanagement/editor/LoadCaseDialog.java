@@ -102,6 +102,7 @@ public class LoadCaseDialog extends JDialog {
         
         try {
             jobs = new JComboBox(presenter.getJobs());
+            jobs.setSelectedItem(null);
             jobs.setPreferredSize(new Dimension(334, 30));
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
@@ -114,6 +115,7 @@ public class LoadCaseDialog extends JDialog {
         layoutGenerator.addLabelWidgetPair("Case Job:", jobs, panel);
         
         msgArea = new TextArea("messages", "", 38, 8);
+        msgArea.setEditable(false);
         JScrollPane msgTextArea = new JScrollPane(msgArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         layoutGenerator.addLabelWidgetPair("Messages:", msgTextArea, panel);
@@ -152,8 +154,18 @@ public class LoadCaseDialog extends JDialog {
             public void actionPerformed(ActionEvent e){
                 try {
                     clearMessagePanel();
+                    msgArea.setText("");
+                    
                     checkFolderField();
-                    String loadingMsg = presenter.loadCase(path.getText(), (CaseJob)jobs.getSelectedItem());
+                    CaseJob selected = (CaseJob)jobs.getSelectedItem();
+                    
+                    if (selected == null) {
+                        messagePanel.setError("Please select a valid job.");
+                        return;
+                    }
+                    
+                    LoadCaseDialog.this.validate();
+                    String loadingMsg = presenter.loadCase(path.getText(), selected);
                     msgArea.setText(loadingMsg);
                     messagePanel.setMessage("Finished loading case.");
                 } catch (EmfException e1) {
