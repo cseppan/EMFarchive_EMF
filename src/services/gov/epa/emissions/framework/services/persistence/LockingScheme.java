@@ -74,7 +74,7 @@ public class LockingScheme {
     }
 
     public Lockable releaseLock(User owner, Lockable current, Session session) {
-        if (!current.isLocked() || !current.isLocked(owner))
+        if (current == null || !current.isLocked() || !current.isLocked(owner))
             return current;
         
         return releaseLock(current, session);
