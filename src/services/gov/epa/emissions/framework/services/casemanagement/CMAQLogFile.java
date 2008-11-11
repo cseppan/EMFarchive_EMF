@@ -125,7 +125,7 @@ public class CMAQLogFile implements EMFCaseFile {
                     continue;
 
                 if (attrib.equals(tempAttr)) {
-                    sb.append("WARNING: " + tempAttr + "--duplicate value: " + value + lineSep);
+                    sb.append("WARNING: environment variable\'" + tempAttr + "\'--duplicate value: " + value + lineSep);
                     continue;
                 }
 
@@ -152,7 +152,7 @@ public class CMAQLogFile implements EMFCaseFile {
     }
 
     public String getMessages() {
-        return (sb != null) ? sb.toString() : null;
+        return (sb != null) ? sb.toString() : "";
     }
 
 }

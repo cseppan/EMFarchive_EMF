@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -28,7 +29,9 @@ import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
 
 public class LoadCaseDialog extends JDialog {
@@ -36,6 +39,8 @@ public class LoadCaseDialog extends JDialog {
     private SingleLineMessagePanel messagePanel;
 
     private JTextField path;
+    
+    private TextArea msgArea;
     
     private JComboBox jobs;
 
@@ -107,10 +112,14 @@ public class LoadCaseDialog extends JDialog {
         folderPanel.add(button, BorderLayout.LINE_END);
         layoutGenerator.addLabelWidgetPair("File:", folderPanel, panel);
         layoutGenerator.addLabelWidgetPair("Case Job:", jobs, panel);
-
-
+        
+        msgArea = new TextArea("messages", "", 38, 8);
+        JScrollPane msgTextArea = new JScrollPane(msgArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        layoutGenerator.addLabelWidgetPair("Messages:", msgTextArea, panel);
+        
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
 
@@ -142,16 +151,13 @@ public class LoadCaseDialog extends JDialog {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e){
                 try {
-                    messagePanel.setMessage(" ");
+                    clearMessagePanel();
                     checkFolderField();
-                    presenter.loadCase(path.getText(), (CaseJob)jobs.getSelectedItem());
+                    String loadingMsg = presenter.loadCase(path.getText(), (CaseJob)jobs.getSelectedItem());
+                    msgArea.setText(loadingMsg);
+                    messagePanel.setMessage("Finished loading case.");
                 } catch (EmfException e1) {
-                    String msg = e1.getMessage();
-                    
-                    if (e1.isMessage())
-                        messagePanel.setMessage(msg.substring(msg.indexOf(":") + 1));
-                    else
-                        messagePanel.setError(msg);
+                    messagePanel.setError(e1.getMessage());
                 } 
             }
         };

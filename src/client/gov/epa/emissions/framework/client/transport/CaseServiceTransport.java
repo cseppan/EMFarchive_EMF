@@ -1169,7 +1169,7 @@ public class CaseServiceTransport implements CaseService {
         call.request(new Object[] { folder, files, user });
     }
 
-    public synchronized void loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
+    public synchronized String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("loadCMAQCase");
@@ -1177,9 +1177,9 @@ public class CaseServiceTransport implements CaseService {
         call.addIntegerParam("jobId");
         call.addIntegerParam("caseId");
         call.addParam("user", dataMappings.user());
-        call.setVoidReturnType();
+        call.setStringReturnType();
 
-        call.request(new Object[] { path, new Integer(jobId), new Integer(caseId), user });
+        return (String) call.requestResponse(new Object[] { path, new Integer(jobId), new Integer(caseId), user });
     }
 
 }

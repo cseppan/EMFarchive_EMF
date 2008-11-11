@@ -4904,7 +4904,7 @@ public class ManagedCaseService {
         return temp.replaceAll("\\\\", "/");
     }
 
-    public synchronized void loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
+    public synchronized String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
         File logFile = new File(path);
         
         if (!logFile.exists() || !logFile.canRead())
@@ -4915,10 +4915,17 @@ public class ManagedCaseService {
         
         List<CaseParameter> paramObjects = getValidParameters(jobId, caseId);
         List<String> paramEnvs = getEnvVars(paramObjects);
+        
+        if (paramEnvs == null || paramEnvs.size() == 0)
+            throw new EmfException("No valid parameters selected to load.");
+        
         EMFCaseFile caseFile = new CMAQLogFile(logFile);
         caseFile.read(paramEnvs);
         
+        StringBuffer sb = new StringBuffer();
+        
         int numLoaded = 0;
+        String lineSep = System.getProperty("line.separator");
         
         for(Iterator<CaseParameter> iter = paramObjects.iterator(); iter.hasNext();) {
             CaseParameter param = iter.next();
@@ -4932,12 +4939,19 @@ public class ManagedCaseService {
             if (value == null || value.isEmpty()) 
                 continue;
             
+            String existingVal = param.getValue();
+            
+            if (existingVal != null)
+                sb.append("WARNING: parameter \'" + param.getName() + "\'--value replaced (preivous: " + existingVal + ")" + lineSep);
+            
             param.setValue(value);
             updateCaseParameter(user, param);
             numLoaded++;
         }
         
-        throw new EmfException(EmfException.MSG_TYPE + ":" + numLoaded + " parameter environment value" + (numLoaded > 0 ? "s" : "") + " loaded.");
+        String msg = numLoaded + " parameter value" + (numLoaded > 0 ? "s" : "") + " loaded." + lineSep;
+        
+        return msg + sb.toString() + caseFile.getMessages();
     }
 
     private synchronized List<CaseParameter> getValidParameters(int jobId, int caseId) throws EmfException {

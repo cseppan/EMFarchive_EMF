@@ -733,8 +733,8 @@ public class CaseServiceImpl implements CaseService {
         getCaseAssistanceService().importCase(folder, files, user);
     }
 
-    public void loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
-        getCaseService().loadCMAQCase(path, jobId, caseId, user);
+    public String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
+        return getCaseService().loadCMAQCase(path, jobId, caseId, user);
     }
     
 }
