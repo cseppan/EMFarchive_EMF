@@ -56,20 +56,28 @@ public class UserServiceImpl implements UserService {
         try {
             User user = getUser(username);
             
-            LOG.warn("User " + user.getUsername() + " (" + user.getName() + ") tried to login to the EMF service.");
-            
             if (user == null)
                 throw new AuthenticationException("User " + username + " does not exist");
 
+            LOG.warn("User " + user.getUsername() + " (" + user.getName() + ") tried to login to the EMF service.");
+            
             if (user.isAccountDisabled())
                 throw new AuthenticationException("Account Disabled");
 
             if (!user.getEncryptedPassword().equals(password))
                 throw new AuthenticationException("Incorrect Password");
-        } catch (RuntimeException e) {
-            LOG.error("Unable to authenticate due to data access failure for user " + username, e);
-            throw new EmfException("Unable to authenticate due to data access failure");
+        } catch (Exception e) {
+            LOG.error("Unable to authenticate user: " + username, e);
+            throw new EmfException(e.getMessage());
         }
+//        catch (RuntimeException e) {
+//            LOG.error("Unable to authenticate due to data access failure for user " + username, e);
+//            throw new EmfException("Unable to authenticate due to runtime exception");
+//        }
+//        catch (Exception e) {
+//            LOG.error("Unable to authenticate due to data access failure for user " + username, e);
+//            throw new EmfException("Unable to authenticate due to exception");
+//        }
     }
 
     public synchronized User getUser(String username) throws EmfException {
