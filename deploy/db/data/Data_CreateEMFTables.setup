@@ -392,8 +392,8 @@ CREATE TABLE reference.rsm_inv_sectors
   rsm_sector varchar(255) NOT NULL,
   pollutant varchar(255) NOT NULL,
   inv_sector varchar(255) NOT NULL,
-  aa_rsm_factor varchar(4) NOT NULL,
-  inv_sector varchar(4) NOT NULL
+  aa_rsm_factor varchar(4),
+  naa_rsm_factor varchar(4)
 ) 
 WITHOUT OIDS;
 -- reference.rsm_inv_sectors

@@ -56,6 +56,15 @@ CREATE TABLE cases.speciations
 WITHOUT OIDS;
 -- cases.speciations
 
+-- cases.model_to_runs
+CREATE TABLE cases.model_to_runs
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- cases.model_to_runs
+
 -- cases.programs
 CREATE TABLE cases.programs
 (
@@ -66,15 +75,6 @@ CREATE TABLE cases.programs
 ) 
 WITHOUT OIDS;
 -- cases.programs
-
--- cases.model_to_runs
-CREATE TABLE cases.model_to_runs
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
-) 
-WITHOUT OIDS;
--- cases.model_to_runs
 
 -- cases.inputnames
 CREATE TABLE cases.inputnames
