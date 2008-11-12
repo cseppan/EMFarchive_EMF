@@ -53,6 +53,8 @@ public class CaseJobTask extends Task {
 
     private String runRedirect = ">&"; // shell specific redirect
     
+    private static final String lineSep = System.getProperty("line.separator");
+    
     private String qId;
 
     public String getJobkey() {
@@ -110,7 +112,10 @@ public class CaseJobTask extends Task {
 
     public void run() {
         String status = null;
-        String mesg = null;
+        String msg1 = "";
+        String msg2 = "";
+        String msgType1 = "i";
+        String msgType2 = "e";
 
         System.out.println("@@@@ CASE job task RUNNING jobId= " + jobId + " jobName= " + jobName + " caseId= " + caseId
                 + " CaseJobTask id= " + this.getTaskId() + " now running in Thread id= "
@@ -127,7 +132,9 @@ public class CaseJobTask extends Task {
             e.printStackTrace();
             
             status = "failed";
-            mesg="Error creating job script " + this.jobFile + ": " + e.getMessage();
+            String mesg = "Error creating job script " + this.jobFile + ": " + e.getMessage();
+            notifyManager(status, new String[] {mesg}, new String[]{"e"}, false);
+            return;
         }
 
         // Create an execution string and submit job to the queue,
@@ -154,26 +161,32 @@ public class CaseJobTask extends Task {
             if (hostName.equals("localhost")) {
                 // execute on local machine
                 executionStr = executionStr + " " + this.runRedirect + " " + this.logFile;
+                msg2 = msg1 = "Submitting job to " + hostName + ". Execution string: " + executionStr + lineSep;
                 InputStream inStream = RemoteCommand.executeLocal(executionStr);
                 processLogs(executionStr, inStream, "localhost");
             } else {
                 // execute on remote machine and log stdout
+                msg2 = msg1 = "Submitting job to " + hostName + ". Execution string: " + executionStr + lineSep;
                 InputStream inStream = RemoteCommand.execute(username, hostName, executionStr);
                 processLogs(executionStr, inStream, hostName);
                 // capture PBSqueueId and send back to case job submitter
                 // TODO:
             }
 
-            status="completed";
+            status = "completed";
         } catch (Exception e) {
             log.error("Error executing job file: " + jobFile + " Execution string= " + executionStr);
             e.printStackTrace();
             status = "failed";
-            mesg="Error submitting job (" + this.jobName + ") to " + hostName + ". Command: " + executionStr;
+            msg2 = e.getMessage();
         }
 
+        notifyManager(status, new String[]{msg1, msg2}, new String[]{msgType1, msgType2}, true);
+    }
+
+    private void notifyManager(String status, String[] msgs, String[] msgTypes, boolean regHistory) {
         try {
-            CaseJobTaskManager.callBackFromThread(this.taskId, this.submitterId, status, mesg);
+            CaseJobTaskManager.callBackFromThread(this.taskId, this.submitterId, status, msgs, msgTypes, regHistory);
         } catch (EmfException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

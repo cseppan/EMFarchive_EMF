@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.regex.Matcher;
@@ -19,6 +20,8 @@ public class RemoteCommand {
     private static Log LOG = LogFactory.getLog(RemoteCommand.class);
 
     private static String qID;
+    
+    private static final String lineSep = System.getProperty("line.separator");
 
     public static void logStdout(String title, InputStream inStream) throws EmfException {
         /**
@@ -214,7 +217,7 @@ public class RemoteCommand {
                 String errorTitle = "stderr from (" + hostname + "): " + remoteCmd;
                 logStderr(errorTitle, p.getErrorStream());
 
-                throw new EmfException("ERROR executing remote command: " + executeCmd);
+                throw new EmfException("ERROR executing remote command: " + executeCmd + lineSep + extractError(p));
 
             }
 
@@ -257,7 +260,7 @@ public class RemoteCommand {
 
             if (errorLevel > 0) {
                 // error in local command
-                throw new EmfException("ERROR executing local command: " + localCmd);
+                throw new EmfException("ERROR executing local command: " + localCmd + lineSep + extractError(p));
             }
 
             return p.getInputStream();
@@ -272,4 +275,20 @@ public class RemoteCommand {
         return qID;
     }
 
+    private static String extractError(Process p) throws IOException {
+        if (p == null)
+            return "";
+        
+        String line = "";
+        StringBuffer sb = new StringBuffer(line);
+        
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+        
+        while ((line = reader.readLine()) != null)
+            sb.append(line + lineSep);
+        
+        reader.close();
+        
+        return sb.toString();
+    }
 }

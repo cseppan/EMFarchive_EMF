@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseJobTask;
 import gov.epa.emissions.framework.services.casemanagement.PersistedWaitTask;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -175,13 +176,13 @@ public class CaseJobTaskManager implements TaskManager {
         }// synchronized
     }
 
-    public static synchronized void callBackFromThread(String taskId, String submitterId, String status, String mesg)
+    public static synchronized void callBackFromThread(String taskId, String submitterId, String status, String[] msgs, String[] msgTypes, boolean regHistory)
             throws EmfException {
         if (DebugLevels.DEBUG_2)
             System.out.println("CaseJobTaskManager::callBackFromThread  refCount= " + refCount);
         if (DebugLevels.DEBUG_2)
             System.out.println("%%%% CaseJobTaskManager reports that Task# " + taskId + " for submitter= "
-                    + submitterId + " completed with status= " + status + " and message= " + mesg);
+                    + submitterId + " completed with status= " + status + " and message= " + msgs);
 
         if (DebugLevels.DEBUG_0)
             System.out.println("***BELOW*** In callback the sizes are ***BELOW***");
@@ -194,7 +195,7 @@ public class CaseJobTaskManager implements TaskManager {
         if (DebugLevels.DEBUG_0)
             System.out.println("***ABOVE*** In callback the sizes are shown ***ABOVE***");
 
-        if (updateRunStatus(taskId, status, mesg))
+        if (updateRunStatus(taskId, status, msgs, msgTypes, regHistory))
             synchronized (waitTable) {
                 waitTable.remove(taskId);
             }
@@ -205,7 +206,7 @@ public class CaseJobTaskManager implements TaskManager {
         processTaskQueue();
     }
 
-    private static boolean updateRunStatus(String taskId, String status, String mesg) throws EmfException {
+    private static boolean updateRunStatus(String taskId, String status, String[] msgs, String[] msgTypes, boolean regHistory) throws EmfException {
         System.out.println("CaseJobTaskManager::updateRunStatus: " + taskId + " status= " + status);
 
         CaseJobTask cjt = null;
@@ -393,9 +394,23 @@ public class CaseJobTaskManager implements TaskManager {
             if (toUpdate) {
                 JobRunStatus jrStat = caseDAO.getJobRunStatuse(jobStatus);
                 caseJob.setRunstatus(jrStat);
-                caseJob.setRunLog(mesg);
+                caseJob.setRunLog(msgs[msgs.length-1]);
                 caseDAO.updateCaseJob(caseJob);
-
+                
+                if (regHistory) {
+                    for (int i = 0; i < msgs.length; i++){
+                        if (msgs != null && !msgs[i].isEmpty()) {
+                            JobMessage jobMsg = new JobMessage();
+                            jobMsg.setCaseId(caseJob.getCaseId());
+                            jobMsg.setJobId(caseJob.getId());
+                            jobMsg.setMessageType(msgTypes[i]);
+                            jobMsg.setMessage(msgs[i]);
+                            jobMsg.setStatus(jrStat.getName());
+                            jobMsg.setReceivedTime(new Date());
+                            caseDAO.add(jobMsg);
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
             if (DebugLevels.DEBUG_9)
@@ -661,7 +676,7 @@ public class CaseJobTaskManager implements TaskManager {
 
             if (status.equals("completed")) {
                 cjt.setExportsSuccess(true);
-                if (updateRunStatus(cjtId, "export succeeded", mesg))
+                if (updateRunStatus(cjtId, "export succeeded", new String[]{mesg}, new String[]{"i"}, false))
                     synchronized (waitTable) {
                         waitTable.remove(cjtId);
                     }
@@ -669,7 +684,7 @@ public class CaseJobTaskManager implements TaskManager {
 
             if (status.equals("failed")) {
                 cjt.setExportsSuccess(false);
-                if (updateRunStatus(cjtId, "export failed", mesg))
+                if (updateRunStatus(cjtId, "export failed", new String[]{mesg}, new String[]{"i"}, false))
                     synchronized (waitTable) {
                         waitTable.remove(cjtId);
                     }
@@ -813,7 +828,7 @@ public class CaseJobTaskManager implements TaskManager {
                             User user = caseJob.getUser();
 
                             // set the CaseJob jobstatus (casejob table) to Failed
-                            if (updateRunStatus(cjt.getTaskId(), "failed", ""))
+                            if (updateRunStatus(cjt.getTaskId(), "failed", new String[]{""}, new String[]{"i"}, false))
                                 tasks2Remove.add(cjt.getTaskId());
 
                             String message = "Job name= " + cjt.getJobName()
