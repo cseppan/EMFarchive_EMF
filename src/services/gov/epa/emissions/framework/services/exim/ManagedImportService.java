@@ -492,7 +492,7 @@ public class ManagedImportService {
             throw new EmfException("No files found for pattern '" + pattern + "'");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Folder: " + folder + " Pattern:" + pattern);
+            System.out.println("Bad Folder+Pattern: " + folder + File.pathSeparator + pattern);
             throw new EmfException("No files found for pattern: "+pattern+" in folder "+
                     folder);
         }
