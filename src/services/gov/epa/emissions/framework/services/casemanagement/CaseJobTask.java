@@ -116,6 +116,8 @@ public class CaseJobTask extends Task {
         String msg2 = "";
         String msgType1 = "i";
         String msgType2 = "e";
+        String[] msgs = null;
+        String[] types = null;
 
         System.out.println("@@@@ CASE job task RUNNING jobId= " + jobId + " jobName= " + jobName + " caseId= " + caseId
                 + " CaseJobTask id= " + this.getTaskId() + " now running in Thread id= "
@@ -161,27 +163,31 @@ public class CaseJobTask extends Task {
             if (hostName.equals("localhost")) {
                 // execute on local machine
                 executionStr = executionStr + " " + this.runRedirect + " " + this.logFile;
-                msg2 = msg1 = "Submitting job to " + hostName + ". Execution string: " + executionStr + lineSep;
+                msg1 = "Submitting job to " + hostName + ". Execution string: " + executionStr + lineSep;
                 InputStream inStream = RemoteCommand.executeLocal(executionStr);
                 processLogs(executionStr, inStream, "localhost");
             } else {
                 // execute on remote machine and log stdout
-                msg2 = msg1 = "Submitting job to " + hostName + ". Execution string: " + executionStr + lineSep;
+                msg1 = "Submitting job to " + hostName + ". Execution string: " + executionStr + lineSep;
                 InputStream inStream = RemoteCommand.execute(username, hostName, executionStr);
                 processLogs(executionStr, inStream, hostName);
                 // capture PBSqueueId and send back to case job submitter
                 // TODO:
             }
 
+            msgs = new String[] {msg1};
+            types = new String[] {msgType1};
             status = "completed";
         } catch (Exception e) {
             log.error("Error executing job file: " + jobFile + " Execution string= " + executionStr);
             e.printStackTrace();
             status = "failed";
             msg2 = e.getMessage();
+            msgs = new String[] {msg1, msg2};
+            types = new String[] {msgType1, msgType2};
         }
 
-        notifyManager(status, new String[]{msg1, msg2}, new String[]{msgType1, msgType2}, true);
+        notifyManager(status, msgs, types, true);
     }
 
     private void notifyManager(String status, String[] msgs, String[] msgTypes, boolean regHistory) {
