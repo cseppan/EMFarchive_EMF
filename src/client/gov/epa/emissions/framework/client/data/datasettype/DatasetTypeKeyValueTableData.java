@@ -28,8 +28,10 @@ public class DatasetTypeKeyValueTableData extends AbstractTableData {
 
     private List createRows(KeyVal[] values) {
         List rows = new ArrayList();
-        for (int i = 0; i < values.length; i++)
-            rows.add(row(values[i]));
+        if (values == null) {
+            for (int i = 0; i < values.length; i++)
+                rows.add(row(values[i]));
+        }
 
         return rows;
     }
