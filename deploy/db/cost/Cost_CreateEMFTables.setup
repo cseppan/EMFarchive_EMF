@@ -356,7 +356,8 @@ CREATE INDEX input_datasets_control_strategies_strat_id
 CREATE TABLE emf.strategy_result_types
 (
   id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
+  name varchar(255) NOT NULL UNIQUE,
+  optional boolean DEFAULT false
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.strategy_result_types OWNER TO emf;
