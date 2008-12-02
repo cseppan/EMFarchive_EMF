@@ -46,7 +46,7 @@ DECLARE
 	percent_reduction_sql character varying;
 	inventory_sectors character varying := '';
 BEGIN
-	SET work_mem TO '256MB';
+--	SET work_mem TO '256MB';
 --	SET enable_seqscan TO 'off';
 
 
@@ -362,14 +362,14 @@ BEGIN
 		TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ', ''FM990.099'')::double precision as rule_pen,
 		TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ', ''FM990.099'')::double precision as rule_eff,
 		TO_CHAR(' || percent_reduction_sql || ', ''FM990.099'')::double precision as percent_reduction,
-		inv.ceff,
-		' || case when is_point_table = false then 'inv.rpen' else '100' end || ',
-		inv.reff,
-		' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
-		' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 as emis_reduction,
-		' || annual_emis_sql || ' as inv_emissions,
-		' || annual_emis_sql || ' as input_emis,
-		' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as output_emis,
+		TO_CHAR(inv.ceff, ''FM990.099'')::double precision,
+		TO_CHAR(' || case when is_point_table = false then 'inv.rpen' else '100' end || ', ''FM990.099'')::double precision,
+		TO_CHAR(inv.reff, ''FM990.099'')::double precision,
+		TO_CHAR(' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM990.0099'')::double precision as final_emissions,
+		TO_CHAR(' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ''FM990.0099'')::double precision as emis_reduction,
+		TO_CHAR(' || annual_emis_sql || ', ''FM990.0099'')::double precision as inv_emissions,
+		TO_CHAR(' || annual_emis_sql || ', ''FM990.0099'')::double precision as input_emis,
+		TO_CHAR(' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM990.0099'')::double precision as output_emis,
 		1,
 		substr(inv.fips, 1, 2),
 		substr(inv.fips, 3, 3),
@@ -585,28 +585,30 @@ BEGIN
 --		and cstp.control_strategy_id = ' || control_strategy_id || '
 
 	where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-		and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0) * ' || case when has_rpen_column then 'coalesce(inv.rpen / 100, 1.0)' else '1.0' end || ', 0) <> 100.0
-		and (	p.id <> ' ||  target_pollutant_id || '
-			or 
-			(
-				p.id = ' ||  target_pollutant_id || '
-				and er.efficiency - coalesce(inv.ceff, 0) >= ' || replacement_control_min_eff_diff_constraint || '
-			)
-		)
+--		and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0) * ' || case when has_rpen_column then 'coalesce(inv.rpen / 100, 1.0)' else '1.0' end || ', 0) <> 100.0
+		-- TODO:  I don''t think this is needed, seems redundant
+--		and (	p.id <> ' ||  target_pollutant_id || '
+--			or 
+--			(
+--				p.id = ' ||  target_pollutant_id || '
+--				and er.efficiency - coalesce(inv.ceff, 0) >= ' || replacement_control_min_eff_diff_constraint || '
+--			)
+--		)
 		-- constraint filter, BUT ONLY for target pollutants
+		-- TODO:  I don''t think this is needed, seems redundant
 		' || case when has_constraints then '
-		and (	p.id <> ' ||  target_pollutant_id || ' --cstp.pollutant_id is null 
-			or 
-			(
-				p.id = ' ||  target_pollutant_id || '-- cstp.pollutant_id is not null  
-				and (
-					' || percent_reduction_sql || ' >= ' || coalesce(min_control_efficiency_constraint, -100.0) || '
-					' || coalesce(' and ' || percent_reduction_sql || ' / 100 * ' || annualized_emis_sql || ' >= ' || min_emis_reduction_constraint, '')  || '
-					' || coalesce(' and coalesce(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.computed_cost_per_ton, -1E+308) <= ' || max_cost_per_ton_constraint, '')  || '
-					' || coalesce(' and coalesce(' || percent_reduction_sql || ' / 100 * ' || annualized_emis_sql || ' * ' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.computed_cost_per_ton, -1E+308) <= ' || max_ann_cost_constraint, '')  || '
-				)
-			)
-		)' else '' end || '
+--		and (	p.id <> ' ||  target_pollutant_id || ' --cstp.pollutant_id is null 
+--			or 
+--			(
+--				p.id = ' ||  target_pollutant_id || '-- cstp.pollutant_id is not null  
+--				and (
+--					' || percent_reduction_sql || ' >= ' || coalesce(min_control_efficiency_constraint, -100.0) || '
+--					' || coalesce(' and ' || percent_reduction_sql || ' / 100 * ' || annualized_emis_sql || ' >= ' || min_emis_reduction_constraint, '')  || '
+--					' || coalesce(' and coalesce(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.computed_cost_per_ton, -1E+308) <= ' || max_cost_per_ton_constraint, '')  || '
+--					' || coalesce(' and coalesce(' || percent_reduction_sql || ' / 100 * ' || annualized_emis_sql || ' * ' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.computed_cost_per_ton, -1E+308) <= ' || max_ann_cost_constraint, '')  || '
+--				)
+--			)
+--		)' else '' end || '
 
 	order by inv.fips, 
 		inv.scc, 

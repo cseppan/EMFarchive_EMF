@@ -340,15 +340,15 @@ BEGIN
 		scc,
 		fips,
 		' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
-		TO_CHAR(annual_oper_maint_cost, ''FM999999999999999990.09'')::double precision as operation_maintenance_cost,
-		TO_CHAR(annualized_capital_cost, ''FM999999999999999990.09'')::double precision as annualized_capital_cost,
-		TO_CHAR(total_capital_cost, ''FM999999999999999990.09'')::double precision as capital_cost,
-		TO_CHAR(annual_cost, ''FM999999999999999990.09'')::double precision as ann_cost,
-		TO_CHAR(ann_cost_per_ton, ''FM999999999999999990.09'')::double precision as computed_cost_per_ton,
-		TO_CHAR(control_eff, ''FM990.099'')::double precision as efficiency,
-		TO_CHAR(rule_pen, ''FM990.099'')::double precision as rule_pen,
-		TO_CHAR(rule_eff, ''FM990.099'')::double precision as rule_eff,
-		TO_CHAR(percent_reduction, ''FM990.099'')::double precision as percent_reduction,
+		annual_oper_maint_cost as operation_maintenance_cost,
+		annualized_capital_cost as annualized_capital_cost,
+		total_capital_cost as capital_cost,
+		annual_cost as ann_cost,
+		ann_cost_per_ton as computed_cost_per_ton,
+		control_eff as efficiency,
+		rule_pen as rule_pen,
+		rule_eff as rule_eff,
+		percent_reduction as percent_reduction,
 		final_emissions,
 		Inv_Ctrl_Eff,
 		Inv_Rule_Pen,
@@ -414,8 +414,8 @@ BEGIN
 				TO_CHAR(sum(total_capital_cost), ''FM999999999999999990.09'')::double precision, 
 				case when poll = ' || quote_literal(target_pollutant) || ' then TO_CHAR(' || domain_wide_emis_reduction || ' / ' || uncontrolled_emis || ' * 100, ''FM990.099'')::double precision else null::double precision end, 
 				case when poll = ' || quote_literal(target_pollutant) || ' then TO_CHAR(sum(emis_reduction) / ' || uncontrolled_emis || ' * 100, ''FM990.099'')::double precision else null::double precision end, 
-				sum(emis_reduction), 
-				case when poll = ' || quote_literal(target_pollutant) || ' then ' || uncontrolled_emis || ' else null::double precision end
+				TO_CHAR(sum(emis_reduction), ''FM990.0099'')::double precision, 
+				TO_CHAR(case when poll = ' || quote_literal(target_pollutant) || ' then ' || uncontrolled_emis || ' else null::double precision end, ''FM990.0099'')::double precision
 			from emissions.'|| detailed_result_table_name || '
 			where poll = ' || quote_literal(target_pollutant) || '
 			group by poll';
