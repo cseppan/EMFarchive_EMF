@@ -104,7 +104,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
         this.parentConsole = parentConsole;
-        this.decFormat = new DecimalFormat("0.###E0");
+//        this.decFormat = new DecimalFormat("0.###E0");
+        this.decFormat = new DecimalFormat("#,##0");
         this.costYearTable = costYearTable;
         this.verifier = new NumberFieldVerifier("Summary tab: ");
         this.presenter = presenter;
@@ -315,7 +316,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Completion Date:", completionDate, panel);
         layoutGenerator.addLabelWidgetPair("User:", user, panel);
         layoutGenerator.addLabelWidgetPair("Total Annualized Cost:", costValue, panel);
-        layoutGenerator.addLabelWidgetPair("Target Poll. Reduction:", emissionReductionValue, panel);
+        layoutGenerator.addLabelWidgetPair("Target Poll. Reduction (tons):", emissionReductionValue, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
@@ -473,7 +474,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName,  String cost, String emisReduction) {
         completionDate.setText(closeDate);
         user.setText(userName);
-        costValue.setText(cost.length() == 0 ? "" : decFormat.format(new Double(cost)));
+        costValue.setText(cost.length() == 0 ? "" : "$" + decFormat.format(new Double(cost)));
         emissionReductionValue.setText(emisReduction.length() == 0 ? "" : decFormat.format(new Double(emisReduction)));
     }
 

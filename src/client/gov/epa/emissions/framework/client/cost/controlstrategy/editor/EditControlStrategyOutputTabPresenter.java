@@ -204,4 +204,17 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
     public long getTableRecordCount(EmfDataset dataset) throws EmfException {
         return session.dataService().getTableRecordCount("emissions." + getTableName(dataset));
     }
+
+    public Version getVersion(int datasetId, int version) throws EmfException {
+        try {
+            Version[] versions = session.dataEditorService().getVersions(datasetId);
+            for (Version v : versions) {
+                if (v.getVersion() == version)
+                    return v;
+            }
+            return null;
+        } finally {
+            //
+        }
+    }
 }

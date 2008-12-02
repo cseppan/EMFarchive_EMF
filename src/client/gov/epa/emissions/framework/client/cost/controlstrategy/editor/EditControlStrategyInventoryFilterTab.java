@@ -14,6 +14,8 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionView;
+import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
+import gov.epa.emissions.framework.client.data.viewer.DataViewer;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -154,6 +156,16 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             }
         });
         panel.add(viewButton);
+        Button viewDataButton = new BorderlessButton("View Data", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    viewDataAction();
+                } catch (EmfException e) {
+                    messagePanel.setError("Error viewing dataset data: " + e.getMessage());
+                }
+            }
+        });
+        panel.add(viewDataButton);
 
         JPanel rightPanel = new JPanel();
         mergeInventories = new JCheckBox("Merge Inventories", null, controlStrategy.getMergeInventories() != null ? controlStrategy.getMergeInventories() : true);
@@ -163,6 +175,22 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         container.add(rightPanel, BorderLayout.LINE_END);
 
         return container;
+    }
+
+
+    private void viewDataAction() throws EmfException {
+        messagePanel.clear();
+        List selected = table.selected();
+
+        if (selected.size() == 0) {
+            messagePanel.setError("Please select an item to view.");
+            return;
+        }
+
+        for (int i = 0; i < selected.size(); i++) {
+            EmfDataset dataset = editControlStrategyPresenter.getDataset(((ControlStrategyInputDataset)selected.get(i)).getInputDataset().getId());
+            showDatasetDataViewer(dataset, dataset.getInternalSources()[0].getTable(), editControlStrategyPresenter.getVersion(dataset.getId(), ((ControlStrategyInputDataset)selected.get(i)).getVersion()));
+        }
     }
 
     private void addAction() throws EmfException {
@@ -321,6 +349,16 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         
     }
     
+    private void viewCountyDatasetData() {
+        messagePanel.clear();
+        EmfDataset countyDataset = (EmfDataset) dataset.getSelectedItem();
+        if (countyDataset == null){
+            messagePanel.setError("Please select an item to view.");
+            return;
+        }
+        showDatasetDataViewer(countyDataset, countyDataset.getInternalSources()[0].getTable(), (Version) version.getSelectedItem());
+    }
+    
     
     private JPanel createMiddleSection(ControlStrategy controlStrategy) throws EmfException {
         JPanel middlePanel = new JPanel(new SpringLayout());
@@ -384,7 +422,9 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         JPanel invPanel = new JPanel(new BorderLayout(5,0));
 
         invPanel.add(dataset, BorderLayout.LINE_START);
-        invPanel.add(viewButton, BorderLayout.LINE_END );
+        invPanel.add(viewButton);
+        Button viewDataButton = new BorderlessButton("View Data", viewCountyDatasetDataAction()); 
+        invPanel.add(viewDataButton, BorderLayout.LINE_END );
         return invPanel;
     }
     
@@ -396,6 +436,14 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
                 } catch (EmfException e) {
                     messagePanel.setError("Error viewing dataset: " + e.getMessage());
                 }
+            }
+        };
+    }
+    
+    private Action viewCountyDatasetDataAction() {
+        return new AbstractAction(){
+            public void actionPerformed(ActionEvent event) {
+                viewCountyDatasetData();
             }
         };
     }
@@ -452,4 +500,16 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         // NOTE Auto-generated method stub
         
     }
+    
+    private void showDatasetDataViewer(EmfDataset dataset, String table, Version version) {
+        DataViewer view = new DataViewer(dataset, parentConsole, desktopManager);
+        try {
+            DataViewPresenter presenter = new DataViewPresenter(dataset, version, table, view, session);
+            presenter.display();
+//            presenter.doView(version, table, view);
+        } catch (EmfException e) {
+//            displayError(e.getMessage());
+        }
+    }
+
 }

@@ -258,4 +258,17 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         
     }
 
+    public Version getVersion(int datasetId, int version) throws EmfException {
+        try {
+            Version[] versions = session.dataEditorService().getVersions(datasetId);
+            for (Version v : versions) {
+                if (v.getVersion() == version)
+                    return v;
+            }
+            return null;
+        } finally {
+            //
+        }
+    }
+
 }
