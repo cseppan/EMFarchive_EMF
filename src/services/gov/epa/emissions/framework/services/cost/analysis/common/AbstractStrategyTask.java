@@ -257,9 +257,9 @@ public abstract class AbstractStrategyTask implements Strategy {
             //NOTE:  Still need to  support mobile monthly files
             String sql = "INSERT INTO " + qualifiedEmissionTableName(summaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, scc, poll, Control_Measure_Abbreviation, Control_Measure, Control_Technology, source_group, avg_ann_cost_per_ton, Annual_Cost, Emis_Reduction) " 
             + "select " + summaryResult.getDetailedResultDataset().getId() + ", 0, summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name as Control_Technology, sg.name, "
-            + "case when sum(summary.Emis_Reduction) <> 0 then sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) else null end as avg_cost_per_ton, " 
-            + "sum(summary.Annual_Cost) as Annual_Cost, "
-            + "sum(summary.Emis_Reduction) as Emis_Reduction " 
+            + "TO_CHAR(case when sum(summary.Emis_Reduction) <> 0 then sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) else null end, 'FM999999999999999990')::double precision as avg_cost_per_ton, " 
+            + "TO_CHAR(sum(summary.Annual_Cost), 'FM999999999999999990')::double precision as Annual_Cost, "
+            + "TO_CHAR(sum(summary.Emis_Reduction), 'FM990.0099')::double precision as Emis_Reduction " 
             + "from (";
             int count = 0;
             for (int i = 0; i < results.length; i++) {
@@ -284,7 +284,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             try {
                 datasource.query().execute(sql);
             } catch (SQLException e) {
-                throw new EmfException("Error occured when inserting data to strategy summary table" + "\n" + e.getMessage());
+                throw new EmfException("Error occured when inserting data to strategy measure summary table" + "\n" + e.getMessage());
             }
         }
     }
@@ -338,7 +338,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                                   + "left outer join " + detailedresultTableName + " e "
                                   + "on e.source_id = i.record_id "
                                   + "and e.ORIGINAL_DATASET_ID = " + inventory.getInputDataset().getId() + " "
-                                  + "where " + versionedQuery.query().replaceAll("delete_versions ", "i.delete_versions ").replaceAll("version ", "i.version ").replaceAll("dataset_id", "i.dataset_id")
+                                  + "where " + versionedQuery.query().replaceAll("delete_versions ", "i.delete_versions ").replaceAll("version ", "i.version ").replaceAll("dataset_id", "i.dataset_id") + " "
                                   + "group by i.fips, i.poll ";
                               ++count;
                               }
@@ -370,7 +370,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                             + "from " + inventoryTableName + " i "
                             + "left outer join " + detailedresultTableName + " e "
                             + "on e.source_id = i.record_id "
-                            + "where " + versionedQuery.query().replaceAll("delete_versions ", "i.delete_versions ").replaceAll("version ", "i.version ").replaceAll("dataset_id", "i.dataset_id")
+                            + "where " + versionedQuery.query().replaceAll("delete_versions ", "i.delete_versions ").replaceAll("version ", "i.version ").replaceAll("dataset_id", "i.dataset_id") + " "
                             + "group by i.fips, i.poll ";
                         ++count;
                     }
@@ -382,7 +382,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             try {
                 datasource.query().execute(sql);
             } catch (SQLException e) {
-                throw new EmfException("Error occured when inserting data to strategy summary table" + "\n" + e.getMessage());
+                throw new EmfException("Error occured when inserting data to strategy county summary table" + "\n" + e.getMessage());
             }
         }
     }
