@@ -549,8 +549,10 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
     public void addJob(CaseJob job) {
         tableData.add(job);
-        table.refresh(tableData);
-        panelRefresh();
+        setMessage("New job '" + job.getName() 
+                + "' has been added.  Click Refresh to see it in the table.");
+//        table.refresh(tableData);
+//        panelRefresh();
     }
 
     private void panelRefresh() {

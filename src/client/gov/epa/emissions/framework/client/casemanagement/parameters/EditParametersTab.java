@@ -359,8 +359,9 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
 
     public void addParameter(CaseParameter param) {
         tableData.add(param);
-        table.refresh(tableData);
-        panelRefresh();
+        setMessage("New parameter '" + param.getName() + "' has been added.  Click Refresh to see it in the table.");
+        //table.refresh(tableData);
+        //panelRefresh();
     }
 
     private void panelRefresh() {

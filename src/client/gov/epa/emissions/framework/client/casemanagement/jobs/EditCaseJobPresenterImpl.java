@@ -10,8 +10,6 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
 
     private EditCaseJobView view;
     
-    private EditJobsTabView parentView;
-    
     private EmfSession session;
     
     private JobFieldsPanelPresenter jobFieldsPresenter;
@@ -23,7 +21,6 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
     public EditCaseJobPresenterImpl(EditCaseJobView view, 
             EditJobsTabView parentView, EditJobsTabPresenter parentPresenter, EmfSession session) {
         this.view = view;
-        this.parentView = parentView;
         this.session = session;
         this.parentPresenter = parentPresenter;
     }
@@ -51,7 +48,7 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
     
     public void saveJob() throws EmfException {
         parentPresenter.addNewSectorToSummary(jobFieldsPresenter.doSave());
-        parentView.refresh();
+        //parentView.refresh();
     }
     
     

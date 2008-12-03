@@ -61,7 +61,7 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
 
         if (param.getCaseID() == caseObj.getId()) {
             view.addParameter(loaded);
-            refreshView();
+            //refreshView();
             addSectorBacktoCase(loaded.getSector());
         }
     }
@@ -70,9 +70,8 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         return session.caseService();
     }
 
-    private void refreshView() {
+    public void refreshView() {
         view.refresh();
-        // view.notifychanges();
     }
 
     public void editParameter(CaseParameter param, EditCaseParameterView parameterEditor) throws EmfException {

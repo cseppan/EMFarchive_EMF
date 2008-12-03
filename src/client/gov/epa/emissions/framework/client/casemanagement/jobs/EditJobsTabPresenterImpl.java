@@ -63,7 +63,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
         if (newJob.getCaseId() == caseObj.getId()) {
             view.addJob(newJob);
-            refreshView();
+            //refreshView();
             addNewSectorToSummary(job);
         }
 
@@ -74,7 +74,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         return session.caseService();
     }
 
-    private void refreshView() {
+    public void refreshView() {
         view.refresh();
     }
 

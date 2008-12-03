@@ -69,7 +69,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
         if (input.getCaseID() == caseObj.getId()) {
             view.addInput(loaded);
-            refreshView();
+            //refreshView();
             addSectorBacktoCase(loaded.getSector());
         }
     }
@@ -78,7 +78,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         return session.caseService();
     }
 
-    private void refreshView() {
+    public void refreshView() {
         view.refresh();
     }
 
