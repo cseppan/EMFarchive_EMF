@@ -80,7 +80,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private EditableComboBox host;
 
     private TextField qoption;
-    
+
     private TextField jobGroup;
 
     private MessagePanel messagePanel;
@@ -89,9 +89,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private ComboBox sector;
 
-//    private String comboWidth = EmptyStrings.create(38);
-    
-    private Dimension comboSize = new Dimension(190,25);
+    private Dimension comboSize = new Dimension(190, 25);
 
     private JLabel queID;
 
@@ -108,15 +106,15 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private Case caseObj;
 
     private TextField oldJobOrder;
-    
+
     private Button browseButton;
-    
+
     private CheckBox localBox;
-    
+
     private AddRemoveWidget dependentJobsList;
 
     private static String lastPath = "";
-    
+
     public JobFieldsPanel(boolean edit, MessagePanel messagePanel, ManageChangeables changeablesList,
             EmfConsole parent, EmfSession session) {
         this.edit = edit;
@@ -129,21 +127,27 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     public void display(Case caseObj, CaseJob job, JComponent container) {
         this.job = job;
         this.caseObj = caseObj;
-        localBox = new CheckBox("");
+        localBox = new CheckBox("Local");
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         container.add(nameNPurposPanel());
-        
+
         try {
             container.add(setupPanel());
         } catch (EmfException e) {
             setError(e.getMessage());
         }
 
-        if (edit) {
+        if (job.getId() > 0) {            // Not new job
             container.add(resultPanel());
             populateFields();
-        }       
+        }
+
+        if (edit)
+            setEditTracking();
+
+        if (!edit)
+            setViewOnly();
     }
 
     private JPanel nameNPurposPanel() {
@@ -152,12 +156,10 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         // name
         name = new TextField("name", 45);
-        changeablesList.addChangeable(name);
         layoutGenerator.addLabelWidgetPair(" Name:", name, panel);
 
         // description
         purpose = new TextArea("purposes", job.getPurpose());
-        changeablesList.addChangeable(purpose);
         ScrollableComponent scrolpane = new ScrollableComponent(purpose);
         scrolpane.setPreferredSize(new Dimension(500, 80));
         layoutGenerator.addLabelWidgetPair(" Purpose:", scrolpane, panel);
@@ -169,7 +171,6 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         path = new TextField("path", execPath, 39);
         path.setPreferredSize(new Dimension(300, 15));
-        changeablesList.addChangeable(path);
         layoutGenerator.addLabelWidgetPair(" Executable:", getFolderChooserPanel(path, "Select the Executable File"),
                 panel);
 
@@ -183,14 +184,11 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private JPanel setupPanel() throws EmfException {
         JPanel panel = new JPanel();
-//        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.setLayout(new GridLayout(1,2,5,5));
+        panel.setLayout(new GridLayout(1, 2, 5, 5));
         panel.add(leftSetupPanel());
         panel.add(rightSetupPanel());
 
         if (edit)
-            // panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.gray), "Job Setup",
-            // 1, 1, Font.getFont(Font.SANS_SERIF), Color.blue));
             panel.setBorder(BorderFactory.createTitledBorder("Setup"));
 
         return panel;
@@ -202,16 +200,13 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         int charsWide = 16;
 
         version = new TextField("version", job.getVersion() + "", charsWide);
-        changeablesList.addChangeable(version);
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
-        
+
         args = new TextField("args", job.getArgs(), charsWide);
-        changeablesList.addChangeable(args);
         layoutGenerator.addLabelWidgetPair("Arguments:", args, panel);
 
         jobOrder = new TextField("jobOrder", job.getJobNo() + "", charsWide);
-        changeablesList.addChangeable(jobOrder);
-        // AME: Used what was job number for Job order, since we don't use the order or 
+        // AME: Used what was job number for Job order, since we don't use the order or
         // number for dependencies, and jobNo was a float, while job order was int
         layoutGenerator.addLabelWidgetPair("Job Order:", jobOrder, panel);
         jobOrder.setToolTipText("The order in which this job should be displayed in the table.");
@@ -219,20 +214,22 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         // temporarily leave this there
         oldJobOrder = new TextField("oldJobOrder", job.getOrder() + "", charsWide);
         jobGroup = new TextField("jobGroup", job.getJobGroup(), charsWide);
-        changeablesList.addChangeable(jobGroup);
         layoutGenerator.addLabelWidgetPair("Job Group:", jobGroup, panel);
 
         qoption = new TextField("qoption", job.getQueOptions(), charsWide);
-        changeablesList.addChangeable(qoption);
         layoutGenerator.addLabelWidgetPair("Queue Options:", qoption, panel);
-        
+
+        JPanel pIdLocal = new JPanel(new BorderLayout());
+        JLabel parentCase = new JLabel(job.getParentCaseId() + "");
+        pIdLocal.add(parentCase, BorderLayout.LINE_START);
+        pIdLocal.add(localBox, BorderLayout.LINE_END);
+        pIdLocal.setPreferredSize(new Dimension(150, 20));
+        layoutGenerator.addLabelWidgetPair("Parent case ID: ", pIdLocal, panel);
+
         String user = job.getUser() == null ? session.user().getName() : job.getUser().getName();
         userLabel = new JLabel(user);
         layoutGenerator.addLabelWidgetPair("User:", userLabel, panel);
 
-        JLabel parentCase = new JLabel(String.valueOf(job.getParentCaseId()));
-        layoutGenerator.addLabelWidgetPair("Parent case ID: ", parentCase, panel);
-        
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
                 5, 5, // initialX, initialY
@@ -248,38 +245,32 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("<html>Depends on:<br><br><br></html>", jobDependencyPanel(), panel);
 
         sector = new ComboBox(presenter.getSectors());
-        //sector.setPrototypeDisplayValue(comboWidth);
         sector.setPreferredSize(comboSize);
         sector.setSelectedItem(job.getSector() == null ? sector.getItemAt(0) : job.getSector());
         addPopupMenuListener(sector, "sectors");
-        changeablesList.addChangeable(sector);
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
 
         host = new EditableComboBox(presenter.getHosts());
-        //host.setPrototypeDisplayValue(comboWidth);
         host.setSelectedItem(job.getHost());
         host.setPreferredSize(comboSize);
         addPopupMenuListener(host, "hosts");
-        changeablesList.addChangeable(host);
         layoutGenerator.addLabelWidgetPair("Host:", host, panel);
-        
+
         status = new ComboBox(presenter.getRunStatuses());
-        //status.setPrototypeDisplayValue(comboWidth);
         status.setPreferredSize(comboSize);
         status.setSelectedItem(job.getRunstatus());
         addPopupMenuListener(status, "status");
-        changeablesList.addChangeable(status);
         layoutGenerator.addLabelWidgetPair("Run Status:", status, panel);
-        layoutGenerator.addLabelWidgetPair("Local?",localBox,panel);
+        // layoutGenerator.addLabelWidgetPair("Local?",localBox,panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 10);// xPad, yPad
 
         return panel;
     }
-    
+
     private void addPopupMenuListener(final JComboBox box, final String toget) {
         box.addPopupMenuListener(new PopupMenuListener() {
             public void popupMenuCanceled(PopupMenuEvent event) {
@@ -322,7 +313,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
                 selectFolder(dir, title);
             }
         });
-        browseButton.setMargin(new Insets(3,5,3,5));
+        browseButton.setMargin(new Insets(3, 5, 3, 5));
         JPanel folderPanel = new JPanel(new BorderLayout(2, 0));
         folderPanel.add(dir, BorderLayout.LINE_START);
         folderPanel.add(browseButton, BorderLayout.LINE_END);
@@ -354,8 +345,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
     private JPanel resultPanel() {
         JPanel panel = new JPanel();
-//        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.setLayout(new GridLayout(1,2,5,5));
+        // panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setLayout(new GridLayout(1, 2, 5, 5));
 
         JPanel leftpanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator leftlayout = new SpringLayoutGenerator();
@@ -378,7 +369,6 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         SpringLayoutGenerator rightlayout = new SpringLayoutGenerator();
 
         runNote = new TextArea("runnote", job.getRunNotes());
-        changeablesList.addChangeable(runNote);
         ScrollableComponent scrolpane1 = new ScrollableComponent(runNote);
         scrolpane1.setPreferredSize(new Dimension(180, 80));
         rightlayout.addLabelWidgetPair("Job Notes:", scrolpane1, rightpanel);
@@ -437,8 +427,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setCaseId(this.caseObj.getId());
         job.setName(name.getText().trim());
         job.setPurpose(purpose.getText().trim());
-        
-        //NOTE: order is being stored as job number and order should be a float number
+
+        // NOTE: order is being stored as job number and order should be a float number
         job.setJobNo(Float.parseFloat(jobOrder.getText().trim()));
         job.setOrder(Integer.parseInt(oldJobOrder.getText().trim()));
         job.setArgs(args.getText().trim());
@@ -452,20 +442,17 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setJobGroup(jobGroup.getText().trim());
         Object[] objects = dependentJobsList.getObjects();
         String[] jobNames = new String[objects.length];
-        
+
         for (int i = 0; i < jobNames.length; i++)
             jobNames[i] = objects[i].toString();
-        
+
         job.setDependentJobs(presenter.dependentJobs(jobNames));
 
-        if (edit) {
+        if (edit && job.getId() > 0) {
             job.setRunLog(lastMsg.getText());
             job.setRunNotes(runNote.getText());
             job.setUser(session.user());
         }
-
-//        if (presenter.checkDuplication(job))
-//            showRemind();
 
         return job;
     }
@@ -494,10 +481,10 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             // this assumes that the server and client are running on the same platform
             return File.separatorChar;
         }
-        
+
         if (path.contains("/"))
             return '/';
-        
+
         if (path.contains("\\"))
             return '\\';
 
@@ -560,62 +547,48 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
             throw new EmfException("Please enter a valid host name.");
 
         validateJobGroup(jobGroup.getText().trim());
-        
+
         try {
             Integer.parseInt(version.getText().trim());
         } catch (NumberFormatException e) {
             throw new EmfException("Please enter an integer that is the version of the executable.");
         }
     }
-    
-    private void validateJobGroup(String abbrev) throws EmfException{
-        String underscore="_";
+
+    private void validateJobGroup(String abbrev) throws EmfException {
+        String underscore = "_";
         for (int i = 0; i < abbrev.length(); i++) {
-            if (!(Character.isLetterOrDigit(abbrev.charAt(i)) 
-                    || underscore.equalsIgnoreCase(abbrev.charAt(i)+"")))
-                throw new EmfException ("Job group must contain only letters, digits, and underscores. ");
+            if (!(Character.isLetterOrDigit(abbrev.charAt(i)) || underscore.equalsIgnoreCase(abbrev.charAt(i) + "")))
+                throw new EmfException("Job group must contain only letters, digits, and underscores. ");
         }
     }
-
-
-//    private void showRemind() throws EmfException {
-//        String title = "Warning";
-//        String message = "A similar job already exists for this case. Are you sure want to add another one?";
-//        int selection = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION,
-//                JOptionPane.QUESTION_MESSAGE);
-//
-//        if (selection != JOptionPane.YES_OPTION) {
-//            throw new EmfException("Please cancel or modify your job settings.");
-//        }
-//    }
 
     public CaseJob getJob() throws EmfException {
         presenter.doValidateFields();
         return this.job;
     }
-    
+
     private JPanel jobDependencyPanel() throws EmfException {
         String[] jobNames = null;
         String[] dependentJobNames = null;
-        
-        if (edit) {
+
+        if (edit)
             jobNames = presenter.getAllValidJobs(job.getId());
-            dependentJobNames = presenter.getDependentJobs(job.getId());
-        } else {
-            jobNames = presenter.getExistedJobs();
-            dependentJobNames = new String[0];
-        }
-        Arrays.sort(jobNames,new Comparator()
-         {
-            public final int compare ( Object a, Object b) 
-            {
-               return (((String)a).compareToIgnoreCase((String)b)); 
+        else
+            jobNames = new String[0];
+
+        dependentJobNames = presenter.getDependentJobs(job.getId());
+
+        Arrays.sort(jobNames, new Comparator() {
+            public final int compare(Object a, Object b) {
+                return (((String) a).compareToIgnoreCase((String) b));
             }
-         });
+        });
         Arrays.sort(dependentJobNames);
-        dependentJobsList = new AddRemoveWidget(jobNames, changeablesList, parent, false, true);
+
+        dependentJobsList = new AddRemoveWidget(jobNames, changeablesList, parent, true, true);
         dependentJobsList.setObjects(dependentJobNames);
-        dependentJobsList.setPreferredSize(new Dimension(190,120));
+        dependentJobsList.setPreferredSize(new Dimension(190, 120));
         return dependentJobsList;
     }
 
@@ -626,28 +599,38 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private void setError(String error) {
         messagePanel.setError(error);
     }
-    
 
-    public void viewOnly() {
+    private void setEditTracking() {
+        changeablesList.addChangeable(name);
+        changeablesList.addChangeable(purpose);
+        changeablesList.addChangeable(path);
+        changeablesList.addChangeable(version);
+        changeablesList.addChangeable(args);
+        changeablesList.addChangeable(jobOrder);
+        changeablesList.addChangeable(jobGroup);
+        changeablesList.addChangeable(qoption);
+        changeablesList.addChangeable(sector);
+        changeablesList.addChangeable(host);
+        changeablesList.addChangeable(status);
+        changeablesList.addChangeable(runNote);
+        changeablesList.addChangeable(localBox);
+    }
+
+    public void setViewOnly() {
         browseButton.setVisible(false);
         name.setEditable(false);
         purpose.setEditable(false);
-        purpose.setEnabled(false);
         path.setEditable(false);
         version.setEditable(false);
         args.setEditable(false);
         dependentJobsList.viewOnly();
-        
-        sector.setEnabled(false);
-        status.setEnabled(false);
+        localBox.setEnabled(false);
+
         jobOrder.setEditable(false);
-        host.setEnabled(false);
+        host.setEditable(false);
         qoption.setEditable(false);
         jobGroup.setEditable(false);
-        
-        lastMsg.setEnabled(false);
-        lastMsg.setEditable(false);
+
         runNote.setEditable(false);
-        runNote.setEnabled(false);
     }
 }

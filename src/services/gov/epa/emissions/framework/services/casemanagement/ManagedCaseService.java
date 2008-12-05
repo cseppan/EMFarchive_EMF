@@ -1946,7 +1946,7 @@ public class ManagedCaseService {
                 for (int k = 0; k < params.length; k++)
                     if (params[k].getJobId() == jobs[i].getId())
                         params[k].setJobId(0);
-                
+
                 jobs[i].setDependentJobs(null);
             }
         } catch (RuntimeException e) {
@@ -1968,14 +1968,21 @@ public class ManagedCaseService {
         checkJobHistoryItems(jobs, session);
         resetRelatedJobsField(jobs);
         deleteCaseJobKeyObjects(jobs, session);
+        
+        try {
+            dao.checkJobDependency(jobs, session);
+        } catch (EmfException e) {
+            throw new EmfException("Cannot remove " + e.getMessage());
+        }
 
         try {
+            session.clear();
             dao.removeCaseJobs(jobs, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove case job " + jobs[0].getName() + " etc.\n" + e.getMessage());
             throw new EmfException(
-                    "Could not remove job; please verify that is not waiting on another job to finish before it can run.");
+                    "Could not remove selected job(s): " + e.getLocalizedMessage());
         } finally {
             session.close();
         }
@@ -3310,9 +3317,9 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized String[] getAllValidJobs(int jobId) throws EmfException {
+    public synchronized String[] getAllValidJobs(int jobId, int caseId) throws EmfException {
         try {
-            return dao.getAllValidJobs(jobId);
+            return dao.getAllValidJobs(jobId, caseId);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not get all valid jobs for job (id=" + jobId + ").\n" + e.getMessage());
@@ -4655,7 +4662,8 @@ public class ManagedCaseService {
             log.error("Could not print case "
                     + (currentCase == null ? " (id = " + caseId + ")." : currentCase.getName() + "."), e);
             throw new EmfException("Could not print case "
-                    + (currentCase == null ? " (id = " + caseId + "). " : currentCase.getName() + ". ") + e.getMessage());
+                    + (currentCase == null ? " (id = " + caseId + "). " : currentCase.getName() + ". ")
+                    + e.getMessage());
         } finally {
             if (session != null && session.isConnected())
                 session.close();
@@ -4722,21 +4730,22 @@ public class ManagedCaseService {
                 + "\""
                 + ls
                 + "Tab,Parameter,Order,Envt. Var.,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose"
-                + ls + "Summary,Model to Run,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,\"" + clean(model)
-                + "\",String,TRUE,TRUE,,," + ls
+                + ls + "Summary,Model to Run,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,\""
+                + clean(model) + "\",String,TRUE,TRUE,,," + ls
                 + "Summary,Model Version,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,\""
                 + clean(currentCase.getModelVersion()) + "\",String,TRUE,TRUE,,," + ls
                 + "Summary,Modeling Region,0,,All sectors,All jobs for sector,All programs,\"" + clean(modelRegion)
                 + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Grid Name,0,IOAPI_GRIDNAME_1,All sectors,All jobs for sector,All programs,\"" + clean(gridName)
-                + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Grid Resolution,0,EMF_GRID,All sectors,All jobs for sector,All programs,\"" + clean(gridResolution)
-                + "\",String,TRUE,TRUE,,," + ls + "Summary,Met Layers,0,,All sectors,All jobs for sector,All programs,"
-                + currentCase.getNumMetLayers() + ",Integer,TRUE,TRUE,,," + ls
+                + "Summary,Grid Name,0,IOAPI_GRIDNAME_1,All sectors,All jobs for sector,All programs,\""
+                + clean(gridName) + "\",String,TRUE,TRUE,,," + ls
+                + "Summary,Grid Resolution,0,EMF_GRID,All sectors,All jobs for sector,All programs,\""
+                + clean(gridResolution) + "\",String,TRUE,TRUE,,," + ls
+                + "Summary,Met Layers,0,,All sectors,All jobs for sector,All programs," + currentCase.getNumMetLayers()
+                + ",Integer,TRUE,TRUE,,," + ls
                 + "Summary,Emission Layers,0,,All sectors,All jobs for sector,All programs,"
                 + currentCase.getNumEmissionsLayers() + ",Integer,TRUE,TRUE,,," + ls
-                + "Summary,Downstream Model,0,EMF_AQM,All sectors,All jobs for sector,All programs,\"" + clean(dstrModel)
-                + "\",String,TRUE,TRUE,,," + ls
+                + "Summary,Downstream Model,0,EMF_AQM,All sectors,All jobs for sector,All programs,\""
+                + clean(dstrModel) + "\",String,TRUE,TRUE,,," + ls
                 + "Summary,Speciation,0,EMF_SPC,All sectors,All jobs for sector,All programs,\"" + clean(speciation)
                 + "\",String,TRUE,TRUE,,," + ls
                 + "Summary,Meteorological Year,0,,All sectors,All jobs for sector,All programs," + metYear
@@ -4769,9 +4778,9 @@ public class ManagedCaseService {
             String notes = param.getNotes() == null ? "" : param.getNotes();
             String purpose = param.getPurpose() == null ? "" : param.getPurpose();
 
-            sb.append("Parameters,\"" + clean(name) + "\"," + order + ",\"" + clean(envVar) + "\",\"" + clean(sector) + "\",\"" + clean(job)
-                    + "\",\"" + clean(prog) + "\",\"" + clean(value) + "\"," + clean(type) + "," + reqrd + "," + local + "," + lstMod
-                    + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\"" + ls);
+            sb.append("Parameters,\"" + clean(name) + "\"," + order + ",\"" + clean(envVar) + "\",\"" + clean(sector)
+                    + "\",\"" + clean(job) + "\",\"" + clean(prog) + "\",\"" + clean(value) + "\"," + clean(type) + ","
+                    + reqrd + "," + local + "," + lstMod + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\"" + ls);
         }
 
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, sumParamFile))));
@@ -4844,9 +4853,10 @@ public class ManagedCaseService {
             Case parent = (input.getParentCaseId() > 0) ? dao.getCase(input.getParentCaseId(), session) : null;
             String parentName = parent != null ? parent.getName() : "";
 
-            sb.append("Inputs,\"" + clean(name) + "\",\"" + clean(envVar) + "\",\"" + clean(sector) + "\",\"" + clean(job) + "\",\"" + clean(prog) + "\",\""
-                    + clean(dsName) + "\"," + dsVersion + "," + clean(qaStatus) + ",\"" + clean(dsType) + "\"," + reqrd + "," + local + ","
-                    + clean(subdir) + "," + lstMod + ",\"" + clean(parentName) + "\"" + ls);
+            sb.append("Inputs,\"" + clean(name) + "\",\"" + clean(envVar) + "\",\"" + clean(sector) + "\",\""
+                    + clean(job) + "\",\"" + clean(prog) + "\",\"" + clean(dsName) + "\"," + dsVersion + ","
+                    + clean(qaStatus) + ",\"" + clean(dsType) + "\"," + reqrd + "," + local + "," + clean(subdir) + ","
+                    + lstMod + ",\"" + clean(parentName) + "\"" + ls);
         }
 
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, inputsFile))));
@@ -4885,74 +4895,77 @@ public class ManagedCaseService {
             String purpose = job.getPurpose() == null ? "" : job.getPurpose();
             String dependsOn = getDependsOnJobsString(job.getDependentJobs(), session);
 
-            sb.append("Jobs,\"" + clean(name) + "\"," + order + ",\"" + clean(sector) + "\"," + clean(status) + "," + start + "," + end
-                    + "," + clean(exec) + ",\"" + clean(args) + "\"," + clean(path) + ",\"" + clean(qOptns) + "\",\"" + clean(jobGrp) + "\"," + local
-                    + ",\"" + clean(qId) + "\",\"" + clean(user) + "\", " + clean(host) + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\",\"" + clean(dependsOn) + "\"" + ls);
+            sb.append("Jobs,\"" + clean(name) + "\"," + order + ",\"" + clean(sector) + "\"," + clean(status) + ","
+                    + start + "," + end + "," + clean(exec) + ",\"" + clean(args) + "\"," + clean(path) + ",\""
+                    + clean(qOptns) + "\",\"" + clean(jobGrp) + "\"," + local + ",\"" + clean(qId) + "\",\""
+                    + clean(user) + "\", " + clean(host) + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\",\""
+                    + clean(dependsOn) + "\"" + ls);
         }
 
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, jobsFile))));
         writer.println(sb.toString());
         writer.close();
     }
-    
+
     private String clean(String toClean) {
         if (toClean == null || toClean.trim().isEmpty())
             return "";
-        
+
         String temp = toClean.replace('"', '\'');
-        
+
         return temp.replaceAll("\\\\", "/");
     }
 
     public synchronized String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
         File logFile = new File(path);
-        
+
         if (!logFile.exists())
             throw new EmfException("CMAQ log file doesn't exist: " + path + ".");
-        
+
         if (!logFile.isFile())
             throw new EmfException("Please specify a valid log file.");
-        
+
         if (!logFile.canRead())
             throw new EmfException("CMAQ log file is not readable by Tomcat: " + path + ".");
-        
+
         List<CaseParameter> paramObjects = getValidParameters(jobId, caseId);
         List<String> paramEnvs = getEnvVars(paramObjects);
-        
+
         if (paramEnvs == null || paramEnvs.size() == 0)
             throw new EmfException("No valid parameters selected to load.");
-        
+
         EMFCaseFile caseFile = new CMAQLogFile(logFile);
         caseFile.read(paramEnvs);
-        
+
         StringBuffer sb = new StringBuffer();
-        
+
         int numLoaded = 0;
         String lineSep = System.getProperty("line.separator");
-        
-        for(Iterator<CaseParameter> iter = paramObjects.iterator(); iter.hasNext();) {
+
+        for (Iterator<CaseParameter> iter = paramObjects.iterator(); iter.hasNext();) {
             CaseParameter param = iter.next();
             ParameterEnvVar envVar = param.getEnvVar();
-            
+
             if (envVar == null)
                 continue;
-            
+
             String value = caseFile.getAttributeValue(envVar.getName());
             String existingVal = param.getValue();
-            
-            if (value == null || value.isEmpty() || value.equals(existingVal)) 
+
+            if (value == null || value.isEmpty() || value.equals(existingVal))
                 continue;
-            
+
             if (existingVal != null && !existingVal.trim().isEmpty())
-                sb.append("WARNING: parameter \'" + param.getName() + "\'--value replaced (previous: " + existingVal + ")" + lineSep);
-            
+                sb.append("WARNING: parameter \'" + param.getName() + "\'--value replaced (previous: " + existingVal
+                        + ")" + lineSep);
+
             param.setValue(value);
             updateCaseParameter(user, param);
             numLoaded++;
         }
-        
+
         String msg = numLoaded + " parameter value" + (numLoaded > 1 ? "s" : "") + " loaded." + lineSep;
-        
+
         return msg + sb.toString() + caseFile.getMessages();
     }
 
@@ -4962,59 +4975,61 @@ public class ManagedCaseService {
         try {
             CaseJob job = dao.getCaseJob(jobId, session);
             Sector sector = (job == null) ? null : job.getSector();
-            
+
             List<CaseParameter> jobSpecParams = dao.getCaseParametersByJobId(caseId, jobId, session);
-            List<CaseParameter> sectorSpecParams = (sector != null) ? dao.getCaseParametersBySector(caseId, sector, session) : dao.getCaseParametersForAllSectors(caseId, session);
+            List<CaseParameter> sectorSpecParams = (sector != null) ? dao.getCaseParametersBySector(caseId, sector,
+                    session) : dao.getCaseParametersForAllSectors(caseId, session);
             List<CaseParameter> params4AllSectorsAllJobs = dao.getCaseParametersForAllSectorsAllJobs(caseId, session);
-            
+
             return selectValidParameters(jobSpecParams, sectorSpecParams, params4AllSectorsAllJobs);
         } catch (Exception e) {
             log.error("Error reading case parameters for case id = " + caseId + " and job id = " + jobId + ".", e);
-            throw new EmfException("Error reading case parameters for case id = " + caseId + " and job id = " + jobId + ".");
+            throw new EmfException("Error reading case parameters for case id = " + caseId + " and job id = " + jobId
+                    + ".");
         } finally {
             if (session != null && session.isOpen())
                 session.close();
         }
     }
-    
+
     private List<CaseParameter> selectValidParameters(List<CaseParameter> jobSpecParams,
             List<CaseParameter> sectorSpecParams, List<CaseParameter> params4AllSectorsAllJobs) {
         List<String> paramEnvs = getEnvVars(jobSpecParams);
-        
+
         for (Iterator<CaseParameter> iter = sectorSpecParams.iterator(); iter.hasNext();) {
             CaseParameter param = iter.next();
             ParameterEnvVar envVar = param.getEnvVar();
             int paramJobId = param.getJobId();
-            
+
             if (!paramEnvs.contains(envVar.getName()) && paramJobId == 0) {
                 jobSpecParams.add(param);
                 paramEnvs.add(envVar.getName());
             }
         }
-        
+
         for (Iterator<CaseParameter> iter = params4AllSectorsAllJobs.iterator(); iter.hasNext();) {
             CaseParameter param = iter.next();
             ParameterEnvVar envVar = param.getEnvVar();
-            
+
             if (!paramEnvs.contains(envVar.getName())) {
                 jobSpecParams.add(param);
                 paramEnvs.add(envVar.getName());
             }
         }
-        
+
         return jobSpecParams;
     }
 
     private synchronized List<String> getEnvVars(List<CaseParameter> paramObjects) {
         List<String> envs = new ArrayList<String>();
-        
+
         for (Iterator<CaseParameter> iter = paramObjects.iterator(); iter.hasNext();) {
             ParameterEnvVar env = iter.next().getEnvVar();
-            
+
             if (env != null && env.getName() != null && !env.getName().trim().isEmpty())
                 envs.add(env.getName());
         }
-        
+
         return envs;
     }
 

@@ -547,8 +547,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getJobMessages(caseId, jobId);
     }
 
-    public String[] getAllValidJobs(int jobId) throws EmfException {
-        return getCaseService().getAllValidJobs(jobId);
+    public String[] getAllValidJobs(int jobId, int caseId) throws EmfException {
+        return getCaseService().getAllValidJobs(jobId, caseId);
     }
 
     public String[] getDependentJobs(int jobId) throws EmfException {

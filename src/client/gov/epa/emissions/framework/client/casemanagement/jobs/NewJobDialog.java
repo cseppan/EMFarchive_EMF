@@ -66,7 +66,7 @@ public class NewJobDialog extends Dialog implements NewJobView, ManageChangeable
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
         
-        jobFieldsPanel = new JobFieldsPanel(false, messagePanel, this, parent, session);
+        jobFieldsPanel = new JobFieldsPanel(true, messagePanel, this, parent, session);
 
         try {
             presenter.addJobFields(newjob, panel, jobFieldsPanel);

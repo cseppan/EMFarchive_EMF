@@ -800,14 +800,15 @@ public class CaseServiceTransport implements CaseService {
         return (JobMessage[]) call.requestResponse(new Object[] { new Integer(caseId), new Integer(jobId) });
     }
 
-    public synchronized String[] getAllValidJobs(int jobId) throws EmfException {
+    public synchronized String[] getAllValidJobs(int jobId, int caseId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getAllValidJobs");
         call.addIntegerParam("jobId");
+        call.addIntegerParam("caseId");
         call.setStringArrayReturnType();
 
-        return (String[]) call.requestResponse(new Object[] { new Integer(jobId) });
+        return (String[]) call.requestResponse(new Object[] { new Integer(jobId), new Integer(caseId) });
     }
 
     public synchronized String[] getDependentJobs(int jobId) throws EmfException {

@@ -24,6 +24,8 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
 
     private boolean shouldCreate;
 
+    private boolean edit = true;
+
     private JPanel layout;
 
     private EditCaseJobPresenterImpl presenter;
@@ -31,23 +33,30 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
     private MessagePanel messagePanel;
 
     private Button ok;
-    
+
     private EmfConsole parent;
-    
+
     private EmfSession session;
 
     private JobFieldsPanel jobFieldsPanel;
 
     public EditCaseJobWindow(String title, DesktopManager desktopManager, EmfConsole parent, EmfSession session) {
         super(title, new Dimension(600, 640), desktopManager);
-        //super.setLabel(super.getTitle());
         this.parent = parent;
         this.session = session;
     }
 
+    public EditCaseJobWindow(boolean forView, String title, DesktopManager desktopManager, EmfConsole parent,
+            EmfSession session) {
+        super(title, new Dimension(600, 640), desktopManager);
+        this.parent = parent;
+        this.session = session;
+        this.edit = !forView;
+    }
+
     public void display(CaseJob job) throws EmfException {
         layout = createLayout();
-        
+
         super.getContentPane().add(layout);
         super.display();
         super.resetChanges();
@@ -59,36 +68,37 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.jobFieldsPanel = new JobFieldsPanel(true, messagePanel, this, parent, session);
+        this.jobFieldsPanel = new JobFieldsPanel(edit, messagePanel, this, parent, session);
         presenter.doAddJobFields(panel, jobFieldsPanel);
         panel.add(buttonsPanel());
 
         return panel;
     }
-    
+
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
 
         ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if(hasChanges()){
-                    try{
+                if (hasChanges()) {
+                    try {
                         validateFields();
                         presenter.saveJob();
                         disposeView();
-                    }catch(EmfException e1) {
+                    } catch (EmfException e1) {
                         messagePanel.setError(e1.getMessage());
                     }
+                } else {
+                    disposeView();
                 }
-                else
-                {
-                   disposeView();
-                }   
 
             }
         });
-        getRootPane().setDefaultButton(ok);
-        panel.add(ok);
+
+        if (edit) {
+            getRootPane().setDefaultButton(ok);
+            panel.add(ok);
+        }
 
         Button cancel = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -98,29 +108,14 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
         panel.add(cancel);
 
         panel.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
-        
+
         return panel;
     }
 
-//    private void doSave() {
-//        clearMessage();
-//        try {
-//                validateFields();
-//                presenter.saveJob();
-//            }
-//        } catch (EmfException e) {
-//            messagePanel.setError(e.getMessage());
-//        }
-//    }
-    
     private void validateFields() throws EmfException {
-        //try {
-            jobFieldsPanel.validateFields();
-//        } catch (EmfException e) {
-//            messagePanel.setError(e.getMessage());
-//        }
+        jobFieldsPanel.validateFields();
     }
-    
+
     private void clearMessage() {
         messagePanel.clear();
     }
@@ -138,10 +133,10 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
     }
 
     private void doClose() {
-        if (shouldDiscardChanges())
+        if (!edit || shouldDiscardChanges())
             super.disposeView();
     }
-    
+
     public void loadCaseJob() throws EmfException {
         // NOTE Auto-generated method stub
         throw new EmfException("Under construction...");
@@ -149,18 +144,12 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
 
     public void populateFields() {
         // NOTE Auto-generated method stub
-        
+
     }
-    
+
     public void signalChanges() {
         clearMessage();
         super.signalChanges();
-    }
-
-    public void viewOnly(String title){
-        //super.setTitle("View Case Job: " + title);
-        ok.setVisible(false);
-        jobFieldsPanel.viewOnly();
     }
 
 }

@@ -18,5 +18,5 @@ public interface JobFieldsPanelView {
     
     void validateFields() throws EmfException;
     
-    void viewOnly();
+    void setViewOnly();
 }

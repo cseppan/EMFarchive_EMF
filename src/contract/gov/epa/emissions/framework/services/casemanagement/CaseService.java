@@ -118,7 +118,7 @@ public interface CaseService {
     
     String[] getDependentJobs(int jobId) throws EmfException;
     
-    String[] getAllValidJobs(int jobId) throws EmfException;
+    String[] getAllValidJobs(int jobId, int caseId) throws EmfException;
 
     JobRunStatus[] getJobRunStatuses() throws EmfException;
     

@@ -110,10 +110,13 @@ public class JobFieldsPanelPresenter {
     }
     
     public String[] getAllValidJobs(int jobId) throws EmfException {
-        return caseService().getAllValidJobs(jobId);
+        return caseService().getAllValidJobs(jobId, caseObj.getId());
     }
 
     public String[] getDependentJobs(int jobId) throws EmfException {
+        if (jobId <= 0)
+            return new String[0];
+        
         return caseService().getDependentJobs(jobId);
     }
 

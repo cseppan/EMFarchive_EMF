@@ -221,11 +221,11 @@ public class CaseDAO {
     public List<CaseCategory> getCaseCategories(Session session) {
         return hibernateFacade.getAll(CaseCategory.class, Order.asc("name"), session);
     }
-    
+
     public CaseCategory getCaseCategory(String name, Session session) {
         Criterion crit = Restrictions.eq("name", name);
-        
-        return (CaseCategory)hibernateFacade.load(CaseCategory.class, crit, session);
+
+        return (CaseCategory) hibernateFacade.load(CaseCategory.class, crit, session);
     }
 
     public List<EmissionsYear> getEmissionsYears(Session session) {
@@ -255,10 +255,10 @@ public class CaseDAO {
     public Case getCase(int caseId, Session session) {
         Criterion criterion = Restrictions.eq("id", new Integer(caseId));
         List<Case> caseObj = hibernateFacade.get(Case.class, criterion, session);
-        
+
         if (caseObj == null || caseObj.size() == 0)
             return null;
-        
+
         return caseObj.get(0);
     }
 
@@ -368,7 +368,7 @@ public class CaseDAO {
         Criterion criterion = Restrictions.eq("name", name);
         return hibernateFacade.load(clazz, criterion, session);
     }
-    
+
     public Object load(Class<?> clazz, Criterion[] criterions, Session session) {
         return hibernateFacade.load(clazz, criterions, session);
     }
@@ -377,56 +377,56 @@ public class CaseDAO {
         Criterion criterion = Restrictions.eq("id", new Integer(id));
         return hibernateFacade.load(clazz, criterion, session);
     }
-    
+
     public ParameterEnvVar loadParamEnvVar(ParameterEnvVar envVar, Session session) {
         Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(envVar.getModelToRunId()));
         Criterion crit2 = Restrictions.eq("name", envVar.getName());
 
-        return (ParameterEnvVar) this.load(ParameterEnvVar.class, new Criterion[] {crit1, crit2}, session);
+        return (ParameterEnvVar) this.load(ParameterEnvVar.class, new Criterion[] { crit1, crit2 }, session);
     }
-    
+
     public CaseProgram loadCaseProgram(CaseProgram prog, Session session) {
         Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(prog.getModelToRunId()));
         Criterion crit2 = Restrictions.eq("name", prog.getName());
 
-        return (CaseProgram) this.load(CaseProgram.class, new Criterion[] {crit1, crit2}, session);
+        return (CaseProgram) this.load(CaseProgram.class, new Criterion[] { crit1, crit2 }, session);
     }
-    
+
     public SubDir loadCaseSubdir(SubDir subdir, Session session) {
         Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(subdir.getModelToRunId()));
         Criterion crit2 = Restrictions.eq("name", subdir.getName());
 
-        return (SubDir) this.load(SubDir.class, new Criterion[] {crit1, crit2}, session);
+        return (SubDir) this.load(SubDir.class, new Criterion[] { crit1, crit2 }, session);
     }
-    
+
     public Object loadParameterName(ParameterName paramName, Session session) {
         Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(paramName.getModelToRunId()));
         Criterion crit2 = Restrictions.eq("name", paramName.getName());
 
-        return this.load(ParameterName.class, new Criterion[] {crit1, crit2}, session);
+        return this.load(ParameterName.class, new Criterion[] { crit1, crit2 }, session);
     }
-    
+
     public Object loadParameterEnvVar(ParameterEnvVar envVar, Session session) {
         Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(envVar.getModelToRunId()));
         Criterion crit2 = Restrictions.eq("name", envVar.getName());
 
-        return this.load(ParameterEnvVar.class, new Criterion[] {crit1, crit2}, session);
+        return this.load(ParameterEnvVar.class, new Criterion[] { crit1, crit2 }, session);
     }
-    
+
     public InputName loadInputName(InputName inputName, Session session) {
         Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(inputName.getModelToRunId()));
         Criterion crit2 = Restrictions.eq("name", inputName.getName());
 
-        return (InputName) this.load(InputName.class, new Criterion[] {crit1, crit2}, session);
+        return (InputName) this.load(InputName.class, new Criterion[] { crit1, crit2 }, session);
     }
-    
+
     public InputEnvtVar loadInputEnvtVar(InputEnvtVar envVar, Session session) {
         Criterion crit1 = Restrictions.eq("modelToRunId", new Integer(envVar.getModelToRunId()));
         Criterion crit2 = Restrictions.eq("name", envVar.getName());
 
-        return (InputEnvtVar) this.load(InputEnvtVar.class, new Criterion[] {crit1, crit2}, session);
+        return (InputEnvtVar) this.load(InputEnvtVar.class, new Criterion[] { crit1, crit2 }, session);
     }
-    
+
     public Object loadCaseInput(CaseInput input, Session session) {
         Criterion[] criterions = uniqueCaseInputCriteria(input.getCaseID(), input);
 
@@ -518,22 +518,22 @@ public class CaseDAO {
 
     public List<Case> getCasesThatInputToOtherCases(int caseId, Session session) {
         String sql = "select new gov.epa.emissions.framework.services.casemanagement.Case(cs.id, cs.name) from Case cs where cs.id in (select distinct cO.caseId from CaseInput as cI, CaseOutput as cO where cI.dataset.id = cO.datasetId and cI.caseID = :caseId)";
-        Query query = session.createQuery(sql)
-            .setInteger("caseId", caseId);
+        Query query = session.createQuery(sql).setInteger("caseId", caseId);
         return query.list();
     }
 
     public List<Case> getCasesThatOutputToOtherCases(int caseId, Session session) {
         String sql = "select new gov.epa.emissions.framework.services.casemanagement.Case(cs.id, cs.name) from Case cs where cs.id in (select distinct cI.caseID from CaseOutput as cO, CaseInput as cI where cI.dataset.id = cO.datasetId and cO.caseId = :caseId)";
-        Query query = session.createQuery(sql)
-            .setInteger("caseId", caseId);
+        Query query = session.createQuery(sql).setInteger("caseId", caseId);
         return query.list();
     }
 
     public List<Case> getCasesByOutputDatasets(int[] datasetIds, Session session) {
         String idList = "";
-        for (int id : datasetIds) idList += (idList.length() > 0 ? "," : "") + id;
-        String sql = "select new gov.epa.emissions.framework.services.casemanagement.Case(cs.id, cs.name) from Case cs where cs.id in (select distinct cO.caseId from CaseOutput as cO where cO.datasetId in (" + idList + "))";
+        for (int id : datasetIds)
+            idList += (idList.length() > 0 ? "," : "") + id;
+        String sql = "select new gov.epa.emissions.framework.services.casemanagement.Case(cs.id, cs.name) from Case cs where cs.id in (select distinct cO.caseId from CaseOutput as cO where cO.datasetId in ("
+                + idList + "))";
         Query query = session.createQuery(sql);
         return query.list();
     }
@@ -667,12 +667,12 @@ public class CaseDAO {
         Criterion crit = Restrictions.eq("id", new Integer(jobId));
         return (CaseJob) hibernateFacade.load(CaseJob.class, crit, session);
     }
-    
-    public List<Sector> getSectorsUsedbyJobs(int caseId, Session session){
+
+    public List<Sector> getSectorsUsedbyJobs(int caseId, Session session) {
         Criterion crit = Restrictions.eq("caseId", new Integer(caseId));
         return hibernateFacade.get(Sector.class, crit, session);
     }
- 
+
     public CaseJob getCaseJob(int jobId) {
         CaseJob caseJob = null;
         Session session = sessionFactory.getSession();
@@ -850,7 +850,7 @@ public class CaseDAO {
     public CaseParameter loadCaseParameter(CaseParameter param, Session session) {
         Criterion[] criterions = uniqueCaseParameterCriteria(param.getCaseID(), param);
 
-        return (CaseParameter)hibernateFacade.load(CaseParameter.class, criterions, session);
+        return (CaseParameter) hibernateFacade.load(CaseParameter.class, criterions, session);
     }
 
     public CaseParameter loadCaseParameter4Sensitivity(int caseId, CaseParameter param, Session session) {
@@ -933,7 +933,7 @@ public class CaseDAO {
 
         return params;
     }
-    
+
     public List<CaseParameter> getCaseParametersByJobId(int caseId, int jobId, Session session) {
         Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion c2 = Restrictions.eq("jobId", new Integer(jobId));
@@ -947,18 +947,18 @@ public class CaseDAO {
 
         return hibernateFacade.get(CaseParameter.class, new Criterion[] { c1, c2 }, session);
     }
-    
+
     public List<CaseParameter> getCaseParametersForAllSectors(int caseId, Session session) {
         Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion c2 = Restrictions.isNull("sector");
 
         return hibernateFacade.get(CaseParameter.class, new Criterion[] { c1, c2 }, session);
     }
-    
+
     public List<CaseParameter> getCaseParametersForAllSectorsAllJobs(int caseId, Session session) {
         return getJobParameters(caseId, 0, null, session);
     }
-    
+
     public List<CaseParameter> getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll,
             Session session) {
         if (sector == null)
@@ -1006,9 +1006,8 @@ public class CaseDAO {
         Criterion crit1 = Restrictions.eq("name", envName);
         Criterion crit2 = Restrictions.eq("modelToRunId", model_to_run_id);
         Criterion[] crits = { crit1, crit2 };
-       
 
-//        return hibernateFacade.get(ParameterEnvVar.class, crits, session);
+        // return hibernateFacade.get(ParameterEnvVar.class, crits, session);
         return (ParameterEnvVar) hibernateFacade.load(ParameterEnvVar.class, crits, session);
     }
 
@@ -1075,9 +1074,8 @@ public class CaseDAO {
         return (CaseParameter) hibernateFacade.load(CaseParameter.class, crit, session);
     }
 
-    public String[] getAllValidJobs(int jobId) {
+    public String[] getAllValidJobs(int jobId, int caseId) {
         List<String> validJobNames = new ArrayList<String>();
-        int caseId = getCaseJob(jobId).getCaseId();
         List<CaseJob> jobs = getCaseJobs(caseId);
 
         for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
@@ -1091,6 +1089,9 @@ public class CaseDAO {
     }
 
     public String[] getDependentJobs(int jobId) {
+        if (jobId <= 0)
+            return new String[0];
+        
         DependentJob[] dependentJobs = getCaseJob(jobId).getDependentJobs();
         String[] dependentJobNames = new String[dependentJobs.length];
 
@@ -1105,6 +1106,9 @@ public class CaseDAO {
     private boolean canDependOn(int jobId, int dependentJobId) {
         // FIXME: this really should be a recursive check on all the possible dependencies
         // to avoid cycle dependencies.
+        if (jobId <= 0) // a new job
+            return true;
+        
         if (jobId == dependentJobId)
             return false;
 
@@ -1434,7 +1438,8 @@ public class CaseDAO {
         return sb.toString();
     }
 
-    public CaseParameter[] getCaseParametersFromEnvName(int caseId, String envName, int model_to_run_id) throws EmfException {
+    public CaseParameter[] getCaseParametersFromEnvName(int caseId, String envName, int model_to_run_id)
+            throws EmfException {
         // Get case parameters that match a specific environment variables name
         Session session = sessionFactory.getSession();
         try {
@@ -1481,7 +1486,8 @@ public class CaseDAO {
         return envVars.toArray(new String[0]);
     }
 
-    public String replaceEnvVars(String input, String delimiter, int caseId, int jobId, int model_to_run_id) throws EmfException {
+    public String replaceEnvVars(String input, String delimiter, int caseId, int jobId, int model_to_run_id)
+            throws EmfException {
         // replace any environemental variables with their values
         // use the delimiter to separate out environment variables
         try {
@@ -1493,7 +1499,8 @@ public class CaseDAO {
                     for (String envName : envVarsStrs) {
                         // loop over env variable names, get the parameter,
                         // and replace the env name in input string w/ that value
-                        CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId, model_to_run_id);
+                        CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId,
+                                model_to_run_id);
 
                         // Replace exact matches of environmental variable name
 
@@ -1581,7 +1588,8 @@ public class CaseDAO {
         }
     }
 
-    public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId, int model_to_run_id) throws EmfException {
+    public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId, int model_to_run_id)
+            throws EmfException {
         // Get case parameters that match a specific environment variables name
         // If more than 1 matches the environmental variable name, uses the job Id to find unique one
         try {
@@ -1592,7 +1600,7 @@ public class CaseDAO {
             } else if (tempParams.length > 1) {
                 // loop over params and find any that match jobId
                 for (CaseParameter param : tempParams) {
-                    if (param.getJobId() == jobId){
+                    if (param.getJobId() == jobId) {
                         params.add(param);
                     }
                 }
@@ -1632,38 +1640,61 @@ public class CaseDAO {
 
     public void checkParentChildRelationship(Case caseObj, Session session) throws EmfException {
         int caseId = caseObj.getId();
-        
+
         List<?> parentCases = session.createQuery(
-                "SELECT obj.sensCaseId FROM " + CasesSens.class.getSimpleName() + " as obj WHERE obj.parentCaseid = " + caseId
-                        + " ORDER BY obj.parentCaseid").list();
-        
+                "SELECT obj.sensCaseId FROM " + CasesSens.class.getSimpleName() + " as obj WHERE obj.parentCaseid = "
+                        + caseId + " ORDER BY obj.parentCaseid").list();
+
         if (parentCases.size() == 1)
-            throw new EmfException("Case " + caseObj.getName() + " is the parent case of " + getCase(Integer.parseInt(parentCases.get(0).toString()), session).getName() + ".");
-        
+            throw new EmfException("Case " + caseObj.getName() + " is the parent case of "
+                    + getCase(Integer.parseInt(parentCases.get(0).toString()), session).getName() + ".");
+
         if (parentCases.size() > 1)
-            throw new EmfException("Case " + caseObj.getName() + " is the parent case of multiple cases: " + getCase(Integer.parseInt(parentCases.get(0).toString()), session).getName() + ", etc.");
-        
+            throw new EmfException("Case " + caseObj.getName() + " is the parent case of multiple cases: "
+                    + getCase(Integer.parseInt(parentCases.get(0).toString()), session).getName() + ", etc.");
+
     }
-    
-    public void removeChildCase(int caseId, Session session) {  
+
+    public void checkJobDependency(CaseJob[] jobs, Session session) throws EmfException {
+        Criterion c1 = Restrictions.isNotNull("dependentJobs");
+        Criterion c2 = Restrictions.isNotEmpty("dependentJobs");
+        
+        List<CaseJob> jobsDeps = hibernateFacade.get(CaseJob.class, new Criterion[] { c1, c2 }, session);
+        
+        for (Iterator<CaseJob> iter = jobsDeps.iterator(); iter.hasNext();) {
+            CaseJob jobDeps = iter.next();
+            DependentJob[] depJobs = jobDeps.getDependentJobs();
+            
+            for (DependentJob depJob : depJobs) {
+                int depJobId = depJob.getJobId();
+                
+                for (CaseJob del : jobs)
+                    if (depJobId == del.getId())
+                        throw new EmfException("job '" + del.getName() 
+                                + "', because job '" + jobDeps.getName() + "' depends on it.");
+            }
+        }
+    }
+
+    public void removeChildCase(int caseId, Session session) {
         List<?> childrenCases = session.createQuery(
                 "SELECT obj.id FROM " + CasesSens.class.getSimpleName() + " as obj WHERE obj.sensCaseId = " + caseId
                         + " ORDER BY obj.id").list();
-             
+
         int numOfChildren = childrenCases.size();
-            
+
         if (numOfChildren == 0)
             return;
-        
+
         String clause = " obj.id = ";
-        
+
         for (int i = 0; i < numOfChildren; i++) {
             if (i < numOfChildren - 1)
                 clause += Integer.parseInt(childrenCases.get(i).toString()) + " AND obj.id = ";
             else
                 clause += Integer.parseInt(childrenCases.get(i).toString());
         }
-        
+
         Transaction tx = session.beginTransaction();
         String hqlDelete = "DELETE FROM " + CasesSens.class.getSimpleName() + " obj WHERE " + clause;
         session.createQuery(hqlDelete).executeUpdate();

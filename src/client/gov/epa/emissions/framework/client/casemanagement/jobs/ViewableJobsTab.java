@@ -244,9 +244,8 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
         for (Iterator iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = (CaseJob) iter.next();
             String title = "View Case Job : " + job.getName() + " (" + job.getId() + ") (" + caseObj.getName() + ")";
-            EditCaseJobView jobEditor = new EditCaseJobWindow(title, desktopManager, parentConsole, session);
+            EditCaseJobView jobEditor = new EditCaseJobWindow(true, title, desktopManager, parentConsole, session);
             presenter.editJob(job, jobEditor);
-            jobEditor.viewOnly(title);
         }
     }
 
@@ -333,6 +332,10 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
                     (jobs.length > 1 ? "S" : "") + "?";
         int width = 50;
         int height = (validationMsg.length() / 50)+3;
+        
+        if (height > 30)
+            height = 30;
+        
         ScrollableComponent msgArea = createMsgScrollPane(finalMsg, width, height);
         
         return showDialog(msgArea, "Confirm Running Jobs");
