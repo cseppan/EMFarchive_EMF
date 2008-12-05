@@ -29,6 +29,8 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
 
     private Button ok;
     
+    private boolean viewOnly = false;
+    
     private ParameterFieldsPanel parameterFieldsPanel;
     
     public EditCaseParameterWindow(String title, DesktopManager desktopManager) {
@@ -116,7 +118,7 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
     }
 
     private void doClose() {
-        if (shouldDiscardChanges())
+        if (viewOnly || shouldDiscardChanges())
             super.disposeView();
     }
     
@@ -136,7 +138,7 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
     }
     
     public void viewOnly(String title){
-        //super.setTitle("View Parameter: " + title);
+        viewOnly = true;
         ok.setVisible(false);
         parameterFieldsPanel.viewOnly();
     }

@@ -80,7 +80,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     protected EmfConsole parentConsole;
 
     private int modelToRunId;
-
+    
     protected DesktopManager desktopManager;
 
     private Dimension preferredSize = new Dimension(450, 25);
@@ -455,20 +455,13 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     }
 
     public void viewOnly() {
+        inputName.setEditable(false);
+        envtVar.setEditable(false);
         program.setEditable(false);
-        program.setEnabled(false);
-        inputName.setEnabled(false);
-        sector.setEnabled(false);
-        envtVar.setEnabled(false);
-        dataset.setEnabled(false);
-        dataset.setPreferredSize(preferredSize);
-        version.setEnabled(false);
-        dsType.setEnabled(false);
-        qaStatus.setEnabled(false);
-        subDir.setEnabled(false);
-        jobs.setEnabled(false);
+        subDir.setEditable(false);
         required.setEnabled(false);
         localBox.setEnabled(false);
+        dataset.setPreferredSize(preferredSize);
         selectButton.setVisible(false);
     }
 

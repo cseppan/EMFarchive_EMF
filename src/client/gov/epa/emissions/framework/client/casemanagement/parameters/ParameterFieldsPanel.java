@@ -312,16 +312,13 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
     }
     
     public void viewOnly(){
-        parameterName.setEnabled(false);
-        program.setEnabled(false);
-        sector.setEnabled(false);
-        envtVar.setEnabled(false);
-        jobs.setEnabled(false);
-        varTypes.setEnabled(false);
-        notes.setEnabled(false);
-        envValue.setEnabled(false);
-        purpose.setEnabled(false);
-        order.setEnabled(false);
+        parameterName.setEditable(false);
+        program.setEditable(false);
+        envtVar.setEditable(false);
+        notes.setEditable(false);
+        envValue.setEditable(false);
+        purpose.setEditable(false);
+        order.setEditable(false);
         required.setEnabled(false);
         local.setEnabled(false);
     }

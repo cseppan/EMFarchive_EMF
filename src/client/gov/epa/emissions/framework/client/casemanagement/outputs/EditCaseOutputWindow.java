@@ -29,6 +29,8 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
 
     private Button save;
     
+    private boolean viewOnly = false;
+    
     private OutputFieldsPanel outputFieldsPanel; 
 
     public EditCaseOutputWindow(String title, DesktopManager desktopManager) {
@@ -109,7 +111,7 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
     }
 
     private void doClose() {
-        if (shouldDiscardChanges())
+        if (viewOnly || shouldDiscardChanges())
             super.disposeView();
     }
     
@@ -137,7 +139,7 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
     }
     
     public void viewOnly(String title){
-        //super.setTitle("View Case Output: " + title);
+        viewOnly = true;
         save.setVisible(false);
         outputFieldsPanel.viewOnly();
     }

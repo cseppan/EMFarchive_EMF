@@ -283,9 +283,6 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     
     public void viewOnly(){
         outputName.setEditable(false);
-        jobCombo.setEnabled(false);
-        dsTypeCombo.setEnabled(false);
-        datasetCombo.setEnabled(false);
-        message.setEnabled(false);
+        message.setEditable(false);
     }
 }

@@ -51,7 +51,7 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
     private TextField outputDir;
 
     private EmfSession session;
-
+   
     private DesktopManager desktopManager;
 
     public ViewableJobsTab(EmfConsole parentConsole, MessagePanel messagePanel,

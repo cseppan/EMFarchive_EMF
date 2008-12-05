@@ -30,6 +30,8 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
 
     private Button ok;
     
+    private boolean viewOnly = false;
+    
     private InputFieldsPanel inputFieldsPanel;
     
     private EmfConsole parentConsole; 
@@ -122,7 +124,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     }
 
     private void doClose() {
-        if (shouldDiscardChanges())
+        if (viewOnly || shouldDiscardChanges())
             super.disposeView();
     }
     
@@ -142,6 +144,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     }
     
     public void viewOnly(String title){
+        viewOnly = true;
         ok.setVisible(false);
         inputFieldsPanel.viewOnly();
     }
