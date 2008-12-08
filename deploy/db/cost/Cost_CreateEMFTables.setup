@@ -357,7 +357,8 @@ CREATE TABLE emf.strategy_result_types
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
-  optional boolean DEFAULT false
+  optional boolean DEFAULT false,
+  classname varchar(255) 
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.strategy_result_types OWNER TO emf;

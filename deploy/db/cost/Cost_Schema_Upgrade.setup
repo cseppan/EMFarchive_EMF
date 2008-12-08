@@ -650,3 +650,19 @@ ALTER TABLE emf.strategy_result_types
    ADD COLUMN optional boolean;
 ALTER TABLE emf.strategy_result_types
    ALTER COLUMN optional SET DEFAULT false;
+   
+
+-- 12/8/08 DCD added new classname column so reflection could be used
+-- when auto generating additional strategy summary results
+ALTER TABLE emf.strategy_result_types
+   ADD COLUMN classname character varying(255);
+   
+update emf.strategy_result_types 
+set classname = 'gov.epa.emissions.framework.services.cost.analysis.StrategyCountySummaryTask'
+where name = 'Strategy County Summary';
+update emf.strategy_result_types 
+set classname = 'gov.epa.emissions.framework.services.cost.analysis.StrategyCountyImpactSummaryTask'
+where name = 'Strategy Impact Summary';
+update emf.strategy_result_types 
+set classname = 'gov.epa.emissions.framework.services.cost.analysis.StrategyRSMPctRedSummaryTask'
+where name = 'RSM Percent Reduction Summary';
