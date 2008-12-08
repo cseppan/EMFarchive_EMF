@@ -26,7 +26,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
 
     public String[] columns() {
         return new String[] { "Name", "Last Modified", "Run Status", "Region", 
-                "Target Pollutant", "Total Cost", "Reduction", 
+                "Target Pollutant", "Total Cost", "Reduction (tons)", 
                 "Project", "Strategy Type", "Cost Year", 
                 "Inv. Year", "Creator" };
     }
