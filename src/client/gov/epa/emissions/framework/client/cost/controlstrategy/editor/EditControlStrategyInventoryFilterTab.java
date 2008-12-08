@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
@@ -189,7 +191,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
         for (int i = 0; i < selected.size(); i++) {
             EmfDataset dataset = editControlStrategyPresenter.getDataset(((ControlStrategyInputDataset)selected.get(i)).getInputDataset().getId());
-            showDatasetDataViewer(dataset, dataset.getInternalSources()[0].getTable(), editControlStrategyPresenter.getVersion(dataset.getId(), ((ControlStrategyInputDataset)selected.get(i)).getVersion()));
+            showDatasetDataViewer(dataset);
         }
     }
 
@@ -356,7 +358,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             messagePanel.setError("Please select an item to view.");
             return;
         }
-        showDatasetDataViewer(countyDataset, countyDataset.getInternalSources()[0].getTable(), (Version) version.getSelectedItem());
+        showDatasetDataViewer(countyDataset);
     }
     
     
@@ -501,15 +503,31 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         
     }
     
-    private void showDatasetDataViewer(EmfDataset dataset, String table, Version version) {
-        DataViewer view = new DataViewer(dataset, parentConsole, desktopManager);
+    private void showDatasetDataViewer(EmfDataset dataset) {
         try {
-            DataViewPresenter presenter = new DataViewPresenter(dataset, version, table, view, session);
-            presenter.display();
+            Version[] versions = editControlStrategyPresenter.getVersions(dataset);
+            //if just one version, then go directly to the dataviewer
+            if (versions.length == 1) {
+                DataViewer dataViewerView = new DataViewer(dataset, parentConsole, desktopManager);
+                DataViewPresenter dataViewPresenter = new DataViewPresenter(dataset, versions[0], getTableName(dataset), dataViewerView, session);
+                dataViewPresenter.display();
+            //else goto to dataset editior and display different version to display
+            } else {
+                DatasetPropertiesViewer datasetPropertiesViewerView = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
+                editControlStrategyPresenter.doDisplayPropertiesView(datasetPropertiesViewerView, dataset);
+                datasetPropertiesViewerView.setDefaultTab(1);
+            }
 //            presenter.doView(version, table, view);
         } catch (EmfException e) {
 //            displayError(e.getMessage());
         }
     }
-
+    
+    protected String getTableName(Dataset dataset) {
+        InternalSource[] internalSources = dataset.getInternalSources();
+        String tableName = "";
+        if (internalSources.length > 0)
+            tableName = internalSources[0].getTable();
+        return tableName;
+    }
 }

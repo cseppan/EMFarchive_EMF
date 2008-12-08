@@ -53,6 +53,8 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     
     private Version version; 
 
+    private JTabbedPane tabbedPane;
+
     public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties View", new Dimension(700, 500), desktopManager);
         this.parentConsole = parentConsole;
@@ -68,7 +70,8 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
-        panel.add(createTabbedPane(), BorderLayout.CENTER);
+        tabbedPane = createTabbedPane();
+        panel.add(tabbedPane, BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         super.getContentPane().add(panel);
@@ -258,6 +261,10 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     public void clearMessage() {
         messagePanel.clear();
+    }
+
+    public void setDefaultTab(int index) {
+        this.tabbedPane.setSelectedIndex(index);
     }
 
 }

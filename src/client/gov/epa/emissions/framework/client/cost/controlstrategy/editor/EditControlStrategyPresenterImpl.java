@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategiesManagerPresenter;
+import gov.epa.emissions.framework.client.meta.PropertiesView;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
@@ -271,4 +273,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         }
     }
 
+    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {
+        PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
+        presenter.doDisplay(propertiesView);
+    }
 }

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
@@ -60,4 +61,5 @@ public interface EditControlStrategyPresenter {
     
     void resetButtons(boolean enable); 
     
+    void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException;
 }

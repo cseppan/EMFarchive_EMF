@@ -1,11 +1,12 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
-import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -63,7 +64,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private JPanel tablePanel; 
 
-    private Button analysisButton, view, viewDataButton, exportButton, createButton, editButton, customizeButton;
+    private Button analysisButton, /*view, */viewDataButton, exportButton, createButton, editButton, customizeButton, summarizeButton;
     
     private EmfSession session;
 
@@ -364,9 +365,11 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private JPanel buttonPanel() {
         exportButton = new ExportButton(exportAction());
         analysisButton = new Button("Analyze", analysisAction());
-        view = new ViewButton("View", viewAction());
+        analysisButton.setVisible(false);
+//        view = new ViewButton("View", viewAction());
         viewDataButton = new Button("View Data", viewDataAction());
         editButton = new Button("Edit", editAction());
+        summarizeButton = new Button("Summarize", summarizeAction());
         createButton = new Button("Create", createOutputAction());
         createButton.setEnabled(false);
         customizeButton = new Button("Customize", customizeAction());
@@ -394,9 +397,10 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel buttonPanel = new JPanel();
         mainPanel.add(radioPanel, BorderLayout.NORTH);
-        buttonPanel.add(view);
+//        buttonPanel.add(view);
         buttonPanel.add(viewDataButton);
         buttonPanel.add(editButton);
+        buttonPanel.add(summarizeButton);
         buttonPanel.add(exportButton);
         buttonPanel.add(analysisButton);
         buttonPanel.add(createButton);
@@ -467,7 +471,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private void toggleRadioButtons() {
         if (buttonGroup.getSelection().equals(invButton.getModel()) ||buttonGroup.getSelection().equals(detailButton.getModel()) ){
             createButton.setEnabled(false);
-            view.setEnabled(true);
+//            view.setEnabled(true);
+            viewDataButton.setEnabled(true);
+            summarizeButton.setEnabled(true);
             analysisButton.setEnabled(false);
             exportButton.setEnabled(true);
             editButton.setEnabled(true);
@@ -500,12 +506,16 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             else
                 createButton.setEnabled(false);
             if (hasControlledInventories) {
-                view.setEnabled(true);
+//                view.setEnabled(true);
+                viewDataButton.setEnabled(true);
+                summarizeButton.setEnabled(true);
                 analysisButton.setEnabled(true);
                 exportButton.setEnabled(true);
                 editButton.setEnabled(true);
             } else {
-                view.setEnabled(false);
+//                view.setEnabled(false);
+                viewDataButton.setEnabled(false);
+                summarizeButton.setEnabled(false);
                 analysisButton.setEnabled(false);
                 exportButton.setEnabled(false);
                 editButton.setEnabled(false);
@@ -531,20 +541,29 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         };
     }
 
-    private Action viewAction() {
-        return new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                messagePanel.clear();
-                viewDataSets();
-            }
-        };
-    }
+//    private Action viewAction() {
+//        return new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) {
+//                messagePanel.clear();
+//                viewDataSets();
+//            }
+//        };
+//    }
 
     private Action viewDataAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 messagePanel.clear();
                 viewDataSetsData();
+            }
+        };
+    }
+
+    private Action summarizeAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
+                summarize();
             }
         };
     }
@@ -599,40 +618,40 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         super.validate();
     }
 
-    private void viewDataSets() {
-        ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
-        if (controlStrategyResults.length == 0) {
-            messagePanel.setError("Please select at least one item.");
-            return;
-        }
-         
-        try{ 
-            for (int i = 0; i < controlStrategyResults.length; i++) {
-                DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
-     
-//                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
-                    if (buttonGroup.getSelection().equals(invButton.getModel())) {
-                        if (controlStrategyResults[i].getInputDataset() != null) 
-                            presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
-                    } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
-                        if (controlStrategyResults[i].getDetailedResultDataset() != null) 
-                            presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
-    
-                    } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
-                        if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
-                            presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
-                        } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventory) && controlStrategyResults[i].getDetailedResultDataset() != null) {
-                            presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
-                        }
-                    }
-//                } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
-//                    presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
-//                }
-            }
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
-    }
+//    private void viewDataSets() {
+//        ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
+//        if (controlStrategyResults.length == 0) {
+//            messagePanel.setError("Please select at least one item.");
+//            return;
+//        }
+//         
+//        try{ 
+//            for (int i = 0; i < controlStrategyResults.length; i++) {
+//                DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
+//     
+////                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+//                    if (buttonGroup.getSelection().equals(invButton.getModel())) {
+//                        if (controlStrategyResults[i].getInputDataset() != null) 
+//                            presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
+//                    } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+//                        if (controlStrategyResults[i].getDetailedResultDataset() != null) 
+//                            presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+//    
+//                    } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
+//                        if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
+//                            presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset());
+//                        } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventory) && controlStrategyResults[i].getDetailedResultDataset() != null) {
+//                            presenter.doDisplayPropertiesView(view, (EmfDataset)controlStrategyResults[i].getDetailedResultDataset());
+//                        }
+//                    }
+////                } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
+////                    presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
+////                }
+//            }
+//        } catch (EmfException e) {
+//            messagePanel.setError(e.getMessage());
+//        }
+//    }
     
     private void viewDataSetsData() {
         ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
@@ -641,49 +660,92 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             return;
         }
          
+        for (int i = 0; i < controlStrategyResults.length; i++) {
+            EmfDataset dataset = null;
+            if (buttonGroup.getSelection().equals(invButton.getModel())) {
+                if (controlStrategyResults[i].getInputDataset() != null) {
+                    dataset = controlStrategyResults[i].getInputDataset();
+                }
+            } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+                if (controlStrategyResults[i].getDetailedResultDataset() != null) 
+                    dataset = (EmfDataset)controlStrategyResults[i].getDetailedResultDataset();
+            } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
+                if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
+                    dataset = (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset();
+                } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventory) && controlStrategyResults[i].getDetailedResultDataset() != null) {
+                    dataset = (EmfDataset)controlStrategyResults[i].getDetailedResultDataset();
+                }
+            }
+            if (dataset != null)
+                showDatasetDataViewer(dataset);
+        }
+    }
+    
+    private void summarize() {
+        ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
+        if (controlStrategyResults.length == 0) {
+            messagePanel.setError("Please select at least one item.");
+            return;
+        }
+
         try{ 
             for (int i = 0; i < controlStrategyResults.length; i++) {
-                    EmfDataset dataset = null;
-//                if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
-                    if (buttonGroup.getSelection().equals(invButton.getModel())) {
-                        if (controlStrategyResults[i].getInputDataset() != null) {
-                            dataset = controlStrategyResults[i].getInputDataset();
-                            showDatasetDataViewer(dataset, dataset.getInternalSources()[0].getTable(), presenter.getVersion(dataset.getId(), dataset.getDefaultVersion()));
-                        }
-                    } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
-                        if (controlStrategyResults[i].getDetailedResultDataset() != null) 
-                            dataset = (EmfDataset)controlStrategyResults[i].getDetailedResultDataset();
-                            showDatasetDataViewer(dataset, dataset.getInternalSources()[0].getTable(), presenter.getVersion(dataset.getId(), dataset.getDefaultVersion()));
-    
-                    } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
-                        if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
-                            dataset = (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset();
-                            showDatasetDataViewer(dataset, dataset.getInternalSources()[0].getTable(), presenter.getVersion(dataset.getId(), dataset.getDefaultVersion()));
-                        } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventory) && controlStrategyResults[i].getDetailedResultDataset() != null) {
-                            dataset = (EmfDataset)controlStrategyResults[i].getDetailedResultDataset();
-                            showDatasetDataViewer(dataset, dataset.getInternalSources()[0].getTable(), presenter.getVersion(dataset.getId(), dataset.getDefaultVersion()));
-                        }
+                EmfDataset dataset = null;
+                DatasetPropertiesEditor view = new DatasetPropertiesEditor(session, parentConsole, desktopManager);
+
+                if (buttonGroup.getSelection().equals(invButton.getModel())) {
+                    if (controlStrategyResults[i].getInputDataset() != null) {
+                        dataset = controlStrategyResults[i].getInputDataset();
                     }
-//                } else {//if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.strategySummary)) {
-//                    presenter.doDisplayPropertiesView(view, controlStrategyResults[i].getInputDataset());
-//                }
+                } else if (buttonGroup.getSelection().equals(detailButton.getModel())) {
+                    if (controlStrategyResults[i].getDetailedResultDataset() != null) {
+                        dataset = (EmfDataset)controlStrategyResults[i].getDetailedResultDataset();
+                    }
+                } else if (buttonGroup.getSelection().equals(contInvButton.getModel())) {
+                    if (controlStrategyResults[i].getControlledInventoryDataset() != null) {
+                        dataset = (EmfDataset)controlStrategyResults[i].getControlledInventoryDataset();
+                    } else if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.controlledInventory) && controlStrategyResults[i].getDetailedResultDataset() != null) {
+                        dataset = (EmfDataset)controlStrategyResults[i].getDetailedResultDataset();
+                    }
+                }
+                if (dataset != null) {
+                    presenter.doDisplayPropertiesEditor(view, dataset);
+                    view.setDefaultTab(7);
+                }
             }
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
     }
     
-    private void showDatasetDataViewer(EmfDataset dataset, String table, Version version) {
-        DataViewer view = new DataViewer(dataset, parentConsole, desktopManager);
+    private void showDatasetDataViewer(EmfDataset dataset) {
         try {
-            DataViewPresenter presenter = new DataViewPresenter(dataset, version, table, view, session);
-            presenter.display();
+            Version[] versions = presenter.getVersions(dataset.getId());
+            //if just one version, then go directly to the dataviewer
+            if (versions.length == 1) {
+                DataViewer dataViewerView = new DataViewer(dataset, parentConsole, desktopManager);
+                DataViewPresenter dataViewPresenter = new DataViewPresenter(dataset, versions[0], getTableName(dataset), dataViewerView, session);
+                dataViewPresenter.display();
+            //else goto to dataset editior and display different version to display
+            } else {
+                DatasetPropertiesViewer datasetPropertiesViewerView = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
+                presenter.doDisplayPropertiesView(datasetPropertiesViewerView, dataset);
+                datasetPropertiesViewerView.setDefaultTab(1);
+            }
 //            presenter.doView(version, table, view);
         } catch (EmfException e) {
 //            displayError(e.getMessage());
         }
     }
     
+    protected String getTableName(Dataset dataset) {
+        InternalSource[] internalSources = dataset.getInternalSources();
+        String tableName = "";
+        if (internalSources.length > 0)
+            tableName = internalSources[0].getTable();
+        return tableName;
+    }
+
     private ControlStrategyResult[] getSelectedDatasets() {
         return table.selected().toArray(new ControlStrategyResult[0]);
     }

@@ -14,4 +14,5 @@ public interface PropertiesView extends ManagedView {
 
     void clearMessage();
 
+    void setDefaultTab(int index);
 }
