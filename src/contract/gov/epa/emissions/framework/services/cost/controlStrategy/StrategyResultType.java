@@ -10,6 +10,8 @@ public class StrategyResultType implements Serializable {
     
     private Boolean optional;
     
+    private String className;
+
     public static final String strategyMeasureSummary = "Strategy Measure Summary";
     
     public static final String strategyCountySummary = "Strategy County Summary";
@@ -60,5 +62,13 @@ public class StrategyResultType implements Serializable {
 
     public String toString() {
         return this.name;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getClassName() {
+        return className;
     }
 }
