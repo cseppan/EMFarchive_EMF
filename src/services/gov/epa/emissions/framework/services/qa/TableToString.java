@@ -66,6 +66,8 @@ public class TableToString {
                     }
                     row += (i > startingColumn ? delimiter : "") + (!rs.wasNull() ? value : "\"\"");
                 }
+                //the analysis engine only supports reports with more than one column, so add a dummy column value for now.
+                if (columnCount == 1) row += delimiter + "\"\"";
                 output.append(row + lineFeeder);
             }
         } catch (Exception e) {
@@ -82,7 +84,11 @@ public class TableToString {
             colTypes += md.getColumnTypeName(i) + "(" + md.getPrecision(i) + ")" + (i < columnCount ? "|" : "");
             colNames += (i > startingColumn ? delimiter : "") + md.getColumnName(i).toLowerCase();
         }
-        
+        //the analysis engine only supports reports with more than one column, so add a dummy column for now.
+        if (columnCount == 1) {
+            colTypes += "|varchar(1)";
+            colNames += delimiter + "extra";
+        }
         output.append(colTypes + lineFeeder + colNames + lineFeeder);
     }
 }
