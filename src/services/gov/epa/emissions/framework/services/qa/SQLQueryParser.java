@@ -705,9 +705,9 @@ public class SQLQueryParser {
         String prefix = token.substring(0, index);
         String suffix = token.substring(index + endQueryTag.length());
 
-        //System.out.println("suffixSplit prefix: " + prefix); 
-        //System.out.println("suffixSplit suffix: " + suffix);
-        //System.out.println("Index: " + index);
+//        System.out.println("suffixSplit prefix: " + prefix); 
+//        System.out.println("suffixSplit suffix: " + suffix);
+//        System.out.println("Index: " + index);
         
         if (prefix.trim().equals("")) {
             throw new EmfException("Appropriate comma-separated arguments must be specified within the brackets");
@@ -716,12 +716,35 @@ public class SQLQueryParser {
         // Determine whether the alias value exists or not. If it does, isolate it.
         // If it does not, throw an exception.
         
-        if (Character.isSpaceChar(suffix.charAt(0)) && Character.isLetter(suffix.charAt(1))
-            && suffix.charAt(1) != ')' && (!Character.isLetterOrDigit(suffix.charAt(2))))
+        if (suffix.length() >= 1 && suffix.charAt(0) == ')') {
+            aliasValue = null;
+        } else if (suffix.length() >= 2 && suffix.charAt(1) == ')') {
+            aliasValue = null;
+        } else if 
+        (
+            suffix.length() == 2 && 
+            (
+                (
+                    Character.isSpaceChar(suffix.charAt(0)) && Character.isLetter(suffix.charAt(1))
+                    && suffix.charAt(1) != ')' 
+                )
+            )
+        )
         {
             aliasValue = suffix.charAt(1) + "";
-        } else if ((suffix.charAt(0) == ')') || (suffix.charAt(1) == ')')) {
-            aliasValue = null;
+        } else if 
+        (
+            suffix.length() >= 3 && 
+            (
+                (
+                    Character.isSpaceChar(suffix.charAt(0)) && Character.isLetter(suffix.charAt(1))
+                    && suffix.charAt(1) != ')' 
+                    && (!Character.isLetterOrDigit(suffix.charAt(2)))
+                )
+            )
+        )
+        {
+            aliasValue = suffix.charAt(1) + "";
         } else {
             throw new EmfException("A one-character alias value is expected after the '" + endQueryTag + "'");
         }
