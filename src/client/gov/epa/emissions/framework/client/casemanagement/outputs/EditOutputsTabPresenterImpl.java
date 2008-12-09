@@ -93,7 +93,6 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
     public void addNewOutput(CaseOutput output) throws EmfException {
         output.setCaseId(caseObj.getId());
         view.addOutput(service().addCaseOutput(session.user(), output));
-        view.refresh();
     }
     
     public void doAddOutputFields(JComponent container, OutputFieldsPanelView outputFields, CaseOutput newOutput) throws EmfException {

@@ -12,6 +12,8 @@ public interface EditOutputsTabView {
     void observe(EditOutputsTabPresenterImpl editOutputsTabPresenterImpl);
 
     void clearMessage();
+    
+    void setMessage(String msg);
 
     void addOutput(CaseOutput addCaseOutput);
     

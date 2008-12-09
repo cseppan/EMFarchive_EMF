@@ -80,18 +80,16 @@ public class EditCaseJobWindow extends DisposableInteralFrame implements EditCas
 
         ok = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if (hasChanges()) {
-                    try {
+                try {
+                    if (hasChanges()) {
                         validateFields();
                         presenter.saveJob();
-                        disposeView();
-                    } catch (EmfException e1) {
-                        messagePanel.setError(e1.getMessage());
                     }
-                } else {
+                    
                     disposeView();
+                } catch (EmfException e1) {
+                    messagePanel.setError(e1.getMessage());
                 }
-
             }
         });
 

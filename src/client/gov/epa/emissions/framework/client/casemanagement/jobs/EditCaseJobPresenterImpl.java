@@ -17,12 +17,15 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
     private CaseJob job;
     
     private EditJobsTabPresenter parentPresenter;
+    
+    private EditJobsTabView parentView;
 
     public EditCaseJobPresenterImpl(EditCaseJobView view, 
             EditJobsTabView parentView, EditJobsTabPresenter parentPresenter, EmfSession session) {
         this.view = view;
         this.session = session;
         this.parentPresenter = parentPresenter;
+        this.parentView = parentView;
     }
     
     public EditCaseJobPresenterImpl(EditCaseJobView view, 
@@ -47,8 +50,8 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
     }
     
     public void saveJob() throws EmfException {
+        parentView.setMessage("Saved \"" + job.getName() + "\". Refresh to see the changes in the table.");
         parentPresenter.addNewSectorToSummary(jobFieldsPresenter.doSave());
-        //parentView.refresh();
     }
     
     

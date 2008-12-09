@@ -28,19 +28,19 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
     private MessagePanel messagePanel;
 
     private Button ok;
-    
+
     private boolean viewOnly = false;
-    
+
     private ParameterFieldsPanel parameterFieldsPanel;
-    
+
     public EditCaseParameterWindow(String title, DesktopManager desktopManager) {
         super(title, new Dimension(450, 550), desktopManager);
-        //super.setLabel(super.getTitle() + ": " + title);
+        // super.setLabel(super.getTitle() + ": " + title);
     }
 
     public void display(CaseParameter parameter) throws EmfException {
         layout = createLayout();
-        
+
         super.getContentPane().add(layout);
         super.display();
         super.resetChanges();
@@ -58,7 +58,7 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
 
         return panel;
     }
-    
+
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
 
@@ -82,24 +82,27 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
 
     private void doSave() {
         clearMessage();
+
         try {
-            doValidateFields();
-            //doCheckDuplicate();
-            presenter.doSave();
+            if (hasChanges()) {
+                doValidateFields();
+                presenter.doSave();
+            }
+            
             disposeView();
         } catch (EmfException e) {
             e.printStackTrace();
             messagePanel.setError(e.getMessage());
         }
     }
-    
+
     private void doValidateFields() throws EmfException {
         parameterFieldsPanel.validateFields();
     }
-    
-//    private void doCheckDuplicate() throws EmfException {
-//        presenter.doCheckDuplicate(input);
-//    }
+
+    // private void doCheckDuplicate() throws EmfException {
+    // presenter.doCheckDuplicate(input);
+    // }
 
     private void clearMessage() {
         messagePanel.clear();
@@ -121,7 +124,7 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
         if (viewOnly || shouldDiscardChanges())
             super.disposeView();
     }
-    
+
     public void loadInput() throws EmfException {
         // NOTE Auto-generated method stub
         throw new EmfException("");
@@ -129,18 +132,18 @@ public class EditCaseParameterWindow extends DisposableInteralFrame implements E
 
     public void populateFields() {
         // NOTE Auto-generated method stub
-        
+
     }
-    
+
     public void signalChanges() {
         clearMessage();
         super.signalChanges();
     }
-    
-    public void viewOnly(String title){
+
+    public void viewOnly(String title) {
         viewOnly = true;
         ok.setVisible(false);
         parameterFieldsPanel.viewOnly();
     }
-    
+
 }

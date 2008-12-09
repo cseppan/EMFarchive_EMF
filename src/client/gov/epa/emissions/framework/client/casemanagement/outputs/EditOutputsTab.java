@@ -381,11 +381,15 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
     public void clearMessage() {
         messagePanel.clear();
     }
+    
+    public void setMessage(String msg) {
+        messagePanel.setMessage(msg);
+    }
 
     public void addOutput(CaseOutput addCaseOutput) {
         tableData.add(addCaseOutput);
-        table.refresh(tableData);
-        panelRefresh();
+        setMessage("Added \"" + addCaseOutput.getName() 
+                + "\".  Click Refresh to see it in the table.");
     }
     
     private void panelRefresh() {

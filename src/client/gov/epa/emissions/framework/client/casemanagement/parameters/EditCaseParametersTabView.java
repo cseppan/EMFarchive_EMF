@@ -21,6 +21,6 @@ public interface EditCaseParametersTabView {
     
     void addSectorBacktoCase(Sector updatedSector);
     
-//    void notifychanges();
+    void setMessage(String msg);
 
 }

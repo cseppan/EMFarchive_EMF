@@ -557,10 +557,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     public void addInput(CaseInput input) {
         tableData.add(input);
-        setMessage("New input '" + input.getName() 
-                + "' has been added.  Click Refresh to see it in the table.");
-//        table.refresh(tableData);
-//        panelRefresh();
+        setMessage("Added \"" + input.getName() 
+                + "\".  Click Refresh to see it in the table.");
     }
 
     private List<CaseInput> getSelectedInputs() {

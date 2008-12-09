@@ -543,16 +543,14 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         messagePanel.clear();
     }
 
-    private void setMessage(String msg) {
+    public void setMessage(String msg) {
         messagePanel.setMessage(msg);
     }
 
     public void addJob(CaseJob job) {
         tableData.add(job);
-        setMessage("New job '" + job.getName() 
-                + "' has been added.  Click Refresh to see it in the table.");
-//        table.refresh(tableData);
-//        panelRefresh();
+        setMessage("Added \"" + job.getName() 
+                + "\".  Click Refresh to see it in the table.");
     }
 
     private void panelRefresh() {

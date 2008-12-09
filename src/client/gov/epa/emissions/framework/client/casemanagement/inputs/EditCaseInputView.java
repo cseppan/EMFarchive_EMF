@@ -13,4 +13,6 @@ public interface EditCaseInputView {
     void populateFields();
     
     void viewOnly(String title );
+    
+    boolean hasChanges();
 }

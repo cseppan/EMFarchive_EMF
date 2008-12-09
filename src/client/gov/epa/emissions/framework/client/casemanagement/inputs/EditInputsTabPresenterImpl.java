@@ -69,7 +69,6 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
         if (input.getCaseID() == caseObj.getId()) {
             view.addInput(loaded);
-            //refreshView();
             addSectorBacktoCase(loaded.getSector());
         }
     }

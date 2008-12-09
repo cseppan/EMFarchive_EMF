@@ -23,6 +23,8 @@ public interface EditInputsTabView {
 
     void addSectorBacktoCase(Sector updatedSector);
     
+    void setMessage(String message);
+    
 //    void notifychanges();
 
 }

@@ -29,15 +29,15 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     private MessagePanel messagePanel;
 
     private Button ok;
-    
+
     private boolean viewOnly = false;
-    
+
     private InputFieldsPanel inputFieldsPanel;
-    
-    private EmfConsole parentConsole; 
-    
+
+    private EmfConsole parentConsole;
+
     private DesktopManager desktopManager;
-    
+
     public EditCaseInputWindow(String title, DesktopManager desktopManager, EmfConsole parentConsole) {
         super(title, new Dimension(610, 540), desktopManager);
         this.parentConsole = parentConsole;
@@ -46,7 +46,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
 
     public void display(CaseInput input) throws EmfException {
         layout = createLayout();
-        
+
         super.getContentPane().add(layout);
         super.display();
         super.resetChanges();
@@ -58,13 +58,13 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this, parentConsole, desktopManager );
+        this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this, parentConsole, desktopManager);
         presenter.doAddInputFields(panel, inputFieldsPanel);
         panel.add(buttonsPanel());
 
         return panel;
     }
-    
+
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
 
@@ -89,23 +89,25 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     private void doSave() {
         clearMessage();
         try {
-            doValidateFields();
-            //doCheckDuplicate();
-            presenter.doSave();
+            if (hasChanges()) {
+                doValidateFields();
+                presenter.doSave();
+            }
+
             disposeView();
         } catch (EmfException e) {
             e.printStackTrace();
             messagePanel.setError(e.getMessage());
         }
     }
-    
+
     private void doValidateFields() throws EmfException {
         inputFieldsPanel.validateFields();
     }
-    
-//    private void doCheckDuplicate() throws EmfException {
-//        presenter.doCheckDuplicate(input);
-//    }
+
+    // private void doCheckDuplicate() throws EmfException {
+    // presenter.doCheckDuplicate(input);
+    // }
 
     private void clearMessage() {
         messagePanel.clear();
@@ -127,7 +129,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
         if (viewOnly || shouldDiscardChanges())
             super.disposeView();
     }
-    
+
     public void loadInput() throws EmfException {
         // NOTE Auto-generated method stub
         throw new EmfException("");
@@ -135,15 +137,15 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
 
     public void populateFields() {
         // NOTE Auto-generated method stub
-        
+
     }
-    
+
     public void signalChanges() {
         clearMessage();
         super.signalChanges();
     }
-    
-    public void viewOnly(String title){
+
+    public void viewOnly(String title) {
         viewOnly = true;
         ok.setVisible(false);
         inputFieldsPanel.viewOnly();

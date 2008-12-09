@@ -51,8 +51,8 @@ public class EditCaseParameterPresenterImpl implements EditCaseParameterPresente
     
     public void doSave() throws EmfException {
         parameterFieldsPresenter.doSave();
+        parentView.setMessage("Saved \"" + parameter.getName() + "\". Refresh to see the changes in the table.");
         parentView.addSectorBacktoCase(parameterFieldsPresenter.getUpdatedSector());
-        //parentView.refresh();
     }
 
 }

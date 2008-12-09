@@ -17,6 +17,8 @@ public interface EditJobsTabView {
     void refresh();
     
     int numberOfRecord();
+    
+    void setMessage(String msg);
 
     void clearMessage();
     

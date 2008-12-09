@@ -39,7 +39,6 @@ public class EditCaseOutputPresenterImpl implements EditOutputPresenter {
         this.output = output;
         view.observe(this);
         view.display(output);
-//        view.populateFields();
     }
 
 
@@ -52,7 +51,7 @@ public class EditCaseOutputPresenterImpl implements EditOutputPresenter {
     
     public void doSave() throws EmfException {
         outputFieldsPresenter.doSave();
-        parentView.refresh();
+        parentView.setMessage("Saved \"" + output.getName() + "\". Refresh to see the changes in the table.");
     }
 
 }

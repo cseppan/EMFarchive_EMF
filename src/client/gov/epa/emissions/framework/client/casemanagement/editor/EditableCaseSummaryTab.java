@@ -657,7 +657,12 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         if (!found) {
             sectorsWidget.addSector(sector);
-            messagePanel.setMessage("The sector " + sector.getName() + " has been added to the summary tab.");
+            String msg = messagePanel.getMessage();
+            
+            if (msg == null || (msg != null && msg.toUpperCase().contains("SAVED")))
+                msg = "";
+                    
+            messagePanel.setMessage(msg + " Sector \"" + sector.getName() + "\" added to the summary tab.");
         }
     }
 

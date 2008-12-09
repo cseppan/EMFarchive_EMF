@@ -28,16 +28,15 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
     private MessagePanel messagePanel;
 
     private Button save;
-    
+
     private boolean viewOnly = false;
-    
-    private OutputFieldsPanel outputFieldsPanel; 
+
+    private OutputFieldsPanel outputFieldsPanel;
 
     public EditCaseOutputWindow(String title, DesktopManager desktopManager) {
         super(title, new Dimension(610, 420), desktopManager);
-        //super.setLabel(super.getTitle() + ": " + title);
+        // super.setLabel(super.getTitle() + ": " + title);
     }
-    
 
     public void display(CaseOutput output) throws EmfException {
         layout = createLayout();
@@ -52,13 +51,13 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.outputFieldsPanel=new OutputFieldsPanel(messagePanel, this);
+        this.outputFieldsPanel = new OutputFieldsPanel(messagePanel, this);
         presenter.addOutputFields(panel, outputFieldsPanel);
         panel.add(buttonsPanel());
 
         return panel;
     }
-    
+
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
 
@@ -82,16 +81,17 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
 
     private void doSave() {
         clearMessage();
+        
         try {
-            doValidateFields();
-            //doCheckDuplicate();
-            presenter.doSave();
-//            disposeView();
+            if (hasChanges()) {
+                doValidateFields();
+                presenter.doSave();
+            }
+            
+            disposeView();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
-            return;
         }
-        disposeView();
     }
 
     private void clearMessage() {
@@ -114,12 +114,12 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
         if (viewOnly || shouldDiscardChanges())
             super.disposeView();
     }
-    
+
     public void populateFields() {
         // NOTE Auto-generated method stub
-        
+
     }
-    
+
     public void signalChanges() {
         clearMessage();
         super.signalChanges();
@@ -127,18 +127,19 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
 
     public void loadOutput() {
         // NOTE Auto-generated method stub
-        
+
     }
 
     public CaseOutput setFields() {
         // NOTE Auto-generated method stub
         return null;
     }
+
     private void doValidateFields() throws EmfException {
         outputFieldsPanel.validateFields();
     }
-    
-    public void viewOnly(String title){
+
+    public void viewOnly(String title) {
         viewOnly = true;
         save.setVisible(false);
         outputFieldsPanel.viewOnly();
