@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
             if (!user.getEncryptedPassword().equals(password))
                 throw new AuthenticationException("Incorrect Password");
         } catch (Exception e) {
-            LOG.error("Unable to authenticate user: " + username);
+            LOG.error("Unable to authenticate user: " + username + ". " + e.getMessage());
             throw new EmfException(e.getMessage());
         }
     }
