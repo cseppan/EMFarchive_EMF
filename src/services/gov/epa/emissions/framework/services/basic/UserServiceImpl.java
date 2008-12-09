@@ -67,17 +67,9 @@ public class UserServiceImpl implements UserService {
             if (!user.getEncryptedPassword().equals(password))
                 throw new AuthenticationException("Incorrect Password");
         } catch (Exception e) {
-            LOG.error("Unable to authenticate user: " + username, e);
+            LOG.error("Unable to authenticate user: " + username);
             throw new EmfException(e.getMessage());
         }
-//        catch (RuntimeException e) {
-//            LOG.error("Unable to authenticate due to data access failure for user " + username, e);
-//            throw new EmfException("Unable to authenticate due to runtime exception");
-//        }
-//        catch (Exception e) {
-//            LOG.error("Unable to authenticate due to data access failure for user " + username, e);
-//            throw new EmfException("Unable to authenticate due to exception");
-//        }
     }
 
     public synchronized User getUser(String username) throws EmfException {
