@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureEquation;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.EfficiencyRecordValidation;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
@@ -104,7 +105,9 @@ public class CMEfficiencyRecordReader {
             if (this.colCount == 15) {
                 controlEfficiency(efficiencyRecord, tokens[6], sb);
                 costYear(efficiencyRecord, tokens[7], sb);
-                costPerTon(efficiencyRecord, tokens[8], tokens[7], sb);
+                costPerTon(efficiencyRecord, tokens[0], controlMeasures, 
+                        tokens[8], tokens[7], 
+                        sb);
 //                costYear(efficiencyRecord, tokens[7], sb);
 //                costPerTon(efficiencyRecord, tokens[8], sb);
                 refYrCostPerTon(efficiencyRecord, tokens[7], tokens[8]);
@@ -120,7 +123,9 @@ public class CMEfficiencyRecordReader {
                 maxEmis(efficiencyRecord, tokens[7], sb);
                 controlEfficiency(efficiencyRecord, tokens[8], sb);
                 costYear(efficiencyRecord, tokens[9], sb);
-                costPerTon(efficiencyRecord, tokens[10], tokens[9], sb);
+                costPerTon(efficiencyRecord, tokens[0], controlMeasures,
+                        tokens[10], tokens[9], 
+                        sb);
                 refYrCostPerTon(efficiencyRecord, tokens[9], tokens[10]);
                 ruleEffectiveness(efficiencyRecord, tokens[11], sb);
                 rulePenetration(efficiencyRecord, tokens[12], sb);
@@ -135,7 +140,9 @@ public class CMEfficiencyRecordReader {
                 maxEmis(efficiencyRecord, tokens[7], sb);
                 controlEfficiency(efficiencyRecord, tokens[8], sb);
                 costYear(efficiencyRecord, tokens[9], sb);
-                costPerTon(efficiencyRecord, tokens[10], tokens[9], sb);
+                costPerTon(efficiencyRecord, tokens[0], controlMeasures,
+                        tokens[10], tokens[9], 
+                        sb);
                 refYrCostPerTon(efficiencyRecord, tokens[9], tokens[10]);
                 ruleEffectiveness(efficiencyRecord, tokens[11], sb);
                 rulePenetration(efficiencyRecord, tokens[12], sb);
@@ -252,9 +259,25 @@ public class CMEfficiencyRecordReader {
 
     }
 
-    private void costPerTon(EfficiencyRecord efficiencyRecord, String costValue, String year, StringBuffer sb) {
+    private void costPerTon(EfficiencyRecord efficiencyRecord, String abbreviation, 
+            Map controlMeasures, String costValue, 
+            String year, StringBuffer sb) {
         try {
-            efficiencyRecord.setCostPerTon(validation.costPerTon(costValue, year));
+            Double costPerTon = validation.costPerTon(costValue, year);
+            //check if has equation, if so, make sure there is a default cpt
+            if (costPerTon == null) {
+                ControlMeasure measure = (ControlMeasure) controlMeasures.get(abbreviation);
+                ControlMeasureEquation[] equations = measure.getEquations();
+                if (equations.length > 0) {
+                    for (ControlMeasureEquation equation : equations) {
+                        if (equation.getPollutant().equals(efficiencyRecord.getPollutant())) {
+                            throw new EmfException("The efficiency record for, " + efficiencyRecord.getPollutant().getName() + ", must have a cost per ton when a equation uses the same pollutant.");
+                        }
+                    }
+                }
+            }
+                
+            efficiencyRecord.setCostPerTon(costPerTon);
         } catch (EmfException e) {
             sb.append(format(e.getMessage()));
         }
