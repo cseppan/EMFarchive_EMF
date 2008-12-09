@@ -365,7 +365,7 @@ BEGIN
 			eq.value5, eq.value6, 
 			eq.value7, eq.value8, 
 			eq.value9, eq.value10, 
-			' || case when not is_point_table then 'null' else 'inv.stkflow' end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity' end end || ', 
+			' || case when not is_point_table then 'null' else 'inv.stkflow * 60.0' end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity' end end || ', 
 			' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_numerator' end end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_denominator' end end 
 			else
 			'null, 
@@ -492,7 +492,7 @@ BEGIN
 			TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ', ''FM990.099'')::double precision as rule_pen,
 			TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ', ''FM990.099'')::double precision as rule_eff,
 			TO_CHAR(' || percent_reduction_sql || ', ''FM990.099'')::double precision as percent_reduction,
-			TO_CHAR(' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM990.0099'')::double precision as final_emissions,
+			TO_CHAR(' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM999999999999999990.0099'')::double precision as final_emissions,
 			TO_CHAR(inv.ceff, ''FM990.099'')::double precision,
 			TO_CHAR(' || case when has_rpen_column then 'coalesce(inv.rpen, 100.0::double precision)' else '100.0::double precision' end || ', ''FM990.099'')::double precision,
 			TO_CHAR(coalesce(inv.reff, 100.0::double precision), ''FM990.099'')::double precision,
@@ -501,15 +501,15 @@ BEGIN
 					'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' 
 				else 
 					'inv.ann_emis' 
-			end || ' - ' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM990.0099'')::double precision as emis_reduction,
---			TO_CHAR(' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ''FM990.0099'')::double precision as emis_reduction,
+			end || ' - ' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM999999999999999990.0099'')::double precision as emis_reduction,
+--			TO_CHAR(' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ''FM999999999999999990.0099'')::double precision as emis_reduction,
 			TO_CHAR(' || case 
 				when dataset_month != 0 then 
 					'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' 
 				else 
 					'inv.ann_emis' 
-			end || ', ''FM990.0099'')::double precision as inv_emissions,
---			TO_CHAR(' || annual_emis_sql || ', ''FM990.0099'')::double precision as inv_emissions,
+			end || ', ''FM999999999999999990.0099'')::double precision as inv_emissions,
+--			TO_CHAR(' || annual_emis_sql || ', ''FM999999999999999990.0099'')::double precision as inv_emissions,
 			' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 			' || case when not has_merged_columns then 'inv.record_id::integer' else 'inv.original_record_id::integer' end || ' as source_id,
@@ -733,7 +733,7 @@ BEGIN
 		TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ', ''FM990.099'')::double precision as rule_pen,
 		TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ', ''FM990.099'')::double precision as rule_eff,
 		TO_CHAR(' || percent_reduction_sql || ', ''FM990.099'')::double precision as percent_reduction,
-		TO_CHAR(' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM990.0099'')::double precision as final_emissions,
+		TO_CHAR(' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM999999999999999990.0099'')::double precision as final_emissions,
 		TO_CHAR(inv.ceff, ''FM990.099'')::double precision,
 		TO_CHAR(' || case when has_rpen_column then 'coalesce(inv.rpen, 100.0::double precision)' else '100.0::double precision' end || ', ''FM990.099'')::double precision,
 		TO_CHAR(coalesce(inv.reff, 100.0::double precision), ''FM990.099'')::double precision,
@@ -742,15 +742,15 @@ BEGIN
 					'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' 
 				else 
 					'inv.ann_emis' 
-			end || ' - ' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM990.0099'')::double precision as emis_reduction,
---		TO_CHAR(' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ''FM990.0099'')::double precision as emis_reduction,
+			end || ' - ' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM999999999999999990.0099'')::double precision as emis_reduction,
+--		TO_CHAR(' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ''FM999999999999999990.0099'')::double precision as emis_reduction,
 		TO_CHAR(' || case 
 				when dataset_month != 0 then 
 					'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' 
 				else 
 					'inv.ann_emis' 
-		end || ', ''FM990.0099'')::double precision as inv_emissions,
---		TO_CHAR(' || annual_emis_sql || ', ''FM990.0099'')::double precision as inv_emissions,
+		end || ', ''FM999999999999999990.0099'')::double precision as inv_emissions,
+--		TO_CHAR(' || annual_emis_sql || ', ''FM999999999999999990.0099'')::double precision as inv_emissions,
 		' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
 		' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 		' || case when not has_merged_columns then 'inv.record_id::integer' else 'inv.original_record_id::integer' end || ' as source_id,

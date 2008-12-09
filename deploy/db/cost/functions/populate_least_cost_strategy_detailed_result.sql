@@ -407,15 +407,15 @@ BEGIN
 				) 
 			select ' || costcurve_dataset_id || ',
 				poll, 
-				TO_CHAR(sum(annual_cost), ''FM999999999999999990.09'')::double precision, 
-				TO_CHAR(sum(annual_cost) / sum(emis_reduction), ''FM999999999999999990.09'')::double precision, 
-				TO_CHAR(sum(annual_oper_maint_cost), ''FM999999999999999990.09'')::double precision, 
-				TO_CHAR(sum(annualized_capital_cost), ''FM999999999999999990.09'')::double precision, 
-				TO_CHAR(sum(total_capital_cost), ''FM999999999999999990.09'')::double precision, 
+				TO_CHAR(sum(annual_cost), ''FM999999999999999990'')::double precision, 
+				TO_CHAR(sum(annual_cost) / sum(emis_reduction), ''FM999999999999999990'')::double precision, 
+				TO_CHAR(sum(annual_oper_maint_cost), ''FM999999999999999990'')::double precision, 
+				TO_CHAR(sum(annualized_capital_cost), ''FM999999999999999990'')::double precision, 
+				TO_CHAR(sum(total_capital_cost), ''FM999999999999999990'')::double precision, 
 				case when poll = ' || quote_literal(target_pollutant) || ' then TO_CHAR(' || domain_wide_emis_reduction || ' / ' || uncontrolled_emis || ' * 100, ''FM990.099'')::double precision else null::double precision end, 
 				case when poll = ' || quote_literal(target_pollutant) || ' then TO_CHAR(sum(emis_reduction) / ' || uncontrolled_emis || ' * 100, ''FM990.099'')::double precision else null::double precision end, 
-				TO_CHAR(sum(emis_reduction), ''FM990.0099'')::double precision, 
-				TO_CHAR(case when poll = ' || quote_literal(target_pollutant) || ' then ' || uncontrolled_emis || ' else null::double precision end, ''FM990.0099'')::double precision
+				TO_CHAR(sum(emis_reduction), ''FM999999999999999990.0099'')::double precision, 
+				TO_CHAR(case when poll = ' || quote_literal(target_pollutant) || ' then ' || uncontrolled_emis || ' else null::double precision end, ''FM999999999999999990.0099'')::double precision
 			from emissions.'|| detailed_result_table_name || '
 			where poll = ' || quote_literal(target_pollutant) || '
 			group by poll';
