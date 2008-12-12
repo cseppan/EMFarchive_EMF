@@ -260,6 +260,10 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
         String validationMsg = presenter.validateJobs(jobs);
         int width = 50;
         int height = validationMsg.length() / 50;
+        
+        if (height > 30)
+            height = 30;
+        
         String title = "Possible Issues with Datasets Selected for Job Inputs";
 
         showMessageDialog(createMsgScrollPane(validationMsg, width, height), title);

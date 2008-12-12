@@ -88,8 +88,6 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
         List<String> cancel = new ArrayList<String>();
         List<String> warning = new ArrayList<String>();
         
-        System.out.println("Getting status of jobs from server");
-        
         for (int i = 0; i < jobs.length; i++) {
             String status = service().getCaseJob(jobs[i].getId()).getRunstatus().getName();
 
@@ -121,8 +119,6 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
                 cancel.add(status);
         }
         
-        System.out.println("Finished getting jobs status from server");
-
         if (ok.size() == jobs.length)
             return "OK";
 

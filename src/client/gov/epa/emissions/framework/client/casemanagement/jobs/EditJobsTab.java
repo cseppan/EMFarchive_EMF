@@ -427,6 +427,10 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         String validationMsg = presenter.validateJobs(jobs);
         int width = 50;
         int height = (validationMsg.length() / 50)+3;
+        
+        if (height > 30)
+            height = 30;
+        
         String title = "Possible Issues with Datasets Selected for Job Inputs";
 
         showMessageDialog(createMsgScrollPane(validationMsg, width, height), title);
