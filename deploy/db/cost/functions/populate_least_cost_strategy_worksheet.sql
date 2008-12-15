@@ -334,7 +334,7 @@ BEGIN
 	chained_gdp_adjustment_factor := cost_year_chained_gdp / ref_cost_year_chained_gdp;
 
 	--TO DO - tempoprary shouldn't be used in production
-	execute 'truncate emissions.' || worksheet_table_name;
+--	execute 'truncate emissions.' || worksheet_table_name;
 
 --	annual_emis_sql := case when dataset_month != 0 then 'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' else 'inv.ann_emis' end;
 --	annualized_emis_sql := case when dataset_month != 0 then 'coalesce(inv.avd_emis * 365, inv.ann_emis)' else 'inv.ann_emis' end;

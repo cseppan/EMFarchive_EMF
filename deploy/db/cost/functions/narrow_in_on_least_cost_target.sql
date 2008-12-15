@@ -38,7 +38,7 @@ BEGIN
 			target_pollutant, 
 			target_record_offset);
 
-		raise notice '%', 'next starting point, first look at record_offset = ' || coalesce(target_record_offset,0) || ', previous_record_offset = ' || coalesce(prev_target_record_offset,0) || ', record_count = ' || record_count || ', emis_reduction = ' || coalesce(emis_reduction,0) || ' - ' || clock_timestamp();
+--		raise notice '%', 'next starting point, first look at record_offset = ' || coalesce(target_record_offset,0) || ', previous_record_offset = ' || coalesce(prev_target_record_offset,0) || ', record_count = ' || record_count || ', emis_reduction = ' || coalesce(emis_reduction,0) || ' - ' || clock_timestamp();
 
 		target_record_offset_diff := abs(target_record_offset - prev_target_record_offset);
 		prev_target_record_offset := target_record_offset;

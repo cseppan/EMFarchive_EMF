@@ -8,7 +8,7 @@ DECLARE
 	target_pollutant varchar;
 	gimme_count integer := 0;
 BEGIN
-	SET work_mem TO '256MB';
+--	SET work_mem TO '256MB';
 --	SET enable_seqscan TO 'off';
 --	SET enable_nestloop TO 'on';
 
@@ -38,7 +38,7 @@ BEGIN
 	where cs.id = control_strategy_id
 	INTO target_pollutant;
 
-	raise notice '%', 'start ' || clock_timestamp();
+--	raise notice '%', 'start ' || clock_timestamp();
 
 
 	-- look for ties too, since we have a double precision data type. thats why a pct diff is used instead of
@@ -47,7 +47,7 @@ BEGIN
 	set status = 0
 	where record_id in (
 		select case when 
-		(tbl.emis_reduction - public.running_max_previous_value(tbl.emis_reduction, ''s'' || tbl.source)) / tbl.emis_reduction <= 0.001
+		coalesce(tbl.emis_reduction, 0.0) <> 0.0 and (tbl.emis_reduction - public.running_max_previous_value(tbl.emis_reduction, ''s'' || tbl.source)) / tbl.emis_reduction <= 0.001
 --		tbl.emis_reduction <= public.running_max_previous_value(tbl.emis_reduction, ''s'' || tbl.source) 
 		then tbl.record_id else null::integer 
 		end
@@ -61,7 +61,7 @@ BEGIN
 	)';
 
 	get diagnostics gimme_count = row_count;
-	raise notice '%', 'get rid of measures - you''d never pay more to get less (or the same) - emissions.' || worksheet_table_name || ' count = ' || gimme_count || ' - ' || clock_timestamp();
+--	raise notice '%', 'get rid of measures - you''d never pay more to get less (or the same) - emissions.' || worksheet_table_name || ' count = ' || gimme_count || ' - ' || clock_timestamp();
 
 	-- remove unsuitable measures (get rid of target and cobenefit pollutants)
 	execute 'update emissions.' || worksheet_table_name || ' as detailed_result
@@ -76,7 +76,7 @@ BEGIN
 			where tp.status = 0
 				and tp.poll = ' || quote_literal(target_pollutant) || ');';
 				
-	raise notice '%', 'delete from emissions.' || worksheet_table_name || ' where status = 0 ' || ' - ' || clock_timestamp();
+--	raise notice '%', 'delete from emissions.' || worksheet_table_name || ' where status = 0 ' || ' - ' || clock_timestamp();
 
 	return;
 END;
