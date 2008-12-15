@@ -46,14 +46,14 @@ public class StrategySummarySelectionDialog extends JDialog implements StrategyS
         panel.add(buildList(strategyResultTypes), BorderLayout.CENTER);
         panel.add(buttonPanel(), BorderLayout.SOUTH);
         contentPane.add(panel);
-        if (strategyResultTypes.length == 1)
-        {
-            setTitle("Select "+strategyResultTypes[0].getName()+" Strategy Summary");
-        }
-        else
-        {
-           setTitle("Select Strategy Summaries");
-        }   
+//        if (strategyResultTypes.length == 1)
+//        {
+//            setTitle("Select "+strategyResultTypes[0].getName()+" Strategy Summary");
+//        }
+//        else
+//        {
+           setTitle("Select Strategy Summaries To Generate");
+//        }   
         this.pack();
         this.setSize(500, 400);
         this.setLocation(ScreenUtils.getPointToCenter(this));
