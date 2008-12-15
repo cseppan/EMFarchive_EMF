@@ -87,6 +87,10 @@ public class DataCommonsDAO {
         return datasetTypesDAO.get(name, session);
     }
 
+    public DatasetType getDatasetType(int id, Session session) {
+        return datasetTypesDAO.current(id, DatasetType.class, session);
+    }
+
     public Sector obtainLockedSector(User user, Sector sector, Session session) {
         return sectorsDao.obtainLocked(user, sector, session);
     }

@@ -31,4 +31,11 @@ public class EditQAStepTemplatesPresenterImpl implements EditQAStepTemplatesPres
         parentView.refresh();
     }
 
+    public void doCopyQAStepTemplates(QAStepTemplate[] templates, int[] datasetTypeIds, boolean replace) throws EmfException {
+        //view.loadTemplate();
+        session.dataCommonsService().copyQAStepTemplates(session.user(), templates, datasetTypeIds, replace);
+        
+        parentView.refresh();
+    }
+
 }

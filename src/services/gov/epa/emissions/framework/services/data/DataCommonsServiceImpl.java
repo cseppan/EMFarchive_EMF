@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
@@ -777,6 +778,48 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             return matchedNames;
         } catch (Exception e) {
             throw new EmfException("Cannot apply pattern.");
+        }
+    }
+
+    public void copyQAStepTemplates(User user, QAStepTemplate[] templates, int[] datasetTypeIds, boolean replace) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            for (int datasetTypeId : datasetTypeIds) {
+                //get lock on dataset type so we can update it...
+                DatasetType datasetType = dao.obtainLockedDatasetType(user, dao.getDatasetType(datasetTypeId, session), session);
+                QAStepTemplate[] existingQaStepTemplates = datasetType.getQaStepTemplates();
+                boolean exists = false;
+                //add qa templates to dataset type
+                for (QAStepTemplate template : templates) {
+                    exists = false;
+                    //check if one with the same name already exists
+                    for (QAStepTemplate existingTemplate : existingQaStepTemplates) {
+                        if (existingTemplate.getName().equals(template.getName())) {
+                            exists = true;
+                            //if replacing, then remove existing template
+                            if (replace) datasetType.removeQaStepTemplate(existingTemplate);
+                        }
+                    }
+                    //if not replacing, then add "Copy of " in front of the name
+                    if (exists && !replace) {
+                        template.setName("Copy of " + template.getName());
+                    }
+                    datasetType.addQaStepTemplate(template);
+                }
+                //update the dataset type
+                dao.updateDatasetType(datasetType, session);
+            }
+
+        } catch (RuntimeException e) {
+            LOG.error("Could not copy QAStepTemplates to Dataset Types.", e);
+            throw new EmfException("Could not copy QA Step Templates to Dataset Types. " + e.getMessage());
+        } finally {
+            //release lock on dataset type
+            for (int datasetTypeId : datasetTypeIds) {
+                dao.releaseLockedDatasetType(user, dao.getDatasetType(datasetTypeId, session), session);
+            }
+            session.close();
         }
     }
 

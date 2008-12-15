@@ -27,6 +27,10 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
         remove(getSelected());
     }
 
+    public void removeAll() {
+        rows.clear();
+    }
+
     private void remove(QAStepTemplate template) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();

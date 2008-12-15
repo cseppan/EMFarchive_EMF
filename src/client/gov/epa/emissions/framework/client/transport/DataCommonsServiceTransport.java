@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
@@ -452,6 +453,19 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.setTimeOut(30000); //set time out in milliseconds to terminate if service doesn't response
         
         return (EmfFileInfo[])call.requestResponse(new Object[] { dir, filter });
+    }
+
+    public void copyQAStepTemplates(User user, QAStepTemplate[] templates, int[] datasetTypeIds, boolean replace) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("copyQAStepTemplates");
+        call.addParam("user", mappings.user());
+        call.addParam("templates", mappings.qaStepTemplates());
+        call.addParam("datasetTypeIds", mappings.integers());
+        call.addBooleanParameter("replace");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, templates, datasetTypeIds, new Boolean(replace) });
     }
 
 }

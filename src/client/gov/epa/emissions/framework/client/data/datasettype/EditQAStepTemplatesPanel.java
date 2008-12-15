@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -144,6 +145,13 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
         });
         container.add(update);
 
+        Button copy = new CopyButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                doCopy();
+            }
+        });
+        container.add(copy);
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
 
@@ -160,6 +168,45 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
             }
+        }
+    }
+
+    protected void doCopy() {
+        QAStepTemplate[] templates = tableData.getSelected();
+        if (templates.length == 0) {
+            messagePanel.setMessage("Please select QAStepTemplate(s) to copy.");
+            return;
+        }
+        
+        CopyQAStepTemplateToDatasetTypeSelectionView view = new CopyQAStepTemplateToDatasetTypeSelectionDialog(parent);
+        CopyQAStepTemplateToDatasetTypeSelectionPresenter presenter = new CopyQAStepTemplateToDatasetTypeSelectionPresenter(view, session);
+        try {
+            presenter.display();
+            DatasetType[] datasetTypes = presenter.getSelectedDatasetTypes();
+            boolean copyToExistingDatasetType = false;
+            if (datasetTypes.length > 0) {
+                int[] datasetTypeIds = new int[datasetTypes.length];
+                for (int i = 0; i < datasetTypes.length; i++) {
+                    datasetTypeIds[i] = datasetTypes[i].getId();
+                    if (datasetTypes[i].getId() == type.getId()) copyToExistingDatasetType = true;
+                }
+                this.presenter.doCopyQAStepTemplates(templates, datasetTypeIds, presenter.shouldReplace());
+                //if copied to self, then a lock would have been lose, and needs to be reclaimed
+                //also, refresh the templates table
+                if (copyToExistingDatasetType) {
+                    this.type = this.presenter.obtainLockedDatasetType(session.user(), this.type);
+                    tableData.removeAll();
+                    for (QAStepTemplate template : this.type.getQaStepTemplates())
+                        tableData.add(template);
+
+//                    tableData = new EditableQAStepTemplateTableData(this.type.getQaStepTemplates());
+//                    tableModel.refresh(tableData);
+                    
+                    refresh();
+                }
+            }
+        } catch (Exception exp) {
+            messagePanel.setError(exp.getMessage());
         }
     }
 

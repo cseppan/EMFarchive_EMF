@@ -73,7 +73,7 @@ public class DatasetTypesDAO {
         return hibernateFacade.nameUsed(name, clazz, session);
     }
 
-    private DatasetType current(int id, Class clazz, Session session) {
+    public DatasetType current(int id, Class clazz, Session session) {
         return (DatasetType) hibernateFacade.current(id, clazz, session);
     }
 

@@ -10,4 +10,6 @@ public interface EditQAStepTemplatesPresenter {
     void display(DatasetType type, QAProgram[] programs, QAStepTemplate template);
 
     void doEdit() throws EmfException;
+
+    void doCopyQAStepTemplates(QAStepTemplate[] templates, int[] datasetTypeIds, boolean replace) throws EmfException;
 }
