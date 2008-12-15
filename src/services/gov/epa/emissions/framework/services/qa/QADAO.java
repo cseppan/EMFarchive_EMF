@@ -82,6 +82,10 @@ public class QADAO {
         hibernateFacade.remove(stepResult, session);
     }
 
+    public void removeQAStep(QAStep step, Session session) {
+        hibernateFacade.remove(step, session);
+    }
+
     public void updateQAStepResult(QAStepResult result, Session session) {
         hibernateFacade.saveOrUpdate(result, session);
     }

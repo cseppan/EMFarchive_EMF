@@ -35,4 +35,6 @@ public interface QAService {
 
     ProjectionShapeFile[] getProjectionShapeFiles() throws EmfException;
 
+    void copyQAStepsToDatasets(User user, QAStep[] steps, int[] datasetIds, boolean replace) throws EmfException;
+
 }

@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
-import java.util.Date;
-
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -11,6 +9,8 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 import gov.epa.emissions.framework.services.qa.QAService;
+
+import java.util.Date;
 
 public class EditableQATabPresenterImpl implements EditableQATabPresenter {
 
@@ -45,7 +45,6 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
     public void doSave() {
         // DO NOTHING
     }
-
     public void doAddUsingTemplate(NewQAStepView stepView) {
         DatasetType type = dataset.getDatasetType();
         if (type.getQaStepTemplates().length == 0) {
@@ -94,6 +93,11 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
     
     public EmfSession getSession(){
         return session; 
+    }
+
+    public void doCopyQASteps(QAStep[] steps, int[] datasetIds, boolean replace)
+            throws EmfException {
+        session.qaService().copyQAStepsToDatasets(session.user(), steps, datasetIds, replace);
     }
 
 }

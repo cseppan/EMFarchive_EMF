@@ -150,4 +150,17 @@ public class QAServiceTransport implements QAService {
         return (ProjectionShapeFile[]) call.requestResponse(new Object[] {});
     }
 
+    public void copyQAStepsToDatasets(User user, QAStep[] steps, int[] datasetIds, boolean replace) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("copyQAStepsToDatasets");
+        call.addParam("user", mappings.user());
+        call.addParam("steps", mappings.qaSteps());
+        call.addParam("datasetIds", mappings.integers());
+        call.addBooleanParameter("replace");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, steps, datasetIds, new Boolean(replace) });
+    }
+
 }

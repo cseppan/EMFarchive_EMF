@@ -22,4 +22,5 @@ public interface EditableQATabPresenter extends PropertiesEditorTabPresenter {
 
     void addFromTemplates(QAStep[] newSteps) throws EmfException;
 
+    public void doCopyQASteps(QAStep[] steps, int[] datasetIds, boolean replace) throws EmfException;
 }

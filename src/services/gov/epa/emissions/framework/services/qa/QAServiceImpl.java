@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
@@ -111,7 +112,15 @@ public class QAServiceImpl implements QAService {
         } catch (Exception e) {
             LOG.error("Error running in qa step-" + step.getName(), e);
             throw new EmfException("Error running in qa step-" + step.getName() + ":" + e.getMessage());
+        } finally {
+            try {
+                dbServer.disconnect();
+            } catch (Exception e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
         }
+        
     }
 
     private synchronized void removeQAResultTable(QAStep step, DbServer dbServer) throws EmfException {
@@ -291,6 +300,56 @@ public class QAServiceImpl implements QAService {
             throw new EmfException("Could not get Projection Shape Files");
         } finally {
             session.close();
+        }
+    }
+
+    public void copyQAStepsToDatasets(User user, QAStep[] steps, int[] datasetIds, boolean replace)
+            throws EmfException {
+        Session session = sessionFactory.getSession();
+        DatasetDAO datasetDAO = new DatasetDAO();
+        DbServer dbServer = dbServerFactory.getDbServer();
+        try {
+            for (int datasetId : datasetIds) {
+                //get lock on dataset type so we can update it...
+                EmfDataset dataset = datasetDAO.getDataset(session, datasetId);
+//                EmfDataset dataset = datasetDAO.obtainLocked(user, datasetDAO.getDataset(session, datasetId), session);
+                QAStep[] existingQaSteps = dao.steps(dataset, session);
+                boolean exists = false;
+                //add qa step to dataset
+                for (QAStep step : steps) {
+                    exists = false;
+                    //override dataset id to new dataset
+                    step.setDatasetId(datasetId);
+                    //check if one with the same name already exists
+                    for (QAStep existingQAStep : existingQaSteps) {
+                        if (existingQAStep.getName().equals(step.getName())) {
+                            exists = true;
+                            //if replacing, then remove existing template
+                            if (replace) {
+                                removeQAResultTable(existingQAStep, dbServer);
+                                dao.removeQAStep(existingQAStep, session);
+                            }
+                        }
+                    }
+                    //if not replacing, then add "Copy of " in front of the name
+                    if (exists && !replace) {
+                        step.setName("Copy of " + step.getName());
+                    }
+                    dao.add(new QAStep[] { step }, session);
+                }
+            }
+
+        } catch (RuntimeException e) {
+            LOG.error("Could not copy QAStepTemplates to Dataset Types.", e);
+            throw new EmfException("Could not copy QA Step Templates to Dataset Types. " + e.getMessage());
+        } finally {
+            session.close();
+            try {
+                dbServer.disconnect();
+            } catch (Exception e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 }

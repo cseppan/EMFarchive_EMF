@@ -5,8 +5,12 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.dataset.CopyQAStepTemplateToDatasetSelectionDialog;
+import gov.epa.emissions.framework.client.data.dataset.CopyQAStepTemplateToDatasetSelectionPresenter;
+import gov.epa.emissions.framework.client.data.dataset.CopyQAStepTemplateToDatasetSelectionView;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -45,10 +49,13 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private int datasetID;
 
-    public EditableQATab(EmfConsole parent, DesktopManager desktop, MessagePanel messagePanel) {
+    private EmfSession session;
+    
+    public EditableQATab(EmfSession session, EmfConsole parent, DesktopManager desktop, MessagePanel messagePanel) {
         this.parentConsole = parent;
         this.desktop = desktop;
         this.messagePanel = messagePanel;
+        this.session = session;
     }
 
     public void display(Dataset dataset, QAStep[] steps, QAStepResult[] qaStepResults, Version[] versions) {
@@ -104,6 +111,13 @@ public class EditableQATab extends JPanel implements EditableQATabView {
             }
         });
         container.add(edit);
+
+        Button copy = new BorderlessButton("Copy", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                doCopy();
+            }
+        });
+        container.add(copy);
 
         Button status = new BorderlessButton("Set Status", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -164,6 +178,47 @@ public class EditableQATab extends JPanel implements EditableQATabView {
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
             }
+        }
+    }
+
+    private void doCopy() {
+        clearMessage();
+
+        List selected = table.selected();
+        if (selected == null || selected.size() == 0) {
+            messagePanel.setMessage("Please select a QA step.");
+            return;
+        }
+
+        CopyQAStepTemplateToDatasetSelectionView view = new CopyQAStepTemplateToDatasetSelectionDialog(parentConsole);
+        CopyQAStepTemplateToDatasetSelectionPresenter presenter = new CopyQAStepTemplateToDatasetSelectionPresenter(view, session);
+        try {
+            presenter.display(null, true);
+            Dataset[] datasets = presenter.getDatasets();
+//            boolean copyToExistingDatasetType = false;
+            if (datasets.length > 0) {
+                int[] datasetIds = new int[datasets.length];
+                for (int i = 0; i < datasets.length; i++) {
+                    datasetIds[i] = datasets[i].getId();
+//                    if (datasets[i].getId() == datasetID) copyToExistingDatasetType = true;
+                }
+                this.presenter.doCopyQASteps((QAStep[])selected.toArray(new QAStep[0]), datasetIds, presenter.shouldReplace());
+                //if copied to self, then a lock would have been lose, and needs to be reclaimed
+                //also, refresh the templates table
+//                if (copyToExistingDatasetType) {
+//                    this.type = this.presenter.obtainLockedDatasetType(session.user(), this.type);
+//                    tableData.removeAll();
+//                    for (QAStepTemplate template : this.type.getQaStepTemplates())
+//                        tableData.add(template);
+//
+////                    tableData = new EditableQAStepTemplateTableData(this.type.getQaStepTemplates());
+////                    tableModel.refresh(tableData);
+//                    
+//                    refresh();
+//                }
+            }
+        } catch (Exception exp) {
+            messagePanel.setError(exp.getMessage());
         }
     }
 
