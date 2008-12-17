@@ -233,14 +233,14 @@ public class CaseObjectManager {
             subDir = (SubDir) selected;
             subDir.setModelToRunId(modelToRunId);
         }
-        this.getSubDirs(); // make sure programs have been retrieved
+        this.getSubDirs(); // make sure subdir have been retrieved
 
         for (int i = 0; i < subDirs.length; i++) {
             if (subDirs[i].toString().equalsIgnoreCase(subDir.getName().toString())
                     && subDirs[i].getModelToRunId() == subDir.getModelToRunId())
-                return subDirs[i]; // the program already exists (case insensitive check)
+                return subDirs[i]; // the subdir already exists (case insensitive check)
         }
-        // the program was not found in the list
+        // the subdir was not found in the list
         return addSubDir(subDir);
     }
 

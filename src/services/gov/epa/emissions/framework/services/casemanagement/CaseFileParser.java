@@ -120,9 +120,9 @@ public class CaseFileParser {
             for (record = reader.read(); !record.isEnd(); record = reader.read())
                 processSummary(record.getTokens());
         } catch (ParseException e) {
-            throw new Exception("Field not in correct format: " + e.getMessage());
+            throw new Exception("Summary field not in correct format: " + e.getMessage());
         } catch (Exception e) {
-            throw e;
+            throw new Exception("Could not read summary info: " + e.getMessage());
         }
     }
 
@@ -134,9 +134,9 @@ public class CaseFileParser {
             for (record = reader.read(); !record.isEnd(); record = reader.read())
                 processInputs(record.getTokens());
         } catch (ParseException e) {
-            throw new Exception("Field not in correct format: " + e.getMessage());
+            throw new Exception("Inputs field not in correct format: " + e.getMessage());
         } catch (Exception e) {
-            throw e;
+            throw new Exception("Could not read inputs info: " + e.getMessage());
         }
     }
 
@@ -148,9 +148,9 @@ public class CaseFileParser {
             for (record = reader.read(); !record.isEnd(); record = reader.read())
                 processJobs(record.getTokens());
         } catch (ParseException e) {
-            throw new Exception("Field not in correct format: " + e.getMessage());
+            throw new Exception("Jobs field not in correct format: " + e.getMessage());
         } catch (Exception e) {
-            throw e;
+            throw new Exception("Could not read jobs info: " + e.getMessage());
         }
     }
 
