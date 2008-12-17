@@ -96,7 +96,7 @@ public class DatasetDAO {
 
         EmfDataset current = (EmfDataset) current(id, EmfDataset.class, session);
         session.clear();// clear to flush current
-        if (current.getName().equals(newName))
+        if (current.getName().equalsIgnoreCase(newName))
             return true;
 
         return !datasetNameUsed(newName);
