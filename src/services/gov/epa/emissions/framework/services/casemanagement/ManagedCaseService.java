@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.io.generic.GenericExporterToString;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
+import gov.epa.emissions.commons.util.CustomStringTools;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
@@ -983,9 +984,15 @@ public class ManagedCaseService {
     public synchronized SubDir addSubDir(SubDir subdir) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.add(subdir, session);
             Criterion crit1 = Restrictions.eq("name", subdir.getName());
             Criterion crit2 = Restrictions.eq("modelToRunId", new Integer(subdir.getModelToRunId()));
+            SubDir existed = (SubDir) dao.load(SubDir.class, new Criterion[] { crit1, crit2 }, session);
+            
+            if (existed != null)
+                return existed;
+            
+            dao.add(subdir, session);
+            
             return (SubDir) dao.load(SubDir.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
             e.printStackTrace();
@@ -4651,6 +4658,7 @@ public class ManagedCaseService {
             List<CaseParameter> parameters = dao.getCaseParameters(caseId, session);
 
             String prefix = currentCase.getName() + "_" + currentCase.getAbbreviation().getName() + "_";
+            prefix = CustomStringTools.replaceNoneLetterDigit(prefix, '_');
             String sumParamFile = prefix + "Summary_Parameters.csv";
             String inputsFile = prefix + "Inputs.csv";
             String jobsFile = prefix + "Jobs.csv";
