@@ -658,17 +658,45 @@ public class DataServiceImpl implements DataService {
             Datasource datasource = dbServer.getEmissionsDatasource();
             DataModifier dataModifier = datasource.dataModifier();
             VersionedQuery versionedQuery = new VersionedQuery(version);
-            String query = "UPDATE " + table + " SET " + col + "='" + replaceWith
-                    + "' WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")" 
-                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") ;
+            String[] cols = getTableColumns(dataModifier, table, "");
+            int vNum = version.getVersion();
             
-            if (DebugLevels.DEBUG_16)
-                System.out.println("Query to replace column values: " + query);
+            String selectQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols) 
+                    + " FROM " + table
+                    + " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")" 
+                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
+                    + " AND version <> " + vNum;
             
-            dataModifier.execute(query);
-        } catch (Exception e) {
+            String insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")"
+                    + selectQuery;
+    
+            String updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith
+                    + "' WHERE " + col + "='" + find + "' AND version=" + vNum;
+            
+            String updateDelVersions = "UPDATE " + table 
+                    + " SET delete_versions = coalesce(delete_versions,'')||'," + vNum + "'"
+                    + " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")" 
+                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
+                    + " AND version <> " + vNum;
+    
+            if (DebugLevels.DEBUG_16) {
+                System.out.println("Query to insert records: " + insertQuery);
+                System.out.println("Query to replace column values: " + updateQuery);
+                System.out.println("Query to update previous delete_versions: " + updateDelVersions);
+            }
+            
+            if (!dataModifier.resultExists(selectQuery))
+                throw new EmfException("No record found for colum = '" + col + "' and value ='" + find + "'.");
+            
+            dataModifier.execute(insertQuery);
+            dataModifier.execute(updateQuery);
+            dataModifier.execute(updateDelVersions);
+        } catch (SQLException e) {
             LOG.error("Could not query table : ", e);
-            throw new EmfException("Could not query table: " + e.getMessage());
+            throw new EmfException("Could not query table.");
+        } catch (Exception e) {
+            LOG.error("Error : ", e);
+            throw new EmfException(e.getMessage());
         } finally {
             closeDB(dbServer);
         }
