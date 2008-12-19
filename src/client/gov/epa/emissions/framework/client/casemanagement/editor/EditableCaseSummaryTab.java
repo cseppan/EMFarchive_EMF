@@ -304,6 +304,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private JComponent isTemplate() {
         isTemplate = new CheckBox(" Is Template");
+        isTemplate.setToolTipText("Template case for making copies and filling values.");
         isTemplate.setSelected(caseObj.isCaseTemplate());
 
         return isTemplate;
@@ -311,6 +312,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private JComponent isFinal() {
         isFinal = new CheckBox("");
+        isFinal.setToolTipText("Final version. No changes will be make to case.");
         isFinal.setSelected(caseObj.getIsFinal());
 
         return isFinal;
