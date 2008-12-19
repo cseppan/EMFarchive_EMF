@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 
 public interface CopyQAStepTemplateToDatasetTypeSelectionView {
 
-    void display(DatasetType[] datasetTypes);
+    void display(DatasetType[] datasetTypes, DatasetType[] defaultSelectedDatasetTypes);
 
     void observe(CopyQAStepTemplateToDatasetTypeSelectionPresenter presenter);
 

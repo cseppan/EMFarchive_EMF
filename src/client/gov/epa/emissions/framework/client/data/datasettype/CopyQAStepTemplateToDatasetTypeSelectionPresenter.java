@@ -18,13 +18,13 @@ public class CopyQAStepTemplateToDatasetTypeSelectionPresenter {
         this.view = view;
     }
 
-    public void display() throws Exception {
+    public void display(DatasetType[] defaultSelectedDatasetTypes) throws Exception {
         view.observe(this);
 
         //get data...
-        DatasetType[] datasetTypes = session.dataCommonsService().getDatasetTypes();
+        DatasetType[] datasetTypes = session.dataCommonsService().getLightDatasetTypes();
 
-        view.display(datasetTypes);
+        view.display(datasetTypes, defaultSelectedDatasetTypes);
     }
     
     public DatasetType[] getSelectedDatasetTypes() {
