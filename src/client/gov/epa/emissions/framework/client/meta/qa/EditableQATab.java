@@ -8,9 +8,9 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.client.data.dataset.CopyQAStepTemplateToDatasetSelectionDialog;
-import gov.epa.emissions.framework.client.data.dataset.CopyQAStepTemplateToDatasetSelectionPresenter;
-import gov.epa.emissions.framework.client.data.dataset.CopyQAStepTemplateToDatasetSelectionView;
+import gov.epa.emissions.framework.client.data.dataset.CopyQAStepToDatasetSelectionDialog;
+import gov.epa.emissions.framework.client.data.dataset.CopyQAStepToDatasetSelectionPresenter;
+import gov.epa.emissions.framework.client.data.dataset.CopyQAStepToDatasetSelectionView;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -190,16 +190,18 @@ public class EditableQATab extends JPanel implements EditableQATabView {
             return;
         }
 
-        CopyQAStepTemplateToDatasetSelectionView view = new CopyQAStepTemplateToDatasetSelectionDialog(parentConsole);
-        CopyQAStepTemplateToDatasetSelectionPresenter presenter = new CopyQAStepTemplateToDatasetSelectionPresenter(view, session);
+        CopyQAStepToDatasetSelectionView view = new CopyQAStepToDatasetSelectionDialog(parentConsole);
+        CopyQAStepToDatasetSelectionPresenter presenter = new CopyQAStepToDatasetSelectionPresenter(view, session);
         try {
-            presenter.display(null, true);
+            presenter.display(null, false);
             Dataset[] datasets = presenter.getDatasets();
 //            boolean copyToExistingDatasetType = false;
             if (datasets.length > 0) {
                 int[] datasetIds = new int[datasets.length];
+                String datasetNameList = "";
                 for (int i = 0; i < datasets.length; i++) {
                     datasetIds[i] = datasets[i].getId();
+                    datasetNameList = datasetNameList + (i > 0 ? ", " : "") + datasets[i].getName();
 //                    if (datasets[i].getId() == datasetID) copyToExistingDatasetType = true;
                 }
                 this.presenter.doCopyQASteps((QAStep[])selected.toArray(new QAStep[0]), datasetIds, presenter.shouldReplace());
@@ -216,6 +218,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 //                    
 //                    refresh();
 //                }
+                messagePanel.setMessage("Copied " + selected.size() + " QA Steps to Datasets: " + datasetNameList + ".");
             }
         } catch (Exception exp) {
             messagePanel.setError(exp.getMessage());
