@@ -181,7 +181,7 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
         CopyQAStepTemplateToDatasetTypeSelectionView view = new CopyQAStepTemplateToDatasetTypeSelectionDialog(parent);
         CopyQAStepTemplateToDatasetTypeSelectionPresenter presenter = new CopyQAStepTemplateToDatasetTypeSelectionPresenter(view, session);
         try {
-            presenter.display();
+            presenter.display(new DatasetType[] {this.type});
             DatasetType[] datasetTypes = presenter.getSelectedDatasetTypes();
             boolean copyToExistingDatasetType = false;
             if (datasetTypes.length > 0) {
@@ -205,6 +205,7 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
                     refresh();
                 }
             }
+            messagePanel.setMessage("Copied " + templates.length + " QA Step Templates to " + datasetTypes.length + " Dataset Types.");
         } catch (Exception exp) {
             messagePanel.setError(exp.getMessage());
         }
