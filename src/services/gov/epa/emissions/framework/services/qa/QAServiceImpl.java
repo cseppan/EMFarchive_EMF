@@ -11,6 +11,8 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -308,18 +310,32 @@ public class QAServiceImpl implements QAService {
         Session session = sessionFactory.getSession();
         DatasetDAO datasetDAO = new DatasetDAO();
         DbServer dbServer = dbServerFactory.getDbServer();
+        //store locked datasets in this array, some could be null, if their locked by someone else
+        EmfDataset[] datasets = new EmfDataset[datasetIds.length];
+        String datasetNameList = "";
         try {
-            for (int datasetId : datasetIds) {
+            //get lock first, if you can't then throw an error
+            for (int i = 0; i < datasetIds.length; i++) {
+                int datasetId = datasetIds[i];
                 //get lock on dataset type so we can update it...
-                EmfDataset dataset = datasetDAO.getDataset(session, datasetId);
-//                EmfDataset dataset = datasetDAO.obtainLocked(user, datasetDAO.getDataset(session, datasetId), session);
+                EmfDataset dataset = datasetDAO.obtainLocked(user, datasetDAO.getDataset(session, datasetId), session);
+                if (!dataset.isLocked(user)) 
+                    throw new EmfException("Could not copy QA Steps to " + dataset.getName() + " its locked by " + dataset.getLockOwner() + ".");
+                datasets[i] = dataset;
+            }
+            int i = 0;
+            for (EmfDataset dataset : datasets) {
+                ++i;
                 QAStep[] existingQaSteps = dao.steps(dataset, session);
                 boolean exists = false;
                 //add qa step to dataset
                 for (QAStep step : steps) {
                     exists = false;
-                    //override dataset id to new dataset
-                    step.setDatasetId(datasetId);
+                    //override applicable settings...
+                    step.setDatasetId(dataset.getId());
+                    step.setWho("");
+                    step.setDate(null);
+                    step.setStatus("Not Started");
                     //check if one with the same name already exists
                     for (QAStep existingQAStep : existingQaSteps) {
                         if (existingQAStep.getName().equals(step.getName())) {
@@ -331,18 +347,40 @@ public class QAServiceImpl implements QAService {
                             }
                         }
                     }
-                    //if not replacing, then add "Copy of " in front of the name
+                    //if not replacing, then add "Copy of " in front of the name, 
+                    //also make sure the new "Copy of " + name is not already used.
                     if (exists && !replace) {
-                        step.setName("Copy of " + step.getName());
+                        String newName = "Copy of " + step.getName();
+                        //check if one with the same name already exists
+                        for (QAStep existingQAStep : existingQaSteps) {
+                            if (existingQAStep.getName().equals(newName)) {
+                                newName = "Copy of " + newName;
+                            }
+                        }
+                        step.setName(newName);
                     }
                     dao.add(new QAStep[] { step }, session);
                 }
+                datasetNameList += (i > 1 ? ", " : "") + dataset.getName();
             }
+            Status endStatus = new Status();
+            endStatus.setUsername(user.getUsername());
+            endStatus.setType("CopyQAStep");
+            endStatus.setMessage("Copied " + steps.length + " QA Steps to Datasets: " + datasetNameList + ".");
+            endStatus.setTimestamp(new Date());
+
+            new StatusDAO(sessionFactory).add(endStatus);
 
         } catch (RuntimeException e) {
-            LOG.error("Could not copy QAStepTemplates to Dataset Types.", e);
-            throw new EmfException("Could not copy QA Step Templates to Dataset Types. " + e.getMessage());
+            LOG.error("Could not copy QA Steps to Datasets.", e);
+            throw new EmfException("Could not copy QA Steps to Datasets. " + e.getMessage());
         } finally {
+            //release lock
+            for (EmfDataset dataset : datasets) {
+                //release lock on datasets
+                if (dataset != null)
+                    datasetDAO.releaseLocked(user, dataset, session);
+            }
             session.close();
             try {
                 dbServer.disconnect();
