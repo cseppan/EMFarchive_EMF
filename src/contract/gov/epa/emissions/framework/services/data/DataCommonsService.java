@@ -50,6 +50,7 @@ public interface DataCommonsService {
 
     // DatasetType
     DatasetType[] getDatasetTypes() throws EmfException;
+    DatasetType[] getLightDatasetTypes() throws EmfException;
 
     DatasetType getDatasetType(String name) throws EmfException;
 

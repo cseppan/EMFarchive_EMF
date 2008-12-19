@@ -28,6 +28,12 @@ public class DatasetTypesDAO {
         return hibernateFacade.getAll(DatasetType.class, Order.asc("name").ignoreCase(), session);
     }
 
+    public List<DatasetType> getLightAll(Session session) {
+        return session.createQuery("select new DatasetType(dT.id, dT.name) " +
+                "from DatasetType dT order by dT.name").list();
+//        return hibernateFacade.getAll(DatasetType.class, Order.asc("name").ignoreCase(), session);
+    }
+
     public DatasetType obtainLocked(User user, DatasetType type, Session session) {
         return (DatasetType) lockingScheme.getLocked(user, current(type, session), session);
     }

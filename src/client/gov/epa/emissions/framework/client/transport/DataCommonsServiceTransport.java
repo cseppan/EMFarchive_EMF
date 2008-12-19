@@ -107,6 +107,15 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (DatasetType[]) call.requestResponse(new Object[] {});
     }
 
+    public synchronized DatasetType[] getLightDatasetTypes() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getLightDatasetTypes");
+        call.setReturnType(mappings.datasetTypes());
+
+        return (DatasetType[]) call.requestResponse(new Object[] {});
+    }
+
     public synchronized DatasetType getDatasetType(String name) throws EmfException {
         EmfCall call = call();
 

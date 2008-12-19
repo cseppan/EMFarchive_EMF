@@ -83,6 +83,10 @@ public class DataCommonsDAO {
         return datasetTypesDAO.getAll(session);
     }
 
+    public List<DatasetType> getLightDatasetTypes(Session session) {
+        return datasetTypesDAO.getLightAll(session);
+    }
+
     public DatasetType getDatasetType(String name, Session session) {
         return datasetTypesDAO.get(name, session);
     }
