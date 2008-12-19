@@ -150,6 +150,20 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
+    public synchronized DatasetType[] getLightDatasetTypes() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List<DatasetType> list = dao.getLightDatasetTypes(session);
+
+            return list.toArray(new DatasetType[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all DatasetTypes", e);
+            throw new EmfException("Could not get all DatasetTypes ");
+        } finally {
+            if (session != null) session.close();
+        }
+    }
+
     public synchronized DatasetType getDatasetType(String name) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -785,9 +799,16 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         Session session = sessionFactory.getSession();
 
         try {
-            for (int datasetTypeId : datasetTypeIds) {
+            DatasetType[] datasetTypes = new DatasetType[datasetTypeIds.length];
+            //get lock first, if you can't then throw an error
+            for (int i = 0; i < datasetTypeIds.length; i++) {
+                int datasetTypeId = datasetTypeIds[i];
                 //get lock on dataset type so we can update it...
                 DatasetType datasetType = dao.obtainLockedDatasetType(user, dao.getDatasetType(datasetTypeId, session), session);
+                if (!datasetType.isLocked(user)) throw new EmfException("Could not copy QA Step Templates to " + datasetType.getName() + " its locked by " + datasetType.getLockOwner() + ".");
+                datasetTypes[i] = datasetType;
+            }
+            for (DatasetType datasetType : datasetTypes) {
                 QAStepTemplate[] existingQaStepTemplates = datasetType.getQaStepTemplates();
                 boolean exists = false;
                 //add qa templates to dataset type
@@ -803,7 +824,14 @@ public class DataCommonsServiceImpl implements DataCommonsService {
                     }
                     //if not replacing, then add "Copy of " in front of the name
                     if (exists && !replace) {
-                        template.setName("Copy of " + template.getName());
+                        String newName = "Copy of " + template.getName();
+                        //check if one with the same name already exists
+                        for (QAStepTemplate existingQAStepTemplate : existingQaStepTemplates) {
+                            if (existingQAStepTemplate.getName().equals(newName)) {
+                                newName = "Copy of " + newName;
+                            }
+                        }
+                        template.setName(newName);
                     }
                     datasetType.addQaStepTemplate(template);
                 }
