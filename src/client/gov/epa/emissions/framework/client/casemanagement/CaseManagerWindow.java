@@ -186,7 +186,8 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private JPanel createTopPanel() {
         JPanel msgRefreshPanel = new JPanel(new BorderLayout());
         msgRefreshPanel.add(messagePanel, BorderLayout.CENTER);
-        Button button = new RefreshButton(this, "Refresh Cases", messagePanel);
+        Button button = new RefreshButton(this, "Refresh Cases along with lists of sectors and other items", 
+                messagePanel);
         msgRefreshPanel.add(button, BorderLayout.EAST);
 
         JPanel panel = new JPanel(new GridLayout(2, 1));
