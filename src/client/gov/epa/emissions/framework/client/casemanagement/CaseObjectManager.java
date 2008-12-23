@@ -77,7 +77,7 @@ public class CaseObjectManager {
 
     private List<ValueType> parameterValueTypes;
 
-    private List<CaseCategory> categoies;
+    private List<CaseCategory> categories;
 
     private List<Abbreviation> abbreviations;
 
@@ -122,26 +122,36 @@ public class CaseObjectManager {
         this.dataCommonsService = session.dataCommonsService();
     }
 
-    public synchronized void refresh() throws EmfException {
+    public synchronized void refresh() {
         // refresh the pieces of the cache that have been used so far
-        //if (programs != null)
-            programs = caseService.getPrograms();
-        //if (inputEnvtVars != null)
-            inputEnvtVars = caseService.getInputEnvtVars();
-        //if (inputNames != null)
-            inputNames = caseService.getInputNames();
-        //if (subDirs != null)
-            subDirs = caseService.getSubDirs();
-
-        //if (sectors != null)
-            sectors = dataCommonsService.getSectors();
-        //if (datasetTypes != null)
-            datasetTypes = dataCommonsService.getDatasetTypes();
-
+        this.abbreviations = null;
+        this.datasetTypes=null;
+        this.hosts =null;
+        this.airQualityModels = null;
+        this.categories = null;
+        this.emissionsYears = null;
+        this.gridResolutions = null;
+        this.grids = null;
+        this.inputEnvtVars = null;
+        this.inputNames = null;
+        this.meteorlogicalYears =null;
+        this.modelToRuns = null;
+        this.parameterEnvtVars = null;
+        this.parameterNames = null;
+        this.parameterValueTypes = null;
+        this.programs = null;
+        this.projects = null;
+        this.regions = null;
+        this.speciations = null;
+        this.subDirs= null;
+        
+        sectorsWithAll = null;
+        sectors=null;
+         
         lastCaseId = -1;
         jobsForLastCaseId = null;
         
-        System.out.println("Refresh case object manager.");
+        System.out.println("Refreshed case object manager.");
     }
 
     public synchronized void refreshJobList() throws EmfException {
@@ -614,20 +624,20 @@ public class CaseObjectManager {
     }
 
     public synchronized CaseCategory[] getCaseCategories() throws EmfException {
-        if (categoies == null) {
-            categoies = Arrays.asList(caseService.getCaseCategories());
-            Collections.sort(categoies);
+        if (categories == null) {
+            categories = Arrays.asList(caseService.getCaseCategories());
+            Collections.sort(categories);
         }
 
-        return categoies.toArray(new CaseCategory[0]);
+        return categories.toArray(new CaseCategory[0]);
     }
 
     public synchronized CaseCategory addCaseCategory(CaseCategory cat) throws EmfException {
         CaseCategory newCateg = caseService.addCaseCategory(cat);
 
         // refresh the cache when a new one is added
-        categoies = Arrays.asList(caseService.getCaseCategories());
-        Collections.sort(categoies);
+        categories = Arrays.asList(caseService.getCaseCategories());
+        Collections.sort(categories);
 
         return newCateg;
     }
@@ -645,8 +655,8 @@ public class CaseObjectManager {
 
         this.getCaseCategories(); // make sure category have been retrieved
 
-        if (categoies.contains(category))
-            return categoies.get(categoies.indexOf(category));
+        if (categories.contains(category))
+            return categories.get(categories.indexOf(category));
 
         // the category was not found in the list
         return addCaseCategory(category);
