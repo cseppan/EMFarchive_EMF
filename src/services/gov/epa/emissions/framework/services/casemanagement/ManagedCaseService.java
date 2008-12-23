@@ -4649,10 +4649,14 @@ public class ManagedCaseService {
 
         try {
             currentCase = dao.getCase(caseId, session);
-
             if (currentCase == null)
                 throw new EmfException("Cannot retrieve current case.");
 
+            File exportDir = new File(folder);
+            if (!exportDir.canWrite())
+            {
+                throw new EmfException("EMF cannot write to folder "+folder);
+            }
             List<CaseJob> jobs = dao.getCaseJobs(caseId);
             List<CaseInput> inputs = dao.getCaseInputs(caseId, session);
             List<CaseParameter> parameters = dao.getCaseParameters(caseId, session);
@@ -4667,10 +4671,11 @@ public class ManagedCaseService {
             printCaseInputs(inputs, jobs, folder, inputsFile, session);
             printCaseJobs(jobs, folder, jobsFile, session);
         } catch (Exception e) {
-            log.error("Could not print case "
+            log.error("Could not export case "
                     + (currentCase == null ? " (id = " + caseId + ")." : currentCase.getName() + "."), e);
-            throw new EmfException("Could not print case "
-                    + (currentCase == null ? " (id = " + caseId + "). " : currentCase.getName() + ". ")
+            throw new EmfException("Could not export case: "
+                   // AME: this info makes the message too long to see it all in the window
+                   // + (currentCase == null ? " (id = " + caseId + "). " : currentCase.getName() + ". ")
                     + e.getMessage());
         } finally {
             if (session != null && session.isConnected())
