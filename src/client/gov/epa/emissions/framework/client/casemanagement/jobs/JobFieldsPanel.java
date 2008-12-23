@@ -220,6 +220,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         qoption = new TextField("qoption", job.getQueOptions(), charsWide);
         layoutGenerator.addLabelWidgetPair("Queue Options:", qoption, panel);
+        qoption.setToolTipText(qoption.getText());
 
         JPanel pIdLocal = new JPanel(new BorderLayout());
         JLabel parentCase = new JLabel(job.getParentCaseId() + "");
