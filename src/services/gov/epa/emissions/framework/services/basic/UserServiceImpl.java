@@ -86,6 +86,21 @@ public class UserServiceImpl implements UserService {
             session.close();
         }
     }
+    
+    public synchronized User getUserByEmail(int id, String email) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            User user = dao.getUserByEmail(id, email, session);
+
+            return user;
+        } catch (RuntimeException e) {
+            LOG.error("Could not get User by email - " + email, e);
+            throw new EmfException("Could not get User due to data access failure");
+        } finally {
+            session.close();
+        }
+    }
 
     public synchronized User[] getUsers() throws EmfException {
         try {
@@ -102,10 +117,17 @@ public class UserServiceImpl implements UserService {
 
     public synchronized User createUser(User user) throws EmfException {
         User existingUser = this.getUser(user.getUsername());
+        
         if (existingUser != null) {
             throw new EmfException("Could not create new user. The username '" + user.getUsername()
                     + "' is already taken");
         }
+        
+        existingUser = this.getUserByEmail(user.getId(), user.getEmail());
+        
+        if (existingUser != null)
+            throw new EmfException("The same email address has already been used by user '" + existingUser.getUsername() + "'.");
+        
         Session session = sessionFactory.getSession();
         try {
             dao.add(user, session);
@@ -119,6 +141,10 @@ public class UserServiceImpl implements UserService {
     }
 
     public synchronized void updateUser(User user) throws EmfException {
+        User existingUser = this.getUserByEmail(user.getId(), user.getEmail());
+        
+        if (existingUser != null)
+            throw new EmfException("The same email address has already been used by user '" + existingUser.getUsername() + "'.");
         try {
             Session session = sessionFactory.getSession();
             dao.update(user, session);

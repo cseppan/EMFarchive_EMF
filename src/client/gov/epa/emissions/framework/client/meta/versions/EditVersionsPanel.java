@@ -108,9 +108,9 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         tableModel = new EmfTableModel(tableData);
 
         ScrollableTable table = new ScrollableTable(tableModel, null);
-        
+
         // set maximum column width
-        String[] columns = {"Select", "Version", "Base", "Is Final?"}; //table.setColWidthsBasedOnColNames();
+        String[] columns = { "Select", "Version", "Base", "Is Final?" }; // table.setColWidthsBasedOnColNames();
         table.setMaxColWidth(columns);
         table.disableScrolling();
         return table;
@@ -137,7 +137,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         if (dataset.getInternalSources().length == 0) {
             newButton.setEnabled(false);
         }
-        
+
         Button renameButton = new Button("Rename", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -154,7 +154,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         if (dataset.getInternalSources().length == 0) {
             renameButton.setEnabled(false);
         }
-        
+
         Button markFinal = new Button("Mark Final", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doMarkFinal(tableData.selected());
@@ -167,45 +167,36 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             markFinal.setEnabled(false);
         }
         panel.add(markFinal);
-        //moved Edit Properties button to another part of the window
-        
-        /*ConfirmDialog confirmDialog = new ConfirmDialog("", "Warning", parentConsole);
-        SelectAwareButton propButton = new SelectAwareButton("Edit Properties", editPropAction(), getTable(),
-                confirmDialog);
-        panel.add(propButton);*/
+        // moved Edit Properties button to another part of the window
+
+        /*
+         * ConfirmDialog confirmDialog = new ConfirmDialog("", "Warning", parentConsole); SelectAwareButton propButton =
+         * new SelectAwareButton("Edit Properties", editPropAction(), getTable(), confirmDialog); panel.add(propButton);
+         */
         return panel;
     }
 
-    /*private SelectableSortFilterWrapper getTable() {
-        EmfDatasetTableData tableData = new EmfDatasetTableData(new EmfDataset[] { dataset });
-        return new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
-    }*/
+    /*
+     * private SelectableSortFilterWrapper getTable() { EmfDatasetTableData tableData = new EmfDatasetTableData(new
+     * EmfDataset[] { dataset }); return new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria()); }
+     */
 
-    /*private SortCriteria sortCriteria() {
-        String[] columnNames = { "Last Modified Date" };
-        return new SortCriteria(columnNames, new boolean[] { false }, new boolean[] { true });
-    }*/
+    /*
+     * private SortCriteria sortCriteria() { String[] columnNames = { "Last Modified Date" }; return new
+     * SortCriteria(columnNames, new boolean[] { false }, new boolean[] { true }); }
+     */
 
-   /* private Action editPropAction() {
-        // DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
-        return new AbstractAction() {
-            public void actionPerformed(ActionEvent arg0) {
-
-                DatasetPropertiesEditor view = new DatasetPropertiesEditor(presenter.getSession(), parentConsole,
-                        desktopManager);
-                PropertiesEditorPresenter editPresenter = new PropertiesEditorPresenterImpl(dataset, view, presenter
-                        .getSession());
-
-                clear();
-                try {
-                    editPresenter.doDisplay();
-                } catch (EmfException e) {
-                    // NOTE Auto-generated catch block
-                    messagePanel.setError(e.getMessage());
-                }
-            }
-        };
-    }*/
+    /*
+     * private Action editPropAction() { // DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole,
+     * desktopManager); return new AbstractAction() { public void actionPerformed(ActionEvent arg0) {
+     * 
+     * DatasetPropertiesEditor view = new DatasetPropertiesEditor(presenter.getSession(), parentConsole,
+     * desktopManager); PropertiesEditorPresenter editPresenter = new PropertiesEditorPresenterImpl(dataset, view,
+     * presenter .getSession());
+     * 
+     * clear(); try { editPresenter.doDisplay(); } catch (EmfException e) { // NOTE Auto-generated catch block
+     * messagePanel.setError(e.getMessage()); } } }; }
+     */
 
     protected void doNew(Version[] versions) {
         clear();
@@ -221,23 +212,23 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             }
         }
     }
-    
+
     protected void doEdit() throws EmfException {
         clear();
-        Version[] selectedVersions= tableData.selected();
- 
-        if (selectedVersions.length>1 || selectedVersions.length==0 ){
+        Version[] selectedVersions = tableData.selected();
+
+        if (selectedVersions.length > 1 || selectedVersions.length == 0) {
             messagePanel.setMessage("Please select one version only");
-            return; 
-         }
-        
-        Version lockedVersion = presenter.getLockedVersion(selectedVersions[0]);
-        if (lockedVersion==null)
             return;
-        
+        }
+
+        Version lockedVersion = presenter.getLockedVersion(selectedVersions[0]);
+        if (lockedVersion == null)
+            return;
+
         EditVersionDialog dialog = new EditVersionDialog(dataset, lockedVersion, tableData.getValues(), parentConsole);
         dialog.run();
-        
+
         if (dialog.shouldChange()) {
             try {
                 presenter.doChangeVersionName(dialog.getVersion());
@@ -246,15 +237,17 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
                 e.printStackTrace();
                 messagePanel.setError(e.getMessage());
             }
- //           reload(tableData.getValues());
+            // reload(tableData.getValues());
         }
 
     }
-    
 
     protected void doMarkFinal(Version[] versions) {
         clear();
 
+        if (versions == null || versions.length == 0)
+            messagePanel.setMessage("Please select version(s) to mark as final.");
+            
         try {
             presenter.doMarkFinal(versions);
         } catch (EmfException e) {
@@ -385,7 +378,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
 
         return (String[]) tables.toArray(new String[0]);
     }
-    
+
     public void notifyLockFailure(Version version) {
         clear();
         messagePanel.setError("Cannot obtain a lock for version \"" + version.getName() + "\".");

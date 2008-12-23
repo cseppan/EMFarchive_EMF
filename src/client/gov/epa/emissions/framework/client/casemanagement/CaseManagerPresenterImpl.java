@@ -22,10 +22,13 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
     private CaseManagerView view;
 
     private EmfSession session;
+    
+    private CaseObjectManager caseObjectManager = null;
 
     public CaseManagerPresenterImpl(EmfSession session, CaseManagerView view) {
         this.session = session;
         this.view = view;
+        this.caseObjectManager = CaseObjectManager.getCaseObjectManager(session);
     }
 
     public void display() {
@@ -112,6 +115,9 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
     }
 
     public Case[] getCases(CaseCategory category) throws EmfException {
+        this.caseObjectManager.refresh();
+        this.caseObjectManager.refreshJobList();
+        
         if (category == null)
             return new Case[0];
         

@@ -60,7 +60,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
     private Case caseObj;
 
     private int caseId;
-    
+
     private Sector selectedSector;
 
     private InputsTableData tableData;
@@ -142,10 +142,10 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     private void doRefresh(CaseInput[] inputs) throws Exception {
         String inputFileDir = caseObj.getInputFileDir();
-        
+
         if (!inputDir.getText().equalsIgnoreCase(inputFileDir))
             inputDir.setText(inputFileDir);
-        
+
         sectorsComboBox.resetModel(presenter.getAllSetcors());
         sectorsComboBox.setSelectedItem(this.selectedSector);
         setupTableModel(inputs);
@@ -186,7 +186,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Envt. Var.", "Sector", "Input", "Job" };
-        return new SortCriteria(columnNames, new boolean[] { true, true, true, true }, new boolean[] { false, false, false, false });
+        return new SortCriteria(columnNames, new boolean[] { true, true, true, true }, new boolean[] { false, false,
+                false, false });
     }
 
     private JPanel createFolderNSectorPanel() {
@@ -248,7 +249,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
     private JPanel controlPanel(final EditInputsTabPresenter presenter) {
         Insets insets = new Insets(1, 2, 1, 2);
         JPanel container = new JPanel();
-        
+
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMessage();
@@ -274,7 +275,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         });
         remove.setMargin(insets);
         container.add(remove);
-        
+
         String message1 = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmDialog1 = new ConfirmDialog(message1, "Warning", this);
         SelectAwareButton edit = new SelectAwareButton("Edit", editAction(), table, confirmDialog1);
@@ -300,7 +301,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         });
         export.setMargin(insets);
         container.add(export);
-        
+
         Button findRelated = new Button("Find", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 viewCasesReleatedToDataset();
@@ -340,7 +341,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             }
         };
     }
-    
+
     private Action editAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -352,7 +353,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
                 }
             }
         };
-        return action; 
+        return action;
     }
 
     protected void doNewInput(EditInputsTabPresenter presenter) throws EmfException {
@@ -390,8 +391,8 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
     }
 
     private void doEditInput(EditInputsTabPresenter presenter) throws EmfException {
-        checkModelToRun(); 
-        
+        checkModelToRun();
+
         List<CaseInput> inputs = getSelectedInputs();
 
         if (inputs.size() == 0) {
@@ -401,14 +402,14 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
-            String title = "Edit Case Input: "+input.getName() + "(" + input.getId() + ")(" + caseObj.getName() + ")";
+            String title = "Edit Case Input: " + input.getName() + "(" + input.getId() + ")(" + caseObj.getName() + ")";
             EditCaseInputView inputEditor = new EditCaseInputWindow(title, desktopManager, parentConsole);
             presenter.doEditInput(input, inputEditor);
         }
     }
-    
-    private void checkModelToRun() throws EmfException{
-        if (caseObj.getModel() == null || caseObj.getModel().getId()==0)
+
+    private void checkModelToRun() throws EmfException {
+        if (caseObj.getModel() == null || caseObj.getModel().getId() == 0)
             throw new EmfException("Please specify model to run on summary tab. ");
     }
 
@@ -437,9 +438,9 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             showEditor(presenter, inputs, selectedCase);
         }
     }
-    
+
     private void showEditor(EditInputsTabPresenter presenter, List<CaseInput> inputs, String selectedCase)
-    throws Exception {
+            throws Exception {
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
             NewInputDialog view = new NewInputDialog(parentConsole);
@@ -447,7 +448,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             view.setLocationByPlatform(true);
             presenter.copyInput(input, view);
         }
-}
+    }
 
     private void doDisplayInputDatasetsPropertiesViewer() {
         List<EmfDataset> datasets = getSelectedDatasets(getSelectedInputs());
@@ -475,13 +476,13 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
         int numberToExport = checkToWriteStartMessage(inputlist);
 
-        if (!checkExportDir(inputDir.getText()) || !checkDatasets(inputlist) || numberToExport < 1)
-            return;
-
-        int ok = checkOverWrite();
-        String purpose = "Used by case: " + this.caseObj.getName() + ".";
-
         try {
+            if (!checkExportDir(inputDir.getText()) || !checkDatasets(inputlist) || numberToExport < 1)
+                return;
+
+            int ok = checkOverWrite();
+            String purpose = "Used by case: " + this.caseObj.getName() + ".";
+
             if (ok != JOptionPane.YES_OPTION) {
                 presenter.exportCaseInputs(inputlist, purpose);
             } else {
@@ -494,10 +495,14 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         }
     }
 
-    private boolean checkExportDir(String exportDir) {
+    private boolean checkExportDir(String exportDir) throws EmfException {
         if (exportDir == null || exportDir.equals("")) {
             messagePanel.setMessage("Please specify the input folder before exporting the case inputs.");
             return false;
+        }
+
+        if (exportDir.contains("/home/") || exportDir.endsWith("/home")) {
+            throw new EmfException("Export data into user's home directory is not allowed.");
         }
 
         return true;
@@ -557,8 +562,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     public void addInput(CaseInput input) {
         tableData.add(input);
-        setMessage("Added \"" + input.getName() 
-                + "\".  Click Refresh to see it in the table.");
+        setMessage("Added \"" + input.getName() + "\".  Click Refresh to see it in the table.");
     }
 
     private List<CaseInput> getSelectedInputs() {
@@ -610,15 +614,15 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     private CaseInput[] listFreshInputs() throws EmfException {
         CaseInput[] freshList = presenter.getCaseInput(caseId, getSelectedSector(), showAll.isSelected());
-        
+
         if (getSelectedSector() == null && freshList.length == presenter.getPageSize())
             setMessage("Please select a sector to see full list of inputs.");
         else
             messagePanel.clear();
-        
+
         return freshList;
     }
-    
+
     public void refresh() {
         // note that this will get called when the case is save
         try {
@@ -652,23 +656,23 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             throw new EmfException(e.getMessage());
         }
     }
-    
+
     private void viewCasesReleatedToDataset() {
         List<CaseInput> inputlist = getSelectedInputs();
-        if (inputlist == null || inputlist.size() != 1 ){
+        if (inputlist == null || inputlist.size() != 1) {
             messagePanel.setMessage("Please select one input. ");
-            return; 
+            return;
         }
-        
+
         EmfDataset dataset = inputlist.get(0).getDataset();
-        if (dataset == null ){
+        if (dataset == null) {
             messagePanel.setMessage("No dataset available. ");
-            return; 
+            return;
         }
-        
+
         try {
             Case[] casesByInputDataset = presenter.getCasesByInputDataset(dataset.getId());
-            Case[] casesByOutputDataset  = presenter.getCasesByOutputDatasets(new int[] {dataset.getId()});
+            Case[] casesByOutputDataset = presenter.getCasesByOutputDatasets(new int[] { dataset.getId() });
             String title = "Find Uses of Dataset: " + dataset.getName();
             RelatedCaseView view = new FindCaseWindow(title, session, parentConsole, desktopManager);
             presenter.doViewRelated(view, casesByOutputDataset, casesByInputDataset);
@@ -680,6 +684,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     public void addSectorBacktoCase(Sector updatedSector) {
         presenter.addSectorBacktoCase(updatedSector);
-    } 
+    }
 
 }

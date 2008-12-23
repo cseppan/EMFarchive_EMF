@@ -202,7 +202,9 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         version = new TextField("version", job.getVersion() + "", charsWide);
         layoutGenerator.addLabelWidgetPair("Version:", version, panel);
 
-        args = new TextField("args", job.getArgs(), charsWide);
+        String argsText = job.getArgs();
+        args = new TextField("args", argsText, charsWide);
+        args.setToolTipText(argsText);
         layoutGenerator.addLabelWidgetPair("Arguments:", args, panel);
 
         jobOrder = new TextField("jobOrder", job.getJobNo() + "", charsWide);

@@ -53,7 +53,7 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
     private InputsTableData tableData;
 
     private JPanel mainPanel;
-    
+
     private SelectableSortFilterWrapper table;
 
     private MessagePanel messagePanel;
@@ -61,18 +61,16 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
     private DesktopManager desktopManager;
 
     private TextField inputDir;
-    
+
     private JCheckBox showAll;
-    
+
     private ComboBox sectorsComboBox;
 
     private EmfSession session;
 
     private Sector selectedSector;
 
-
-    public ViewableInputsTab(EmfConsole parentConsole, MessagePanel messagePanel,
-            DesktopManager desktopManager) {
+    public ViewableInputsTab(EmfConsole parentConsole, MessagePanel messagePanel, DesktopManager desktopManager) {
         super.setName("viewInputsTab");
         this.parentConsole = parentConsole;
         this.messagePanel = messagePanel;
@@ -129,15 +127,14 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         table.refresh(tableData);
         panelRefresh();
     }
-    
+
     private void panelRefresh() {
         mainPanel.removeAll();
         mainPanel.add(table);
         super.validate();
     }
 
-    private JPanel createLayout(CaseInput[] inputs, EmfConsole parentConsole)
-            throws Exception {
+    private JPanel createLayout(CaseInput[] inputs, EmfConsole parentConsole) throws Exception {
         final JPanel layout = new JPanel(new BorderLayout());
 
         layout.add(createFolderNSectorPanel(), BorderLayout.NORTH);
@@ -156,8 +153,8 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
         return mainPanel;
     }
-    
-    private void setupTableModel(CaseInput[] inputs){
+
+    private void setupTableModel(CaseInput[] inputs) {
         tableData = new InputsTableData(inputs, session);
     }
 
@@ -188,13 +185,14 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Envt. Var.", "Sector", "Input", "Job" };
-        return new SortCriteria(columnNames, new boolean[] { true, true, true, true }, new boolean[] { false, false, false, false });
+        return new SortCriteria(columnNames, new boolean[] { true, true, true, true }, new boolean[] { false, false,
+                false, false });
     }
 
     private JPanel controlPanel() {
         Insets insets = new Insets(1, 2, 1, 2);
         JPanel container = new JPanel();
-        
+
         String message = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
         SelectAwareButton view = new SelectAwareButton("View", viewAction(), table, confirmDialog);
@@ -216,7 +214,7 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         });
         export.setMargin(insets);
         container.add(export);
-        
+
         Button findRelated = new Button("Find", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 viewCasesReleatedToDataset();
@@ -243,7 +241,7 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
         return panel;
     }
-    
+
     private Action viewAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -255,9 +253,9 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
                 }
             }
         };
-        return action; 
+        return action;
     }
-    
+
     private void doView() throws EmfException {
         List inputs = getSelectedInputs();
 
@@ -268,7 +266,7 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
         for (Iterator iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = (CaseInput) iter.next();
-            String title = "View Case Input:"+input.getName() + "(" + input.getId() + ")(" + caseObj.getName() + ")";
+            String title = "View Case Input:" + input.getName() + "(" + input.getId() + ")(" + caseObj.getName() + ")";
             EditCaseInputView inputEditor = new EditCaseInputWindow(title, desktopManager, parentConsole);
             presenter.doEditInput(input, inputEditor);
             inputEditor.viewOnly(title);
@@ -300,13 +298,13 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
         int numberToExport = checkToWriteStartMessage(inputlist);
 
-        if (!checkExportDir(inputDir.getText()) || !checkDatasets(inputlist) || numberToExport < 1)
-            return;
-
-        int ok = checkOverWrite();
-        String purpose = "Used by case: " + this.caseObj.getName() + ".";
-
         try {
+            if (!checkExportDir(inputDir.getText()) || !checkDatasets(inputlist) || numberToExport < 1)
+                return;
+
+            int ok = checkOverWrite();
+            String purpose = "Used by case: " + this.caseObj.getName() + ".";
+
             if (ok != JOptionPane.YES_OPTION) {
                 presenter.exportCaseInputs(inputlist, purpose);
             } else {
@@ -319,10 +317,15 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         }
     }
 
-    private boolean checkExportDir(String exportDir) {
+    private boolean checkExportDir(String exportDir) throws EmfException {
         if (exportDir == null || exportDir.equals("")) {
-            messagePanel.setMessage("Please specify the input folder before exporting the case inputs.");
+            messagePanel
+                    .setMessage("Please specify/save the input folder through case editor before exporting the case inputs.");
             return false;
+        }
+
+        if (exportDir.contains("/home/") || exportDir.endsWith("/home")) {
+            throw new EmfException("Export data into user's home directory is not allowed.");
         }
 
         return true;
@@ -358,23 +361,23 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
         return count;
     }
-    
+
     private void viewCasesReleatedToDataset() {
         List<CaseInput> inputlist = getSelectedInputs();
-        if (inputlist == null || inputlist.size() != 1 ){
+        if (inputlist == null || inputlist.size() != 1) {
             messagePanel.setMessage("Please select one input. ");
-            return; 
+            return;
         }
-        
+
         EmfDataset dataset = inputlist.get(0).getDataset();
-        if (dataset == null ){
+        if (dataset == null) {
             messagePanel.setMessage("No dataset available. ");
-            return; 
+            return;
         }
-        
+
         try {
             Case[] casesByInputDataset = presenter.getCasesByInputDataset(dataset.getId());
-            Case[] casesByOutputDataset  = presenter.getCasesByOutputDatasets(new int[] {dataset.getId()});
+            Case[] casesByOutputDataset = presenter.getCasesByOutputDatasets(new int[] { dataset.getId() });
             String title = "Find Uses of Dataset: " + dataset.getName();
             RelatedCaseView view = new FindCaseWindow(title, session, parentConsole, desktopManager);
             presenter.doViewRelated(view, casesByOutputDataset, casesByInputDataset);
@@ -382,11 +385,10 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
             messagePanel.setError(e.getMessage());
         }
 
-    } 
-
+    }
 
     private int checkOverWrite() {
-        //FIXME: Temporal setting till gets back from Marc on this policy 11/09/2007 Qun
+        // FIXME: Temporal setting till gets back from Marc on this policy 11/09/2007 Qun
         return JOptionPane.YES_OPTION;
     }
 
@@ -405,27 +407,27 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
     private CaseInput[] listFreshInputs() throws EmfException {
         this.selectedSector = getSelectedSector();
         CaseInput[] freshList = presenter.getCaseInput(caseId, selectedSector, showAll.isSelected());
-        
+
         if (selectedSector == null && freshList.length == presenter.getPageSize())
             setMessage("Please select a sector to see full list of inputs.");
         else
             messagePanel.clear();
-        
+
         return freshList;
     }
-    
+
     private Sector getSelectedSector() {
         return (Sector) sectorsComboBox.getSelectedItem();
     }
-    
+
     public void setMessage(String message) {
         messagePanel.setMessage(message);
     }
-    
+
     public void setErrorMessage(String message) {
         messagePanel.setError(message);
     }
-    
+
     public void addInput(CaseInput note) {
         tableData.add(note);
         table.refresh(tableData);
@@ -465,7 +467,5 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
             throw new EmfException(e.getMessage());
         }
     }
-    
-    
 
 }

@@ -97,7 +97,6 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
     private void doRefresh(CaseOutput[] outputs){
         messagePanel.clear();
         //selectedJob=(CaseJob) jobCombo.getSelectedItem();
-        //super.removeAll();
         setupTableModel(outputs);
         table.refresh(tableData);
         panelRefresh();
@@ -135,7 +134,7 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
         jobCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 selectedJob=(CaseJob) jobCombo.getSelectedItem();
-                retrieveJobMsg();
+                retrieveCaseOutputs();
             }
         });  
         layoutGenerator.addLabelWidgetPair("Job: ", jobCombo, panel);
@@ -145,7 +144,7 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
         return panel;
     }
 
-    public synchronized void retrieveJobMsg() {
+    public synchronized void retrieveCaseOutputs() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case outputs...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -307,10 +306,33 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
         populateThread.start();
     }
     
+    private synchronized void refreshJobList() throws EmfException {
+        getAllJobs();
+        jobCombo.resetModel(caseJobs.toArray(new CaseJob[0]));
+        jobCombo.setSelectedItem(getCaseJob(caseJobs, this.selectedJob));
+    }
+    
+    private CaseJob getCaseJob(List<CaseJob> allJobs, CaseJob selectedJob) {
+        if (selectedJob == null)
+            return null;
+        
+        for (Iterator<CaseJob> iter = allJobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            
+            if (selectedJob.getId() == job.getId())
+                return job;
+        }
+
+        return null;
+    }
+    
     private synchronized void retrieveOutputs() {
         try {
             messagePanel.setMessage("Please wait while retrieving all outputs...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            
+            refreshJobList();
+            
             if ( selectedJob == null){
                 clearMessage();
                 setCursor(Cursor.getDefaultCursor());

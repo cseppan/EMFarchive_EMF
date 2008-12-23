@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +39,12 @@ public class DataAccessorImpl implements DataAccessor {
 
     public void applyConstraints(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder)
             throws EmfException {
+        if (DebugLevels.DEBUG_19) {
+            System.out.println("DataAccessorImpl:applyConstraints():token null ? " + (token == null));
+            if (token != null)
+                System.out.println("\tTable: " + token.getTable() + " column filter: " + columnFilter + " row filter: " + rowFilter);
+        }
+        
         try {
             Session session = sessionFactory.getSession();
             cache.applyConstraints(token, columnFilter, rowFilter, sortOrder, session);
@@ -50,6 +57,12 @@ public class DataAccessorImpl implements DataAccessor {
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
+        if (DebugLevels.DEBUG_19) {
+            System.out.println("DataAccessorImpl:getPage():token null ? " + (token == null));
+            if (token != null)
+                System.out.println("\tTable: " + token.getTable() + " key: " + token.key() + " page number: " + pageNumber);
+        }
+        
         try {
             Session session = sessionFactory.getSession();
             Page result = pageFetch.getPage(token, pageNumber, session);

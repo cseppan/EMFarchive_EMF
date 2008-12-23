@@ -45,6 +45,16 @@ public class UserDAO {
             return null;
         return (User) list.get(0);
     }
+    
+    public User getUserByEmail(int id, String email, Session session) {
+        Criterion crit1 = Restrictions.eq("email", email);
+        Criterion crit2 = Restrictions.ne("id", new Integer(id));
+        
+        List list = facade.get(User.class, new Criterion[]{crit1, crit2}, session);
+        if (list.isEmpty())
+            return null;
+        return (User) list.get(0);
+    }
 
     public User get(int userId, Session session) {
         Criterion criterion = Restrictions.eq("id", userId);

@@ -38,7 +38,7 @@ public class PrintCaseDialog extends JDialog {
 
     private PrintCasePresenter presenter;
 
-    private JButton updateButton;
+    private JButton okButton;
 
     private EmfConsole parentConsole;
 
@@ -115,9 +115,9 @@ public class PrintCaseDialog extends JDialog {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        updateButton = new Button("Print", printCase());
-        container.add(updateButton);
-        getRootPane().setDefaultButton(updateButton);
+        okButton = new Button("OK", printCase());
+        container.add(okButton);
+        getRootPane().setDefaultButton(okButton);
 
         JButton cancelButton = new CancelButton(cancelAction());
         container.add(cancelButton);
@@ -182,6 +182,9 @@ public class PrintCaseDialog extends JDialog {
         
         if (specified == null || specified.trim().isEmpty() || specified.trim().length() == 1)
             throw new EmfException("Please specify a valid folder.");
+        
+        if (specified.contains("/home/") || specified.endsWith("/home"))
+            throw new EmfException("Export data into user's home directory is not allowed.");
         
         if (specified.charAt(0) != '/' && specified.charAt(1) != ':')
             throw new EmfException("Specified folder is not in a right format (ex. C:\\, /home, etc.).");

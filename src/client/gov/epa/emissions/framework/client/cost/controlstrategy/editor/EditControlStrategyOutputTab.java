@@ -111,6 +111,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     public void export() {
         try {
+            validateFolder(folder.getText());
+            
             ControlStrategyResult[] controlStrategyResults = getSelectedDatasets();
             List<EmfDataset> datasetList = new ArrayList<EmfDataset>();
             for (int i = 0; i < controlStrategyResults.length; i++) {
@@ -757,6 +759,14 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     public void notifyStrategyTypeChange(StrategyType strategyType) {
         // NOTE Auto-generated method stub
         
+    }
+    
+    private void validateFolder(String folder) throws EmfException {
+        if (folder == null || folder.trim().isEmpty())
+            throw new EmfException("Please select a valid folder to export.");
+        
+        if (folder.contains("/home/") || folder.endsWith("/home"))
+            throw new EmfException("Export data into user's home directory is not allowed.");
     }
 
     public void notifyStrategyRun(ControlStrategy controlStrategy) {

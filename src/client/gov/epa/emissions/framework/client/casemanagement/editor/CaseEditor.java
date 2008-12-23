@@ -202,13 +202,13 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         buttonsPanel.add(loadCaseButton);
         loadCaseButton.setToolTipText("Load case inputs, parameters, and outputs from case log file.");
         
-        Button printCaseButton = new Button("Print", new AbstractAction() {
+        Button printCaseButton = new Button("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 printCase();
             }
         });
         buttonsPanel.add(printCaseButton);
-        printCaseButton.setToolTipText("Print case summary, jobs, inputs and outputs into a csv file.");
+        printCaseButton.setToolTipText("Export the settings for current case.");
 
         Button save = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -301,7 +301,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     }
 
     private void printCase() {
-        PrintCaseDialog printCase = new PrintCaseDialog("Print Case " + caseObj.getName(), this, parentConsole, session);
+        PrintCaseDialog printCase = new PrintCaseDialog("Export Case " + caseObj.getName(), this, parentConsole, session);
         PrintCasePresenter printPresenter = new PrintCasePresenter(session, caseObj);
         printPresenter.display(printCase);
     }

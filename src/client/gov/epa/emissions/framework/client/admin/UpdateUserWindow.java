@@ -28,8 +28,6 @@ public class UpdateUserWindow extends DisposableInteralFrame implements Updatabl
     public UpdateUserWindow(AdminOption adminOption, DesktopManager desktopManager) {
         super("Edit User",new Dimension(350, 425), desktopManager);
         this.adminOption = adminOption;
-
-        super.setResizable(false);
     }
 
     public void display(User user) {

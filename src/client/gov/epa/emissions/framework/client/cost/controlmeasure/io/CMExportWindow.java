@@ -163,6 +163,8 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
 
     private void doExport() {
         try {
+            validateFolder(folder.getText());
+            
             if (!overwrite.isSelected())
                 presenter.doExportWithoutOverwrite(getControlMeasureIds(controlMeasures), folder.getText(), prefix.getText());
             else
@@ -210,5 +212,13 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
         if (file.isDirectory()) {
             folder.setText(file.getAbsolutePath());
         }
+    }
+    
+    private void validateFolder(String folder) throws EmfException {
+        if (folder == null || folder.trim().isEmpty())
+            throw new EmfException("Please select a valid folder to export.");
+        
+        if (folder.contains("/home/") || folder.endsWith("/home"))
+            throw new EmfException("Export data into user's home directory is not allowed.");
     }
 }

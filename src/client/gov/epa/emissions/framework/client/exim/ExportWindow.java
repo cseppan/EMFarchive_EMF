@@ -192,6 +192,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private void doExport() {
         try {
+            validateFolder(folder.getText());
+            
             if (!overwrite.isSelected())
                 presenter.doExport(datasets, folder.getText(), purpose.getText());
             else
@@ -230,6 +232,15 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
         if (file.isDirectory()) {
             folder.setText(file.getAbsolutePath());
+        }
+    }
+    
+    private void validateFolder(String folder) throws EmfException {
+        if (folder == null || folder.trim().isEmpty())
+            throw new EmfException("Please specify a valid export folder.");
+        
+        if (folder.contains("/home/") || folder.endsWith("/home")) {
+            throw new EmfException("Export data into user's home directory is not allowed.");
         }
     }
 

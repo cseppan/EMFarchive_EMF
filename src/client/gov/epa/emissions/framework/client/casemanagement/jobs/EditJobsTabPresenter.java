@@ -16,6 +16,8 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
     CaseJob addNewJob(CaseJob job) throws EmfException;
     
     void addNewSectorToSummary(CaseJob job);
+    
+    void refreshJobList() throws EmfException;
 
     void editJob(CaseJob job, EditCaseJobView jobEditor) throws EmfException;
     

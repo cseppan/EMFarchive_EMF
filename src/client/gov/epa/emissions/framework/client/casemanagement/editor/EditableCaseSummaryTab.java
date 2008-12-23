@@ -261,6 +261,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private TextField futureYear() {
         futureYear = new TextField("Future Year", fieldWidth);
+        futureYear.setToolTipText("Value set to parameter environment variable 'FUTURE_YEAR'.");
         futureYear.setText(caseObj.getFutureYear() + "");
         changeablesList.addChangeable(futureYear);
         futureYear.setPreferredSize(defaultDimension);
@@ -304,7 +305,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private JComponent isTemplate() {
         isTemplate = new CheckBox(" Is Template");
-        isTemplate.setToolTipText("Template case for making copies and filling values.");
+        isTemplate.setToolTipText("If checked, case is used as a template.");
         isTemplate.setSelected(caseObj.isCaseTemplate());
 
         return isTemplate;
@@ -312,7 +313,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private JComponent isFinal() {
         isFinal = new CheckBox("");
-        isFinal.setToolTipText("Final version. No changes will be make to case.");
+        isFinal.setToolTipText("If checked, no changes will be made to case.");
         isFinal.setSelected(caseObj.getIsFinal());
 
         return isFinal;
@@ -338,14 +339,15 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         if (caseObj.getModel() == null)
             messagePanel.setMessage("Please specify model to run. ");
         modelToRunCombo = new ComboBox(presenter.getModelToRuns());
+        modelToRunCombo.setToolTipText("Value set to parameter environment variable 'MODEL_LABEL'.");
         modelToRunCombo.setSelectedItem(runModel);
         modelToRunCombo.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
         changeablesList.addChangeable(modelToRunCombo);
 
         modelVersionField = new TextField("modelVersion", fieldWidth / 2);
+        modelVersionField.setToolTipText("Value set to parameter environment variable 'MODEL_LABEL'.");
         modelVersionField.setText(caseObj.getModelVersion());
-        modelVersionField.setToolTipText("Input model version.");
         modelVersionField.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
         changeablesList.addChangeable(modelToRunCombo);
@@ -368,6 +370,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox gridResolution() throws EmfException {
         gridResolutionCombo = new EditableComboBox(presenter.getGridResolutions());
+        gridResolutionCombo.setToolTipText("Value set to parameter environment variable 'EMF_GRID'.");
         gridResolutionCombo.setSelectedItem(caseObj.getGridResolution());
         gridResolutionCombo.setPreferredSize(defaultDimension);
         changeablesList.addChangeable(gridResolutionCombo);
@@ -396,6 +399,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox airQualityModels() throws EmfException {
         airQualityModelsCombo = new EditableComboBox(presenter.getAirQualityModels());
+        airQualityModelsCombo.setToolTipText("Value set to parameter environment variable 'EMF_AQM'.");
         airQualityModelsCombo.setSelectedItem(caseObj.getAirQualityModel());
         airQualityModelsCombo.setPreferredSize(defaultDimension);
 
@@ -423,6 +427,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox emissionsYears() throws EmfException {
         emissionsYearCombo = new EditableComboBox(presenter.getEmissionsYears());
+        emissionsYearCombo.setToolTipText("Value set to parameter environment variable 'BASE_YEAR'.");
         emissionsYearCombo.setSelectedItem(caseObj.getEmissionsYear());
         emissionsYearCombo.setPreferredSize(defaultDimension);
         changeablesList.addChangeable(emissionsYearCombo);
@@ -432,6 +437,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox grids() throws EmfException {
         gridCombo = new EditableComboBox(presenter.getGrids());
+        gridCombo.setToolTipText("Value set to parameter environment variable 'IOAPI_GRIDNAME_1'.");
         gridCombo.setSelectedItem(caseObj.getGrid());
         gridCombo.setPreferredSize(defaultDimension);
         changeablesList.addChangeable(gridCombo);
@@ -450,6 +456,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox speciations() throws EmfException {
         speciationCombo = new EditableComboBox(presenter.getSpeciations());
+        speciationCombo.setToolTipText("Value set to parameter environment variable 'EMF_SPC'.");
         speciationCombo.setSelectedItem(caseObj.getSpeciation());
         speciationCombo.setPreferredSize(defaultDimension);
 
@@ -473,20 +480,20 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private TextField startDate() {
         startDate = new TextField("Start Date", fieldWidth);
+        startDate.setToolTipText("Value (MM/dd/yyyy HH:mm) set to parameter environment variable 'EPI_STDATE_TIME'.");
         startDate.setText(format(caseObj.getStartDate()) + "");
         changeablesList.addChangeable(startDate);
         startDate.setPreferredSize(defaultDimension);
-        startDate.setToolTipText("Date in format MM/dd/yyyy HH:mm");
 
         return startDate;
     }
 
     private TextField endDate() {
         endDate = new TextField("End Date", fieldWidth);
+        endDate.setToolTipText("Value (MM/dd/yyyy HH:mm) set to parameter environment variable 'EPI_ENDATE_TIME'.");
         endDate.setText(format(caseObj.getEndDate()) + "");
         changeablesList.addChangeable(endDate);
         endDate.setPreferredSize(defaultDimension);
-        endDate.setToolTipText("Date in format MM/dd/yyyy HH:mm");
 
         return endDate;
     }

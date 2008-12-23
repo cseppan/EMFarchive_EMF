@@ -178,5 +178,10 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
         
     }
 
+    public void refreshJobList() {
+        // NOTE Auto-generated method stub
+        
+    }
+
     
 }

@@ -45,10 +45,11 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         view.display(session, caseObj, this, parentPresenter);
     }
 
-    public void doSave() {
+    public void doSave() throws EmfException {
         String caseOutputDir = view.getCaseOutputFileDir();
         if (caseOutputDir != null)
             caseObj.setOutputFileDir(caseOutputDir);
+        this.caseObjectManager.refreshJobList();
         view.refresh();
     }
 
@@ -278,6 +279,10 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             return;
         
         view.addSector(sector);
+    }
+    
+    public void refreshJobList() throws EmfException {
+        this.caseObjectManager.refreshJobList();
     }
 
 }

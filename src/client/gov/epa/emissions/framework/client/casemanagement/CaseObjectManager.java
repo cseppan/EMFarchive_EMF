@@ -124,22 +124,24 @@ public class CaseObjectManager {
 
     public synchronized void refresh() throws EmfException {
         // refresh the pieces of the cache that have been used so far
-        if (programs != null)
+        //if (programs != null)
             programs = caseService.getPrograms();
-        if (inputEnvtVars != null)
+        //if (inputEnvtVars != null)
             inputEnvtVars = caseService.getInputEnvtVars();
-        if (inputNames != null)
+        //if (inputNames != null)
             inputNames = caseService.getInputNames();
-        if (subDirs != null)
+        //if (subDirs != null)
             subDirs = caseService.getSubDirs();
 
-        if (sectors != null)
+        //if (sectors != null)
             sectors = dataCommonsService.getSectors();
-        if (datasetTypes != null)
+        //if (datasetTypes != null)
             datasetTypes = dataCommonsService.getDatasetTypes();
 
         lastCaseId = -1;
         jobsForLastCaseId = null;
+        
+        System.out.println("Refresh case object manager.");
     }
 
     public synchronized void refreshJobList() throws EmfException {

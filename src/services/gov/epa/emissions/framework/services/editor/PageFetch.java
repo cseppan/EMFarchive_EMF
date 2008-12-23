@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.editor.ChangeSets.ChangeSetsIterator;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import org.hibernate.Session;
 
@@ -27,6 +28,12 @@ public class PageFetch {
     }
 
     void setRange(Page page, DataAccessToken token, Session session) throws Exception {
+        if (DebugLevels.DEBUG_19) {
+            System.out.println("PageFetch:setRange():Page null ? " + (page == null));
+            if (page != null)
+                System.out.println("\tPage number: " + page.getNumber() + " max: " + page.getMax() + " min: " + page.getMin());
+        }
+        
         int previousPage = page.getNumber() - 1;
         int previousPagesTotal = totalSizeOfPreviousPagesUpto(token, previousPage, session);
         int min = page.count() == 0 ? previousPagesTotal : previousPagesTotal + 1;
@@ -38,6 +45,16 @@ public class PageFetch {
         PageReader reader = cache.reader(token);
         Page page = reader.page(pageNumber);
         ChangeSets changesets = cache.changesets(token, pageNumber, session);
+        
+        if (DebugLevels.DEBUG_19) {
+            System.out.println("PageFetch:filteredPage():Page null from PageReader? " + (page == null));
+            if (page != null)
+                System.out.println("\tPage number: " + page.getNumber());
+            
+            System.out.println("\tchangesets null from cache? " + (changesets == null));
+            if (changesets != null)
+                System.out.println("\tNumber of changesets: " + changesets.size() + " has changes? " + changesets.hasChanges() + " net increase: " + changesets.netIncrease());
+        }
 
         return filter.filter(page, changesets);
     }
