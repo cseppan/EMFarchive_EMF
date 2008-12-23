@@ -330,12 +330,12 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         ModelToRun runModel = caseObj.getModel();
         
         modelToRunCombo = new ComboBox(presenter.getModelToRuns());
-        modelToRunCombo.setToolTipText("Value set to parameter environment variable 'MODEL_LABEL'.");
+        modelToRunCombo.setToolTipText("This value is set for the environment variable 'MODEL_LABEL'.");
         modelToRunCombo.setSelectedItem(runModel);
         modelToRunCombo.setPreferredSize(new Dimension(122, 22));
         
         modelVersionField = new TextField("modelVersion", fieldWidth / 2);
-        modelVersionField.setToolTipText("Value set to parameter environment variable 'MODEL_LABEL'.");
+        modelVersionField.setToolTipText("This value is set for the environment variable 'MODEL_LABEL'.");
         modelVersionField.setText(caseObj.getModelVersion());
         modelVersionField.setEditable(false);
         modelVersionField.setPreferredSize(new Dimension(122, 22));
@@ -357,7 +357,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
     private ComboBox gridResolution() throws EmfException {
         gridResolutionCombo = new ComboBox(presenter.getGridResolutions());
-        gridResolutionCombo.setToolTipText("Value set to parameter environment variable 'EMF_GRID'.");
+        gridResolutionCombo.setToolTipText("This value is set for the environment variable 'EMF_GRID'.");
         gridResolutionCombo.setSelectedItem(caseObj.getGridResolution());
         gridResolutionCombo.setPreferredSize(defaultDimension);
 
@@ -375,7 +375,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
     private ComboBox airQualityModels() throws EmfException {
         airQualityModelsCombo = new ComboBox(presenter.getAirQualityModels());
-        airQualityModelsCombo.setToolTipText("Value set to parameter environment variable 'EMF_AQM'.");
+        airQualityModelsCombo.setToolTipText("This value is set for the environment variable 'EMF_AQM'.");
         airQualityModelsCombo.setSelectedItem(caseObj.getAirQualityModel());
         airQualityModelsCombo.setPreferredSize(defaultDimension);
 
@@ -400,7 +400,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
     private ComboBox emissionsYears() throws EmfException {
         emissionsYearCombo = new ComboBox(presenter.getEmissionsYears());
-        emissionsYearCombo.setToolTipText("Value set to parameter environment variable 'BASE_YEAR'.");
+        emissionsYearCombo.setToolTipText("This value is set for the environment variable 'BASE_YEAR'.");
         emissionsYearCombo.setSelectedItem(caseObj.getEmissionsYear());
         emissionsYearCombo.setPreferredSize(defaultDimension);
 
@@ -409,7 +409,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
     private ComboBox grids() throws EmfException {
         gridCombo = new ComboBox(presenter.getGrids());
-        gridCombo.setToolTipText("Value set to parameter environment variable 'IOAPI_GRIDNAME_1'.");
+        gridCombo.setToolTipText("This value is set for the environment variable 'IOAPI_GRIDNAME_1'.");
         gridCombo.setSelectedItem(caseObj.getGrid());
         gridCombo.setPreferredSize(defaultDimension);
 
@@ -426,7 +426,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
     private ComboBox speciations() throws EmfException {
         speciationCombo = new ComboBox(presenter.getSpeciations());
-        speciationCombo.setToolTipText("Value set to parameter environment variable 'EMF_SPC'.");
+        speciationCombo.setToolTipText("This value is set for the environment variable 'EMF_SPC'.");
         speciationCombo.setSelectedItem(caseObj.getSpeciation());
         speciationCombo.setPreferredSize(defaultDimension);
 

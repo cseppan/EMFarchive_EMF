@@ -261,7 +261,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private TextField futureYear() {
         futureYear = new TextField("Future Year", fieldWidth);
-        futureYear.setToolTipText("Value set to parameter environment variable 'FUTURE_YEAR'.");
+        futureYear.setToolTipText("This value is set for the environment variable 'FUTURE_YEAR'.");
         futureYear.setText(caseObj.getFutureYear() + "");
         changeablesList.addChangeable(futureYear);
         futureYear.setPreferredSize(defaultDimension);
@@ -305,7 +305,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private JComponent isTemplate() {
         isTemplate = new CheckBox(" Is Template");
-        isTemplate.setToolTipText("If checked, case is used as a template.");
+        isTemplate.setToolTipText("If checked, case is a template and will not run.");
         isTemplate.setSelected(caseObj.isCaseTemplate());
 
         return isTemplate;
@@ -313,7 +313,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private JComponent isFinal() {
         isFinal = new CheckBox("");
-        isFinal.setToolTipText("If checked, no changes will be made to case.");
+        isFinal.setToolTipText("If checked, no changes should be made to the case.");
         isFinal.setSelected(caseObj.getIsFinal());
 
         return isFinal;
@@ -339,14 +339,14 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         if (caseObj.getModel() == null)
             messagePanel.setMessage("Please specify model to run. ");
         modelToRunCombo = new ComboBox(presenter.getModelToRuns());
-        modelToRunCombo.setToolTipText("Value set to parameter environment variable 'MODEL_LABEL'.");
+        modelToRunCombo.setToolTipText("This value is set for the environment variable 'MODEL_LABEL'.");
         modelToRunCombo.setSelectedItem(runModel);
         modelToRunCombo.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
         changeablesList.addChangeable(modelToRunCombo);
 
         modelVersionField = new TextField("modelVersion", fieldWidth / 2);
-        modelVersionField.setToolTipText("Value set to parameter environment variable 'MODEL_LABEL'.");
+        modelVersionField.setToolTipText("This value is set for the environment variable 'MODEL_LABEL'.");
         modelVersionField.setText(caseObj.getModelVersion());
         modelVersionField.setPreferredSize(new Dimension(122, 22));
         addPopupMenuListener(modelToRunCombo, "modeltoruns");
@@ -370,7 +370,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox gridResolution() throws EmfException {
         gridResolutionCombo = new EditableComboBox(presenter.getGridResolutions());
-        gridResolutionCombo.setToolTipText("Value set to parameter environment variable 'EMF_GRID'.");
+        gridResolutionCombo.setToolTipText("This value is set for the environment variable 'EMF_GRID'.");
         gridResolutionCombo.setSelectedItem(caseObj.getGridResolution());
         gridResolutionCombo.setPreferredSize(defaultDimension);
         changeablesList.addChangeable(gridResolutionCombo);
@@ -399,7 +399,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox airQualityModels() throws EmfException {
         airQualityModelsCombo = new EditableComboBox(presenter.getAirQualityModels());
-        airQualityModelsCombo.setToolTipText("Value set to parameter environment variable 'EMF_AQM'.");
+        airQualityModelsCombo.setToolTipText("This value is set for the environment variable 'EMF_AQM'.");
         airQualityModelsCombo.setSelectedItem(caseObj.getAirQualityModel());
         airQualityModelsCombo.setPreferredSize(defaultDimension);
 
@@ -427,7 +427,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox emissionsYears() throws EmfException {
         emissionsYearCombo = new EditableComboBox(presenter.getEmissionsYears());
-        emissionsYearCombo.setToolTipText("Value set to parameter environment variable 'BASE_YEAR'.");
+        emissionsYearCombo.setToolTipText("This value is set for the environment variable 'BASE_YEAR'.");
         emissionsYearCombo.setSelectedItem(caseObj.getEmissionsYear());
         emissionsYearCombo.setPreferredSize(defaultDimension);
         changeablesList.addChangeable(emissionsYearCombo);
@@ -437,7 +437,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox grids() throws EmfException {
         gridCombo = new EditableComboBox(presenter.getGrids());
-        gridCombo.setToolTipText("Value set to parameter environment variable 'IOAPI_GRIDNAME_1'.");
+        gridCombo.setToolTipText("This value is set for the environment variable 'IOAPI_GRIDNAME_1'.");
         gridCombo.setSelectedItem(caseObj.getGrid());
         gridCombo.setPreferredSize(defaultDimension);
         changeablesList.addChangeable(gridCombo);
@@ -456,7 +456,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox speciations() throws EmfException {
         speciationCombo = new EditableComboBox(presenter.getSpeciations());
-        speciationCombo.setToolTipText("Value set to parameter environment variable 'EMF_SPC'.");
+        speciationCombo.setToolTipText("This value is set for the environment variable 'EMF_SPC'.");
         speciationCombo.setSelectedItem(caseObj.getSpeciation());
         speciationCombo.setPreferredSize(defaultDimension);
 
