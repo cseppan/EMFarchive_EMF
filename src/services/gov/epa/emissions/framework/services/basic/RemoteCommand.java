@@ -224,7 +224,8 @@ public class RemoteCommand {
                 if (errorMsg == null)
                     errorMsg = "Error message not readable from remote machine.";
 
-                throw new EmfException("ERROR executing remote command: " + executeCmd + lineSep + errorMsg);
+//                throw new EmfException("ERROR executing remote command: " + executeCmd + lineSep + errorMsg);
+                throw new EmfException(errorMsg);
 
             }
 
@@ -233,7 +234,7 @@ public class RemoteCommand {
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("ERROR executing remote command: " + executeCmd);
-            throw new EmfException("ERROR executing remote command: " + e.getMessage());
+            throw new EmfException("ERROR from remote command: " + e.getMessage());
         }
     }
 
