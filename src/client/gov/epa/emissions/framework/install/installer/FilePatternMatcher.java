@@ -43,11 +43,13 @@ public class FilePatternMatcher {
 
     public String[] matchingNames(String[] names) {
         List matchingNames = new ArrayList();
-
-        for (int i = 0; i < names.length;i++) {
-            Matcher m = pattern.matcher(names[i]);
-            if (m.matches()) {
-                matchingNames.add(names[i]);
+        if (names != null)
+        {
+            for (int i = 0; i < names.length;i++) {
+                Matcher m = pattern.matcher(names[i]);
+                if (m.matches()) {
+                    matchingNames.add(names[i]);
+                }
             }
         }
         return (String[]) matchingNames.toArray(new String[0]);
