@@ -183,8 +183,8 @@ public class PrintCaseDialog extends JDialog {
         if (specified == null || specified.trim().isEmpty() || specified.trim().length() == 1)
             throw new EmfException("Please specify a valid folder.");
         
-        if (specified.contains("/home/") || specified.endsWith("/home"))
-            throw new EmfException("Export data into user's home directory is not allowed.");
+        if (specified.contains("/home/"))
+            throw new EmfException("The EMF (tomcat user) cannot export data into a home directory.");
         
         if (specified.charAt(0) != '/' && specified.charAt(1) != ':')
             throw new EmfException("Specified folder is not in a right format (ex. C:\\, /home, etc.).");
