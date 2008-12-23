@@ -98,7 +98,7 @@ public class SQLQAAnnualQuery {
          tokenizer2.nextToken();
          while (tokenizer2.hasMoreTokens()) {
              String datasetName = tokenizer2.nextToken().trim();
-             System.out.println("The dataset name is : \n" + datasetName);
+//             System.out.println("The dataset name is : \n" + datasetName);
              if (datasetName.length() > 0)
                  allDatasetNames.add(datasetName);
              else {
@@ -149,7 +149,7 @@ public class SQLQAAnnualQuery {
             String month = "";
             EmfDataset dataset=null;
             try {
-                System.out.println("allDatasetNames.size() = " + allDatasetNames.size() + "  "+allDatasetNames.get(j));
+//                System.out.println("allDatasetNames.size() = " + allDatasetNames.size() + "  "+allDatasetNames.get(j));
                 dataset = getDataset(allDatasetNames.get(j).toString().trim());
             } catch(EmfException ex){
                 throw new EmfException("The dataset name " + allDatasetNames.get(j) + " is not valid");
@@ -396,7 +396,7 @@ public class SQLQAAnnualQuery {
         }
         
         private EmfDataset getDataset(String dsName) throws EmfException {
-            System.out.println("Database name = \n" + dsName + "\n");
+//            System.out.println("Database name = \n" + dsName + "\n");
             DatasetDAO dao = new DatasetDAO();
             try {
                 return dao.getDataset(sessionFactory.getSession(), dsName);
