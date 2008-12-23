@@ -163,12 +163,12 @@ public class CaseJobTask extends Task {
             if (hostName.equals("localhost")) {
                 // execute on local machine
                 executionStr = executionStr + " " + this.runRedirect + " " + this.logFile;
-                msg1 = "Submitting job to " + hostName + ". Execution string: " + executionStr + lineSep;
+                msg1 = "Submitted job to " + hostName + ". Execution string: " + executionStr + lineSep;
                 InputStream inStream = RemoteCommand.executeLocal(executionStr);
                 processLogs(executionStr, inStream, "localhost");
             } else {
                 // execute on remote machine and log stdout
-                msg1 = "Submitting job to " + hostName + ". Execution string: " + executionStr + lineSep;
+                msg1 = "Submitted job to " + hostName + ". Execution string: " + executionStr + lineSep;
                 InputStream inStream = RemoteCommand.execute(username, hostName, executionStr);
                 processLogs(executionStr, inStream, hostName);
                 // capture PBSqueueId and send back to case job submitter
