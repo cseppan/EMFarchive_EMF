@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement.jobs;
 
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.io.DeepCopy;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
@@ -119,6 +120,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         newJob.setRunLog(null);
         newJob.setRunStartDate(null);
         newJob.setRunCompletionDate(null);
+        newJob.setRunJobUser(null); // not running at this moment
 
         addNewJob(newJob);
     }
@@ -129,11 +131,15 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
                 copyJob2CurrentCase(caseId, job, null);
         } else {
             CaseJob[] jobsArray = jobs.toArray(new CaseJob[0]);
+            User user = session.user();
 
-            for (int i = 0; i < jobs.size(); i++)
+            for (int i = 0; i < jobs.size(); i++) {
                 jobsArray[i].setParentCaseId(this.caseObj.getId());
+                jobsArray[i].setRunJobUser(null); // not running at this moment
+                jobsArray[i].setUser(user); // job owner changes
+            }
 
-            service().addCaseJobs(session.user(), caseId, jobsArray);
+            service().addCaseJobs(user, caseId, jobsArray);
         }
     }
 

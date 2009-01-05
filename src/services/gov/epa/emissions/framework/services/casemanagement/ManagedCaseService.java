@@ -1443,6 +1443,8 @@ public class ManagedCaseService {
         copied.setRunLog(null);
         copied.setRunStartDate(null);
         copied.setRunCompletionDate(null);
+        copied.setRunJobUser(null); // no running user at this time
+        copied.setUser(user); // the user who makes the copy should be the owner of the copy
 
         return addCaseJob(user, copied, true);
     }
@@ -4284,7 +4286,7 @@ public class ManagedCaseService {
             job.setParentCaseId(parentCaseId);
             job.setJobGroup(jobGroup);
             job.setUser(user);
-            job.setRunJobUser(user);
+            job.setRunJobUser(null);
             copied.add(job);
         }
 
