@@ -419,9 +419,6 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
 
         EmfFileInfo[] dirs = fsv.getSubdirs(dir);
 
-        if (dirs == null)
-            throw new EmfException("Connection to server timed out.");
-
         folder.setText(dirs[0].getAbsolutePath());
         if (!dirs[0].getAbsolutePath().equals(currentDir.getAbsolutePath()))
             currentDir = dirs[0];

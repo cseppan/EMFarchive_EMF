@@ -655,9 +655,10 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
             File childFile = fsv.getChild(EmfFileSerializer.convert(file), child);
+            checkDirPermission(childFile);
             return EmfFileSerializer.convert(childFile);
         } catch (Exception e) {
-            throw new EmfException("Could not get a child.");
+            throw new EmfException(e.getMessage());
         }
     }
 
@@ -665,9 +666,10 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             EmfServerFileSystemView fsv = new EmfServerFileSystemView();
             File parentFile = fsv.getParentDirectory(EmfFileSerializer.convert(file));
+            checkDirPermission(parentFile);
             return EmfFileSerializer.convert(parentFile);
         } catch (Exception e) {
-            throw new EmfException("Could not get a parent directory.");
+            throw new EmfException(e.getMessage());
         }
     }
 
@@ -680,13 +682,19 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             
             currentDirectory = gooddir;
             File currentdirFile = new File(currentDirectory.getAbsolutePath());
+            checkDirPermission(currentdirFile);
             listDirsAndFiles(currentdirFile.listFiles(), currentdirFile, "*");
 
             return this.subdirs != null ? this.subdirs : new EmfFileInfo[0];
         } catch (Exception e) {
             LOG.warn("Could not get subdirectories of  " + dir.getAbsolutePath() + ": " + e.getMessage());
-            throw new EmfException("Could not get subdirectories of  " + dir.getAbsolutePath() + ": " + e.getMessage());
+            throw new EmfException(e.getMessage());
         }
+    }
+
+    private void checkDirPermission(File dir) throws EmfException {
+        if (dir.exists() && dir.isDirectory() && dir.listFiles() == null)
+            throw new EmfException("Tomcat doesn't have read permission.");
     }
 
     private synchronized EmfFileInfo correctEmptyDir(EmfFileInfo dir) throws IOException {
@@ -696,7 +704,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             resetPath = true;
         else {
             File f = new File(dir.getAbsolutePath());
-
+            
             if (f.isFile())
                 return EmfFileSerializer.convert(f.getParentFile());
             

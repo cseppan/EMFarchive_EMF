@@ -99,28 +99,28 @@ public class EmfFileSystemView implements Serializable {
         return result;
     }
 
-    public EmfFileInfo getChild(EmfFileInfo file, String child) {
+    public EmfFileInfo getChild(EmfFileInfo file, String child) throws EmfException {
         try {
             EmfFileInfo fileInfo = service.getChild(file, child);
             return fileInfo;
         } catch (Exception e) {
-            return null;
+            throw new EmfException(e.getMessage());
         }
     }
 
-    public EmfFileInfo[] getSubdirs(EmfFileInfo file) {
+    public EmfFileInfo[] getSubdirs(EmfFileInfo file) throws EmfException {
         try {
             return service.getSubdirs(file);
         } catch (Exception e) {
-            return null;
+            throw new EmfException(e.getMessage());
         }
     }
 
-    public EmfFileInfo getParentDirectory(EmfFileInfo file) {
+    public EmfFileInfo getParentDirectory(EmfFileInfo file) throws EmfException {
         try {
             return service.getParentDirectory(file);
         } catch (Exception e) {
-            return null;
+            throw new EmfException(e.getMessage());
         }
     }
 
