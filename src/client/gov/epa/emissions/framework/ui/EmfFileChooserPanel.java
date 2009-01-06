@@ -15,10 +15,16 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,6 +65,10 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
 
     private boolean dirOnly;
 
+    private JPanel subdirsPanel;
+
+    private Window window;
+
     private SingleLineMessagePanel messagePanel;
 
     private Component parent;
@@ -75,12 +85,14 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
 
     private final String[] filters = { "*", "*.*", "*.txt", "*.ncf" };
 
-    public EmfFileChooserPanel(Component parent, EmfFileSystemView fsv, EmfFileInfo initialFile, boolean dirOnly) {
+    public EmfFileChooserPanel(Component parent, EmfFileSystemView fsv, EmfFileInfo initialFile, boolean dirOnly,
+            Window window) {
         this.fsv = fsv;
         this.currentDir = initialFile;
         this.dirOnly = dirOnly;
         this.messagePanel = new SingleLineMessagePanel();
         this.parent = parent;
+        this.window = window;
         this.curFilterList = new ArrayList<String>();
         this.curFilterList.addAll(Arrays.asList(filters));
         if (!dirOnly)
@@ -99,6 +111,13 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         add(upperPanel());
         add(fileListPanels(subdirs, files));
 
+        // Make sub directory list get the focus whenever frame is activated.
+        window.addWindowFocusListener(new WindowAdapter() {
+            public void windowGainedFocus(WindowEvent e) {
+                subdirsList.requestFocusInWindow();
+            }
+        });
+
         if (dirOnly)
             setPreferredSize(new Dimension(424, 300));
         else
@@ -110,7 +129,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
     private JPanel fileListPanels(EmfFileInfo[] subdirs, EmfFileInfo[] files) {
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.X_AXIS));
-        JPanel subdirsPanel = subdirPanel(subdirs);
+        subdirsPanel = subdirPanel(subdirs);
 
         if (dirOnly) {
             container.add(subdirsPanel);
@@ -280,21 +299,21 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         return createSortFilterPanel(parent);
-//        return new SortFilterSelectionPanel(parent, selectModel);
+        // return new SortFilterSelectionPanel(parent, selectModel);
     }
-    
+
     private JPanel createSortFilterPanel(Component parent) {
         SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parent, selectModel);
         sortFilterPanel.sort(sortCriteria());
         return sortFilterPanel;
-//        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
-//        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
-//        return scrollPane;
+        // JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
+        // sortFilterPanel.setPreferredSize(new Dimension(450, 60));
+        // return scrollPane;
     }
-    
+
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Name"};
-        return new SortCriteria(columnNames, new boolean[] { true }, new boolean[] { false});
+        String[] columnNames = { "Name" };
+        return new SortCriteria(columnNames, new boolean[] { true }, new boolean[] { false });
     }
 
     private JScrollPane subdirListWidgit(EmfFileInfo[] files) {
@@ -306,17 +325,28 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         subdirsList = new JList();
         subdirsList.setModel(model);
         subdirsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        subdirsList.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
+        subdirsList.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    openSelectedDir(e);
+                }
+            }
+
+            public void keyReleased(KeyEvent e) {
+                //
+            }
+
+            public void keyTyped(KeyEvent e) {
+                //
+            }
+        });
+
         subdirsList.addMouseListener(new MouseListener() {
 
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    Object source = e.getSource();
-                    EmfFileInfo fileInfo = (EmfFileInfo) ((JList) source).getSelectedValue();
-
-                    if (fileInfo.getName().equals("."))
-                        return;
-
-                    updateDirSelections(fileInfo);
+                    openSelectedDir(e);
                 }
 
             }
@@ -346,6 +376,16 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         return new JScrollPane(subdirsList);
     }
 
+    private void openSelectedDir(InputEvent e) {
+        Object source = e.getSource();
+        EmfFileInfo fileInfo = (EmfFileInfo) ((JList) source).getSelectedValue();
+
+        if (fileInfo == null || fileInfo.getName() == null || fileInfo.getName().equals("."))
+            return;
+
+        updateDirSelections(fileInfo);
+    }
+
     protected void updateDirSelections(EmfFileInfo fileInfo) {
         clearMsg();
         currentDir = fileInfo;
@@ -369,6 +409,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
             messagePanel.setError(e.getMessage());
         } finally {
             setCursor(Cursor.getDefaultCursor());
+            setFocusOnDirList();
         }
     }
 
@@ -418,6 +459,10 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
 
     public EmfFileInfo selectedDirectory() {
         return this.currentDir;
+    }
+    
+    public void setFocusOnDirList() {
+        subdirsList.requestFocusInWindow();
     }
 
     public void run() {

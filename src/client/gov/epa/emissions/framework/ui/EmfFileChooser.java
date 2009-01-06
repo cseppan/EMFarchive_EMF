@@ -45,6 +45,8 @@ public class EmfFileChooser extends JComponent {
     public static final String CANCEL_SELECTION = "CancelSelection";
 
     public static final String APPROVE_SELECTION = "ApproveSelection";
+    
+    private static EmfFileInfo LAST_SELECTED_DIR = null;
 
     private EmfFileInfo current;
 
@@ -55,7 +57,7 @@ public class EmfFileChooser extends JComponent {
     private int returnValue = ERROR_OPTION;
 
     private int dialogType = OPEN_DIALOG;
-
+    
     private JDialog dialog = null;
 
     private EmfFileChooserPanel chooserPanel;
@@ -65,8 +67,11 @@ public class EmfFileChooser extends JComponent {
     private EmfFileSystemView fsv;
 
     public EmfFileChooser(EmfFileInfo dir, EmfFileSystemView fsv) {
-        this.current = dir;
         this.fsv = fsv;
+        this.current = dir;
+        
+        if (LAST_SELECTED_DIR != null)
+            this.current = LAST_SELECTED_DIR;
     }
 
     public EmfFileChooser(EmfFileSystemView fsv) {
@@ -125,7 +130,7 @@ public class EmfFileChooser extends JComponent {
         JDialog dialog = new JDialog((Frame) parent, title, true);
         dialog.setComponentOrientation(this.getComponentOrientation());
 
-        this.chooserPanel = new EmfFileChooserPanel(parent, fsv, current, dirOnly);
+        this.chooserPanel = new EmfFileChooserPanel(parent, fsv, current, dirOnly, dialog);
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(new BorderLayout());
         contentPane.add(this.chooserPanel, BorderLayout.CENTER);
@@ -196,6 +201,7 @@ public class EmfFileChooser extends JComponent {
     private Action selectAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                LAST_SELECTED_DIR = chooserPanel.selectedDirectory();
                 closeDialog();
                 returnValue = APPROVE_OPTION;
             }
