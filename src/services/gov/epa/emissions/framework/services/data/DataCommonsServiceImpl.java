@@ -53,15 +53,17 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
 
     public synchronized Keyword[] getKeywords() throws EmfException {
+        Session session = sessionFactory.getSession();
+        
         try {
-            Session session = sessionFactory.getSession();
             List keywords = dao.getKeywords(session);
-            session.close();
-
+            
             return (Keyword[]) keywords.toArray(new Keyword[keywords.size()]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Keywords", e);
             throw new EmfException("Could not get all Keywords");
+        } finally {
+            session.close();
         }
     }
 

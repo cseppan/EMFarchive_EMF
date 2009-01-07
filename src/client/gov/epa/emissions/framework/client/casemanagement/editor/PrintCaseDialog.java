@@ -165,7 +165,7 @@ public class PrintCaseDialog extends JDialog {
         EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
 
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(service));
-        chooser.setTitle("Select a folder for print case files");
+        chooser.setTitle("Select a folder for exported case settings");
         int option = chooser.showDialog(parentConsole, "Select a folder");
 
         EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;

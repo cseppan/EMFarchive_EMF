@@ -326,6 +326,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         subdirsList.setModel(model);
         subdirsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         subdirsList.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
+        subdirsList.setSelectedIndex(0);
         subdirsList.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -460,6 +461,20 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
     
     public void setFocusOnDirList() {
         subdirsList.requestFocusInWindow();
+    }
+    
+    public void setSelectionCurrentDir() {
+        EmfFileInfo selected = (EmfFileInfo)subdirsList.getSelectedValue();
+        
+        if (selected == null)
+            return;
+        
+        String dir = selected.getName();
+        
+        if (!dir.equals(".") && !dir.equals("..")) {
+            this.folder.setText(dir);
+            this.currentDir = selected;
+        }
     }
 
     public void run() {

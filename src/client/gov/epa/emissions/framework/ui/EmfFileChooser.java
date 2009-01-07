@@ -201,6 +201,7 @@ public class EmfFileChooser extends JComponent {
     private Action selectAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                chooserPanel.setSelectionCurrentDir();
                 LAST_SELECTED_DIR = chooserPanel.selectedDirectory();
                 closeDialog();
                 returnValue = APPROVE_OPTION;

@@ -275,8 +275,8 @@ public class DatasetDAO {
                         "select new EmfDataset( DS.id, DS.name, DS.defaultVersion, DS.datasetType.id, DS.datasetType.name) from EmfDataset as DS where DS.datasetType.id = "
                                 + datasetTypeId
                                 + " and lower(DS.name) like "
-                                + "'%"
-                                + nameContains.toLowerCase().trim() + "%' and DS.status <> 'Deleted' order by DS.name")
+                                + "'%%"
+                                + nameContains.toLowerCase().trim() + "%%' and DS.status <> 'Deleted' order by DS.name")
                 .list();
     }
 
