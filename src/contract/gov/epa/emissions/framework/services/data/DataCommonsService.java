@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -109,5 +110,7 @@ public interface DataCommonsService {
     EmfFileInfo getChild(EmfFileInfo file, String child) throws EmfException;
 
     EmfFileInfo getParentDirectory(EmfFileInfo file) throws EmfException;
+
+    void copyDataset(EmfDataset dataset, Version version, User user) throws EmfException;
 
 }

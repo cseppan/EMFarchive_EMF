@@ -28,11 +28,18 @@ public class VersionsViewPresenter {
     }
 
     public void doView(Version version, String table, DataView view) throws EmfException {
-//        if (!version.isFinalVersion())
-//            throw new EmfException("Can only view a version that is Final");
+        // if (!version.isFinalVersion())
+        // throw new EmfException("Can only view a version that is Final");
 
         DataViewPresenter presenter = new DataViewPresenter(dataset, version, table, view, session);
         presenter.display();
+    }
+
+    public void copyDataset(Version version) throws EmfException {
+        if (!version.isFinalVersion())
+            throw new EmfException("Can only copy a version that is Final");
+
+        session.dataCommonsService().copyDataset(dataset, version, session.user());
     }
 
 }

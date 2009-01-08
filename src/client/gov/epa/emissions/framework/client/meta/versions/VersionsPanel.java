@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.versions;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -129,12 +130,40 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
         Button view = new ViewButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                clear();
                 doView(tableCombo);
             }
         });
+        
         panel.add(view);
 
+        Button copy = new CopyButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                clear();
+                copyDataSet(tableCombo.getSelectedItem());
+            }
+        });
+        
+        copy.setToolTipText("Copy a Version to New Dataset");
+        panel.add(copy);
+        
         return panel;
+    }
+
+    private void copyDataSet(Object table) {
+        Version[] versions = tableData.selected();
+        
+        if (versions.length < 1) {
+            displayError("Please select at least one Version");
+            return;
+        }
+        
+        if (versions.length > 1) {
+            displayError("Please select only one final Version");
+            return;
+        }
+        
+        showMsg("Please go see the copied dataset in the datasets manager window.");
     }
 
     private void doView(final JComboBox tableCombo) {
@@ -162,6 +191,11 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private void displayError(String message) {
         messagePanel.setError(message);
+        refreshLayout();
+    }
+    
+    private void showMsg(String message) {
+        messagePanel.setMessage(message);
         refreshLayout();
     }
 
