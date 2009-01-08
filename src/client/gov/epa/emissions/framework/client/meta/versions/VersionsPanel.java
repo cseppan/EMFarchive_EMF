@@ -163,6 +163,13 @@ public class VersionsPanel extends JPanel implements VersionsView {
             return;
         }
         
+        try {
+            presenter.copyDataset(versions[0]);
+        } catch (EmfException e) {
+            displayError(e.getMessage());
+            return;
+        }
+        
         showMsg("Please go see the copied dataset in the datasets manager window.");
     }
 
