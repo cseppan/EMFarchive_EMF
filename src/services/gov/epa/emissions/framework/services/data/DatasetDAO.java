@@ -123,6 +123,10 @@ public class DatasetDAO {
         hibernateFacade.add(dataset, session);
     }
 
+    public void add(Version version, Session session) {
+        hibernateFacade.add(version, session);
+    }
+    
     public void updateWithoutLocking(EmfDataset dataset, Session session) throws Exception {
         try {
             renameEmissionTable(dataset, getDataset(session, dataset.getId()), session);
@@ -1051,6 +1055,12 @@ public class DatasetDAO {
             if (DebugLevels.DEBUG_16)
                 LOG.warn(updatedItems + " items updated from " + EmfDataset.class.getName() + " table.");
         }
+    }
+
+    public List<String> getDatasetNamesStartWith(String start, Session session) {
+        String query = "SELECT DS.name FROM " + EmfDataset.class.getSimpleName() + " AS DS WHERE lower(DS.name) LIKE "
+                       + "'%" + start.toLowerCase().trim() + "%' ORDER BY DS.name";
+        return session.createQuery(query).list();
     }
 
 }

@@ -9,7 +9,6 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -860,20 +859,6 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             }
             session.close();
         }
-    }
-
-    public void copyDataset(EmfDataset dataset, Version version, User user) throws EmfException {
-        Session session = sessionFactory.getSession();
-        
-        try {
-            //dao.copyDataset(dataset, version, session);
-        } catch (Exception e) {
-            LOG.error("Error in copying dataset.", e);
-            throw new EmfException(e.getMessage());
-        } finally {
-            session.close();
-        }
-        
     }
 
 }

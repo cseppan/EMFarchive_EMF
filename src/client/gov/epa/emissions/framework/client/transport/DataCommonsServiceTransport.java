@@ -9,14 +9,12 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DatasetNote;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
@@ -477,18 +475,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.setVoidReturnType();
 
         call.request(new Object[] { user, templates, datasetTypeIds, new Boolean(replace) });
-    }
-
-    public void copyDataset(EmfDataset dataset, Version version, User user) throws EmfException {
-        EmfCall call = call();
-        
-        call.setOperation("copyDataset");
-        call.addParam("dataset", mappings.dataset());
-        call.addParam("version", mappings.version());
-        call.addParam("user", mappings.user());
-        call.setVoidReturnType();
-
-        call.request(new Object[] { dataset, version, user });
     }
 
 }

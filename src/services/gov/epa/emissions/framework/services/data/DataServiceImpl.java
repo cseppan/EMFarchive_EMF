@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.io.VersionedDatasetQuery;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.security.User;
@@ -21,7 +22,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -701,5 +704,87 @@ public class DataServiceImpl implements DataService {
             closeDB(dbServer);
         }
     }
+    
+    public synchronized void copyDataset(EmfDataset dataset, Version version, User user) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            EmfDataset copied = (EmfDataset) DeepCopy.copy(dataset);
+            copied.setName(getUniqueNewName("Copy of " + dataset.getName() + "_v" + version.getVersion()));
+            copied.setStatus("Copied from " + dataset.getName() + "(version " + version.getVersion() + ")");
+            copied.setCreator(user.getUsername());
+            copied.setDefaultVersion(0);
+            
+            Date time = new Date();
+            copied.setCreatedDateTime(time);
+            copied.setAccessedDateTime(time);
+            copied.setModifiedDateTime(time);
+            dao.add(copied, session);
+            
+            EmfDataset loaded = dao.getDataset(session, copied.getName());
+            
+            Version defaultVersion = new Version(0);
+            defaultVersion.setName("Initial Version");
+            defaultVersion.setPath("");
+            defaultVersion.setCreator(user);
+            defaultVersion.setDatasetId(loaded.getId());
+            defaultVersion.setLastModifiedDate(time);
+            
+            dao.add(defaultVersion, session);
+        } catch (Exception e) {
+            String error = "Error in copying dataset.";
+            String msg = e.getMessage();
+            LOG.error(error, e);
+            throw new EmfException(msg == null ? error : error + msg.substring(msg.length() - 50));
+        } finally {
+            session.close();
+        }
+        
+    }
+    
+    private String getUniqueNewName(String name) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            List<String> names = dao.getDatasetNamesStartWith(name, session);
+
+            if (names == null || names.size() == 0)
+                return name;
+
+            return name + " " + getSequence(name, names);
+        } catch (Exception e) {
+            LOG.error("Could not get all dataset names.\n", e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+    
+    private int getSequence(String stub, List<String> names) {
+        int sequence = names.size() + 1;
+        String integer = "";
+
+        try {
+            for (Iterator<String> iter = names.iterator(); iter.hasNext();) {
+                integer = iter.next().substring(stub.length()).trim();
+
+                if (!integer.isEmpty()) {
+                    int temp = Integer.parseInt(integer);
+
+                    if (temp == sequence)
+                        ++sequence;
+                    else if (temp > sequence)
+                        sequence = temp + 1;
+                }
+            }
+
+            return sequence;
+        } catch (Exception e) {
+            // NOTE: Assume one dataset won't be copied 10000 times.
+            // This is farely safe assuming the random number do not duplicate.
+            return Math.abs(new Random().nextInt()) % 10000;
+        }
+    }
+
 
 }

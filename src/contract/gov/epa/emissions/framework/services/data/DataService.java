@@ -51,4 +51,5 @@ public interface DataService {
     
     void replaceColValues(String table, String colName, String find, String replaceWith, Version version, String rowFilter) throws EmfException;
 
+    void copyDataset(EmfDataset dataset, Version version, User user) throws EmfException;
 }

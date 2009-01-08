@@ -264,5 +264,16 @@ public class DataServiceTransport implements DataService {
         call.request(new Object[]{table, colName, find, replaceWith, version, rowFilter});
     }
 
+    public void copyDataset(EmfDataset dataset, Version version, User user) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("copyDataset");
+        call.addParam("dataset", mappings.dataset());
+        call.addParam("version", mappings.version());
+        call.addParam("user", mappings.user());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { dataset, version, user });
+    }
 
 }
