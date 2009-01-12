@@ -121,6 +121,9 @@ public class ExportTask extends Task {
                     return;
                 // updateDataset(dataset); //Disabled because of nothing updated during exporting
 
+                accesslog.setEnddate(new Date());
+                accesslog.setLinesExported(exportedLineCount);
+
                 String msghead = "Completed export of " + dataset.getName();
                 String msgend = " in " + accesslog.getTimereqrd() + " seconds.";
 
@@ -136,12 +139,11 @@ public class ExportTask extends Task {
 
             String query = "SELECT obj.id from " + AccessLog.class.getSimpleName() + " obj WHERE obj.datasetId = "
                     + accesslog.getDatasetId() + " AND obj.version = '" + accesslog.getVersion() + "' "
-                    + "AND obj.description LIKE '%" + accesslog.getDescription() + "%'";
+//                    + "AND obj.description LIKE '%%" + accesslog.getDescription() + "%%'";
+                    + "AND obj.description = '" + accesslog.getDescription() + "'";
             List<?> list = session.createQuery(query).list();
 
             if (list == null || list.size() == 0) {
-                accesslog.setEnddate(new Date());
-                accesslog.setLinesExported(exportedLineCount);
                 loggingService.setAccessLog(accesslog);
             }
 
