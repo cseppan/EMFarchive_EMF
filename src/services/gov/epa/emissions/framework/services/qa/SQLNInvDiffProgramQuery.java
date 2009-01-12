@@ -142,6 +142,8 @@ public class SQLNInvDiffProgramQuery {
                      innerSQLBase += "t" + j + ".fips=t" + (j-1) + ".fips";
                  else if (summaryTypeToken.equals("County+SCC")) 
                      innerSQLBase += "t" + j + ".fips=t" + (j-1) + ".fips and t" + j + ".scc=t" + (j-1) + ".scc";
+                 else if (summaryTypeToken.equals("SCC")) 
+                     innerSQLBase += "t" + j + ".scc=t" + (j-1) + ".scc";
                  innerSQLBase += " and t" + j + ".poll=t" + (j-1) + ".poll";
              }
          }
@@ -161,6 +163,8 @@ public class SQLNInvDiffProgramQuery {
              sql = "coalesce(" + aliasedFipsList + ") as fips";
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "coalesce(" + aliasedFipsList + ") as fips, coalesce(" + aliasedSCCList + ") as scc";
+         else if (summaryTypeToken.equals("SCC")) 
+             sql = "coalesce(" + aliasedSCCList + ") as scc";
          diffQuery = diffQuery.replaceAll("@!@", sql);
 
          //replace !@! symbol with main columns in inner select statement
@@ -172,6 +176,8 @@ public class SQLNInvDiffProgramQuery {
              sql = "fips";
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "fips, scc";
+         else if (summaryTypeToken.equals("SCC")) 
+             sql = "scc";
          diffQuery = diffQuery.replaceAll("!@!", sql);
          
          //replace @@@ symbol with group by columns in outer select statement
@@ -183,6 +189,8 @@ public class SQLNInvDiffProgramQuery {
              sql = "coalesce(" + aliasedFipsList + ")";
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "coalesce(" + aliasedFipsList + "), coalesce(" + aliasedSCCList + ")";
+         else if (summaryTypeToken.equals("SCC")) 
+             sql = "coalesce(" + aliasedSCCList + ")";
          diffQuery = diffQuery.replaceAll("@@@", sql);
          
          //replace !!@ symbol with group by columns in inner select statement
@@ -194,6 +202,8 @@ public class SQLNInvDiffProgramQuery {
              sql = "fips";
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "fips, scc";
+         else if (summaryTypeToken.equals("SCC")) 
+             sql = "scc";
          diffQuery = diffQuery.replaceAll("!!@", sql);
 
         //return the built query

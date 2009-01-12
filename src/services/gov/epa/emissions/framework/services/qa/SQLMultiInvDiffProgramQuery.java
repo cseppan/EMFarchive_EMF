@@ -174,6 +174,8 @@ public class SQLMultiInvDiffProgramQuery {
            sql = "b.fips=c.fips";
        else if (summaryTypeToken.equals("County+SCC")) 
            sql = "b.fips=c.fips and b.scc=c.scc";
+       else if (summaryTypeToken.equals("SCC")) 
+           sql = "b.scc=c.scc";
        diffQuery = diffQuery.replaceAll("!!!", sql);
        
      //replace @@! symbol with main columns in outer select statement
@@ -185,6 +187,8 @@ public class SQLMultiInvDiffProgramQuery {
            sql = "t.fips";
        else if (summaryTypeToken.equals("County+SCC")) 
            sql = "t.fips, t.scc";
+       else if (summaryTypeToken.equals("SCC")) 
+           sql = "t.scc";
        diffQuery = diffQuery.replaceAll("@@!", sql);
 
        
@@ -197,6 +201,8 @@ public class SQLMultiInvDiffProgramQuery {
              sql = "coalesce(b.fips, c.fips) as fips";
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "coalesce(b.fips, c.fips) as fips, coalesce(b.scc, c.scc) as scc";
+         else if (summaryTypeToken.equals("SCC")) 
+             sql = "coalesce(b.scc, c.scc) as scc";
          diffQuery = diffQuery.replaceAll("@!@", sql);
 
          //replace !@! symbol with main columns in inner select statement
@@ -208,6 +214,8 @@ public class SQLMultiInvDiffProgramQuery {
              sql = "fips";
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "fips, scc";
+         else if (summaryTypeToken.equals("SCC")) 
+             sql = "scc";
          diffQuery = diffQuery.replaceAll("!@!", sql);
          
          //replace @@@ symbol with group by columns in outer select statement
@@ -219,6 +227,8 @@ public class SQLMultiInvDiffProgramQuery {
              sql = "coalesce(b.fips, c.fips)";
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "coalesce(b.fips, c.fips), coalesce(b.scc, c.scc)";
+         else if (summaryTypeToken.equals("SCC")) 
+             sql = "coalesce(b.scc, c.scc)";
          diffQuery = diffQuery.replaceAll("@@@", sql);
          
          //replace !!@ symbol with group by columns in inner select statement
@@ -230,6 +240,8 @@ public class SQLMultiInvDiffProgramQuery {
              sql = "fips";
          else if (summaryTypeToken.equals("County+SCC")) 
              sql = "fips, scc";
+         else if (summaryTypeToken.equals("SCC")) 
+             sql = "scc";
          diffQuery = diffQuery.replaceAll("!!@", sql);
 
         //return the built query

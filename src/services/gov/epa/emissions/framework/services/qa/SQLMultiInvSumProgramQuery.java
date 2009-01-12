@@ -109,6 +109,8 @@ public class SQLMultiInvSumProgramQuery {
             sql = "te.fips";
         else if (summaryTypeToken.equals("County+SCC")) 
             sql = "te.fips, te.scc";
+        else if (summaryTypeToken.equals("SCC")) 
+            sql = "te.scc";
         outerQuery = outerQuery.replaceAll("@!@", sql);
 
         //replace !@! symbol with main columns in inner select statement
@@ -120,6 +122,8 @@ public class SQLMultiInvSumProgramQuery {
             sql = "fips";
         else if (summaryTypeToken.equals("County+SCC")) 
             sql = "fips, scc";
+        else if (summaryTypeToken.equals("SCC")) 
+            sql = "scc";
         outerQuery = outerQuery.replaceAll("!@!", sql);
         
         //replace @@@ symbol with group by columns in outer select statement
@@ -131,6 +135,8 @@ public class SQLMultiInvSumProgramQuery {
             sql = "te.fips";
         else if (summaryTypeToken.equals("County+SCC")) 
             sql = "te.fips, te.scc";
+        else if (summaryTypeToken.equals("SCC")) 
+            sql = "te.scc";
         outerQuery = outerQuery.replaceAll("@@@", sql);
         
         //replace !!! symbol with group by columns in inner select statement
@@ -142,6 +148,8 @@ public class SQLMultiInvSumProgramQuery {
             sql = "fips";
         else if (summaryTypeToken.equals("County+SCC")) 
             sql = "fips, scc";
+        else if (summaryTypeToken.equals("SCC")) 
+            sql = "scc";
         outerQuery = outerQuery.replaceAll("!!!", sql);
 
         //return the built query

@@ -151,7 +151,7 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
     }
     
     private void summaryTypeCombo() {
-        String [] values= new String[]{"State", "State+SCC", "County", "County+SCC"};
+        String [] values= new String[]{"State", "State+SCC", "County", "County+SCC", "SCC"};
         summaryTypes = new ComboBox("Not Selected", values);
         summaryTypes.setPreferredSize(new Dimension(350, 25));
         if(!(summaryType==null) && (summaryType.trim().length()>0))
