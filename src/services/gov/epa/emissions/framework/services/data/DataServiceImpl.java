@@ -564,10 +564,12 @@ public class DataServiceImpl implements DataService {
         List<String> cols = new ArrayList<String>();
         int colCount = md.getColumnCount();
 
+        //Asumming firt 4 columns are record_id, dataset_id, version, and delete_versions
+        //which is common to all emf datasets
         cols.add(md.getColumnName(1) + " SERIAL PRIMARY KEY");
         cols.add(md.getColumnName(2) + " int8 NOT NULL");
-        cols.add(md.getColumnName(3) + " NULL DEFAULT 0");
-        cols.add(md.getColumnName(4) + " DEFAULT ''::text");
+        cols.add(md.getColumnName(3) + " int4 DEFAULT 0");
+        cols.add(md.getColumnName(4) + " text DEFAULT ''::text");
         
         for (int i = 5; i <= colCount; i++) { 
             String type = md.getColumnTypeName(i);
@@ -756,7 +758,7 @@ public class DataServiceImpl implements DataService {
             
             EmfDataset copied = (EmfDataset) DeepCopy.copy(dataset);
             copied.setName(getUniqueNewName("Copy of " + dataset.getName() + "_v" + version.getVersion()));
-            copied.setStatus("Copied from " + dataset.getName() + "(version " + version.getVersion() + ")");
+            copied.setStatus(dataset.getStatus());
             copied.setDescription("Copied from version " + version.getVersion() + " of dataset " +
             		dataset.getName() + " on " + time + System.getProperty("line.separator") + dataset.getDescription());
             copied.setCreator(user.getUsername());
@@ -788,7 +790,7 @@ public class DataServiceImpl implements DataService {
             String error = "Error copying dataset...";
             String msg = e.getMessage();
             LOG.error(error, e);
-            throw new EmfException(msg == null ? error : error + msg.substring(msg.length() - 50));
+            throw new EmfException(msg == null ? error : msg.substring(msg.length() > 150 ? msg.length()- 150 : 0));
         } finally {
             session.close();
         }
@@ -821,7 +823,7 @@ public class DataServiceImpl implements DataService {
             emisSrc.tableDefinition().execute(create);
             emisSrc.tableDefinition().execute(insert);
             
-            src.setSource(dataset.getName());
+            src.setSource(dataset.getName() + " version: " + version.getVersion());
             src.setTable(newTable);
             copied.setInternalSources(new InternalSource[]{src});
             dao.update(copied, session);

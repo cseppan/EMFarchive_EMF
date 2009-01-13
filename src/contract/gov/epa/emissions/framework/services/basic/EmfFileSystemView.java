@@ -19,6 +19,7 @@ public class EmfFileSystemView implements Serializable {
         try {
             return service.getEmfFileInfos(dir, pattern);
         } catch (Exception e) {
+            e.printStackTrace();
             return new EmfFileInfo[0];
         }
     }
@@ -32,6 +33,7 @@ public class EmfFileSystemView implements Serializable {
             EmfFileInfo defaultDir = service.getDefaultDir();
             return defaultDir;
         } catch (EmfException e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -41,6 +43,7 @@ public class EmfFileSystemView implements Serializable {
             EmfFileInfo homeDir = service.getHomeDir();
             return homeDir;
         } catch (EmfException e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -52,6 +55,7 @@ public class EmfFileSystemView implements Serializable {
 
             return emfRoots;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -69,6 +73,7 @@ public class EmfFileSystemView implements Serializable {
 
             return retVal;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -80,6 +85,7 @@ public class EmfFileSystemView implements Serializable {
                     || ((file.getAbsolutePath().length() == 3) && (file.getAbsolutePath().charAt(1) == ':'));
             return retVal;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -104,6 +110,7 @@ public class EmfFileSystemView implements Serializable {
             EmfFileInfo fileInfo = service.getChild(file, child);
             return fileInfo;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException(e.getMessage());
         }
     }
@@ -112,6 +119,7 @@ public class EmfFileSystemView implements Serializable {
         try {
             return service.getSubdirs(file);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException(e.getMessage());
         }
     }
@@ -120,6 +128,7 @@ public class EmfFileSystemView implements Serializable {
         try {
             return service.getParentDirectory(file);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException(e.getMessage());
         }
     }

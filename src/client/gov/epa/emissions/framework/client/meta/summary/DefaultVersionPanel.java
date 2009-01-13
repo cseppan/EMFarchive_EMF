@@ -70,6 +70,9 @@ public class DefaultVersionPanel extends JPanel {
 
     public int getSelectedDefaultVersionNum()
     {
+        if (versionCombo == null || (Version)versionCombo.getSelectedItem() == null)
+            return 0;
+        
         return ((Version)versionCombo.getSelectedItem()).getVersion();
     }
 
