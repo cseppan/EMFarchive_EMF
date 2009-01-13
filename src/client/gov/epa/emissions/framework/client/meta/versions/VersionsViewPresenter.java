@@ -39,7 +39,7 @@ public class VersionsViewPresenter {
         if (!version.isFinalVersion())
             throw new EmfException("Can only copy a version that is Final");
 
-        session.dataService().copyDataset(dataset, version, session.user());
+        session.dataService().copyDataset(dataset.getId(), version, session.user());
     }
 
 }

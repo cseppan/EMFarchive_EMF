@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.io.VersionedDatasetQuery;
 import gov.epa.emissions.commons.io.VersionedQuery;
+import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -44,7 +45,7 @@ public class DataServiceImpl implements DataService {
     }
 
     public DataServiceImpl(HibernateSessionFactory sessionFactory) {
-        this(null, sessionFactory);
+        this(DbServerFactory.get(), sessionFactory);
     }
 
     public DataServiceImpl(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
@@ -549,6 +550,38 @@ public class DataServiceImpl implements DataService {
 
         return cols.toArray(new String[0]);
     }
+    
+    private String[] getColNameTypes(DataModifier mod, String table) throws Exception {
+        ResultSetMetaData md = null;
+        String query = "SELECT * FROM " + table + " LIMIT 0";
+
+        try {
+            md = mod.getMetaData(query);
+        } catch (SQLException e) {
+            throw new Exception(e.getMessage());
+        }
+
+        List<String> cols = new ArrayList<String>();
+        int colCount = md.getColumnCount();
+
+        cols.add(md.getColumnName(1) + " SERIAL PRIMARY KEY");
+        cols.add(md.getColumnName(2) + " int8 NOT NULL");
+        cols.add(md.getColumnName(3) + " NULL DEFAULT 0");
+        cols.add(md.getColumnName(4) + " DEFAULT ''::text");
+        
+        for (int i = 5; i <= colCount; i++) { 
+            String type = md.getColumnTypeName(i);
+            String notNull = (md.isNullable(i) == ResultSetMetaData.columnNoNulls ? "NOT NULL" : "");
+            
+            if (type.toUpperCase().startsWith("VARCHAR"))
+                cols.add(md.getColumnName(i) + " " + type + "(" +
+            		md.getPrecision(i) + ")" + " " + notNull);
+            else
+                cols.add(md.getColumnName(i) + " " + type + " " + notNull);
+        }
+
+        return cols.toArray(new String[0]);
+    }
 
     public boolean checkTableDefinitions(int srcDSid, int targetDSid) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
@@ -640,7 +673,7 @@ public class DataServiceImpl implements DataService {
 
         return colString;
     }
-
+    
     private String getTargetColString(String[] cols) {
         // NOTE: assume first 4 columns are record_id, dataset_id, version, delete_versions
         // which is common for dataset tables. Omit the first column.
@@ -705,34 +738,54 @@ public class DataServiceImpl implements DataService {
         }
     }
     
-    public synchronized void copyDataset(EmfDataset dataset, Version version, User user) throws EmfException {
+    public synchronized void copyDataset(int datasetId, Version version, User user) throws EmfException {
         Session session = sessionFactory.getSession();
         
         try {
+            EmfDataset dataset = dao.getDataset(session, datasetId);
+            Date time = new Date();
+            
+            DatasetType type = dataset.getDatasetType();
+            String imprtClass = type.getImporterClassName();
+            InternalSource[] sources = dataset.getInternalSources();
+            
+            boolean smkReport = (imprtClass == null ? false : imprtClass.equals("gov.epa.emissions.commons.io.other.SMKReportImporter"));
+            
+            if (type.isExternal() || smkReport || (sources != null && sources.length > 1))
+                throw new Exception("Copying of a version to a new dataset is not supported for this dataset type.");
+            
             EmfDataset copied = (EmfDataset) DeepCopy.copy(dataset);
             copied.setName(getUniqueNewName("Copy of " + dataset.getName() + "_v" + version.getVersion()));
             copied.setStatus("Copied from " + dataset.getName() + "(version " + version.getVersion() + ")");
+            copied.setDescription("Copied from version " + version.getVersion() + " of dataset " +
+            		dataset.getName() + " on " + time + System.getProperty("line.separator") + dataset.getDescription());
             copied.setCreator(user.getUsername());
             copied.setDefaultVersion(0);
+            copied.setInternalSources(null);
             
-            Date time = new Date();
             copied.setCreatedDateTime(time);
             copied.setAccessedDateTime(time);
             copied.setModifiedDateTime(time);
-            dao.add(copied, session);
             
+            session.clear();
+            dao.add(copied, session);
             EmfDataset loaded = dao.getDataset(session, copied.getName());
+            EmfDataset locked = dao.obtainLocked(user, loaded, session);
+            
+            if (locked == null)
+                throw new EmfException("Errror copying dataset: can't obtain lock to update copied dataset.");
+            
+            copyDatasetTable(dataset, version, loaded, user, session);
             
             Version defaultVersion = new Version(0);
             defaultVersion.setName("Initial Version");
             defaultVersion.setPath("");
             defaultVersion.setCreator(user);
-            defaultVersion.setDatasetId(loaded.getId());
+            defaultVersion.setDatasetId(locked.getId());
             defaultVersion.setLastModifiedDate(time);
-            
             dao.add(defaultVersion, session);
         } catch (Exception e) {
-            String error = "Error in copying dataset.";
+            String error = "Error copying dataset...";
             String msg = e.getMessage();
             LOG.error(error, e);
             throw new EmfException(msg == null ? error : error + msg.substring(msg.length() - 50));
@@ -742,6 +795,53 @@ public class DataServiceImpl implements DataService {
         
     }
     
+    private void copyDatasetTable(EmfDataset dataset, Version version, EmfDataset copied, User user, Session session) throws Exception {
+        InternalSource[] sources = dataset.getInternalSources();
+        
+        if (sources == null || sources.length == 0)
+            return;
+        
+        DbServer dbServer = dbServerFactory.getDbServer();
+        Datasource emisSrc = dbServer.getEmissionsDatasource();
+        String schema = emisSrc.getName() + ".";
+        InternalSource src = sources[0];
+        DataTable tableData = new DataTable(copied, emisSrc);
+        String newTable = tableData.name();
+        String origTable = schema + src.getTable();
+        VersionedDatasetQuery queryOrigData = new VersionedDatasetQuery(version, dataset);
+        
+        if (sources.length == 1) {
+            String[] cols = getTableColumns(emisSrc.dataModifier(), origTable, "");
+            String[] colNameTypes = getColNameTypes(emisSrc.dataModifier(), origTable);
+            String create = "CREATE TABLE " + schema + newTable + " (" +
+                    colString(colNameTypes, 0) + ")";
+            String insert = "INSERT INTO " + schema + newTable + "(" + colString(cols,1) + ") SELECT " + getSrcColString(copied.getId(), 0, cols, cols) +
+            		" FROM " + origTable + " " + queryOrigData.versionWhereClause();
+            
+            emisSrc.tableDefinition().execute(create);
+            emisSrc.tableDefinition().execute(insert);
+            
+            src.setSource(dataset.getName());
+            src.setTable(newTable);
+            copied.setInternalSources(new InternalSource[]{src});
+            dao.update(copied, session);
+            dao.releaseLocked(user, copied, session);
+        }
+        
+    }
+
+    private String colString(String[] cols, int start) {
+        int len = cols.length;
+        String colString = "";
+        
+        for (int i = start; i < len-1; i++)
+            colString += cols[i] + ",";
+        
+        colString += cols[len-1];
+            
+        return colString;
+    }
+
     private String getUniqueNewName(String name) throws EmfException {
         Session session = sessionFactory.getSession();
 
