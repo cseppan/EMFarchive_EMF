@@ -38,7 +38,11 @@ public class EditVersionsPresenter {
     private DataEditorService editorService() {
         return session.dataEditorService();
     }
-    
+
+    private DataService dataservice() {
+        return session.dataService();
+    }
+
     private DataService dataService() {
         return session.dataService();
     }
@@ -47,11 +51,11 @@ public class EditVersionsPresenter {
         Version derived = editorService().derive(base, session.user(), name);
         view.add(derived);
     }
-    
+
     public void doView(Version version, String table, DataView view) throws EmfException {
-//        if (!version.isFinalVersion())
-//            throw new EmfException("Cannot view a Version that is not Final. Please choose edit for Version "+
-//                    version.getName());
+        // if (!version.isFinalVersion())
+        // throw new EmfException("Cannot view a Version that is not Final. Please choose edit for Version "+
+        // version.getName());
 
         DataViewPresenter presenter = new DataViewPresenter(dataset, version, table, view, session);
         presenter.display();
@@ -64,8 +68,8 @@ public class EditVersionsPresenter {
 
     void edit(Version version, DataEditorView view, DataEditorPresenter presenter) throws EmfException {
         if (version.isFinalVersion())
-            throw new EmfException("Cannot edit a Version that is Final. Please choose View for Version "+
-                    version.getName());
+            throw new EmfException("Cannot edit a Version that is Final. Please choose View for Version "
+                    + version.getName());
         presenter.display(view);
     }
 
@@ -88,7 +92,8 @@ public class EditVersionsPresenter {
         Version[] updatedVersions = editorService().getVersions(dataset.getId());
         view.reload(updatedVersions);
     }
-    public EmfSession getSession(){
+
+    public EmfSession getSession() {
         return session;
     }
 
@@ -100,7 +105,7 @@ public class EditVersionsPresenter {
     private User getUser() {
         return session.user();
     }
-    
+
     public Version getLockedVersion(Version version) throws EmfException {
         Version locked = dataService().obtainedLockOnVersion(getUser(), version.getId());
         if (!locked.isLocked(getUser())) {// view mode, locked by another user
@@ -110,5 +115,24 @@ public class EditVersionsPresenter {
 
         return locked;
     }
-}
 
+    public void markFinalNDefault(Version version) throws Exception {
+        editorService().markFinal(token(version));
+
+        EmfDataset locked = dataservice().obtainLockedDataset(getUser(), dataset);
+
+        if (locked != null && locked.isLocked(getUser())) {
+            locked.setDefaultVersion(version.getVersion());
+            dataservice().updateDataset(locked);
+        }
+        
+        reload(dataset);
+        
+        if (locked == null || !locked.isLocked(getUser()))
+            throw new EmfException("Cannot obtain lock on dataset. Set default version failed.");
+    }
+
+    public void releaseLock(Version lockedVersion) throws EmfException {
+        dataService().updateVersionNReleaseLock(lockedVersion);
+    }
+}

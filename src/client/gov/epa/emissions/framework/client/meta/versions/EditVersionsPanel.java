@@ -28,6 +28,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.CompoundBorder;
 
@@ -157,7 +158,12 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
 
         Button markFinal = new Button("Mark Final", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doMarkFinal(tableData.selected());
+                try {
+                    doMarkFinal(tableData.selected());
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    displayError(e1.getMessage());
+                }
             }
         });
         markFinal.setToolTipText("Mark the selected versions as final so that no more edits can be made");
@@ -226,28 +232,42 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         if (lockedVersion == null)
             return;
 
+        boolean locked = true;
         EditVersionDialog dialog = new EditVersionDialog(dataset, lockedVersion, tableData.getValues(), parentConsole);
         dialog.run();
 
-        if (dialog.shouldChange()) {
-            try {
+        try {
+            if (dialog.shouldChange()) {
                 presenter.doChangeVersionName(dialog.getVersion());
-            } catch (EmfException e) {
-                // NOTE Auto-generated catch block
-                e.printStackTrace();
-                messagePanel.setError(e.getMessage());
+                locked = false;
             }
-            // reload(tableData.getValues());
+        } catch (EmfException e) {
+            e.printStackTrace();
+            messagePanel.setError(e.getMessage());
+        } finally {
+            if (locked)
+                presenter.releaseLock(lockedVersion);
         }
-
     }
 
-    protected void doMarkFinal(Version[] versions) {
+    protected void doMarkFinal(Version[] versions) throws Exception {
         clear();
 
         if (versions == null || versions.length == 0)
             messagePanel.setMessage("Please select version(s) to mark as final.");
-            
+
+        if (versions.length == 1 && !versions[0].isFinalVersion()) {
+            String msg = "Would you like to make this the default version for the dataset?";
+            int makeDefault = JOptionPane.showConfirmDialog(parentConsole, msg, "Make Default Version",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null);
+
+            if (makeDefault == JOptionPane.YES_OPTION) {
+                presenter.markFinalNDefault(versions[0]);
+
+                return;
+            }
+        }
+
         try {
             presenter.doMarkFinal(versions);
         } catch (EmfException e) {
