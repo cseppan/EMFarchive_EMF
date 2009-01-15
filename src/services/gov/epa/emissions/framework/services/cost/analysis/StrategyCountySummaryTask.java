@@ -214,6 +214,8 @@ public class StrategyCountySummaryTask extends AbstractStrategySummaryTask {
                 }
             }
             sql += ") summary ";
+            sql += "order by fips, sector, poll ";
+            
             System.out.println(sql);
             try {
                 datasource.query().execute(sql);

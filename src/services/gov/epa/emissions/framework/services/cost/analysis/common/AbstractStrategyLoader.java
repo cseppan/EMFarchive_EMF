@@ -235,7 +235,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             //supress all errors, the indexes might already be on the table...
         } finally {
             //

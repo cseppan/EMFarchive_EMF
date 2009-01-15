@@ -281,6 +281,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                 + "on sg.id = cm.source_group "
                 + "group by summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name, sg.name "
                 + "order by summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name, sg.name";
+            System.out.println(sql);
             try {
                 datasource.query().execute(sql);
             } catch (SQLException e) {
@@ -377,6 +378,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                 }
             }
             sql += ") summary ";
+            sql += "order by fips, sector, poll ";
             
             System.out.println(sql);
             try {
