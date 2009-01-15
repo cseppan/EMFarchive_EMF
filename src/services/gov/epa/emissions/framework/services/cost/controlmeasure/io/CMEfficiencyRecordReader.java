@@ -271,7 +271,8 @@ public class CMEfficiencyRecordReader {
                 if (equations.length > 0) {
                     for (ControlMeasureEquation equation : equations) {
                         if (equation.getPollutant().equals(efficiencyRecord.getPollutant())) {
-                            throw new EmfException("The efficiency record for, " + efficiencyRecord.getPollutant().getName() + ", must have a cost per ton when a equation uses the same pollutant.");
+                            warning = true;
+                            sb.append(format("Warning: The " + abbreviation + " efficiency record for, " + efficiencyRecord.getPollutant().getName() + ", has empty default cost per ton when an equation uses the same pollutant."));
                         }
                     }
                 }

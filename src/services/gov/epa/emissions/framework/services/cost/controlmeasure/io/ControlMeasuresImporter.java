@@ -308,8 +308,8 @@ public class ControlMeasuresImporter implements Importer {
 
     private File[] fileNames(File folder, String[] fileNames) throws ImporterException {
         int length = fileNames.length;
-        if (length < 3 || length > 4) {
-            throw new ImporterException("Select between 3 to 4 files");
+        if (length < 3 || length > 5) {
+            throw new ImporterException("Select between 3 to 5 files");
         }
         File[] files = new File[length];
         for (int i = 0; i < length; i++)
