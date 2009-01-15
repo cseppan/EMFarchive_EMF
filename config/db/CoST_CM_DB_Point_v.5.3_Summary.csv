@@ -518,6 +518,7 @@ Sulfur Recovery and/or Tail Gas Treatment; Sulfur Recovery Plants - Elemental Su
 Sulfur Recovery and/or Tail Gas Treatment; Sulfur Recovery Plants - Elemental Sulfur Production (Not Classified),SSRTGSRPNC,SO2,Sulfur Recovery and/or Tail Gas Treatment,Sulfur Recovery Plants - Elemental Sulfur Production (Not Classified),PTNONIPM,Known,15,,2006,1,S1001
 Sulfur Recovery and/or Tail Gas Treatment; Sulfur Recovery Plants - Sulfur Removal Process (99.9% removal),SSRTGSRP99,SO2,Sulfur Recovery and/or Tail Gas Treatment,Sulfur Recovery Plants - Sulfur Removal Process (99.9% removal),PTNONIPM,Known,15,,2006,1,S0901
 Sulfuric Acid Plant; Primary Metals Industry,SSADPPRMTL,SO2,Sulfuric Acid Plant,Primary Metals Industry,PTNONIPM,Known,15,,2006,1,S1401
+FGD; Secondary Metal Production,SFGDSECMP,SO2,FGD,Secondary Metal Production,PTNONIPM,Known,15,,2006,1,S1501
 Thermal Reduction; Adipic Acid Manufacturing,NTHRDADMF,NOx,Thermal Reduction,Adipic Acid Manufacturing,PTNONIPM,Known,10,,2006,1,Abbreviation was N0281
 ULNB; Process Heaters - Distillate Oil,NULNBPHDO,NOx,ULNB,Process Heaters - Distillate Oil,PTNONIPM,Known,15,,2006,1,Abbreviation was N0254
 ULNB; Process Heaters - LPG,NULNBPHLP,NOx,ULNB,Process Heaters - LPG,PTNONIPM,Known,15,,2006,1,Abbreviation was N0484
@@ -558,3 +559,4 @@ Wet Gas Scrubber;Cement Kilns (preheater),SSCRBPRKL,SO2,Wet Gas Scrubber,Cement 
 Wet Gas Scrubber;Cement Kilns (preheater/precalciner),SSCRBPRPR,SO2,Wet Gas Scrubber,Cement Kilns,PTNONIPM,Known,,,2006,, 
 Wet Gas Scrubber;Cement Kilns (wet process),SSCRBCEMKL,SO2,Wet Gas Scrubber,Cement Kilns,PTNONIPM,Known,,,2006,, 
 Wet Gas Scrubber;Petroleum Refinery Catalytic and Thermal Cracking Units,SSCRBPETCK,SO2,Wet Gas Scrubber,Petroleum Refinery Catalytic and Thermal Cracking Units,PTNONIPM,Known,,,2006,28|29, 
+FGD; Inorganic Chemical Manufacture,SFGDSINCM,SO2,FGD,Inorganic Chemical Manufacture,PTNONIPM,Known,15,0,2006,1,S1101
