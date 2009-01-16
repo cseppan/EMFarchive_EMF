@@ -263,9 +263,19 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     }
 
     private JScrollPane buildGridsPanel() {
+        String[] gridnames = new String[] { "Grid 1", "Grid 2", "Grid 3" };
+        String[] namevalues = gridnames;
+        
+        try {
+            namevalues = presenter.getGridNameValues(gridnames, parentCase.getId(), parentCase.getModel().getId());
+        } catch (EmfException e) {
+            e.printStackTrace();
+            messagePanel.setError(e.getMessage());
+        }
+        
         grids = new JList();
-        grids.setListData(new Grid[] { new Grid("Select All"), new Grid("Grid 1"), new Grid("Grid 2"),
-                new Grid("Grid 3") });
+        grids.setListData(new Grid[] { new Grid("Select All"), new Grid(namevalues[0]), new Grid(namevalues[1]),
+                new Grid(namevalues[2]) });
         grids.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane scrollPane = new JScrollPane(grids, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);

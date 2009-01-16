@@ -153,8 +153,10 @@ public interface CaseService {
     CaseParameter[] getCaseParameters(int caseId) throws EmfException;
     
     CaseParameter[] getCaseParameters(int caseId, int[] jobIds) throws EmfException;
-
+    
     CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll) throws EmfException;
+    
+    CaseParameter getCaseParameter(int caseId, ParameterEnvVar var) throws EmfException;
     
     void updateCaseParameter(User user, CaseParameter parameter) throws EmfException;
 
@@ -220,5 +222,5 @@ public interface CaseService {
     void importCase(String folder, String[] files, User user) throws EmfException;
     
     String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException;
-    
+
  }

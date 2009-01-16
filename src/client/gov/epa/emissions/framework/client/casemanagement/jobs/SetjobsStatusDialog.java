@@ -14,8 +14,8 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -23,17 +23,15 @@ import javax.swing.SpringLayout;
 
 public class SetjobsStatusDialog extends JDialog{
 
-
-    private ViewableJobsTabPresenterImpl presenter;
+    private EditJobsTabPresenter presenter;
 
     private ComboBox status; 
     
     private CaseJob[] jobs; 
     
-    private ViewableJobsTab view; 
+    private JobsTabView view; 
     
-    
-    public SetjobsStatusDialog(EmfConsole parentConsole, ViewableJobsTab view, CaseJob[] jobs, ViewableJobsTabPresenterImpl presenter) {
+    public SetjobsStatusDialog(EmfConsole parentConsole, JobsTabView view, CaseJob[] jobs, EditJobsTabPresenter presenter) {
         super(parentConsole);
         this.presenter = presenter; 
         this.jobs =jobs; 

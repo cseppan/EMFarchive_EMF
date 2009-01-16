@@ -385,6 +385,10 @@ public class CaseServiceImpl implements CaseService {
         getCaseService().addCaseParameters(user, caseID, params);
     }
 
+    public CaseParameter getCaseParameter(int caseId, ParameterEnvVar var) throws EmfException {
+        return getCaseService().getCaseParameter(caseId, var);
+    }
+    
     public CaseParameter[] getCaseParameters(int caseId) throws EmfException {
         return getCaseService().getCaseParameters(caseId);
     }
@@ -736,5 +740,5 @@ public class CaseServiceImpl implements CaseService {
     public String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
         return getCaseService().loadCMAQCase(path, jobId, caseId, user);
     }
-    
+
 }

@@ -1183,4 +1183,16 @@ public class CaseServiceTransport implements CaseService {
         return (String) call.requestResponse(new Object[] { path, new Integer(jobId), new Integer(caseId), user });
     }
 
+    public CaseParameter getCaseParameter(int caseId, ParameterEnvVar var) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getCaseParameter");
+        call.addIntegerParam("caseId");
+        call.addParam("var", caseMappings.parameterEnvVar());
+        call.setReturnType(caseMappings.caseParameter());
+        
+        return (CaseParameter)call.requestResponse(new Object[]{new Integer(caseId), var});
+    }
+
+
 }

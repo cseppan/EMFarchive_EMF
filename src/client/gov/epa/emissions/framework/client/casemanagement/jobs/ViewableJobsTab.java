@@ -23,16 +23,19 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class ViewableJobsTab extends JPanel implements RefreshObserver {
+public class ViewableJobsTab extends JPanel implements JobsTabView, RefreshObserver {
 
     private EmfConsole parentConsole;
 
@@ -189,6 +192,10 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
         });
         run.setMargin(insets);
         container.add(run);
+        
+        Button copy = new Button("Copy", copyAction());
+        copy.setMargin(insets);
+        container.add(copy);
 
         Button validate = new Button("Validate", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -248,6 +255,64 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
             presenter.editJob(job, jobEditor);
         }
     }
+    
+    private Action copyAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    clearMessage();
+                    copyJobs();
+                } catch (Exception ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+    }
+    
+    private void copyJobs() throws Exception {
+        List<CaseJob> jobs = getSelectedJobs();
+
+        if (jobs.size() == 0) {
+            messagePanel.setMessage("Please select job(s) to copy.");
+            return;
+        }
+
+        Object[] selected = presenter.getAllCaseNameIDs();
+        String selectedCase = (String)JOptionPane.showInputDialog(parentConsole, "Copy " + jobs.size() + " job(s) to case: ",
+                "Copy Case Jobs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected, selected[getDefultIndex(selected)]);
+
+        if ((selectedCase != null) && (selectedCase.length() > 0)) {
+            presenter.copyJobs(getCaseId(selectedCase), jobs);
+        }
+    }
+    
+    private Icon getCopyIcon() {
+        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
+        
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        }
+        
+        return null;
+    }
+    
+    private int getDefultIndex(Object[] selected) {
+        int currentCaseId = this.caseObj.getId();
+        int length = selected.length;
+        
+        for (int i = 0; i < length; i++)
+            if (selected[i].toString().contains("(" + currentCaseId + ")"))
+                return i;
+        
+        return 0;
+    }
+    
+    private int getCaseId(String selectedCase) {
+        int index1 = selectedCase.indexOf("(") + 1;
+        int index2 = selectedCase.indexOf(")");
+         
+        return Integer.parseInt(selectedCase.substring(index1, index2));
+    }
 
     private void validateJobDatasets() throws EmfException {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
@@ -273,11 +338,11 @@ public class ViewableJobsTab extends JPanel implements RefreshObserver {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 
         if (jobs.length == 0) {
-            messagePanel.setMessage("Please select one or more jobs to run.");
+            messagePanel.setMessage("Please select one or more jobs to set status.");
             return;
         }
 
-        SetjobsStatusDialog setDialog = new  SetjobsStatusDialog(parentConsole, this, jobs,presenter);
+        SetjobsStatusDialog setDialog = new  SetjobsStatusDialog(parentConsole, this, jobs, presenter);
         setDialog.run();    
     }
             

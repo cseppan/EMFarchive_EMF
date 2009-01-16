@@ -1700,4 +1700,20 @@ public class CaseDAO {
         session.createQuery(hqlDelete).executeUpdate();
         tx.commit();
     }
+
+    public CaseParameter getCaseParameter(int caseId, ParameterEnvVar var, Session session) {
+        ParameterEnvVar loadedVar = this.getParameterEnvVar(var.getName(), var.getModelToRunId(), session);
+        
+        if (loadedVar == null)
+            return null;
+        
+        String query = "SELECT obj.id FROM " + CaseParameter.class.getSimpleName() + " obj WHERE " +
+        		"obj.caseID = " + caseId + " AND obj.envVar.id = " + loadedVar.getId();
+        List ids = session.createQuery(query).list();
+        
+        if (ids == null || ids.size() == 0)
+            return null;
+        
+        return getCaseParameter(Integer.parseInt(ids.get(0).toString()), session);
+    }
 }

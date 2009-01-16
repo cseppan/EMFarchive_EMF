@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresen
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorTabPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 
 public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
 
@@ -40,5 +41,9 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
     void checkIfLockedByCurrentUser() throws EmfException;
     
     Object[] getAllCaseNameIDs() throws EmfException;
+    
+    JobRunStatus[] getRunStatuses() throws EmfException;
+    
+    void doSave(CaseJob[] jobs) throws EmfException;
 
 }

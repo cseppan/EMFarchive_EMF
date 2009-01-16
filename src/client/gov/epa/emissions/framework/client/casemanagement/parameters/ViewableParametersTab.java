@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement.parameters;
 
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
@@ -20,12 +21,16 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -178,6 +183,10 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
         SelectAwareButton view = new SelectAwareButton("View", viewAction(), table, confirmDialog);
         view.setMargin(insets);
         container.add(view);
+        
+        Button copy = new Button("Copy", copyAction(presenter));
+        copy.setMargin(insets);
+        container.add(copy);
 
         showAll = new JCheckBox("Show All", false);
         showAll.addActionListener(new AbstractAction() {
@@ -229,7 +238,76 @@ public class ViewableParametersTab extends JPanel implements RefreshObserver {
         }
     }
 
+    private Action copyAction(final ViewableParametersTabPresenterImpl localPresenter) {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    clearMessage();
+                    checkModelToRun();
+                    copyParameters(localPresenter);
+                } catch (Exception ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+    }
+    
+    private void checkModelToRun() throws EmfException{
+        if (caseObj.getModel() == null ||caseObj.getModel().getId() == 0 )
+            throw new EmfException("Please specify model to run on summary tab. ");
+    }
+    
+    private void copyParameters(ViewableParametersTabPresenterImpl presenter) throws Exception {
+        List<CaseParameter> params = getSelectedParameters();
 
+        if (params.size() == 0) {
+            messagePanel.setMessage("Please select parameter(s) to copy.");
+            return;
+        }
+
+        Object[] selected = presenter.getAllCaseNameIDs();
+        String selectedCase = (String) JOptionPane.showInputDialog(parentConsole, "Copy " + params.size()
+                + " case parameter(s) to case: ", "Copy Case Parameters", JOptionPane.PLAIN_MESSAGE, getCopyIcon(),
+                selected, selected[getDefultIndex(selected)]);
+
+        if ((selectedCase != null) && (selectedCase.length() > 0)) {
+            int selectedCaseId = getCaseId(selectedCase);
+
+            if (selectedCaseId != this.caseId) {
+                presenter.copyParameter(selectedCaseId, params);
+                return;
+            }
+        }
+    }
+    
+    private Icon getCopyIcon() {
+        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
+
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        }
+
+        return null;
+    }
+    
+    private int getDefultIndex(Object[] selected) {
+        int currentCaseId = this.caseObj.getId();
+        int length = selected.length;
+
+        for (int i = 0; i < length; i++)
+            if (selected[i].toString().contains("(" + currentCaseId + ")"))
+                return i;
+
+        return 0;
+    }
+    
+    private int getCaseId(String selectedCase) {
+        int index1 = selectedCase.indexOf("(") + 1;
+        int index2 = selectedCase.indexOf(")");
+
+        return Integer.parseInt(selectedCase.substring(index1, index2));
+    }
+    
     private List getSelectedParameters() {
         return table.selected();
     }

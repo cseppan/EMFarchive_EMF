@@ -274,6 +274,15 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         });
         validate.setMargin(insets);
         container.add(validate);
+        
+        Button set = new Button("Set Status", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                clearMessage();
+                setStatus();
+            }
+        });
+        set.setMargin(insets);
+        container.add(set);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
@@ -436,6 +445,18 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         showMessageDialog(createMsgScrollPane(validationMsg, width, height), title);
     }
 
+    private void setStatus() {
+        CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
+
+        if (jobs.length == 0) {
+            messagePanel.setMessage("Please select one or more jobs to set status.");
+            return;
+        }
+
+        SetjobsStatusDialog setDialog = new SetjobsStatusDialog(parentConsole, this, jobs, presenter);
+        setDialog.run();    
+    }
+    
     private void runJobs() throws Exception {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 

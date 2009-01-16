@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.Grid;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -119,8 +120,11 @@ public class SensitivityPresenter {
         //Find jobs contain selected grids
         if ( sectors != null && grids.length > 0 ){
             for (Grid grid : grids){
+                int parenth = grid.getName().indexOf("("); //strip off the grid value part plus a space
+                int end =  parenth < 0 ? grid.getName().length() : parenth - 1;
+                String gridName = grid.getName().substring(0, end).replace("_", " ");
                 for (CaseJob job : jobs){
-                    if ((job.getName().toLowerCase().replace("_", " ")).contains(grid.toString().toLowerCase().replace("_", " ")))
+                    if ((job.getName().toLowerCase().replace("_", " ")).contains(gridName.toLowerCase()))
                         filteredJobs1.add(job);
                 }
             }
@@ -177,7 +181,24 @@ public class SensitivityPresenter {
 
         //return service().getcasgetCaseParameters(caseId, sector, showAll);
         return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
-
+    }
+    
+    public String[] getGridNameValues(String[] names, int caseId, int modelId) throws EmfException {
+        if (modelId <= 0)
+            throw new EmfException("Please specify parent case run model.");
+        
+        String[] namevalues = new String[names.length];
+        
+        for (int i = 0; i < names.length; i++) {
+            ParameterEnvVar var = new ParameterEnvVar(names[i].toUpperCase().replace(' ', '_'));
+            var.setModelToRunId(modelId);
+            CaseParameter param = service().getCaseParameter(caseId, var);
+            String value = (param == null || param.getValue() == null ? "Not available" : param.getValue());
+            namevalues[i] = names[i] + " (" + value + ")";
+        }
+        
+        return namevalues;
+        
     }
 
 }

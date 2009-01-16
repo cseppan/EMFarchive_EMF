@@ -134,5 +134,18 @@ public class ViewableInputsTabPresenterImpl {
         presenter.doDisplay(casesByInputDataset, casesByOutputDataset);
     }
 
+    public Object[] getAllCaseNameIDs() throws EmfException {
+        return service().getAllCaseNameIDs();
+    }
+    
+    //NOTE: used for copying into different case
+    public void copyInput(int caseId, List<CaseInput> inputs) throws Exception {
+        CaseInput[] inputsArray = inputs.toArray(new CaseInput[0]);
+        
+        for (int i = 0; i < inputs.size(); i++)
+            inputsArray[i].setParentCaseId(this.caseObj.getId());
+        
+        service().addCaseInputs(session.user(), caseId, inputsArray);
+    }
     
 }

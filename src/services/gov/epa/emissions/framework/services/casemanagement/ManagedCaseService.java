@@ -1613,6 +1613,19 @@ public class ManagedCaseService {
         }
     }
 
+    public CaseParameter getCaseParameter(int caseId, ParameterEnvVar var) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            return dao.getCaseParameter(caseId, var, session);
+        } catch (Exception e) {
+            log.error("Could not get parameter for case (id=" + caseId + ") and environment variable: " + var.getName() + ".\n", e);
+            throw new EmfException("Could not get parameter for case (id=" + caseId + ") and environment variable: " + var.getName() + ".\n");
+        } finally {
+            session.close();
+        }
+    }
+    
     public synchronized CaseParameter[] getCaseParameters(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
 

@@ -33,6 +33,15 @@ public class ViewableParametersTabPresenterImpl {
         view.display(session, caseObj, this);
     }
 
+    // NOTE: used for copying into different case
+    public void copyParameter(int caseID, List<CaseParameter> params) throws Exception {
+        CaseParameter[] paramsArray = params.toArray(new CaseParameter[0]);
+        
+        for (int i = 0; i < params.size(); i++)
+            paramsArray[i].setParentCaseId(this.caseObj.getId());
+        
+        service().addCaseParameters(session.user(), caseID, paramsArray);
+    }
 
     private CaseService service() {
         return session.caseService();
@@ -77,5 +86,10 @@ public class ViewableParametersTabPresenterImpl {
     public Case getCaseObj() {
         return this.caseObj;
     }
+    
+    public Object[] getAllCaseNameIDs() throws EmfException {
+        return service().getAllCaseNameIDs();
+    }
+
 
 }

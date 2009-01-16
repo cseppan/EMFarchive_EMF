@@ -29,12 +29,15 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -199,6 +202,10 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         view.setMargin(insets);
         container.add(view);
 
+        Button copy = new Button("Copy", copyAction(presenter));
+        copy.setMargin(insets);
+        container.add(copy);
+
         Button viewDS = new ViewButton("View Dataset", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doDisplayInputDatasetsPropertiesViewer();
@@ -273,6 +280,76 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         }
     }
 
+    private Action copyAction(final ViewableInputsTabPresenterImpl localPresenter) {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    clearMessage();
+                    copyInputs(localPresenter);
+                } catch (Exception ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+    }
+    
+    private void copyInputs(ViewableInputsTabPresenterImpl presenter) throws Exception {
+        checkModelToRun();
+        List<CaseInput> inputs = getSelectedInputs();
+
+        if (inputs.size() == 0) {
+            messagePanel.setMessage("Please select input(s) to copy.");
+            return;
+        }
+
+        Object[] selected = presenter.getAllCaseNameIDs();
+        String selectedCase = (String) JOptionPane.showInputDialog(parentConsole, "Copy " + inputs.size()
+                + " case input(s) to case: ", "Copy Case Inputs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected,
+                selected[getDefultIndex(selected)]);
+
+        if ((selectedCase != null) && (selectedCase.length() > 0)) {
+            int selectedCaseId = getCaseId(selectedCase);
+
+            if (selectedCaseId != this.caseId) {
+                presenter.copyInput(selectedCaseId, inputs);
+                return;
+            }
+        }
+    }
+
+    private void checkModelToRun() throws EmfException {
+        if (caseObj.getModel() == null || caseObj.getModel().getId() == 0)
+            throw new EmfException("Please specify model to run on summary tab. ");
+    }
+    
+    private int getDefultIndex(Object[] selected) {
+        int currentCaseId = this.caseObj.getId();
+        int length = selected.length;
+
+        for (int i = 0; i < length; i++)
+            if (selected[i].toString().contains("(" + currentCaseId + ")"))
+                return i;
+
+        return 0;
+    }
+
+    private Icon getCopyIcon() {
+        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
+
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        }
+
+        return null;
+    }
+    
+    private int getCaseId(String selectedCase) {
+        int index1 = selectedCase.indexOf("(") + 1;
+        int index2 = selectedCase.indexOf(")");
+
+        return Integer.parseInt(selectedCase.substring(index1, index2));
+    }
+    
     private void doDisplayInputDatasetsPropertiesViewer() {
         List<EmfDataset> datasets = getSelectedDatasets(getSelectedInputs());
         if (datasets.isEmpty()) {
@@ -434,8 +511,8 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         panelRefresh();
     }
 
-    private List getSelectedInputs() {
-        return table.selected();
+    private List<CaseInput> getSelectedInputs() {
+        return (List<CaseInput>)table.selected();
     }
 
     public CaseInput[] caseInputs() {

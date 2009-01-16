@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
 import java.util.ArrayList;
@@ -54,6 +55,11 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         view.refresh();
     }
 
+    public void doSave(CaseJob[] jobs) throws EmfException {
+        for (CaseJob job : jobs)
+            service().updateCaseJobStatus(job);
+    }
+    
     public void addNewJobDialog(NewJobView dialog) {
         dialog.register(this);
         dialog.display();
@@ -289,6 +295,10 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     
     public void refreshJobList() throws EmfException {
         this.caseObjectManager.refreshJobList();
+    }
+    
+    public synchronized JobRunStatus[] getRunStatuses() throws EmfException {
+        return CaseObjectManager.getCaseObjectManager(session).getJobRunStatuses();
     }
 
 }
