@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
@@ -50,8 +51,9 @@ public class SetCasePresenterImpl implements SetCasePresenter {
     }
 
     public void doAddInputFields(CaseInput input, JPanel container, SetInputFieldsPanel setInputFieldsPanel) throws EmfException {
+        ModelToRun model = caseObj.getModel();
         InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), setInputFieldsPanel, session);
-        inputFieldsPresenter.display(input, container, caseObj.getModel().getId());
+        inputFieldsPresenter.display(input, container, (model == null ? 0 : model.getId()));
     }
 
     public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
