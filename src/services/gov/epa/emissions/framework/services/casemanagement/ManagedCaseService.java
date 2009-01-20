@@ -1040,7 +1040,7 @@ public class ManagedCaseService {
             try {
                 updateSectorsList(user, caseId, session, sectors);
             } catch (Exception e) {
-                throw new EmfException(e.getMessage());
+                throw new EmfException(e.getMessage() + " " + inputs.length + " inputs copied.");
             } finally {
                 session.close();
             }
@@ -1554,7 +1554,7 @@ public class ManagedCaseService {
             try {
                 updateSectorsList(user, caseId, session, sectors);
             } catch (Exception e) {
-                throw new EmfException(e.getMessage());
+                throw new EmfException(e.getMessage() + " " + params.length + " parameters copied.");
             } finally {
                 session.close();
             }
@@ -1922,7 +1922,7 @@ public class ManagedCaseService {
             try {
                 updateSectorsList(user, caseId, session, sectors);
             } catch (Exception e) {
-                throw new EmfException(e.getMessage());
+                throw new EmfException(e.getMessage() + " " + jobs.length + " jobs copied.");
             } finally {
                 session.close();
             }
