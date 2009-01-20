@@ -9,10 +9,10 @@ import java.util.List;
 
 public class AirQualityModels {
 
-    private List list;
+    private List<AirQualityModel> list;
 
     public AirQualityModels(AirQualityModel[] array) {
-        this.list = new ArrayList(Arrays.asList(array));
+        this.list = new ArrayList<AirQualityModel>(Arrays.asList(array));
     }
 
     public AirQualityModel get(String name) {
@@ -21,7 +21,7 @@ public class AirQualityModels {
 
         name = name.trim();
         for (int i = 0; i < list.size(); i++) {
-            AirQualityModel item = ((AirQualityModel) list.get(i));
+            AirQualityModel item = list.get(i);
             if (item.getName().equalsIgnoreCase(name))
                 return item;
         }
@@ -29,13 +29,13 @@ public class AirQualityModels {
     }
 
     public String[] names() {
-        List names = new ArrayList();
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
-            AirQualityModel element = (AirQualityModel) iter.next();
+        List<String> names = new ArrayList<String>();
+        for (Iterator<AirQualityModel> iter = list.iterator(); iter.hasNext();) {
+            AirQualityModel element = iter.next();
             names.add(element.getName());
         }
 
-        return (String[]) names.toArray(new String[0]);
+        return names.toArray(new String[0]);
     }
 
 }
