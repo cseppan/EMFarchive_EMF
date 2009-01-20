@@ -1568,7 +1568,7 @@ public class ManagedCaseService {
             if (target.isLocked() && !target.isLocked(user))
                 throw new EmfException("Cannot obtain lock on target case to update sectors list.");
             
-            Case locked = dao.obtainLocked(user, dao.getCase(caseId, session), session);
+            Case locked = dao.obtainLocked(user, target, session);
             
             Sector[] sectrs = locked.getSectors();
             List<Sector> existed = new ArrayList<Sector>();
@@ -4053,6 +4053,8 @@ public class ManagedCaseService {
             existingJobs.addAll(Arrays.asList(jobs));
             lockedSC.setSectors(getSectorsFromJobs(existingJobs.toArray(new CaseJob[0])));
 
+            session.clear();
+            dao.obtainLocked(user, lockedSC, session);//NOTE: in case lock is lost
             updateCase(lockedSC);
 
             return lockedSC;
@@ -4261,6 +4263,8 @@ public class ManagedCaseService {
             if (abbr == null)
                 lockedSC.setAbbreviation(new Abbreviation(lockedSC.getId() + ""));
 
+            session.clear();
+            dao.obtainLocked(user, lockedSC, session); //NOTE: in case the lock is released by other process
             updateCase(lockedSC);
             dao.add(new CasesSens(parentCaseId, lockedSC.getId()));
 
