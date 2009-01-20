@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.Reader;
 import gov.epa.emissions.commons.io.importer.TerminatorRecord;
 import gov.epa.emissions.commons.io.importer.Tokenizer;
+import gov.epa.emissions.commons.util.CustomStringTools;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,7 +28,7 @@ public class CMCSVFileReader implements Reader {
 
     private BufferedReader fileReader;
 
-    private List comments;
+    private List<String> comments;
 
     private Tokenizer tokenizer;
 
@@ -37,14 +38,14 @@ public class CMCSVFileReader implements Reader {
 
     private String[] cols;
 
-    private List header;
+    private List<String> header;
 
     public CMCSVFileReader(File file) throws ImporterException {
         try {
 //            fileReader = new BufferedReader(new FileReader(file));
             fileReader = new BufferedReader(new CustomCharSetInputStreamReader(new FileInputStream(file)));
             tokenizer = new CommaDelimitedTokenizer();
-            comments = new ArrayList();
+            comments = new ArrayList<String>();
             this.lineNumber = 0;
             cols = read().getTokens();
         } catch (FileNotFoundException e) {
@@ -70,7 +71,7 @@ public class CMCSVFileReader implements Reader {
                 if (isData(line))
                     return doRead(line);
                 if (isComment(line))
-                    comments.add(line);
+                    comments.add(CustomStringTools.escapeBackSlash(line));
 
                 line = fileReader.readLine();
             }
@@ -98,7 +99,7 @@ public class CMCSVFileReader implements Reader {
         return line.startsWith("#");
     }
 
-    public List comments() {
+    public List<String> comments() {
         return comments;
     }
 
@@ -110,7 +111,7 @@ public class CMCSVFileReader implements Reader {
         return line;
     }
 
-    public List getHeader() {
+    public List<String> getHeader() {
         return header;
     }
 

@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.Reader;
 import gov.epa.emissions.commons.io.importer.TerminatorRecord;
 import gov.epa.emissions.commons.io.importer.Tokenizer;
+import gov.epa.emissions.commons.util.CustomStringTools;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,7 +28,7 @@ public class CSCSVFileReader implements Reader {
 
     private BufferedReader fileReader;
 
-    private List comments;
+    private List<String> comments;
 
     private Tokenizer tokenizer;
 
@@ -37,21 +38,20 @@ public class CSCSVFileReader implements Reader {
 
     private String[] cols;
 
-    private List header;
+    private List<String> header;
 
     public CSCSVFileReader(File file) throws ImporterException {
         try {
-//            fileReader = new BufferedReader(new FileReader(file));
             fileReader = new BufferedReader(new CustomCharSetInputStreamReader(new FileInputStream(file)));
             tokenizer = new CommaDelimitedTokenizer();
-            comments = new ArrayList();
+            comments = new ArrayList<String>();
             this.lineNumber = 0;
             cols = read().getTokens();
         } catch (FileNotFoundException e) {
-            log.error("Importer failure: File not found" + "\n" + e);
+            log.error("Importer failure: File not found" + "\n", e);
             throw new ImporterException("Importer failure: File not found");
         } catch (UnsupportedEncodingException e) {
-            log.error("Importer failure: encoding char set not supported" + "\n" + e);
+            log.error("Importer failure: encoding char set not supported" + "\n", e);
             throw new ImporterException("Importer failure: encoding char set not supported");
         }
     }
@@ -67,12 +67,11 @@ public class CSCSVFileReader implements Reader {
             while (line != null) {
                 lineNumber++;
                 this.line = line;
-//                if (lineNumber == 1) 
-//                    header = Arrays.asList(tokenizer.tokens(line));
+                
                 if (isData(line))
                     return doRead(line);
                 if (isComment(line))
-                    comments.add(line);
+                    comments.add(CustomStringTools.escapeBackSlash(line));
 
                 line = fileReader.readLine();
             }
@@ -100,7 +99,7 @@ public class CSCSVFileReader implements Reader {
         return line.startsWith("#");
     }
 
-    public List comments() {
+    public List<String> comments() {
         return comments;
     }
 
@@ -112,7 +111,7 @@ public class CSCSVFileReader implements Reader {
         return line;
     }
 
-    public List getHeader() {
+    public List<String> getHeader() {
         return header;
     }
 
