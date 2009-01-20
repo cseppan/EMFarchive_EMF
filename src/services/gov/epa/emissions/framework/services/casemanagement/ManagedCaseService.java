@@ -5145,4 +5145,39 @@ public class ManagedCaseService {
         return envs;
     }
 
+    public synchronized void updateRelatedModels(int caseId) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            List<CaseParameter> params = dao.getCaseParameters(caseId, session);
+            Case caze = dao.getCase(caseId, session);
+            ModelToRun model = caze.getModel();
+            
+            if (model == null)
+                return;
+            
+            int modelId = model.getId();
+            
+            for (Iterator<CaseParameter> iter = params.iterator(); iter.hasNext();) {
+                CaseParameter param = iter.next();
+                ParameterName name = param.getParameterName();
+                ParameterEnvVar envar = param.getEnvVar();
+                name.setModelToRunId(modelId);
+                envar.setModelToRunId(modelId);
+                param.setParameterName(name);
+                param.setEnvVar(envar);
+                dao.updateCaseParameter(param, session);
+            }
+            
+            //NOTE: need to update input name and env var also
+        } catch (Exception e) {
+            log.error("Error reading case parameters for case id = " + caseId + ".", e);
+            throw new EmfException("Error reading case parameters for case id = " + caseId
+                    + ".");
+        } finally {
+            if (session != null && session.isOpen())
+                session.close();
+        }
+    }
+
 }

@@ -223,4 +223,6 @@ public interface CaseService {
     
     String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException;
 
+    void updateRelatedModels(int caseId) throws EmfException;
+
  }

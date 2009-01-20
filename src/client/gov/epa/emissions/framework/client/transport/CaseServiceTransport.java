@@ -1194,5 +1194,15 @@ public class CaseServiceTransport implements CaseService {
         return (CaseParameter)call.requestResponse(new Object[]{new Integer(caseId), var});
     }
 
+    public void updateRelatedModels(int caseId) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("updateRelatedModels");
+        call.addIntegerParam("caseId");
+        call.setVoidReturnType();
+        
+        call.request(new Object[]{new Integer(caseId)});
+    }
+
 
 }

@@ -264,7 +264,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
     private JScrollPane buildGridsPanel() {
         String[] gridnames = new String[] { "Grid 1", "Grid 2", "Grid 3" };
-        String[] namevalues = gridnames;
+        String[] namevalues = new String[] { "Grid 1 (Not available)", "Grid 2 (Not available)", "Grid 3 (Not available)" };
 
         try {
             if (parentCase.getModel() != null)

@@ -741,4 +741,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().loadCMAQCase(path, jobId, caseId, user);
     }
 
+    public void updateRelatedModels(int caseId) throws EmfException {
+        getCaseService().updateRelatedModels(caseId);
+    }
+
 }

@@ -193,7 +193,7 @@ public class SensitivityPresenter {
             ParameterEnvVar var = new ParameterEnvVar(names[i].toUpperCase().replace(' ', '_'));
             var.setModelToRunId(modelId);
             CaseParameter param = service().getCaseParameter(caseId, var);
-            String value = (param == null || param.getValue() == null ? "Not available" : param.getValue());
+            String value = (param == null || param.getValue() == null || param.getValue().trim().isEmpty()? "Not available" : param.getValue());
             namevalues[i] = names[i] + " (" + value + ")";
         }
         
