@@ -724,7 +724,7 @@ public class DataServiceImpl implements DataService {
             }
             
             if (!dataModifier.resultExists(selectQuery))
-                throw new EmfException("No record found for colum = '" + col + "' and value ='" + find + "'.");
+                throw new EmfException("No record found for column = '" + col + "' and value ='" + find + "'.");
             
             dataModifier.execute(insertQuery);
             dataModifier.execute(updateQuery);
