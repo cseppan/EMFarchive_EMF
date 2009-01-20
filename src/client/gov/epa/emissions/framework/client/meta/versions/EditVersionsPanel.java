@@ -257,7 +257,8 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             messagePanel.setMessage("Please select version(s) to mark as final.");
 
         if (versions.length == 1 && !versions[0].isFinalVersion()) {
-            String msg = "Would you like to make this the default version for the dataset?";
+            String msg = "Would you like to make version " + versions[0].getId() + 
+                " the default version for the dataset?";
             int makeDefault = JOptionPane.showConfirmDialog(parentConsole, msg, "Make Default Version",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null);
 
