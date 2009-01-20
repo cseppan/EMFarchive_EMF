@@ -987,12 +987,12 @@ public class ManagedCaseService {
             Criterion crit1 = Restrictions.eq("name", subdir.getName());
             Criterion crit2 = Restrictions.eq("modelToRunId", new Integer(subdir.getModelToRunId()));
             SubDir existed = (SubDir) dao.load(SubDir.class, new Criterion[] { crit1, crit2 }, session);
-            
+
             if (existed != null)
                 return existed;
-            
+
             dao.add(subdir, session);
-            
+
             return (SubDir) dao.load(SubDir.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1006,7 +1006,7 @@ public class ManagedCaseService {
     public synchronized void addCaseInputs(User user, int caseId, CaseInput[] inputs) throws EmfException {
         Session session = sessionFactory.getSession();
         List<Sector> sectors = new ArrayList<Sector>();
-        
+
         try {
             for (int i = 0; i < inputs.length; i++) {
                 inputs[i].setCaseID(caseId);
@@ -1028,7 +1028,7 @@ public class ManagedCaseService {
             for (CaseInput input : inputs) {
                 dao.add(input, session);
                 Sector sector = input.getSector();
-                
+
                 if (sector != null && !sectors.contains(sector))
                     sectors.add(input.getSector());
             }
@@ -1036,7 +1036,7 @@ public class ManagedCaseService {
             log.error("Could not add new case input '" + inputs[0].getName() + "' etc.\n", e);
             throw new EmfException(e.getMessage());
         } finally {
-            //NOTE: if any inputs get copied, we need to update target case sector list
+            // NOTE: if any inputs get copied, we need to update target case sector list
             try {
                 updateSectorsList(user, caseId, session, sectors);
             } catch (Exception e) {
@@ -1541,7 +1541,7 @@ public class ManagedCaseService {
             for (CaseParameter param : params) {
                 dao.addParameter(param, session);
                 Sector sector = param.getSector();
-                
+
                 if (sector != null && !sectors.contains(sector))
                     sectors.add(param.getSector());
             }
@@ -1549,7 +1549,7 @@ public class ManagedCaseService {
             log.error("Could not add new case parameter '" + params[0].getName() + "' etc.\n", e);
             throw new EmfException(e.getMessage());
         } finally {
-            //NOTE: if there is any parameter get copied, need to add new sectors to the copied case
+            // NOTE: if there is any parameter get copied, need to add new sectors to the copied case
             // sectors list
             try {
                 updateSectorsList(user, caseId, session, sectors);
@@ -1560,24 +1560,24 @@ public class ManagedCaseService {
             }
         }
     }
-
+    
     private void updateSectorsList(User user, int caseId, Session session, List<Sector> sectors) throws EmfException {
         if (sectors.size() > 0) {
             Case target = dao.getCase(caseId, session);
-            
+
             if (target.isLocked() && !target.isLocked(user))
                 throw new EmfException("Cannot obtain lock on target case to update sectors list.");
-            
+
             Case locked = dao.obtainLocked(user, target, session);
-            
+
             Sector[] sectrs = locked.getSectors();
             List<Sector> existed = new ArrayList<Sector>();
             existed.addAll(Arrays.asList(sectrs));
-            
-            for(int i = 0; i < sectors.size(); i++)
+
+            for (int i = 0; i < sectors.size(); i++)
                 if (!existed.contains(sectors.get(i)))
                     existed.add(sectors.get(i));
-            
+
             locked.setSectors(existed.toArray(new Sector[0]));
             dao.update(locked, session);
         }
@@ -1665,13 +1665,15 @@ public class ManagedCaseService {
         try {
             return dao.getCaseParameter(caseId, var, session);
         } catch (Exception e) {
-            log.error("Could not get parameter for case (id=" + caseId + ") and environment variable: " + var.getName() + ".\n", e);
-            throw new EmfException("Could not get parameter for case (id=" + caseId + ") and environment variable: " + var.getName() + ".\n");
+            log.error("Could not get parameter for case (id=" + caseId + ") and environment variable: " + var.getName()
+                    + ".\n", e);
+            throw new EmfException("Could not get parameter for case (id=" + caseId + ") and environment variable: "
+                    + var.getName() + ".\n");
         } finally {
             session.close();
         }
     }
-    
+
     public synchronized CaseParameter[] getCaseParameters(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -1893,7 +1895,7 @@ public class ManagedCaseService {
     public synchronized void addCaseJobs(User user, int caseId, CaseJob[] jobs) throws EmfException {
         Session session = sessionFactory.getSession();
         List<Sector> sectors = new ArrayList<Sector>();
-        
+
         try {
             for (CaseJob job : jobs)
                 if (dao.getCaseJob(caseId, job, session) != null)
@@ -1908,7 +1910,7 @@ public class ManagedCaseService {
                 job.setRunstatus(dao.getJobRunStatuse("Not Started"));
                 dao.add(job, session);
                 Sector sector = job.getSector();
-                
+
                 if (sector != null && !sectors.contains(sector))
                     sectors.add(job.getSector());
             }
@@ -1916,7 +1918,7 @@ public class ManagedCaseService {
             log.error("Could not add new case jobs '" + jobs[0].getName() + "' etc.\n" + e.getMessage());
             throw new EmfException(e.getMessage());
         } finally {
-            //NOTE: if any jobs get copied, we need to update target case sector list
+            // NOTE: if any jobs get copied, we need to update target case sector list
             try {
                 updateSectorsList(user, caseId, session, sectors);
             } catch (Exception e) {
@@ -1924,6 +1926,31 @@ public class ManagedCaseService {
             } finally {
                 session.close();
             }
+        }
+    }
+
+    public synchronized void addCaseJobs4Sensitivity(User user, int caseId, CaseJob[] jobs) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            for (CaseJob job : jobs)
+                if (dao.getCaseJob(caseId, job, session) != null)
+                    throw new EmfException("Case job: " + job.getName() + " already exists in the target case.");
+
+            for (CaseJob job : jobs) {
+                job.setCaseId(caseId);
+                job.setJobkey(null); // jobkey supposedly generated when it is run
+                job.setRunLog(null);
+                job.setRunStartDate(null);
+                job.setRunCompletionDate(null);
+                job.setRunstatus(dao.getJobRunStatuse("Not Started"));
+                dao.add(job, session);
+            }
+        } catch (EmfException e) {
+            log.error("Could not add new case jobs '" + jobs[0].getName() + "' etc.\n" + e.getMessage());
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
         }
     }
 
@@ -2049,7 +2076,7 @@ public class ManagedCaseService {
         checkJobHistoryItems(jobs, session);
         resetRelatedJobsField(jobs);
         deleteCaseJobKeyObjects(jobs, session);
-        
+
         try {
             dao.checkJobDependency(jobs, session);
         } catch (EmfException e) {
@@ -2062,8 +2089,7 @@ public class ManagedCaseService {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not remove case job " + jobs[0].getName() + " etc.\n" + e.getMessage());
-            throw new EmfException(
-                    "Could not remove selected job(s): " + e.getLocalizedMessage());
+            throw new EmfException("Could not remove selected job(s): " + e.getLocalizedMessage());
         } finally {
             session.close();
         }
@@ -4045,7 +4071,7 @@ public class ManagedCaseService {
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(),
                     getValidCaseParameters4SensitivityCase(template.getId(), jobIds, jobs2copy, session), session);
 
-            addCaseJobs(user, targetId, jobs);
+            addCaseJobs4Sensitivity(user, targetId, jobs);
             addCaseInputs(user, targetId, removeRedundantInputs(inputs, existingInputs, jobPrefix), jobPrefix);
             addCaseParameters(user, targetId, removeRedundantParams(params, existingParams, jobPrefix), jobPrefix);
 
@@ -4053,8 +4079,6 @@ public class ManagedCaseService {
             existingJobs.addAll(Arrays.asList(jobs));
             lockedSC.setSectors(getSectorsFromJobs(existingJobs.toArray(new CaseJob[0])));
 
-            session.clear();
-            dao.obtainLocked(user, lockedSC, session);//NOTE: in case lock is lost
             updateCase(lockedSC);
 
             return lockedSC;
@@ -4248,7 +4272,7 @@ public class ManagedCaseService {
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(),
                     getValidCaseParameters4SensitivityCase(template.getId(), jobIds, jobs2copy, session), session);
 
-            addCaseJobs(user, targetId, jobs);
+            addCaseJobs4Sensitivity(user, targetId, jobs);
             addCaseInputs(user, targetId, inputs, jobPrefix);
             addCaseParameters(user, targetId, params, jobPrefix);
             copySummaryInfo(lockedPC, lockedSC);
@@ -4263,8 +4287,6 @@ public class ManagedCaseService {
             if (abbr == null)
                 lockedSC.setAbbreviation(new Abbreviation(lockedSC.getId() + ""));
 
-            session.clear();
-            dao.obtainLocked(user, lockedSC, session); //NOTE: in case the lock is released by other process
             updateCase(lockedSC);
             dao.add(new CasesSens(parentCaseId, lockedSC.getId()));
 
@@ -4731,9 +4753,8 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot retrieve current case.");
 
             File exportDir = new File(folder);
-            if (!exportDir.canWrite())
-            {
-                throw new EmfException("EMF cannot write to folder "+folder);
+            if (!exportDir.canWrite()) {
+                throw new EmfException("EMF cannot write to folder " + folder);
             }
             List<CaseJob> jobs = dao.getCaseJobs(caseId);
             List<CaseInput> inputs = dao.getCaseInputs(caseId, session);
@@ -4752,8 +4773,8 @@ public class ManagedCaseService {
             log.error("Could not export case "
                     + (currentCase == null ? " (id = " + caseId + ")." : currentCase.getName() + "."), e);
             throw new EmfException("Could not export case: "
-                   // AME: this info makes the message too long to see it all in the window
-                   // + (currentCase == null ? " (id = " + caseId + "). " : currentCase.getName() + ". ")
+            // AME: this info makes the message too long to see it all in the window
+                    // + (currentCase == null ? " (id = " + caseId + "). " : currentCase.getName() + ". ")
                     + e.getMessage());
         } finally {
             if (session != null && session.isConnected())
