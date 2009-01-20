@@ -1005,7 +1005,8 @@ public class ManagedCaseService {
 
     public synchronized void addCaseInputs(User user, int caseId, CaseInput[] inputs) throws EmfException {
         Session session = sessionFactory.getSession();
-
+        List<Sector> sectors = new ArrayList<Sector>();
+        
         try {
             for (int i = 0; i < inputs.length; i++) {
                 inputs[i].setCaseID(caseId);
@@ -1026,13 +1027,23 @@ public class ManagedCaseService {
 
             for (CaseInput input : inputs) {
                 dao.add(input, session);
+                Sector sector = input.getSector();
+                
+                if (sector != null && !sectors.contains(sector))
+                    sectors.add(input.getSector());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new case input '" + inputs[0].getName() + "' etc.\n" + e.getMessage());
+            log.error("Could not add new case input '" + inputs[0].getName() + "' etc.\n", e);
             throw new EmfException(e.getMessage());
         } finally {
-            session.close();
+            //NOTE: if any inputs get copied, we need to update target case sector list
+            try {
+                updateSectorsList(user, caseId, session, sectors);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage());
+            } finally {
+                session.close();
+            }
         }
     }
 
@@ -1506,6 +1517,7 @@ public class ManagedCaseService {
 
     public synchronized void addCaseParameters(User user, int caseId, CaseParameter[] params) throws EmfException {
         Session session = sessionFactory.getSession();
+        List<Sector> sectors = new ArrayList<Sector>();
 
         try {
             for (int i = 0; i < params.length; i++) {
@@ -1526,14 +1538,48 @@ public class ManagedCaseService {
                     throw new EmfException("Case parameter: " + params[i].getName() + " already exists in target case.");
             }
 
-            for (CaseParameter param : params)
+            for (CaseParameter param : params) {
                 dao.addParameter(param, session);
+                Sector sector = param.getSector();
+                
+                if (sector != null && !sectors.contains(sector))
+                    sectors.add(param.getSector());
+            }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new case parameter '" + params[0].getName() + "' etc.\n" + e.getMessage());
+            log.error("Could not add new case parameter '" + params[0].getName() + "' etc.\n", e);
             throw new EmfException(e.getMessage());
         } finally {
-            session.close();
+            //NOTE: if there is any parameter get copied, need to add new sectors to the copied case
+            // sectors list
+            try {
+                updateSectorsList(user, caseId, session, sectors);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage());
+            } finally {
+                session.close();
+            }
+        }
+    }
+
+    private void updateSectorsList(User user, int caseId, Session session, List<Sector> sectors) throws EmfException {
+        if (sectors.size() > 0) {
+            Case target = dao.getCase(caseId, session);
+            
+            if (target.isLocked() && !target.isLocked(user))
+                throw new EmfException("Cannot obtain lock on target case to update sectors list.");
+            
+            Case locked = dao.obtainLocked(user, dao.getCase(caseId, session), session);
+            
+            Sector[] sectrs = locked.getSectors();
+            List<Sector> existed = new ArrayList<Sector>();
+            existed.addAll(Arrays.asList(sectrs));
+            
+            for(int i = 0; i < sectors.size(); i++)
+                if (!existed.contains(sectors.get(i)))
+                    existed.add(sectors.get(i));
+            
+            locked.setSectors(existed.toArray(new Sector[0]));
+            dao.update(locked, session);
         }
     }
 
@@ -1846,6 +1892,8 @@ public class ManagedCaseService {
 
     public synchronized void addCaseJobs(User user, int caseId, CaseJob[] jobs) throws EmfException {
         Session session = sessionFactory.getSession();
+        List<Sector> sectors = new ArrayList<Sector>();
+        
         try {
             for (CaseJob job : jobs)
                 if (dao.getCaseJob(caseId, job, session) != null)
@@ -1859,12 +1907,23 @@ public class ManagedCaseService {
                 job.setRunCompletionDate(null);
                 job.setRunstatus(dao.getJobRunStatuse("Not Started"));
                 dao.add(job, session);
+                Sector sector = job.getSector();
+                
+                if (sector != null && !sectors.contains(sector))
+                    sectors.add(job.getSector());
             }
         } catch (EmfException e) {
             log.error("Could not add new case jobs '" + jobs[0].getName() + "' etc.\n" + e.getMessage());
             throw new EmfException(e.getMessage());
         } finally {
-            session.close();
+            //NOTE: if any jobs get copied, we need to update target case sector list
+            try {
+                updateSectorsList(user, caseId, session, sectors);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage());
+            } finally {
+                session.close();
+            }
         }
     }
 
