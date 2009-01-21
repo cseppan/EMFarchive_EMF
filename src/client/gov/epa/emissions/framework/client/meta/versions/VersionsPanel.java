@@ -154,12 +154,12 @@ public class VersionsPanel extends JPanel implements VersionsView {
         Version[] versions = tableData.selected();
         
         if (versions.length < 1) {
-            displayError("Please select at least one Version");
+            displayError("Please select a final version to copy");
             return;
         }
         
         if (versions.length > 1) {
-            displayError("Please select only one final Version");
+            displayError("Please select only one final version to copy");
             return;
         }
         
@@ -170,7 +170,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
             return;
         }
         
-        showMsg("Please go see the copied dataset in the datasets manager window.");
+        showMsg("Please go to the dataset manager window and Refresh to see the copied dataset.");
     }
 
     private void doView(final JComboBox tableCombo) {
@@ -179,7 +179,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
         String table = (String) tableCombo.getSelectedItem();
         Version[] versions = tableData.selected();
         if (versions.length < 1) {
-            displayError("Please select at least one Version");
+            displayError("Please select at least one version to view");
             return;
         }
 

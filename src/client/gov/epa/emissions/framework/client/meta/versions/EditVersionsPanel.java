@@ -332,7 +332,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         String table = (String) tableCombo.getSelectedItem();
         Version[] versions = tableData.selected();
         if (versions.length < 1) {
-            displayError("Please select at least one version");
+            displayError("Please select at least one version to view");
             return;
         }
 
@@ -367,7 +367,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         String table = (String) tableCombo.getSelectedItem();
         Version[] versions = tableData.selected();
         if (versions.length != 1) {
-            displayError("Please select a single version");
+            displayError("Please select a single version to edit");
             return;
         }
 
