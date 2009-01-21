@@ -244,8 +244,7 @@ public class DataServiceImpl implements DataService {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new EmfException(ex.getMessage());
-        }
-        finally {
+        } finally {
             session.close();
         }
     }
@@ -334,18 +333,16 @@ public class DataServiceImpl implements DataService {
         try {
             if (user.getUsername().equals("admin") && user.isAdmin())
                 dao.removeEmptyDatasets(user, dbServer, session);
-            
+
             List<EmfDataset> list = dao.deletedDatasets(user, session);
             dao.deleteDatasets(list.toArray(new EmfDataset[0]), dbServer, session);
         } catch (Exception e) {
             e.printStackTrace();
             throw new EmfException(e.getMessage());
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             t.printStackTrace();
             throw new EmfException(t.getMessage());
-        }
-        finally {
+        } finally {
             session.close();
             closeDB(dbServer);
         }
@@ -550,7 +547,7 @@ public class DataServiceImpl implements DataService {
 
         return cols.toArray(new String[0]);
     }
-    
+
     private String[] getColNameTypes(DataModifier mod, String table) throws Exception {
         ResultSetMetaData md = null;
         String query = "SELECT * FROM " + table + " LIMIT 0";
@@ -564,20 +561,19 @@ public class DataServiceImpl implements DataService {
         List<String> cols = new ArrayList<String>();
         int colCount = md.getColumnCount();
 
-        //Asumming firt 4 columns are record_id, dataset_id, version, and delete_versions
-        //which is common to all emf datasets
+        // Asumming firt 4 columns are record_id, dataset_id, version, and delete_versions
+        // which is common to all emf datasets
         cols.add(md.getColumnName(1) + " SERIAL PRIMARY KEY");
         cols.add(md.getColumnName(2) + " int8 NOT NULL");
         cols.add(md.getColumnName(3) + " int4 DEFAULT 0");
         cols.add(md.getColumnName(4) + " text DEFAULT ''::text");
-        
-        for (int i = 5; i <= colCount; i++) { 
+
+        for (int i = 5; i <= colCount; i++) {
             String type = md.getColumnTypeName(i);
             String notNull = (md.isNullable(i) == ResultSetMetaData.columnNoNulls ? "NOT NULL" : "");
-            
+
             if (type.toUpperCase().startsWith("VARCHAR"))
-                cols.add(md.getColumnName(i) + " " + type + "(" +
-            		md.getPrecision(i) + ")" + " " + notNull);
+                cols.add(md.getColumnName(i) + " " + type + "(" + md.getPrecision(i) + ")" + " " + notNull);
             else
                 cols.add(md.getColumnName(i) + " " + type + " " + notNull);
         }
@@ -675,7 +671,7 @@ public class DataServiceImpl implements DataService {
 
         return colString;
     }
-    
+
     private String getTargetColString(String[] cols) {
         // NOTE: assume first 4 columns are record_id, dataset_id, version, delete_versions
         // which is common for dataset tables. Omit the first column.
@@ -688,8 +684,8 @@ public class DataServiceImpl implements DataService {
         return colString;
     }
 
-    public void replaceColValues(String table, String col, String find, String replaceWith, Version version, String filter)
-            throws EmfException {
+    public void replaceColValues(String table, String col, String find, String replaceWith, Version version,
+            String filter) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
 
         try {
@@ -698,37 +694,49 @@ public class DataServiceImpl implements DataService {
             VersionedQuery versionedQuery = new VersionedQuery(version);
             String[] cols = getTableColumns(dataModifier, table, "");
             int vNum = version.getVersion();
+
+            String whereClause = " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")"
+                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") + " AND version <> " + vNum;
             
-            String selectQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols) 
-                    + " FROM " + table
-                    + " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")" 
-                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
-                    + " AND version <> " + vNum;
-            
-            String insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")"
-                    + selectQuery;
-    
-            String updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith
-                    + "' WHERE " + col + "='" + find + "' AND version=" + vNum;
-            
-            String updateDelVersions = "UPDATE " + table 
-                    + " SET delete_versions = coalesce(delete_versions,'')||'," + vNum + "'"
-                    + " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")" 
-                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
-                    + " AND version <> " + vNum;
-    
+            String selectQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols) + " FROM "
+                    + table + whereClause;
+
+            String selectCurVerQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols)
+                    + " FROM " + table + " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")"
+                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") + " AND version = " + vNum;
+
+            String insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")" + selectQuery;
+
+            String updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith + "' WHERE " + col + "='"
+                    + find + "' AND version=" + vNum;
+
+            String updateDelVersions = "UPDATE " + table + " SET delete_versions = coalesce(delete_versions,'')||',"
+                    + vNum + "'" + whereClause;
+
             if (DebugLevels.DEBUG_16) {
+                System.out.println("Query to select records: " + selectQuery);
+                System.out.println("Query to select records in current version: " + selectCurVerQuery);
                 System.out.println("Query to insert records: " + insertQuery);
                 System.out.println("Query to replace column values: " + updateQuery);
                 System.out.println("Query to update previous delete_versions: " + updateDelVersions);
             }
-            
-            if (!dataModifier.resultExists(selectQuery))
-                throw new EmfException("No record found for column = '" + col + "' and value ='" + find + "'.");
-            
-            dataModifier.execute(insertQuery);
-            dataModifier.execute(updateQuery);
-            dataModifier.execute(updateDelVersions);
+
+            // NOTE: replace values of records in previous versions and also in current version
+            if (dataModifier.resultExists(selectQuery)) {
+                dataModifier.execute(insertQuery);
+                dataModifier.execute(updateQuery);
+                dataModifier.execute(updateDelVersions);
+                return;
+            }
+
+            // NOTE: replace values of records only in current version
+            if (dataModifier.resultExists(selectCurVerQuery)) {
+                dataModifier.execute(updateQuery);
+                return;
+            }
+
+            // NOTE: if no records found in previous version and current version, throw exception
+            throw new EmfException("No record found for column = '" + col + "' and value ='" + find + "'.");
         } catch (SQLException e) {
             LOG.error("Could not query table : ", e);
             throw new EmfException("Could not query table.");
@@ -739,70 +747,73 @@ public class DataServiceImpl implements DataService {
             closeDB(dbServer);
         }
     }
-    
+
     public synchronized void copyDataset(int datasetId, Version version, User user) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             EmfDataset dataset = dao.getDataset(session, datasetId);
             Date time = new Date();
-            
+
             DatasetType type = dataset.getDatasetType();
             String imprtClass = type.getImporterClassName();
             InternalSource[] sources = dataset.getInternalSources();
-            
-            boolean smkReport = (imprtClass == null ? false : imprtClass.equals("gov.epa.emissions.commons.io.other.SMKReportImporter"));
-            
+
+            boolean smkReport = (imprtClass == null ? false : imprtClass
+                    .equals("gov.epa.emissions.commons.io.other.SMKReportImporter"));
+
             if (type.isExternal() || smkReport || (sources != null && sources.length > 1))
                 throw new Exception("Copying of a version to a new dataset is not supported for this dataset type.");
-            
+
             EmfDataset copied = (EmfDataset) DeepCopy.copy(dataset);
             copied.setName(getUniqueNewName("Copy of " + dataset.getName() + "_v" + version.getVersion()));
             copied.setStatus(dataset.getStatus());
-            copied.setDescription("Copied from version " + version.getVersion() + " of dataset " +
-            		dataset.getName() + " on " + time + System.getProperty("line.separator") + dataset.getDescription());
+            copied.setDescription("Copied from version " + version.getVersion() + " of dataset " + dataset.getName()
+                    + " on " + time + System.getProperty("line.separator") + dataset.getDescription());
             copied.setCreator(user.getUsername());
             copied.setDefaultVersion(0);
             copied.setInternalSources(null);
-            
+
             copied.setCreatedDateTime(time);
             copied.setAccessedDateTime(time);
             copied.setModifiedDateTime(time);
-            
+
             session.clear();
             dao.add(copied, session);
             EmfDataset loaded = dao.getDataset(session, copied.getName());
             EmfDataset locked = dao.obtainLocked(user, loaded, session);
-            
+
             if (locked == null)
                 throw new EmfException("Errror copying dataset: can't obtain lock to update copied dataset.");
-            
+
             copyDatasetTable(dataset, version, loaded, user, session);
-            
+
             Version defaultVersion = new Version(0);
             defaultVersion.setName("Initial Version");
             defaultVersion.setPath("");
             defaultVersion.setCreator(user);
             defaultVersion.setDatasetId(locked.getId());
             defaultVersion.setLastModifiedDate(time);
+            defaultVersion.setFinalVersion(true);
             dao.add(defaultVersion, session);
         } catch (Exception e) {
             String error = "Error copying dataset...";
             String msg = e.getMessage();
             LOG.error(error, e);
-            throw new EmfException(msg == null ? error : msg.substring(msg.length() > 150 ? msg.length()- 150 : 0));
+            throw new EmfException(msg == null ? error : msg.substring(msg.length() > 150 ? msg.length() - 150 : 0));
         } finally {
             session.close();
         }
-        
+
     }
-    
-    private void copyDatasetTable(EmfDataset dataset, Version version, EmfDataset copied, User user, Session session) throws Exception {
+
+    private void copyDatasetTable(EmfDataset dataset, Version version, EmfDataset copied, User user, Session session)
+            throws Exception {
         InternalSource[] sources = dataset.getInternalSources();
-        
+
         if (sources == null || sources.length == 0)
             return;
-        
+
         DbServer dbServer = dbServerFactory.getDbServer();
         Datasource emisSrc = dbServer.getEmissionsDatasource();
         String schema = emisSrc.getName() + ".";
@@ -811,36 +822,36 @@ public class DataServiceImpl implements DataService {
         String newTable = tableData.name();
         String origTable = schema + src.getTable();
         VersionedDatasetQuery queryOrigData = new VersionedDatasetQuery(version, dataset);
-        
+
         if (sources.length == 1) {
             String[] cols = getTableColumns(emisSrc.dataModifier(), origTable, "");
             String[] colNameTypes = getColNameTypes(emisSrc.dataModifier(), origTable);
-            String create = "CREATE TABLE " + schema + newTable + " (" +
-                    colString(colNameTypes, 0) + ")";
-            String insert = "INSERT INTO " + schema + newTable + "(" + colString(cols,1) + ") SELECT " + getSrcColString(copied.getId(), 0, cols, cols) +
-            		" FROM " + origTable + " " + queryOrigData.versionWhereClause();
-            
+            String create = "CREATE TABLE " + schema + newTable + " (" + colString(colNameTypes, 0) + ")";
+            String insert = "INSERT INTO " + schema + newTable + "(" + colString(cols, 1) + ") SELECT "
+                    + getSrcColString(copied.getId(), 0, cols, cols) + " FROM " + origTable + " "
+                    + queryOrigData.versionWhereClause();
+
             emisSrc.tableDefinition().execute(create);
             emisSrc.tableDefinition().execute(insert);
-            
+
             src.setSource(dataset.getName() + " version: " + version.getVersion());
             src.setTable(newTable);
-            copied.setInternalSources(new InternalSource[]{src});
+            copied.setInternalSources(new InternalSource[] { src });
             dao.update(copied, session);
             dao.releaseLocked(user, copied, session);
         }
-        
+
     }
 
     private String colString(String[] cols, int start) {
         int len = cols.length;
         String colString = "";
-        
-        for (int i = start; i < len-1; i++)
+
+        for (int i = start; i < len - 1; i++)
             colString += cols[i] + ",";
-        
-        colString += cols[len-1];
-            
+
+        colString += cols[len - 1];
+
         return colString;
     }
 
@@ -861,7 +872,7 @@ public class DataServiceImpl implements DataService {
             session.close();
         }
     }
-    
+
     private int getSequence(String stub, List<String> names) {
         int sequence = names.size() + 1;
         String integer = "";
@@ -887,6 +898,5 @@ public class DataServiceImpl implements DataService {
             return Math.abs(new Random().nextInt()) % 10000;
         }
     }
-
 
 }
