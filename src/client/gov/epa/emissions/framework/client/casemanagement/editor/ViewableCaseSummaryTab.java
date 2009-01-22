@@ -581,6 +581,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
     public void doRefresh() throws EmfException {
         super.removeAll();
         this.caseObj = session.caseService().reloadCase(caseObj.getId());
+        presenter.refreshObjectManager();
         setLayout();
         viewOnly();
     }

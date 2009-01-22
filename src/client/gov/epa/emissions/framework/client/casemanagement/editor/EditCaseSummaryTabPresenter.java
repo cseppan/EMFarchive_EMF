@@ -112,6 +112,8 @@ public class EditCaseSummaryTabPresenter {
         return caseObjectManager.getOrAddGrid(selected);
     }
     
-    
+    public void refreshObjectManager() {
+        caseObjectManager.refresh();
+    }
 
 }

@@ -636,9 +636,11 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     public void doRefresh() throws EmfException {
+        presenter.refreshObjectManager();
+        checkIfLockedByCurrentUser();
         super.removeAll();
         setLayout();
-        checkIfLockedByCurrentUser();
+        super.validate();
         changeablesList.resetChanges();
     }
 
@@ -648,6 +650,8 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         if (!reloaded.isLocked(session.user()))
             throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
                     + " has it now.");
+        
+        this.caseObj = reloaded;
     }
 
     public void addSector(Sector sector) {
