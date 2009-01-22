@@ -1563,12 +1563,18 @@ public class ManagedCaseService {
     
     private void updateSectorsList(User user, int caseId, Session session, List<Sector> sectors) throws EmfException {
         if (sectors.size() > 0) {
+            boolean lockObtained = false;
             Case target = dao.getCase(caseId, session);
 
             if (target.isLocked() && !target.isLocked(user))
                 throw new EmfException("Cannot obtain lock on target case to update sectors list.");
 
-            Case locked = dao.obtainLocked(user, target, session);
+            Case locked = target;
+            
+            if (!target.isLocked()) {
+                locked = dao.obtainLocked(user, target, session);
+                lockObtained = true;
+            }
 
             Sector[] sectrs = locked.getSectors();
             List<Sector> existed = new ArrayList<Sector>();
@@ -1579,7 +1585,13 @@ public class ManagedCaseService {
                     existed.add(sectors.get(i));
 
             locked.setSectors(existed.toArray(new Sector[0]));
-            dao.update(locked, session);
+            
+            if (lockObtained) {
+                dao.update(locked, session);
+                return;
+            }
+            
+            dao.updateWithLock(locked, session);
         }
     }
 
