@@ -942,7 +942,13 @@ public class ManagedCaseService {
     public synchronized ModelToRun addModelToRun(ModelToRun model) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            ModelToRun temp = (ModelToRun) dao.load(ModelToRun.class, model.getName(), session);
+
+            if (temp != null)
+                return temp;
+
             dao.add(model, session);
+
             return (ModelToRun) dao.load(ModelToRun.class, model.getName(), session);
         } catch (Exception e) {
             e.printStackTrace();
@@ -956,6 +962,11 @@ public class ManagedCaseService {
     public synchronized GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            GridResolution temp = (GridResolution) dao.load(GridResolution.class, gridResolution.getName(), session);
+
+            if (temp != null)
+                return temp;
+
             dao.add(gridResolution, session);
             return (GridResolution) dao.load(GridResolution.class, gridResolution.getName(), session);
         } catch (Exception e) {
@@ -1560,7 +1571,7 @@ public class ManagedCaseService {
             }
         }
     }
-    
+
     private void updateSectorsList(User user, int caseId, Session session, List<Sector> sectors) throws EmfException {
         if (sectors.size() > 0) {
             boolean lockObtained = false;
@@ -1570,7 +1581,7 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot obtain lock on target case to update sectors list.");
 
             Case locked = target;
-            
+
             if (!target.isLocked()) {
                 locked = dao.obtainLocked(user, target, session);
                 lockObtained = true;
@@ -1585,12 +1596,12 @@ public class ManagedCaseService {
                     existed.add(sectors.get(i));
 
             locked.setSectors(existed.toArray(new Sector[0]));
-            
+
             if (lockObtained) {
                 dao.update(locked, session);
                 return;
             }
-            
+
             dao.updateWithLock(locked, session);
         }
     }
@@ -3903,8 +3914,13 @@ public class ManagedCaseService {
     public synchronized AirQualityModel addAirQualityModel(AirQualityModel airQModel) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            AirQualityModel temp = (AirQualityModel) dao.load(AirQualityModel.class, airQModel.getName(), session);
+
+            if (temp != null)
+                return temp;
             dao.add(airQModel, session);
             return (AirQualityModel) dao.load(AirQualityModel.class, airQModel.getName(), session);
+
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new AirQualityModel '" + airQModel.getName() + "'\n" + e.getMessage());
@@ -3931,6 +3947,11 @@ public class ManagedCaseService {
     public synchronized Grid addGrid(Grid grid) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            Grid temp = (Grid) dao.load(Grid.class, grid.getName(), session);
+
+            if (temp != null)
+                return temp;
+
             dao.add(grid, session);
             return (Grid) dao.load(Grid.class, grid.getName(), session);
         } catch (Exception e) {
@@ -3959,6 +3980,11 @@ public class ManagedCaseService {
     public synchronized Speciation addSpeciation(Speciation speciation) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            Speciation temp = (Speciation) dao.load(Speciation.class, speciation.getName(), session);
+
+            if (temp != null)
+                return temp;
+
             dao.add(speciation, session);
             return (Speciation) dao.load(Speciation.class, speciation.getName(), session);
         } catch (Exception e) {
@@ -5054,17 +5080,247 @@ public class ManagedCaseService {
 
         List<CaseParameter> paramObjects = getValidParameters(jobId, caseId);
         List<String> paramEnvs = getEnvVars(paramObjects);
+        List<String> withSumEnvs = combineSumEnvs(paramEnvs);
 
-        if (paramEnvs == null || paramEnvs.size() == 0)
+        if (withSumEnvs == null || withSumEnvs.size() == 0)
             throw new EmfException("No valid parameters selected to load.");
 
         EMFCaseFile caseFile = new CMAQLogFile(logFile);
-        caseFile.read(paramEnvs);
+        caseFile.read(withSumEnvs);
 
         StringBuffer sb = new StringBuffer();
 
-        int numLoaded = 0;
         String lineSep = System.getProperty("line.separator");
+
+        try {
+            resetSummaryValues(withSumEnvs, caseFile, sb, lineSep, caseId);
+        } catch (Exception e) {
+            throw new EmfException("Error parsing summary info: " + e.getMessage());
+        }
+
+        int numLoaded = resetParameterValues(user, paramObjects, caseFile, sb, lineSep);
+
+        String msg = numLoaded + " parameter value" + (numLoaded > 1 ? "s" : "") + " loaded." + lineSep;
+
+        return msg + sb.toString() + caseFile.getMessages();
+    }
+
+    private List<String> combineSumEnvs(List<String> paramEnvs) {
+        if (paramEnvs == null)
+            paramEnvs = new ArrayList<String>();
+
+        if (!paramEnvs.contains("MODEL_LABEL"))
+            paramEnvs.add("MODEL_LABEL");
+
+        if (!paramEnvs.contains("IOAPI_GRIDNAME_1"))
+            paramEnvs.add("IOAPI_GRIDNAME_1");
+
+        if (!paramEnvs.contains("EMF_GRID"))
+            paramEnvs.add("EMF_GRID");
+
+        if (!paramEnvs.contains("EMF_AQM"))
+            paramEnvs.add("EMF_AQM");
+
+        if (!paramEnvs.contains("EMF_SPC"))
+            paramEnvs.add("EMF_SPC");
+
+        if (!paramEnvs.contains("BASE_YEAR"))
+            paramEnvs.add("BASE_YEAR");
+
+        if (!paramEnvs.contains("FUTURE_YEAR"))
+            paramEnvs.add("FUTURE_YEAR");
+
+        if (!paramEnvs.contains("EPI_STDATE_TIME"))
+            paramEnvs.add("EPI_STDATE_TIME");
+
+        if (!paramEnvs.contains("EPI_ENDATE_TIME"))
+            paramEnvs.add("EPI_ENDATE_TIME");
+
+        return paramEnvs;
+    }
+
+    private void resetSummaryValues(List<String> paramEnvs, EMFCaseFile caseFile, StringBuffer sb, String lineSep,
+            int caseId) throws Exception {
+        Case caze = this.getCase(caseId);
+        Session session = sessionFactory.getSession();
+
+        for (Iterator<String> iter = paramEnvs.iterator(); iter.hasNext();) {
+            String envVar = iter.next();
+            String value = caseFile.getAttributeValue(envVar);
+
+            if (value == null)
+                continue;
+
+            if (envVar.toUpperCase().equals("MODEL_LABEL")) {
+                String origName = (caze.getModel() == null ? null : caze.getModel().getName());
+                String origVersion = caze.getModelVersion();
+
+                ModelToRun model = new ModelToRun();
+                String version = setModelNVersion(model, value);
+                model = addModelToRun(model);
+
+                if (!model.getName().isEmpty() && !model.getName().equalsIgnoreCase(origName)) {
+                    caze.setModel(model);
+                    sb.append("WARNING: model -- value replaced (previous: " + origName + ")" + lineSep);
+                }
+
+                if (!version.isEmpty() && !version.equalsIgnoreCase(origVersion)) {
+                    caze.setModelVersion(version);
+                    sb.append("WARNING: version -- value replaced (previous: " + origVersion + ")" + lineSep);
+                }
+            }
+
+            if (envVar.toUpperCase().equals("IOAPI_GRIDNAME_1")) {
+                Grid grid = caze.getGrid();
+
+                if (grid != null && grid.getName() != null && grid.getName().trim().equalsIgnoreCase(value))
+                    continue;
+
+                if (grid != null && grid.getName() != null)
+                    sb.append("WARNING: grid -- value replaced (previous: " + grid.getName() + ")" + lineSep);
+
+                grid = new Grid();
+                grid.setName(value);
+                grid = this.addGrid(grid);
+
+                caze.setGrid(grid);
+            }
+
+            if (envVar.toUpperCase().equals("EMF_GRID")) {
+                GridResolution resltn = caze.getGridResolution();
+
+                if (resltn != null && resltn.getName() != null && resltn.getName().trim().equalsIgnoreCase(value))
+                    continue;
+
+                if (resltn != null && resltn.getName() != null)
+                    sb.append("WARNING: grid resolution -- value replaced (previous: " + resltn.getName() + ")"
+                            + lineSep);
+
+                resltn = new GridResolution();
+                resltn.setName(value);
+                resltn = this.addGridResolution(resltn);
+
+                caze.setGridResolution(resltn);
+            }
+
+            if (envVar.toUpperCase().equals("EMF_AQM")) {
+                AirQualityModel aqm = caze.getAirQualityModel();
+
+                if (aqm != null && aqm.getName() != null && aqm.getName().trim().equalsIgnoreCase(value))
+                    continue;
+
+                if (aqm != null && aqm.getName() != null)
+                    sb.append("WARNING: air quality model -- value replaced (previous: " + aqm.getName() + ")"
+                            + lineSep);
+
+                aqm = new AirQualityModel();
+                aqm.setName(value);
+                aqm = this.addAirQualityModel(aqm);
+
+                caze.setAirQualityModel(aqm);
+            }
+
+            if (envVar.toUpperCase().equals("EMF_SPC")) {
+                Speciation spec = caze.getSpeciation();
+
+                if (spec != null && spec.getName() != null && spec.getName().trim().equalsIgnoreCase(value))
+                    continue;
+
+                if (spec != null && spec.getName() != null)
+                    sb.append("WARNING: speciation -- value replaced (previous: " + spec.getName() + ")" + lineSep);
+
+                spec = new Speciation();
+                spec.setName(value);
+                spec = this.addSpeciation(spec);
+
+                caze.setSpeciation(spec);
+            }
+
+            if (envVar.toUpperCase().equals("BASE_YEAR")) {
+                int baseyr = caze.getBaseYear();
+
+                sb.append("WARNING: base year -- value replaced (previous: " + baseyr + ")" + lineSep);
+
+                caze.setBaseYear(Integer.parseInt(value.trim()));
+            }
+
+            if (envVar.toUpperCase().equals("FUTURE_YEAR")) {
+                int futureyr = caze.getFutureYear();
+
+                sb.append("WARNING: base year -- value replaced (previous: " + futureyr + ")" + lineSep);
+
+                caze.setFutureYear(Integer.parseInt(value.trim()));
+            }
+
+            if (envVar.toUpperCase().equals("EPI_STDATE_TIME")) {
+                Date start = caze.getStartDate();
+
+                if (start != null) {
+                    String date = CustomDateFormat.format_MM_DD_YYYY_HH_mm(start);
+                    sb.append("WARNING: start date -- value replaced (previous: " + date + ")" + lineSep);
+                }
+
+                caze.setStartDate(start);
+            }
+
+            if (envVar.toUpperCase().equals("EPI_ENDATE_TIME")) {
+                Date end = caze.getEndDate();
+
+                if (end != null) {
+                    String date = CustomDateFormat.format_MM_DD_YYYY_HH_mm(end);
+                    sb.append("WARNING: end date -- value replaced (previous: " + date + ")" + lineSep);
+                }
+
+                caze.setStartDate(end);
+            }
+        }
+
+        try {
+            dao.updateWithLock(caze, session);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
+
+    private String setModelNVersion(ModelToRun model, String value) throws Exception {
+        // NOTE: parsing mechanism in synch with the log file reader
+        if (value == null || value.trim().isEmpty())
+            return null;
+
+        try {
+            value = value.trim();
+            int comma = value.indexOf(',');
+            String part1 = value;
+            String part2 = "";
+            String version = "";
+
+            if (comma > 0)
+                part1 = value.substring(0, comma).trim();
+
+            if (comma > 0 && comma < value.length() - 1)
+                part2 = value.substring(comma + 1, value.length()).trim();
+
+            if ((!part1.isEmpty() && Character.isDigit(part1.charAt(0)))
+                    || (part1.toUpperCase().startsWith("V") && Character.isDigit(part1.charAt(1)))) {
+                version = part1;
+                model.setName(part2);
+                return version;
+            }
+
+            model.setName(part1);
+            return part2;
+        } catch (Exception e) {
+            log.error("Error parsing case model and version string.", e);
+            throw e;
+        }
+    }
+
+    private int resetParameterValues(User user, List<CaseParameter> paramObjects, EMFCaseFile caseFile,
+            StringBuffer sb, String lineSep) throws EmfException {
+        int numLoaded = 0;
 
         for (Iterator<CaseParameter> iter = paramObjects.iterator(); iter.hasNext();) {
             CaseParameter param = iter.next();
@@ -5088,9 +5344,7 @@ public class ManagedCaseService {
             numLoaded++;
         }
 
-        String msg = numLoaded + " parameter value" + (numLoaded > 1 ? "s" : "") + " loaded." + lineSep;
-
-        return msg + sb.toString() + caseFile.getMessages();
+        return numLoaded;
     }
 
     private synchronized List<CaseParameter> getValidParameters(int jobId, int caseId) throws EmfException {
@@ -5164,12 +5418,12 @@ public class ManagedCaseService {
             List<CaseParameter> params = dao.getCaseParameters(caseId, session);
             Case caze = dao.getCase(caseId, session);
             ModelToRun model = caze.getModel();
-            
+
             if (model == null)
                 return;
-            
+
             int modelId = model.getId();
-            
+
             for (Iterator<CaseParameter> iter = params.iterator(); iter.hasNext();) {
                 CaseParameter param = iter.next();
                 ParameterName name = param.getParameterName();
@@ -5180,12 +5434,11 @@ public class ManagedCaseService {
                 param.setEnvVar(envar);
                 dao.updateCaseParameter(param, session);
             }
-            
-            //NOTE: need to update input name and env var also
+
+            // NOTE: need to update input name and env var also
         } catch (Exception e) {
             log.error("Error reading case parameters for case id = " + caseId + ".", e);
-            throw new EmfException("Error reading case parameters for case id = " + caseId
-                    + ".");
+            throw new EmfException("Error reading case parameters for case id = " + caseId + ".");
         } finally {
             if (session != null && session.isOpen())
                 session.close();

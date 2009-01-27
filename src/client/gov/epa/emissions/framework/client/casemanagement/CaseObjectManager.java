@@ -150,8 +150,6 @@ public class CaseObjectManager {
          
         lastCaseId = -1;
         jobsForLastCaseId = null;
-        
-        System.out.println("Refreshed case object manager.");
     }
 
     public synchronized void refreshJobList() throws EmfException {
