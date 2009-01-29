@@ -192,7 +192,7 @@ public class SQLQueryParserTest extends ServiceTestCase {
         addVersionEntryToVersionsTable(version);
         addVersionEntryToVersionsTable(version1);
         
-        QAProgram qaProgram = new QAProgram("Average day to Annual State Summary");
+        QAProgram qaProgram = new QAProgram("Average day to Annual Summary");
         
         QAStep qaStep = new QAStep();
         qaStep.setName("Step1");
@@ -203,7 +203,7 @@ public class SQLQueryParserTest extends ServiceTestCase {
         qaStepResult.setTable("QA_DSID603_V0_20070827122550Test1");
         qaStepResult.getTable();
         
-        String userQuery = "SELECT fipsst, sum(ann_emis) as ann_emis, poll FROM ((select br.fipsst, be.poll, be.ann_emis from $DATASET_QASTEP[TEST, Average day to Annual State Summary] as be) union all (select te.fipsst, te.name, te.ann_emis from $DATASET_QASTEP[TEST, Average day to Annual State Summary] as te)) as ab group by ab.fipsst, ab.ann_emis, ab.poll order by ab.fipsst";
+        String userQuery = "SELECT fipsst, sum(ann_emis) as ann_emis, poll FROM ((select br.fipsst, be.poll, be.ann_emis from $DATASET_QASTEP[TEST, Average day to Annual Summary] as be) union all (select te.fipsst, te.name, te.ann_emis from $DATASET_QASTEP[TEST, Average day to Annual Summary] as te)) as ab group by ab.fipsst, ab.ann_emis, ab.poll order by ab.fipsst";
         
         //emissions.QA_DSID135_V0_20070824135517Summarize_by_US_State_and_Pollutant 
         //emissions.QA_DSID603_V0_20070827122550Test1

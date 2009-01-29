@@ -6,13 +6,11 @@ import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
-import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
@@ -70,7 +68,7 @@ public class ExportQAStepTask implements Runnable {
         try {
             getStepResult();
             file = exportFile(dirName);
-            Exporter exporter = new DatabaseTableCSVExporter(result.getTable(), dbServer.getEmissionsDatasource(), batchSize(sessionFactory));
+            Exporter exporter = new DatabaseTableCSVExporter(dbServer.getEmissionsDatasource().getName() + "." + result.getTable(), dbServer.getEmissionsDatasource());
             suffix = suffix();
             prepare(suffix);
             exporter.export(file);
@@ -169,15 +167,5 @@ public class ExportQAStepTask implements Runnable {
             throw new EmfException("Folder does not exist: " + dirName);
         }
         return file;
-    }
-
-    private int batchSize(HibernateSessionFactory sessionFactory) {
-        Session session = sessionFactory.getSession();
-        try {
-            EmfProperty property = new EmfPropertiesDAO().getProperty("export-batch-size", session);
-            return Integer.parseInt(property.getValue());
-        } finally {
-            session.close();
-        }
     }
 }

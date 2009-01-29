@@ -1,148 +1,111 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.OptimizedQuery;
-import gov.epa.emissions.commons.io.ColumnMetaData;
-import gov.epa.emissions.commons.io.CustomCharSetOutputStreamWriter;
-import gov.epa.emissions.commons.io.ExportStatement;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.ExporterException;
-import gov.epa.emissions.commons.io.SimpleExportStatement;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 
+
+//This class is only useful for exporting NON VERSIONED tables.
+//Another approach will be needed to deal with versioned tables...
+//This exporter use the Postgres COPY statement to go directly from the table to a file 
+//This exporter will not handle custom SQL statements, but could be easily expanded to support this.
 public class DatabaseTableCSVExporter implements Exporter {
 
     private Datasource datasource;
 
-    private String delimiter;
-
-    private int batchSize;
-
-    private String tableName;
+    private String qualifiedTableName;
     
     private long exportedLinesCount = 0;
 
-    public DatabaseTableCSVExporter(String tableName, Datasource datasource, int optimizedBatchSize) {
-        this.tableName = tableName;
+    private boolean windowsOS = false;
+
+    public DatabaseTableCSVExporter(String qualifiedTableName, Datasource datasource) {
+        this.qualifiedTableName = qualifiedTableName;
         this.datasource = datasource;
-        this.batchSize = optimizedBatchSize;
-        setDelimiter(",");
+        if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS"))
+            windowsOS = true;
     }
 
     public void export(File file) throws ExporterException {
-        PrintWriter writer = printWriter(file);
-        write(file, writer);
-    }
+        Connection connection = null;
 
-    private PrintWriter printWriter(File file) throws ExporterException {
-        PrintWriter writer = null;
         try {
-            //writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-            writer = new PrintWriter(new CustomCharSetOutputStreamWriter(new FileOutputStream(file)));
-        } catch (IOException e) {
-            throw new ExporterException("Could not open file - " + file + " for writing");
-        }
-        return writer;
-    }
+            //build COPY SQL statement
+            String writeQuery = getWriteQueryString(file.getPath());
 
-    protected void write(File file, PrintWriter writer) throws ExporterException {
-        try {
-            String[] cols = getCols(datasource, tableName);
-            writeColumnNames(writer, cols);
-            writeData(writer, datasource, cols);
-        } catch (SQLException e) {
-            throw new ExporterException("Could not export file - " + file, e);
+            connection = datasource.getConnection();
+
+            //execute COPY SQL statement
+            executeQuery(connection, writeQuery);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // NOTE: this closes the db server for other exporters
+            // try {
+            // if ((connection != null) && !connection.isClosed())
+            // connection.close();
+            // } catch (Exception ex) {
+            // ex.printStackTrace();
+            // throw new ExporterException(ex.getMessage());
+            // }
+            throw new ExporterException(e.getMessage());
         } finally {
-            writer.close();
+            //
         }
-    }
-
-    private void writeData(PrintWriter writer, Datasource datasource, String[] cols) throws SQLException {
-        String query = getQueryString(datasource);
-        OptimizedQuery runner = datasource.optimizedQuery(query, batchSize);
-        while (runner.execute()) {
-            ResultSet rs = runner.getResultSet();
-            writeBatchOfData(writer, rs, cols);
-        }
-        runner.close();
-    }
-
-    private String[] getCols(Datasource datasource, String tableName) throws SQLException {
-        try {
-            ColumnMetaData[] cols = datasource.tableDefinition().getTableMetaData(tableName).getCols();
-            String[] colNames = new String[cols.length];
-            for (int i = 0; i < colNames.length; i++) {
-                colNames[i] = cols[i].getName();
-            }
-            return colNames;
-        } catch (SQLException e) {
-            throw new SQLException("Could not get the column names\n" + e.getMessage());
-        }
-    }
-
-    private void writeColumnNames(PrintWriter writer, String[] cols) {
-        for (int i = 0; i < cols.length; i++) {
-            writer.print(cols[i]);
-            if (i + 1 < cols.length)
-                writer.print(delimiter);// delimiter
-        }
-        writer.println();
-    }
-
-    private void writeBatchOfData(PrintWriter writer, ResultSet data, String[] cols) throws SQLException {
-        while (data.next())
-            writeRecord(data, writer, cols);
-        data.close();
-    }
-
-    private String getQueryString(Datasource datasource) {
-        String qualifiedTable = datasource.getName() + "." + tableName;
-        ExportStatement export = new SimpleExportStatement();
-
-        return export.generate(qualifiedTable);
-    }
-
-    private void writeRecord(ResultSet data, PrintWriter writer, String[] cols) throws SQLException {
-        for (int i = 0; i < cols.length; i++) {
-            String value = data.getString(i + 1);
-            if (value != null)
-                writer.write(getValue(value));
-
-            if (i + 1 < cols.length)
-                writer.print(delimiter);// delimiter
-        }
-        writer.println();
-        ++exportedLinesCount;
-    }
-
-    protected String getValue(String value) {
-        return formatValue(value);
-
-    }
-
-    protected String formatValue(String value) {
-        // if (containsDelimiter(value))
-        return "\"" + value + "\"";
-
-        // return value;
-    }
-
-    public void setDelimiter(String del) {
-        this.delimiter = del;
     }
 
     public long getExportedLinesCount() {
         return this.exportedLinesCount;
     }
 
-    // private boolean containsDelimiter(String s) {
-    // return s.indexOf(delimiter) >= 0;
-    //    }
+    private void executeQuery(Connection connection, String writeQuery) throws SQLException {
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        statement.execute(writeQuery);
+        statement.close();
+    }
 
+    private String getWriteQueryString(String dataFile) {
+        String withClause = " WITH NULL '' CSV HEADER FORCE QUOTE " + getNeedQuotesCols();
+
+        return "COPY " + qualifiedTableName + " to '" + putEscape(dataFile) + "'" + withClause;
+    }
+    private String getNeedQuotesCols() {
+        ResultSet rs = null;
+        String colNames = "";
+        try {
+            rs = datasource.query().executeQuery("select * from " + qualifiedTableName + " where 1 = 0");
+            ResultSetMetaData md = rs.getMetaData();
+            for (int i = 1; i <= md.getColumnCount(); i++) {
+                String colType = md.getColumnTypeName(i).toUpperCase();
+
+                if (colType.startsWith("VARCHAR") || colType.startsWith("TEXT"))
+                    colNames += md.getColumnName(i) + ",";
+                
+            }
+        } catch (SQLException e) {
+            //
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
+        }
+        return (colNames.length() > 0) ? colNames.substring(0, colNames.length() - 1) : colNames;
+    }
+
+    private String putEscape(String path) {
+        if (windowsOS)
+            return path.replaceAll("\\\\", "\\\\\\\\");
+
+        return path;
+    }
 }

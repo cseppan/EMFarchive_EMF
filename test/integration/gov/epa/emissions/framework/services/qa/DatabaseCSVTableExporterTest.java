@@ -23,8 +23,9 @@ public class DatabaseCSVTableExporterTest extends ServiceTestCase {
     }
 
     public void testShouldExportATableToCSVFile() throws IOException, ExporterException {
-        DatabaseTableCSVExporter exporter = new DatabaseTableCSVExporter("Pollutants", dbServer()
-                .getReferenceDatasource(), 1000);
+        DatabaseTableCSVExporter exporter = new DatabaseTableCSVExporter(dbServer()
+                .getReferenceDatasource().getName() + ".Pollutants", dbServer()
+                .getReferenceDatasource());
         File file = File.createTempFile("exported", ".csv");
         file.deleteOnExit();
 
