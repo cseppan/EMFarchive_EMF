@@ -19,9 +19,6 @@ DECLARE
 	region RECORD;
 	target_pollutant_id integer := 0;
 	target_pollutant varchar;
-	measures_count integer := 0;
-	measure_with_region_count integer := 0;
-	measure_classes_count integer := 0;
 	county_dataset_filter_sql text := '';
 	cost_year integer := null;
 	inventory_year integer := null;
@@ -56,7 +53,7 @@ DECLARE
 	uncontrolled_emis double precision;
 --	random_number double precision := random();
 BEGIN
-	SET work_mem TO '256MB';
+--	SET work_mem TO '256MB';
 --	SET enable_seqscan TO 'off';
 --	SET enable_nestloop TO 'on';
 
@@ -101,22 +98,6 @@ BEGIN
 		and srt.name = 'Least Cost Curve Summary'
 	into costcurve_dataset_id,
 		costcurve_table_name;
-
-	-- see if control strategy has only certain measures specified
-	SELECT count(id), 
-		count(case when region_dataset_id is not null then 1 else null end)
-	FROM emf.control_strategy_measures 
-	where control_strategy_measures.control_strategy_id = control_strategy_id 
-	INTO measures_count, 
-		measure_with_region_count;
-
-	-- see if measure classes were specified
-	IF measures_count = 0 THEN
-		SELECT count(1)
-		FROM emf.control_strategy_classes 
-		where control_strategy_classes.control_strategy_id = control_strategy_id
-		INTO measure_classes_count;
-	END IF;
 
 	-- get target pollutant, inv filter, and county dataset info if specified
 	SELECT cs.pollutant_id,
@@ -261,6 +242,7 @@ BEGIN
 						where status is null 
 							and poll = ' || quote_literal(target_pollutant) || '
 						ORDER BY marginal, emis_reduction desc, record_id
+--						limit ' || (apply_order) || '
 						limit ' || (apply_order + 1) || '
 					) tbl
 					ORDER BY source, marginal desc, emis_reduction, record_id desc
@@ -287,6 +269,7 @@ BEGIN
 			where status is null 
 				and poll = ' || quote_literal(target_pollutant) || '
 			order by marginal, emis_reduction desc, record_id
+--			limit ' || (apply_order) || '
 			limit ' || (apply_order + 1) || '
 		) tbl order by marginal, emis_reduction desc, record_id
 	) tbl
@@ -381,6 +364,7 @@ BEGIN
 					and ap.cm_id = tp.cm_id
 				where tp.status is null 
 					and ap.status is null 
+--					and tp.apply_order <= ' || coalesce(apply_order, record_count) || '
 					and tp.apply_order <= ' || coalesce(apply_order + 1, record_count) || '
 					and tp.poll = ' || quote_literal(target_pollutant) || '
 				ORDER BY ap.source, ap.poll
