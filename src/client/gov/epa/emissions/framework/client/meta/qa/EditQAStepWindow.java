@@ -141,7 +141,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     
     private static final String emissionTypeTag = "-emissionType";
 
-    private static final String avgDaySummaryProgram = "Average day to Annual State Summary";
+    private static final String avgDaySummaryProgram = "Average day to Annual Summary";
 
     private static final String avgDayToAnnualProgram = "Average day to Annual Inventory";
 
