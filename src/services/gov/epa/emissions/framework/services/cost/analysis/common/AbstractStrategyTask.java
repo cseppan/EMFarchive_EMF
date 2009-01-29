@@ -330,7 +330,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                               }
                               String sqlAnnEmis = (month != -1 ? "coalesce(" + noOfDaysInMonth + " * i.avd_emis, i.ann_emis)" : "i.ann_emis");
                               sql += (count > 0 ? " union all " : "") 
-                                  + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(" + sqlAnnEmis + ") as Uncontrolled_Emis, sum(" + sqlAnnEmis + ") - sum(e.final_emissions) as Emis_Reduction, coalesce(sum(e.final_emissions), sum(" + sqlAnnEmis + ")) as Remaining_Emis, case when sum(" + sqlAnnEmis + ") <> 0 then (sum(" + sqlAnnEmis + ") - sum(e.final_emissions)) / sum(" + sqlAnnEmis + ") * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
+                                  + "select '" + sector.replace("'", "''") + "'::character varying(64) as sector, i.fips, i.poll, sum(" + sqlAnnEmis + ") as Uncontrolled_Emis, sum(" + sqlAnnEmis + ") - sum(e.final_emissions) as Emis_Reduction, coalesce(sum(e.final_emissions), sum(" + sqlAnnEmis + ")) as Remaining_Emis, case when sum(" + sqlAnnEmis + ") <> 0 then (sum(" + sqlAnnEmis + ") - sum(e.final_emissions)) / sum(" + sqlAnnEmis + ") * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
                                   + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
                                   + "sum(e.Annualized_Capital_Cost) as Annualized_Capital_Cost, "
                                   + "sum(e.Total_Capital_Cost) as Total_Capital_Cost, "
@@ -363,7 +363,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                         }
                         String sqlAnnEmis = (month != -1 ? "coalesce(" + noOfDaysInMonth + " * i.avd_emis, i.ann_emis)" : "i.ann_emis");
                         sql += (count > 0 ? " union all " : "") 
-                            + "select '" + sector.replace("'", "''") + "' as sector, i.fips, i.poll, sum(" + sqlAnnEmis + ") as Uncontrolled_Emis, sum(" + sqlAnnEmis + ") - sum(e.final_emissions) as Emis_Reduction, coalesce(sum(e.final_emissions), sum(" + sqlAnnEmis + ")) as Remaining_Emis, case when sum(" + sqlAnnEmis + ") <> 0 then (sum(" + sqlAnnEmis + ") - sum(e.final_emissions)) / sum(" + sqlAnnEmis + ") * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
+                            + "select '" + sector.replace("'", "''") + "'::character varying(64) as sector, i.fips, i.poll, sum(" + sqlAnnEmis + ") as Uncontrolled_Emis, sum(" + sqlAnnEmis + ") - sum(e.final_emissions) as Emis_Reduction, coalesce(sum(e.final_emissions), sum(" + sqlAnnEmis + ")) as Remaining_Emis, case when sum(" + sqlAnnEmis + ") <> 0 then (sum(" + sqlAnnEmis + ") - sum(e.final_emissions)) / sum(" + sqlAnnEmis + ") * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
                             + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
                             + "sum(e.Annualized_Capital_Cost) as Annualized_Capital_Cost, "
                             + "sum(e.Total_Capital_Cost) as Total_Capital_Cost, "
