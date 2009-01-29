@@ -10,18 +10,8 @@ DECLARE
 	is_point_table boolean := false;
 BEGIN
 
-	-- see if there are point specific columns to be indexed
-	SELECT count(1) = 4
-	FROM pg_class c
-		inner join pg_attribute a
-		on a.attrelid = c.oid
-		inner join pg_type t
-		on t.oid = a.atttypid
-	WHERE c.relname = lower(table_name)
-		and a.attname in ('plantid','pointid','stackid','segment')
-		AND a.attnum > 0
-	into is_point_table;
-
+	-- see if there are point specific columns in the inventory
+	is_point_table := public.check_table_for_columns(table_name, 'plantid,pointid,stackid,segment', ',');
 
 	-- Create Indexes....
 

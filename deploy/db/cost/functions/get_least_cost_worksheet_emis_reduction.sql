@@ -24,7 +24,7 @@ BEGIN
 	) tbl' 
 	into emis_reduction;
 
-	RETURN emis_reduction;
+	RETURN coalesce(emis_reduction,0.0);
 END;
 $BODY$
   LANGUAGE 'plpgsql' IMMUTABLE
