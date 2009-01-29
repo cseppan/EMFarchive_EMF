@@ -11,7 +11,7 @@ BEGIN
 		on a.attrelid = c.oid
 		inner join pg_type t
 		on t.oid = a.atttypid
-	WHERE c.relname = ' || quote_literal(fully_qualified_table_name) || '
+	WHERE c.relname = ' || lower(quote_literal(fully_qualified_table_name)) || '
 		and a.attname in (''' || array_to_string(string_to_array(column_list, column_list_delimiter), ''',''') || ''')
 		AND a.attnum > 0'
 	into has_columns;
