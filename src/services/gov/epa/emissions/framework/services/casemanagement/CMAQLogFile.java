@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,9 @@ public class CMAQLogFile implements EMFCaseFile {
 
     private CustomCharSetInputStreamReader inputStreamReader;
 
-    private Map<String, String> data = new HashMap<String, String>();
+    private Map<String, String> parameters = new HashMap<String, String>();
+
+    private Map<String, String[]> inputs = new HashMap<String, String[]>();
 
     private StringBuffer sb = null;
 
@@ -49,39 +52,70 @@ public class CMAQLogFile implements EMFCaseFile {
     }
 
     public String getAttributeValue(String attribute) {
-        return data.get(attribute);
+        return parameters.get(attribute);
+    }
+
+    public String[] getInputValue(String envVar) {
+        return inputs.get(envVar);
+    }
+
+    public String getParameterValue(String envVar) {
+        return parameters.get(envVar);
     }
 
     /*******************************************************************************************************************
-     * Read all the attributes and their values and put them in a hash map
+     * Read specified attributes (inputs) only
      */
-    public void readAll() throws EmfException {
-        String tempAttr = "";
-        sb = new StringBuffer();
+    public void readInputs(List<String> attributes, StringBuffer msg) throws EmfException {
+        if (attributes == null || attributes.size() == 0)
+            throw new EmfException("No attributes specified to read from log file.");
 
-        if (!data.isEmpty())
-            data.clear();
+        String prevAttr = "";
+        boolean first = true;
+        List<String> files = new ArrayList<String>();
+
+        if (!inputs.isEmpty())
+            inputs.clear();
 
         try {
             open();
             String line = null;
 
             while ((line = fileReader.readLine()) != null) {
+                line = line.trim();
                 int eqIndex = line.indexOf("=");
 
                 if (eqIndex < 0)
                     continue;
 
                 String attrib = line.substring(0, eqIndex).trim();
-                String value = line.substring(eqIndex + 1).trim();
 
-                if (attrib.equals(tempAttr)) {
-                    sb.append("WARNING: " + tempAttr + "--duplicate value: " + value + lineSep);
-                    continue;
+                if (!first && !attrib.equals(prevAttr)) {
+                    addAttribValue(prevAttr, files, inputs);
+                    files.clear();
+                    first = true;
                 }
 
-                addAttribValue(attrib, value, data);
-                tempAttr = attrib;
+                if (!attributes.contains(attrib))
+                    continue;
+
+                int space = line.indexOf(" ");
+
+                if (space < 0)
+                    space = line.length();
+
+                String value = line.substring(eqIndex + 1, space).trim();
+                int slash = value.lastIndexOf('/');
+                String dir = value.substring(0, slash+1);
+                String file = value.substring(slash + 1);
+
+                if (first) {
+                    files.add(dir);
+                    first = false;
+                }
+                
+                files.add(file);
+                prevAttr = attrib;
             }
 
             close();
@@ -98,16 +132,15 @@ public class CMAQLogFile implements EMFCaseFile {
     /*******************************************************************************************************************
      * Read specified attributes (parameters) only
      */
-    public void read(List<String> attributes) throws EmfException {
+    public void readParameters(List<String> attributes, StringBuffer msg) throws EmfException {
         if (attributes == null || attributes.size() == 0)
             throw new EmfException("No attributes specified to read from log file.");
 
         String tempAttr = "";
         boolean recorded = false;
-        sb = new StringBuffer();
 
-        if (!data.isEmpty())
-            data.clear();
+        if (!parameters.isEmpty())
+            parameters.clear();
 
         try {
             open();
@@ -120,21 +153,22 @@ public class CMAQLogFile implements EMFCaseFile {
                     continue;
 
                 String attrib = line.substring(0, eqIndex).trim();
-                String value = line.substring(eqIndex + 1).trim();
 
                 if (!attributes.contains(attrib))
                     continue;
 
-                if (attrib.equals(tempAttr) && !attrib.toUpperCase().equals("MODEL_LABEL")) {
+                String value = line.substring(eqIndex + 1).trim();
+
+                if (attrib.equals(tempAttr)) {
                     if (!recorded) {
-                        sb.append("WARNING: Variable \'" + tempAttr + "\' has duplicate values." + lineSep);
+                        msg.append("WARNING: Variable \'" + tempAttr + "\' has duplicate values." + lineSep);
                         recorded = true;
                     }
 
                     continue;
                 }
 
-                addAttribValue(attrib, value, data);
+                addAttribValue(attrib, value, parameters);
                 tempAttr = attrib;
                 recorded = false;
             }
@@ -154,16 +188,14 @@ public class CMAQLogFile implements EMFCaseFile {
         if (key == null || key.isEmpty())
             return;
 
-        if (key.toUpperCase().equals("MODEL_LABEL")) {
-            String prevValue = map.get(key);
-
-            if (prevValue != null) {
-                value = prevValue + "," + value;
-                map.remove(key);
-            }
-        }
-
         map.put(key, value);
+    }
+
+    private void addAttribValue(String key, List<String> files, Map<String, String[]> inputsMap) {
+        if (key == null || key.isEmpty())
+            return;
+
+        inputsMap.put(key, files.toArray(new String[0]));
     }
 
     public String getMessages() {

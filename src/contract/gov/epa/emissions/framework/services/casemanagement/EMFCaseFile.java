@@ -6,11 +6,15 @@ import gov.epa.emissions.framework.services.EmfException;
 
 public interface EMFCaseFile {
 
-    void readAll() throws EmfException;
+    void readParameters(List<String> attributes, StringBuffer msg) throws EmfException;
     
-    void read(List<String> attributes) throws EmfException;
+    void readInputs(List<String> attributes, StringBuffer msg) throws EmfException;
     
     String getAttributeValue(String attribute) throws EmfException;
+    
+    String[] getInputValue(String envVar);
+    
+    String getParameterValue(String envVar);
     
     String getMessages();
 }

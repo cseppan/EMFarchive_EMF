@@ -552,6 +552,24 @@ public class CaseDAO {
 
         return hibernateFacade.get(CaseInput.class, crits, session);
     }
+    
+    public List<CaseInput> getInputsBySector(int caseId, Sector sector, Session session) {
+        Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
+        Criterion c2 = Restrictions.eq("sector", sector);
+
+        return hibernateFacade.get(CaseInput.class, new Criterion[] { c1, c2 }, session);
+    }
+    
+    public List<CaseInput> getInputsForAllSectors(int caseId, Session session) {
+        Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
+        Criterion c2 = Restrictions.isNull("sector");
+
+        return hibernateFacade.get(CaseInput.class, new Criterion[] { c1, c2 }, session);
+    }
+    
+    public List<CaseInput> getInputs4AllJobsAllSectors(int caseId, Session session) {
+        return getJobInputs(caseId, 0, null, session);
+    }
 
     public List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector, Session session) {
         /**
@@ -1715,5 +1733,26 @@ public class CaseDAO {
             return null;
         
         return getCaseParameter(Integer.parseInt(ids.get(0).toString()), session);
+    }
+    
+    public int[] getExternalDatasetIds(String source, Session session) {
+        if (source == null || source.trim().isEmpty())
+            return new int[0];
+        //NOTE: emf.external_sources and emf.datasets tables are hardwired here, not a desirable
+        // way but necessary, because ExternalSource object is not explicitly mapped through hibernate
+        // Another way to access the tables is to use DbServer object.
+        String queryAll = "SELECT DISTINCT ex.dataset_id FROM emf.external_sources ex WHERE ex.datasource=" +
+        		"'" + source.replaceAll("\\\\", "\\\\\\\\") + "'";
+        
+        String queryNonDeleted = "SELECT ds.id FROM emf.datasets ds WHERE lower(ds.status) <> 'deleted' AND ds.id IN (" + queryAll + ")";
+        List ids = session.createSQLQuery(queryNonDeleted).list();
+
+        int[] dsIds = new int[ids.size()];
+        
+        for (int i = 0; i < dsIds.length; i++) {
+            dsIds[i] = Integer.parseInt(ids.get(i).toString());
+        }
+        
+        return dsIds;
     }
 }
