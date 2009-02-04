@@ -519,7 +519,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 viewResults();
             }
         });
-
+        view.setToolTipText(
+"View the result as a local file on the client computer. Optionally create Google Earth .kmz file");
         view.setMnemonic('V');
         return view;
     }
