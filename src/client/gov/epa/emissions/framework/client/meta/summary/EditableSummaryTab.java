@@ -59,7 +59,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private DataCommonsService service;
 
-    private EditableComboBox projectsCombo;
+    private ComboBox projectsCombo;
 
     private ComboBox temporalResolutionsCombo;
 
@@ -258,7 +258,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         // layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
 
         allProjects = service.getProjects();
-        projectsCombo = new EditableComboBox(allProjects);
+        projectsCombo = new ComboBox(allProjects);
         projectsCombo.setSelectedItem(dataset.getProject());
         projectsCombo.setPreferredSize(new Dimension(250, 20));
         changeablesList.addChangeable(projectsCombo);
