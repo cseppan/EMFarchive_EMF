@@ -86,7 +86,7 @@ public class TableColumnHeaders {
                 return "\n"+type;
             }
             int length = data.getSize();
-            String size = (length==-1)?"*":""+length;
+            String size = (length==-1 || length > 500)?"*":""+length;
             return "\n" + type + "(" + size + ")";
         }
 
