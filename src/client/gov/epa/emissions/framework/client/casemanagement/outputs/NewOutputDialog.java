@@ -31,7 +31,7 @@ public class NewOutputDialog extends Dialog implements NewOutputView, ManageChan
     
     public NewOutputDialog(EmfConsole parent) {
         super("Add Output to case", parent);
-        super.setSize(new Dimension(610, 520));
+        super.setSize(new Dimension(630, 500));
         super.center();
     }
 
@@ -91,7 +91,7 @@ public class NewOutputDialog extends Dialog implements NewOutputView, ManageChan
     private void addNewOutput() throws EmfException {
         doValidateFields();
 //        shouldCreate = true;
-        presenter.addNewOutput(Output());
+        presenter.addNewOutput(output());
         close();
     }
 
@@ -99,9 +99,9 @@ public class NewOutputDialog extends Dialog implements NewOutputView, ManageChan
 //        return shouldCreate;
 //    }
 
-    public CaseOutput Output() {
-            OutputFieldsPanel.setFields();
-        return OutputFieldsPanel.getOutput();
+    private CaseOutput output() {
+       return  OutputFieldsPanel.setFields();
+//        return OutputFieldsPanel.getOutput();
     }
 
     public void observe(Object presenter) {

@@ -7,7 +7,7 @@ public interface NewOutputView {
 
  //   boolean shouldCreate();
 
-    CaseOutput Output();
+//    CaseOutput Output();
     
     void observe(Object presenter);
 }

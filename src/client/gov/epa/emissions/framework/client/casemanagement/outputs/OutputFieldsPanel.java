@@ -43,7 +43,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     
     private JLabel program;
 
-    private JLabel status;
+    private TextField status;
 
     private TextArea message;
 
@@ -71,10 +71,9 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         this.datasetValues = presenter.getDatasetValues();
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        //String width = EmptyStrings.create(150);
 
         outputName = new TextField("name", output.getName(), 43);
-        outputName.setEditable(true);
+        //outputName.setEditable(true);
         outputName.setPreferredSize(preferredSize);
         changeablesList.addChangeable(outputName);
         layoutGenerator.addLabelWidgetPair("Output Name:", outputName, panel);
@@ -125,7 +124,12 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         datasetCreationDate=new JLabel("");
         datasetCreater=new JLabel("");
         program=new JLabel("");
-        status = new JLabel("");
+        
+        status = new TextField("status", output.getStatus(), 43);
+        status.setEditable(true);
+        status.setPreferredSize(preferredSize);
+        changeablesList.addChangeable(status);
+        
         updateSectorName((CaseJob)jobCombo.getSelectedItem());
         outputLabels(); 
         if(type==null) 
@@ -133,7 +137,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         else 
             datasetLabels((EmfDataset) datasetCombo.getSelectedItem());
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
-        layoutGenerator.addLabelWidgetPair("Creator:", datasetCreater, panel);
+        layoutGenerator.addLabelWidgetPair("Dataset Creator:", datasetCreater, panel);
         layoutGenerator.addLabelWidgetPair("Creation Date:", datasetCreationDate, panel);
         layoutGenerator.addLabelWidgetPair("Exec name:", program, panel);
         layoutGenerator.addLabelWidgetPair("Status:", status, panel);
@@ -217,6 +221,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
 //        System.out.println(output.getDatasetType());
         updateDataset();
         updateMessage();
+        updateStatus();
         return output;
     }
 
@@ -235,6 +240,10 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
 
     private void updateOutputName() {
         output.setName(outputName.getText().trim());
+    }
+    
+    private void updateStatus() {
+        output.setStatus(status.getText().trim());
     }
     
     private void updateMessage() {

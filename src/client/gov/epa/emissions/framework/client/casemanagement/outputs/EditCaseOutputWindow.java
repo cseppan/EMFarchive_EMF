@@ -34,7 +34,7 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
     private OutputFieldsPanel outputFieldsPanel;
 
     public EditCaseOutputWindow(String title, DesktopManager desktopManager) {
-        super(title, new Dimension(610, 420), desktopManager);
+        super(title, new Dimension(630, 500), desktopManager);
         // super.setLabel(super.getTitle() + ": " + title);
     }
 
