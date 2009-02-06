@@ -20,7 +20,6 @@ import gov.epa.emissions.framework.client.casemanagement.parameters.EditParamete
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
-import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,14 +59,9 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
 
     private boolean outputsLoaded = false;
     
-    private ModelToRun previousModel;
-    
-    private ModelToRun currentModel;
-
     public CaseEditorPresenterImpl(Case caseObj, EmfSession session, CaseEditorView view,
             CaseManagerPresenter managerPresenter) {
         this.caseObj = caseObj;
-        currentModel = previousModel = caseObj.getModel();
         this.session = session;
         this.view = view;
         this.managerPresenter = managerPresenter;
@@ -112,14 +106,9 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         if (isDuplicate(caseObj))
             throw new EmfException("Duplicate name - '" + caseObj.getName() + "'.");
 
-        this.updateModels(caseObj.getModel());
-        
         caseObj.setLastModifiedBy(session.user());
         caseObj.setLastModifiedDate(new Date());
         service().updateCaseWithLock(caseObj);
-        
-        if (this.currentModel != null && !this.currentModel.equals(this.previousModel))
-            service().updateRelatedModels(caseObj.getId());
     }
 
     private void saveTabs() throws EmfException {
@@ -244,9 +233,4 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         presenter.doDisplay(inputCases, outputCases);
     }
     
-    public void updateModels(ModelToRun model) {
-        this.previousModel = this.currentModel;
-        this.currentModel = model;
-    }
-
 }

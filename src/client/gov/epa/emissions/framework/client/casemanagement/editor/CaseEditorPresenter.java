@@ -8,7 +8,6 @@ import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabV
 import gov.epa.emissions.framework.client.casemanagement.parameters.EditCaseParametersTabView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
-import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 
 public interface CaseEditorPresenter {
 
@@ -37,8 +36,6 @@ public interface CaseEditorPresenter {
     void checkIfLockedByCurrentUser() throws EmfException;
     
     void addSectorBacktoCase(Sector sector);
-    
-    void updateModels(ModelToRun model) throws EmfException;
     
     Case getCaseFromName(String caseName) throws EmfException;
     

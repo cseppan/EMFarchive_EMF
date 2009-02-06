@@ -169,7 +169,6 @@ public class LoadCaseDialog extends JDialog {
                     msgArea.setText(loadingMsg);
                     messagePanel.setMessage("Finished loading case.");
                 } catch (EmfException e1) {
-                    e1.printStackTrace();
                     messagePanel.setError(e1.getMessage());
                 } 
             }

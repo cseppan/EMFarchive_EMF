@@ -739,16 +739,12 @@ public class CaseServiceImpl implements CaseService {
 
     public String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
         try {
-            return getCaseService().loadCMAQCase(path, jobId, caseId, user);
+            return getCaseAssistanceService().loadCMAQCase(path, jobId, caseId, user);
         } catch (Exception e) {
             // NOTE Auto-generated catch block
             e.printStackTrace();
             throw new EmfException(e.getMessage());
         }
-    }
-
-    public void updateRelatedModels(int caseId) throws EmfException {
-        getCaseService().updateRelatedModels(caseId);
     }
 
 }
