@@ -788,11 +788,11 @@ public class CaseAssistanceService {
 
     private void checkNSetInputDataset(StringBuffer sb, String lineSep, User user, String[] values, String massDir,
             CaseInput input) throws EmfException {
-        String firstSrc = values[0] + File.separator + values[1];
+        String[] firstSrc = this.reconstructSources(new String[]{values[0], values[1]}, values[0]);
         Session session = sessionFactory.getSession();
 
         try {
-            int[] dsIds = caseDao.getExternalDatasetIds(firstSrc, session);
+            int[] dsIds = caseDao.getExternalDatasetIds(firstSrc[0], session);
 
             if (dsIds == null || dsIds.length == 0) {
                 checkMassStorage(sb, lineSep, user, values, massDir, input);
@@ -813,7 +813,6 @@ public class CaseAssistanceService {
 
     private void setInputDatasetValues(User user, String[] values, CaseInput input, EmfDataset dataset)
             throws EmfException {
-        DatasetDAO datadao = new DatasetDAO();
         Session session = sessionFactory.getSession();
 
         try {
@@ -823,7 +822,7 @@ public class CaseAssistanceService {
             DatasetType type = dataset.getDatasetType();
             input.setDataset(dataset);
             int dsVersion = dataset.getDefaultVersion();
-            Version version = datadao.getVersion(session, dataset.getId(), dsVersion);
+            Version version = dsDao.getVersion(session, dataset.getId(), dsVersion);
             input.setVersion(version);
 
             if (!type.equals(input.getDatasetType()))
@@ -845,7 +844,6 @@ public class CaseAssistanceService {
             String[] srcs = reconstructSources(values, values[0]);
             List<EmfDataset> dsWithAllSrcs = new ArrayList<EmfDataset>();
             EmfDataset latest = null;
-            DatasetDAO dsDao = new DatasetDAO();
 
             for (int id : dsIds) {
                 EmfDataset ds = dsDao.getDataset(session, id);
@@ -954,10 +952,9 @@ public class CaseAssistanceService {
     private synchronized EmfDataset add2tables(int caseId, String name, ExternalSource[] extSrcs, DatasetType type, 
             User user, boolean moved, String preloc, String massloc) throws Exception {
         Session session = sessionFactory.getSession();
-        DataCommonsDAO datadao = new DataCommonsDAO();
 
         if (type == null)
-            type = datadao.getDatasetType("External File (External)", session);
+            type = dataDao.getDatasetType("External File (External)", session);
 
         if (dsDao.nameUsed(name, EmfDataset.class, session))
             name += "_caseID(" + caseId + ")_" + Math.abs(new Random().nextInt());
@@ -975,8 +972,8 @@ public class CaseAssistanceService {
         external.setDefaultVersion(0);
         
         if (moved) {
-            Keyword massLocKeyword = (Keyword)datadao.load(Keyword.class, "MASS_STORAGE_LOCATION", session);
-            Keyword prevLocKeyword = (Keyword)datadao.load(Keyword.class, "PREVIOUS_LOCATION", session);
+            Keyword massLocKeyword = (Keyword)dataDao.load(Keyword.class, "MASS_STORAGE_LOCATION", session);
+            Keyword prevLocKeyword = (Keyword)dataDao.load(Keyword.class, "PREVIOUS_LOCATION", session);
             KeyVal massKeyVal = new KeyVal(massLocKeyword, massloc);
             KeyVal prevLocKeyVal = new KeyVal(prevLocKeyword, preloc);
             external.addKeyVal(new KeyVal[]{massKeyVal, prevLocKeyVal});
@@ -1031,7 +1028,6 @@ public class CaseAssistanceService {
     }
 
     private boolean containsAllSrcs(ExternalSource[] dsSrcs, String[] srcs) {
-        // List<String> temp = Arrays.asList(srcs);
         List<String> temp = new ArrayList<String>();
         temp.addAll(Arrays.asList(srcs));
         int len = dsSrcs.length;
@@ -1050,12 +1046,13 @@ public class CaseAssistanceService {
         int len = values.length;
         String[] srcs = new String[len - 1]; // Firt be dir, the rest be file names
 
-        for (int i = 0; i < len - 1; i++) {
-            if (dir.startsWith("/") || dir.endsWith("/"))
-                srcs[i] = dir + (dir.endsWith("/") ? "" : "/") + values[i + 1];
-            else
-                srcs[i] = dir + "\\" + values[i + 1];
-        }
+        if (dir.startsWith("/") || dir.endsWith("/"))
+            dir += dir.endsWith("/") ? "" : "/";
+        else
+            dir += dir + "\\";
+        
+        for (int i = 0; i < len - 1; i++)
+            srcs[i] = dir + values[i + 1];
 
         return srcs;
     }
