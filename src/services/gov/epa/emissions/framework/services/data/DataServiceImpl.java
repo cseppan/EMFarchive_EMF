@@ -763,7 +763,7 @@ public class DataServiceImpl implements DataService {
                     .equals("gov.epa.emissions.commons.io.other.SMKReportImporter"));
 
             if (type.isExternal() || smkReport || (sources != null && sources.length > 1))
-                throw new Exception("Copying of a version to a new dataset is not supported for this dataset type.");
+                throw new Exception("Copying of a version to a new dataset is not supported for this dataset type: " + type.getName() + ".");
 
             EmfDataset copied = (EmfDataset) DeepCopy.copy(dataset);
             copied.setName(getUniqueNewName("Copy of " + dataset.getName() + "_v" + version.getVersion()));

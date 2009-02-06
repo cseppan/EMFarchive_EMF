@@ -76,6 +76,9 @@ public class UserServiceImpl implements UserService {
         Session session = sessionFactory.getSession();
         
         try {
+            if (username == null || username.trim().isEmpty())
+                throw new EmfException("Please specify a valid username.");
+            
             User user = dao.get(username, session);
 
             return user;

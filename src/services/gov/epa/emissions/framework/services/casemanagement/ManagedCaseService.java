@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.ExternalSource;
+import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.DbServer;
@@ -5132,19 +5134,19 @@ public class ManagedCaseService {
     }
 
     private List<String> combineEnvs(List<String> summaryEnvs, List<String> inputEnvs, List<String> paramEnvs) {
-        List<String>  allEnvs = new ArrayList<String>();
+        List<String> allEnvs = new ArrayList<String>();
 
         allEnvs.addAll(paramEnvs);
-        
+
         for (Iterator<String> iter = summaryEnvs.iterator(); iter.hasNext();) {
             String env = iter.next();
-            
+
             if (!allEnvs.contains(env))
                 allEnvs.add(env);
         }
 
         allEnvs.addAll(inputEnvs);
-        
+
         return allEnvs;
     }
 
@@ -5159,7 +5161,7 @@ public class ManagedCaseService {
 
             if (value == null)
                 continue;
-            
+
             if (envVar.toUpperCase().equals("EMF_PROJECT")) {
                 Project proj = caze.getProject();
 
@@ -5171,7 +5173,7 @@ public class ManagedCaseService {
 
                 proj = new Project();
                 proj.setName(value);
-                proj = (Project)dao.load(Project.class, proj.getName(), session);
+                proj = (Project) dao.load(Project.class, proj.getName(), session);
 
                 caze.setProject(proj);
             }
@@ -5320,16 +5322,15 @@ public class ManagedCaseService {
             int space = value.lastIndexOf(' ');
             String part1 = value;
             String part2 = "";
-            
+
             if (space > 0) {
                 String temp1 = value.substring(0, space);
-                String temp2 = value.substring(space+1).trim().toUpperCase();
-                
-                if (Character.isDigit(temp2.charAt(0))
-                        || (temp2.startsWith("V") && Character.isDigit(temp2.charAt(1)))){
-                        part1 = temp1.trim();
-                        part2 = value.substring(space+1).trim();
-                        }
+                String temp2 = value.substring(space + 1).trim().toUpperCase();
+
+                if (Character.isDigit(temp2.charAt(0)) || (temp2.startsWith("V") && Character.isDigit(temp2.charAt(1)))) {
+                    part1 = temp1.trim();
+                    part2 = value.substring(space + 1).trim();
+                }
             }
 
             model.setName(part1);
@@ -5422,8 +5423,8 @@ public class ManagedCaseService {
     private synchronized List<String> getInputEnvVars(List<CaseInput> inputs) {
         List<String> envs = new ArrayList<String>();
 
-        envs.add("OUTPERM"); //Mass storage variable
-        
+        envs.add("OUTPERM"); // Mass storage variable
+
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             InputEnvtVar env = iter.next().getEnvtVars();
 
@@ -5431,30 +5432,30 @@ public class ManagedCaseService {
                 envs.add(env.getName());
             }
         }
-        
+
         return envs;
     }
-    
-    private int resetInputValues(User user, List<CaseInput> inputs, EMFCaseFile caseFile,
-            StringBuffer sb, String lineSep) throws EmfException {
+
+    private int resetInputValues(User user, List<CaseInput> inputs, EMFCaseFile caseFile, StringBuffer sb,
+            String lineSep) throws EmfException {
         int numLoaded = 0;
 
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
             InputEnvtVar envVar = input.getEnvtVars();
-            
+
             if (envVar == null)
                 continue;
-            
+
             if (input.getDatasetType() != null && !input.getDatasetType().isExternal()) {
-                sb.append("Internal dataset type is not loaded for the time being for input: " +
-                		input.getName() + "." + lineSep);
+                sb.append("Internal dataset type is not loaded for the time being for input: " + input.getName() + "."
+                        + lineSep);
                 continue;
             }
 
             String[] values = caseFile.getInputValue(envVar.getName());
             String massDir = caseFile.getAttributeValue("OUTPERM");
-            
+
             if (values == null || values.length == 0)
                 continue;
 
@@ -5466,43 +5467,46 @@ public class ManagedCaseService {
         return numLoaded;
     }
 
-    private void checkNSetInputDataset(StringBuffer sb, String lineSep, User user, String[] values, String massDir, CaseInput input) throws EmfException {
+    private void checkNSetInputDataset(StringBuffer sb, String lineSep, User user, String[] values, String massDir,
+            CaseInput input) throws EmfException {
         String firstSrc = values[0] + File.separator + values[1];
         Session session = sessionFactory.getSession();
-        
+
         try {
             int[] dsIds = dao.getExternalDatasetIds(firstSrc, session);
-            
+
             if (dsIds == null || dsIds.length == 0) {
                 checkMassStorage(sb, lineSep, user, values, massDir, input);
                 return;
             }
-            
-            EmfDataset dataset = getUniqueDataset(sb, lineSep, user, values, input, dsIds);
+
+            EmfDataset dataset = getUniqueDataset(sb, lineSep, user, massDir, values, input, dsIds);
             setInputDatasetValues(user, values, input, dataset);
         } catch (Exception e) {
             log.error("Error resetting input values.", e);
-            throw new EmfException(e.getMessage() == null ? "Error resetting input values." : e.getClass().toString() + ": " + e.getMessage());
+            throw new EmfException(e.getMessage() == null ? "Error resetting input values." : e.getClass().toString()
+                    + ": " + e.getMessage());
         } finally {
             if (session != null && session.isConnected())
                 session.close();
         }
     }
-    
-    private void setInputDatasetValues(User user, String[] values, CaseInput input, EmfDataset dataset) throws EmfException {
+
+    private void setInputDatasetValues(User user, String[] values, CaseInput input, EmfDataset dataset)
+            throws EmfException {
         DatasetDAO datadao = new DatasetDAO();
         Session session = sessionFactory.getSession();
-        
+
         try {
             if (dataset == null)
                 return;
-            
+
             DatasetType type = dataset.getDatasetType();
             input.setDataset(dataset);
             int dsVersion = dataset.getDefaultVersion();
             Version version = datadao.getVersion(session, dataset.getId(), dsVersion);
             input.setVersion(version);
-            
+
             if (!type.equals(input.getDatasetType()))
                 input.setDatasetType(dataset.getDatasetType());
         } catch (Exception e) {
@@ -5514,9 +5518,10 @@ public class ManagedCaseService {
         }
     }
 
-    private EmfDataset getUniqueDataset(StringBuffer sb, String lineSep, User user, String[] values, CaseInput input, int[] dsIds) throws Exception {
+    private EmfDataset getUniqueDataset(StringBuffer sb, String lineSep, User user, String massDir, String[] values,
+            CaseInput input, int[] dsIds) throws Exception {
         Session session = sessionFactory.getSession();
-        
+
         try {
             String[] srcs = reconstructSources(values, values[0]);
             List<EmfDataset> dsWithAllSrcs = new ArrayList<EmfDataset>();
@@ -5525,39 +5530,41 @@ public class ManagedCaseService {
 
             for (int id : dsIds) {
                 EmfDataset ds = dsDao.getDataset(session, id);
-                
+
                 if (ds == null)
                     continue;
-                
+
                 Date modDate = ds.getModifiedDateTime();
                 ExternalSource[] tempSrcs = ds.getExternalSources();
-                
+
                 if (containsAllSrcs(tempSrcs, srcs)) {
                     dsWithAllSrcs.add(ds);
-                    
+
                     if (latest == null || (modDate != null && modDate.after(latest.getModifiedDateTime())))
                         latest = ds;
                 }
             }
-            
+
             if (dsWithAllSrcs.size() == 1)
                 return dsWithAllSrcs.get(0);
-            
+
             if (dsWithAllSrcs.size() > 1) {
                 sb.append("There are multiple existing datasets could be loaded:" + lineSep);
                 int count = 0;
-                
+
                 for (Iterator<EmfDataset> iter = dsWithAllSrcs.iterator(); iter.hasNext();) {
                     EmfDataset each = iter.next();
                     sb.append("\t" + (++count) + ": " + each.getName() + lineSep);
                 }
-                
+
                 sb.append("Only dataset '" + latest.getName() + "' with the latest modified date was chosen.");
-                
+
                 return latest;
             }
+
+            sb.append("For input '" + input.getName() + "': " + lineSep);
             
-            return createNewDataset(input.getCaseID(), values[1], srcs, input.getDatasetType(), user);
+            return createNewDataset(input.getCaseID(), massDir, values, input.getDatasetType(), user, sb, lineSep);
         } catch (Exception e) {
             throw e;
         } finally {
@@ -5566,56 +5573,77 @@ public class ManagedCaseService {
         }
     }
 
-    private void checkMassStorage(StringBuffer sb, String lineSep, User user, String[] values, String massdir, CaseInput input) throws EmfException {
+    private void checkMassStorage(StringBuffer sb, String lineSep, User user, String[] values, String massdir,
+            CaseInput input) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
-            String[] srcs = null;
+            String[] massSrcs = reconstructSources(values, massdir);
             EmfDataset dataset = null;
-            
-            if (massdir == null || massdir.trim().isEmpty()) {
-                srcs = reconstructSources(values, values[0]);
-            } else
-                srcs = reconstructSources(values, massdir);
-            
-            int[] dsIds = dao.getExternalDatasetIds(srcs[0], session);
-            
-            if (dsIds == null || dsIds.length == 0) {
-                dataset = createNewDataset(input.getCaseID(), values[1], srcs, input.getDatasetType(), user);
-            } else {
-                dataset = getUniqueDataset(sb, lineSep, user, values, input, dsIds);
+            int[] dsIds = null;
+
+            if (massdir != null && !massdir.trim().isEmpty())
+                dsIds = dao.getExternalDatasetIds(massSrcs[0], session);
+
+            if (dsIds != null && dsIds.length > 0)
+                dataset = getUniqueDataset(sb, lineSep, user, massdir, values, input, dsIds);
+
+            if (dataset == null) {
+                sb.append("For input '" + input.getName() + "': " + lineSep);
+                dataset = createNewDataset(input.getCaseID(), massdir, values, input.getDatasetType(), user, sb, lineSep);
             }
-            
+
             setInputDatasetValues(user, values, input, dataset);
         } catch (Exception e) {
             log.error("Error resetting input values.", e);
-            throw new EmfException(e.getMessage() == null ? "Error resetting input values." : e.getClass().toString() + ": " + e.getMessage());
+            throw new EmfException(e.getMessage() == null ? "Error resetting input values." : e.getClass().toString()
+                    + ": " + e.getMessage());
         } finally {
             if (session != null && session.isConnected())
                 session.close();
         }
     }
 
-    private EmfDataset createNewDataset(int caseId, String name, String[] srcs, DatasetType type, User user) throws Exception {
+    private EmfDataset createNewDataset(int caseId, String massdir, String[] values, DatasetType type, User user, StringBuffer sb, String lineSep)
+            throws Exception {
         if (type != null && !type.isExternal())
             return null;
+
+        String[] origSrcs = reconstructSources(values, values[0]);
+        boolean origExists = allExist(origSrcs);
+        ExternalSource[] extSrcs = getExternalSrcs(origSrcs);
+
+        if (origExists)
+            return add2tables(caseId, values[1], extSrcs, type, user, false, values[0], massdir);
         
+        String[] massSrcs = reconstructSources(values, massdir);
+        boolean massExists = allExist(massSrcs);
+        
+        if (!massExists) {
+            sb.append("  WARNING: Not all files (Ex. " + values[1] + ") existed on either original source or mass storage place." + lineSep);
+            sb.append("  Original source folder: " + values[0] + "." + lineSep);
+            sb.append("  Mass storage source folder: " + massdir + "." + lineSep);
+            
+            return add2tables(caseId, values[1], extSrcs, type, user, false, values[0], massdir);
+        }
+            
+        extSrcs = getExternalSrcs(massSrcs);
+        
+        return add2tables(caseId, values[1], extSrcs, type, user, true, values[0], massdir);
+    }
+    
+    private synchronized EmfDataset add2tables(int caseId, String name, ExternalSource[] extSrcs, DatasetType type, 
+            User user, boolean moved, String preloc, String massloc) throws Exception {
         Session session = sessionFactory.getSession();
         DataCommonsDAO datadao = new DataCommonsDAO();
         DatasetDAO dsDao = new DatasetDAO();
-        ExternalSource[] extSrcs = new ExternalSource[srcs.length];
-        
-        for (int i = 0; i < srcs.length; i++) {
-            extSrcs[i] = new ExternalSource(srcs[i]);
-            extSrcs[i].setListindex(i);
-        }
-        
+
         if (type == null)
             type = datadao.getDatasetType("External File (External)", session);
-        
+
         if (dsDao.nameUsed(name, EmfDataset.class, session))
             name += "_caseID(" + caseId + ")_" + Math.abs(new Random().nextInt());
-        
+
         Date date = new Date();
         EmfDataset external = new EmfDataset();
         external.setName(name);
@@ -5628,12 +5656,20 @@ public class ManagedCaseService {
         external.setStatus("Auto Imported");
         external.setDefaultVersion(0);
         
+        if (moved) {
+            Keyword massLocKeyword = (Keyword)datadao.load(Keyword.class, "MASS_STORAGE_LOCATION", session);
+            Keyword prevLocKeyword = (Keyword)datadao.load(Keyword.class, "PREVIOUS_LOCATION", session);
+            KeyVal massKeyVal = new KeyVal(massLocKeyword, massloc);
+            KeyVal prevLocKeyVal = new KeyVal(prevLocKeyword, preloc);
+            external.addKeyVal(new KeyVal[]{massKeyVal, prevLocKeyVal});
+        }
+
         dsDao.add(external, session);
-        
+
         try {
             session.clear();
             EmfDataset ds = dsDao.getDataset(session, external.getName());
-            
+
             Version version = new Version(0);
             version.setCreator(user);
             version.setName("Initial Version");
@@ -5642,8 +5678,8 @@ public class ManagedCaseService {
             version.setLastModifiedDate(date);
             version.setPath("");
             dsDao.add(version, session);
-            
-            return ds; 
+
+            return ds;
         } catch (Exception e) {
             throw e;
         } finally {
@@ -5652,33 +5688,57 @@ public class ManagedCaseService {
         }
     }
 
+    private ExternalSource[] getExternalSrcs(String[] srcs) {
+        ExternalSource[] extSrcs = new ExternalSource[srcs.length];
+        
+        for (int i = 0; i < srcs.length; i++) {
+            extSrcs[i] = new ExternalSource(srcs[i]);
+            extSrcs[i].setListindex(i);
+        }
+        
+        return extSrcs;
+    }
+
+    private synchronized boolean allExist(String[] srcs) {
+        boolean allExisted = true;
+
+        for (String src : srcs) {
+            if (!new File(src).exists()) {
+                allExisted = false;
+                break;
+            }
+        }
+
+        return allExisted;
+    }
+
     private boolean containsAllSrcs(ExternalSource[] dsSrcs, String[] srcs) {
-//        List<String> temp = Arrays.asList(srcs);
+        // List<String> temp = Arrays.asList(srcs);
         List<String> temp = new ArrayList<String>();
         temp.addAll(Arrays.asList(srcs));
         int len = dsSrcs.length;
-        
+
         for (int i = 0; i < len; i++) {
             int index = temp.indexOf(dsSrcs[i].getDatasource());
-            
+
             if (index >= 0)
                 temp.remove(index);
         }
-        
+
         return temp.size() == 0;
     }
 
     private String[] reconstructSources(String[] values, String dir) {
         int len = values.length;
-        String[] srcs = new String[len-1]; //Firt be dir, the rest be file names
-        
+        String[] srcs = new String[len - 1]; // Firt be dir, the rest be file names
+
         for (int i = 0; i < len - 1; i++) {
             if (dir.startsWith("/") || dir.endsWith("/"))
-                srcs[i] = dir + (dir.endsWith("/") ? "" : "/") + values[i+1];
+                srcs[i] = dir + (dir.endsWith("/") ? "" : "/") + values[i + 1];
             else
-                srcs[i] = dir + "\\" + values[i+1];
+                srcs[i] = dir + "\\" + values[i + 1];
         }
-        
+
         return srcs;
     }
 
