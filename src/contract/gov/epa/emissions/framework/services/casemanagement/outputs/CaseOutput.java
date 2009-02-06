@@ -5,33 +5,33 @@ import java.io.Serializable;
 public class CaseOutput implements Serializable, Comparable<CaseOutput> {
 
     private int id;
-    
+
     private int caseId;
-    
+
     private int jobId;
-    
+
     private int datasetId;
-    
+
     private String name = ""; // make sure it's empty, not null
-    
+
     private String datasetFile;
-    
+
     private String path;
-    
+
     private String pattern;
-    
+
     private String datasetType;
-    
+
     private String datasetName;
-    
+
     private String status;
-    
+
     private String message;
-    
+
     private String execName;
-    
+
     private String remoteUser;
-    
+
     public CaseOutput() {
         //
     }
@@ -39,11 +39,10 @@ public class CaseOutput implements Serializable, Comparable<CaseOutput> {
     public CaseOutput(String name) {
         this.name = name;
     }
-    
-    public boolean equals(Object obj)
-    {
-        // overriding equals 
-        
+
+    public boolean equals(Object obj) {
+        // overriding equals
+
         // normal tests for equal
         if (this == obj)
             return true;
@@ -51,22 +50,73 @@ public class CaseOutput implements Serializable, Comparable<CaseOutput> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        
+
         // additional tests specific to outputs
-        CaseOutput localOther = (CaseOutput)obj;
+        CaseOutput localOther = (CaseOutput) obj;
         if (!this.name.equalsIgnoreCase(localOther.getName()))
-            return false;   
-        if (!this.datasetFile.equalsIgnoreCase(localOther.datasetFile))
-            return false;    
-        if (!this.path.equalsIgnoreCase(localOther.path))
             return false;
-        if (!this.pattern.equalsIgnoreCase(localOther.pattern))
+        
+        // check if datasetFiles are same
+        if ( this.datasetFile !=null ){
+            if ( localOther.datasetFile != null ) {               
+                if (!this.datasetFile.equalsIgnoreCase(localOther.datasetFile))
+                    return false; 
+            }
+            else 
+                return false; 
+        }
+        else if (localOther.datasetFile == null)
             return false;
-        if (!this.datasetName.equalsIgnoreCase(localOther.datasetName))
+        
+     // check if paths are same
+        if ( this.path !=null ){
+            if ( localOther.path != null ) {               
+                if (!this.path.equalsIgnoreCase(localOther.path))
+                    return false; 
+            }
+            else 
+                return false; 
+        }
+        else if (localOther.path != null)
             return false;
-        if (!this.datasetType.equalsIgnoreCase(localOther.datasetType))
+        
+     // check if patterns are same
+        if ( this.pattern !=null ){
+            if ( localOther.pattern != null ) {               
+                if (!this.pattern.equalsIgnoreCase(localOther.pattern))
+                    return false; 
+            }
+            else 
+                return false; 
+        }
+        else if (localOther.pattern != null)
             return false;
-       
+        
+     // check if dataset names are same
+        if ( this.datasetName !=null ){
+            if ( localOther.datasetName != null ) {               
+                if (!this.datasetName.equalsIgnoreCase(localOther.datasetName))
+                    return false; 
+            }
+            else 
+                return false; 
+        }
+        else if (localOther.datasetName != null)
+            return false;
+        
+        
+     // check if dataset types are same
+        if ( this.datasetType !=null ){
+            if ( localOther.datasetType != null ) {               
+                if (!this.datasetType.equalsIgnoreCase(localOther.datasetType))
+                    return false; 
+            }
+            else 
+                return false; 
+        }
+        else if (localOther.datasetType != null)
+            return false;
+
         // if got to hear return true
         return true;
     }
@@ -170,7 +220,7 @@ public class CaseOutput implements Serializable, Comparable<CaseOutput> {
     public void setJobId(int jobId) {
         this.jobId = jobId;
     }
-    
+
     public String getExecName() {
         return execName;
     }
@@ -178,7 +228,7 @@ public class CaseOutput implements Serializable, Comparable<CaseOutput> {
     public void setExecName(String execName) {
         this.execName = execName;
     }
-    
+
     public String getRemoteUser() {
         return remoteUser;
     }
@@ -186,18 +236,11 @@ public class CaseOutput implements Serializable, Comparable<CaseOutput> {
     public void setRemoteUser(String remoteUser) {
         this.remoteUser = remoteUser;
     }
-    
+
     public boolean isEmpty() {
         boolean result = true;
-        String[] fields = new String[] {
-                datasetType,
-                datasetName,
-                path,
-                datasetFile,
-                pattern,
-                name
-        };
-        
+        String[] fields = new String[] { datasetType, datasetName, path, datasetFile, pattern, name };
+
         for (String field : fields) {
             if (field != null && !field.trim().isEmpty()) {
                 result = false;
