@@ -18,6 +18,7 @@ import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -39,10 +40,14 @@ public class LoadCaseDialog extends JDialog {
     private SingleLineMessagePanel messagePanel;
 
     private JTextField path;
-    
+
     private TextArea msgArea;
-    
+
     private JComboBox jobs;
+
+    private Button loadButton;
+    
+    private Button cancelButton;
 
     private LoadCasePresenter presenter;
 
@@ -59,7 +64,7 @@ public class LoadCaseDialog extends JDialog {
         this.parentConsole = parentConsole;
         this.service = session.dataCommonsService();
     }
-    
+
     public void display() {
         this.getContentPane().add(createLayout());
         this.pack();
@@ -90,7 +95,7 @@ public class LoadCaseDialog extends JDialog {
         path = new JTextField(30);
         path.setName("path");
         this.setMostRecentUsedFolder(presenter.getDefaultBaseFolder());
-        
+
         Button button = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clearMessagePanel();
@@ -99,7 +104,7 @@ public class LoadCaseDialog extends JDialog {
         });
         Icon icon = new ImageResources().open("Open a file");
         button.setIcon(icon);
-        
+
         try {
             jobs = new JComboBox(presenter.getJobs());
             jobs.setSelectedItem(null);
@@ -113,13 +118,14 @@ public class LoadCaseDialog extends JDialog {
         folderPanel.add(button, BorderLayout.LINE_END);
         layoutGenerator.addLabelWidgetPair("File:", folderPanel, panel);
         layoutGenerator.addLabelWidgetPair("Case Job:", jobs, panel);
-        
+
         msgArea = new TextArea("messages", "", 38, 8);
         msgArea.setEditable(false);
+        msgArea.setLineWrap(false);
         JScrollPane msgTextArea = new JScrollPane(msgArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         layoutGenerator.addLabelWidgetPair("Messages:", msgTextArea, panel);
-        
+
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
@@ -137,11 +143,11 @@ public class LoadCaseDialog extends JDialog {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button loadButton = new Button("Load", loadCase());
+        loadButton = new Button("Load", loadCase());
         container.add(loadButton);
         getRootPane().setDefaultButton(loadButton);
 
-        Button cancelButton = new Button("Done", closeAction());
+        cancelButton = new Button("Done", closeAction());
         container.add(cancelButton);
 
         panel.add(container, BorderLayout.EAST);
@@ -151,38 +157,63 @@ public class LoadCaseDialog extends JDialog {
 
     private Action loadCase() {
         return new AbstractAction() {
-            public void actionPerformed(ActionEvent e){
+            public void actionPerformed(ActionEvent e) {
                 try {
                     clearMessagePanel();
                     msgArea.setText("");
-                    
+
                     checkFolderField();
-                    CaseJob selected = (CaseJob)jobs.getSelectedItem();
-                    
+                    CaseJob selected = (CaseJob) jobs.getSelectedItem();
+
                     if (selected == null) {
                         messagePanel.setError("Please select a valid job.");
                         return;
                     }
-                    
+
                     LoadCaseDialog.this.validate();
-                    String loadingMsg = presenter.loadCase(path.getText(), selected);
-                    msgArea.setText(loadingMsg);
-                    messagePanel.setMessage("Finished loading case.");
+                    kickLoadingThread(selected);
                 } catch (EmfException e1) {
                     messagePanel.setError(e1.getMessage());
-                } 
+                }
             }
         };
     }
 
     private Action closeAction() {
         return new AbstractAction() {
-            public void actionPerformed(ActionEvent e){ 
+            public void actionPerformed(ActionEvent e) {
                 dispose();
             }
         };
     }
-    
+
+    private void kickLoadingThread(final CaseJob job) {
+        Thread loadingThread = new Thread(new Runnable() {
+            public void run() {
+                loadInputs(job);
+            }
+        });
+
+        loadingThread.start();
+    }
+
+    private synchronized void loadInputs(CaseJob selected) {
+        try {
+            messagePanel.setMessage("Please wait while loading case values...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            loadButton.setEnabled(false);
+            cancelButton.setEnabled(false);
+            String loadingMsg = presenter.loadCase(path.getText(), selected);
+            msgArea.setText(loadingMsg);
+            messagePanel.setMessage("Finished loading case.");
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+            loadButton.setEnabled(true);
+            cancelButton.setEnabled(true);
+        }
+    }
 
     private void clearMessagePanel() {
         messagePanel.clear();
@@ -202,7 +233,7 @@ public class LoadCaseDialog extends JDialog {
         int option = chooser.showDialog(parentConsole, "Select a file");
 
         EmfFileInfo[] files = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedFiles() : null;
-        
+
         if (files == null || files.length == 0)
             return;
 
@@ -211,21 +242,21 @@ public class LoadCaseDialog extends JDialog {
             messagePanel.setError("Please select a single log file.");
             return;
         }
-        
+
         if (files[0].isFile()) {
             path.setText(files[0].getAbsolutePath());
         }
     }
-    
+
     private void checkFolderField() throws EmfException {
         String specified = path.getText();
-        
+
         if (specified == null || specified.trim().isEmpty() || specified.trim().length() == 1)
             throw new EmfException("Please specify a valid file.");
-        
+
         if (specified.charAt(0) != '/' && specified.charAt(1) != ':')
             throw new EmfException("Specified folder is not in a right format (ex. C:\\, /home, etc.).");
-        
+
         if (specified.charAt(0) != '/' && !Character.isLetter(specified.charAt(0)))
             throw new EmfException("Specified folder is not in a right format (ex. C:\\).");
     }
