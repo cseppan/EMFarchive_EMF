@@ -1044,7 +1044,7 @@ public class CaseAssistanceService {
 
     private String[] reconstructSources(String[] values, String dir) {
         int len = values.length;
-        String[] srcs = new String[len - 1]; // Firt be dir, the rest be file names
+        String[] srcs = new String[len - 1]; // First be dir, the rest be file names
 
         if (dir.startsWith("/") || dir.endsWith("/"))
             dir += dir.endsWith("/") ? "" : "/";
