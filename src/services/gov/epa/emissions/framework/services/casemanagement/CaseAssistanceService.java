@@ -1049,7 +1049,7 @@ public class CaseAssistanceService {
         if (dir.startsWith("/") || dir.endsWith("/"))
             dir += dir.endsWith("/") ? "" : "/";
         else
-            dir += dir + "\\";
+            dir += dir.endsWith("\\") ? "" : "\\";
         
         for (int i = 0; i < len - 1; i++)
             srcs[i] = dir + values[i + 1];
