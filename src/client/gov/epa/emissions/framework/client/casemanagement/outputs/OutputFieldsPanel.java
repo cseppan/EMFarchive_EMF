@@ -292,6 +292,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     
     public void viewOnly(){
         outputName.setEditable(false);
+        status.setEditable(false);
         message.setEditable(false);
     }
 }
