@@ -774,7 +774,8 @@ CREATE TABLE emf.sources
   plantid character varying(15),
   pointid character varying(15),
   stackid character varying(15),
-  segment character varying(15)
+  segment character varying(15),
+  CONSTRAINT uq_sources_name UNIQUE (source)
 );
 
 CREATE INDEX sources_id

@@ -666,3 +666,7 @@ where name = 'Strategy Impact Summary';
 update emf.strategy_result_types 
 set classname = 'gov.epa.emissions.framework.services.cost.analysis.StrategyRSMPctRedSummaryTask'
 where name = 'RSM Percent Reduction Summary';
+
+--add unique constraint to the source column
+alter table emf.sources 
+add CONSTRAINT uq_sources_name UNIQUE (source);
