@@ -30,6 +30,7 @@ public class RunQAProgramFactory {
         try {
             return doCreate();
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Could not create qa program runner ", e);
             throw new EmfException("Could not create qa program runner\n" + e.getMessage());
         }

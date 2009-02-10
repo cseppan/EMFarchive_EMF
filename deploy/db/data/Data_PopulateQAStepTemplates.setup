@@ -1346,4 +1346,52 @@ from emf.dataset_types dt
 where name in ('Control Strategy Detailed Result')
 	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Summarize all Control Measures');
 
-	
+-- Compare VOC Speciation with HAP inventory - Details - ORL Point Inventory (PTINV)
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare VOC Speciation with HAP inventory - Details', (select id from emf.qa_programs where name = 'Compare VOC Speciation with HAP inventory') as program_id, E'-summaryType\nDetails', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Point Inventory (PTINV)')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Compare VOC Speciation with HAP inventory - Details');
+
+-- Compare VOC Speciation with HAP inventory - By MACT - ORL Point Inventory (PTINV)
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare VOC Speciation with HAP inventory - By MACT', (select id from emf.qa_programs where name = 'Compare VOC Speciation with HAP inventory') as program_id, E'-summaryType\nBy MACT', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Point Inventory (PTINV)')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Compare VOC Speciation with HAP inventory - By MACT');
+
+-- Compare VOC Speciation with HAP inventory - Details - ORL Point Inventory (PTINV)
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare VOC Speciation with HAP inventory - By NAICS', (select id from emf.qa_programs where name = 'Compare VOC Speciation with HAP inventory') as program_id, E'-summaryType\nBy NAICS', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Point Inventory (PTINV)')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Compare VOC Speciation with HAP inventory - By NAICS');
+
+-- Compare VOC Speciation with HAP inventory - By Profile Code - ORL Point Inventory (PTINV)
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare VOC Speciation with HAP inventory - By Profile Code', (select id from emf.qa_programs where name = 'Compare VOC Speciation with HAP inventory') as program_id, E'-summaryType\nBy Profile Code', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Point Inventory (PTINV)')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Compare VOC Speciation with HAP inventory - By Profile Code');
+
+-- Compare VOC Speciation with HAP inventory - By SIC - ORL Point Inventory (PTINV)
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare VOC Speciation with HAP inventory - By SIC', (select id from emf.qa_programs where name = 'Compare VOC Speciation with HAP inventory') as program_id, E'-summaryType\nBy SIC', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Point Inventory (PTINV)')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Compare VOC Speciation with HAP inventory - By SIC');
+
+-- Compare VOC Speciation with HAP inventory - By SCC - ORL Point Inventory (PTINV)
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare VOC Speciation with HAP inventory - By SCC', (select id from emf.qa_programs where name = 'Compare VOC Speciation with HAP inventory') as program_id, E'-summaryType\nBy SCC', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Point Inventory (PTINV)')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Compare VOC Speciation with HAP inventory - By SCC');
+
+-- Compare VOC Speciation with HAP inventory - By NEI Unique Id - ORL Point Inventory (PTINV)
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Compare VOC Speciation with HAP inventory - By NEI Unique Id', (select id from emf.qa_programs where name = 'Compare VOC Speciation with HAP inventory') as program_id, E'-summaryType\nBy NEI Unique Id', false, 1, ''
+from emf.dataset_types dt
+where name in ('ORL Point Inventory (PTINV)')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Compare VOC Speciation with HAP inventory - By NEI Unique Id');
+
