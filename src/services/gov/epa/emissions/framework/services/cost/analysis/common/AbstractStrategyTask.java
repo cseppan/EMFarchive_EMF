@@ -297,7 +297,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             //SET work_mem TO '512MB';
             //NOTE:  Still need to  support mobile monthly files
             String sql = "INSERT INTO " + qualifiedEmissionTableName(countySummaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, poll, Uncontrolled_Emis, Emis_Reduction, Remaining_Emis, Pct_Red, Annual_Cost, Annual_Oper_Maint_Cost, Annualized_Capital_Cost, Total_Capital_Cost, Avg_Ann_Cost_per_Ton) " 
-            + "select " + countySummaryResult.getDetailedResultDataset().getId() + ", 0, sector, fips, poll, TO_CHAR(Uncontrolled_Emis, 'FM999999999999999990.0099')::double precision, TO_CHAR(Emis_Reduction, 'FM999999999999999990.0099')::double precision, TO_CHAR(Remaining_Emis, 'FM999999999999999990.0099')::double precision, TO_CHAR(Pct_Red, 'FM990.0099')::double precision, TO_CHAR(Annual_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Annual_Oper_Maint_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Annualized_Capital_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Total_Capital_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Avg_Ann_Cost_per_Ton, 'FM999999999999999990')::double precision " 
+            + "select " + countySummaryResult.getDetailedResultDataset().getId() + ", 0, sector, fips, poll, TO_CHAR(Uncontrolled_Emis, 'FM999999999999999990.0099')::double precision, TO_CHAR(Emis_Reduction, 'FM999999999999999990.0099')::double precision, TO_CHAR(Remaining_Emis, 'FM999999999999999990.0099')::double precision, TO_CHAR(Pct_Red, 'FM999999999999999990.0099')::double precision, TO_CHAR(Annual_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Annual_Oper_Maint_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Annualized_Capital_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Total_Capital_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Avg_Ann_Cost_per_Ton, 'FM999999999999999990')::double precision " 
             + "from (";
             int count = 0;
             
@@ -363,7 +363,13 @@ public abstract class AbstractStrategyTask implements Strategy {
                         }
                         String sqlAnnEmis = (month != -1 ? "coalesce(" + noOfDaysInMonth + " * i.avd_emis, i.ann_emis)" : "i.ann_emis");
                         sql += (count > 0 ? " union all " : "") 
-                            + "select '" + sector.replace("'", "''") + "'::character varying(64) as sector, i.fips, i.poll, sum(" + sqlAnnEmis + ") as Uncontrolled_Emis, sum(" + sqlAnnEmis + ") - sum(e.final_emissions) as Emis_Reduction, coalesce(sum(e.final_emissions), sum(" + sqlAnnEmis + ")) as Remaining_Emis, case when sum(" + sqlAnnEmis + ") <> 0 then (sum(" + sqlAnnEmis + ") - sum(e.final_emissions)) / sum(" + sqlAnnEmis + ") * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
+                            + "select '" + sector.replace("'", "''") + "'::character varying(64) as sector, i.fips, i.poll, "
+                            + "sum(" + sqlAnnEmis + ") as Uncontrolled_Emis, "
+                            + "sum(" + sqlAnnEmis + ") - sum(e.final_emissions) as Emis_Reduction, "
+                            + "coalesce(sum(e.final_emissions), "
+                            + "sum(" + sqlAnnEmis + ")) as Remaining_Emis, "
+                            + "case when sum(" + sqlAnnEmis + ") <> 0 then (sum(" + sqlAnnEmis + ") - sum(e.final_emissions)) / sum(" + sqlAnnEmis + ") * 100.0 else null::double precision end as Pct_Red, "
+                            + "sum(e.Annual_Cost) as Annual_Cost, "
                             + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
                             + "sum(e.Annualized_Capital_Cost) as Annualized_Capital_Cost, "
                             + "sum(e.Total_Capital_Cost) as Total_Capital_Cost, "
