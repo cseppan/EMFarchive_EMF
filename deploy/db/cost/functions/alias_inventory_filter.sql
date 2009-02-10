@@ -5,34 +5,31 @@ DECLARE
 BEGIN
 
 	RETURN 
-		replace(
-		replace(
-			replace(
-			replace(
-				replace(
-				replace(
-					replace(
-					replace(
-						replace(
-						replace(
-							replace(
-							replace(
-								filter, 
-							'scc', table_alias || '.scc'), 
-							'SCC', table_alias || '.scc'), 
-						'fips', table_alias || '.fips'), 
-						'FIPS', table_alias || '.fips'), 
-					'plantid', table_alias || '.plantid'), 
-					'PLANTID', table_alias || '.PLANTID'), 
-				'pointid', table_alias || '.pointid'), 
-				'POINTID', table_alias || '.pointid'), 
-			'stackid', table_alias || '.stackid'), 
-			'STACKID', table_alias || '.stackid'), 
-		'segment', table_alias || '.segment'), 
-		'SEGMENT', table_alias || '.segment');
+	--select regexp_replace('chaka dinosaur like diNosaur holly sleaze dinosAur stack river dInosaur will farrel', 'dinosaUr', 'inv.dinosaur', 'gi');
+	regexp_replace(
+		regexp_replace(
+			regexp_replace(
+				regexp_replace(
+					regexp_replace(
+						regexp_replace(
+							regexp_replace(
+								regexp_replace(
+									regexp_replace(
+										regexp_replace(
+											filter, 
+										'scc', table_alias || '.scc', 'gi'), 
+									'fips', table_alias || '.fips', 'gi'), 
+								'plantid', table_alias || '.plantid', 'gi'), 
+							'pointid', table_alias || '.pointid', 'gi'), 
+						'stackid', table_alias || '.stackid', 'gi'), 
+					'segment', table_alias || '.segment', 'gi'),
+				'sic', table_alias || '.sic', 'gi'),
+			'mact', table_alias || '.mact', 'gi'),
+		'naics', table_alias || '.naics', 'gi'),
+	'poll', table_alias || '.poll', 'gi');
 
 END;
 $BODY$
-  LANGUAGE 'plpgsql' VOLATILE
+  LANGUAGE 'plpgsql' IMMUTABLE
   COST 100;
 ALTER FUNCTION public.alias_inventory_filter(text, varchar) OWNER TO emf;
