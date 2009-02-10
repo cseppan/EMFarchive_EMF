@@ -48,7 +48,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     private ManageChangeables changeablesList;
 
-    private ControlMeasureClass defaultClass = new ControlMeasureClass("All");
+    private ControlMeasureClass defaultClass = new ControlMeasureClass("Known");
 
     private JPanel tablePanel; 
 
@@ -266,7 +266,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         // get all measure classes and cs classes
         // and add default "ALL" to both lists
         List allClassesList = new ArrayList(Arrays.asList(allClasses));
-        allClassesList.add(0, defaultClass);
+//        allClassesList.add(0, defaultClass);
         allClasses = (ControlMeasureClass[]) allClassesList.toArray(new ControlMeasureClass[0]);
         if (classes.length == 0) {
             List selClassesList = new ArrayList();
@@ -275,6 +275,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         }
         // build list widget
         this.classesList = new ListWidget(allClasses, classes);
+        this.classesList.setToolTipText("Use Ctrl or Shift to select multiple classes");
         changeables.addChangeable(classesList);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
@@ -289,8 +290,8 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         return panel;
     }
 
-    public void save(ControlStrategy controlStrategy) {
-        controlStrategy.setControlMeasureClasses(getControlMeasureClasses());
+    public void save(ControlStrategy controlStrategy) throws EmfException {
+        ControlMeasureClass[] controlMeasureClasses = getControlMeasureClasses();
         ControlStrategyMeasure[] cms = {};
         if (tableData != null) {
             cms = new ControlStrategyMeasure[tableData.rows().size()];
@@ -300,11 +301,16 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         } else {
             cms = controlStrategy.getControlMeasures();
         }
+        
+        if (cms != null && cms.length == 0 && controlMeasureClasses.length == 0) 
+            throw new EmfException("At least one measure class must be selected.");
+
         controlStrategy.setControlMeasures(cms);
+        controlStrategy.setControlMeasureClasses(controlMeasureClasses);
     }
 
     private ControlMeasureClass[] getControlMeasureClasses() {
-        ControlMeasureClass[] controlMeasureClasses = {};
+//        ControlMeasureClass[] controlMeasureClasses = {};
         ControlMeasureClass[] selClasses = {};
         if (classesList != null){
             selClasses = Arrays.asList(classesList.getSelectedValues()).toArray(
@@ -315,15 +321,15 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
         // make sure we don't include the All class, its just for display purposes,
         // its not stored in the database
-        if (selClasses.length != 0 && !(selClasses.length == 1 && selClasses[0].equals(defaultClass))) {
-            List selClassesList = new ArrayList();
-            for (int i = 0; i < selClasses.length; i++)
-                if (!selClasses[i].equals(defaultClass))
-                    selClassesList.add(selClasses[i]);
-
-            controlMeasureClasses = (ControlMeasureClass[]) selClassesList.toArray(new ControlMeasureClass[0]);
-        }
-        return controlMeasureClasses;
+//        if (selClasses.length != 0 && !(selClasses.length == 1 && selClasses[0].equals(defaultClass))) {
+//            List selClassesList = new ArrayList();
+//            for (int i = 0; i < selClasses.length; i++)
+//                if (!selClasses[i].equals(defaultClass))
+//                    selClassesList.add(selClasses[i]);
+//
+//            controlMeasureClasses = (ControlMeasureClass[]) selClassesList.toArray(new ControlMeasureClass[0]);
+//        }
+        return selClasses;//controlMeasureClasses;
     }
 
     public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
