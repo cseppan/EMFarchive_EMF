@@ -616,9 +616,14 @@ BEGIN
 						operation_maintenance_cost,
 						annualized_capital_cost,
 						computed_cost_per_ton;
-					actual_equation_type := 'Type 1';
+					IF annual_cost is not null THEN
+						actual_equation_type := 'Type 1';
+					ELSE
+						actual_equation_type := '-Type 1';
+					END IF;
 					return;
 				END IF;
+				actual_equation_type := '-Type 1';
 			END IF;
 
 			-- Type 2
@@ -650,10 +655,15 @@ BEGIN
 							operation_maintenance_cost,
 							annualized_capital_cost,
 							computed_cost_per_ton;
-						actual_equation_type := 'Type 2';
+						IF annual_cost is not null THEN
+							actual_equation_type := 'Type 2';
+						ELSE
+							actual_equation_type := '-Type 2';
+						END IF;
 						return;
 					END IF;
 				END IF;
+				actual_equation_type := '-Type 2';
 			END IF;
 
 			-- Type 3
@@ -676,9 +686,14 @@ BEGIN
 						operation_maintenance_cost,
 						annualized_capital_cost,
 						computed_cost_per_ton;
-					actual_equation_type := 'Type 3';
+					IF annual_cost is not null THEN
+						actual_equation_type := 'Type 3';
+					ELSE
+						actual_equation_type := '-Type 3';
+					END IF;
 					return;
 				END IF;
+				actual_equation_type := '-Type 3';
 			END IF;
 
 			-- Type 4
@@ -701,9 +716,14 @@ BEGIN
 						operation_maintenance_cost,
 						annualized_capital_cost,
 						computed_cost_per_ton;
-					actual_equation_type := 'Type 4';
+					IF annual_cost is not null THEN
+						actual_equation_type := 'Type 4';
+					ELSE
+						actual_equation_type := '-Type 4';
+					END IF;
 					return;
 				END IF;
+				actual_equation_type := '-Type 4';
 			END IF;
 
 			-- Type 5
@@ -726,9 +746,14 @@ BEGIN
 						operation_maintenance_cost,
 						annualized_capital_cost,
 						computed_cost_per_ton;
-					actual_equation_type := 'Type 5';
+					IF annual_cost is not null THEN
+						actual_equation_type := 'Type 5';
+					ELSE
+						actual_equation_type := '-Type 5';
+					END IF;
 					return;
 				END IF;
+				actual_equation_type := '-Type 5';
 			END IF;
 
 			-- Type 6
@@ -751,9 +776,14 @@ BEGIN
 						operation_maintenance_cost,
 						annualized_capital_cost,
 						computed_cost_per_ton;
-					actual_equation_type := 'Type 6';
+					IF annual_cost is not null THEN
+						actual_equation_type := 'Type 6';
+					ELSE
+						actual_equation_type := '-Type 6';
+					END IF;
 					return;
 				END IF;
+				actual_equation_type := '-Type 6';
 			END IF;
 
 			-- Type 7
@@ -776,9 +806,14 @@ BEGIN
 						operation_maintenance_cost,
 						annualized_capital_cost,
 						computed_cost_per_ton;
-					actual_equation_type := 'Type 7';
+					IF annual_cost is not null THEN
+						actual_equation_type := 'Type 7';
+					ELSE
+						actual_equation_type := '-Type 7';
+					END IF;
 					return;
 				END IF;
+				actual_equation_type := '-Type 7';
 			END IF;
 
 			-- Type 8
@@ -806,9 +841,14 @@ BEGIN
 						operation_maintenance_cost,
 						annualized_capital_cost,
 						computed_cost_per_ton;
-					actual_equation_type := 'Type 8';
+					IF annual_cost is not null THEN
+						actual_equation_type := 'Type 8';
+					ELSE
+						actual_equation_type := '-Type 8';
+					END IF;
 					return;
 				END IF;
+				actual_equation_type := '-Type 8';
 			END IF;
 		END IF;
 	END IF;
@@ -829,7 +869,7 @@ BEGIN
 		operation_maintenance_cost,
 		annualized_capital_cost,
 		computed_cost_per_ton;
-	actual_equation_type := null;
+--	actual_equation_type := null;
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
