@@ -299,11 +299,11 @@ BEGIN
 		column_name := region.attname;
 		
 		IF column_name = 'record_id' THEN
-			select_column_list_sql := select_column_list_sql || 'inv.record_id';
-			insert_column_list_sql := insert_column_list_sql || column_name;
+--			select_column_list_sql := select_column_list_sql || 'inv.record_id';
+--			insert_column_list_sql := insert_column_list_sql || column_name;
 		ELSIF column_name = 'dataset_id' THEN
-			select_column_list_sql := select_column_list_sql || ',' || detailed_result_dataset_id || ' as dataset_id';
-			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+			select_column_list_sql := select_column_list_sql || '' || detailed_result_dataset_id || ' as dataset_id';
+			insert_column_list_sql := insert_column_list_sql || '' || column_name;
 		ELSIF column_name = 'delete_versions' THEN
 			select_column_list_sql := select_column_list_sql || ','''' as delete_versions';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
@@ -389,8 +389,8 @@ BEGIN
 				case 
 					when has_cpri_column or has_primary_device_type_code_column then 
 						case 
-							when has_cpri_column then 'and cmnd.nei_device_code = inv.cpri'
-							else 'and cmnd.nei_device_code = inv.primary_device_type_code'
+							when has_cpri_column then 'and cmnd.nei_device_code = inv.cpri::integer'
+							else 'and cmnd.nei_device_code = inv.primary_device_type_code::integer'
 						end
 					else ''
 				end || '

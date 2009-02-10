@@ -36,7 +36,9 @@ DECLARE
 	get_strategt_cost_sql character varying;
 	get_strategt_cost_inner_sql character varying;
 	annualized_emis_sql character varying;
-	annual_emis_sql character varying;
+	annualized_uncontrolled_emis_sql character varying;
+	uncontrolled_emis_sql character varying;
+	emis_sql character varying;
 	percent_reduction_sql character varying;
 	inventory_sectors character varying := '';
 BEGIN
@@ -177,14 +179,28 @@ BEGIN
 
 	chained_gdp_adjustment_factor := cost_year_chained_gdp / ref_cost_year_chained_gdp;
 
-	annual_emis_sql := 
+	uncontrolled_emis_sql := 
 			case 
 				when dataset_month != 0 then 
 					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
 				else 
 					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
 			end;
+	emis_sql := 
+			case 
+				when dataset_month != 0 then 
+					'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' 
+				else 
+					'inv.ann_emis' 
+			end;
 	annualized_emis_sql := 
+			case 
+				when dataset_month != 0 then 
+					'coalesce(inv.avd_emis * 365, inv.ann_emis)'
+				else 
+					'inv.ann_emis'
+			end;
+	annualized_uncontrolled_emis_sql := 
 			case 
 				when dataset_month != 0 then 
 					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * 365, inv.ann_emis) / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
@@ -196,7 +212,7 @@ BEGIN
 			abbreviation, ' || discount_rate|| ', 
 			m.equipment_life, er.cap_ann_ratio, 
 			er.cap_rec_factor, er.ref_yr_cost_per_ton, 
-			' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ' || ref_cost_year_chained_gdp || ' / cast(chained_gdp as double precision), 
+			' || emis_sql || ' * ' || percent_reduction_sql || ' / 100, ' || ref_cost_year_chained_gdp || ' / cast(chained_gdp as double precision), 
 			' || case when use_cost_equations then 
 			'et.name, 
 			eq.value1, eq.value2, 
@@ -218,6 +234,7 @@ BEGIN
 			end
 			|| '))';
 	get_strategt_cost_inner_sql := replace(get_strategt_cost_sql,'m.control_measures_id','m.id');
+
 
 --	EXECUTE 
 	EXECUTE 'insert into emissions.' || detailed_result_table_name || ' 
@@ -256,7 +273,8 @@ BEGIN
 		xloc,
 		yloc,
 		plant,
-		sector
+		sector,
+		equation_type
 		)
 	select 	' || detailed_result_dataset_id || '::integer,
 		abbreviation,
@@ -292,7 +310,8 @@ BEGIN
 		xloc,
 		yloc,
 		plant,
-		' || quote_literal(inventory_sectors) || ' as sector
+		' || quote_literal(inventory_sectors) || ' as sector,
+		equation_type
 	from (
 		select DISTINCT ON (inv.scc, inv.fips, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id, er.control_measures_id) 
 			m.abbreviation,
@@ -314,9 +333,9 @@ BEGIN
 			' || case when is_point_table = false then 'inv.rpen' else '100' end || ' as rpen,
 			inv.reff,
 
-			' || annual_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
-			' || annual_emis_sql || ' * ' || percent_reduction_sql || ' / 100 as emis_reduction,
-			' || annual_emis_sql || ' as inv_emissions,
+			' || emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
+			' || emis_sql || ' * ' || percent_reduction_sql || ' / 100 as emis_reduction,
+			' || emis_sql || ' as inv_emissions,
 
 			substr(inv.fips, 1, 2) as fipsst,
 			substr(inv.fips, 3, 3) as fipscty,
@@ -324,6 +343,7 @@ BEGIN
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ' as naics,
 			inv.record_id::integer as source_id,
 			er.control_measures_id as cm_id,
+			' || get_strategt_cost_inner_sql || '.actual_equation_type as equation_type,
 			' || case when measures_count > 0 then 'csm.apply_order ' else '1.0' end || ' as apply_order,
 			' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
 			' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || '
@@ -386,6 +406,7 @@ BEGIN
 		) as tbl
 	order by scc, fips, ' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || 'poll, apply_order, coalesce(computed_cost_per_ton, 0), percent_reduction desc';
 	
+
 
 	raise notice '%', 'end call_batch_state ' || clock_timestamp();
 
