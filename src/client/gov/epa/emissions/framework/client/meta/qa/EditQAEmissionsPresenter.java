@@ -1,5 +1,8 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 
@@ -8,10 +11,13 @@ public class EditQAEmissionsPresenter {
     private EditQAEmissionsView view;
     
     private EditQAStepView editQAStepView;
+    
+    private EmfSession session;
         
-    public EditQAEmissionsPresenter(EditQAEmissionsView view, EditQAStepView view2) {
+    public EditQAEmissionsPresenter(EditQAEmissionsView view, EditQAStepView view2, EmfSession session) {
         this.view = view;
         this.editQAStepView = view2;
+        this.session = session;
     }
 
     public void display(EmfDataset dataset, QAStep qaStep) {
@@ -30,5 +36,26 @@ public class EditQAEmissionsPresenter {
     public void updateInventories(Object [] invBase, Object [] invControl, Object [] invTables, String summaryType) {
         editQAStepView.updateInventories(invBase, invControl, invTables, summaryType);
     }
-   
+
+    public void updateDatasets(Object capInventory, 
+            Object hapInventory, 
+            Object speciationToolSpecieInfoDataset, 
+            Object pollToPollConversionDataset, 
+            Object[] speciationProfileWeightDatasets, 
+            Object[] speciationCrossReferenceDatasets, 
+            String filter,
+            String summaryType) {
+        editQAStepView.updateDatasets(capInventory, 
+                hapInventory, 
+                speciationToolSpecieInfoDataset, 
+                pollToPollConversionDataset, 
+                speciationProfileWeightDatasets, 
+                speciationCrossReferenceDatasets, 
+                filter,
+                summaryType);
+    }
+
+    public DatasetType getDatasetType(String name) throws EmfException {
+        return session.dataCommonsService().getDatasetType(name);
+    }
 }

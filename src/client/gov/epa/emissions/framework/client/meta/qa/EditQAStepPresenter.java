@@ -135,13 +135,16 @@ public class EditQAStepPresenter {
                 try {
                     output.write( writeHeader(qaStep, qaResult, dataset.getName()));
                     output.write( getTableAsString(qaResult) );
-                }
-                finally {
+//                } catch (Exception e)  {
+//                    e.printStackTrace();
+//                    throw e;
+                } finally {
                     output.close();
                     localFile.setLastModified(qaResult.getTableCreationDate().getTime());
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException(e.getMessage());
         }
         

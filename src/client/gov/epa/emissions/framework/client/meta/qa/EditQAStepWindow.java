@@ -139,11 +139,15 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private static final String summaryTypeTag = "-summaryType";
     
+    private static final String filterTag = "-filter";
+    
     private static final String emissionTypeTag = "-emissionType";
 
     private static final String avgDaySummaryProgram = "Average day to Annual Summary";
 
     private static final String avgDayToAnnualProgram = "Average day to Annual Inventory";
+
+    protected static final String compareVOCSpeciationWithHAPInventoryProgram = "Compare VOC Speciation With HAP Inventory";
 
     private static final String fireDataSummaryProgram = "Fire Data Summary (Day-specific)";
 
@@ -572,6 +576,71 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             if (!check)
                 throw new EmfException(" Inventories, summary type are needed ");
 
+        }else if (compareVOCSpeciationWithHAPInventoryProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+
+            int capIndex = programSwitches.indexOf("-cap");
+            int hapIndex = programSwitches.indexOf("-hap");
+            int gstsiIndex = programSwitches.indexOf("-gstsi");
+            int gscnvIndex = programSwitches.indexOf("-gscnv");
+            int gspwIndex = programSwitches.indexOf("-gspw");
+            int gsrefIndex = programSwitches.indexOf("-gsref");
+            //int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+            
+            String capInventory = null;
+            String hapInventory = null;
+            String speciationToolSpecieInfoDataset = null;
+            String pollToPollConversionDataset = null;
+            String[] speciationProfileWeightDatasets = null; 
+            String[] speciationCrossReferenceDatasets = null;
+            String[] datasets;
+            String summaryType = "";
+            if (capIndex != -1) {
+                datasets = getDatasetNames(programSwitches, capIndex, programSwitches.indexOf("\n-", capIndex) != -1 ? programSwitches.indexOf("\n-", capIndex) : programSwitches.length()).toArray(new String[0]);
+                if (datasets != null && datasets.length > 0) capInventory = datasets[0];
+            }
+            if (hapIndex != -1) {
+                datasets = getDatasetNames(programSwitches, hapIndex, programSwitches.indexOf("\n-", hapIndex) != -1 ? programSwitches.indexOf("\n-", hapIndex) : programSwitches.length()).toArray(new String[0]);
+                if (datasets != null && datasets.length > 0) hapInventory = datasets[0];
+            }
+            if (gstsiIndex != -1) {
+                datasets = getDatasetNames(programSwitches, gstsiIndex, programSwitches.indexOf("\n-", gstsiIndex) != -1 ? programSwitches.indexOf("\n-", gstsiIndex) : programSwitches.length()).toArray(new String[0]);
+                if (datasets != null && datasets.length > 0) speciationToolSpecieInfoDataset = datasets[0];
+            }
+            if (gscnvIndex != -1) {
+                datasets = getDatasetNames(programSwitches, gscnvIndex, programSwitches.indexOf("\n-", gscnvIndex) != -1 ? programSwitches.indexOf("\n-", gscnvIndex) : programSwitches.length()).toArray(new String[0]);
+                if (datasets != null && datasets.length > 0) pollToPollConversionDataset = datasets[0];
+            }
+            if (gspwIndex != -1) {
+                datasets = getDatasetNames(programSwitches, gspwIndex, programSwitches.indexOf("\n-", gspwIndex) != -1 ? programSwitches.indexOf("\n-", gspwIndex) : programSwitches.length()).toArray(new String[0]);
+                if (datasets != null && datasets.length > 0) speciationProfileWeightDatasets = datasets;
+            }
+            if (gsrefIndex != -1) {
+                datasets = getDatasetNames(programSwitches, gsrefIndex, programSwitches.indexOf("\n-", gsrefIndex) != -1 ? programSwitches.indexOf("\n-", gsrefIndex) : programSwitches.length()).toArray(new String[0]);
+                if (datasets != null && datasets.length > 0) speciationCrossReferenceDatasets = datasets;
+            }
+            summaryType = getSummaryType(programSwitches, sumTypeIndex, programSwitches.indexOf("\n-", sumTypeIndex) != -1 ? programSwitches.indexOf("\n-", sumTypeIndex) : programSwitches.length());
+
+            
+            String errors = "";
+
+            if (capInventory == null) 
+                errors = "Missing CAP inventory. ";
+            if (hapInventory == null) 
+                errors += "Missing HAP inventory. ";
+            if (speciationToolSpecieInfoDataset == null) 
+                errors += "Missing Speciation Tool Gas Profiles Dataset. ";
+            if (pollToPollConversionDataset == null) 
+                errors += "Missing Pollutant-To-Pollutant Conversion Dataset. ";
+            if (speciationProfileWeightDatasets == null || speciationProfileWeightDatasets.length == 0) 
+                errors += "Missing Speciation Profile Weight Dataset(s). ";
+            if (speciationCrossReferenceDatasets == null || speciationCrossReferenceDatasets.length == 0) 
+                errors += "Missing Speciation Cross Reference Dataset(s). ";
+            if (summaryType == null || summaryType.trim().length() == 0) 
+                errors += "Missing summary type value. ";
+            
+            if (errors.length() > 0) 
+                throw new EmfException(errors);
+        
         }else if (MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
             if (!(programSwitches.trim().equals("")) && invIndex != -1 
                     && emiIndex !=-1 && invTableIndex !=-1 && sumTypeIndex !=-1) 
@@ -659,6 +728,25 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return inventoryList;
     }
 
+    private List<String> getDatasetNames(String programSwitches, int beginIndex, int endIndex){
+        List<String> inventoryList = new ArrayList<String>();
+        String nextDataset = "";
+        String datasetsString = "";
+        // get the part of the arguments starting with -inventories or -inventories_base(compare)
+        
+        datasetsString = programSwitches.substring(beginIndex, endIndex);
+        StringTokenizer tokenizer2 = new StringTokenizer(datasetsString);
+        tokenizer2.nextToken(); // skip the flag
+
+        while (tokenizer2.hasMoreTokens()) {
+            nextDataset = tokenizer2.nextToken().trim();
+            //System.out.println("----"+ nextDataset);
+            if (!nextDataset.isEmpty())
+                inventoryList.add(nextDataset);
+        }
+        return inventoryList;
+    }
+
     private void getInventoryTable(String programSwitches, int beginIndex, int endIndex) throws EmfException {
         List<EmfDataset> invTableList= new ArrayList<EmfDataset>();
         invTableList = getDatasets(programSwitches, beginIndex, endIndex);
@@ -703,6 +791,23 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             summaryType = tokenizer3.nextToken().trim();
     }
 
+    private String getSummaryType(String programSwitches, int beginIndex, int endIndex) {
+        String summaryType = "";
+        String summaryTypeString = "";
+        // get the part of the arguments starting with -inventories or -inventories_base(compare)
+        
+        if (beginIndex != -1) {
+            summaryTypeString = programSwitches.substring(beginIndex, endIndex);
+            StringTokenizer tokenizer2 = new StringTokenizer(summaryTypeString, "\n");
+            tokenizer2.nextToken(); // skip the flag
+
+            while (tokenizer2.hasMoreTokens()) {
+                summaryType = tokenizer2.nextToken().trim();
+            }
+        }
+        return summaryType;
+    }
+
     private Button exportButton() {
         Button export = new ExportButton("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -742,6 +847,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     showAvgDaySummaryWindow();
                 }else if (MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     showColumnSummaryWindow();
+                } else if (compareVOCSpeciationWithHAPInventoryProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+                    showCompareCAPHAPInventoriesWindow();
                 } else if (avgDayToAnnualProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     showAvgDayToAnnualWindow();
                 } else if (MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
@@ -793,12 +900,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         }
         if (CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
             EditControlDetailedDiffWindow view = new EditControlDetailedDiffWindow(desktopManager, programVal, session, invBase, invCompare, summaryType);
-            EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+            EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
             presenter.display(origDataset, step);
         }else{
             EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invCompare, invTables,
                     summaryType);
-            EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+            EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
             presenter.display(origDataset, step);
         }
     }
@@ -831,13 +938,13 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             }finally{
                 EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, programVal, session, inventories, invTables,
                         summaryType);
-                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
                 presenter.display(origDataset, step); 
             }
         }
         EditQAEmissionsWindow view = new EditQAEmissionsWindow(desktopManager, programVal, session, inventories, invTables,
                 summaryType);
-        EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+        EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
         presenter.display(origDataset, step);
 
     }
@@ -874,13 +981,13 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             }finally{
                 EditQAEmissionsColumnBasedWindow view = new EditQAEmissionsColumnBasedWindow(desktopManager, programVal, session, inventories, invTables,
                         summaryType, emissionType);
-                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
                 presenter.display(origDataset, step); 
             }
         }
         EditQAEmissionsColumnBasedWindow view = new EditQAEmissionsColumnBasedWindow(desktopManager, programVal, session, inventories, invTables,
                 summaryType, emissionType);
-        EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+        EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
         presenter.display(origDataset, step);
 
     }
@@ -909,6 +1016,216 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         EditQANonsummaryEmissionsPresenter presenter = new EditQANonsummaryEmissionsPresenter(view, this);
         presenter.display(origDataset, step);
 
+    }
+
+//    public class CompareCAPHAPInventoriesInputs {
+//        private EmfDataset capInventory = null;
+//        private EmfDataset hapInventory = null;
+//        private EmfDataset speciationToolSpecieInfoDataset = null;
+//        private EmfDataset pollToPollConversionDataset = null;
+//        private EmfDataset [] speciationProfileWeightDatasets = null; 
+//        private EmfDataset [] speciationCrossReferenceDatasets = null;
+//        private String summaryType = "";
+//        
+//        public CompareCAPHAPInventoriesInputs(EmfDataset capInventory,
+//            EmfDataset hapInventory,
+//            EmfDataset speciationToolSpecieInfoDataset,
+//            EmfDataset pollToPollConversionDataset,
+//            EmfDataset [] speciationProfileWeightDatasets,
+//            EmfDataset [] speciationCrossReferenceDatasets,
+//            String summaryType) {
+//            this.setCapInventory(capInventory);
+//            this.setHapInventory(hapInventory);
+//            this.setSpeciationToolSpecieInfoDataset(speciationToolSpecieInfoDataset);
+//            this.setPollToPollConversionDataset(pollToPollConversionDataset);
+//            this.setSpeciationProfileWeightDatasets(speciationProfileWeightDatasets); 
+//            this.setSpeciationCrossReferenceDatasets(speciationCrossReferenceDatasets);
+//            this.setSummaryType(summaryType);
+//        }
+//
+//        public void setCapInventory(EmfDataset capInventory) {
+//            this.capInventory = capInventory;
+//        }
+//
+//        public EmfDataset getCapInventory() {
+//            return capInventory;
+//        }
+//
+//        public void setHapInventory(EmfDataset hapInventory) {
+//            this.hapInventory = hapInventory;
+//        }
+//
+//        public EmfDataset getHapInventory() {
+//            return hapInventory;
+//        }
+//
+//        public void setSpeciationToolSpecieInfoDataset(EmfDataset speciationToolSpecieInfoDataset) {
+//            this.speciationToolSpecieInfoDataset = speciationToolSpecieInfoDataset;
+//        }
+//
+//        public EmfDataset getSpeciationToolSpecieInfoDataset() {
+//            return speciationToolSpecieInfoDataset;
+//        }
+//
+//        public void setPollToPollConversionDataset(EmfDataset pollToPollConversionDataset) {
+//            this.pollToPollConversionDataset = pollToPollConversionDataset;
+//        }
+//
+//        public EmfDataset getPollToPollConversionDataset() {
+//            return pollToPollConversionDataset;
+//        }
+//
+//        public void setSpeciationProfileWeightDatasets(EmfDataset [] speciationProfileWeightDatasets) {
+//            this.speciationProfileWeightDatasets = speciationProfileWeightDatasets;
+//        }
+//
+//        public EmfDataset [] getSpeciationProfileWeightDatasets() {
+//            return speciationProfileWeightDatasets;
+//        }
+//
+//        public void setSpeciationCrossReferenceDatasets(EmfDataset [] speciationCrossReferenceDatasets) {
+//            this.speciationCrossReferenceDatasets = speciationCrossReferenceDatasets;
+//        }
+//
+//        public EmfDataset [] getSpeciationCrossReferenceDatasets() {
+//            return speciationCrossReferenceDatasets;
+//        }
+//
+//        public void setSummaryType(String summaryType) {
+//            this.summaryType = summaryType;
+//        }
+//
+//        public String getSummaryType() {
+//            return summaryType;
+//        }
+//    }
+//    
+//    private CompareCAPHAPInventoriesInputs getCompareCAPHAPInventoriesInputs(String programSwitches) throws EmfException {
+//        
+//        int capIndex = programSwitches.indexOf("-cap");
+//        int hapIndex = programSwitches.indexOf("-hap");
+//        int gstsiIndex = programSwitches.indexOf("-gstsi");
+//        int gscnvIndex = programSwitches.indexOf("-gscnv");
+//        int gspwIndex = programSwitches.indexOf("-gspw");
+//        int gsrefIndex = programSwitches.indexOf("-gsref");
+//        int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+//        EmfDataset capInventory = null;
+//        EmfDataset hapInventory = null;
+//        EmfDataset speciationToolSpecieInfoDataset = null;
+//        EmfDataset pollToPollConversionDataset = null;
+//        EmfDataset [] speciationProfileWeightDatasets = null; 
+//        EmfDataset [] speciationCrossReferenceDatasets = null;
+//        EmfDataset[] datasets;
+//        String summaryType = "";
+//        CompareCAPHAPInventoriesInputs compareCAPHAPInventoriesInputs = null;
+//        if (capIndex != -1) {
+//            datasets = getDatasets(programSwitches, capIndex, programSwitches.indexOf("\n-", capIndex) != -1 ? programSwitches.indexOf("\n-", capIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+//            if (datasets != null && datasets.length > 0) capInventory = datasets[0];
+//        }
+//        if (hapIndex != -1) {
+//            datasets = getDatasets(programSwitches, hapIndex, programSwitches.indexOf("\n-", hapIndex) != -1 ? programSwitches.indexOf("\n-", hapIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+//            if (datasets != null && datasets.length > 0) hapInventory = datasets[0];
+//        }
+//        if (gstsiIndex != -1) {
+//            datasets = getDatasets(programSwitches, gstsiIndex, programSwitches.indexOf("\n-", gstsiIndex) != -1 ? programSwitches.indexOf("\n-", gstsiIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+//            if (datasets != null && datasets.length > 0) speciationToolSpecieInfoDataset = datasets[0];
+//        }
+//        if (gscnvIndex != -1) {
+//            datasets = getDatasets(programSwitches, gscnvIndex, programSwitches.indexOf("\n-", gscnvIndex) != -1 ? programSwitches.indexOf("\n-", gscnvIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+//            if (datasets != null && datasets.length > 0) pollToPollConversionDataset = datasets[0];
+//        }
+//        if (gspwIndex != -1) {
+//            datasets = getDatasets(programSwitches, gspwIndex, programSwitches.indexOf("\n-", gspwIndex) != -1 ? programSwitches.indexOf("\n-", gspwIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+//            if (datasets != null && datasets.length > 0) speciationProfileWeightDatasets = datasets;
+//        }
+//        if (gsrefIndex != -1) {
+//            datasets = getDatasets(programSwitches, gsrefIndex, programSwitches.indexOf("\n-", gsrefIndex) != -1 ? programSwitches.indexOf("\n-", gsrefIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+//            if (datasets != null && datasets.length > 0) speciationCrossReferenceDatasets = datasets;
+//        }
+//        summaryType = getSummaryType(programSwitches, sumTypeIndex, programSwitches.indexOf("\n-", sumTypeIndex) != -1 ? programSwitches.indexOf("\n-", sumTypeIndex) : programSwitches.length());
+//        compareCAPHAPInventoriesInputs = new CompareCAPHAPInventoriesInputs(capInventory,
+//                hapInventory,
+//                speciationToolSpecieInfoDataset,
+//                pollToPollConversionDataset,
+//                speciationProfileWeightDatasets,
+//                speciationCrossReferenceDatasets,
+//                summaryType);
+//        return compareCAPHAPInventoriesInputs;
+//    }
+    
+    private void showCompareCAPHAPInventoriesWindow() {
+        // When there is no data in window, set button causes new window to pop up,
+        // with the warning message to also show up. When data in window is invalid, a new window still
+        // pops up, but with a different warning message.
+        // Also change the window name to EditQASetArgumentsWindow
+        invBase = null;
+        invCompare = null;
+        invTables = null;
+        summaryType = "";
+
+        String programVal = program.getSelectedItem().toString();
+        String programSwitches = programArguments.getText();        
+        try {
+            int capIndex = programSwitches.indexOf("-cap");
+            int hapIndex = programSwitches.indexOf("-hap");
+            int gstsiIndex = programSwitches.indexOf("-gstsi");
+            int gscnvIndex = programSwitches.indexOf("-gscnv");
+            int gspwIndex = programSwitches.indexOf("-gspw");
+            int gsrefIndex = programSwitches.indexOf("-gsref");
+            int filterIndex = programSwitches.indexOf("-filter");
+            int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+            EmfDataset capInventory = null;
+            EmfDataset hapInventory = null;
+            EmfDataset speciationToolSpecieInfoDataset = null;
+            EmfDataset pollToPollConversionDataset = null;
+            EmfDataset [] speciationProfileWeightDatasets = null; 
+            EmfDataset [] speciationCrossReferenceDatasets = null;
+            EmfDataset[] datasets;
+            String summaryType = "";
+            String filter = "";
+
+            if (capIndex != -1) {
+                datasets = getDatasets(programSwitches, capIndex, programSwitches.indexOf("\n-", capIndex) != -1 ? programSwitches.indexOf("\n-", capIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) capInventory = datasets[0];
+            }
+            if (hapIndex != -1) {
+                datasets = getDatasets(programSwitches, hapIndex, programSwitches.indexOf("\n-", hapIndex) != -1 ? programSwitches.indexOf("\n-", hapIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) hapInventory = datasets[0];
+            }
+            if (gstsiIndex != -1) {
+                datasets = getDatasets(programSwitches, gstsiIndex, programSwitches.indexOf("\n-", gstsiIndex) != -1 ? programSwitches.indexOf("\n-", gstsiIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) speciationToolSpecieInfoDataset = datasets[0];
+            }
+            if (gscnvIndex != -1) {
+                datasets = getDatasets(programSwitches, gscnvIndex, programSwitches.indexOf("\n-", gscnvIndex) != -1 ? programSwitches.indexOf("\n-", gscnvIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) pollToPollConversionDataset = datasets[0];
+            }
+            if (gspwIndex != -1) {
+                datasets = getDatasets(programSwitches, gspwIndex, programSwitches.indexOf("\n-", gspwIndex) != -1 ? programSwitches.indexOf("\n-", gspwIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) speciationProfileWeightDatasets = datasets;
+            }
+            if (gsrefIndex != -1) {
+                datasets = getDatasets(programSwitches, gsrefIndex, programSwitches.indexOf("\n-", gsrefIndex) != -1 ? programSwitches.indexOf("\n-", gsrefIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) speciationCrossReferenceDatasets = datasets;
+            }
+            filter = getSummaryType(programSwitches, filterIndex, programSwitches.indexOf("\n-", filterIndex) != -1 ? programSwitches.indexOf("\n-", filterIndex) : programSwitches.length());
+            summaryType = getSummaryType(programSwitches, sumTypeIndex, programSwitches.indexOf("\n-", sumTypeIndex) != -1 ? programSwitches.indexOf("\n-", sumTypeIndex) : programSwitches.length());
+            QACompareVOCSpeciationWithHAPInventoryWindow view = new QACompareVOCSpeciationWithHAPInventoryWindow(desktopManager, 
+                programVal, 
+                session, 
+                capInventory, 
+                hapInventory, 
+                speciationToolSpecieInfoDataset, 
+                pollToPollConversionDataset,
+                speciationProfileWeightDatasets,
+                speciationCrossReferenceDatasets,
+                filter,
+                summaryType);
+            EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
+            presenter.display(origDataset, step);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
     }
 
     private void doSetWindow() {
@@ -969,6 +1286,33 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         updateArgumentsTextArea(datasetNames);
     }
     
+    public void updateDatasets(Object capInventory, 
+            Object hapInventory, 
+            Object speciationToolSpecieInfoDataset,
+            Object pollToPollConversionDataset, 
+            Object[] speciationProfileWeightDatasets,
+            Object[] speciationCrossReferenceDatasets, 
+            String filter,
+            String summaryType) {
+        clear();
+        String datasetNames = "";
+        if (capInventory != null) datasetNames += "-cap" + lineFeeder + ((EmfDataset) capInventory).getName() + lineFeeder;
+        if (hapInventory != null) datasetNames += "-hap" + lineFeeder + ((EmfDataset) hapInventory).getName() + lineFeeder;
+        if (speciationToolSpecieInfoDataset != null) datasetNames += "-gstsi" + lineFeeder + ((EmfDataset) speciationToolSpecieInfoDataset).getName() + lineFeeder;
+        if (pollToPollConversionDataset != null) datasetNames += "-gscnv" + lineFeeder + ((EmfDataset) pollToPollConversionDataset).getName() + lineFeeder;
+        if (speciationProfileWeightDatasets != null) datasetNames += getInvString("-gspw", speciationProfileWeightDatasets);
+        if (speciationCrossReferenceDatasets != null) datasetNames += getInvString("-gsref", speciationCrossReferenceDatasets);
+
+        datasetNames += summaryTypeTag + lineFeeder;
+        if (summaryType != null && summaryType.length() > 0)
+            datasetNames += summaryType + lineFeeder;
+        datasetNames += filterTag + lineFeeder;
+        if (filter != null && filter.length() > 0)
+            datasetNames += filter + lineFeeder;
+
+        updateArgumentsTextArea(datasetNames);
+    }
+
     private String getInvString(String tag, Object[] inventories){
         String invString =tag + lineFeeder;
         for (int i = 0; i < inventories.length; i++) {

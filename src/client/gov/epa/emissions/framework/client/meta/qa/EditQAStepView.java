@@ -30,4 +30,12 @@ public interface EditQAStepView extends ManagedView {
     
     void updateInventories(Object [] inventories);
 
+    void updateDatasets(Object capInventory, 
+            Object hapInventory, 
+            Object speciationToolSpecieInfoDataset, 
+            Object pollToPollConversionDataset, 
+            Object[] speciationProfileWeightDatasets, 
+            Object[] speciationCrossReferenceDatasets, 
+            String filter,
+            String summaryType);
 }
