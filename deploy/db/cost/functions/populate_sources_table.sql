@@ -27,7 +27,8 @@ BEGIN
 		and sources.stackid = inv.stackid
 		and sources.segment = inv.segment
 		' end || '
-	where 	sources.id is null ' || coalesce(public.alias_inventory_filter(inv_filter, 'inv'), '') || '
+		 where sources.id is null 
+			' || case when length(coalesce(inv_filter, '')) > 0 then ' and (' || public.alias_inventory_filter(inv_filter, 'inv') || ')' else '' end || '
 		';
 
 	return;
