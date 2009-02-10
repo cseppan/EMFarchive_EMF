@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -238,15 +239,20 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
         String sql = "select ";
         String columnList = "";
         Column[] columns = tableFormat.cols();
+        //flag indicating if we are doing replacement vs
+        //add on controls., currently we only support replacement controls.
+        boolean isReplacementControl = !controlStrategy.getStrategyType().getName().equals(StrategyType.applyMeasuresInSeries);
         //right before abbreviation, is an empty now...
         for (int i = 0; i < columns.length; i++) {
             String columnName = columns[i].name();
             if (columnName.equalsIgnoreCase("record_id")) {
-                sql += "record_id";
-                columnList += "record_id";
+//                sql += "record_id";
+//                columnList += "record_id";
             } else if (columnName.equalsIgnoreCase("dataset_id")) {
-                sql += "," + datasetId + " as dataset_id";
-                columnList += ",dataset_id";
+//              sql += "," + datasetId + " as dataset_id";
+//              columnList += ",dataset_id";
+                sql += datasetId + " as dataset_id";
+                columnList += "dataset_id";
             } else if (columnName.equalsIgnoreCase("delete_versions")) {
                 sql += ", '' as delete_versions";
                 columnList += "," + columnName;
@@ -254,7 +260,8 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
                 sql += ", 0 as version";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("ceff")) {
-                sql += ", case when b.source_id is not null then case when " + (month != -1 ? "coalesce(avd_emis, ann_emis)" : "ann_emis") + " <> 0 then TO_CHAR((1 - " + (month != -1 ? "b.final_emissions / " + noOfDaysInMonth + " / coalesce(avd_emis, ann_emis)" : "b.final_emissions / ann_emis") + ") * 100, 'FM990.099')::double precision else 0.0 end else ceff end as ceff";
+                sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then TO_CHAR((1- b.final_emissions / b.starting_emissions) * 100, 'FM990.099')::double precision else null::double precision end else ceff end as ceff";
+//              sql += ", case when b.source_id is not null then case when " + (month != -1 ? "coalesce(avd_emis, ann_emis)" : "ann_emis") + " <> 0 then TO_CHAR((1 - " + (month != -1 ? "b.final_emissions / " + noOfDaysInMonth + " / coalesce(avd_emis, ann_emis)" : "b.final_emissions / ann_emis") + ") * 100, 'FM990.099')::double precision else 0.0 end else ceff end as ceff";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("avd_emis")) {
                 sql += ", case when b.source_id is not null then b.final_emissions / " + (month != -1 ? noOfDaysInMonth : "365") + " else avd_emis end as avd_emis";
@@ -269,16 +276,26 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
                 sql += ", case when b.source_id is not null then 100 else rpen end as rpen";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("CONTROL_MEASURES")) {
-                sql += ", case when " + (!missingColumns ? "control_measures" : "null") + " is null or length(" + (!missingColumns ? "control_measures" : "null") + ") = 0 then cm_abbrev_list else " + (!missingColumns ? "control_measures" : "null") + " || '&' || cm_abbrev_list end as CONTROL_MEASURES";
+                if (isReplacementControl)
+                    sql += ", cm_abbrev_list as CONTROL_MEASURES";
+                else
+                    sql += ", case when " + (!missingColumns ? "control_measures" : "null") + " is null or length(" + (!missingColumns ? "control_measures" : "null") + ") = 0 then cm_abbrev_list else " + (!missingColumns ? "control_measures" : "null") + " || '&' || cm_abbrev_list end as CONTROL_MEASURES";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("PCT_REDUCTION")) {
-                sql += ", case when " + (!missingColumns ? "pct_reduction" : "null") + " is null or length(" + (!missingColumns ? "pct_reduction" : "null") + ") = 0 then percent_reduction_list else " + (!missingColumns ? "pct_reduction" : "null") + " || '&' || percent_reduction_list end as PCT_REDUCTION";
+                if (isReplacementControl)
+                    sql += ", percent_reduction_list as PCT_REDUCTION";
+                else
+                    sql += ", case when " + (!missingColumns ? "pct_reduction" : "null") + " is null or length(" + (!missingColumns ? "pct_reduction" : "null") + ") = 0 then percent_reduction_list else " + (!missingColumns ? "pct_reduction" : "null") + " || '&' || percent_reduction_list end as PCT_REDUCTION";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("CURRENT_COST")) {
                 sql += ", annual_cost as CURRENT_COST";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("CUMULATIVE_COST")) {
-                sql += ", case when " + (!missingColumns ? "cumulative_cost" : "null") + " is null and annual_cost is null then null else coalesce(" + (!missingColumns ? "cumulative_cost" : "null") + ", 0) + coalesce(annual_cost, 0) end as CUMULATIVE_COST";
+                if (isReplacementControl)
+                    sql += ", case when b.source_id is not null then " + (!missingColumns ? "case when cumulative_cost is null then annual_cost when cumulative_cost is not null then coalesce(annual_cost, 0.0) end" : "annual_cost") + " else " + (!missingColumns ? "cumulative_cost" : "null::double precision") + " end as CUMULATIVE_COST";
+                else
+                    sql += ", case when b.source_id is not null then " + (!missingColumns ? "case when cumulative_cost is null then annual_cost when cumulative_cost is not null then cumulative_cost + coalesce(annual_cost, 0.0) end" : "annual_cost") + " else " + (!missingColumns ? "cumulative_cost" : "null::double precision") + " end as CUMULATIVE_COST";
+//                sql += ", case when " + (!missingColumns ? "cumulative_cost" : "null") + " is null and annual_cost is null then null::double precision else coalesce(" + (!missingColumns ? "cumulative_cost" : "null::double precision") + ", 0.0) + coalesce(annual_cost, 0) end as CUMULATIVE_COST";
                 columnList += "," + columnName;
             } else {
                 sql += ", " + columnName;
@@ -288,18 +305,19 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
         sql += " FROM " + qualifiedTable(inputTable, datasource) + " as inv ";
         sql += " left outer join ( "
         + "SELECT source_id, "
-        + "max(final_emissions) as final_emissions, "
+        + "min(final_emissions) as final_emissions, "
+        + "max(input_emis) as starting_emissions, "
         + "sum(annual_cost) as annual_cost, "
         + "public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list, "
         + "public.concatenate_with_ampersand(TO_CHAR(percent_reduction, 'FM990.099')) as percent_reduction_list "
-        + "FROM (select source_id, final_emissions, annual_cost, cm_abbrev, percent_reduction "
+        + "FROM (select source_id, input_emis, final_emissions, annual_cost, cm_abbrev, percent_reduction "
         + "        FROM " + qualifiedTable(detailResultTable, datasource)
         + "        order by source_id, apply_order "
         + "        ) tbl "
         + "    group by source_id ) as b "
         + "on inv.record_id = b.source_id"
         + " WHERE " + versionedQuery.query();
-        sql = "SET work_mem TO '256MB';INSERT INTO " + qualifiedTable(outputTable, datasource) + " (" + columnList + ") " + sql;
+        sql = "INSERT INTO " + qualifiedTable(outputTable, datasource) + " (" + columnList + ") " + sql;
         System.out.println(sql);
         return sql;
     }
