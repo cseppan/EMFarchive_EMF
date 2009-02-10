@@ -205,4 +205,11 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     }
 
 
+    public void notifyEditFailure(ControlMeasure measure) {
+        String message = "Cannot edit Properties of ControlMeasure: " + measure.getName()
+                + "; as you must be the administrator or creator of the measure";
+        InfoDialog dialog = new InfoDialog(this, "Message", message);
+        dialog.confirm();
+    }
+
 }

@@ -17,4 +17,6 @@ public interface ControlMeasureView extends ManagedView {
 
     void signalChanges();
 
-}
+    void notifyEditFailure(ControlMeasure measure);
+    
+ }

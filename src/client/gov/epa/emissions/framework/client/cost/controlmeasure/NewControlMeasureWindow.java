@@ -188,5 +188,10 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     public void notifyModified() {
         presenter.doModify();
     }
+
+    public void notifyEditFailure(ControlMeasure measure) {
+        // NOTE Auto-generated method stub
+        
+    }
     
 }
