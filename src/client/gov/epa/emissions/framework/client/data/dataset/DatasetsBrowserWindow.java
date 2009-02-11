@@ -96,11 +96,17 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private void createDSTypesComboBox() {
         dsTypesBox = new ComboBox("Select one", allDSTypes);
+        dsTypesBox.setPreferredSize(new Dimension(450, 25));
         dsTypesBox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 DatasetType type = getSelectedDSType();
                 try {
+                    // get count of datasets
+                    if ( 10 <20 )
                     doRefresh();
+                    else {
+                        //
+                    }           
                 } catch (EmfException e1) {
                     messagePanel.setError("Could not retrieve all datasets for dataset type " + type.getName());
                 }
@@ -116,6 +122,11 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         return (DatasetType) selected;
     }
+    
+//    private void loadDataset(){
+//        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
+//        ConfirmDialog confirmDialog1 = new ConfirmDialog(message1, "Warning", this);
+//    }
 
     private JPanel createLayout(EmfDataset[] datasets) {
         JPanel panel = new JPanel();
@@ -150,11 +161,11 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         msgRefreshPanel.add(button, BorderLayout.EAST);
         
         JPanel topPanel = new JPanel(new BorderLayout());
-        textFilter = new TextField("textfilter", 15);
+        textFilter = new TextField("textfilter", 10);
         textFilter.setEditable(true);
         textFilter.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                return; 
+                return;   //make it no action
             }
         });
         topPanel.add(getDSTypePanel("Show Datasets of Type:", dsTypesBox), BorderLayout.LINE_START);
@@ -173,7 +184,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         jlabel.setHorizontalAlignment(JLabel.RIGHT);
         panel.add(jlabel, BorderLayout.WEST);
         panel.add(box, BorderLayout.CENTER);
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 30, 5, 20));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 10));
 
         return panel;
     }
@@ -184,7 +195,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         jlabel.setHorizontalAlignment(JLabel.RIGHT);
         panel.add(jlabel, BorderLayout.WEST);
         panel.add(textFilter, BorderLayout.CENTER);
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 20));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
         return panel;
     }
