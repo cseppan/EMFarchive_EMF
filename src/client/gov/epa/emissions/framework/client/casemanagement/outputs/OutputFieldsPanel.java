@@ -105,12 +105,12 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("Dataset Type:", dsTypeCombo, panel);
 
         // fill in dataset
-        EmfDataset[] datasets=presenter.getDatasets(type);
+        //EmfDataset[] datasets=presenter.getDatasets(type);
         datasetCombo = new ComboBox(new EmfDataset[0]);
         String dsName = getDatasetProperty("name");
         fillDatasets(type);
         if (type !=null && !dsName.trim().isEmpty())
-            datasetCombo.setSelectedIndex(presenter.getDatasetIndex(dsName, datasets));
+            datasetCombo.setSelectedItem(getDatasetItem(dsName));
         datasetCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 datasetLabels((EmfDataset) datasetCombo.getSelectedItem());
@@ -211,6 +211,15 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+    }
+    
+    private EmfDataset getDatasetItem (String datasetName){
+        int count = datasetCombo.getItemCount();
+        for ( int i =0; i<count; i++){
+            if (datasetName.equalsIgnoreCase(datasetCombo.getItemAt(i).toString()))
+                    return (EmfDataset) datasetCombo.getItemAt(i);
+        }
+        return null; 
     }
 
  

@@ -104,14 +104,6 @@ public class OutputFieldsPanelPresenter{
          session.caseService().updateCaseOutput(session.user(), view.setFields());
     }
 
-//    public CaseProgram getCaseProgram(Object selected) throws EmfException {
-//        return caseObjectManager.getOrAddProgram(selected);
-//    }
-//
-//    public SubDir getSubDir(Object selected) throws EmfException {
-//        return caseObjectManager.getOrAddSubDir(selected);
-//    }
-
     public int getJobIndex(int caseJobId, CaseJob [] jobs) //throws EmfException 
     {
         //CaseJob[] jobs = session.caseService().getCaseJobs(caseId);
@@ -123,23 +115,23 @@ public class OutputFieldsPanelPresenter{
         return 0;
     }
     
-    public int getDatasetTypeIndex(String dsType, DatasetType[] datasetTypes) //throws EmfException 
-    {
-        if (dsType.trim()=="") return 0;
-        for (int i = 0; i < datasetTypes.length; i++)
-            if (datasetTypes[i].getName().trim().equalsIgnoreCase(dsType.trim()))
-                return i+1; // because of the default "All jobs" job is not in db
-        return 0;
-    } 
+//    public int getDatasetTypeIndex(String dsType, DatasetType[] datasetTypes) //throws EmfException 
+//    {
+//        if (dsType.trim()=="") return 0;
+//        for (int i = 0; i < datasetTypes.length; i++)
+//            if (datasetTypes[i].getName().trim().equalsIgnoreCase(dsType.trim()))
+//                return i+1; // because of the default "All jobs" job is not in db
+//        return 0;
+//    } 
     
-    public int getDatasetIndex(String ds, EmfDataset[] datasets) //throws EmfException 
-    {
-        if (ds.trim()=="") return 0;
-        for (int i = 0; i < datasets.length; i++)
-            if (datasets[i].getName().trim().equalsIgnoreCase(ds.trim()))
-                return i+1; // because of the default "not selected" job is in db
-        return 0;
-    }
+//    public int getDatasetIndex(String ds, EmfDataset[] datasets) //throws EmfException 
+//    {
+//        if (ds.trim()=="") return 0;
+//        for (int i = 0; i < datasets.length; i++)
+//            if (datasets[i].getName().trim().equalsIgnoreCase(ds.trim()))
+//                return i+1; // because of the default "not selected" job is in db
+//        return 0;
+//    }
 
     public Sector getJobSector(Integer jobId){
         Sector sec=null; 
