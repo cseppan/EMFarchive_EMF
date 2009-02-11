@@ -59,7 +59,7 @@ public class ParametersRowSource implements RowSource {
     }
     
     private String getLastModified(CaseParameter input) {
-        return (input.getLastModifiedDate() == null) ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(input.getLastModifiedDate());
+        return (input.getLastModifiedDate() == null) ? "" : CustomDateFormat.format_YYYY_MM_DD_HH_MM(input.getLastModifiedDate());
     }
 
     private String getJob(CaseParameter param) {

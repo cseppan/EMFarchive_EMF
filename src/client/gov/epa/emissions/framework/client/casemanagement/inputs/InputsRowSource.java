@@ -70,9 +70,9 @@ public class InputsRowSource implements RowSource {
     }
     
     private String getLastModifiedDate(CaseInput input) {
-        return (input.getLastModifiedDate() == null) ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(input.getLastModifiedDate());
+        return (input.getLastModifiedDate() == null) ? "" : CustomDateFormat.format_YYYY_MM_DD_HH_MM(input.getLastModifiedDate());
     }
-    
+     
     private String getJob(CaseInput input) {
         try {
             CaseJob job = session.caseService().getCaseJob(input.getCaseJobID());
