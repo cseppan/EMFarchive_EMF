@@ -42,13 +42,13 @@ public class DataServiceTest extends ServiceTestCase {
     }
 
     public void testShouldGetAllDatasets() throws EmfException {
-        EmfDataset[] datasets = service.getDatasets();
+        EmfDataset[] datasets = service.getDatasets("");
         assertEquals(0, datasets.length);
 
         EmfDataset dataset = newDataset();
 
         try {
-            EmfDataset[] postInsert = service.getDatasets();
+            EmfDataset[] postInsert = service.getDatasets("");
             assertEquals(1, postInsert.length);
         } finally {
             remove(dataset);
@@ -254,7 +254,7 @@ public class DataServiceTest extends ServiceTestCase {
             EmfDataset locked1 = service.obtainLockedDataset(owner, dataset1);
             EmfDataset locked2 = service.obtainLockedDataset(owner, dataset2);
             service.deleteDatasets(owner, new EmfDataset[] { locked1, locked2 });
-            EmfDataset[] datasets = service.getDatasets();
+            EmfDataset[] datasets = service.getDatasets("");
 
             assertEquals("0 datasets", 0, datasets.length);
         } catch (EmfException e) {

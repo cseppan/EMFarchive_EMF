@@ -118,6 +118,17 @@ public class DatasetDAO {
                                 + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
                                 + " where DS.status <> 'Deleted' order by DS.name").list();
     }
+    
+    public List allNonDeleted(Session session, String nameContains) {
+        return session
+                .createQuery(
+                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime) "
+                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
+                                + " where lower(DS.name) like "
+                                + "'%%"
+                                + nameContains.toLowerCase().trim() + "%%' and DS.status <> 'Deleted' order by DS.name").list();
+    
+    }
 
     public void add(EmfDataset dataset, Session session) {
         hibernateFacade.add(dataset, session);
@@ -271,6 +282,18 @@ public class DatasetDAO {
                                 + " where DS.datasetType.id = "
                                 + datasetTypeId
                                 + " and DS.status <> 'Deleted' order by DS.name").list();
+    }
+    
+    public List getDatasetsWithFilter(Session session, int datasetTypeId, String nameContains) {
+        return session
+                .createQuery(
+                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime) "
+                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
+                                + " where DS.datasetType.id = "
+                                + datasetTypeId
+                                + " and lower(DS.name) like "
+                                + "'%%"
+                                + nameContains.toLowerCase().trim() + "%%' and DS.status <> 'Deleted' order by DS.name").list();
     }
 
     public List getDatasets(Session session, int datasetTypeId, String nameContains) {

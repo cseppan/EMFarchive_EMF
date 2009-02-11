@@ -10,11 +10,11 @@ public interface DataService {
 
     EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException;
 
-    EmfDataset[] getDatasets(int datasetTypeId) throws EmfException;
+    EmfDataset[] getDatasetsWithFilter(int datasetTypeId, String nameContains) throws EmfException;
 
     EmfDataset[] getDatasets(int datasetTypeId, String nameContaining) throws EmfException;
 
-    EmfDataset[] getDatasets() throws EmfException;
+    EmfDataset[] getDatasets(String nameContains) throws EmfException;
 
     EmfDataset getDataset(Integer datasetId) throws EmfException;
 

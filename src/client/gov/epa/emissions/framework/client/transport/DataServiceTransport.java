@@ -30,13 +30,15 @@ public class DataServiceTransport implements DataService {
         return call;
     }
 
-    public synchronized EmfDataset[] getDatasets() throws EmfException {
+    public synchronized EmfDataset[] getDatasets(String nameContains) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getDatasets");
+        call.addStringParam("nameContains");
         call.setReturnType(mappings.datasets());
 
-        return (EmfDataset[]) call.requestResponse(new Object[] {});
+        return (EmfDataset[]) call.requestResponse(new Object[] {nameContains});
+        
     }
 
     public synchronized EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
@@ -83,15 +85,16 @@ public class DataServiceTransport implements DataService {
     
     }
 
-    public synchronized EmfDataset[] getDatasets(int datasetTypeId) throws EmfException {
+    public synchronized EmfDataset[] getDatasetsWithFilter(int datasetTypeId, String nameContains) throws EmfException {
 
         EmfCall call = call();
 
         call.setOperation("getDatasets");
         call.addIntegerParam("datasetTypeId");
+        call.addStringParam("nameContains");
         call.setReturnType(mappings.datasets());
 
-        return (EmfDataset[]) call.requestResponse(new Object[] { new Integer(datasetTypeId)});
+        return (EmfDataset[]) call.requestResponse(new Object[] { new Integer(datasetTypeId), nameContains});
     
     }
 

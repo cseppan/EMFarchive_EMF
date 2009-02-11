@@ -54,11 +54,14 @@ public class DataServiceImpl implements DataService {
         dao = new DatasetDAO(dbServerFactory);
     }
 
-    public synchronized EmfDataset[] getDatasets() throws EmfException {
+    public synchronized EmfDataset[] getDatasets(String nameContains) throws EmfException {
         Session session = sessionFactory.getSession();
+        List datasets;
         try {
-            List datasets = dao.allNonDeleted(session);
-
+            if (nameContains==null || nameContains.trim().length()==0)
+                datasets = dao.allNonDeleted(session);
+            else
+                datasets = dao.allNonDeleted(session, nameContains);   
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets", e);
@@ -166,10 +169,14 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public synchronized EmfDataset[] getDatasets(int datasetTypeId) throws EmfException {
+    public synchronized EmfDataset[] getDatasetsWithFilter(int datasetTypeId, String nameContains) throws EmfException {
         Session session = sessionFactory.getSession();
+        List datasets; 
         try {
-            List datasets = dao.getDatasets(session, datasetTypeId);
+            if (nameContains==null || nameContains.trim().length()==0)
+                datasets = dao.getDatasets(session, datasetTypeId);
+            else
+                datasets = dao.getDatasetsWithFilter(session, datasetTypeId, nameContains);
 
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
         } catch (RuntimeException e) {

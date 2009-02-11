@@ -54,7 +54,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     }
 
     public void doRefresh() throws EmfException {
-        view.refresh(getDatasets());
+        view.refresh(getDatasets(view.getNameContains()));
         view.clearMessage();
     }
     
@@ -62,8 +62,8 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         return session.dataCommonsService().getDatasetTypes();
     }
     
-    private EmfDataset[] getDatasets() throws EmfException {
-        return dataService().getDatasets();
+    private EmfDataset[] getDatasets(String nameContains) throws EmfException {
+        return dataService().getDatasets(nameContains);
     }
 
     private DataService dataService() {
@@ -159,14 +159,14 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
             dataService().releaseLockedDataset(session.user(), lockedDatasets[i]);
     }
 
-    public EmfDataset[] getEmfDatasets(DatasetType type) throws EmfException {
+    public EmfDataset[] getEmfDatasets(DatasetType type, String nameContains) throws EmfException {
         if (type.getName().equalsIgnoreCase("Select one"))
             return new EmfDataset[0];
         
         if (type.getName().equalsIgnoreCase("All"))
-            return getDatasets();
+            return getDatasets(nameContains);
         
-        return dataService().getDatasets(type.getId());
+        return dataService().getDatasetsWithFilter(type.getId(), nameContains);
     }
 
     public void purgeDeletedDatasets() throws EmfException {

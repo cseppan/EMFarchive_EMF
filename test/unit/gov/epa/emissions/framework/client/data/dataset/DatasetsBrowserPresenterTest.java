@@ -109,7 +109,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         session.stubs().method("dataService").will(returnValue(dataService.proxy()));
         
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter((EmfSession) session.proxy());
-        presenter.getEmfDatasets(dstype);
+        presenter.getEmfDatasets(dstype, "");
     }
 
     public void testShouldGetAllDatasetTypes() throws EmfException {

@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ImportButton;
@@ -62,6 +63,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private EmfSession session;
 
     private ComboBox dsTypesBox;
+    
+    private TextField textFilter;
 
     private DatasetType[] allDSTypes;
 
@@ -77,6 +80,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     public void display(EmfDataset[] datasets) throws EmfException {
         getAllDSTypes();
         createDSTypesComboBox();
+        //createNameContains(); 
         JPanel panel = createLayout(datasets);
         Container contentPane = getContentPane();
         contentPane.add(panel);
@@ -144,10 +148,21 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         msgRefreshPanel.add(messagePanel, BorderLayout.CENTER);
         Button button = new RefreshButton(this, "Refresh Datasets", messagePanel);
         msgRefreshPanel.add(button, BorderLayout.EAST);
+        
+        JPanel topPanel = new JPanel(new BorderLayout());
+        textFilter = new TextField("textfilter", 15);
+        textFilter.setEditable(true);
+        textFilter.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                return; 
+            }
+        });
+        topPanel.add(getDSTypePanel("Show Datasets of Type:", dsTypesBox), BorderLayout.LINE_START);
+        topPanel.add(nameContains("Name Contains: ", textFilter), BorderLayout.EAST);
 
         JPanel panel = new JPanel(new GridLayout(2, 1));
         panel.add(msgRefreshPanel);
-        panel.add(getDSTypePanel("Show Datasets of Type:", dsTypesBox));
+        panel.add(topPanel);
 
         return panel;
     }
@@ -158,7 +173,18 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         jlabel.setHorizontalAlignment(JLabel.RIGHT);
         panel.add(jlabel, BorderLayout.WEST);
         panel.add(box, BorderLayout.CENTER);
-        panel.setBorder(BorderFactory.createEmptyBorder(3, 150, 5, 150));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 30, 5, 20));
+
+        return panel;
+    }
+    
+    private JPanel nameContains(String label, TextField textFilter) {
+        JPanel panel = new JPanel(new BorderLayout(5, 2));
+        JLabel jlabel = new JLabel(label);
+        jlabel.setHorizontalAlignment(JLabel.RIGHT);
+        panel.add(jlabel, BorderLayout.WEST);
+        panel.add(textFilter, BorderLayout.CENTER);
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 20));
 
         return panel;
     }
@@ -467,7 +493,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     public void doRefresh() throws EmfException {
-        refresh(presenter.getEmfDatasets(getSelectedDSType()));
+        refresh(presenter.getEmfDatasets(getSelectedDSType(), textFilter.getText()));
     }
 
     public void notifyLockFailure(EmfDataset dataset) {
@@ -482,5 +508,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             selected.toArray(new EmfDataset[0]);
             
         return null;
+    }
+
+    public String getNameContains() {
+        return textFilter.getText();
+        
     }
 }
