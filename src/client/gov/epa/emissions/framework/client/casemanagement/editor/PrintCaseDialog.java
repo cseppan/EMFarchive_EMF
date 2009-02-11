@@ -34,7 +34,9 @@ public class PrintCaseDialog extends JDialog {
 
     private SingleLineMessagePanel messagePanel;
 
-    private JTextField folder;
+    private JTextField serverfolder;
+    
+    private JTextField localfolder;
 
     private PrintCasePresenter presenter;
 
@@ -43,6 +45,10 @@ public class PrintCaseDialog extends JDialog {
     private EmfConsole parentConsole;
 
     private DataCommonsService service;
+    
+    private boolean serverFolderExist;
+    
+    private boolean localFolderExist;
 
     public PrintCaseDialog(String title, Component container, EmfConsole parentConsole, EmfSession session) {
         super(parentConsole);
@@ -70,37 +76,67 @@ public class PrintCaseDialog extends JDialog {
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        panel.add(createFolderPanel());
+        panel.add(createServerFolderPanel());
+        panel.add(createLocalFolderPanel());
         panel.add(createButtonsPanel());
 
         return panel;
     }
 
-    private JPanel createFolderPanel() {
+    private JPanel createServerFolderPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // folder
-        folder = new JTextField(40);
-        folder.setName("folder");
-        Button button = new BrowseButton(new AbstractAction() {
+        serverfolder = new JTextField(40);
+        serverfolder.setName("serverfolder");
+        Button serverButton = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clearMessagePanel();
-                selectFolder();
+                selectFolder(serverfolder);
             }
         });
         Icon icon = new ImageResources().open("Open a folder");
-        button.setIcon(icon);
+        serverButton.setIcon(icon);
 
         JPanel folderPanel = new JPanel(new BorderLayout(2, 0));
-        folderPanel.add(folder, BorderLayout.LINE_START);
-        folderPanel.add(button, BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("Folder", folderPanel, panel);
+        folderPanel.add(serverfolder, BorderLayout.LINE_START);
+        folderPanel.add(serverButton, BorderLayout.LINE_END);
+        layoutGenerator.addLabelWidgetPair("Server Folder", folderPanel, panel);
 
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
+                5, 5);// xPad, yPad
+
+        return panel;
+    }
+    
+    private JPanel createLocalFolderPanel() {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        // folder
+        localfolder = new JTextField(40);
+        localfolder.setName("localfolder");
+        Button localButton = new BrowseButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                clearMessagePanel();
+                selectFolder(localfolder);
+            }
+        });
+        Icon icon = new ImageResources().open("Open a folder");
+        localButton.setIcon(icon);
+
+        JPanel folderPanel = new JPanel(new BorderLayout(2, 0));
+        folderPanel.add(localfolder, BorderLayout.LINE_START);
+        folderPanel.add(localButton, BorderLayout.LINE_END);
+        layoutGenerator.addLabelWidgetPair("Local Folder", folderPanel, panel);
+
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                10, 5, // initialX, initialY
                 5, 5);// xPad, yPad
 
         return panel;
@@ -134,7 +170,10 @@ public class PrintCaseDialog extends JDialog {
                 
                 try {
                     checkFolderField();
-                    presenter.printCase(folder.getText());
+                    if (serverFolderExist)
+                        presenter.printCase(serverfolder.getText());
+                    if (localFolderExist)
+                        presenter.printLocalCase(localfolder.getText());                  
                     dispose();
                 } catch (Exception e1) {
                     messagePanel.setError(e1.getMessage());
@@ -151,17 +190,17 @@ public class PrintCaseDialog extends JDialog {
         };
     }
     
-
     private void clearMessagePanel() {
         messagePanel.clear();
     }
 
     public void setMostRecentUsedFolder(String mostRecentUsedFolder) {
-        if (mostRecentUsedFolder != null && folder != null)
-            folder.setText(mostRecentUsedFolder);
+        if (mostRecentUsedFolder != null && serverfolder != null)
+            serverfolder.setText(mostRecentUsedFolder);
     }
 
-    private void selectFolder() {
+    private void selectFolder(JTextField folder) {
+        
         EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
 
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(service));
@@ -178,19 +217,35 @@ public class PrintCaseDialog extends JDialog {
     }
     
     private void checkFolderField() throws EmfException {
-        String specified = folder.getText();
+        String serverSide = serverfolder.getText();
+        String localSide = localfolder.getText();
         
-        if (specified == null || specified.trim().isEmpty() || specified.trim().length() == 1)
-            throw new EmfException("Please specify a valid folder.");
+        if ( (serverSide == null || serverSide.trim().isEmpty() || serverSide.trim().length() == 1)
+              && ( localSide == null || localSide.trim().isEmpty() || localSide.trim().length() == 1 ))
+            throw new EmfException("Please specify a valid server or local folder.");
         
-        if (specified.contains("/home/"))
-            throw new EmfException("The EMF (tomcat user) cannot export data into a home directory.");
-        
-        if (specified.charAt(0) != '/' && specified.charAt(1) != ':')
-            throw new EmfException("Specified folder is not in a right format (ex. C:\\, /home, etc.).");
-        
-        if (specified.charAt(0) != '/' && !Character.isLetter(specified.charAt(0)))
-            throw new EmfException("Specified folder is not in a right format (ex. C:\\).");
-    }
+        if (serverSide != null && !serverSide.trim().isEmpty() && serverSide.trim().length() > 1  ){
+            if (serverSide.contains("/home/"))
+                throw new EmfException("The EMF (tomcat user) cannot export data into a home directory.");
+            
+            if ( serverSide.charAt(0) != '/' && serverSide.charAt(1) != ':' )
+                throw new EmfException("Specified server folder is not in a right format (ex. C:\\, /home, etc.).");
 
+            if ( serverSide.charAt(0) != '/' && !Character.isLetter(serverSide.charAt(0)))
+                throw new EmfException("Specified server folder is not in a right format (ex. C:\\).");
+            serverFolderExist = true;
+        }
+        else 
+            serverFolderExist = false;
+        if (localSide != null && !localSide.trim().isEmpty() && localSide.trim().length() > 1 ){
+            if (localSide.charAt(0) != '/' && localSide.charAt(1) != ':' )
+                throw new EmfException("Specified local folder is not in a right format (ex. C:\\, /home, etc.).");
+
+            if (localSide.charAt(0) != '/' && !Character.isLetter(localSide.charAt(0)))
+                throw new EmfException("Specified local folder is not in a right format (ex. C:\\).");
+            localFolderExist = true;
+        }
+        else
+            localFolderExist = false;
+    }
 }

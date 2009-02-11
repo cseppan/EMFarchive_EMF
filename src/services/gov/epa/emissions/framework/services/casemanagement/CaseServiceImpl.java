@@ -714,6 +714,10 @@ public class CaseServiceImpl implements CaseService {
     public void printCase(String folder, int caseId) throws EmfException {
         getCaseService().printCase(folder, caseId);
     }
+    
+    public String[] printLocalCase(int caseId) throws EmfException {
+        return getCaseService().printLocalCase(caseId);
+    }
 
     public Case[] getCasesByOutputDatasets(int[] datasetIds) {
         Session session = sessionFactory.getSession();
