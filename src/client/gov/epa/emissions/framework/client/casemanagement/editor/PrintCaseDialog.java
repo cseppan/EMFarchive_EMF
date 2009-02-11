@@ -19,6 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -26,6 +27,7 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -76,6 +78,7 @@ public class PrintCaseDialog extends JDialog {
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
+        messagePanel.setMessage("Optionally select server foler, local folder or both. ");
         panel.add(createServerFolderPanel());
         panel.add(createLocalFolderPanel());
         panel.add(createButtonsPanel());
@@ -123,7 +126,7 @@ public class PrintCaseDialog extends JDialog {
         Button localButton = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clearMessagePanel();
-                selectFolder(localfolder);
+                selectLocalFolder(localfolder);
             }
         });
         Icon icon = new ImageResources().open("Open a folder");
@@ -176,6 +179,7 @@ public class PrintCaseDialog extends JDialog {
                         presenter.printLocalCase(localfolder.getText());                  
                     dispose();
                 } catch (Exception e1) {
+                    messagePanel.clear();
                     messagePanel.setError(e1.getMessage());
                 }
             }
@@ -215,6 +219,26 @@ public class PrintCaseDialog extends JDialog {
             folder.setText(file.getAbsolutePath());
         }
     }
+    
+    private void selectLocalFolder(JTextField folder) {
+        JFileChooser chooser;
+        File file = new File(folder.getText());
+
+        if (file.isDirectory()) {
+            chooser = new JFileChooser(file);
+        } else {
+            chooser = new JFileChooser("C:\\");
+        }
+
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setDialogTitle("Please select a folder for local export.  ");
+
+        int option = chooser.showDialog(this, "Select");
+        if (option == JFileChooser.APPROVE_OPTION) {
+            folder.setText("" + chooser.getSelectedFile());
+        }
+    }
+
     
     private void checkFolderField() throws EmfException {
         String serverSide = serverfolder.getText();
