@@ -4782,7 +4782,7 @@ public class ManagedCaseService {
         return theInput;
     }
 
-    public void printCase(String folder, int caseId) throws EmfException {
+    public synchronized void printCase(String folder, int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
         Case currentCase = null;
 
@@ -4804,10 +4804,17 @@ public class ManagedCaseService {
             String sumParamFile = prefix + "Summary_Parameters.csv";
             String inputsFile = prefix + "Inputs.csv";
             String jobsFile = prefix + "Jobs.csv";
+            
+            //First buffer: parameter
+            //Second buffer: inputs
+            //third buffer: jobs
+            String[] caseExportString = getCaseExportString(currentCase,parameters, jobs, inputs, session);
+            
+            printCaseSumParams(caseExportString[0], folder, sumParamFile);
+            printCaseInputs(caseExportString[1], folder, inputsFile);
+            printCaseJobs(caseExportString[2], folder, jobsFile);
 
-            printCaseSumParams(currentCase, parameters, jobs, folder, sumParamFile);
-            printCaseInputs(inputs, jobs, folder, inputsFile, session);
-            printCaseJobs(jobs, folder, jobsFile, session);
+            //return caseExportString;
         } catch (Exception e) {
             log.error("Could not export case "
                     + (currentCase == null ? " (id = " + caseId + ")." : currentCase.getName() + "."), e);
@@ -4820,9 +4827,71 @@ public class ManagedCaseService {
                 session.close();
         }
     }
+    
+    public String[] printLocalCase(int caseId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        Case currentCase = null;
 
-    private synchronized void printCaseSumParams(Case currentCase, List<CaseParameter> parameters, List<CaseJob> jobs,
-            String folder, String sumParamFile) throws IOException {
+        try {
+            currentCase = dao.getCase(caseId, session);
+            if (currentCase == null)
+                throw new EmfException("Cannot retrieve current case.");
+
+            List<CaseJob> jobs = dao.getCaseJobs(caseId);
+            List<CaseInput> inputs = dao.getCaseInputs(caseId, session);
+            List<CaseParameter> parameters = dao.getCaseParameters(caseId, session);
+            
+            //First buffer: parameter
+            //Second buffer: inputs
+            //third buffer: jobs
+            String[] caseExportString = getCaseExportString(currentCase,parameters, jobs, inputs, session);
+           
+            return caseExportString;
+        } catch (Exception e) {
+            log.error("Could not export case "
+                    + (currentCase == null ? " (id = " + caseId + ")." : currentCase.getName() + "."), e);
+            throw new EmfException("Could not export case: "
+            // AME: this info makes the message too long to see it all in the window
+                    // + (currentCase == null ? " (id = " + caseId + "). " : currentCase.getName() + ". ")
+                    + e.getMessage());
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
+    
+    private synchronized String[] getCaseExportString(Case currentCase, List<CaseParameter> parameters, 
+            List<CaseJob> jobs, List<CaseInput> inputs, Session session) {
+        
+        List<String> caseExportList = new ArrayList<String>();
+        caseExportList.add(bufferCaseSumParams(currentCase, parameters, jobs));
+        caseExportList.add(bufferCaseInputs(inputs, jobs, session));
+        caseExportList.add(bufferCaseJobs(jobs, session));
+        return caseExportList.toArray(new String[0]);
+    }
+
+    private synchronized void printCaseSumParams(String sb, String folder, String sumParamFile) 
+        throws IOException {        
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, sumParamFile))));
+        writer.println(sb.toString());
+        writer.close();
+    }
+    
+    private synchronized void printCaseInputs(String sb, String folder,
+            String inputsFile) throws IOException {
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, inputsFile))));
+        writer.println(sb.toString());
+        writer.close();
+    }
+    
+    private synchronized void printCaseJobs(String sb, String folder, String jobsFile)
+    throws IOException {
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, jobsFile))));
+        writer.println(sb.toString());
+        writer.close();
+    }
+    
+    private synchronized String bufferCaseSumParams(Case currentCase, List<CaseParameter> parameters, List<CaseJob> jobs) {
         String ls = System.getProperty("line.separator");
         String model = (currentCase.getModel() == null) ? "" : currentCase.getModel().getName();
         String modelRegion = (currentCase.getModelingRegion() == null) ? "" : currentCase.getModelingRegion().getName();
@@ -4934,9 +5003,7 @@ public class ManagedCaseService {
                     + reqrd + "," + local + "," + lstMod + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\"" + ls);
         }
 
-        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, sumParamFile))));
-        writer.println(sb.toString());
-        writer.close();
+        return sb.toString();
     }
 
     private String getSectors(Sector[] sectors) {
@@ -4977,8 +5044,8 @@ public class ManagedCaseService {
         return lastAmp < 0 ? sb.toString() : sb.toString().substring(0, lastAmp);
     }
 
-    private synchronized void printCaseInputs(List<CaseInput> inputs, List<CaseJob> jobs, String folder,
-            String inputsFile, Session session) throws IOException {
+    private synchronized String bufferCaseInputs(List<CaseInput> inputs, List<CaseJob> jobs, 
+            Session session) {
         String ls = System.getProperty("line.separator");
         String columns = "Tab,Inputname,Envt Variable,Sector,Job,Program,Dataset,Version,QA status,DS Type,Reqd?,Local?,Subdir,Last Modified,Parentcase"
                 + ls;
@@ -5009,14 +5076,13 @@ public class ManagedCaseService {
                     + clean(qaStatus) + ",\"" + clean(dsType) + "\"," + reqrd + "," + local + "," + clean(subdir) + ","
                     + lstMod + ",\"" + clean(parentName) + "\"" + ls);
         }
-
-        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, inputsFile))));
-        writer.println(sb.toString());
-        writer.close();
+        return sb.toString(); 
+        //PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, inputsFile))));
+        //writer.println(sb.toString());
+        //writer.close();
     }
 
-    private synchronized void printCaseJobs(List<CaseJob> jobs, String folder, String jobsFile, Session session)
-            throws IOException {
+    private String  bufferCaseJobs(List<CaseJob> jobs, Session session) {
         String ls = System.getProperty("line.separator");
         String columns = "Tab,JobName,Order,Sector,RunStatus,StartDate,CompletionDate,Executable,Arguments,Path,QueueOptions,JobGroup,Local,QueueID,User,Host,Notes,Purpose,DependsOn"
                 + ls;
@@ -5052,10 +5118,7 @@ public class ManagedCaseService {
                     + clean(user) + "\", " + clean(host) + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\",\""
                     + clean(dependsOn) + "\"" + ls);
         }
-
-        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, jobsFile))));
-        writer.println(sb.toString());
-        writer.close();
+        return sb.toString();
     }
 
     private String clean(String toClean) {
