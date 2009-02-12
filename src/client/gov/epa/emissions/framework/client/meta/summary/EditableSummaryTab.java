@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
 import gov.epa.emissions.commons.util.CustomDateFormat;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.data.IntendedUses;
@@ -59,7 +60,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private DataCommonsService service;
 
-    private ComboBox projectsCombo;
+    private EditableComboBox projectsCombo;
 
     private ComboBox temporalResolutionsCombo;
 
@@ -70,6 +71,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     private Project[] allProjects;
 
     private Region[] allRegions;
+    
+    private EmfSession session;
 
     private IntendedUse[] allIntendedUses;
 
@@ -77,11 +80,12 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private DefaultVersionPanel defaultVersionPanel;
 
-    public EditableSummaryTab(EmfDataset dataset, Version[] versions, DataCommonsService service,
+    public EditableSummaryTab(EmfDataset dataset, Version[] versions, EmfSession session,
             MessagePanel messagePanel, ManageChangeables changeablesList) throws EmfException {
         super.setName("summary");
         this.dataset = dataset;
-        this.service = service;
+        this.session = session; 
+        this.service = session.dataCommonsService();
         this.messagePanel = messagePanel;
         this.changeablesList = changeablesList;
 
@@ -258,10 +262,12 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         // layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
 
         allProjects = service.getProjects();
-        projectsCombo = new ComboBox(allProjects);
+        projectsCombo = new EditableComboBox(allProjects);
         projectsCombo.setSelectedItem(dataset.getProject());
         projectsCombo.setPreferredSize(new Dimension(250, 20));
         changeablesList.addChangeable(projectsCombo);
+        if (!session.user().isAdmin())
+            projectsCombo.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Project:", projectsCombo, panel);
 
         // creator

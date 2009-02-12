@@ -68,6 +68,8 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private CaseCategory selectedCategory;
 
     private EmfSession session;
+    
+    //boolean isAdmin; 
 
     private ComboBox categoriesBox;
 
@@ -76,7 +78,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
         this.session = session;
         this.parentConsole = parentConsole;
-
+        //this.isAdmin = session.user().isAdmin();
         layout = new JPanel();
         this.getContentPane().add(layout);
     }
@@ -262,6 +264,8 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             }
         });
         crudPanel.add(removeButton);
+        if (!session.user().isAdmin())
+            removeButton.setEnabled(false);
 
         Button copyButton = new CopyButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -369,7 +373,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             return;
         }
 
-        int selection = showWarningMsg("Warning", "Are you sure you want to remove the selected case(s)?");
+        int selection = showWarningMsg("Warning", "Are you sure you want to remove " + selected.size()+ (selected.size()>1? " cases.":" case."));
         
         if (selection == JOptionPane.NO_OPTION) {
             return;

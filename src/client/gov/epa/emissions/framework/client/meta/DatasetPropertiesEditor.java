@@ -112,7 +112,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private JPanel createSummaryTab(EmfDataset dataset, Version[] versions) {
         try {
-            EditableSummaryTab view = new EditableSummaryTab(dataset, versions, session.dataCommonsService(),
+            EditableSummaryTab view = new EditableSummaryTab(dataset, versions, session,
                     messagePanel, this);
             presenter.set(view);
             return view;

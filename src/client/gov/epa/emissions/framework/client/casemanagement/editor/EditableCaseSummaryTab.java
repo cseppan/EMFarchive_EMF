@@ -64,7 +64,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private TextArea description;
 
-    private ComboBox projectsCombo;
+    private EditableComboBox projectsCombo;
 
     private EmfSession session;
 
@@ -319,13 +319,14 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return isFinal;
     }
 
-    private ComboBox projects() throws EmfException {
-        projectsCombo = new ComboBox(presenter.getProjects());
+    private EditableComboBox projects() throws EmfException {
+        projectsCombo = new EditableComboBox(presenter.getProjects());
         projectsCombo.setSelectedItem(caseObj.getProject());
         projectsCombo.setPreferredSize(defaultDimension);
         addPopupMenuListener(projectsCombo, "projects");
         changeablesList.addChangeable(projectsCombo);
-
+        if (!session.user().isAdmin())
+            projectsCombo.setEditable(false);
         return projectsCombo;
     }
 
