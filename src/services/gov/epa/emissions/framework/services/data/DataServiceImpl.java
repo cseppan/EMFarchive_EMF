@@ -281,9 +281,9 @@ public class DataServiceImpl implements DataService {
         List<String> values = new ArrayList<String>();
 
         if (datasetId == null || datasetId.intValue() == 0)
-            dataset = new EmfDataset();
-        else
-            dataset = getDataset(datasetId);
+            return null; 
+
+        dataset = getDataset(datasetId);
 
         values.add("name," + (dataset.getName() == null ? "" : dataset.getName()));
         values.add("datasetType," + (dataset.getDatasetTypeName() == null ? "" : dataset.getDatasetTypeName()));
