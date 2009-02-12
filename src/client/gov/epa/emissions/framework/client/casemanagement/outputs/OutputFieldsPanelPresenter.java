@@ -39,7 +39,7 @@ public class OutputFieldsPanelPresenter{
 
     public void display(CaseOutput output, JComponent container) throws EmfException {
         view.observe(this);
-        view.display(output, container);
+        view.display(output, container, session);
     }
 
     public Sector[] getSectors() throws EmfException {
@@ -76,17 +76,17 @@ public class OutputFieldsPanelPresenter{
         return session.dataService();
     }
     
-    public String[] getDatasetValues(Integer id) {
- //       CaseOutput output=view.getOutput();
-        String[] values = null;
-        
-        try {
-            values = dataService().getDatasetValues(id);
-        } catch (Exception e) {
-            return null;
-        }
-        return values;
-    }
+//    public String[] getDatasetValues(Integer id) {
+// //       CaseOutput output=view.getOutput();
+//        String[] values = null;
+//        
+//        try {
+//            values = dataService().getDatasetValues(id);
+//        } catch (Exception e) {
+//            return null;
+//        }
+//        return values;
+//    }
     
     public String[] getDatasetValues() {
                CaseOutput output=view.getOutput();

@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -32,10 +33,14 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
     private boolean viewOnly = false;
 
     private OutputFieldsPanel outputFieldsPanel;
+    
+    private EmfConsole parentConsole;
 
-    public EditCaseOutputWindow(String title, DesktopManager desktopManager) {
+    public EditCaseOutputWindow(String title, DesktopManager desktopManager, EmfConsole parentConsole) {
         super(title, new Dimension(630, 500), desktopManager);
         // super.setLabel(super.getTitle() + ": " + title);
+        this.parentConsole = parentConsole;
+        //this.desktopManager = desktopManager;
     }
 
     public void display(CaseOutput output) throws EmfException {
@@ -51,7 +56,7 @@ public class EditCaseOutputWindow extends DisposableInteralFrame implements Edit
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.outputFieldsPanel = new OutputFieldsPanel(messagePanel, this);
+        this.outputFieldsPanel = new OutputFieldsPanel(messagePanel, this, parentConsole);
         presenter.addOutputFields(panel, outputFieldsPanel);
         panel.add(buttonsPanel());
 

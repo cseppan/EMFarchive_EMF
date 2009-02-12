@@ -267,7 +267,7 @@ public class EditOutputsTab extends JPanel implements EditOutputsTabView, Refres
         for (Iterator iter = outputs.iterator(); iter.hasNext();) {
             CaseOutput output = (CaseOutput) iter.next();
             String title = "Edit Case Output: " + output.getName()+"("+output.getId()+ ")(" + caseObj.getName() + ")";
-            EditCaseOutputView outputEditor = new EditCaseOutputWindow(title, desktopManager);
+            EditCaseOutputView outputEditor = new EditCaseOutputWindow(title, desktopManager, parentConsole);
             presenter.editOutput(output, outputEditor);
         }
     }

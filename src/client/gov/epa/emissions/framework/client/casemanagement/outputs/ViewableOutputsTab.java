@@ -249,7 +249,7 @@ public class ViewableOutputsTab extends JPanel implements RefreshObserver {
         for (Iterator iter = outputs.iterator(); iter.hasNext();) {
             CaseOutput output = (CaseOutput) iter.next();
             String title = "View Case Output: " + output.getName() + "("+output.getId()+ ")(" + caseObj.getName() + ")";
-            EditCaseOutputView outputEditor = new EditCaseOutputWindow(title, desktopManager);
+            EditCaseOutputView outputEditor = new EditCaseOutputWindow(title, desktopManager, parentConsole);
             presenter.viewOutput(output, outputEditor);
             outputEditor.viewOnly(title);
         }

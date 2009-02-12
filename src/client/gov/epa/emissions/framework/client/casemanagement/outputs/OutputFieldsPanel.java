@@ -2,26 +2,31 @@ package gov.epa.emissions.framework.client.casemanagement.outputs;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
+import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.DefaultComboBoxModel;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,23 +38,23 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     
     private ComboBox jobCombo;
 
-    private ComboBox dsTypeCombo;
+    private JLabel dsTypeLabel;
 
-    private ComboBox datasetCombo;
+    private TextField datasetLabel;
     
     private JLabel sector;
     
     private JLabel datasetCreationDate, datasetCreater; 
     
-    private JLabel program;
+    private TextField execName;
 
     private TextField status;
 
     private TextArea message;
 
-//    private CheckBox required;
-//
     private String[] datasetValues; 
+    
+    //private EmfDataset dataset;
 
     private MessagePanel messagePanel;
 
@@ -60,14 +65,23 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     private Dimension preferredSize = new Dimension(480, 20);
 
     private CaseOutput output;
+    
+    private Button selectButton;
+    
+    private EmfSession session;
 
-    public OutputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList) {
+    private EmfConsole parentConsole;  
+    
+    public OutputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList, 
+            EmfConsole parentConsole) {
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
+        this.parentConsole = parentConsole;
     }
 
-    public void display(CaseOutput output, JComponent container) throws EmfException {
+    public void display(CaseOutput output, JComponent container, EmfSession session) throws EmfException {
         this.output = output;
+        this.session = session;
         this.datasetValues = presenter.getDatasetValues();
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -89,90 +103,92 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         });
         layoutGenerator.addLabelWidgetPair("Job:", jobCombo, panel);
 
-        DatasetType[] dsTypeArray = presenter.getDSTypes();
-        dsTypeCombo = new ComboBox(dsTypeArray);
-        String datasetType=getDatasetProperty("datasetType");
-        DatasetType type = presenter.getDatasetType(datasetType);
-        dsTypeCombo.setSelectedItem(type);
-        dsTypeCombo.addActionListener(new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                fillDatasets((DatasetType) dsTypeCombo.getSelectedItem());
-                datasetLabels(null);
-            }
-        });
-        changeablesList.addChangeable(dsTypeCombo);
-        dsTypeCombo.setPreferredSize(preferredSize);
-        layoutGenerator.addLabelWidgetPair("Dataset Type:", dsTypeCombo, panel);
+        dsTypeLabel = new JLabel("");
+        layoutGenerator.addLabelWidgetPair("Dataset Type:", dsTypeLabel, panel);
 
         // fill in dataset
-        //EmfDataset[] datasets=presenter.getDatasets(type);
-        datasetCombo = new ComboBox(new EmfDataset[0]);
-        String dsName = getDatasetProperty("name");
-        fillDatasets(type);
-        if (type !=null && !dsName.trim().isEmpty())
-            datasetCombo.setSelectedItem(getDatasetItem(dsName));
-        datasetCombo.addActionListener(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                datasetLabels((EmfDataset) datasetCombo.getSelectedItem());
-            }
-        });
-        changeablesList.addChangeable(datasetCombo);
-        datasetCombo.setPreferredSize(preferredSize);
-        layoutGenerator.addLabelWidgetPair("Dataset:", datasetCombo, panel);
+        layoutGenerator.addLabelWidgetPair("Dataset:", datasetPanel(), panel);
         
         sector=new JLabel("");
         datasetCreationDate=new JLabel("");
         datasetCreater=new JLabel("");
-        program=new JLabel("");
+        
+        execName = new TextField("program", output.getExecName(), 43);
+        //execName.setEditable(true);
+        execName.setPreferredSize(preferredSize);
+        changeablesList.addChangeable(execName);
         
         status = new TextField("status", output.getStatus(), 43);
-        status.setEditable(true);
+        //status.setEditable(true);
         status.setPreferredSize(preferredSize);
         changeablesList.addChangeable(status);
-        
-        updateSectorName((CaseJob)jobCombo.getSelectedItem());
-        outputLabels(); 
-        if(type==null) 
-            datasetLabels(null);
-        else 
-            datasetLabels((EmfDataset) datasetCombo.getSelectedItem());
+  
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
         layoutGenerator.addLabelWidgetPair("Dataset Creator:", datasetCreater, panel);
         layoutGenerator.addLabelWidgetPair("Creation Date:", datasetCreationDate, panel);
-        layoutGenerator.addLabelWidgetPair("Exec name:", program, panel);
+        layoutGenerator.addLabelWidgetPair("Exec name:", execName, panel);
         layoutGenerator.addLabelWidgetPair("Status:", status, panel);
         layoutGenerator.addLabelWidgetPair("Message:", message(), panel);
-
+        
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 10, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
         container.add(panel);
-    }
-
-    private void datasetLabels(EmfDataset selectedItem) {
-        String dateText="";
-        String createrText="";
-        if (selectedItem !=null  && !selectedItem.getName().equalsIgnoreCase("Not Selected") ){
-            datasetValues=presenter.getDatasetValues(new Integer(selectedItem.getId()));
-            dateText=getDatasetProperty("createdDateTime").substring(0, 16);
-            createrText=getDatasetProperty("creator");
-        }
-        datasetCreationDate.setText(dateText);
-        datasetCreater.setText(createrText);
+        
+        updateSectorName((CaseJob)jobCombo.getSelectedItem());
+        datasetLabels();
     }
     
-    private void outputLabels() {
-        String programText="";
-        String statusText ="";
-        if (output !=null ){
-            programText=output.getExecName();
-            statusText=output.getStatus();
-        }
-        program.setText(programText);
-        status.setText(statusText);
+    private JPanel datasetPanel() {
 
+        datasetLabel = new TextField("dataset", 38);
+        datasetLabel.setEditable(false);
+        //datasetLabel.setText( getDatasetProperty("name"));
+        changeablesList.addChangeable(datasetLabel);
+        datasetLabel.setToolTipText("Press select button to choose from a dataset list.");
+        selectButton = new AddButton("Select", selectAction());
+        selectButton.setMargin(new Insets(1, 2, 1, 2));
+
+        JPanel invPanel = new JPanel(new BorderLayout(5, 0));
+
+        invPanel.add(datasetLabel, BorderLayout.LINE_START);
+        invPanel.add(selectButton);
+        return invPanel;
+    }
+
+    private void datasetLabels() {
+        String dsTypeText ="";
+        String dateText="";
+        String createrText="";
+        String datasetName = "";
+
+        if (datasetValues != null ){
+            datasetName=getDatasetProperty("name");
+            if (datasetName.trim().length()>0){
+                dateText=getDatasetProperty("createdDateTime").substring(0, 16);
+                createrText=getDatasetProperty("creator");
+                dsTypeText=getDatasetProperty("datasetType");  
+            }
+        }
+        datasetLabel.setText(datasetName);
+        datasetCreationDate.setText(dateText);
+        datasetCreater.setText(createrText);
+        dsTypeLabel.setText(dsTypeText);
+    }
+    
+    private Action selectAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    messagePanel.clear();
+                    doAddWindow();
+                } catch (Exception e1) {
+                    messagePanel.setError(e1.getMessage());
+                }
+            }
+        };
     }
     
     protected void updateSectorName(CaseJob job) {
@@ -194,42 +210,40 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         return descScrollableTextArea;
     }
     
+    private void doAddWindow() throws Exception {
+        DatasetType[] dsTypeArray = presenter.getDSTypes();
+        DatasetType type = presenter.getDatasetType(dsTypeLabel.getText());
+        //DatasetType[] datasetTypes = new DatasetType[] { type };
+        InputDatasetSelectionDialog view = new InputDatasetSelectionDialog(parentConsole);
+        InputDatasetSelectionPresenter datasePresenter = new InputDatasetSelectionPresenter(view, session, dsTypeArray);
+        if (type != null)
+            datasePresenter.display(type, true);
+        else
+            datasePresenter.display(null, true);
 
-    private void fillDatasets( DatasetType type) {
-        try {
-            List list = new ArrayList();
-            EmfDataset blank = new EmfDataset();
-            blank.setName("Not selected");
-            list.add(blank);
-            list.addAll(Arrays.asList(presenter.getDatasets(type)));
-            EmfDataset[] datasets = (EmfDataset[]) list.toArray(new EmfDataset[0]);
-
-            datasetCombo.removeAllItems();
-            datasetCombo.setModel(new DefaultComboBoxModel(datasets));
-            datasetCombo.revalidate();
-            datasetCombo.setEnabled(true);
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
+        setDatasets(datasePresenter.getDatasets());
     }
     
-    private EmfDataset getDatasetItem (String datasetName){
-        int count = datasetCombo.getItemCount();
-        for ( int i =0; i<count; i++){
-            if (datasetName.equalsIgnoreCase(datasetCombo.getItemAt(i).toString()))
-                    return (EmfDataset) datasetCombo.getItemAt(i);
+    private void setDatasets(EmfDataset[] datasets) {
+        if (datasets == null || datasets.length == 0) {
+            updateDataset(null);
+            datasetValues=presenter.getDatasetValues();
+            datasetLabels();
+            return; 
         }
-        return null; 
+        updateDataset(datasets[0]);
+        datasetValues=presenter.getDatasetValues();
+        datasetLabels();
     }
 
- 
     public CaseOutput setFields() {
         updateOutputName();
         updateJob();
-        output.setDatasetType(((DatasetType)dsTypeCombo.getSelectedItem()).getName());
+        output.setDatasetType(dsTypeLabel.getText());
 //        System.out.println(output.getDatasetType());
-        updateDataset();
+        //updateDataset();
         updateMessage();
+        updateExecName();
         updateStatus();
         return output;
     }
@@ -251,6 +265,10 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         output.setName(outputName.getText().trim());
     }
     
+    private void updateExecName() {
+        output.setExecName(execName.getText().trim());
+    }
+    
     private void updateStatus() {
         output.setStatus(status.getText().trim());
     }
@@ -259,14 +277,12 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
         output.setMessage(message.getText());
     }
     
-    private void updateDataset() {
-        EmfDataset selected = (EmfDataset) datasetCombo.getSelectedItem();
-        if (selected != null && selected.getName().equalsIgnoreCase("Not selected")) {
+    private void updateDataset(EmfDataset dataset) {
+        if (dataset == null ) {
             output.setDatasetId(0);
             return;
         }
-
-        output.setDatasetId(selected.getId());
+        output.setDatasetId(dataset.getId());
     }
 
     public void observe(OutputFieldsPanelPresenter presenter) {
@@ -278,8 +294,6 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     }
 
     public void validateFields() throws EmfException {
-        if (this.dsTypeCombo.getSelectedItem() == null)
-            throw new EmfException("Please select a dataset type for the output");
         if (outputName.getText().trim().equalsIgnoreCase(""))
             throw new EmfException("Please specify an output name.");
         if (((CaseJob)jobCombo.getSelectedItem()).getId()==0)
@@ -301,6 +315,7 @@ public class OutputFieldsPanel extends JPanel implements OutputFieldsPanelView {
     
     public void viewOnly(){
         outputName.setEditable(false);
+        execName.setEditable(false);
         status.setEditable(false);
         message.setEditable(false);
     }

@@ -26,6 +26,8 @@ public class NewOutputDialog extends Dialog implements NewOutputView, ManageChan
     protected EditOutputsTabPresenterImpl presenter;
 
     private MessagePanel messagePanel;
+    
+    private EmfConsole parentConsole; 
 
     private OutputFieldsPanel OutputFieldsPanel;
     
@@ -33,6 +35,7 @@ public class NewOutputDialog extends Dialog implements NewOutputView, ManageChan
         super("Add Output to case", parent);
         super.setSize(new Dimension(630, 500));
         super.center();
+        this.parentConsole = parent;
     }
 
     public void display(int caseId, CaseOutput newOutput) {
@@ -52,7 +55,7 @@ public class NewOutputDialog extends Dialog implements NewOutputView, ManageChan
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        this.OutputFieldsPanel = new OutputFieldsPanel(messagePanel, this);
+        this.OutputFieldsPanel = new OutputFieldsPanel(messagePanel, this, parentConsole);
 
         try {
             presenter.doAddOutputFields(panel, OutputFieldsPanel, newOutput);
