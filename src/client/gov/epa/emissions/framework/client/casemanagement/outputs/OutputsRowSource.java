@@ -28,7 +28,7 @@ public class OutputsRowSource implements RowSource {
         
         return new Object[] { getOutputName(source), getJobName(), getSector(), getDatasetProperty("name"),
                 getDatasetProperty("datasetType"), getStatus(source), getDatasetProperty("creator"),
-                getDatasetProperty("createdDateTime"), getExecName(source), getMessage(source) };
+                getDatasetCreatedDate("createdDateTime"), getExecName(source), getMessage(source) };
     }
 
     private String getMessage(CaseOutput source) {
@@ -67,8 +67,18 @@ public class OutputsRowSource implements RowSource {
             if (values.startsWith(property))
                 value = values.substring(values.indexOf(",") + 1);
         }
-        
-        return value;
+        return value; 
+    }
+    
+    private String getDatasetCreatedDate(String property) {
+        String value = null;
+
+        for (String values : datasetValues) {
+            if (values.startsWith(property))
+                value = values.substring(values.indexOf(",") + 1, values.indexOf(",") + 17);
+                //value = ((value !=null) && value.length() >16) ? value.substring(0, 16): value;
+        }
+        return value; 
     }
 
     private String getOutputName(CaseOutput output) {
@@ -106,6 +116,8 @@ public class OutputsRowSource implements RowSource {
     private String[] getDatasetValues(CaseOutput output, EmfSession session) {
         String[] values = null;
         
+        if (output.getDatasetId() == 0)
+            return null; 
         try {
             values = session.dataService().getDatasetValues(new Integer(output.getDatasetId()));
         } catch (Exception e) {
