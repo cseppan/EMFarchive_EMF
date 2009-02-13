@@ -203,6 +203,27 @@ public class DataServiceTransport implements DataService {
 
         return (Integer) call.requestResponse(new Object[] { user });
     }
+    
+    public int getNumOfDatasets(int datasetTypeId, String nameContains) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getNumOfDatasets");
+        call.addIntegerParam("datasetTypeId");
+        call.addStringParam("nameContains");
+        call.setIntegerReturnType();
+        
+        return (Integer) call.requestResponse(new Object[] {new Integer(datasetTypeId), nameContains });
+    }
+    
+    public int getNumOfDatasets(String nameContains) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getNumOfDatasets");
+        call.addStringParam("nameContains");
+        call.setIntegerReturnType();
+        
+        return (Integer) call.requestResponse(new Object[] {nameContains });
+    }
 
     public String getTableAsString(String qualifiedTableName) throws EmfException {
         EmfCall call = call();

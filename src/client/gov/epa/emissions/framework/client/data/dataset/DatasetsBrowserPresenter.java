@@ -180,6 +180,15 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     public int getNumOfDeletedDatasets() throws EmfException {
         return dataService().getNumOfDeletedDatasets(getUser());
     }
+    
+    public int getNumOfDatasets(DatasetType type, String nameContains) throws EmfException {
+        if (type.getName().equalsIgnoreCase("Select one"))
+            return 0;
+        
+        if (type.getName().equalsIgnoreCase("All"))
+            return dataService().getNumOfDatasets(nameContains);
+        return dataService().getNumOfDatasets(type.getId(), nameContains);
+    }
 
     public boolean isAdminUser() {
         User user = session.user();

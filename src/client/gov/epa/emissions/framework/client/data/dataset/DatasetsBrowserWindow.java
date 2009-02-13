@@ -101,11 +101,12 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             public void actionPerformed(ActionEvent e) {
                 DatasetType type = getSelectedDSType();
                 try {
-                    // get count of datasets
-                    if ( 10 <20 )
-                    doRefresh();
+                    // count the number of datasets
+                    int numDataset = presenter.getNumOfDatasets(getSelectedDSType(), textFilter.getText());
+                    if ( numDataset < 300 )
+                        doRefresh();
                     else {
-                        //
+                        doRefreshAfterConfirm(numDataset);
                     }           
                 } catch (EmfException e1) {
                     messagePanel.setError("Could not retrieve all datasets for dataset type " + type.getName());
@@ -503,8 +504,18 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         messagePanel.clear();
     }
 
-    public void doRefresh() throws EmfException {
+    public void doRefresh() throws EmfException {      
         refresh(presenter.getEmfDatasets(getSelectedDSType(), textFilter.getText()));
+    }
+    
+    public void doRefreshAfterConfirm(int numDataset) throws EmfException {
+        
+        String message = "There are " + numDataset + " datasets, would you like to continus?";
+        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+        
+        if (selection == JOptionPane.YES_OPTION)      
+            refresh(presenter.getEmfDatasets(getSelectedDSType(), textFilter.getText()));
     }
 
     public void notifyLockFailure(EmfDataset dataset) {

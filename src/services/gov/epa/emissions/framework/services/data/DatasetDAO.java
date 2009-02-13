@@ -119,6 +119,19 @@ public class DatasetDAO {
                                 + " where DS.status <> 'Deleted' order by DS.name").list();
     }
     
+//    public int getNumOfDatasets(Session session, int datasetTypeId, String nameContains) {
+//        return  getDatasetsWithFilter(session, datasetTypeId, nameContains).size();
+//    }
+//    
+//    public int getNumOfDatasets(Session session, int datasetTypeId) {
+//        return getDatasets(session, datasetTypeId).size();  
+//    }
+//    
+//    public int getNumOfDatasets(Session session) {
+//        return getDatasets(session, datasetTypeId, nameContains);
+//    }
+    
+    
     public List allNonDeleted(Session session, String nameContains) {
         return session
                 .createQuery(
@@ -623,7 +636,7 @@ public class DatasetDAO {
             } catch (Exception e) {
                 LOG.error(e);
                 exception = e;
-            }
+          }
 
             try {
                 dropDataTables(deletableDatasets, emissionTableTool);

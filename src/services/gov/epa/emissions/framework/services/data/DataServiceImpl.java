@@ -69,9 +69,8 @@ public class DataServiceImpl implements DataService {
         } finally {
             session.close();
         }
-
     }
-
+    
     public synchronized EmfDataset getDataset(Integer datasetId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -90,7 +89,6 @@ public class DataServiceImpl implements DataService {
 
         try {
             EmfDataset dataset = dao.getDataset(session, datasetName);
-
             return dataset;
         } catch (RuntimeException e) {
             LOG.error("Could not get dataset " + datasetName, e);
@@ -193,6 +191,35 @@ public class DataServiceImpl implements DataService {
             List datasets = dao.getDatasets(session, datasetTypeId, nameContaining);
 
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Datasets for dataset type " + datasetTypeId, e);
+            throw new EmfException("Could not get all Datasets for dataset type " + datasetTypeId);
+        } finally {
+            session.close();
+        }
+    }
+    
+    public synchronized int getNumOfDatasets(String nameContains) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            if (nameContains==null || nameContains.trim().length()==0)
+                return dao.allNonDeleted(session).size();          
+            return dao.allNonDeleted(session, nameContains).size();   
+       
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Datasets", e);
+            throw new EmfException("Could not get all Datasets");
+        } finally {
+            session.close();
+        }
+    }
+    
+    public synchronized int getNumOfDatasets(int datasetTypeId, String nameContains) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            if (nameContains==null || nameContains.trim().length()==0)
+                return dao.getDatasets(session, datasetTypeId).size();
+            return dao.getDatasets(session, datasetTypeId, nameContains).size();
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets for dataset type " + datasetTypeId, e);
             throw new EmfException("Could not get all Datasets for dataset type " + datasetTypeId);
