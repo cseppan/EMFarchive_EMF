@@ -96,18 +96,13 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private void createDSTypesComboBox() {
         dsTypesBox = new ComboBox("Select one", allDSTypes);
-        dsTypesBox.setPreferredSize(new Dimension(450, 25));
+        dsTypesBox.setPreferredSize(new Dimension(420, 25));
         dsTypesBox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 DatasetType type = getSelectedDSType();
                 try {
-                    // count the number of datasets
-                    int numDataset = presenter.getNumOfDatasets(getSelectedDSType(), textFilter.getText());
-                    if ( numDataset < 300 )
-                        doRefresh();
-                    else {
-                        doRefreshAfterConfirm(numDataset);
-                    }           
+                    // count the number of datasets and do refresh
+                        doRefresh();          
                 } catch (EmfException e1) {
                     messagePanel.setError("Could not retrieve all datasets for dataset type " + type.getName());
                 }
@@ -504,19 +499,29 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         messagePanel.clear();
     }
 
-    public void doRefresh() throws EmfException {      
+    public void doRefresh() throws EmfException {  
+        int numDataset = presenter.getNumOfDatasets(getSelectedDSType(), textFilter.getText());
+        if ( numDataset >= 300){
+            String message = "There are " + numDataset + " datasets, would you like to continue?";
+            int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+
+            if (selection == JOptionPane.YES_OPTION)   
+                refresh(presenter.getEmfDatasets(getSelectedDSType(), textFilter.getText()));
+            return; 
+        }
         refresh(presenter.getEmfDatasets(getSelectedDSType(), textFilter.getText()));
     }
     
-    public void doRefreshAfterConfirm(int numDataset) throws EmfException {
-        
-        String message = "There are " + numDataset + " datasets, would you like to continus?";
-        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-        
-        if (selection == JOptionPane.YES_OPTION)      
-            refresh(presenter.getEmfDatasets(getSelectedDSType(), textFilter.getText()));
-    }
+//    public void doRefreshAfterConfirm(int numDataset) throws EmfException {
+//        
+//        String message = "There are " + numDataset + " datasets, would you like to continus?";
+//        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+//                JOptionPane.QUESTION_MESSAGE);
+//        
+//        if (selection == JOptionPane.YES_OPTION)      
+//            refresh(presenter.getEmfDatasets(getSelectedDSType(), textFilter.getText()));
+//    }
 
     public void notifyLockFailure(EmfDataset dataset) {
         clearMessage();
