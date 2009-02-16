@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -19,6 +20,14 @@ public interface DataService {
     EmfDataset getDataset(Integer datasetId) throws EmfException;
 
     String[] getDatasetValues(Integer datasetId) throws EmfException;
+    
+    void addExternalSources(String folder, String[] files, int datasetId) throws EmfException;
+    
+    void updateExternalSources(int datasetId, String newDir) throws EmfException;
+    
+    ExternalSource[] getExternalSources(int datasetId, int limit) throws EmfException;
+    
+    boolean isExternal (int datasetId) throws EmfException;
 
     EmfDataset getDataset(String datasetName) throws EmfException;
 

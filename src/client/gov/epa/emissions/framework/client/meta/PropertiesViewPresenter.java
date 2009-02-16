@@ -70,8 +70,7 @@ public class PropertiesViewPresenter {
     }
 
     public void set(InfoTabView view) {
-        InfoTabPresenter presenter = new InfoTabPresenter(view, dataset, session);
-        presenter.doDisplay();
+        new InfoTabPresenter(view, dataset, session);
     }
 
     public void set(DataTabView view) {

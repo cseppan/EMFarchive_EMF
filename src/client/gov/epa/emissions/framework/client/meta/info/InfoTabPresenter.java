@@ -1,8 +1,10 @@
 package gov.epa.emissions.framework.client.meta.info;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorTabPresenter;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class InfoTabPresenter implements PropertiesEditorTabPresenter {
@@ -17,20 +19,20 @@ public class InfoTabPresenter implements PropertiesEditorTabPresenter {
         this.view = view;
         this.dataset = dataset;
         this.session = session;
+        view.observe(this);
     }
 
     public void doSave() {
         //NOTE: don't need to do anything, dataset's been updated
     }
 
-    public void doDisplay() {
-        view.observe(this);
+    public void doDisplay() throws EmfException {
         DatasetType type = dataset.getDatasetType();
 
         if (!type.isExternal())
             view.displayInternalSources(dataset.getInternalSources());
         else
-            view.displayExternalSources(dataset.getExternalSources());
+            view.displayExternalSources(getExternalSrcs(dataset.getId(), -1));
     }
 
     public EmfDataset getDataset() {
@@ -41,8 +43,12 @@ public class InfoTabPresenter implements PropertiesEditorTabPresenter {
         return session;
     }
 
-    public void updateExternalSources() {
-        view.displayExternalSources(dataset.getExternalSources());
+    public void refreshExternalSources() throws EmfException {
+        view.displayExternalSources(getExternalSrcs(dataset.getId(), -1));
+    }
+    
+    public ExternalSource[] getExternalSrcs(int dsId, int limit) throws EmfException {
+        return session.dataService().getExternalSources(dsId, limit);
     }
 
 }

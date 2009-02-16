@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class ExternalSourceUpdatePresenter {
@@ -15,8 +16,6 @@ public class ExternalSourceUpdatePresenter {
 
     private InfoTabPresenter sourceTabPresenter;
     
-    private String fs = "/";
-
     public ExternalSourceUpdatePresenter(InfoTabPresenter sourceTabPresenter) {
         this.dataset = sourceTabPresenter.getDataset();
         this.session = sourceTabPresenter.getSession();
@@ -29,10 +28,7 @@ public class ExternalSourceUpdatePresenter {
     }
 
     public void update(String folder, boolean isMassLoc) throws Exception {
-        if (Character.isLetter(folder.charAt(0)))
-            fs = "\\";
-        
-        ExternalSource[] sources = dataset.getExternalSources();
+        ExternalSource[] sources = session.dataService().getExternalSources(dataset.getId(), -1);
         KeyVal[] keys = dataset.getKeyVals();
         Keywords keywords = new Keywords(session.dataCommonsService().getKeywords());
         Keyword massLocKeyword = keywords.get("MASS_STORAGE_LOCATION");
@@ -55,7 +51,7 @@ public class ExternalSourceUpdatePresenter {
         if (!existLoc.equals(folder))
             updateExternalSources(folder, sources);
 
-        updateDatasetSource();
+        refreshDatasetSource();
     }
 
     /*
@@ -118,25 +114,32 @@ public class ExternalSourceUpdatePresenter {
 
     private void updateExternalSources(String folder, ExternalSource[] sources) throws Exception {
         try {
-            for (int i = 0; i < sources.length; i++)
-                sources[i].setDatasource(folder + fs + getFileInfo(sources[i], true));
-
-            dataset.setExternalSources(sources);
+            session.dataService().updateExternalSources(dataset.getId(), folder);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
     }
 
-    public void updateDatasetSource() {
-        this.sourceTabPresenter.updateExternalSources();
+    public void refreshDatasetSource() throws EmfException {
+        this.sourceTabPresenter.refreshExternalSources();
     }
 
     private String getFileInfo(ExternalSource ext, boolean name) {
         String source = ext.getDatasource();
-
-        if (name)
-            return source.substring(source.lastIndexOf(fs) + 1);
         
-        return source.substring(0, source.lastIndexOf(fs));
+        if (source == null)
+            return null;
+        
+        source = source.trim();
+        String sep = (source.contains("/") ? "/" : "\\");
+        int index = source.lastIndexOf(sep);
+        
+        if (name)
+            return source.substring(index + 1);
+        
+        if (index < 0)
+            index = source.length();
+        
+        return source.substring(0, index);
     }
 }

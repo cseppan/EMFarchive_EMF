@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DataQuery;
 import gov.epa.emissions.commons.db.Datasource;
@@ -150,7 +151,7 @@ public class DatasetDAO {
     public void add(Version version, Session session) {
         hibernateFacade.add(version, session);
     }
-    
+
     public void updateWithoutLocking(EmfDataset dataset, Session session) throws Exception {
         try {
             renameEmissionTable(dataset, getDataset(session, dataset.getId()), session);
@@ -166,7 +167,15 @@ public class DatasetDAO {
         if (DebugLevels.DEBUG_12)
             System.out.println("dataset dao remove(dataset, session) called: " + dataset.getId() + " "
                     + dataset.getName());
+        
+        ExternalSource[] extSrcs = null;
+        
+        if (dataset.isExternal())
+            extSrcs = getExternalSrcs(dataset.getId(), -1, session);
 
+        if (extSrcs != null && extSrcs.length > 0)
+            hibernateFacade.removeObjects(extSrcs, session);
+        
         hibernateFacade.remove(dataset, session);
     }
 
@@ -223,7 +232,7 @@ public class DatasetDAO {
 
             updateToRemove(locked, dataset, session);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Could not remove dataset " + datasetName + ".", e);
             throw new EmfException("Could not remove dataset " + datasetName + ". Reason: " + e.getMessage());
         }
 
@@ -320,6 +329,32 @@ public class DatasetDAO {
                 .list();
     }
 
+    public void addExternalSources(ExternalSource[] srcs, Session session) {
+        hibernateFacade.add(srcs, session);
+    }
+
+    //NOTE: limit < 0 will return all external sources
+    public ExternalSource[] getExternalSrcs(int datasetId, int limit, Session session) {
+        String query = " FROM " + ExternalSource.class.getSimpleName() + " as ext WHERE ext.datasetId=" + datasetId;
+        List<ExternalSource> srcsList = new ArrayList<ExternalSource>();
+        
+        if (limit < 0)
+            srcsList = session.createQuery(query).list();
+        
+        if (limit > 0)
+            srcsList = session.createQuery(query).setMaxResults(limit).list();
+        
+        return srcsList.toArray(new ExternalSource[0]);
+    }
+
+    public boolean isExternal(int datasetId, Session session) {
+        String query = "SELECT COUNT(ext) FROM " + ExternalSource.class.getSimpleName() + " as ext WHERE ext.datasetId="
+                + datasetId;
+        List count = session.createSQLQuery(query).list();
+
+        return count != null && count.size() > 0;
+    }
+
     public EmfDataset getDataset(Session session, String name) {
         Criterion statusCrit = Restrictions.ne("status", "Deleted"); // FIXME: to be deleted after dataset removed
         // from db
@@ -398,7 +433,7 @@ public class DatasetDAO {
         DatasetType type = dataset.getDatasetType();
 
         if (type.getExporterClassName().endsWith("ExternalFilesExporter"))
-            return dataset.getExternalSources().length;
+            return getExternalSrcs(dataset.getId(), -1, session).length;
 
         Datasource datasource = dbServer.getEmissionsDatasource();
         InternalSource source = dataset.getInternalSources()[0];
@@ -645,9 +680,11 @@ public class DatasetDAO {
                 exception = e;
             }
         }
-        
-        if (exception != null)
+
+        if (exception != null) {
+            LOG.error("Error deleting datasets.", exception);
             throw new EmfException(exception.getMessage());
+        }
     }
 
     public void checkIfUsedByCases(int[] datasetIDs, Session session) throws EmfException {
@@ -738,6 +775,7 @@ public class DatasetDAO {
         deleteFromObjectTable(datasetIDs, AccessLog.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, DatasetNote.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, Revision.class, "datasetId", session);
+        deleteFromObjectTable(datasetIDs, ExternalSource.class, "datasetId", session);
 
         try {
             dropQAStepResultTable(datasetIDs, tableTool, session);
@@ -877,7 +915,7 @@ public class DatasetDAO {
 
         for (Iterator<String> iter = tables.iterator(); iter.hasNext();) {
             String table = iter.next();
-            
+
             if (table == null || table.trim().isEmpty())
                 continue;
 
@@ -1026,7 +1064,7 @@ public class DatasetDAO {
     private void deleteControlStrategies(int[] dsIDsWithNoEmisData, Session session) throws EmfException {
         try {
             checkIfUsedByStrategies(dsIDsWithNoEmisData, session);
-            //checkIfUsedByControlPrograms(dsIDsWithNoEmisData, session);
+            // checkIfUsedByControlPrograms(dsIDsWithNoEmisData, session);
         } catch (Exception e) {
             String name = "";
 
@@ -1095,8 +1133,13 @@ public class DatasetDAO {
 
     public List<String> getDatasetNamesStartWith(String start, Session session) {
         String query = "SELECT DS.name FROM " + EmfDataset.class.getSimpleName() + " AS DS WHERE lower(DS.name) LIKE "
-                       + "'%" + start.toLowerCase().trim() + "%' ORDER BY DS.name";
+                + "'%" + start.toLowerCase().trim() + "%' ORDER BY DS.name";
         return session.createQuery(query).list();
+    }
+
+    public void updateExternalSrcsWithoutLocking(ExternalSource[] srcs, Session session) {
+        //NOTE: update without locking objects
+        hibernateFacade.update(srcs, session);
     }
 
 }

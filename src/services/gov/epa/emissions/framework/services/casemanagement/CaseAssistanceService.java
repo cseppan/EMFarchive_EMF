@@ -852,7 +852,7 @@ public class CaseAssistanceService {
                     continue;
 
                 Date modDate = ds.getModifiedDateTime();
-                ExternalSource[] tempSrcs = ds.getExternalSources();
+                ExternalSource[] tempSrcs = dsDao.getExternalSrcs(id, -1, session);
 
                 if (containsAllSrcs(tempSrcs, srcs)) {
                     dsWithAllSrcs.add(ds);
@@ -962,7 +962,6 @@ public class CaseAssistanceService {
         Date date = new Date();
         EmfDataset external = new EmfDataset();
         external.setName(name);
-        external.setExternalSources(extSrcs);
         external.setDatasetType(type);
         external.setCreator(user.getUsername());
         external.setCreatedDateTime(date);
@@ -984,6 +983,11 @@ public class CaseAssistanceService {
         try {
             session.clear();
             EmfDataset ds = dsDao.getDataset(session, external.getName());
+            
+            for (int i = 0; i < extSrcs.length; i++)
+                extSrcs[i].setDatasetId(ds.getId());
+            
+            dsDao.addExternalSources(extSrcs, session);
 
             Version version = new Version(0);
             version.setCreator(user);

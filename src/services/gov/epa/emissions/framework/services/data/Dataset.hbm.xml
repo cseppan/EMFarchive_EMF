@@ -68,14 +68,6 @@
     </composite-element>
   </array>
 
-  <array name="externalSources" table="external_sources" cascade="save-update">
-    <key column="dataset_id"/>
-    <list-index column="list_index"/>
-    <composite-element class="gov.epa.emissions.commons.data.ExternalSource">
-		<property name="datasource"	column="datasource" not-null="true"/>
-    </composite-element>
-  </array>
-
 	<array name="keyVals" table="datasets_keywords" cascade="save-update">
       <key column="dataset_id"/>
       <list-index column="list_index"/>

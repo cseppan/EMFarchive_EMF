@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.client.meta.summary.SummaryTab;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -52,6 +53,8 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     private EmfDataset dataset;
     
     private Version version; 
+    
+    private boolean sourcesLoaded;
 
     private JTabbedPane tabbedPane;
 
@@ -70,8 +73,8 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
-        tabbedPane = createTabbedPane();
-        panel.add(tabbedPane, BorderLayout.CENTER);
+        tabbedPane = new JTabbedPane();
+        panel.add(createTabbedPane(), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         super.getContentPane().add(panel);
@@ -80,7 +83,6 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     }
 
     private JTabbedPane createTabbedPane() {
-        JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
 
         tabbedPane.addTab("Summary", createSummaryTab());
@@ -97,6 +99,21 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 localMsgPanel.clear();
+                
+                int tabIndex = tabbedPane.getSelectedIndex();
+                String tabTitle = tabbedPane.getTitleAt(tabIndex);
+
+                if (tabTitle.equals("Sources") && !sourcesLoaded) {
+                    Component cp = tabbedPane.getSelectedComponent();
+                    
+                    try {
+                        ((RefreshObserver)cp).doRefresh();
+                    } catch (Exception e1) {
+                        messagePanel.setError(e1.getMessage());
+                    }
+                    
+                    sourcesLoaded = true;
+                }
             }
         });
 
@@ -116,7 +133,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     }
 
     private JPanel createInfoTab(EmfConsole parentConsole) {
-        InfoTab view = new InfoTab(null, parentConsole, true);
+        InfoTab view = new InfoTab(messagePanel, null, parentConsole, true);
         presenter.set(view);
         return view;
     }

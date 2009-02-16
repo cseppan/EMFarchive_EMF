@@ -214,7 +214,6 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
         dataset.setDatasetType(dstype);
         dataset.setDefaultVersion(0);
         dataset.setDescription("description");
-        dataset.setExternalSources(new ExternalSource[] { externalSrc });
         dataset.setIntendedUse(use);
         dataset.setInternalSources(new InternalSource[] { internalSrc });
         dataset.setKeyVals(new KeyVal[] { keyval });
@@ -234,6 +233,10 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
         dataset.setYear(1999);
         add(dataset);
 
+        EmfDataset reloadedDS = (EmfDataset)load(EmfDataset.class, dataset.getName());
+        externalSrc.setDatasetId(reloadedDS.getId());
+        add(externalSrc);
+        
         InputEnvtVar envtVar = new InputEnvtVar();
         envtVar.setName("test" + Math.random());
         add(envtVar);
@@ -429,7 +432,7 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
             throw e;
         }
     }
-
+    
     private DatasetType loadDatasetType(String name) {
         Transaction tx = null;
         

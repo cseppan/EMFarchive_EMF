@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -298,6 +299,50 @@ public class DataServiceTransport implements DataService {
         call.setVoidReturnType();
 
         call.request(new Object[] { new Integer(datasetId), version, user });
+    }
+
+    public ExternalSource[] getExternalSources(int datasetId, int limit) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getExternalSources");
+        call.addIntegerParam("datasetId");
+        call.addIntegerParam("limit");
+        call.setReturnType(mappings.externalSources());
+        
+        return (ExternalSource[])call.requestResponse(new Object[]{new Integer(datasetId), new Integer(limit)});
+    }
+
+    public boolean isExternal(int datasetId) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("isExternal");
+        call.addIntegerParam("datasetId");
+        call.setBooleanReturnType();
+        
+        return (Boolean)call.requestResponse(new Object[]{new Integer(datasetId)});
+    }
+
+    public void addExternalSources(String folder, String[] files, int datasetId) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addExternalSources");
+        call.addStringParam("folder");
+        call.addParam("files", mappings.strings());
+        call.addIntegerParam("datasetId");
+        call.setVoidReturnType();
+        
+        call.request(new Object[]{folder, files, new Integer(datasetId)});
+    }
+
+    public void updateExternalSources(int datasetId, String newDir) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("updateExternalSources");
+        call.addIntegerParam("datasetId");
+        call.addStringParam("newDir");
+        call.setVoidReturnType();
+        
+        call.request(new Object[]{new Integer(datasetId), newDir});
     }
 
 }

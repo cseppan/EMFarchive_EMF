@@ -32,6 +32,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParame
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ManagedExportService;
 import gov.epa.emissions.framework.services.exim.ManagedImportService;
@@ -2858,9 +2859,21 @@ public class ManagedCaseService {
 
         // check for external dataset
         if (dataset.isExternal()) {
+            Session session = this.sessionFactory.getSession();
+            ExternalSource[] externalDatasets = null;
+            DatasetDAO dsdao = new DatasetDAO();
+            
+            try {
+                externalDatasets = dsdao.getExternalSrcs(dataset.getId(), -1, session);
+            } catch (Exception e) {
+                log.error("Could not get external sources for dataset " + dataset.getName(), e);
+                throw new EmfException("Could not get external sources for dataset " + dataset.getName() + ".");
+            } finally {
+                session.close();
+            }
+            
             // set the full path to the first external file in the dataset
-            ExternalSource[] externalDatasets = dataset.getExternalSources();
-            if (externalDatasets.length == 0) {
+            if (externalDatasets == null || externalDatasets.length == 0) {
                 throw new EmfException("Input (" + input.getName() + ") must have at least 1 external dataset");
             }
             fullPath = externalDatasets[0].getDatasource();

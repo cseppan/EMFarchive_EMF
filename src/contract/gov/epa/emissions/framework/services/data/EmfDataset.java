@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.data;
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Lockable;
@@ -62,8 +61,6 @@ public class EmfDataset implements Dataset, Lockable {
     private DatasetType datasetType;
 
     private InternalSource[] internalSources = new InternalSource[]{};
-
-    private ExternalSource[] externalSources = new ExternalSource[]{};
 
     private KeyVal[] keyValsList = new KeyVal[]{};
 
@@ -285,22 +282,6 @@ public class EmfDataset implements Dataset, Lockable {
         this.internalSources = internalSourceList.toArray(new InternalSource[0]);
     }
 
-    public ExternalSource[] getExternalSources() {
-        return this.externalSources;
-    }
-
-    public void setExternalSources(ExternalSource[] externalSources) {
-        this.externalSources = externalSources;
-    }
-
-    public void addExternalSource(ExternalSource source) {
-        List<ExternalSource> sources = new ArrayList<ExternalSource>();
-        sources.addAll(Arrays.asList(this.externalSources));
-        sources.add(source);
-        
-        this.externalSources = sources.toArray(new ExternalSource[0]);
-    }
-
     public void addSector(Sector sector) {
         List<Sector> sectors = new ArrayList<Sector>();
         sectors.addAll(Arrays.asList(this.sectorsList));
@@ -446,7 +427,7 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public boolean isExternal() {
-        return getInternalSources().length == 0;
+        return datasetType == null ? false : datasetType.isExternal();
     }
 
     public KeyVal[] mergeKeyVals() {

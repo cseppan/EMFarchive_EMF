@@ -76,7 +76,7 @@ public class DataMappings extends Mappings {
         bean(call, DatasetType.class, datasetType());
 
         bean(call, InternalSource.class, "InternalSource");
-        bean(call, ExternalSource.class, "ExternalSource");
+        bean(call, ExternalSource.class, externalSource());
 
         bean(call, Keyword.class, keyword());
         bean(call, KeyVal.class, "KeyVal");
@@ -151,7 +151,7 @@ public class DataMappings extends Mappings {
         array(call, EmfDataset[].class, datasets());
         array(call, DatasetType[].class, datasetTypes());
 
-        array(call, ExternalSource[].class, "ExternalSources");
+        array(call, ExternalSource[].class, externalSources());
         array(call, InternalSource[].class, "InternalSources");
 
         array(call, Keyword[].class, keywords());
@@ -609,6 +609,14 @@ public class DataMappings extends Mappings {
     
     public QName emfFileInfos() {
         return qname("EmfFileInfos");
+    }
+    
+    public QName externalSource() {
+        return qname("ExternalSource");
+    }
+    
+    public QName externalSources() {
+        return qname("ExternalSources");
     }
     
 }

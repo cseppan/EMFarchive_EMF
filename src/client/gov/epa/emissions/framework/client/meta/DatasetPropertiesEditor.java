@@ -26,10 +26,12 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -57,6 +59,8 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private EditableKeywordsTab keywordsTab;
 
     private JTabbedPane tabbedPane;
+    
+    private boolean sourcesLoaded = false;
 
     private EmfDataset dataset;
 
@@ -91,6 +95,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
                 localMsgPanel.clear();
 
                 int tabIndex = tabbedPane.getSelectedIndex();
+                String tabTitle = tabbedPane.getTitleAt(tabIndex);
 
                 if (tabIndex == 2) // Keywords tab
                     keywordsPresenter.refreshView();
@@ -102,7 +107,20 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
                         messagePanel.setError(e1.getMessage());
                     }
                 }
-
+                
+                if (tabTitle.equals("Sources") && !sourcesLoaded) {
+                    Component cp = tabbedPane.getSelectedComponent();
+                    
+                    try {
+                        ((RefreshObserver)cp).doRefresh();
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                        messagePanel.setError(e1.getMessage());
+                    }
+                    
+                    sourcesLoaded = true;
+                }
+                
                 previousTab = tabIndex;
             }
         });
@@ -140,18 +158,16 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private JPanel createInfoTab(EmfDataset dataset, EmfConsole parentConsole) {
-        InfoTab view = new InfoTab(this, parentConsole, false);
-
+        InfoTab view = new InfoTab(messagePanel, this, parentConsole, false);
         try {
             presenter.set(view);
         } catch (EmfException e) {
             showError("Could not load Sources Tab." + e.getMessage());
             return createErrorTab("Could not load Sources Tab." + e.getMessage());
         }
-
         return view;
     }
-
+    
     private JPanel createKeywordsTab() {
         keywordsTab = new EditableKeywordsTab(this, parentConsole);
 

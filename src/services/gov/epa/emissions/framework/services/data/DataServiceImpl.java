@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
@@ -58,10 +59,10 @@ public class DataServiceImpl implements DataService {
         Session session = sessionFactory.getSession();
         List datasets;
         try {
-            if (nameContains==null || nameContains.trim().length()==0)
+            if (nameContains == null || nameContains.trim().length() == 0)
                 datasets = dao.allNonDeleted(session);
             else
-                datasets = dao.allNonDeleted(session, nameContains);   
+                datasets = dao.allNonDeleted(session, nameContains);
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets", e);
@@ -70,7 +71,7 @@ public class DataServiceImpl implements DataService {
             session.close();
         }
     }
-    
+
     public synchronized EmfDataset getDataset(Integer datasetId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -169,9 +170,9 @@ public class DataServiceImpl implements DataService {
 
     public synchronized EmfDataset[] getDatasetsWithFilter(int datasetTypeId, String nameContains) throws EmfException {
         Session session = sessionFactory.getSession();
-        List datasets; 
+        List datasets;
         try {
-            if (nameContains==null || nameContains.trim().length()==0)
+            if (nameContains == null || nameContains.trim().length() == 0)
                 datasets = dao.getDatasets(session, datasetTypeId);
             else
                 datasets = dao.getDatasetsWithFilter(session, datasetTypeId, nameContains);
@@ -198,14 +199,14 @@ public class DataServiceImpl implements DataService {
             session.close();
         }
     }
-    
+
     public synchronized int getNumOfDatasets(String nameContains) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            if (nameContains==null || nameContains.trim().length()==0)
-                return dao.allNonDeleted(session).size();          
-            return dao.allNonDeleted(session, nameContains).size();   
-       
+            if (nameContains == null || nameContains.trim().length() == 0)
+                return dao.allNonDeleted(session).size();
+            return dao.allNonDeleted(session, nameContains).size();
+
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets", e);
             throw new EmfException("Could not get all Datasets");
@@ -213,11 +214,11 @@ public class DataServiceImpl implements DataService {
             session.close();
         }
     }
-    
+
     public synchronized int getNumOfDatasets(int datasetTypeId, String nameContains) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            if (nameContains==null || nameContains.trim().length()==0)
+            if (nameContains == null || nameContains.trim().length() == 0)
                 return dao.getDatasets(session, datasetTypeId).size();
             return dao.getDatasets(session, datasetTypeId, nameContains).size();
         } catch (RuntimeException e) {
@@ -276,7 +277,7 @@ public class DataServiceImpl implements DataService {
         try {
             dao.checkIfUsedByCases(datasetIDs, session);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.error("Error checking case.", ex);
             throw new EmfException(ex.getMessage());
         } finally {
             session.close();
@@ -308,7 +309,7 @@ public class DataServiceImpl implements DataService {
         List<String> values = new ArrayList<String>();
 
         if (datasetId == null || datasetId.intValue() == 0)
-            return null; 
+            return null;
 
         dataset = getDataset(datasetId);
 
@@ -371,13 +372,15 @@ public class DataServiceImpl implements DataService {
             List<EmfDataset> list = dao.deletedDatasets(user, session);
             dao.deleteDatasets(list.toArray(new EmfDataset[0]), dbServer, session);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Error purging deleted datasets.", e);
             throw new EmfException(e.getMessage());
         } catch (Throwable t) {
-            t.printStackTrace();
+            LOG.error("Error purging deleted datasets.", t);
             throw new EmfException(t.getMessage());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
+            
             closeDB(dbServer);
         }
     }
@@ -731,7 +734,7 @@ public class DataServiceImpl implements DataService {
 
             String whereClause = " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")"
                     + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") + " AND version <> " + vNum;
-            
+
             String selectQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols) + " FROM "
                     + table + whereClause;
 
@@ -797,7 +800,8 @@ public class DataServiceImpl implements DataService {
                     .equals("gov.epa.emissions.commons.io.other.SMKReportImporter"));
 
             if (type.isExternal() || smkReport || (sources != null && sources.length > 1))
-                throw new Exception("Copying of a version to a new dataset is not supported for this dataset type: " + type.getName() + ".");
+                throw new Exception("Copying of a version to a new dataset is not supported for this dataset type: "
+                        + type.getName() + ".");
 
             EmfDataset copied = (EmfDataset) DeepCopy.copy(dataset);
             copied.setName(getUniqueNewName("Copy of " + dataset.getName() + "_v" + version.getVersion()));
@@ -933,4 +937,144 @@ public class DataServiceImpl implements DataService {
         }
     }
 
+    public void addExternalSources(String folder, String[] files, int datasetId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        EmfDataset ds = null;
+
+        try {
+            ds = dao.getDataset(session, datasetId);
+            ExternalSource[] srcs = reconstructExtSrcs(folder, files, datasetId);
+            dao.addExternalSources(srcs, session);
+        } catch (Exception e) {
+            LOG.error("Could not add all external sources for dataset "
+                    + (ds == null ? "(id=" + datasetId + ")." : ds.getName() + "."), e);
+            throw new EmfException("Could not add all external sources for dataset "
+                    + (ds == null ? "(id=" + datasetId + ")." : ds.getName() + "."));
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
+
+    private ExternalSource[] reconstructExtSrcs(String dir, String[] files, int datasetId) {
+        int len = files.length;
+        ExternalSource[] srcs = new ExternalSource[len];
+        String sep = getSeparator(dir);
+        dir += dir.endsWith(sep) ? "" : sep;
+
+        for (int i = 0; i < len - 1; i++) {
+            srcs[i] = new ExternalSource();
+            srcs[i].setDatasetId(datasetId);
+            srcs[i].setDatasource(dir + files[i]);
+        }
+
+        return srcs;
+    }
+
+    private String getSeparator(String file) {
+        if (file == null)
+            return "/";
+
+        file = file.trim();
+
+        if (file.startsWith("/") || file.startsWith("./") || file.startsWith("../"))
+            return "/";
+
+        return "\\";
+    }
+
+    public ExternalSource[] getExternalSources(int datasetId, int limit) throws EmfException {
+        Session session = sessionFactory.getSession();
+        EmfDataset ds = null;
+
+        try {
+            ds = dao.getDataset(session, datasetId);
+            return dao.getExternalSrcs(datasetId, limit, session);
+        } catch (Exception e) {
+            LOG.error("Could not get all external sources for dataset "
+                    + (ds == null ? "(id=" + datasetId + ")." : ds.getName() + "."), e);
+            throw new EmfException("Could not get all external sources for dataset "
+                    + (ds == null ? "(id=" + datasetId + ")." : ds.getName() + "."));
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
+
+    public boolean isExternal(int datasetId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        EmfDataset ds = null;
+
+        try {
+            ds = dao.getDataset(session, datasetId);
+            return dao.isExternal(datasetId, session);
+        } catch (Exception e) {
+            LOG.error("Could not determine externality for dataset "
+                    + (ds == null ? "(id=" + datasetId + ")." : ds.getName() + "."), e);
+            throw new EmfException("Could not determine externality for dataset "
+                    + (ds == null ? "(id=" + datasetId + ")." : ds.getName() + "."));
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
+
+    public synchronized void updateExternalSources(int datasetId, String newDir) throws EmfException {
+        Session session = sessionFactory.getSession();
+        EmfDataset ds = null;
+
+        try {
+            ds = dao.getDataset(session, datasetId);
+            ExternalSource[] srcs = dao.getExternalSrcs(datasetId, -1, session);
+
+            if (ds == null)
+                throw new EmfException("Dataset (id=" + datasetId + ") doesn't exist.");
+
+            if (!ds.getDatasetType().isExternal())
+                throw new EmfException("Dataset (" + ds.getName() + ") type is not external.");
+
+            if (srcs == null || srcs.length == 0)
+                throw new EmfException("Dataset (" + ds.getName() + ") has no sources to update.");
+
+            String firstSrc = srcs[0].getDatasource();
+            String oldsep = getSeparator(firstSrc);
+            String newsep = getSeparator(newDir);
+
+            for (int i = 0; i < srcs.length; i++) {
+                String src = srcs[i].getDatasource();
+
+                if (src == null || src.trim().isEmpty())
+                    continue;
+
+                int index = src.lastIndexOf(oldsep);
+
+                System.out.println("Src: " + src);
+                System.out.println("index of " + oldsep + ": " + index);
+
+                if (index <= 0)
+                    continue;
+
+                if (index == src.trim().length() - 1) {
+                    srcs[i].setDatasource(newDir);
+                    continue;
+                }
+
+                String temp = src.substring(index + 1); // File name
+                srcs[i].setDatasource(newDir + newsep + temp);
+                System.out.println("new source: " + srcs[i].getDatasource());
+            }
+
+            // NOTE: assume this is locked by editing the dataset; need to take care if other porcesses update
+            // external sources at the same time
+            dao.updateExternalSrcsWithoutLocking(srcs, session);
+        } catch (Exception e) {
+            LOG.error("Could not update sources for dataset "
+                    + (ds == null ? "(id=" + datasetId + ")." : ds.getName() + "."), e);
+            throw new EmfException("Could not update sources for dataset "
+                    + (ds == null ? "(id=" + datasetId + ")." : ds.getName() + "."));
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
 }

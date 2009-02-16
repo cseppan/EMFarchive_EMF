@@ -135,7 +135,6 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
 
     public void set(InfoTabView infoView) {
         InfoTabPresenter presenter = new InfoTabPresenter(infoView, dataset, session);
-        presenter.doDisplay();
         presenters.add(presenter);
     }
     

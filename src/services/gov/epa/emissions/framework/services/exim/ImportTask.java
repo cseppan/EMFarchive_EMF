@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.services.exim;
 
-import java.io.File;
-import java.util.Date;
-
+import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.io.external.AbstractExternalFilesImporter;
 import gov.epa.emissions.commons.io.importer.Importer;
+import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -16,10 +16,12 @@ import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.ImportTaskManager;
 import gov.epa.emissions.framework.tasks.Task;
 
+import java.io.File;
+import java.util.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.FlushMode;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class ImportTask extends Task {
@@ -46,6 +48,8 @@ public class ImportTask extends Task {
     protected HibernateSessionFactory sessionFactory;
 
     protected double numSeconds;
+    
+    protected ExternalSource[] extSrcs;
     
     protected DatasetDAO dao;
 
@@ -96,6 +100,12 @@ public class ImportTask extends Task {
             
             prepare(session);
             importer.run();
+            
+            if (dataset.isExternal() && importer instanceof VersionedImporter) {
+                Importer extImporter = ((VersionedImporter)importer).getWrappedImporter();
+                extSrcs = ((AbstractExternalFilesImporter)extImporter).getExternalSources();
+            }
+                
             numSeconds = (System.currentTimeMillis() - startTime)/1000;
             complete(session, "Imported");
             isDone = true;
@@ -105,22 +115,24 @@ public class ImportTask extends Task {
             logError("File(s) import failed for user (" + user.getUsername() + ") at " + new Date().toString() + " -- " + filesList(), e);
             removeDataset(dataset);
         } finally {
-            if (isDone) {
-                addCompletedStatus();
-                session.flush();
-            } else 
-                addFailedStatus(errorMsg);
-            
             try {
-                if (session != null) 
-                    session.close();
-                
-                if (dbServer != null && dbServer.isConnected())
-                    dbServer.disconnect();
-            } catch (HibernateException e1) {
-                log.error("Error closing hibernate session.", e1);
+                if (isDone) {
+                    addCompletedStatus();
+                    session.flush();
+                } else 
+                    addFailedStatus(errorMsg);
             } catch (Exception e2) {
-                log.error("Error closing database connection.", e2);
+                log.error("Error setting outputs status.", e2);
+            } finally {
+                try {
+                    if (session != null && session.isConnected()) 
+                        session.close();
+                    
+                    if (dbServer != null && dbServer.isConnected())
+                        dbServer.disconnect();
+                } catch (Exception e) {
+                    log.error("Error closing database connection.", e);
+                }
             }
         }
     }
@@ -164,6 +176,13 @@ public class ImportTask extends Task {
 
     protected void updateDataset(EmfDataset dataset, Session session) {
         try {
+            if (dataset.isExternal() && extSrcs != null && extSrcs.length > 0) {
+                for (int i = 0; i < extSrcs.length; i++)
+                    extSrcs[i].setDatasetId(dataset.getId());
+                
+                dao.addExternalSources(extSrcs, session);
+            }
+            
             dao.updateWithoutLocking(dataset, session);
         } catch (Exception e) {
             logError("Could not update Dataset - " + dataset.getName(), e);

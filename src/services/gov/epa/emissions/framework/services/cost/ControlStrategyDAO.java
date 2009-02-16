@@ -314,8 +314,6 @@ public class ControlStrategyDAO {
             try {
                 deleteDatasets(datasets, user, session);
                 datasetDao.deleteDatasets(datasets, dbServer, session);
-//                    session.flush();
-//                    session.clear();
             } catch (EmfException e) {
                 if (DebugLevels.DEBUG_12)
                     System.out.println(e.getMessage());

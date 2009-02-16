@@ -42,6 +42,7 @@
     	<mapping resource="gov/epa/emissions/framework/services/persistence/EmfProperties.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/data/Keyword.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/basic/Version.hbm.xml"/>
+    	<mapping resource="gov/epa/emissions/framework/services/basic/ExternalSource.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/data/Region.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/data/Project.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/data/IntendedUse.hbm.xml"/>

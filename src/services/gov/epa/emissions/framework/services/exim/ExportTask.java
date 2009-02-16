@@ -1,9 +1,11 @@
 package gov.epa.emissions.framework.services.exim;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Exporter;
+import gov.epa.emissions.commons.io.external.ExternalFilesExporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfProperty;
@@ -60,6 +62,8 @@ public class ExportTask extends Task {
 
     private Version version;
 
+    private ExternalSource[] extSrcs;
+
     private DbServerFactory dbFactory;
 
     private int sleepAfterExport = 0;
@@ -86,6 +90,7 @@ public class ExportTask extends Task {
         DbServer dbServer = null;
         Session session = sessionFactory.getSession();
         this.sleepAfterExport = sleepAfterExport(session);
+        extSrcs = getExternalSrcs(session);
 
         if (DebugLevels.DEBUG_1)
             System.out.println(">>## ExportTask:run() " + createId() + " for datasetId: " + this.dataset.getId());
@@ -111,6 +116,10 @@ public class ExportTask extends Task {
                 VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer
                         .getSqlDataTypes(), batchSize(session));
                 Exporter exporter = exporterFactory.create(dataset, version);
+
+                if (exporter instanceof ExternalFilesExporter)
+                    ((ExternalFilesExporter) exporter).setExternalSources(extSrcs);
+
                 exporter.export(file);
 
                 exportedLineCount = exporter.getExportedLinesCount();
@@ -139,7 +148,7 @@ public class ExportTask extends Task {
 
             String query = "SELECT obj.id from " + AccessLog.class.getSimpleName() + " obj WHERE obj.datasetId = "
                     + accesslog.getDatasetId() + " AND obj.version = '" + accesslog.getVersion() + "' "
-//                    + "AND obj.description LIKE '%%" + accesslog.getDescription() + "%%'";
+                    // + "AND obj.description LIKE '%%" + accesslog.getDescription() + "%%'";
                     + "AND obj.description = '" + accesslog.getDescription() + "'";
             List<?> list = session.createQuery(query).list();
 
@@ -159,17 +168,23 @@ public class ExportTask extends Task {
                 if ((dbServer != null) && (dbServer.isConnected()))
                     dbServer.disconnect();
 
-                session.close();
+                if (session != null && session.isConnected())
+                    session.close();
 
                 if (this.sleepAfterExport > 0) {
                     Thread.sleep(this.sleepAfterExport * 1000);
                     log.warn("ExportTask sleeps " + sleepAfterExport + " seconds after export.");
                 }
-
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Error closing db connections.", e);
             }
         }
+    }
+
+    private ExternalSource[] getExternalSrcs(Session session) {
+        DatasetDAO dao = new DatasetDAO();
+
+        return dao.getExternalSrcs(dataset.getId(), -1, session);
     }
 
     private void printLogInfo(AccessLog log) {
@@ -208,15 +223,13 @@ public class ExportTask extends Task {
     }
 
     private void setErrorStatus(Exception e, String message) {
-        if (log != null && file != null && e != null) 
-        {
+        if (log != null && file != null && e != null) {
             log.error("Problem attempting to export file : " + file + " " + message, e);
-        }
-        else if (e!=null)
-        {
-            if (message != null) System.out.println("Message = "+message);
+        } else if (e != null) {
+            if (message != null)
+                System.out.println("Message = " + message);
             e.printStackTrace();
-        }        
+        }
         setStatus("failed", "Export failure. " + message + ((e == null) ? "" : e.getMessage()));
     }
 

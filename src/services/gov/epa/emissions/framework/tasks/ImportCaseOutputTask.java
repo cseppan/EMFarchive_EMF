@@ -1,7 +1,10 @@
 package gov.epa.emissions.framework.tasks;
 
+import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.io.external.AbstractExternalFilesImporter;
 import gov.epa.emissions.commons.io.importer.Importer;
+import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -43,6 +46,8 @@ public class ImportCaseOutputTask extends Task {
     private CaseOutput output;
 
     protected String[] files;
+
+    protected ExternalSource[] extSrcs;
 
     protected HibernateSessionFactory sessionFactory;
 
@@ -102,6 +107,12 @@ public class ImportCaseOutputTask extends Task {
 
             prepare(dbServer);
             importer.run();
+
+            if (dataset.isExternal() && importer instanceof VersionedImporter) {
+                Importer extImporter = ((VersionedImporter) importer).getWrappedImporter();
+                extSrcs = ((AbstractExternalFilesImporter) extImporter).getExternalSources();
+            }
+
             numSeconds = (System.currentTimeMillis() - startTime) / 1000;
             complete("Imported");
             isDone = true;
@@ -109,7 +120,8 @@ public class ImportCaseOutputTask extends Task {
             errorMsg += e.getMessage();
 
             // this doesn't give the full path for some reason
-            logError("File(s) import failed for user (" + user.getUsername() + ") at " + new Date().toString() + " -- " + filesList(), e);
+            logError("File(s) import failed for user (" + user.getUsername() + ") at " + new Date().toString() + " -- "
+                    + filesList(), e);
 
             removeDataset(dataset);
 
@@ -118,22 +130,27 @@ public class ImportCaseOutputTask extends Task {
             try {
                 caseDao.removeCaseOutputs(user, new CaseOutput[] { output }, true, session);
             } catch (EmfException e1) {
-                e1.printStackTrace();
                 errorMsg += System.getProperty("line.separator") + e1.getMessage();
+                log.error(errorMsg, e1);
             } finally {
-                session.close();
+                if (session != null && session.isConnected())
+                    session.close();
             }
         } finally {
-            if (isDone)
-                addCompletedStatus();
-            else
-                addFailedStatus(errorMsg);
-
             try {
-                if (dbServer != null && dbServer.isConnected())
-                    dbServer.disconnect();
+                if (isDone)
+                    addCompletedStatus();
+                else
+                    addFailedStatus(errorMsg);
             } catch (Exception e2) {
-                log.error("Error closing database connection.", e2);
+                log.error("Error setting outputs status.", e2);
+            } finally {
+                try {
+                    if (dbServer != null && dbServer.isConnected())
+                        dbServer.disconnect();
+                } catch (Exception e) {
+                    log.error("Error closing database connection.", e);
+                }
             }
         }
     }
@@ -154,13 +171,19 @@ public class ImportCaseOutputTask extends Task {
         } catch (Exception e) {
             log.error("Error deleting dataset - " + e.getMessage());
         } finally {
-
-            if (existedOutput != null)
-                caseDao.removeCaseOutputs(new CaseOutput[] { existedOutput }, session);
-            caseDao.add(output);
-            dataset.setStatus("Started import");
-            addDataset();
-            session.close();
+            try {
+                if (existedOutput != null)
+                    caseDao.removeCaseOutputs(new CaseOutput[] { existedOutput }, session);
+                caseDao.add(output);
+                dataset.setStatus("Started import");
+                addDataset();
+            } catch (Exception e) {
+                log.error("Error deleting dataset.", e);
+                throw e;
+            } finally {
+                if (session != null && session.isConnected())
+                    session.close();
+            }
         }
     }
 
@@ -194,10 +217,10 @@ public class ImportCaseOutputTask extends Task {
         if (files.length > 0)
             for (int i = 0; i < files.length; i++)
                 fileList.append(files[i] + ", ");
-        
+
         String ret = fileList.toString();
         int idx = ret.lastIndexOf(",");
-        
+
         return idx > 0 ? ret.substring(0, idx) : ret;
     }
 
@@ -223,11 +246,19 @@ public class ImportCaseOutputTask extends Task {
         Session session = sessionFactory.getSession();
 
         try {
+            if (dataset.isExternal() && extSrcs != null && extSrcs.length > 0) {
+                for (int i = 0; i < extSrcs.length; i++)
+                    extSrcs[i].setDatasetId(dataset.getId());
+
+                datasetDao.addExternalSources(extSrcs, session);
+            }
+
             datasetDao.updateWithoutLocking(dataset, session);
         } catch (Exception e) {
             logError("Could not update Dataset - " + dataset.getName(), e);
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
