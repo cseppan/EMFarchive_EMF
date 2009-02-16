@@ -373,7 +373,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             return;
         }
 
-        int selection = showWarningMsg("Warning", "Are you sure you want to remove " + selected.size()+ (selected.size()>1? " cases.":" case."));
+        int selection = showWarningMsg("Warning", "Are you sure you want to remove " + selected.size()+ (selected.size()>1? " cases?":" case?"));
         
         if (selection == JOptionPane.NO_OPTION) {
             return;
