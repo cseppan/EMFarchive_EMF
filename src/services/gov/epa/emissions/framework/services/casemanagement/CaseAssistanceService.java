@@ -54,7 +54,7 @@ public class CaseAssistanceService {
     private CaseDAO caseDao;
 
     private DataCommonsDAO dataDao;
-    
+
     private DatasetDAO dsDao;
 
     private HibernateSessionFactory sessionFactory;
@@ -697,8 +697,8 @@ public class CaseAssistanceService {
             Sector sector = (job == null) ? null : job.getSector();
 
             List<CaseInput> jobSpecInputs = caseDao.getCaseInputsByJobIds(caseId, new int[] { jobId }, session);
-            List<CaseInput> sectorSpecInputs = (sector != null) ? caseDao.getInputsBySector(caseId, sector, session) : caseDao
-                    .getInputsForAllSectors(caseId, session);
+            List<CaseInput> sectorSpecInputs = (sector != null) ? caseDao.getInputsBySector(caseId, sector, session)
+                    : caseDao.getInputsForAllSectors(caseId, session);
             List<CaseInput> inputs4AllSectorsAllJobs = caseDao.getInputs4AllJobsAllSectors(caseId, session);
 
             return selectValidInputs(jobSpecInputs, sectorSpecInputs, inputs4AllSectorsAllJobs);
@@ -788,7 +788,7 @@ public class CaseAssistanceService {
 
     private void checkNSetInputDataset(StringBuffer sb, String lineSep, User user, String[] values, String massDir,
             CaseInput input) throws EmfException {
-        String[] firstSrc = this.reconstructSources(new String[]{values[0], values[1]}, values[0]);
+        String[] firstSrc = this.reconstructSources(new String[] { values[0], values[1] }, values[0]);
         Session session = sessionFactory.getSession();
 
         try {
@@ -880,7 +880,7 @@ public class CaseAssistanceService {
             }
 
             sb.append("For input '" + input.getName() + "': " + lineSep);
-            
+
             return createNewDataset(input.getCaseID(), massDir, values, input.getDatasetType(), user, sb, lineSep);
         } catch (Exception e) {
             throw e;
@@ -895,21 +895,26 @@ public class CaseAssistanceService {
         Session session = sessionFactory.getSession();
 
         try {
-            String[] massSrcs = reconstructSources(values, massdir);
             EmfDataset dataset = null;
             int[] dsIds = null;
 
-            if (massdir != null && !massdir.trim().isEmpty())
+            if (massdir != null && !massdir.trim().isEmpty()) {
+                String[] massSrcs = reconstructSources(values, massdir);
                 dsIds = caseDao.getExternalDatasetIds(massSrcs[0], session);
+            }
 
             if (dsIds != null && dsIds.length > 0)
                 dataset = getUniqueDataset(sb, lineSep, user, massdir, values, input, dsIds);
 
             if (dataset == null) {
                 sb.append("For input '" + input.getName() + "': " + lineSep);
-                dataset = createNewDataset(input.getCaseID(), massdir, values, input.getDatasetType(), user, sb, lineSep);
+                dataset = createNewDataset(input.getCaseID(), massdir, values, input.getDatasetType(), user, sb,
+                        lineSep);
             }
 
+            if (dataset == null)
+                return;
+            
             setInputDatasetValues(user, values, input, dataset);
         } catch (Exception e) {
             log.error("Error resetting input values.", e);
@@ -921,8 +926,8 @@ public class CaseAssistanceService {
         }
     }
 
-    private EmfDataset createNewDataset(int caseId, String massdir, String[] values, DatasetType type, User user, StringBuffer sb, String lineSep)
-            throws Exception {
+    private EmfDataset createNewDataset(int caseId, String massdir, String[] values, DatasetType type, User user,
+            StringBuffer sb, String lineSep) throws Exception {
         if (type != null && !type.isExternal())
             return null;
 
@@ -932,24 +937,30 @@ public class CaseAssistanceService {
 
         if (origExists)
             return add2tables(caseId, values[1], extSrcs, type, user, false, values[0], massdir);
+
+        boolean massExists = false;
+        String[] massSrcs = new String[0];
         
-        String[] massSrcs = reconstructSources(values, massdir);
-        boolean massExists = allExist(massSrcs);
-        
+        if (massdir != null && !massdir.trim().isEmpty()) {
+            massSrcs = reconstructSources(values, massdir);
+            massExists = allExist(massSrcs);
+        }
+
         if (!massExists) {
-            sb.append("  WARNING: Not all files (Ex. " + values[1] + ") existed on either original source or mass storage place." + lineSep);
+            sb.append("  WARNING: Not all files (Ex. " + values[1]
+                    + ") existed on either original source or mass storage place." + lineSep);
             sb.append("  Original source folder: " + values[0] + "." + lineSep);
             sb.append("  Mass storage source folder: " + massdir + "." + lineSep);
-            
+
             return add2tables(caseId, values[1], extSrcs, type, user, false, values[0], massdir);
         }
-            
-        extSrcs = getExternalSrcs(massSrcs);
         
+        extSrcs = getExternalSrcs(massSrcs);
+
         return add2tables(caseId, values[1], extSrcs, type, user, true, values[0], massdir);
     }
-    
-    private synchronized EmfDataset add2tables(int caseId, String name, ExternalSource[] extSrcs, DatasetType type, 
+
+    private synchronized EmfDataset add2tables(int caseId, String name, ExternalSource[] extSrcs, DatasetType type,
             User user, boolean moved, String preloc, String massloc) throws Exception {
         Session session = sessionFactory.getSession();
 
@@ -969,13 +980,13 @@ public class CaseAssistanceService {
         external.setModifiedDateTime(date);
         external.setStatus("Auto Imported");
         external.setDefaultVersion(0);
-        
-        if (moved) {
-            Keyword massLocKeyword = (Keyword)dataDao.load(Keyword.class, "MASS_STORAGE_LOCATION", session);
-            Keyword prevLocKeyword = (Keyword)dataDao.load(Keyword.class, "PREVIOUS_LOCATION", session);
+
+        if (moved && massloc != null && !massloc.trim().isEmpty()) {
+            Keyword massLocKeyword = (Keyword) dataDao.load(Keyword.class, "MASS_STORAGE_LOCATION", session);
+            Keyword prevLocKeyword = (Keyword) dataDao.load(Keyword.class, "PREVIOUS_LOCATION", session);
             KeyVal massKeyVal = new KeyVal(massLocKeyword, massloc);
             KeyVal prevLocKeyVal = new KeyVal(prevLocKeyword, preloc);
-            external.addKeyVal(new KeyVal[]{massKeyVal, prevLocKeyVal});
+            external.addKeyVal(new KeyVal[] { massKeyVal, prevLocKeyVal });
         }
 
         dsDao.add(external, session);
@@ -983,10 +994,10 @@ public class CaseAssistanceService {
         try {
             session.clear();
             EmfDataset ds = dsDao.getDataset(session, external.getName());
-            
+
             for (int i = 0; i < extSrcs.length; i++)
                 extSrcs[i].setDatasetId(ds.getId());
-            
+
             dsDao.addExternalSources(extSrcs, session);
 
             Version version = new Version(0);
@@ -1009,16 +1020,19 @@ public class CaseAssistanceService {
 
     private ExternalSource[] getExternalSrcs(String[] srcs) {
         ExternalSource[] extSrcs = new ExternalSource[srcs.length];
-        
+
         for (int i = 0; i < srcs.length; i++) {
             extSrcs[i] = new ExternalSource(srcs[i]);
             extSrcs[i].setListindex(i);
         }
-        
+
         return extSrcs;
     }
 
     private synchronized boolean allExist(String[] srcs) {
+        if (srcs == null || srcs.length == 0)
+            return false;
+        
         boolean allExisted = true;
 
         for (String src : srcs) {
@@ -1054,7 +1068,7 @@ public class CaseAssistanceService {
             dir += dir.endsWith("/") ? "" : "/";
         else
             dir += dir.endsWith("\\") ? "" : "\\";
-        
+
         for (int i = 0; i < len - 1; i++)
             srcs[i] = dir + values[i + 1];
 
@@ -1071,7 +1085,8 @@ public class CaseAssistanceService {
             List<CaseParameter> jobSpecParams = caseDao.getCaseParametersByJobId(caseId, jobId, session);
             List<CaseParameter> sectorSpecParams = (sector != null) ? caseDao.getCaseParametersBySector(caseId, sector,
                     session) : caseDao.getCaseParametersForAllSectors(caseId, session);
-            List<CaseParameter> params4AllSectorsAllJobs = caseDao.getCaseParametersForAllSectorsAllJobs(caseId, session);
+            List<CaseParameter> params4AllSectorsAllJobs = caseDao.getCaseParametersForAllSectorsAllJobs(caseId,
+                    session);
 
             return selectValidParameters(jobSpecParams, sectorSpecParams, params4AllSectorsAllJobs);
         } catch (Exception e) {
@@ -1141,7 +1156,7 @@ public class CaseAssistanceService {
             session.close();
         }
     }
-    
+
     public synchronized Grid addGrid(Grid grid) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -1159,11 +1174,12 @@ public class CaseAssistanceService {
             session.close();
         }
     }
-    
+
     public synchronized GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            GridResolution temp = (GridResolution) caseDao.load(GridResolution.class, gridResolution.getName(), session);
+            GridResolution temp = (GridResolution) caseDao
+                    .load(GridResolution.class, gridResolution.getName(), session);
 
             if (temp != null)
                 return temp;
@@ -1214,7 +1230,7 @@ public class CaseAssistanceService {
             session.close();
         }
     }
-    
+
     public synchronized void updateCaseInput(User user, CaseInput input) throws EmfException {
         Session localSession = sessionFactory.getSession();
 
@@ -1235,7 +1251,7 @@ public class CaseAssistanceService {
             localSession.close();
         }
     }
-    
+
     public synchronized void updateCaseParameter(User user, CaseParameter parameter) throws EmfException {
         Session localSession = sessionFactory.getSession();
 
