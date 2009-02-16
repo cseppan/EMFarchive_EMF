@@ -1025,7 +1025,6 @@ public class DataServiceImpl implements DataService {
 
         try {
             ds = dao.getDataset(session, datasetId);
-            ExternalSource[] srcs = dao.getExternalSrcs(datasetId, -1, session);
 
             if (ds == null)
                 throw new EmfException("Dataset (id=" + datasetId + ") doesn't exist.");
@@ -1033,6 +1032,8 @@ public class DataServiceImpl implements DataService {
             if (!ds.getDatasetType().isExternal())
                 throw new EmfException("Dataset (" + ds.getName() + ") type is not external.");
 
+            ExternalSource[] srcs = dao.getExternalSrcs(datasetId, -1, session);
+            
             if (srcs == null || srcs.length == 0)
                 throw new EmfException("Dataset (" + ds.getName() + ") has no sources to update.");
 
@@ -1048,10 +1049,7 @@ public class DataServiceImpl implements DataService {
 
                 int index = src.lastIndexOf(oldsep);
 
-                System.out.println("Src: " + src);
-                System.out.println("index of " + oldsep + ": " + index);
-
-                if (index <= 0)
+                if (index < 0)
                     continue;
 
                 if (index == src.trim().length() - 1) {
@@ -1061,7 +1059,6 @@ public class DataServiceImpl implements DataService {
 
                 String temp = src.substring(index + 1); // File name
                 srcs[i].setDatasource(newDir + newsep + temp);
-                System.out.println("new source: " + srcs[i].getDatasource());
             }
 
             // NOTE: assume this is locked by editing the dataset; need to take care if other porcesses update
