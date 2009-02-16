@@ -502,7 +502,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     public void doRefresh() throws EmfException {  
         int numDataset = presenter.getNumOfDatasets(getSelectedDSType(), textFilter.getText());
         if ( numDataset >= 300){
-            String message = "There are " + numDataset + " datasets, would you like to continue?";
+            String message = "There are " + numDataset + " datasets, which could take a while to transfer, would you like to continue? \n"
+            +"[Hint: if you choose not to continue, enter a filter in Name Contains before proceeding]";
             int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
 
