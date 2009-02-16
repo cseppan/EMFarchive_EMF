@@ -335,7 +335,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         // isDatasetSelected(controlStrategy);
         controlStrategy.setCostYear(new YearValidation("Cost Year").value(costYear.getText(), costYearTable
                 .getStartYear(), costYearTable.getEndYear()));
-        controlStrategy.setInventoryYear(new YearValidation("Inventory Year").value(inventoryYear.getText()));
+        controlStrategy.setInventoryYear(new YearValidation("Target Year").value(inventoryYear.getText()));
         updateRegion();
 
         controlStrategy.setDiscountRate(checkDiscountRate());
