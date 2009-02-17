@@ -253,7 +253,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             }
             sql += "        ) rp \n"
                 + "        where rp.profile = tbl.profile_code::integer \n"
-                + "        limit 1) as benzene_fraction, \n";
+                + "        limit 1) as benzene_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
                 if (i > 0) sql += " union all \n";
@@ -267,7 +267,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             }
             sql += "        ) rp \n"
                 + "        where rp.profile = tbl.profile_code::integer \n"
-                + "        limit 1) as formaldehyde_fraction, \n";
+                + "        limit 1) as formaldehyde_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
                 if (i > 0) sql += " union all \n";
@@ -281,7 +281,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             }
             sql += "        ) rp \n"
                 + "        where rp.profile = tbl.profile_code::integer \n"
-                + "        limit 1) as acetaldehyde_fraction, \n";
+                + "        limit 1) as acetaldehyde_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
                 if (i > 0) sql += " union all \n";
@@ -295,7 +295,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             }
             sql += "        ) rp \n"
                 + "        where rp.profile = tbl.profile_code::integer \n"
-                + "        limit 1) as methanol_fraction, \n";
+                + "        limit 1) as methanol_percent, \n";
 
         
         } else if (summaryType.equals("By NEI Unique Id")) {
