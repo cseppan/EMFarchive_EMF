@@ -84,6 +84,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     protected JCheckBox useCostEquationCheck;
 
+    private JCheckBox includeUnspecifiedCostsCheck;
+
     private ControlStrategyResult[] controlStrategyResults;
 
     private DecimalFormat decFormat;
@@ -186,9 +188,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate(), panel);
         layoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), panel);
+        layoutGenerator.addLabelWidgetPair("Include Unspecified Costs:", includeUnspecifiedCostsCheckBox(), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -207,6 +210,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         useCostEquationCheck = new JCheckBox(" ", null, controlStrategy.getUseCostEquations() != null ? controlStrategy.getUseCostEquations() : true);
         return useCostEquationCheck;
+    }
+
+    private JCheckBox includeUnspecifiedCostsCheckBox() {
+
+        includeUnspecifiedCostsCheck = new JCheckBox(" ", null, controlStrategy.getIncludeUnspecifiedCosts() != null ? controlStrategy.getIncludeUnspecifiedCosts() : true);
+        return includeUnspecifiedCostsCheck;
     }
 
     private IntTextField costYearTextField() {
@@ -343,6 +352,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setStrategyType(strategyType);
         controlStrategy.setTargetPollutant(checkMajorPollutant(!strategyType.getName().equals(StrategyType.projectFutureYearInventory)));
         controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
+        controlStrategy.setIncludeUnspecifiedCosts(includeUnspecifiedCostsCheck.isSelected());
     }
 
     private double checkDiscountRate() throws EmfException {
@@ -422,6 +432,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
+//        this.controlStrategy = controlStrategy;
         updateSummaryResultPanel(controlStrategy, controlStrategyResults);
         
         //ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);

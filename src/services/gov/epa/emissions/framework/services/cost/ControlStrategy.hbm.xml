@@ -29,6 +29,7 @@
 	<property name="exportDirectory" column="export_directory" type="java.lang.String" not-null="false"/>
 	<property name="deleteResults" column="delete_results" type="boolean" not-null="false"/>
 	<property name="mergeInventories" column="merge_inventories" type="boolean" not-null="false"/>
+	<property name="includeUnspecifiedCosts" column="include_unspecified_costs" type="boolean" not-null="false"/>
 
 	<many-to-one name="countyDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="county_dataset_id"/>
 

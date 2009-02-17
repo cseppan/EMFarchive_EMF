@@ -79,6 +79,8 @@ public class ControlStrategy implements Lockable, Serializable {
     
     private ControlProgram[] controlPrograms = new ControlProgram[] {};
 
+    private Boolean includeUnspecifiedCosts;
+    
     public ControlStrategy() {
         this.lock = new Mutex();
 //        this.controlStrategyInputDatasets = new ArrayList();
@@ -410,6 +412,14 @@ public class ControlStrategy implements Lockable, Serializable {
         return mergeInventories;
     }
 
+    public void setIncludeUnspecifiedCosts(Boolean includeUnspecifiedCosts) {
+        this.includeUnspecifiedCosts = includeUnspecifiedCosts;
+    }
+
+    public Boolean getIncludeUnspecifiedCosts() {
+        return includeUnspecifiedCosts;
+    }
+    
     public void setControlPrograms(ControlProgram[] controlPrograms) {
         this.controlPrograms = controlPrograms;
     }
