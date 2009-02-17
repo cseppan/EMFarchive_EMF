@@ -64,6 +64,7 @@ DECLARE
 	percent_reduction_sql character varying;
 	sector character varying := '';
 	strategy_type character varying(255);
+	include_unspecified_costs boolean := true; 
 BEGIN
 --	SET work_mem TO '256MB';
 --	SET enable_seqscan TO 'off';
@@ -114,7 +115,8 @@ BEGIN
 		cs.county_dataset_version,
 		cs.use_cost_equations,
 		cs.discount_rate / 100,
-		st."name"
+		st."name",
+		coalesce(cs.include_unspecified_costs,true)
 	FROM emf.control_strategies cs
 		inner join emf.strategy_types st
 		on st.id = cs.strategy_type_id
@@ -127,7 +129,8 @@ BEGIN
 		county_dataset_version,
 		use_cost_equations,
 		discount_rate,
-		strategy_type;
+		strategy_type,
+		include_unspecified_costs;
 
 	-- get target pollutant name
 	select name
@@ -467,49 +470,49 @@ BEGIN
 			inv.scc,
 			inv.fips,
 			' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
-			TO_CHAR(' || chained_gdp_adjustment_factor || ' * 
+			' || chained_gdp_adjustment_factor || ' * 
 			case 
 				when eq.equation_type_id is null then
 					(' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton - ' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio * er.cap_rec_factor)
 				else
 					' || get_strategt_cost_inner_sql || '.operation_maintenance_cost
-			end, ''FM999999999999999990'')::double precision as annual_oper_maint_cost,
-			TO_CHAR(' || chained_gdp_adjustment_factor || ' * case 
+			end as annual_oper_maint_cost,
+			' || chained_gdp_adjustment_factor || ' * case 
 				when eq.equation_type_id is null then
 					' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio * er.cap_rec_factor
 				else
 					' || get_strategt_cost_inner_sql || '.annualized_capital_cost
-			end, ''FM999999999999999990'')::double precision as annualized_capital_cost,
-			TO_CHAR(' || chained_gdp_adjustment_factor || ' * case 
+			end as annualized_capital_cost,
+			' || chained_gdp_adjustment_factor || ' * case 
 				when eq.equation_type_id is null then
 					' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio
 				else
 					' || get_strategt_cost_inner_sql || '.capital_cost
-			end, ''FM999999999999999990'')::double precision as total_capital_cost,
-			TO_CHAR(' || chained_gdp_adjustment_factor || ' * case 
+			end as total_capital_cost,
+			' || chained_gdp_adjustment_factor || ' * case 
 				when eq.equation_type_id is null then
 					' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton
 				else
 					' || get_strategt_cost_inner_sql || '.annual_cost
-			end, ''FM999999999999999990'')::double precision as annual_cost,
-			TO_CHAR(' || chained_gdp_adjustment_factor || ' * case 
+			end as annual_cost,
+			' || chained_gdp_adjustment_factor || ' * case 
 				when eq.equation_type_id is null then
 					er.ref_yr_cost_per_ton
 				else
 					' || get_strategt_cost_inner_sql || '.computed_cost_per_ton
-			end, ''FM999999999999999990'')::double precision as computed_cost_per_ton,
-			TO_CHAR(efficiency, ''FM990.099'')::double precision,
-			TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ', ''FM990.099'')::double precision as rule_pen,
-			TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ', ''FM990.099'')::double precision as rule_eff,
-			TO_CHAR(' || percent_reduction_sql || ', ''FM990.099'')::double precision as percent_reduction,
-			TO_CHAR(' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM999999999999999990.0099'')::double precision as final_emissions,
-			TO_CHAR(inv.ceff, ''FM990.099'')::double precision,
-			TO_CHAR(' || case when has_rpen_column then 'coalesce(inv.rpen, 100.0::double precision)' else '100.0::double precision' end || ', ''FM990.099'')::double precision,
-			TO_CHAR(coalesce(inv.reff, 100.0::double precision), ''FM990.099'')::double precision,
-			TO_CHAR(' || emis_sql || ' - ' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM999999999999999990.0099'')::double precision as emis_reduction,
-			TO_CHAR(' || emis_sql || ', ''FM999999999999999990.0099'')::double precision as inv_emissions,
-			TO_CHAR(' || uncontrolled_emis_sql || ', ''FM999999999999999990.0099'')::double precision as input_emis,
-			TO_CHAR(' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM999999999999999990.0099'')::double precision as output_emis,
+			end as computed_cost_per_ton,
+			efficiency,
+			' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' as rule_pen,
+			' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
+			' || percent_reduction_sql || ' as percent_reduction,
+			' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
+			inv.ceff,
+			' || case when has_rpen_column then 'coalesce(inv.rpen, 100.0::double precision)' else '100.0::double precision' end || ',
+			coalesce(inv.reff, 100.0::double precision),
+			' || emis_sql || ' - ' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as emis_reduction,
+			' || emis_sql || ' as inv_emissions,
+			' || uncontrolled_emis_sql || ' as input_emis,
+			' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as output_emis,
 			' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 			' || case when not has_merged_columns then 'inv.record_id::integer' else 'inv.original_record_id::integer' end || ' as source_id,
@@ -604,6 +607,85 @@ BEGIN
 
 			left outer join reference.gdplev
 			on gdplev.annual = eq.cost_year
+
+			' || case when include_unspecified_costs = true then '' else '
+			-- include only measures that have specified costs, if no specified costs then don;t include the measure
+			inner join (
+
+				select distinct on (scc.control_measures_id, er.id, inv.fips, inv.scc
+					' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || ')
+					scc.control_measures_id, er.id as eff_rec_id, inv.fips, inv.scc
+					' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || '
+					--,true as valid_costs
+				FROM emissions.' || inv_table_name || ' inv
+
+					inner join emf.pollutants p
+					on p.name = inv.poll
+					
+					inner join emf.control_measure_sccs scc
+					on scc.name = inv.scc
+
+					' || case when measures_count > 0 then '
+					inner join emf.control_strategy_measures csm
+					on csm.control_measure_id = scc.control_measures_id
+					and csm.control_strategy_id = ' || control_strategy_id || '
+					' else '' end || '
+
+					--this part will get applicable measure based on the target pollutant, use this measure for target and cobenefit pollutants...
+					inner join emf.control_measures m
+					on m.id = scc.control_measures_id
+
+					inner join emf.control_measure_months ms
+					on ms.control_measure_id = m.id
+					and ms.month in (0' || case when dataset_month != 0 then ',' || dataset_month else '' end || ')
+
+					left outer join emf.control_measure_equations eq
+					on eq.control_measure_id = m.id
+					and eq.pollutant_id = p.id
+
+					left outer join emf.equation_types et
+					on et.id = eq.equation_type_id
+
+					left outer join reference.gdplev
+					on gdplev.annual = eq.cost_year
+
+					inner join emf.control_measure_efficiencyrecords er
+					on er.control_measures_id = scc.control_measures_id
+					-- pollutant filter
+					and er.pollutant_id = p.id
+					-- min and max emission filter
+					and ' || annualized_uncontrolled_emis_sql || ' between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
+					-- locale filter
+					and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
+					-- effecive date filter
+					and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)		
+
+					' || case when measures_count = 0 and measure_classes_count > 0 then '
+					inner join emf.control_strategy_classes csc
+					on csc.control_measure_class_id = m.cm_class_id
+					and csc.control_strategy_id = ' || control_strategy_id || '
+					' else '' end || '
+
+
+				where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+					and ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton is not null 
+--						group by scc.control_measures_id, er.id, inv.fips, inv.scc, inv.poll
+--							' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || '
+
+			) tblCosts
+			on tblCosts.fips = inv.fips
+			and tblCosts.scc = inv.scc
+--					and tblCosts.poll = inv.poll
+			' || case when is_point_table = false then '' else '
+			and tblCosts.plantid = inv.plantid
+			and tblCosts.pointid = inv.pointid
+			and tblCosts.stackid = inv.stackid
+			and tblCosts.segment = inv.segment
+			' end || '
+			and tblCosts.control_measures_id = m.id
+			and tblCosts.eff_rec_id = er.id
+--					and tblCosts.valid_costs = true
+			' end || '
 
 		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 			and p.id = ' || target_pollutant_id || '::integer
@@ -700,49 +782,49 @@ BEGIN
 		inv.scc,
 		inv.fips,
 		' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
-		TO_CHAR(' || chained_gdp_adjustment_factor || ' * 
+		' || chained_gdp_adjustment_factor || ' * 
 		case 
 			when eq.equation_type_id is null then
 				(' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton - ' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio * er.cap_rec_factor)
 			else
 				' || get_strategt_cost_inner_sql || '.operation_maintenance_cost
-		end, ''FM999999999999999990'')::double precision as annual_oper_maint_cost,
-		TO_CHAR(' || chained_gdp_adjustment_factor || ' * case 
+		end as annual_oper_maint_cost,
+		' || chained_gdp_adjustment_factor || ' * case 
 			when eq.equation_type_id is null then
 				' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio * er.cap_rec_factor
 			else
 				' || get_strategt_cost_inner_sql || '.annualized_capital_cost
-		end, ''FM999999999999999990'')::double precision as annualized_capital_cost,
-		TO_CHAR(' || chained_gdp_adjustment_factor || ' * case 
+		end as annualized_capital_cost,
+		' || chained_gdp_adjustment_factor || ' * case 
 			when eq.equation_type_id is null then
 				' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio
 			else
 				' || get_strategt_cost_inner_sql || '.capital_cost
-		end, ''FM999999999999999990'')::double precision as total_capital_cost,
-		TO_CHAR(' || chained_gdp_adjustment_factor || ' * case 
+		end as total_capital_cost,
+		' || chained_gdp_adjustment_factor || ' * case 
 			when eq.equation_type_id is null then
 				' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton
 			else
 				' || get_strategt_cost_inner_sql || '.annual_cost
-		end, ''FM999999999999999990'')::double precision as annual_cost,
-		TO_CHAR(' || chained_gdp_adjustment_factor || ' * case 
+		end as annual_cost,
+		' || chained_gdp_adjustment_factor || ' * case 
 			when eq.equation_type_id is null then
 				er.ref_yr_cost_per_ton
 			else
 				' || get_strategt_cost_inner_sql || '.computed_cost_per_ton
-		end, ''FM999999999999999990'')::double precision as computed_cost_per_ton,
-		TO_CHAR(efficiency, ''FM990.099'')::double precision,
-		TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ', ''FM990.099'')::double precision as rule_pen,
-		TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ', ''FM990.099'')::double precision as rule_eff,
-		TO_CHAR(' || percent_reduction_sql || ', ''FM990.099'')::double precision as percent_reduction,
-		TO_CHAR(' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM999999999999999990.0099'')::double precision as final_emissions,
-		TO_CHAR(inv.ceff, ''FM990.099'')::double precision,
-		TO_CHAR(' || case when has_rpen_column then 'coalesce(inv.rpen, 100.0::double precision)' else '100.0::double precision' end || ', ''FM990.099'')::double precision,
-		TO_CHAR(coalesce(inv.reff, 100.0::double precision), ''FM990.099'')::double precision,
-		TO_CHAR(' || emis_sql || ' - ' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM999999999999999990.0099'')::double precision as emis_reduction,
-		TO_CHAR(' || emis_sql || ', ''FM999999999999999990.0099'')::double precision as inv_emissions,
-		TO_CHAR(' || uncontrolled_emis_sql || ', ''FM999999999999999990.0099'')::double precision as input_emis,
-		TO_CHAR(' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100), ''FM999999999999999990.0099'')::double precision as output_emis,
+		end as computed_cost_per_ton,
+		efficiency,
+		' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' as rule_pen,
+		' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
+		' || percent_reduction_sql || ' as percent_reduction,
+		' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
+		inv.ceff,
+		' || case when has_rpen_column then 'coalesce(inv.rpen, 100.0::double precision)' else '100.0::double precision' end || ',
+		coalesce(inv.reff, 100.0::double precision),
+		' || emis_sql || ' - ' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as emis_reduction,
+		' || emis_sql || ' as inv_emissions,
+		' || uncontrolled_emis_sql || ' as input_emis,
+		' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as output_emis,
 		' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
 		' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 		' || case when not has_merged_columns then 'inv.record_id::integer' else 'inv.original_record_id::integer' end || ' as source_id,
