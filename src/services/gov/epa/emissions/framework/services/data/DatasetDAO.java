@@ -548,7 +548,7 @@ public class DatasetDAO {
                 return false;
         }
 
-        if (dataset.getName().equalsIgnoreCase(oldDataset.getName()))
+        if (dataset.getName().trim().equalsIgnoreCase(oldDataset.getName().trim()))
             return false;
 
         if (sources == null || sources.length == 0 || type.getTablePerDataset() != 1) {
@@ -568,8 +568,9 @@ public class DatasetDAO {
         if (DebugLevels.DEBUG_12)
             System.out.println("new table name: " + newTableName + " old table name:" + oldTableName);
 
-        sources[0].setTable(newTableName);
         table.rename(oldTableName, newTableName);
+        //only set this if there wasn't an error.
+        sources[0].setTable(newTableName);
     }
 
     public boolean datasetNameUsed(String name) throws Exception {
