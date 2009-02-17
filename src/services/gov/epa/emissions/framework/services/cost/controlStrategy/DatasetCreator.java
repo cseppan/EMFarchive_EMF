@@ -229,6 +229,7 @@ public class DatasetCreator {
             addKeyVal(dataset, "MEASURE_CLASSES", classList);
         addKeyVal(dataset, "DISCOUNT_RATE", controlStrategy.getDiscountRate()+"%");
         addKeyVal(dataset, "USE_COST_EQUATION", (controlStrategy.getUseCostEquations()==true? "true" : "false"));
+        addKeyVal(dataset, "INCLUDE_UNSPECIFIED_COSTS", (controlStrategy.getIncludeUnspecifiedCosts()==true? "true" : "false"));
     }
     
     private void addKeyVal(EmfDataset dataset, String keywordName, String value) {
@@ -288,7 +289,7 @@ public class DatasetCreator {
     }
     
     private String createTableName(String tablePrefix, String name) {
-        return createTableName(tablePrefix + "_" + name);
+        return createTableName(tablePrefix + "_" + name + "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date()));
     }
 
     private String createTableName(String name) {
