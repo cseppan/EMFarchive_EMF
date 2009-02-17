@@ -262,7 +262,8 @@ CREATE TABLE emf.control_strategies
   use_cost_equations boolean,
   export_directory character varying,
   delete_results boolean DEFAULT true,
-  merge_inventories boolean DEFAULT false
+  merge_inventories boolean DEFAULT false,
+  include_unspecified_costs boolean DEFAULT true
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_strategies OWNER TO emf;
