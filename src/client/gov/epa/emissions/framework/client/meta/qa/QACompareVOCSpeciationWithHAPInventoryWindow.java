@@ -20,8 +20,8 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 
@@ -186,11 +186,12 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", addCAPInvAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel invPanel = new JPanel(new BorderLayout(5,0));
+        JPanel container = new JPanel(new FlowLayout());
+
+        container.add(pane);
+        container.add(addButton);
         
-        invPanel.add(pane, BorderLayout.LINE_START);
-        invPanel.add(addButton);
-        return invPanel;
+        return container;
     }
     
     private JPanel hapInvPanel() {
@@ -206,11 +207,12 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", addHAPInvAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel invPanel = new JPanel(new BorderLayout(5,0));
+        JPanel container = new JPanel(new FlowLayout());
+
+        container.add(pane);
+        container.add(addButton);
         
-        invPanel.add(pane, BorderLayout.LINE_START);
-        invPanel.add(addButton);
-        return invPanel;
+        return container;
     }
     
     private JPanel speciationToolGasProfileDatasetPanel() {
@@ -226,11 +228,12 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", addSpeciationToolGasProfileDatasetAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel invPanel = new JPanel(new BorderLayout(5,0));
+        JPanel container = new JPanel(new FlowLayout());
+
+        container.add(pane);
+        container.add(addButton);
         
-        invPanel.add(pane, BorderLayout.LINE_START);
-        invPanel.add(addButton);
-        return invPanel;
+        return container;
     }
     
     private JPanel pollToPollConversionDatasetPanel() {
@@ -246,11 +249,12 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", addPollToPollConversionDatasetAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel invPanel = new JPanel(new BorderLayout(5,0));
+        JPanel container = new JPanel(new FlowLayout());
+
+        container.add(pane);
+        container.add(addButton);
         
-        invPanel.add(pane, BorderLayout.LINE_START);
-        invPanel.add(addButton);
-        return invPanel;
+        return container;
     }
     
     private JPanel speciationCrossReferenceDatasetsPanel() {
@@ -267,11 +271,12 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", addSpeciationCrossReferenceDatasetsAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel invPanel = new JPanel(new BorderLayout(5,0));
+        JPanel container = new JPanel(new FlowLayout());
+
+        container.add(pane);
+        container.add(addButton);
         
-        invPanel.add(pane, BorderLayout.LINE_START);
-        invPanel.add(addButton);
-        return invPanel;
+        return container;
     }
     
     private JPanel speciationProfileWeightDatasetsPanel() {
@@ -288,11 +293,12 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", addSpeciationProfileWeightDatasetsAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel invPanel = new JPanel(new BorderLayout(5,0));
+        JPanel container = new JPanel(new FlowLayout());
+
+        container.add(pane);
+        container.add(addButton);
         
-        invPanel.add(pane, BorderLayout.LINE_START);
-        invPanel.add(addButton);
-        return invPanel;
+        return container;
     }
     
     protected void summaryTypeCombo() {
