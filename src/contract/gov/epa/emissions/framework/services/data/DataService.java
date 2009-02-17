@@ -55,7 +55,7 @@ public interface DataService {
 
     long getTableRecordCount(String qualifiedTableName) throws EmfException;
 
-    void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
+    void appendData(User user, int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
             DoubleValue targetStartLineNumber) throws EmfException;
 
     void checkIfDeletable(User user, int datasetID) throws EmfException;

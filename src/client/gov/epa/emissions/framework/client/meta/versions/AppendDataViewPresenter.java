@@ -43,7 +43,7 @@ public class AppendDataViewPresenter {
     }
     
     public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion, DoubleValue startLineNum) throws EmfException {
-        dataService.appendData(srcDSid, srcDSVersion, filter, targetDSid, targetDSVersion, startLineNum);
+        dataService.appendData(session.user(),srcDSid, srcDSVersion, filter, targetDSid, targetDSVersion, startLineNum);
     }
     
     public Version[] getVersions(int dsId) throws EmfException {

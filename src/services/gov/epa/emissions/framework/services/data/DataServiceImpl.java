@@ -59,7 +59,7 @@ public class DataServiceImpl implements DataService {
         Session session = sessionFactory.getSession();
         List datasets;
         try {
-            if (nameContains == null || nameContains.trim().length() == 0)
+            if (nameContains == null || nameContains.trim().length() == 0 || nameContains.trim().equals("*"))
                 datasets = dao.allNonDeleted(session);
             else
                 datasets = dao.allNonDeleted(session, nameContains);
@@ -170,14 +170,15 @@ public class DataServiceImpl implements DataService {
 
     public synchronized EmfDataset[] getDatasetsWithFilter(int datasetTypeId, String nameContains) throws EmfException {
         Session session = sessionFactory.getSession();
-        List datasets;
+        List<EmfDataset> datasets;
+        
         try {
-            if (nameContains == null || nameContains.trim().length() == 0)
+            if (nameContains == null || nameContains.trim().length() == 0 || nameContains.trim().equals("*"))
                 datasets = dao.getDatasets(session, datasetTypeId);
             else
                 datasets = dao.getDatasetsWithFilter(session, datasetTypeId, nameContains);
 
-            return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
+            return datasets.toArray(new EmfDataset[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets for dataset type " + datasetTypeId, e);
             throw new EmfException("Could not get all Datasets for dataset type " + datasetTypeId);
@@ -438,7 +439,7 @@ public class DataServiceImpl implements DataService {
         return recordCount;
     }
 
-    public synchronized void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid,
+    public synchronized void appendData(User user, int srcDSid, int srcDSVersion, String filter, int targetDSid,
             int targetDSVersion, DoubleValue targetStartLineNumber) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         Session session = sessionFactory.getSession();
@@ -450,6 +451,10 @@ public class DataServiceImpl implements DataService {
             InternalSource[] srcSources = srcDS.getInternalSources();
             EmfDataset targetDS = dao.getDataset(session, targetDSid);
             InternalSource[] targetSources = targetDS.getInternalSources();
+            
+            EmfDataset locked = dao.obtainLocked(user, targetDS, session);
+            locked.setModifiedDateTime(new Date());
+            dao.update(locked, session);
 
             DataModifier dataModifier = datasource.dataModifier();
 
@@ -473,8 +478,9 @@ public class DataServiceImpl implements DataService {
                 appendData2SingleTable(filter, srcVersion, srcDS, srcTable, targetTable, targetDSid, targetDSVersion,
                         dataModifier);
             }
+            
+            dao.releaseLocked(user, locked, session);
         } catch (Exception e) {
-            e.printStackTrace();
             LOG.error("Could not query table : ", e);
             throw new EmfException("Could not query table: " + e.getMessage());
         } finally {
