@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION build_version_where_filter(dataset_id integer, "version" integer)
+CREATE OR REPLACE FUNCTION public.build_version_where_filter(dataset_id integer, "version" integer)
   RETURNS text AS
 $BODY$
 DECLARE
@@ -46,9 +46,9 @@ END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE
   COST 100;
-ALTER FUNCTION build_version_where_filter(integer, integer) OWNER TO emf;
+ALTER FUNCTION public.build_version_where_filter(integer, integer) OWNER TO emf;
 
-CREATE OR REPLACE FUNCTION build_version_where_filter(dataset_id integer, "version" integer, table_alias character varying(63))
+CREATE OR REPLACE FUNCTION public.build_version_where_filter(dataset_id integer, "version" integer, table_alias character varying(63))
   RETURNS text AS
 $BODY$
 DECLARE
@@ -96,4 +96,4 @@ END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE
   COST 100;
-ALTER FUNCTION build_version_where_filter(integer, integer, character varying(63)) OWNER TO emf;
+ALTER FUNCTION public.build_version_where_filter(integer, integer, character varying(63)) OWNER TO emf;
