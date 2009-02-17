@@ -161,7 +161,12 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         textFilter.setEditable(true);
         textFilter.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                return;   //make it no action
+                DatasetType type = getSelectedDSType();
+                try {
+                     doRefresh();          
+                } catch (EmfException e1) {
+                    messagePanel.setError("Could not retrieve all datasets for dataset type " + type.getName());
+                }
             }
         });
         topPanel.add(getDSTypePanel("Show Datasets of Type:", dsTypesBox), BorderLayout.LINE_START);
@@ -173,6 +178,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         return panel;
     }
+    
+ 
 
     private JPanel getDSTypePanel(String label, JComboBox box) {
         JPanel panel = new JPanel(new BorderLayout(5, 2));
