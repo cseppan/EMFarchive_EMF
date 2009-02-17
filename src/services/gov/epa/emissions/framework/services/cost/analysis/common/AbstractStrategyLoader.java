@@ -10,6 +10,8 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.VersionedQuery;
+import gov.epa.emissions.commons.io.other.StrategyMessagesFileFormat;
+import gov.epa.emissions.commons.io.temporal.VersionedTableFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -175,6 +177,19 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return creator.addDataset("Strategy_", "CSDR_", 
                 inputDataset, getControlStrategyDetailedResultDatasetType(), 
                 detailedResultTableFormat);
+    }
+
+    private EmfDataset createStrategyMessagesDataset(EmfDataset inventory) throws Exception {
+      return creator.addDataset("DS_", 
+              DatasetCreator.createDatasetName(inventory.getName() + "_strategy_msgs"), 
+              getDatasetType("Strategy Messages (CSV)"), 
+              new VersionedTableFormat(new StrategyMessagesFileFormat(dbServer.getSqlDataTypes()), dbServer.getSqlDataTypes()), 
+              strategyMessagesDatasetDescription());
+  }
+  
+    private String strategyMessagesDatasetDescription() {
+        return "#Strategy Messages\n" + 
+            "#Implements control strategy: " + controlStrategy.getName() + "\n#";
     }
 
     protected DatasetType getControlStrategyDetailedResultDatasetType() {
@@ -469,4 +484,63 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     public ControlStrategyResult getStrategyMessagesResult() {
         return strategyMessagesResult;
     }
+
+    private StrategyResultType getStrategyMessagesResultType() throws EmfException {
+        StrategyResultType resultType = null;
+        Session session = sessionFactory.getSession();
+        try {
+            resultType = new ControlStrategyDAO().getStrategyResultType(StrategyResultType.strategyMessages, session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not get detailed strategy result type");
+        } finally {
+            session.close();
+        }
+        return resultType;
+    }
+
+    private DatasetType getDatasetType(String name) {
+        Session session = sessionFactory.getSession();
+        try {
+            return new DatasetTypesDAO().get(name, session);
+        } finally {
+            session.close();
+        }
+    }
+
+    protected ControlStrategyResult createStrategyMessagesResult(EmfDataset inventory, int inventoryVersion) throws Exception 
+    {
+        ControlStrategyResult result = new ControlStrategyResult();
+        result.setControlStrategyId(controlStrategy.getId());
+        result.setInputDataset(inventory);
+        result.setInputDatasetVersion(inventoryVersion);
+        result.setDetailedResultDataset(createStrategyMessagesDataset(inventory));
+
+        result.setStrategyResultType(getStrategyMessagesResultType());
+        result.setStartTime(new Date());
+        result.setRunStatus("Start processing strategy messages result");
+
+        //persist result
+        saveControlStrategyResult(result);
+
+        return result;
+    }
+    
+    protected void deleteStrategyMessageResult(ControlStrategyResult strategyMessagesResult) throws EmfException {
+        //get rid of strategy results...
+        Session session = sessionFactory.getSession();
+        try {
+            EmfDataset[] ds = controlStrategyDAO.getResultDatasets(controlStrategy.getId(), strategyMessagesResult.getId(), session);
+            
+            //get rid of old strategy results...
+            controlStrategyDAO.removeControlStrategyResult(controlStrategy.getId(), strategyMessagesResult.getId(), session);
+            //delete and purge datasets
+            controlStrategyDAO.removeResultDatasets(ds, user, session, dbServer);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw new EmfException("Could not remove control strategy message result.");
+        } finally {
+            session.close();
+        }
+    }
+
 }

@@ -404,7 +404,7 @@ public abstract class AbstractStrategyTask implements Strategy {
         String filter = getFilterForSourceQuery();
         if (datasets.length > 0) {
             for (int i = 0; i < datasets.length; i++) {
-                String sql = "select public.populate_sources_table('" + emissionTableName(datasets[i].getInputDataset()) + "'," + (filter.length() == 0 ? "null::text" : "'" + filter.replaceAll("'", "''") + "'") + ");vacuum analyze emf.sources;";
+                String sql = "select public.populate_sources_table('" + emissionTableName(datasets[i].getInputDataset()) + "'," + (filter.length() == 0 ? "null::text" : "'" + filter.replaceAll("'", "''").substring(5) + "'") + ");vacuum analyze emf.sources;";
                 System.out.println( sql);
                 try {
                     datasource.query().execute(sql);
