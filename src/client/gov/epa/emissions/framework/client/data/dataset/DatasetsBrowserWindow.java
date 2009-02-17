@@ -518,19 +518,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 refresh(presenter.getEmfDatasets(getSelectedDSType(), textFilter.getText()));
             return; 
         }
+        
         refresh(presenter.getEmfDatasets(getSelectedDSType(), textFilter.getText()));
     }
     
-//    public void doRefreshAfterConfirm(int numDataset) throws EmfException {
-//        
-//        String message = "There are " + numDataset + " datasets, would you like to continus?";
-//        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
-//                JOptionPane.QUESTION_MESSAGE);
-//        
-//        if (selection == JOptionPane.YES_OPTION)      
-//            refresh(presenter.getEmfDatasets(getSelectedDSType(), textFilter.getText()));
-//    }
-
     public void notifyLockFailure(EmfDataset dataset) {
         clearMessage();
         showError("Cannot obtain a lock for dataset \"" + dataset.getName() + "\".");
