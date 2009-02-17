@@ -90,7 +90,7 @@ public class DataServiceTransport implements DataService {
 
         EmfCall call = call();
 
-        call.setOperation("getDatasets");
+        call.setOperation("getDatasetsWithFilter");
         call.addIntegerParam("datasetTypeId");
         call.addStringParam("nameContains");
         call.setReturnType(mappings.datasets());
@@ -246,11 +246,12 @@ public class DataServiceTransport implements DataService {
         return (Long) call.requestResponse(new Object[] { qualifiedTableName });
     }
 
-    public void appendData(int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
+    public void appendData(User user, int srcDSid, int srcDSVersion, String filter, int targetDSid, int targetDSVersion,
             DoubleValue targetStartLineNumber) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("appendData");
+        call.addParam("user", mappings.user());
         call.addIntegerParam("srcDSid");
         call.addIntegerParam("srcDSVersion");
         call.addStringParam("filter");
@@ -259,7 +260,7 @@ public class DataServiceTransport implements DataService {
         call.addParam("targetStartLineNumber", emfMappings.doubleValue());
         call.setVoidReturnType();
         
-        call.request(new Object[]{new Integer(srcDSid), new Integer(srcDSVersion), filter, new Integer(targetDSid),
+        call.request(new Object[]{user, new Integer(srcDSid), new Integer(srcDSVersion), filter, new Integer(targetDSid),
                 new Integer(targetDSVersion), targetStartLineNumber});
     }
     
