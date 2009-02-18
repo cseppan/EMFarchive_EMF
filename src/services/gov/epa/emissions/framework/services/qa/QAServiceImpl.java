@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
+import gov.epa.emissions.framework.services.basic.RemoteCommand;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
@@ -19,6 +20,10 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -46,14 +51,14 @@ public class QAServiceImpl implements QAService {
     public QAServiceImpl(HibernateSessionFactory sessionFactory) {
         this(sessionFactory, DbServerFactory.get());
     }
-    
+
     public QAServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
         this.threadPool = createThreadPool();
         dao = new QADAO();
     }
-    
+
     private synchronized PooledExecutor createThreadPool() {
         PooledExecutor threadPool = new PooledExecutor(20);
         threadPool.setMinimumPoolSize(1);
@@ -74,7 +79,7 @@ public class QAServiceImpl implements QAService {
             session.close();
         }
     }
-    
+
     public synchronized QAStepResult[] getQAStepResults(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -101,14 +106,21 @@ public class QAServiceImpl implements QAService {
     }
 
     public synchronized void runQAStep(QAStep step, User user) throws EmfException {
-        updateResultStatus(step, "In process");
-        updateWitoutCheckingConstraints(new QAStep[] { step });
-        checkRestrictions(step);
-        DbServer dbServer = dbServerFactory.getDbServer();
-        removeQAResultTable(step, dbServer);
+        DbServer dbServer = null;
+        
+        try {
+            writeDBConnectionInfo("BEFORE RUN QASTEP ON DATASETID = " + step.getDatasetId());
+            updateResultStatus(step, "In process");
+            updateWitoutCheckingConstraints(new QAStep[] { step });
+            checkRestrictions(step);
+            dbServer = dbServerFactory.getDbServer();
+            removeQAResultTable(step, dbServer);
+        } catch (Exception e) {
+            LOG.error("Error pre-processing QA step for running.", e);
+            throw new EmfException(e.getMessage());
+        }
 
-        RunQAStep runner = new RunQAStep(new QAStep[] { step }, user, 
-                dbServerFactory, sessionFactory);
+        RunQAStep runner = new RunQAStep(new QAStep[] { step }, user, dbServerFactory, sessionFactory);
         try {
             threadPool.execute(new GCEnforcerTask("Running QA Steps", runner));
         } catch (Exception e) {
@@ -117,12 +129,66 @@ public class QAServiceImpl implements QAService {
         } finally {
             try {
                 dbServer.disconnect();
+                writeDBConnectionInfo("AFTER RUN QASTEP ON DATASETID = " + step.getDatasetId());
             } catch (Exception e) {
-                // NOTE Auto-generated catch block
-                e.printStackTrace();
+                LOG.error("Error closing DB server and logging DB connections.", e);
             }
         }
-        
+
+    }
+
+    private void writeDBConnectionInfo(String prefix) throws EmfException {
+        String os = System.getProperty("os.name").toUpperCase();
+
+        if (!os.startsWith("WINDOWS")) {
+            String logNumDBConnCmd = "ps aux | grep postgres | wc -l";
+            InputStream inStream = RemoteCommand.executeLocal(logNumDBConnCmd);
+
+            RemoteCommand.logStdout("Logged DB connections (" + prefix + ")", inStream);
+            return;
+        }
+
+        if (os.startsWith("WINDOWS")) {
+            String[] cmd = new String[3];
+            
+            if (os.equalsIgnoreCase("Windows 98") || os.equalsIgnoreCase("Windows 95")) {
+                cmd[0] = "command.com";
+            } else {
+                cmd[0] = "cmd.exe";
+            }
+
+            cmd[1] = "/C";
+            cmd[2] = "tasklist /FI \"IMAGENAME eq postgres.exe\"";
+            cmd = new String[] { cmd[0], cmd[1], cmd[2] };
+
+            Process p;
+
+            try {
+                p = Runtime.getRuntime().exec(cmd);
+            } catch (IOException e1) {
+                LOG.error("Error logging DB connections.", e1);
+                return;
+            }
+
+            InputStream instream = p.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(instream));
+            int count = 0;
+
+            try {
+                while (reader.readLine() != null)
+                    count++;
+            } catch (Exception e) {
+                LOG.error("Error in logging number of DB connections.", e);
+            } finally {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    LOG.error("Error closing inputstream reader on logging DB connections.",e);
+                }
+            }
+
+            LOG.warn("Logged DB connections (" + prefix + "): " + count);
+        }
     }
 
     private synchronized void removeQAResultTable(QAStep step, DbServer dbServer) throws EmfException {
@@ -130,20 +196,20 @@ public class QAServiceImpl implements QAService {
 
         try {
             QAStepResult result = dao.qaStepResult(step, session);
-            
+
             if (result == null)
                 return;
-            
+
             String table = result.getTable();
-            
+
             if (table != null && !table.trim().isEmpty()) {
                 TableCreator tableCreator = new TableCreator(dbServer.getEmissionsDatasource());
-                
+
                 if (tableCreator.exists(table.trim())) {
                     tableCreator.drop(table.trim());
                 }
             }
-            
+
             dao.removeQAStepResult(result, session);
         } catch (Exception e) {
             LOG.error("Cannot drop result table for QA step: " + step.getName(), e);
@@ -151,7 +217,7 @@ public class QAServiceImpl implements QAService {
         } finally {
             try {
                 session.close();
-                
+
                 if (dbServer != null && dbServer.isConnected())
                     dbServer.disconnect();
             } catch (Exception e) {
@@ -185,11 +251,11 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public synchronized void exportShapeFileQAStep(QAStep step, User user, 
-            String dirName, ProjectionShapeFile projectionShapeFile, 
-            Pollutant pollutant) throws EmfException {
+    public synchronized void exportShapeFileQAStep(QAStep step, User user, String dirName,
+            ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
         try {
-            ExportShapeFileQAStep exportQATask = new ExportShapeFileQAStep(step, dbServerFactory, user, sessionFactory, threadPool, true, pollutant);
+            ExportShapeFileQAStep exportQATask = new ExportShapeFileQAStep(step, dbServerFactory, user, sessionFactory,
+                    threadPool, true, pollutant);
             exportQATask.export(dirName, projectionShapeFile);
         } catch (Exception e) {
             LOG.error("Could not export QA step", e);
@@ -305,22 +371,22 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public void copyQAStepsToDatasets(User user, QAStep[] steps, int[] datasetIds, boolean replace)
-            throws EmfException {
+    public void copyQAStepsToDatasets(User user, QAStep[] steps, int[] datasetIds, boolean replace) throws EmfException {
         Session session = sessionFactory.getSession();
         DatasetDAO datasetDAO = new DatasetDAO();
         DbServer dbServer = dbServerFactory.getDbServer();
-        //store locked datasets in this array, some could be null, if their locked by someone else
+        // store locked datasets in this array, some could be null, if their locked by someone else
         EmfDataset[] datasets = new EmfDataset[datasetIds.length];
         String datasetNameList = "";
         try {
-            //get lock first, if you can't then throw an error
+            // get lock first, if you can't then throw an error
             for (int i = 0; i < datasetIds.length; i++) {
                 int datasetId = datasetIds[i];
-                //get lock on dataset type so we can update it...
+                // get lock on dataset type so we can update it...
                 EmfDataset dataset = datasetDAO.obtainLocked(user, datasetDAO.getDataset(session, datasetId), session);
-                if (!dataset.isLocked(user)) 
-                    throw new EmfException("Could not copy QA Steps to " + dataset.getName() + " its locked by " + dataset.getLockOwner() + ".");
+                if (!dataset.isLocked(user))
+                    throw new EmfException("Could not copy QA Steps to " + dataset.getName() + " its locked by "
+                            + dataset.getLockOwner() + ".");
                 datasets[i] = dataset;
             }
             int i = 0;
@@ -328,30 +394,30 @@ public class QAServiceImpl implements QAService {
                 ++i;
                 QAStep[] existingQaSteps = dao.steps(dataset, session);
                 boolean exists = false;
-                //add qa step to dataset
+                // add qa step to dataset
                 for (QAStep step : steps) {
                     exists = false;
-                    //override applicable settings...
+                    // override applicable settings...
                     step.setDatasetId(dataset.getId());
                     step.setWho("");
                     step.setDate(null);
                     step.setStatus("Not Started");
-                    //check if one with the same name already exists
+                    // check if one with the same name already exists
                     for (QAStep existingQAStep : existingQaSteps) {
                         if (existingQAStep.getName().equals(step.getName())) {
                             exists = true;
-                            //if replacing, then remove existing template
+                            // if replacing, then remove existing template
                             if (replace) {
                                 removeQAResultTable(existingQAStep, dbServer);
                                 dao.removeQAStep(existingQAStep, session);
                             }
                         }
                     }
-                    //if not replacing, then add "Copy of " in front of the name, 
-                    //also make sure the new "Copy of " + name is not already used.
+                    // if not replacing, then add "Copy of " in front of the name,
+                    // also make sure the new "Copy of " + name is not already used.
                     if (exists && !replace) {
                         String newName = "Copy of " + step.getName();
-                        //check if one with the same name already exists
+                        // check if one with the same name already exists
                         for (QAStep existingQAStep : existingQaSteps) {
                             if (existingQAStep.getName().equals(newName)) {
                                 newName = "Copy of " + newName;
@@ -375,9 +441,9 @@ public class QAServiceImpl implements QAService {
             LOG.error("Could not copy QA Steps to Datasets.", e);
             throw new EmfException("Could not copy QA Steps to Datasets. " + e.getMessage());
         } finally {
-            //release lock
+            // release lock
             for (EmfDataset dataset : datasets) {
-                //release lock on datasets
+                // release lock on datasets
                 if (dataset != null)
                     datasetDAO.releaseLocked(user, dataset, session);
             }
