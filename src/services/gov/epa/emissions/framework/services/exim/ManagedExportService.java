@@ -124,6 +124,9 @@ public class ManagedExportService {
     private boolean isExportable(EmfDataset dataset, Version version, Services services, User user) {
         DatasetType datasetType = dataset.getDatasetType();
         String message = null;
+        
+        if (version == null)
+            return false;
 
         if (version.isLocked() && !version.isFinalVersion())
             message = "The dataset " + dataset.getName()
