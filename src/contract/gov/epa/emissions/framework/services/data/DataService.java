@@ -25,7 +25,7 @@ public interface DataService {
     
     void updateExternalSources(int datasetId, String newDir) throws EmfException;
     
-    ExternalSource[] getExternalSources(int datasetId, int limit) throws EmfException;
+    ExternalSource[] getExternalSources(int datasetId, int limit, String filter) throws EmfException;
     
     boolean isExternal (int datasetId) throws EmfException;
 
@@ -65,4 +65,6 @@ public interface DataService {
     void replaceColValues(String table, String colName, String find, String replaceWith, Version version, String rowFilter) throws EmfException;
 
     void copyDataset(int datasetId, Version version, User user) throws EmfException;
+
+    int getNumExternalSources(int dsId, String filter) throws EmfException;
 }

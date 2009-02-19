@@ -989,13 +989,13 @@ public class DataServiceImpl implements DataService {
         return "\\";
     }
 
-    public ExternalSource[] getExternalSources(int datasetId, int limit) throws EmfException {
+    public ExternalSource[] getExternalSources(int datasetId, int limit, String filter) throws EmfException {
         Session session = sessionFactory.getSession();
         EmfDataset ds = null;
 
         try {
             ds = dao.getDataset(session, datasetId);
-            return dao.getExternalSrcs(datasetId, limit, session);
+            return dao.getExternalSrcs(datasetId, limit, filter, session);
         } catch (Exception e) {
             LOG.error("Could not get all external sources for dataset "
                     + (ds == null ? "(id=" + datasetId + ")." : ds.getName() + "."), e);
@@ -1005,6 +1005,10 @@ public class DataServiceImpl implements DataService {
             if (session != null && session.isConnected())
                 session.close();
         }
+    }
+    
+    public int getNumExternalSources(int datasetId, String filter) throws EmfException {
+        return getExternalSources(datasetId, -1, filter).length;
     }
 
     public boolean isExternal(int datasetId) throws EmfException {
@@ -1038,7 +1042,7 @@ public class DataServiceImpl implements DataService {
             if (!ds.getDatasetType().isExternal())
                 throw new EmfException("Dataset (" + ds.getName() + ") type is not external.");
 
-            ExternalSource[] srcs = dao.getExternalSrcs(datasetId, -1, session);
+            ExternalSource[] srcs = dao.getExternalSrcs(datasetId, -1, null, session);
             
             if (srcs == null || srcs.length == 0)
                 throw new EmfException("Dataset (" + ds.getName() + ") has no sources to update.");
@@ -1080,4 +1084,5 @@ public class DataServiceImpl implements DataService {
                 session.close();
         }
     }
+
 }

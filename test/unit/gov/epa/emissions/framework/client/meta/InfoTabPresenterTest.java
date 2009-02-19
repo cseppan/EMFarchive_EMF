@@ -42,7 +42,7 @@ public class InfoTabPresenterTest extends MockObjectTestCase {
 
         InfoTabPresenter presenter = new InfoTabPresenter((InfoTabView) view.proxy(), dataset, session);
 
-        presenter.doDisplay();
+        presenter.doDisplay("");
     }
 
     public void testShouldDisplayExternalSourcesAndVersionsIfDatasetTypeIsExternalOnDisplay() throws Exception {
@@ -72,7 +72,7 @@ public class InfoTabPresenterTest extends MockObjectTestCase {
 
         InfoTabPresenter presenter = new InfoTabPresenter((InfoTabView) view.proxy(), dataset, session);
 
-        presenter.doDisplay();
+        presenter.doDisplay("");
     }
 
 }

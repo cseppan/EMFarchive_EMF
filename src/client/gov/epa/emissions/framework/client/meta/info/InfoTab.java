@@ -16,11 +16,18 @@ import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
 
@@ -28,15 +35,22 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
 
     private JPanel sourcesPanel;
 
+    private JTextField nameFilter;
+
     private boolean forViewer;
 
     private ManageChangeables changeablesList;
 
     private InfoTabPresenter sourceTabPresenter;
-    
+
     private MessagePanel msgPanel;
 
-    public InfoTab(MessagePanel messagePanel, ManageChangeables changeablesList, EmfConsole parentConsole, boolean forViewer) {
+    private int sourceLimit = -1;
+
+    private String ls = System.getProperty("line.separator");
+
+    public InfoTab(MessagePanel messagePanel, ManageChangeables changeablesList, EmfConsole parentConsole,
+            boolean forViewer) {
         setName("infoTab");
         this.parentConsole = parentConsole;
         this.forViewer = forViewer;
@@ -49,11 +63,34 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
     }
 
     private JPanel createLayout() {
-        JPanel container = new JPanel();
-        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+        JPanel container = new JPanel(new BorderLayout());
+
+        JPanel filter = new JPanel();
+        filter.add(new JLabel("Name Contains: "));
+        nameFilter = new JTextField();
+        nameFilter.setPreferredSize(new Dimension(100, 20));
+        nameFilter.setToolTipText("Use as a source name filter. Press enter to refresh.");
+        
+        ActionListener actionListener = new ActionListener(){
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    doRefresh();
+                } catch (EmfException e) {
+                    msgPanel.setError("Cannot retrieve dataset sources.");
+                }
+            }
+        };
+        
+        KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
+        nameFilter.registerKeyboardAction(actionListener, keystroke, JComponent.WHEN_FOCUSED);
+        filter.add(nameFilter);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(filter, BorderLayout.LINE_END);
+        container.add(panel, BorderLayout.NORTH);
 
         sourcesPanel = new JPanel(new BorderLayout());
-        container.add(sourcesPanel);
+        container.add(sourcesPanel, BorderLayout.CENTER);
 
         return container;
     }
@@ -62,7 +99,24 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
         displaySources("Data Tables", new InternalSourcesTableData(sources), false);
     }
 
-    public void displayExternalSources(ExternalSource[] sources) throws EmfException {
+    public void displayExternalSources(int numOfSrcs) throws EmfException {
+        if (numOfSrcs > 20) {
+            String s = JOptionPane.showInputDialog(parentConsole, "There are " + numOfSrcs + " sources." + ls
+                    + "Would you please specify a limit to view?", "Limit the Number of Sources to View",
+                    JOptionPane.PLAIN_MESSAGE);
+
+            if ((s != null) && (s.trim().length() > 0)) {
+                try {
+                    sourceLimit = Integer.parseInt(s.trim());
+                } catch (NumberFormatException e) {
+                    throw new EmfException("Please specify a valid integer.");
+                }
+            } else
+                sourceLimit = -1;
+        }
+
+        int dsId = sourceTabPresenter.getCurrentDatasetId();
+        ExternalSource[] sources = sourceTabPresenter.getExternalSrcs(dsId, sourceLimit, nameFilter.getText());
         displaySources("External Files", new ExternalSourcesTableData(sources), true);
     }
 
@@ -73,7 +127,8 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
         sourcesPanel.validate();
     }
 
-    private JPanel createSortFilterPane(TableData tableData, EmfConsole parentConsole, boolean external) throws EmfException {
+    private JPanel createSortFilterPane(TableData tableData, EmfConsole parentConsole, boolean external)
+            throws EmfException {
         JPanel tablePanel = new JPanel(new BorderLayout());
 
         SelectableSortFilterWrapper table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
@@ -82,7 +137,7 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
         EmfDataset dataset = sourceTabPresenter.getDataset();
 
         if (external && !forViewer) {
-            ExternalSource[] extSrcs = sourceTabPresenter.getExternalSrcs(dataset.getId(), 20);
+            ExternalSource[] extSrcs = sourceTabPresenter.getExternalSrcs(dataset.getId(), sourceLimit, getNameFilter());
 
             if (extSrcs != null && extSrcs.length > 0)
                 tablePanel.add(controlPanel(), BorderLayout.PAGE_END);
@@ -134,17 +189,25 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
                 try {
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     msgPanel.setMessage("Please wait while loading dataset sources...");
-                    sourceTabPresenter.doDisplay();
+                    sourceTabPresenter.doDisplay(nameFilter.getText());
                     msgPanel.setMessage("Finished loading dataset sources.");
                 } catch (Exception e) {
-                    msgPanel.setError("Cannot retrieve dataset sources.");
+                    msgPanel.setError(e.getMessage());
                 } finally {
                     setCursor(Cursor.getDefaultCursor());
                 }
             }
         });
-        
+
         populateThread.start();
+    }
+
+    public String getNameFilter() {
+        return nameFilter == null ? null : nameFilter.getText();
+    }
+
+    public int getSourceSize() {
+        return sourceLimit;
     }
 
 }

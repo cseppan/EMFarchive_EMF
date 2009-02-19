@@ -28,11 +28,15 @@ public class ExternalSourceUpdatePresenter {
     }
 
     public void update(String folder, boolean isMassLoc) throws Exception {
-        ExternalSource[] sources = session.dataService().getExternalSources(dataset.getId(), -1);
         KeyVal[] keys = dataset.getKeyVals();
         Keywords keywords = new Keywords(session.dataCommonsService().getKeywords());
         Keyword massLocKeyword = keywords.get("MASS_STORAGE_LOCATION");
         Keyword prevLocKeyword = keywords.get("PREVIOUS_LOCATION");
+        ExternalSource[] sources = sourceTabPresenter.getViewableSources();
+        
+        if (sources == null || sources.length == 0)
+            throw new EmfException("No sources to update.");
+        
         String existLoc = getFileInfo(sources[0], false);
 
         int massLoc = -1;
@@ -49,7 +53,7 @@ public class ExternalSourceUpdatePresenter {
         updateKeyVals(existLoc, folder, isMassLoc, massLoc, prevLoc, keys, massLocKeyword, prevLocKeyword);
 
         if (!existLoc.equals(folder))
-            updateExternalSources(folder, sources);
+            updateExternalSources(folder);
 
         refreshDatasetSource();
     }
@@ -112,7 +116,7 @@ public class ExternalSourceUpdatePresenter {
             dataset.addKeyVal(new KeyVal(massLocKeyword, folder));
     }
 
-    private void updateExternalSources(String folder, ExternalSource[] sources) throws Exception {
+    private void updateExternalSources(String folder) throws Exception {
         try {
             session.dataService().updateExternalSources(dataset.getId(), folder);
         } catch (Exception e) {

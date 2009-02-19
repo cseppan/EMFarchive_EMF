@@ -158,7 +158,7 @@ public class DatasetDAO {
         ExternalSource[] extSrcs = null;
         
         if (dataset.isExternal())
-            extSrcs = getExternalSrcs(dataset.getId(), -1, session);
+            extSrcs = getExternalSrcs(dataset.getId(), -1, null, session);
 
         if (extSrcs != null && extSrcs.length > 0)
             hibernateFacade.removeObjects(extSrcs, session);
@@ -321,8 +321,12 @@ public class DatasetDAO {
     }
 
     //NOTE: limit < 0 will return all external sources
-    public ExternalSource[] getExternalSrcs(int datasetId, int limit, Session session) {
+    public ExternalSource[] getExternalSrcs(int datasetId, int limit, String filter, Session session) {
         String query = " FROM " + ExternalSource.class.getSimpleName() + " as ext WHERE ext.datasetId=" + datasetId;
+        
+        if (filter != null && !filter.trim().isEmpty() && !filter.trim().equals("*"))
+            query += " AND lower(ext.datasource) LIKE '%%" + filter + "%%'";
+        
         List<ExternalSource> srcsList = new ArrayList<ExternalSource>();
         
         if (limit < 0)
@@ -420,7 +424,7 @@ public class DatasetDAO {
         DatasetType type = dataset.getDatasetType();
 
         if (type.getExporterClassName().endsWith("ExternalFilesExporter"))
-            return getExternalSrcs(dataset.getId(), -1, session).length;
+            return getExternalSrcs(dataset.getId(), -1, null, session).length;
 
         Datasource datasource = dbServer.getEmissionsDatasource();
         InternalSource source = dataset.getInternalSources()[0];

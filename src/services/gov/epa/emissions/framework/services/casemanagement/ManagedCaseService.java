@@ -2864,7 +2864,7 @@ public class ManagedCaseService {
             DatasetDAO dsdao = new DatasetDAO();
             
             try {
-                externalDatasets = dsdao.getExternalSrcs(dataset.getId(), -1, session);
+                externalDatasets = dsdao.getExternalSrcs(dataset.getId(), -1, null, session);
             } catch (Exception e) {
                 log.error("Could not get external sources for dataset " + dataset.getName(), e);
                 throw new EmfException("Could not get external sources for dataset " + dataset.getName() + ".");

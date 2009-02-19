@@ -302,15 +302,27 @@ public class DataServiceTransport implements DataService {
         call.request(new Object[] { new Integer(datasetId), version, user });
     }
 
-    public ExternalSource[] getExternalSources(int datasetId, int limit) throws EmfException {
+    public ExternalSource[] getExternalSources(int datasetId, int limit, String filter) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("getExternalSources");
         call.addIntegerParam("datasetId");
         call.addIntegerParam("limit");
+        call.addStringParam("filter");
         call.setReturnType(mappings.externalSources());
         
-        return (ExternalSource[])call.requestResponse(new Object[]{new Integer(datasetId), new Integer(limit)});
+        return (ExternalSource[])call.requestResponse(new Object[]{new Integer(datasetId), new Integer(limit), filter});
+    }
+    
+    public int getNumExternalSources(int datasetId, String filter) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getNumExternalSources");
+        call.addIntegerParam("datasetId");
+        call.addStringParam("filter");
+        call.setIntegerReturnType();
+        
+        return (Integer)call.requestResponse(new Object[]{new Integer(datasetId), filter});
     }
 
     public boolean isExternal(int datasetId) throws EmfException {

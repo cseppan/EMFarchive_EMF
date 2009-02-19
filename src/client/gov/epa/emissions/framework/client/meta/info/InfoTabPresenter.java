@@ -10,6 +10,8 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 public class InfoTabPresenter implements PropertiesEditorTabPresenter {
 
     private InfoTabView view;
+    
+    private ExternalSource[] extSrcs;
 
     private EmfDataset dataset;
     
@@ -26,13 +28,15 @@ public class InfoTabPresenter implements PropertiesEditorTabPresenter {
         //NOTE: don't need to do anything, dataset's been updated
     }
 
-    public void doDisplay() throws EmfException {
+    public void doDisplay(String filter) throws EmfException {
         DatasetType type = dataset.getDatasetType();
 
         if (!type.isExternal())
             view.displayInternalSources(dataset.getInternalSources());
-        else
-            view.displayExternalSources(getExternalSrcs(dataset.getId(), -1));
+        else {
+            int numOfSrcs = getNumExternalSrcs(dataset.getId(), filter);
+            view.displayExternalSources(numOfSrcs);
+        }
     }
 
     public EmfDataset getDataset() {
@@ -44,11 +48,25 @@ public class InfoTabPresenter implements PropertiesEditorTabPresenter {
     }
 
     public void refreshExternalSources() throws EmfException {
-        view.displayExternalSources(getExternalSrcs(dataset.getId(), -1));
+        int numOfSrcs = getNumExternalSrcs(dataset.getId(), view.getNameFilter());
+        view.displayExternalSources(numOfSrcs);
     }
     
-    public ExternalSource[] getExternalSrcs(int dsId, int limit) throws EmfException {
-        return session.dataService().getExternalSources(dsId, limit);
+    public ExternalSource[] getExternalSrcs(int dsId, int limit, String filter) throws EmfException {
+        extSrcs = session.dataService().getExternalSources(dsId, limit, filter);
+        return extSrcs;
+    }
+    
+    private int getNumExternalSrcs(int dsId, String filter) throws EmfException {
+        return session.dataService().getNumExternalSources(dsId, filter);
+    }
+    
+    public ExternalSource[] getViewableSources() {
+        return extSrcs;
+    }
+    
+    public int getCurrentDatasetId() {
+        return dataset.getId();
     }
 
 }

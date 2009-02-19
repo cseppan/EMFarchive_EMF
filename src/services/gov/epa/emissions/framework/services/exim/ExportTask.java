@@ -184,7 +184,7 @@ public class ExportTask extends Task {
     private ExternalSource[] getExternalSrcs(Session session) {
         DatasetDAO dao = new DatasetDAO();
 
-        return dao.getExternalSrcs(dataset.getId(), -1, session);
+        return dao.getExternalSrcs(dataset.getId(), -1, null, session);
     }
 
     private void printLogInfo(AccessLog log) {

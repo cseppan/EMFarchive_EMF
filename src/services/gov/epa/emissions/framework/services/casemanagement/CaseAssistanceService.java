@@ -852,7 +852,7 @@ public class CaseAssistanceService {
                     continue;
 
                 Date modDate = ds.getModifiedDateTime();
-                ExternalSource[] tempSrcs = dsDao.getExternalSrcs(id, -1, session);
+                ExternalSource[] tempSrcs = dsDao.getExternalSrcs(id, -1, null, session);
 
                 if (containsAllSrcs(tempSrcs, srcs)) {
                     dsWithAllSrcs.add(ds);
