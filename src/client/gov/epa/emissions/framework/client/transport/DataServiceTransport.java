@@ -289,6 +289,19 @@ public class DataServiceTransport implements DataService {
         
         call.request(new Object[]{table, colName, find, replaceWith, version, rowFilter});
     }
+    
+    public void deleteRecords(User user, String table, Version version, String filter) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("deleteRecords");
+        call.addParam("user", mappings.user());
+        call.addStringParam("table");
+        call.addParam("version", mappings.version());
+        call.addStringParam("filter");
+        call.setVoidReturnType();
+        
+        call.request(new Object[]{user, table, version, filter});
+    }
 
     public void copyDataset(int datasetId, Version version, User user) throws EmfException {
         EmfCall call = call();

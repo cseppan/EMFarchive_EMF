@@ -226,6 +226,10 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
     public String getDatasetName() {
         return dsName;
     }
+    
+    public String getTable() {
+        return tableMetadata.getTable();
+    }
 
     private void setValueForSelectColumn(Boolean value) {
         for (int i = 0; i < rows.size(); i++) {

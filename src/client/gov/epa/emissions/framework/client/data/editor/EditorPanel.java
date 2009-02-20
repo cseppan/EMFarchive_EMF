@@ -26,7 +26,7 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     private PaginationPanel paginationPanel;
 
     private EmfDataset dataset;
-
+    
     private Version version;
 
     private EditablePage editablePage;

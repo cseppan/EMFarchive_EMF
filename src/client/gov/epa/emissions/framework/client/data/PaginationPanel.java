@@ -336,4 +336,8 @@ public class PaginationPanel extends JPanel implements ObserverPanel {
         return this.totalRecords;
     }
 
+    public void refresh(String filter, String sortOrder) throws EmfException {
+        presenter.doApplyConstraints(filter, sortOrder);
+    }
+
 }

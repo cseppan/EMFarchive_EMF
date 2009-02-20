@@ -64,6 +64,8 @@ public interface DataService {
     
     void replaceColValues(String table, String colName, String find, String replaceWith, Version version, String rowFilter) throws EmfException;
 
+    void deleteRecords (User user, String table, Version version, String filter) throws EmfException;
+    
     void copyDataset(int datasetId, Version version, User user) throws EmfException;
 
     int getNumExternalSources(int dsId, String filter) throws EmfException;

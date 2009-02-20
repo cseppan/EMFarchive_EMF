@@ -1084,5 +1084,43 @@ public class DataServiceImpl implements DataService {
                 session.close();
         }
     }
+    
+    public synchronized void deleteRecords (User user, String table, Version version,
+            String filter) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+
+        try {
+            Datasource datasource = dbServer.getEmissionsDatasource();
+            DataModifier dataModifier = datasource.dataModifier();
+            VersionedQuery versionedQuery = new VersionedQuery(version);
+            int vNum = version.getVersion();
+
+            String whereClause = " WHERE " + versionedQuery.query()
+                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")");
+
+            //NOTE: delete values of records only in current version
+            String deleteCurVerQuery = "DELETE FROM " + table + whereClause + " AND version = " + vNum;
+
+            //NOTE: Update delete versions column
+            String updateDelVersions = "UPDATE " + table + " SET delete_versions = coalesce(delete_versions,'')||',"
+                    + vNum + "'" + whereClause + " AND version <> " + vNum;
+
+            if (DebugLevels.DEBUG_16) {
+                System.out.println("Query to delete records: " + deleteCurVerQuery);
+                System.out.println("Query to update previous delete_versions: " + updateDelVersions);
+            }
+
+            dataModifier.execute(deleteCurVerQuery);
+            dataModifier.execute(updateDelVersions);
+        } catch (SQLException e) {
+            LOG.error("Could not query table : ", e);
+            throw new EmfException("Could not query table.");
+        } catch (Exception e) {
+            LOG.error("Error : ", e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            closeDB(dbServer);
+        }
+    }
 
 }

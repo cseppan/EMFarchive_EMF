@@ -1,17 +1,22 @@
 package gov.epa.emissions.framework.client.data.editor;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.ClipBoardCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.ObserverPanel;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.net.URL;
@@ -23,6 +28,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -44,7 +50,7 @@ public class EditablePagePanel extends JPanel {
     private DataEditorTable editableTable;
 
     private JTextArea rowFilter;
-    
+
     private JTextArea sortOrder;
 
     private ObserverPanel observer;
@@ -54,7 +60,6 @@ public class EditablePagePanel extends JPanel {
     private EmfSession emfSession;
 
     private TablePresenter tablePresenter;
-
 
     public EditablePagePanel(EditablePage page, ObserverPanel observer, MessagePanel messagePanel,
             ManageChangeables listOfChangeables) {
@@ -143,7 +148,13 @@ public class EditablePagePanel extends JPanel {
     private AbstractAction deleteAction(final EditablePage tableData, String nameDelete, ImageIcon iconDelete) {
         return new AbstractAction(nameDelete, iconDelete) {
             public void actionPerformed(ActionEvent e) {
-                doRemove(tableData);
+                try {
+                    messagePanel.clear();
+                    doRemove(tableData);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                    messagePanel.setError(e1.getMessage());
+                }
             }
         };
     }
@@ -218,17 +229,56 @@ public class EditablePagePanel extends JPanel {
         return (above) ? selectedRow : selectedRow + 1;
     }
 
-    private void doRemove(final EditablePage tableData) {
+    private void doRemove(final EditablePage tableData) throws EmfException {
         clearMessagesWithTableRefresh();
+        
         if (tableData.getSelected().length == 0) {
             messagePanel.setError("Please check the Select column for one or more rows to delete them");
             return;
+        }
+
+        if (tableData.getSelected().length == tableData.rows().size()) {
+            String msg = "You have choosen deletion of the whole page. " + System.getProperty("line.separator")
+                    + "Would you like also to delete all records that the row filter applies?";
+            String title = "Delete All Records";
+            int option = JOptionPane.showConfirmDialog((Component) listOfChangeables, msg, title,
+                    JOptionPane.YES_NO_OPTION);
+
+            if (option == JOptionPane.YES_OPTION) {
+                String confirm = "You may not reverse the deletion. Are you sure to proceed and delete all records?";
+                int goDelete = JOptionPane.showConfirmDialog((Component) listOfChangeables, confirm, title,
+                        JOptionPane.YES_OPTION);
+
+                if (goDelete == JOptionPane.YES_OPTION) {
+                    tableData.removeSelected();
+                    deleteRecords(tableData);
+                    refresh();
+                    observer.refresh(rowFilter.getText(), sortOrder.getText());
+                }
+
+                return;
+            }
         }
 
         tableData.removeSelected();
         int numOfDeltd = tableData.changeset().getDeletedRecords().length;
         this.observer.update(-numOfDeltd);
         refresh();
+    }
+
+    private void deleteRecords(EditablePage tableData) {
+        DataService service = emfSession.dataService();
+        Version version = tableData.getVersion();
+        String filter = (rowFilter.getText() == null ? "" : rowFilter.getText());
+        User user = emfSession.user();
+        String table = tableData.getTable();
+
+        try {
+            service.deleteRecords(user, table, version, filter);
+        } catch (EmfException e) {
+            e.printStackTrace();
+            messagePanel.setError(e.getMessage());
+        }
     }
 
     public void scrollToPageEnd() {
@@ -276,4 +326,5 @@ public class EditablePagePanel extends JPanel {
     public void setSortOrder(JTextArea sortOrderText) {
         this.sortOrder = sortOrderText;
     }
+
 }
