@@ -47,7 +47,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     private SortFilterSelectModel selectModel;
 
     public UsersManager(EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("User Manager", new Dimension(550, 300), desktopManager);
+        super("User Manager", new Dimension(730, 400), desktopManager);
         super.setName("userManager");
 
         this.parentConsole = parentConsole;
@@ -118,8 +118,9 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     private JPanel createControlPanel() {
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new BorderLayout());
-
-        controlPanel.add(createCrudPanel(), BorderLayout.WEST);
+        
+        if (parentConsole.getSession().user().isAdmin())
+             controlPanel.add(createCrudPanel(), BorderLayout.WEST);
         controlPanel.add(closePanel(), BorderLayout.EAST);
 
         return controlPanel;

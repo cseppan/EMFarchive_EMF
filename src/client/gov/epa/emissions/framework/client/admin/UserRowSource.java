@@ -12,7 +12,7 @@ public class UserRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { source.getUsername(), source.getName(), source.getEmail(), new Boolean(source.isAdmin()) };
+        return new Object[] { source.getUsername(), source.getName(), source.isLoggedIn(), source.getPhone(), source.getEmail(), new Boolean(source.isAdmin()) };
     }
 
     public Object source() {

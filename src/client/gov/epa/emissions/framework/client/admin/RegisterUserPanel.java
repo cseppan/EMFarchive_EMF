@@ -73,6 +73,7 @@ public class RegisterUserPanel extends JPanel {
             panel.populateUser();
 
             // FIXME: monitor.resetChanges();
+            user.setLoggedIn(true);
             user = presenter.doRegister(user);
             postRegisterStrategy.execute(user);
         } catch (EmfException e) {
