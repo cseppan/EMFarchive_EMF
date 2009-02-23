@@ -24,7 +24,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -47,8 +46,6 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
 
     private int sourceLimit = -1;
 
-    private String ls = System.getProperty("line.separator");
-
     public InfoTab(MessagePanel messagePanel, ManageChangeables changeablesList, EmfConsole parentConsole,
             boolean forViewer) {
         setName("infoTab");
@@ -66,12 +63,12 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
         JPanel container = new JPanel(new BorderLayout());
 
         JPanel filter = new JPanel();
-        filter.add(new JLabel("Name Contains: "));
+        filter.add(new JLabel("Source Name Contains: "));
         nameFilter = new JTextField();
         nameFilter.setPreferredSize(new Dimension(100, 20));
         nameFilter.setToolTipText("Use as a source name filter. Press enter to refresh.");
-        
-        ActionListener actionListener = new ActionListener(){
+
+        ActionListener actionListener = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 try {
                     doRefresh();
@@ -80,7 +77,7 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
                 }
             }
         };
-        
+
         KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
         nameFilter.registerKeyboardAction(actionListener, keystroke, JComponent.WHEN_FOCUSED);
         filter.add(nameFilter);
@@ -101,18 +98,9 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
 
     public void displayExternalSources(int numOfSrcs) throws EmfException {
         if (numOfSrcs > 20) {
-            String s = JOptionPane.showInputDialog(parentConsole, "There are " + numOfSrcs + " sources." + ls
-                    + "Would you please specify a limit to view?", "Limit the Number of Sources to View",
-                    JOptionPane.PLAIN_MESSAGE);
-
-            if ((s != null) && (s.trim().length() > 0)) {
-                try {
-                    sourceLimit = Integer.parseInt(s.trim());
-                } catch (NumberFormatException e) {
-                    throw new EmfException("Please specify a valid integer.");
-                }
-            } else
-                sourceLimit = -1;
+            SourcesInfoDialog dialog = new SourcesInfoDialog("Limit the Number of Sources to View", numOfSrcs, this,
+                    parentConsole);
+            sourceLimit = dialog.showDialog();
         }
 
         int dsId = sourceTabPresenter.getCurrentDatasetId();
@@ -137,7 +125,8 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
         EmfDataset dataset = sourceTabPresenter.getDataset();
 
         if (external && !forViewer) {
-            ExternalSource[] extSrcs = sourceTabPresenter.getExternalSrcs(dataset.getId(), sourceLimit, getNameFilter());
+            ExternalSource[] extSrcs = sourceTabPresenter
+                    .getExternalSrcs(dataset.getId(), sourceLimit, getNameFilter());
 
             if (extSrcs != null && extSrcs.length > 0)
                 tablePanel.add(controlPanel(), BorderLayout.PAGE_END);
