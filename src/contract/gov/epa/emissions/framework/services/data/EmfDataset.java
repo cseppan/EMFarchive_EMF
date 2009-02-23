@@ -91,7 +91,8 @@ public class EmfDataset implements Dataset, Lockable {
             String datasetTypeName, String status,
             String creator, String intendedUse, 
             String project, String region, 
-            Date startDateTime) {
+            Date startDateTime, Date stopDateTime,
+            String temporalResolution) {
         this();
         this.id = id;
         this.name = name;
@@ -103,6 +104,8 @@ public class EmfDataset implements Dataset, Lockable {
         if (project != null) this.project = new Project(project);
         if (region != null) this.region = new Region(region);
         this.startDateTime = startDateTime;
+        this.endDateTime = stopDateTime;
+        this.temporalResolution = temporalResolution;
     }
 
     public int getDefaultVersion() {

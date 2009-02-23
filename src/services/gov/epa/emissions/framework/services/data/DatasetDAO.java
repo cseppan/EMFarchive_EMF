@@ -115,7 +115,7 @@ public class DatasetDAO {
     public List allNonDeleted(Session session) {
         return session
                 .createQuery(
-                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime) "
+                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
                                 + " where DS.status <> 'Deleted' order by DS.name").list();
     }
@@ -123,7 +123,7 @@ public class DatasetDAO {
     public List allNonDeleted(Session session, String nameContains) {
         return session
                 .createQuery(
-                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime) "
+                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
                                 + " where lower(DS.name) like "
                                 + "'%%"
@@ -286,7 +286,7 @@ public class DatasetDAO {
     public List getDatasets(Session session, int datasetTypeId) {
         return session
                 .createQuery(
-                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime) "
+                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime,DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
                                 + " where DS.datasetType.id = "
                                 + datasetTypeId
@@ -296,7 +296,7 @@ public class DatasetDAO {
     public List getDatasetsWithFilter(Session session, int datasetTypeId, String nameContains) {
         return session
                 .createQuery(
-                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime) "
+                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
                                 + " where DS.datasetType.id = "
                                 + datasetTypeId
