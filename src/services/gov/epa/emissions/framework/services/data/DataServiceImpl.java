@@ -1122,5 +1122,31 @@ public class DataServiceImpl implements DataService {
             closeDB(dbServer);
         }
     }
+    
+    public synchronized int getNumOfRecords (String table, Version version,
+            String filter) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+
+        try {
+            Datasource datasource = dbServer.getEmissionsDatasource();
+            DataModifier dataModifier = datasource.dataModifier();
+            VersionedQuery versionedQuery = new VersionedQuery(version);
+
+            String whereClause = " WHERE " + versionedQuery.query()
+                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")");
+
+            String countQuery = "SELECT COUNT(*) FROM " + table + whereClause;
+            
+            return Integer.parseInt(dataModifier.getRowCount(countQuery)+ "");
+        } catch (SQLException e) {
+            LOG.error("Could not query table : ", e);
+            throw new EmfException("Please check data table name and/or the syntax of row filter.");
+        } catch (Exception e) {
+            LOG.error("Error: ", e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            closeDB(dbServer);
+        }
+    }
 
 }

@@ -281,7 +281,15 @@ public class EditablePagePanel extends JPanel {
             return JOptionPane.CANCEL_OPTION;
 
         if (option == JOptionPane.YES_OPTION) {
-            String confirm = "This deletion is not reversible. Are you sure you want to proceed?";
+            int rowCount = 0;
+            
+            try {
+                rowCount = getRowCount(tableData);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage());
+            }
+            
+            String confirm = "This deletion of " + rowCount + " records is not reversible. Are you sure you want to proceed?";
             int goDelete = JOptionPane.showConfirmDialog((Component) listOfChangeables, confirm, title,
                     JOptionPane.YES_NO_OPTION);
 
@@ -318,6 +326,15 @@ public class EditablePagePanel extends JPanel {
             e.printStackTrace();
             messagePanel.setError(e.getMessage());
         }
+    }
+    
+    private int getRowCount(EditablePage tableData) throws EmfException {
+        DataService service = emfSession.dataService();
+        Version version = tableData.getVersion();
+        String filter = (rowFilter.getText() == null ? "" : rowFilter.getText());
+        String table = tableData.getTable();
+
+        return service.getNumOfRecords(table, version, filter);
     }
 
     public void scrollToPageEnd() {

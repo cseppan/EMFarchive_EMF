@@ -69,4 +69,6 @@ public interface DataService {
     void copyDataset(int datasetId, Version version, User user) throws EmfException;
 
     int getNumExternalSources(int dsId, String filter) throws EmfException;
+    
+    int getNumOfRecords (String table, Version version, String filter) throws EmfException;
 }

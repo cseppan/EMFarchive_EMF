@@ -371,4 +371,16 @@ public class DataServiceTransport implements DataService {
         call.request(new Object[]{new Integer(datasetId), newDir});
     }
 
+    public int getNumOfRecords(String table, Version version, String filter) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getNumOfRecords");
+        call.addStringParam("table");
+        call.addParam("version", mappings.version());
+        call.addStringParam("filter");
+        call.setIntegerReturnType();
+        
+        return (Integer)call.requestResponse(new Object[]{table, version, filter});
+    }
+
 }
