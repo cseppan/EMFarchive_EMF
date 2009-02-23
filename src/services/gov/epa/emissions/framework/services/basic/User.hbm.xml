@@ -18,5 +18,6 @@
         <property name="accountDisabled" column="is_account_disabled" type="boolean"/>
         <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
         <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
+        <property name="loggedIn" column="is_login" type="boolean"/>
     </class>
 </hibernate-mapping>

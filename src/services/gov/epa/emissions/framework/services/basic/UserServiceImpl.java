@@ -55,12 +55,12 @@ public class UserServiceImpl implements UserService {
     public synchronized void authenticate(String username, String password) throws EmfException {
         try {
             User user = getUser(username);
-            
+
             if (user == null)
                 throw new AuthenticationException("User " + username + " does not exist");
 
             LOG.warn("User " + user.getUsername() + " (" + user.getName() + ") tried to login to the EMF service.");
-            
+
             if (user.isAccountDisabled())
                 throw new AuthenticationException("Account Disabled");
 
@@ -74,11 +74,11 @@ public class UserServiceImpl implements UserService {
 
     public synchronized User getUser(String username) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             if (username == null || username.trim().isEmpty())
                 throw new EmfException("Please specify a valid username.");
-            
+
             User user = dao.get(username, session);
 
             return user;
@@ -89,10 +89,10 @@ public class UserServiceImpl implements UserService {
             session.close();
         }
     }
-    
+
     public synchronized User getUserByEmail(int id, String email) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             User user = dao.getUserByEmail(id, email, session);
 
@@ -120,17 +120,18 @@ public class UserServiceImpl implements UserService {
 
     public synchronized User createUser(User user) throws EmfException {
         User existingUser = this.getUser(user.getUsername());
-        
+
         if (existingUser != null) {
             throw new EmfException("Could not create new user. The username '" + user.getUsername()
                     + "' is already taken");
         }
-        
+
         existingUser = this.getUserByEmail(user.getId(), user.getEmail());
-        
+
         if (existingUser != null)
-            throw new EmfException("The same email address has already been used by user '" + existingUser.getUsername() + "'.");
-        
+            throw new EmfException("The same email address has already been used by user '"
+                    + existingUser.getUsername() + "'.");
+
         Session session = sessionFactory.getSession();
         try {
             dao.add(user, session);
@@ -145,16 +146,21 @@ public class UserServiceImpl implements UserService {
 
     public synchronized void updateUser(User user) throws EmfException {
         User existingUser = this.getUserByEmail(user.getId(), user.getEmail());
-        
+
         if (existingUser != null)
-            throw new EmfException("The same email address has already been used by user '" + existingUser.getUsername() + "'.");
+            throw new EmfException("The same email address has already been used by user '"
+                    + existingUser.getUsername() + "'.");
+        
+        Session session = sessionFactory.getSession();
+        
         try {
-            Session session = sessionFactory.getSession();
             dao.update(user, session);
-            session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not update user - " + user.getName(), e);
             throw new EmfException("Unable to update user due to data access failure");
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -170,16 +176,22 @@ public class UserServiceImpl implements UserService {
     }
 
     public synchronized User obtainLocked(User owner, User object) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
         try {
-            Session session = sessionFactory.getSession();
-            User locked = dao.obtainLocked(owner, object, session);
-            session.close();
+            User locked = null;
+            
+            if (owner.isAdmin() || owner.equals(object))
+                locked = dao.obtainLocked(owner, object, session);
 
             return locked;
         } catch (RuntimeException e) {
             LOG.error("Could not obtain lock for user: " + object.getUsername() + " by owner: " + owner.getUsername(),
                     e);
             throw new EmfException("Unable to fetch lock user due to data access failure");
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -219,7 +231,7 @@ public class UserServiceImpl implements UserService {
 
     public void logExitMessage(User user) {
         LOG.warn("User " + user.getUsername() + " (" + user.getName() + ") logged out of the EMF service.");
-        
+
         try {
             User existed = getUser(user.getUsername());
             if (existed == null)
