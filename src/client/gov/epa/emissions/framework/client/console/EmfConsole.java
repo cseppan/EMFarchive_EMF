@@ -91,7 +91,12 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     protected void windowClosing() {// overriden
         ExitAndLogoutAction exitAction = new ExitAndLogoutAction(EmfConsole.this, desktopManager);
-        exitAction.exit();
+        try {
+            exitAction.exit();
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     private void setSize() {
@@ -230,6 +235,10 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         } catch (EmfException e) {
             e.printStackTrace();
         }
+    }
+
+    public EmfSession getSession() {     
+        return session;
     }
 
 }

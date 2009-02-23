@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.console;
 
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 
 public interface EmfConsoleView {
@@ -14,5 +15,7 @@ public interface EmfConsoleView {
     int width();
 
     boolean confirm();
+    
+    public EmfSession getSession();
 
 }

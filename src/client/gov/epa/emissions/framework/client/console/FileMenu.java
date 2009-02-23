@@ -38,7 +38,12 @@ public class FileMenu extends JMenu {
         exit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 ExitAndLogoutAction exit = new ExitAndLogoutAction(parent, desktopManager);
-                exit.exit();
+                try {
+                    exit.exit();
+                } catch (EmfException e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         });
         return exit;

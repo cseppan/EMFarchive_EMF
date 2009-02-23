@@ -17,6 +17,7 @@ public class LoginPresenter {
     private String update;
 
     private UserPreference preferences;
+    
 
     public LoginPresenter(UserService model) {
         this.userAdmin = model;
@@ -28,7 +29,17 @@ public class LoginPresenter {
         } catch (CommonsException e) {
             throw new EmfException(e.getMessage());
         }
-        return userAdmin.getUser(username);
+        
+        User user = userAdmin.getUser(username);
+        if (!user.isLoggedIn()){
+            user = userAdmin.obtainLocked(userAdmin.getUser(username), userAdmin.getUser(username));
+            if ( user == null )        
+                throw new EmfException("Unable to fetch lock user");
+            user.setLoggedIn(true);
+            userAdmin.updateUser(user);
+        }
+        return user;
+        //return userAdmin.getUser(username);
     }
 
     public boolean checkEmfVersion(String current) throws EmfException {

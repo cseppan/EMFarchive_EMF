@@ -85,7 +85,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
     }
 
     private void manageUsers(User user, final MessagePanel messagePanel) {
-        if (user.isAdmin()) {
+        //if (user.isAdmin()) {
             JMenuItem users = new JMenuItem("Users");
             users.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
@@ -94,7 +94,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
             });
 
             super.add(users);
-        }
+        //}
     }
 
     private JMenuItem createDatasets(final EmfConsole parent, final MessagePanel messagePanel) {
