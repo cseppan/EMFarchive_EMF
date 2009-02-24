@@ -57,14 +57,14 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
 
     private EmfDataset createDataset() throws EmfException {
         //"LeatCostCM_", 
-        return creator.addDataset("CSLCM_", 
+        return creator.addDataset("CSLCM", 
                 DatasetCreator.createDatasetName("Measure Worksheet " + controlStrategy.getName()), getControlStrategyLeastCostCMWorksheetDatasetType(), 
                 new StrategyLeastCostCMWorksheetTableFormat(dbServer.getSqlDataTypes()), leastCostCMWorksheetDescription());
     }
 
     private EmfDataset createLeastCostCurveSummaryDataset() throws EmfException {
         //"LeatCostCM_", 
-        return creator.addDataset("CSLCCS_", 
+        return creator.addDataset("CSLCCS", 
                 DatasetCreator.createDatasetName("Cost Curve Summary " + controlStrategy.getName()), getControlStrategyLeastCostCurveSummaryDatasetType(), 
                 new LeastCostCurveSummaryTableFormat(dbServer.getSqlDataTypes()), leastCostCurveSummaryDescription());
     }
@@ -184,7 +184,7 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
         String query3 = "";
         query = "SELECT public.populate_least_cost_strategy_worksheet("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ");";
         query2 = "analyze "  + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + ";";
-        query3 = "SELECT public.eliminate_least_cost_strategy_source_measures("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ");vacuum analyze "  + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + ";";
+        query3 = "SELECT public.eliminate_least_cost_strategy_source_measures("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ");analyze "  + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + ";";
         try {
             datasource.query().execute(query);
             System.out.println(System.currentTimeMillis() + " finished " + query);

@@ -82,7 +82,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
 
     private EmfDataset createDataset(EmfDataset inventory) throws Exception {
         //"LeatCostCM_", 
-        return creator.addDataset("DS_", 
+        return creator.addDataset("DS", 
                 DatasetCreator.createDatasetName(inventory.getName() + "_annotated"), 
                 inventory.getDatasetType(), 
                 new FileFormatFactory(dbServer).tableFormat(inventory.getDatasetType()), 

@@ -33,6 +33,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 
 import org.hibernate.Session;
@@ -174,18 +175,18 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     private EmfDataset createResultDataset(EmfDataset inputDataset) throws EmfException {
-        return creator.addDataset("Strategy_", "CSDR_", 
+        return creator.addDataset("Strategy", "CSDR", 
                 inputDataset, getControlStrategyDetailedResultDatasetType(), 
                 detailedResultTableFormat);
     }
 
     private EmfDataset createStrategyMessagesDataset(EmfDataset inventory) throws Exception {
-      return creator.addDataset("DS_", 
+      return creator.addDataset("DS", 
               DatasetCreator.createDatasetName(inventory.getName() + "_strategy_msgs"), 
               getDatasetType("Strategy Messages (CSV)"), 
               new VersionedTableFormat(new StrategyMessagesFileFormat(dbServer.getSqlDataTypes()), dbServer.getSqlDataTypes()), 
               strategyMessagesDatasetDescription());
-  }
+    }
   
     private String strategyMessagesDatasetDescription() {
         return "#Strategy Messages\n" + 
@@ -219,34 +220,43 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     protected boolean inventoryHasTargetPollutant(ControlStrategyInputDataset controlStrategyInputDataset) throws EmfException {
         String versionedQuery = new VersionedQuery(version(controlStrategyInputDataset)).query();
 
-        String query = "SELECT DISTINCT ON (poll) 1 as Found "
+        String query = "SELECT 1 as Found "
             + " FROM " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()) 
             + " where " + versionedQuery
             + " and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "
             + getFilterForSourceQuery() + " limit 1;";
+        //System.out.println(System.currentTimeMillis() + " " + query);
         ResultSet rs = null;
-        System.out.println(System.currentTimeMillis() + " " + query);
+        Statement statement = null;
         try {
-            rs = datasource.query().executeQuery(query);
+            statement = datasource.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            rs = statement.executeQuery(query);
+//            rs = datasource.query().executeQuery(query);
             while (rs.next()) {
                 if (rs.getInt(1) > 0)
                     return true;
             }
+            rs.close();
+            rs = null;
+            statement.close();
+            statement = null;
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    //
-                }
+            if (rs != null) {
+                try { rs.close(); } catch (SQLException e) { /**/ }
+                rs = null;
+            }
+            if (statement != null) {
+                try { statement.close(); } catch (SQLException e) { /**/ }
+                statement = null;
+            }
         }
         return false;
     }
 
     public void makeSureInventoryDatasetHasIndexes(ControlStrategyInputDataset controlStrategyInputDataset) {
-        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + "');vacuum analyze " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + ";";
+        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + "');analyze " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + ";";
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
@@ -292,7 +302,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
             + "' then Emis_Reduction else null end) as total_reduction "
             + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
         ResultSet rs = null;
-        System.out.println(System.currentTimeMillis() + " " + query);
+        //System.out.println(System.currentTimeMillis() + " " + query);
         try {
             rs = datasource.query().executeQuery(query);
             while (rs.next()) {
@@ -317,7 +327,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         String query = "SELECT count(1) as record_count "
             + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
         ResultSet rs = null;
-        System.out.println(System.currentTimeMillis() + " " + query);
+        //System.out.println(System.currentTimeMillis() + " " + query);
         try {
             rs = datasource.query().executeQuery(query);
             while (rs.next()) {
@@ -434,7 +444,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
             + " and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "
             + getFilterForSourceQuery() + ";";
         ResultSet rs = null;
-        System.out.println(System.currentTimeMillis() + " " + query);
+        //System.out.println(System.currentTimeMillis() + " " + query);
         try {
             rs = datasource.query().executeQuery(query);
             while (rs.next()) {
@@ -456,7 +466,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     protected void createDetailedResultTableIndexes(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "SELECT public.create_strategy_detailed_result_table_indexes('" + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + "');analyze emissions." + emissionTableName(controlStrategyResult.getDetailedResultDataset()) + ";";
         
-        System.out.println(System.currentTimeMillis() + " " + query);
+        //System.out.println(System.currentTimeMillis() + " " + query);
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {

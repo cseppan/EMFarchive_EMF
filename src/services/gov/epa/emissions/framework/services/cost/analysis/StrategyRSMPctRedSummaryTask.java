@@ -113,9 +113,11 @@ public class StrategyRSMPctRedSummaryTask extends AbstractStrategySummaryTask {
     }
 
     private EmfDataset createCountySummaryDataset() throws EmfException {
-        return creator.addDataset("CSCS_", 
-                DatasetCreator.createDatasetName("RSM_Pct_Red_" + controlStrategy.getName()), getDatasetType(DatasetType.rsmPercentReduction), 
-                new StrategyRSMPctRedSummaryTableFormat(dbServer.getSqlDataTypes()), summaryResultDatasetDescription(DatasetType.strategyCountySummary));
+        return creator.addDataset("CSCS", 
+                DatasetCreator.createDatasetName("RSM_Pct_Red_" + controlStrategy.getName()), 
+                getDatasetType(DatasetType.rsmPercentReduction), 
+                new StrategyRSMPctRedSummaryTableFormat(dbServer.getSqlDataTypes()), 
+                summaryResultDatasetDescription(DatasetType.strategyCountySummary));
     }
 
     private ControlStrategyResult createStrategyCountySummaryResult() throws EmfException {

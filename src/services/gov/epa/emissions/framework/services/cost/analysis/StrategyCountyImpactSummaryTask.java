@@ -99,7 +99,7 @@ public class StrategyCountyImpactSummaryTask extends AbstractStrategySummaryTask
     }
 
     private EmfDataset createCountyImpactSummaryDataset() throws EmfException {
-        return creator.addDataset("CSIS_", DatasetCreator.createDatasetName("Impact_Sum_" + controlStrategy.getName()),
+        return creator.addDataset("CSIS", DatasetCreator.createDatasetName("Impact_Sum_" + controlStrategy.getName()),
                 getDatasetType(DatasetType.strategyImpactSummary), new StrategyImpactSummaryTableFormat(dbServer
                         .getSqlDataTypes()), summaryResultDatasetDescription(DatasetType.strategyImpactSummary));
     }
@@ -189,7 +189,7 @@ public class StrategyCountyImpactSummaryTask extends AbstractStrategySummaryTask
         String sql = "INSERT INTO " + qualifiedEmissionTableName(countyImpactSummary.getDetailedResultDataset()) + " ("
                 + impactTableCols + ") select " + countyImpactSummary.getDetailedResultDataset().getId() + ", 0, "
                 + selectSubString;
-
+System.out.println(sql);
         try {
             datasource.query().execute(sql);
         } catch (SQLException e) {

@@ -262,7 +262,7 @@ public class DatasetCreator {
     }
 
     private String createResultDatasetName(String datasetNamePrefix, EmfDataset inputDataset) {
-        return createDatasetName(datasetNamePrefix + inputDataset.getId() 
+        return createDatasetName(datasetNamePrefix+ "_" + inputDataset.getId() 
                 + "_V" + inputDataset.getDefaultVersion());
     }
         
@@ -282,18 +282,19 @@ public class DatasetCreator {
     }
         
     private String createTableName(String tablePrefix, EmfDataset inputDataset) {
-        String prefix = tablePrefix + inputDataset.getId() 
+        String prefix = tablePrefix + "_" + inputDataset.getId() 
             + "_V" + inputDataset.getDefaultVersion();
         String name = inputDataset.getName();
         return createTableName(prefix, name);
     }
     
     private String createTableName(String tablePrefix, String name) {
-        return createTableName(tablePrefix + "_" + name + "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date()));
+        return createTableName(tablePrefix + "_" + name);
     }
 
     private String createTableName(String name) {
         String table = name;
+        //truncate if necessary so a unique timestamp can be added to ensure uniqueness
         if (table.length() > 46) {     //postgresql table name max length is 64
             table = table.substring(0, 45);
         }
@@ -304,7 +305,8 @@ public class DatasetCreator {
             }
         }
 
-        return table.trim().replaceAll(" ", "_");// + "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date());
+        //add unique timestamp to ensure uniqueness
+        return table.trim().replaceAll(" ", "_") + "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date());
     }
 
     private void add(EmfDataset dataset) throws EmfException {

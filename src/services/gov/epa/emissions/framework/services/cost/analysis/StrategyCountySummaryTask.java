@@ -116,9 +116,11 @@ public class StrategyCountySummaryTask extends AbstractStrategySummaryTask {
     }
 
     private EmfDataset createCountySummaryDataset() throws EmfException {
-        return creator.addDataset("CSCS_", 
-                DatasetCreator.createDatasetName("Strat_County_Sum_"), getDatasetType(DatasetType.strategyCountySummary), 
-                new StrategyCountySummaryTableFormat(dbServer.getSqlDataTypes()), summaryResultDatasetDescription(DatasetType.strategyCountySummary));
+        return creator.addDataset("CSCS", 
+                DatasetCreator.createDatasetName("Strat_County_Sum"), 
+                getDatasetType(DatasetType.strategyCountySummary), 
+                new StrategyCountySummaryTableFormat(dbServer.getSqlDataTypes()), 
+                summaryResultDatasetDescription(DatasetType.strategyCountySummary));
     }
 
     private ControlStrategyResult createStrategyCountySummaryResult() throws EmfException {

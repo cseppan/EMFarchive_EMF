@@ -31,6 +31,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -404,7 +405,11 @@ public abstract class AbstractStrategyTask implements Strategy {
         String filter = getFilterForSourceQuery();
         if (datasets.length > 0) {
             for (int i = 0; i < datasets.length; i++) {
-                String sql = "select public.populate_sources_table('" + emissionTableName(datasets[i].getInputDataset()) + "'," + (filter.length() == 0 ? "null::text" : "'" + filter.replaceAll("'", "''").substring(5) + "'") + ");vacuum analyze emf.sources;";
+
+                //make sure inventory has indexes created...
+                makeSureInventoryDatasetHasIndexes(datasets[i]);
+
+                String sql = "select public.populate_sources_table('" + emissionTableName(datasets[i].getInputDataset()) + "'," + (filter.length() == 0 ? "null::text" : "'" + filter.replaceAll("'", "''").substring(5) + "'") + ");analyze emf.sources;";
                 System.out.println( sql);
                 try {
                     datasource.query().execute(sql);
@@ -412,6 +417,18 @@ public abstract class AbstractStrategyTask implements Strategy {
                     throw new EmfException("Error occured when populating the sources table " + "\n" + e.getMessage());
                 }
             }
+        }
+    }
+
+    public void makeSureInventoryDatasetHasIndexes(ControlStrategyInputDataset controlStrategyInputDataset) {
+        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + "');analyze " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + ";";
+        try {
+            datasource.query().execute(query);
+        } catch (SQLException e) {
+            //e.printStackTrace();
+            //supress all errors, the indexes might already be on the table...
+        } finally {
+            //
         }
     }
 
@@ -430,21 +447,28 @@ public abstract class AbstractStrategyTask implements Strategy {
         String query = "SELECT count(1) as record_count "
             + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
         ResultSet rs = null;
-        System.out.println(System.currentTimeMillis() + " " + query);
+        Statement statement = null;
         try {
-            rs = datasource.query().executeQuery(query);
+            statement = datasource.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            rs = statement.executeQuery(query);
             while (rs.next()) {
                 controlStrategyResult.setRecordCount(rs.getInt(1));
             }
+            rs.close();
+            rs = null;
+            statement.close();
+            statement = null;
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
-            if (rs != null)
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    //
-                }
+            if (rs != null) {
+                try { rs.close(); } catch (SQLException e) { /**/ }
+                rs = null;
+            }
+            if (statement != null) {
+                try { statement.close(); } catch (SQLException e) { /**/ }
+                statement = null;
+            }
         }
     }
 
@@ -529,15 +553,19 @@ public abstract class AbstractStrategyTask implements Strategy {
     }
 
     private EmfDataset createMeasureSummaryDataset() throws EmfException {
-        return creator.addDataset("CSMS_", 
-                DatasetCreator.createDatasetName("Strat_Meas_Sum_"), getDatasetType(DatasetType.strategyMeasureSummary), 
-                new StrategyMeasureSummaryTableFormat(dbServer.getSqlDataTypes()), summaryResultDatasetDescription(DatasetType.strategyMeasureSummary));
+        return creator.addDataset("CSMS", 
+                DatasetCreator.createDatasetName("Strat_Meas_Sum"), 
+                getDatasetType(DatasetType.strategyMeasureSummary), 
+                new StrategyMeasureSummaryTableFormat(dbServer.getSqlDataTypes()), 
+                summaryResultDatasetDescription(DatasetType.strategyMeasureSummary));
     }
 
     private EmfDataset createCountySummaryDataset() throws EmfException {
-        return creator.addDataset("CSCS_", 
-                DatasetCreator.createDatasetName("Strat_County_Sum_"), getDatasetType(DatasetType.strategyCountySummary), 
-                new StrategyCountySummaryTableFormat(dbServer.getSqlDataTypes()), summaryResultDatasetDescription(DatasetType.strategyCountySummary));
+        return creator.addDataset("CSCS", 
+                DatasetCreator.createDatasetName("Strat_County_Sum"), 
+                getDatasetType(DatasetType.strategyCountySummary), 
+                new StrategyCountySummaryTableFormat(dbServer.getSqlDataTypes()), 
+                summaryResultDatasetDescription(DatasetType.strategyCountySummary));
     }
 
     private String summaryResultDatasetDescription(String datasetTypeName) {
