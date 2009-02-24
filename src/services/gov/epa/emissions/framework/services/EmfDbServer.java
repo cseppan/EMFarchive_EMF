@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services;
 
+import java.sql.Connection;
+
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
@@ -63,5 +65,9 @@ public class EmfDbServer implements DbServer {
     public boolean isConnected() throws Exception{
         // Check underlying db server connection
         return dbServer.isConnected();
+    }
+
+    public Connection getConnection() {
+        return dbServer.getConnection();
     }
 }
