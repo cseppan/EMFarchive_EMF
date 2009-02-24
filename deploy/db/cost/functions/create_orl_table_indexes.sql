@@ -32,7 +32,7 @@ BEGIN
 	-- Create Indexes....
 
 	-- create record_id btree index
-	IF length('fips_' || table_name) >= 63 - 9 THEN
+	IF length('recordid_' || table_name) >= 63 - 9 THEN
 		index_name := 'recordid_' || substr(table_name, 10, 63);
 	ELSE
 		index_name := 'recordid_' || table_name;

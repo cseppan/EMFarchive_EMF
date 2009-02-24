@@ -8,13 +8,15 @@ BEGIN
 	-- see if there are point specific columns to be indexed
 	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
 
-	execute 'insert into emf.sources (scc, fips ' || case when is_point_table = false then '' else ', plantid, pointid, stackid, segment' end || ', source)
+	execute 
+	'insert into emf.sources (scc, fips ' || case when is_point_table = false then '' else ', plantid, pointid, stackid, segment' end || ', source)
 		select distinct on (inv.scc, inv.fips ' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || ')
 		inv.scc, inv.fips ' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || ',
 		inv.scc || inv.fips || ' || case when is_point_table = false then 'rpad('''', 60)' else 'rpad(coalesce(inv.plantid, ''''), 15) || rpad(coalesce(inv.pointid, ''''), 15) || rpad(coalesce(inv.stackid, ''''), 15) || rpad(coalesce(inv.segment, ''''), 15)' end || '
 	FROM emissions.' || inv_table_name || ' inv
 		left outer join emf.sources
-		on sources.scc = inv.scc
+		on sources.source = inv.scc || inv.fips || ' || case when is_point_table = false then 'rpad('''', 60)' else 'rpad(coalesce(inv.plantid, ''''), 15) || rpad(coalesce(inv.pointid, ''''), 15) || rpad(coalesce(inv.stackid, ''''), 15) || rpad(coalesce(inv.segment, ''''), 15)' end || '
+/*		sources.scc = inv.scc
 		and sources.fips = inv.fips
 		' || case when is_point_table = false then '
 		and sources.plantid is null
@@ -27,6 +29,7 @@ BEGIN
 		and sources.stackid = inv.stackid
 		and sources.segment = inv.segment
 		' end || '
+*/
 		 where sources.id is null 
 			' || case when length(coalesce(inv_filter, '')) > 0 then ' and (' || public.alias_inventory_filter(inv_filter, 'inv') || ')' else '' end || '
 		';
@@ -34,3 +37,6 @@ BEGIN
 	return;
 END;
 $$ LANGUAGE plpgsql;
+
+
+--select public.populate_sources_table('DS_point_cap2005_epa_1697358408','version IN (0) AND dataset_id=4441');

@@ -29,4 +29,4 @@ END;
 $BODY$
   LANGUAGE 'plpgsql' IMMUTABLE
   COST 100;
-ALTER FUNCTION get_least_cost_worksheet_emis_reduction(character varying, character varying, integer) OWNER TO postgres;
+ALTER FUNCTION public.get_least_cost_worksheet_emis_reduction(character varying, character varying, integer) OWNER TO postgres;
