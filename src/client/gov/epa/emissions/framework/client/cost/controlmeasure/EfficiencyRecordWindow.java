@@ -216,7 +216,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
             }
         });
         this.addChangeable(costYear);
-        layoutGenerator.addLabelWidgetPair("Cost Year:*", costYear, panel);
+        layoutGenerator.addLabelWidgetPair("Cost Year:", costYear, panel);
 
         costperTon = new TextField("Cost Per Ton Reduced", 10);
         costperTon.addFocusListener(new FocusAdapter() {
@@ -231,7 +231,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         });
 
         this.addChangeable(costperTon);
-        layoutGenerator.addLabelWidgetPair("Cost Per Ton Reduced:*", costperTon, panel);
+        layoutGenerator.addLabelWidgetPair("Cost Per Ton Reduced:", costperTon, panel);
 
         
         capAnnRatio = new TextField("Cap Ann Ratio", 10);
