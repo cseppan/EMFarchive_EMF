@@ -80,6 +80,12 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
     
     private DatasetType orlPointDST;
     
+    private DatasetType orlNonpointDST;
+    
+//    private DatasetType orlNonroadDST;
+//    
+//    private DatasetType orlOnroadDST;
+    
     private DatasetType speciationToolGasProfileDST;
     
     private DatasetType pollToPollConversionDST;
@@ -115,6 +121,9 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
     public void display(EmfDataset dataset, QAStep qaStep) {
         try {
             this.orlPointDST = presenter1.getDatasetType(DatasetType.orlPointInventory);
+            this.orlNonpointDST = presenter1.getDatasetType(DatasetType.orlNonpointInventory);
+//            this.orlNonroadDST = presenter1.getDatasetType(DatasetType.orlNonroadInventory);
+//            this.orlOnroadDST = presenter1.getDatasetType(DatasetType.orlOnroadInventory);
             this.speciationToolGasProfileDST = presenter1.getDatasetType("Speciation Tool gas profiles");
             this.pollToPollConversionDST = presenter1.getDatasetType("Pollutant to Pollutant Conversion (GSCNV)");
             this.speciationProfileWeightDST = presenter1.getDatasetType("Speciation Tool profile weights");
@@ -143,14 +152,14 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         JPanel content = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
        
-        layoutGenerator.addLabelWidgetPair("CAP Inventory:", capInvPanel(), content);
-        layoutGenerator.addLabelWidgetPair("HAP Inventory:", hapInvPanel(), content);
+        layoutGenerator.addLabelWidgetPair("CAP Inventory:", capInvPanel(dataset), content);
+        layoutGenerator.addLabelWidgetPair("HAP Inventory:", hapInvPanel(dataset), content);
         layoutGenerator.addLabelWidgetPair("Speciation Tool Species Info Dataset:", speciationToolGasProfileDatasetPanel(), content);
         layoutGenerator.addLabelWidgetPair("Pollutant to Pollutant Conversion (GSCNV) Dataset:",  pollToPollConversionDatasetPanel(), content);
         layoutGenerator.addLabelWidgetPair("Speciation Cross-Reference (GSREF) Datasets:",  speciationCrossReferenceDatasetsPanel(), content);
         layoutGenerator.addLabelWidgetPair("Speciation Profile Weight Datasets:",  speciationProfileWeightDatasetsPanel(), content);
         
-        summaryTypeCombo();
+        summaryTypeCombo(dataset);
         layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
 
 //        JPanel middlePanel = new JPanel(new SpringLayout());
@@ -173,7 +182,7 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         return layout;
     }
     
-    private JPanel capInvPanel() {
+    private JPanel capInvPanel(EmfDataset dataset) {
         
         capInvListWidget = new ListWidget(new EmfDataset[0]);
         if(!(capInventory == null))
@@ -183,7 +192,7 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         pane.setPreferredSize(new Dimension(350, 25));
         capInvListWidget.setToolTipText("The CAP inventory dataset.  Press select button to choose from a list.");
        
-        Button addButton = new AddButton("Select", addCAPInvAction());
+        Button addButton = new AddButton("Select", dataset.getDatasetType().equals(orlPointDST) ? addCAPPointInvAction() : addCAPNonPointInvAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
         JPanel container = new JPanel(new FlowLayout());
@@ -194,7 +203,7 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         return container;
     }
     
-    private JPanel hapInvPanel() {
+    private JPanel hapInvPanel(EmfDataset dataset) {
         
         hapInvListWidget = new ListWidget(new EmfDataset[0]);
         if(!(hapInventory==null))
@@ -204,7 +213,7 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         pane.setPreferredSize(new Dimension(350, 25));
         hapInvListWidget.setToolTipText("The HAP inventory dataset.  Press select button to choose from a list.");
        
-        Button addButton = new AddButton("Select", addHAPInvAction());
+        Button addButton = new AddButton("Select", dataset.getDatasetType().equals(orlPointDST) ? addHAPPointInvAction() : addHAPNonPointInvAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
         JPanel container = new JPanel(new FlowLayout());
@@ -301,8 +310,13 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         return container;
     }
     
-    protected void summaryTypeCombo() {
-        String [] values= new String[]{"Details", "By NEI Unique Id", "By SCC", "By SIC", "By MACT", "By NAICS", "By Profile Code"};
+    protected void summaryTypeCombo(EmfDataset dataset) {
+        String [] values= new String[]{};
+        if (dataset.getDatasetType().equals(orlPointDST))
+            values= new String[]{"Details", "By NEI Unique Id", "By SCC", "By SIC", "By MACT", "By NAICS", "By Profile Code"};
+        else
+            values= new String[]{"Details", "By SCC", "By SIC", "By MACT", "By NAICS", "By Profile Code"};
+            
         summaryTypes = new ComboBox("Not Selected", values);
         summaryTypes.setPreferredSize(new Dimension(350, 25));
         if(!(summaryType==null) && (summaryType.trim().length()>0))
@@ -322,7 +336,7 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         return panel;
     }
     
-    private Action addCAPInvAction() {
+    private Action addCAPPointInvAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doAddWindow(capInvListWidget, new DatasetType[] {orlPointDST}, orlPointDST, true);
@@ -330,10 +344,26 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         };
     }
   
-    private Action addHAPInvAction() {
+    private Action addHAPPointInvAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doAddWindow(hapInvListWidget, new DatasetType[] {orlPointDST}, orlPointDST, true);
+            }
+        };
+    }
+  
+    private Action addCAPNonPointInvAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doAddWindow(capInvListWidget, new DatasetType[] {orlNonpointDST}, orlNonpointDST, true);
+            }
+        };
+    }
+  
+    private Action addHAPNonPointInvAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doAddWindow(hapInvListWidget, new DatasetType[] {orlNonpointDST}, orlNonpointDST, true);
             }
         };
     }
@@ -357,7 +387,10 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
     private Action addSpeciationCrossReferenceDatasetsAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doAddWindow(speciationCrossReferenceDatasetsListWidget, new DatasetType[] {speciationCrossReferenceDST}, speciationCrossReferenceDST, false);
+                doAddWindow(speciationCrossReferenceDatasetsListWidget, 
+                        new DatasetType[] {speciationCrossReferenceDST}, 
+                        speciationCrossReferenceDST, 
+                        false);
             }
         };
     }

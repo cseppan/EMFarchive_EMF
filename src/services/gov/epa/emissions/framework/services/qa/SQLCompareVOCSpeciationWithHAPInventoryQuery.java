@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +76,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         String valuesString = "";
         
         valuesString = programSwitches.substring(beginIndex, endIndex);
-        StringTokenizer tokenizer2 = new StringTokenizer(valuesString);
+        StringTokenizer tokenizer2 = new StringTokenizer(valuesString, "\n");
         tokenizer2.nextToken(); // skip the flag
 
         while (tokenizer2.hasMoreTokens()) {
@@ -126,7 +127,16 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         String filter;
         String version;
         String table;
-        
+        boolean capIsPoint = false;
+        boolean hapIsPoint = false;
+        boolean capHasSIC = false;
+        boolean hapHasSIC = false;
+        boolean capHasMACT = false;
+        boolean hapHasMACT = false;
+        boolean capHasNAICS = false;
+        boolean hapHasNAICS = false;
+
+
         if (capIndex != -1) {
             arguments = parseSwitchArguments(programArguments, capIndex, programArguments.indexOf("\n-", capIndex) != -1 ? programArguments.indexOf("\n-", capIndex) : programArguments.length());
             if (arguments != null && arguments.length > 0) capInventory = arguments[0];
@@ -207,14 +217,22 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         //lets make sure the inventories are indexed and vacuumed
         indexORLInventory(emissionTableName(dataset));
         //lets make sure the sources table is populated from the input inventories 
-        populateSourcesTable(emissionTableName(dataset), capInventoryVersion.replace("i.",""));
+        populateSourcesTable(emissionTableName(dataset), (capInventoryVersion + (filter.length() == 0 ? "" : " and (" + filter.replaceAll("''", "'") + ")")).replace("i.",""));
+        capIsPoint = checkTableForColumns(emissionTableName(dataset), "plantid,pointid,stackid,segment");
+        capHasSIC = checkTableForColumns(emissionTableName(dataset), "sic");
+        capHasMACT = checkTableForColumns(emissionTableName(dataset), "mact");
+        capHasNAICS = checkTableForColumns(emissionTableName(dataset), "naics");
         dataset = getDataset(hapInventory);
         String hapInventoryTable = qualifiedEmissionTableName(dataset);
         String hapInventoryVersion = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion()), "i").query();
         //lets make sure the inventories are indexed and vacuumed
         indexORLInventory(emissionTableName(dataset));
         //lets make sure the sources table is populated from the input inventories 
-        populateSourcesTable(emissionTableName(dataset), hapInventoryVersion.replace("i.",""));
+        populateSourcesTable(emissionTableName(dataset), (hapInventoryVersion + (filter.length() == 0 ? "" : " and (" + filter.replaceAll("''", "'") + ")")).replace("i.",""));
+        hapIsPoint = checkTableForColumns(emissionTableName(dataset), "plantid,pointid,stackid,segment");
+        hapHasSIC = checkTableForColumns(emissionTableName(dataset), "sic");
+        hapHasMACT = checkTableForColumns(emissionTableName(dataset), "mact");
+        hapHasNAICS = checkTableForColumns(emissionTableName(dataset), "naics");
         dataset = getDataset(speciationToolSpecieInfoDataset);
         String speciationToolSpecieInfoDatasetTable = qualifiedEmissionTableName(dataset);
         String speciationToolSpecieInfoDatasetVersion = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion()), "p").query();
@@ -299,7 +317,12 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
 
         
         } else if (summaryType.equals("By NEI Unique Id")) {
-            sql = "select nei.fips, tbl.nei_unique_id, nei.plant, \n"
+            sql = "select nei.fips, tbl.nei_unique_id, "
+                + (
+                    capIsPoint || hapIsPoint 
+                    ? "nei.plant, \n"
+                    : ""
+                    )
                 + "    nei.sic, coalesce(s2.description, 'UNSPECIFIED') as sic_description,  \n"
                 + "    nei.mact, coalesce(m.mact_source_category, 'UNSPECIFIED') as mact_description, \n"
                 + "    nei.naics, coalesce(n.naics_description, 'UNSPECIFIED') as naics_description, \n"
@@ -372,15 +395,19 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         sql += "select  \n"
         + "c.fips,  \n"
         + "c.scc,  \n"
-        + (summaryType == "Details" 
+        + (summaryType.equals("Details") 
             ? "coalesce(s.scc_description,'UNSPECIFIED') as scc_description, \n" 
             : "") 
-        + "c.nei_unique_id,  \n"
-        + "c.plantid, \n"
-        + "c.pointid,  \n"
-        + "c.stackid,  \n"
-        + "c.segment,  \n"
-        + "c.plant, \n"
+        + (
+            capIsPoint || hapIsPoint 
+            ? "c.nei_unique_id, \n"
+            + "c.plantid, \n"
+            + "c.pointid, \n"
+            + "c.stackid, \n"
+            + "c.segment, \n"
+            + "c.plant, \n"
+            : "c.nei_unique_id, \n"
+            )
         + "c.sic,  \n"
         + "c.mact, \n"
         + "c.naics, \n"
@@ -456,11 +483,72 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "hap_formaldehyde_data_source,  \n"
         + "hap_methanol_data_source, \n"
         + "speciated_code as profile_code \n"
-        + (summaryType.equals("By Profile Code") || summaryType == "Details" 
+        + (summaryType.equals("By Profile Code") || summaryType.equals("Details")
             ? ", coalesce(p.profile_name,'NO PROFILE') as profile_name, \n"
         + "p.date_added as profile_date, p.documentation \n" 
-            : "") 
-        + "from crosstab( \n"
+            : "");
+ 
+        if (summaryType.equals("Details")) {
+            
+            sql += "    ,( select percent from ( \n";
+            for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
+                if (i > 0) sql += " union all \n";
+                dataset = getDataset(speciationProfileWeightDatasets[i]);
+                version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
+                table = qualifiedEmissionTableName(dataset);
+                sql += "       select profile, percent \n"
+                    + "       from " + table + " s \n"
+                    + "       where specie_id = '302' \n"
+                    + "       and " + version;
+            }
+            sql += "        ) rp \n"
+                + "        where rp.profile = c.speciated_code::integer \n"
+                + "        limit 1) as benzene_percent, \n";
+            sql += "    ( select percent from ( \n";
+            for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
+                if (i > 0) sql += " union all \n";
+                dataset = getDataset(speciationProfileWeightDatasets[i]);
+                version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
+                table = qualifiedEmissionTableName(dataset);
+                sql += "       select profile, percent \n"
+                    + "       from " + table + " s \n"
+                    + "       where specie_id = '465' \n"
+                    + "       and " + version;
+            }
+            sql += "        ) rp \n"
+                + "        where rp.profile = c.speciated_code::integer \n"
+                + "        limit 1) as formaldehyde_percent, \n";
+            sql += "    ( select percent from ( \n";
+            for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
+                if (i > 0) sql += " union all \n";
+                dataset = getDataset(speciationProfileWeightDatasets[i]);
+                version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
+                table = qualifiedEmissionTableName(dataset);
+                sql += "       select profile, percent \n"
+                    + "       from " + table + " s \n"
+                    + "       where specie_id = '279' \n"
+                    + "       and " + version;
+            }
+            sql += "        ) rp \n"
+                + "        where rp.profile = c.speciated_code::integer \n"
+                + "        limit 1) as acetaldehyde_percent, \n";
+            sql += "    ( select percent from ( \n";
+            for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
+                if (i > 0) sql += " union all \n";
+                dataset = getDataset(speciationProfileWeightDatasets[i]);
+                version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
+                table = qualifiedEmissionTableName(dataset);
+                sql += "       select profile, percent \n"
+                    + "       from " + table + " s \n"
+                    + "       where specie_id = '531' \n"
+                    + "       and " + version;
+            }
+            sql += "        ) rp \n"
+                + "        where rp.profile = c.speciated_code::integer \n"
+                + "        limit 1) as methanol_percent \n";
+        }
+            
+        sql += "from crosstab( \n"
         + "' \n";
 
         //figure out the cap speciated records...
@@ -470,18 +558,42 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "select distinct on (s.id, i.poll, rp.specie_id) \n"
         + " \n"
         + "    s.id, \n"
-        + "    i.nei_unique_id,  \n"
-        + "    i.plantid,  \n"
-        + "    i.pointid,  \n"
-        + "    i.stackid,  \n"
-        + "    i.segment,  \n"
-        + "    i.plant, \n"
+        + (
+            capIsPoint 
+            ? "i.nei_unique_id,  \n"
+            + "i.plantid, \n"
+            + "i.pointid,  \n"
+            + "i.stackid,  \n"
+            + "i.segment,  \n"
+            + "i.plant, \n"
+            : 
+                hapIsPoint 
+                ? "null::character varying(20) as nei_unique_id,  \n"
+                + "null::character varying(15) as plantid, \n"
+                + "null::character varying(15) as pointid,  \n"
+                + "null::character varying(15) as stackid,  \n"
+                + "null::character varying(15) as segment,  \n"
+                + "null::character varying(40) as plant, \n"
+                : "null::character varying(20) as nei_unique_id,  \n"
+            )
         + "    i.fips,  \n"
         + "    i.scc,  \n"
         + "    i.poll, \n"
-        + "    i.sic,  \n"
-        + "    i.mact,  \n"
-        + "    i.naics,  \n"
+        + (
+            capHasSIC
+            ? "i.sic, \n"
+            : "null::character varying(4) as sic, \n"
+            )
+        + (
+            capHasMACT
+            ? "i.mact, \n"
+            : "null::character varying(6) as mact, \n"
+            )
+        + (
+            capHasNAICS
+            ? "i.naics, \n"
+            : "null::character varying(6) as naics, \n"
+            )
         + "    i.ann_emis,  \n"
         + "    r.code,  \n"
         + "    case when r.code <> ''COMBO'' then coalesce(g.factor, 1.0) else null::double precision end as factor,  \n"
@@ -498,7 +610,12 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "from " + capInventoryTable + " i \n"
         + " \n"
         + "    inner join emf.sources s \n"
-        + "   on s.source = i.scc || i.fips || rpad(coalesce(i.plantid, ''''), 15) || rpad(coalesce(i.pointid, ''''), 15) || rpad(coalesce(i.stackid, ''''), 15) || rpad(coalesce(i.segment, ''''), 15) \n"
+        + "    on s.source = i.scc || i.fips || "
+        + (
+            capIsPoint
+            ? "rpad(coalesce(i.plantid, ''''), 15) || rpad(coalesce(i.pointid, ''''), 15) || rpad(coalesce(i.stackid, ''''), 15) || rpad(coalesce(i.segment, ''''), 15) \n"
+            : "repeat('' '', 60)  \n"
+            )
         + " \n"
         + "   -- get profilecode by SCC and pollutant \n"
         + "   inner join ( \n";
@@ -554,17 +671,42 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + " --taken care of during the datasource record creation) \n"
         + "select distinct on (s.id, i.poll) \n"
         + "    s.id, \n"
-        + "    i.nei_unique_id,  \n"
-        + "   i.plantid,  \n"
-        + "    i.pointid,  \n"
-        + "   i.stackid,  \n"
-        + "    i.segment,  \n"
-        + "    i.plant, \n"
-        + "   i.fips, i.scc,  \n"
-        + "    ''VOC'' as poll,  \n"
-        + "    i.sic,  \n"
-        + "    i.mact,  \n"
-        + "    i.naics,  \n"
+        + (
+            hapIsPoint 
+            ? "i.nei_unique_id,  \n"
+            + "i.plantid, \n"
+            + "i.pointid,  \n"
+            + "i.stackid,  \n"
+            + "i.segment,  \n"
+            + "i.plant, \n"
+            : 
+                capIsPoint 
+                ? "null::character varying(20) as nei_unique_id,  \n"
+                + "null::character varying(15) as plantid, \n"
+                + "null::character varying(15) as pointid,  \n"
+                + "null::character varying(15) as stackid,  \n"
+                + "null::character varying(15) as segment,  \n"
+                + "null::character varying(40) as plant, \n"
+                : "null::character varying(20) as nei_unique_id,  \n"
+            )
+        + "    i.fips, \n"
+        + "    i.scc, \n"
+        + "    ''VOC'' as poll, \n"
+        + (
+            hapHasSIC
+            ? "i.sic, \n"
+            : "null::character varying(4) as sic, \n"
+            )
+        + (
+            hapHasMACT
+            ? "i.mact, \n"
+            : "null::character varying(6) as mact, \n"
+            )
+        + (
+            hapHasNAICS
+            ? "i.naics, \n"
+            : "null::character varying(6) as naics, \n"
+            )
         + "    null::double precision as ann_emis, \n"
         + "    r.code,  \n"
         + "    case when r.code <> ''COMBO'' then coalesce(g.factor, 1.0) else null::double precision end as factor,  \n"
@@ -581,7 +723,12 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "from " + hapInventoryTable + " i \n"
         + " \n"
         + "    inner join emf.sources s \n"
-        + "    on s.source = i.scc || i.fips || rpad(coalesce(i.plantid, ''''), 15) || rpad(coalesce(i.pointid, ''''), 15) || rpad(coalesce(i.stackid, ''''), 15) || rpad(coalesce(i.segment, ''''), 15) \n"
+        + "    on s.source = i.scc || i.fips || "
+        + (
+            hapIsPoint
+            ? "rpad(coalesce(i.plantid, ''''), 15) || rpad(coalesce(i.pointid, ''''), 15) || rpad(coalesce(i.stackid, ''''), 15) || rpad(coalesce(i.segment, ''''), 15) \n"
+            : "repeat('' '', 60)  \n"
+            )
         + " \n"
         + "   -- get profilecode by SCC and pollutant \n"
         + "   left outer join ( \n";
@@ -616,18 +763,42 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         capDatasourceSql = " --cap datasource records (this will also include any voc records that do not have any profile mappings) \n"
         + "select distinct on (s.id) \n"
         + "    s.id, \n"
-        + "    i.nei_unique_id,  \n"
-        + "    i.plantid,  \n"
-        + "    i.pointid,  \n"
-        + "   i.stackid,  \n"
-        + "   i.segment,  \n"
-        + "   i.plant, \n"
+        + (
+                capIsPoint 
+                ? "i.nei_unique_id,  \n"
+                + "i.plantid, \n"
+                + "i.pointid,  \n"
+                + "i.stackid,  \n"
+                + "i.segment,  \n"
+                + "i.plant, \n"
+                : 
+                    hapIsPoint 
+                    ? "null::character varying(20) as nei_unique_id,  \n"
+                    + "null::character varying(15) as plantid, \n"
+                    + "null::character varying(15) as pointid,  \n"
+                    + "null::character varying(15) as stackid,  \n"
+                    + "null::character varying(15) as segment,  \n"
+                    + "null::character varying(40) as plant, \n"
+                    : "null::character varying(20) as nei_unique_id,  \n"
+                )
         + "   i.fips,  \n"
         + "   i.scc,  \n"
         + "   i.poll,  \n"
-        + "   i.sic,  \n"
-        + "   i.mact, \n"
-        + "   i.naics,  \n"
+        + (
+            capHasSIC
+            ? "i.sic, \n"
+            : "null::character varying(4) as sic, \n"
+            )
+        + (
+            capHasMACT
+            ? "i.mact, \n"
+            : "null::character varying(6) as mact, \n"
+            )
+        + (
+            capHasNAICS
+            ? "i.naics, \n"
+            : "null::character varying(6) as naics, \n"
+            )
         + "    i.ann_emis,  \n"
         + "    r.code,  \n"
         + "    case when r.code <> ''COMBO'' then coalesce(g.factor, 1.0) else null::double precision end as factor,  \n"
@@ -637,7 +808,12 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + " \n"
         + " from " + capInventoryTable + " i \n"
         + "    inner join emf.sources s \n"
-        + "    on s.source = i.scc || i.fips || rpad(coalesce(i.plantid, ''''), 15) || rpad(coalesce(i.pointid, ''''), 15) || rpad(coalesce(i.stackid, ''''), 15) || rpad(coalesce(i.segment, ''''), 15) \n"
+        + "    on s.source = i.scc || i.fips || "
+        + (
+            capIsPoint
+            ? "rpad(coalesce(i.plantid, ''''), 15) || rpad(coalesce(i.pointid, ''''), 15) || rpad(coalesce(i.stackid, ''''), 15) || rpad(coalesce(i.segment, ''''), 15) \n"
+            : "repeat('' '', 60)  \n"
+            )
         + " \n"
         + "    -- get profilecode by SCC and pollutant \n"
         + "    left outer join ( \n";
@@ -672,18 +848,42 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         hapDatasourceSql = " --hap datasource records (this will also include any applicable hap records that do not have any profile mappings) \n"
         + "select --distinct on (s.id) \n"
         + "    s.id, \n"
-        + "   i.nei_unique_id,  \n"
-        + "    i.plantid,  \n"
-        + "    i.pointid,  \n"
-        + "    i.stackid,  \n"
-        + "   i.segment,  \n"
-        + "   i.plant, \n"
+        + (
+            hapIsPoint 
+            ? "i.nei_unique_id,  \n"
+            + "i.plantid, \n"
+            + "i.pointid,  \n"
+            + "i.stackid,  \n"
+            + "i.segment,  \n"
+            + "i.plant, \n"
+            : 
+                capIsPoint 
+                ? "null::character varying(20) as nei_unique_id,  \n"
+                + "null::character varying(15) as plantid, \n"
+                + "null::character varying(15) as pointid,  \n"
+                + "null::character varying(15) as stackid,  \n"
+                + "null::character varying(15) as segment,  \n"
+                + "null::character varying(40) as plant, \n"
+                : "null::character varying(20) as nei_unique_id,  \n"
+            )
         + "   i.fips,  \n"
         + "   i.scc,  \n"
         + "   i.poll,  \n"
-        + "   i.sic,  \n"
-        + "    i.mact,  \n"
-        + "    i.naics,  \n"
+        + (
+            hapHasSIC
+            ? "i.sic, \n"
+            : "null::character varying(4) as sic, \n"
+            )
+        + (
+            hapHasMACT
+            ? "i.mact, \n"
+            : "null::character varying(6) as mact, \n"
+            )
+        + (
+            hapHasNAICS
+            ? "i.naics, \n"
+            : "null::character varying(6) as naics, \n"
+            )
         + "    null::double precision as ann_emis,  \n"
         + "    r.code,  \n"
         + "    case when r.code <> ''COMBO'' then coalesce(g.factor, 1.0) else null::double precision end as factor,  \n"
@@ -699,7 +899,12 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + " \n"
         + "from " + hapInventoryTable + " i \n"
         + "    inner join emf.sources s \n"
-        + "    on s.source = i.scc || i.fips || rpad(coalesce(i.plantid, ''''), 15) || rpad(coalesce(i.pointid, ''''), 15) || rpad(coalesce(i.stackid, ''''), 15) || rpad(coalesce(i.segment, ''''), 15) \n"
+        + "    on s.source = i.scc || i.fips || "
+        + (
+            hapIsPoint
+            ? "rpad(coalesce(i.plantid, ''''), 15) || rpad(coalesce(i.pointid, ''''), 15) || rpad(coalesce(i.stackid, ''''), 15) || rpad(coalesce(i.segment, ''''), 15) \n"
+            : "repeat('' '', 60)  \n"
+            )
         + " \n"
         + "    -- get profilecode by SCC and pollutant \n"
         + "   left outer join ( \n";
@@ -749,12 +954,16 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + " ' \n"
         + ") as c( \n"
         + " id int, \n"
-        + " nei_unique_id character varying(20), \n"
-        + "plantid character varying(15), \n"
-        + "pointid character varying(15), \n"
-        + "stackid character varying(15), \n"
-        + "segment character varying(15), \n"
-        + "plant character varying(40), \n"
+        + (
+            hapIsPoint || capIsPoint
+            ? " nei_unique_id character varying(20), \n"
+            + "plantid character varying(15), \n"
+            + "pointid character varying(15), \n"
+            + "stackid character varying(15), \n"
+            + "segment character varying(15), \n"
+            + "plant character varying(40), \n"
+            : " nei_unique_id character varying(20), \n"
+            )
         + "fips character varying(6), \n"
         + "scc character varying(10), \n"
         + "poll character varying(16), \n"
@@ -831,7 +1040,13 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             + " left outer join reference.scc s \n"
             + "on s.scc = c.scc \n"
             + " \n"
-            + "order by c.fips, c.nei_unique_id, c.plantid, c.pointid, c.stackid, c.segment, c.scc";
+            + "order by c.fips, c.nei_unique_id, "
+            + (
+                capIsPoint || hapIsPoint
+                ? "c.plantid, c.pointid, c.stackid, c.segment, "
+                : ""
+                )
+            + "c.scc";
         } else if (summaryType.equals("By NEI Unique Id")) {
             filter = Pattern.compile("''", Pattern.CASE_INSENSITIVE).matcher(filter).replaceAll("'");
 
@@ -849,18 +1064,25 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             + "    maxplant.plant, \n"
             + "    maxfips.fips \n"
             + "from ( \n"
-            + "        select distinct  nei_unique_id \n"
-            + "        from " + capInventoryTable + " i  \n"
-            + "        where i.poll in ('VOC') \n"
-            + "        and (" + capInventoryVersion + ") \n"
-            + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
-            + " \n"
+            + (
+                capIsPoint
+                ? "        select distinct  nei_unique_id \n"
+                + "        from " + capInventoryTable + " i  \n"
+                + "        where i.poll in ('VOC') \n"
+                + "        and (" + capInventoryVersion + ") \n"
+                + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
+                : "        select null::character varying(20) as nei_unique_id \n"
+                )
             + "        union  \n"
-            + "        select distinct  nei_unique_id \n"
-            + "        from " + hapInventoryTable + " i \n"
-            + "        where i.poll in ('71432','50000','75070','67561') \n"
-            + "        and (" + hapInventoryVersion + ") \n"
-            + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
+            + (
+                hapIsPoint
+                ? "        select distinct  nei_unique_id \n"
+                + "        from " + hapInventoryTable + " i \n"
+                + "        where i.poll in ('71432','50000','75070','67561') \n"
+                + "        and (" + hapInventoryVersion + ") \n"
+                + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
+                : "        select null::character varying(20) as nei_unique_id \n"
+                )
             + "    ) nei \n"
             + " \n"
             + "    left outer join ( \n"
@@ -872,31 +1094,67 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             + "        from ( \n"
             + " \n"
             + "            select  \n"
-            + "                nei_unique_id,  \n"
-            + "                sic,  \n"
+            + (
+                capIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20) as nei_unique_id,  \n"
+                )
+            + (
+                capHasSIC
+                ? "                sic,  \n"
+                : "                null::character varying(4) as sic,  \n"
+                )
             + "                count(1) as cnt  \n"
             + "            from " + capInventoryTable + " i  \n"
             + "            where i.poll in ('VOC') \n"
             + "            and (" + capInventoryVersion + ") \n"
             + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
-            + "            group by nei_unique_id, sic \n"
+            + "            group by "
+            + (
+                capIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20), \n"
+                )
+            + (
+                capHasSIC
+                ? "                sic \n"
+                : "                null::character varying(4) \n"
+                )
             + " \n"
             + "            union all \n"
             + "            select  \n"
-            + "                nei_unique_id,  \n"
-            + "                sic,  \n"
+            + (
+                hapIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20) as nei_unique_id,  \n"
+                )
+            + (
+                hapHasSIC
+                ? "                sic,  \n"
+                : "                null::character varying(4) as sic,  \n"
+                )
             + "                count(1) as cnt \n"
             + "            from " + hapInventoryTable + " i \n"
             + "            where i.poll in ('71432','50000','75070','67561') \n"
             + "            and (" + hapInventoryVersion + ") \n"
             + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
-            + "            group by nei_unique_id, sic \n"
+            + "            group by "
+            + (
+                hapIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20), \n"
+                )
+            + (
+                hapHasSIC
+                ? "                sic \n"
+                : "                null::character varying(4) \n"
+                )
             + "        ) tbl \n"
             + "        group by nei_unique_id, sic \n"
             + "        order by nei_unique_id, sum(cnt) desc \n"
             + " \n"
             + "    ) maxsic \n"
-            + "    on maxsic.nei_unique_id = nei.nei_unique_id \n"
+            + "    on coalesce(maxsic.nei_unique_id,'') = coalesce(nei.nei_unique_id,'') \n"
             + " \n"
             + "    left outer join ( \n"
             + "        select distinct on (nei_unique_id)  \n"
@@ -906,31 +1164,76 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             + "        from ( \n"
             + " \n"
             + "            select  \n"
-            + "                nei_unique_id,  \n"
-            + "                mact,  \n"
+            + (
+                capIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20) as nei_unique_id,  \n"
+                )
+            + (
+                capHasMACT
+                ? "                mact,  \n"
+                : "                null::character varying(4) as mact,  \n"
+                )
             + "                count(1) as cnt  \n"
             + "            from " + capInventoryTable + " i  \n"
             + "            where i.poll in ('VOC') \n"
             + "            and (" + capInventoryVersion + ") \n"
-            + "            and upper(mact) <> 'NONE' \n"
-            + "            group by nei_unique_id, mact \n"
+            + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
+            + (
+                capHasMACT
+                ? "            and upper(mact) <> 'NONE' \n"
+                : ""
+                )
+            + "            group by "
+            + (
+                capIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20), \n"
+                )
+            + (
+                capHasMACT
+                ? "                mact \n"
+                : "                null::character varying(6) \n"
+                )
             + " \n"
             + "            union all \n"
             + "            select  \n"
-            + "                nei_unique_id,  \n"
-            + "                mact,  \n"
+            + (
+                hapIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20) as nei_unique_id,  \n"
+                )
+            + (
+                hapHasMACT
+                ? "                mact,  \n"
+                : "                null::character varying(4) as mact,  \n"
+                )
             + "                count(1) as cnt \n"
             + "            from " + hapInventoryTable + " i \n"
             + "            where i.poll in ('71432','50000','75070','67561') \n"
             + "            and (" + hapInventoryVersion + ") \n"
             + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
-            + "            and upper(mact) <> 'NONE' \n"
-            + "            group by nei_unique_id, mact \n"
+            + (
+                hapHasMACT
+                ? "            and upper(mact) <> 'NONE' \n"
+                : ""
+                )
+            + "            group by "
+            + (
+                hapIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20), \n"
+                )
+            + (
+                hapHasMACT
+                ? "                mact \n"
+                : "                null::character varying(6) \n"
+                )
             + "        ) tbl \n"
             + "        group by nei_unique_id, mact \n"
             + "        order by nei_unique_id, sum(cnt) desc \n"
             + "    ) maxmact \n"
-            + "    on maxmact.nei_unique_id = nei.nei_unique_id \n"
+            + "    on coalesce(maxmact.nei_unique_id,'') = coalesce(nei.nei_unique_id,'') \n"
             + " \n"
             + "    left outer join ( \n"
             + "       select distinct on (nei_unique_id)  \n"
@@ -940,29 +1243,66 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             + "        from ( \n"
 
             + "            select  \n"
-            + "                nei_unique_id,  \n"
-            + "                naics,  \n"
+            + (
+                capIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20) as nei_unique_id,  \n"
+                )
+            + (
+                capHasNAICS
+                ? "                naics,  \n"
+                : "                null::character varying(6) as naics,  \n"
+                )
             + "                count(1) as cnt  \n"
             + "            from " + capInventoryTable + " i  \n"
             + "            where i.poll in ('VOC') \n"
             + "            and (" + capInventoryVersion + ") \n"
-            + "            group by nei_unique_id, naics \n"
+            + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
+            + "            group by "
+            + (
+                capIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20), \n"
+                )
+            + (
+                capHasNAICS
+                ? "                naics \n"
+                : "                null::character varying(6) \n"
+                )
             + " \n"
             + "            union all \n"
             + "            select  \n"
-            + "                nei_unique_id,  \n"
-            + "                naics,  \n"
+            + (
+                hapIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20) as nei_unique_id,  \n"
+                )
+            + (
+                hapHasNAICS
+                ? "                naics,  \n"
+                : "                null::character varying(6) as naics,  \n"
+                )
             + "                count(1) as cnt \n"
             + "            from " + hapInventoryTable + " i \n"
             + "            where i.poll in ('71432','50000','75070','67561') \n"
             + "            and (" + hapInventoryVersion + ") \n"
             + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
-            + "            group by nei_unique_id, naics \n"
+            + "            group by "
+            + (
+                hapIsPoint
+                ? "                nei_unique_id,  \n"
+                : "                null::character varying(20),  \n"
+                )
+            + (
+                hapHasNAICS
+                ? "                naics \n"
+                : "                null::character varying(6) \n"
+                )
             + "        ) tbl \n"
             + "        group by nei_unique_id, naics \n"
             + "       order by nei_unique_id, sum(cnt) desc \n"
             + "    ) maxnaics \n"
-            + "    on maxnaics.nei_unique_id = nei.nei_unique_id    \n"
+            + "    on coalesce(maxnaics.nei_unique_id,'') = coalesce(nei.nei_unique_id,'') \n"
             + " \n"
             + "    left outer join ( \n"
             + "       select distinct on (nei_unique_id)  \n"
@@ -972,29 +1312,54 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             + "        from ( \n"
             + " \n"
             + "           select  \n"
-            + "               nei_unique_id,  \n"
-            + "               plant,  \n"
+            + (
+                capIsPoint
+                ? "               nei_unique_id,  \n"
+                + "               plant,  \n"
+                : "                null::character varying(20) as nei_unique_id,  \n"
+                + "                null::character varying(40) as plant,  \n"
+                )
             + "               count(1) as cnt  \n"
             + "            from " + capInventoryTable + " i  \n"
             + "            where i.poll in ('VOC') \n"
             + "            and (" + capInventoryVersion + ") \n"
-            + "            group by nei_unique_id, plant \n"
+            + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
+            + "            group by "
+            + (
+                capIsPoint
+                ? "               nei_unique_id, \n"
+                + "               plant \n"
+                : "                null::character varying(20),  \n"
+                + "                null::character varying(40) \n"
+                )
             + " \n"
             + "           union all \n"
             + "           select  \n"
-            + "               nei_unique_id,  \n"
-            + "                plant,  \n"
+            + (
+                hapIsPoint
+                ? "               nei_unique_id,  \n"
+                + "               plant,  \n"
+                : "                null::character varying(20) as nei_unique_id,  \n"
+                + "                null::character varying(40) as plant,  \n"
+                )
             + "                count(1) as cnt \n"
             + "            from " + hapInventoryTable + " i \n"
             + "            where i.poll in ('71432','50000','75070','67561') \n"
             + "            and (" + hapInventoryVersion + ") \n"
             + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
-            + "            group by nei_unique_id, plant \n"
+            + "            group by "
+            + (
+                hapIsPoint
+                ? "               nei_unique_id, \n"
+                + "               plant \n"
+                : "                null::character varying(20),  \n"
+                + "                null::character varying(40) \n"
+                )
             + "        ) tbl \n"
             + "       group by nei_unique_id, plant \n"
             + "       order by nei_unique_id, sum(cnt) desc \n"
             + "   ) maxplant \n"
-            + "    on maxplant.nei_unique_id = nei.nei_unique_id    \n"
+            + "    on coalesce(maxplant.nei_unique_id,'') = coalesce(nei.nei_unique_id,'') \n"
             + " \n"
             + "    left outer join ( \n"
             + "        select distinct on (nei_unique_id)  \n"
@@ -1004,31 +1369,52 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             + "        from ( \n"
             + " \n"
             + "            select  \n"
-            + "                nei_unique_id,  \n"
+            + (
+                capIsPoint
+                ? "               nei_unique_id, \n"
+                : "                null::character varying(20) as nei_unique_id, \n"
+                )
             + "                fips,  \n"
             + "                count(1) as cnt  \n"
             + "            from " + capInventoryTable + " i  \n"
             + "            where i.poll in ('VOC') \n"
             + "            and (" + capInventoryVersion + ") \n"
-            + "            group by nei_unique_id, fips \n"
+            + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
+            + "            group by "
+            + (
+                capIsPoint
+                ? "               nei_unique_id, \n"
+                : "               null::character varying(20),  \n"
+                )
+            + "               fips \n"
 
             + "            union all \n"
             + "           select  \n"
-            + "                nei_unique_id,  \n"
+            + (
+                hapIsPoint
+                ? "               nei_unique_id, \n"
+                : "                null::character varying(20) as nei_unique_id, \n"
+                )
             + "                fips,  \n"
             + "               count(1) as cnt \n"
             + "            from " + hapInventoryTable + " i \n"
             + "            where i.poll in ('71432','50000','75070','67561') \n"
             + "            and (" + hapInventoryVersion + ") \n"
             + (filter.length() > 0 ? "and (" + filter + ") \n" : "")
-            + "            group by nei_unique_id, fips \n"
+            + "            group by "
+            + (
+                hapIsPoint
+                ? "               nei_unique_id, \n"
+                : "               null::character varying(20),  \n"
+                )
+            + "               fips \n"
             + "       ) tbl \n"
             + "        group by nei_unique_id, fips \n"
             + "        order by nei_unique_id, sum(cnt) desc \n"
             + "    ) maxfips \n"
-            + "    on maxfips.nei_unique_id = nei.nei_unique_id     \n"
+            + "    on coalesce(maxfips.nei_unique_id,'') = coalesce(nei.nei_unique_id,'') \n"
             + ") nei \n"
-            + "on nei.nei_unique_id = tbl.nei_unique_id \n"
+            + "on coalesce(nei.nei_unique_id,'') = coalesce(tbl.nei_unique_id,'') \n"
 
             + "left outer join reference.naics_codes n \n"
             + "on n.naics_code = nei.naics \n"
@@ -1088,26 +1474,136 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         return emissionDatasourceName + "." + table;
     }
 
-    private void populateSourcesTable(String qualifiedTable, String filter) throws EmfException {
-        String sql = "select public.populate_sources_table('" + qualifiedTable + "'," + (filter.length() == 0 ? "null::text" : "'" + filter.replaceAll("'", "''") + "'") + ");vacuum analyze emf.sources;";
-        System.out.println( sql);
+    private void populateSourcesTable(String qualifiedTable, String filter) throws EmfException { 
+        String sql = "select public.populate_sources_table('" + qualifiedTable + "'," + (filter.length() == 0 ? "null::text" : "'" + filter.replaceAll("'", "''") + "'") + ");";
+        System.out.println(System.currentTimeMillis() + " " + sql);
         try {
             dbServer.getEmissionsDatasource().query().execute(sql);
+            System.out.println(System.currentTimeMillis() + " analyze emf.sources;");
+            dbServer.getEmissionsDatasource().query().execute("analyze emf.sources;");
         } catch (SQLException e) {
             throw new EmfException("Error occured when populating the sources table " + "\n" + e.getMessage());
         }
     }
 
     private void indexORLInventory(String table) {
-        String query = "SELECT public.create_orl_table_indexes('" + table.toLowerCase() + "');vacuum analyze " + emissionDatasourceName + "." + table.toLowerCase() + ";";
+        String query = "SELECT public.create_orl_table_indexes('" + table.toLowerCase() + "');";
+//public.create_table_index(table_name character varying, table_col_list character varying, index_name_prefix character varying)
+        System.out.println(query);
         try {
-            dbServer.getEmissionsDatasource().query().execute(query);
+            try {
+                query = "SELECT public.create_table_index('" + table.toLowerCase() + "','record_id','recordid');";
+                System.out.println(System.currentTimeMillis() + " " + query);
+                dbServer.getEmissionsDatasource().query().execute(query);
+            } catch (SQLException e) {
+                //e.printStackTrace();
+            }
+            try {
+                query = "SELECT public.create_table_index('" + table.toLowerCase() + "','fips','fips');";
+                System.out.println(System.currentTimeMillis() + " " + query);
+                dbServer.getEmissionsDatasource().query().execute(query);
+            } catch (SQLException e) {
+                //e.printStackTrace();
+            }
+            try {
+                query = "SELECT public.create_table_index('" + table.toLowerCase() + "','poll','poll');";
+                System.out.println(System.currentTimeMillis() + " " + query);
+                dbServer.getEmissionsDatasource().query().execute(query);
+            } catch (SQLException e) {
+                //e.printStackTrace();
+            }
+            try {
+                query = "SELECT public.create_table_index('" + table.toLowerCase() + "','scc','scc');";
+                System.out.println(System.currentTimeMillis() + " " + query);
+                dbServer.getEmissionsDatasource().query().execute(query);
+            } catch (SQLException e) {
+                //e.printStackTrace();
+            }
+            try {
+                query = "SELECT public.create_table_index('" + table.toLowerCase() + "','plantid','plantid');";
+                System.out.println(System.currentTimeMillis() + " " + query);
+                dbServer.getEmissionsDatasource().query().execute(query);
+            } catch (SQLException e) {
+                //e.printStackTrace();
+            }
+            try {
+                query = "SELECT public.create_table_index('" + table.toLowerCase() + "','pointid','pointid');";
+                System.out.println(System.currentTimeMillis() + " " + query);
+                dbServer.getEmissionsDatasource().query().execute(query);
+            } catch (SQLException e) {
+                //e.printStackTrace();
+            }
+            try {
+                query = "SELECT public.create_table_index('" + table.toLowerCase() + "','stackid','stackid');";
+                System.out.println(System.currentTimeMillis() + " " + query);
+                dbServer.getEmissionsDatasource().query().execute(query);
+            } catch (SQLException e) {
+                //e.printStackTrace();
+            }
+            try {
+                query = "SELECT public.create_table_index('" + table.toLowerCase() + "','segment','segment');";
+                System.out.println(System.currentTimeMillis() + " " + query);
+                dbServer.getEmissionsDatasource().query().execute(query);
+            } catch (SQLException e) {
+                //e.printStackTrace();
+            }
+            try {
+                query = "SELECT public.create_table_index('" + table.toLowerCase() + "','mact','mact');";
+                System.out.println(System.currentTimeMillis() + " " + query);
+                dbServer.getEmissionsDatasource().query().execute(query);
+            } catch (SQLException e) {
+                //e.printStackTrace();
+            }
+            try {
+                query = "SELECT public.create_table_index('" + table.toLowerCase() + "','sic','sic');";
+                System.out.println(System.currentTimeMillis() + " " + query);
+                dbServer.getEmissionsDatasource().query().execute(query);
+            } catch (SQLException e) {
+                //e.printStackTrace();
+            }
+
+//record_id
+//fips
+//poll
+//scc
+//plantid
+//pointid
+//stackid
+//segment
+//mact
+//sic
+            
+//            dbServer.getEmissionsDatasource().query().execute(query);
+            System.out.println(System.currentTimeMillis() + " " + "analyze ");
+            dbServer.getEmissionsDatasource().query().execute("analyze " + emissionDatasourceName + "." + table.toLowerCase() + ";");
         } catch (SQLException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             //supress all errors, the indexes might already be on the table...
         } finally {
             //
         }
     }
 
+    private boolean checkTableForColumns(String table, String colList) throws EmfException {
+        String query = "select public.check_table_for_columns('" + table + "', '" + colList + "', ',');";
+        ResultSet rs = null;
+        boolean tableHasColumns = false;
+        //System.out.println(System.currentTimeMillis() + " " + query);
+        try {
+            rs = dbServer.getEmissionsDatasource().query().executeQuery(query);
+            while (rs.next()) {
+                tableHasColumns = rs.getBoolean(1);
+            }
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    //
+                }
+        }
+        return tableHasColumns;
+    }
 }

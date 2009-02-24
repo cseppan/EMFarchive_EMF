@@ -711,7 +711,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         // get the part of the arguments starting with -inventories or -inventories_base(compare)
         
         inventoriesString = programSwitches.substring(beginIndex, endIndex);
-        StringTokenizer tokenizer2 = new StringTokenizer(inventoriesString);
+        StringTokenizer tokenizer2 = new StringTokenizer(inventoriesString, "\n");
         tokenizer2.nextToken(); // skip the flag
 
         while (tokenizer2.hasMoreTokens()) {
@@ -735,7 +735,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         // get the part of the arguments starting with -inventories or -inventories_base(compare)
         
         datasetsString = programSwitches.substring(beginIndex, endIndex);
-        StringTokenizer tokenizer2 = new StringTokenizer(datasetsString);
+        StringTokenizer tokenizer2 = new StringTokenizer(datasetsString, "\n");
         tokenizer2.nextToken(); // skip the flag
 
         while (tokenizer2.hasMoreTokens()) {
