@@ -67,7 +67,7 @@ public class SourcesInfoDialog extends JDialog {
     private JPanel createInputFieldPanel(int total) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         
-        String msg = "<html>There are " + total + " sources.<br>" +
+        String msg = "<html>There are " + total + " external file sources.<br>" +
         		"How many would you like to view?";
         JLabel msgLabel = new JLabel();
         msgLabel.setText(msg);
