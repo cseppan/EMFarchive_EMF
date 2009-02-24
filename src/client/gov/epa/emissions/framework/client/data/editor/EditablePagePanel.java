@@ -268,7 +268,7 @@ public class EditablePagePanel extends JPanel {
         String filter = rowFilter.getText();
 
         if (filter != null && !filter.trim().isEmpty()) {
-            msg += ls + " that match the row filter (" + filter.trim() + ")";
+            msg += ls + " that match the row filter:" +ls + filter.trim();
         }
 
         msg += "?";
