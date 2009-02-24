@@ -11,9 +11,9 @@ public class ExitAndLogoutAction {
     private EmfConsole emfConsole;
 
     private DesktopManager desktopManager;
-    
-    private EmfSession session; 
-    
+
+    private EmfSession session;
+
     private UserService userService;
 
     public ExitAndLogoutAction(EmfConsole parent, DesktopManager desktopManager) {
@@ -23,12 +23,12 @@ public class ExitAndLogoutAction {
         this.userService = session.userService();
     }
 
-    public boolean logout(){
+    public boolean logout() {
         String message = "Do you want to log out of the Emission Modeling Framework?";
         if (confirm(message)) {
             if (desktopManager.closeAll()) {
                 try {
-                    updateUser();
+                    logoutUser();
                 } catch (EmfException e) {
                     // NOTE Auto-generated catch block
                     e.printStackTrace();
@@ -40,29 +40,31 @@ public class ExitAndLogoutAction {
         }
         return false;
     }
-    
-    private void updateUser() throws EmfException{
+
+    private void logoutUser() throws EmfException {
         User user = session.user();
-        if (user.isLoggedIn()){
+        if (user.isLoggedIn()) {
             user = userService.obtainLocked(session.user(), session.user());
 
-            if ( user == null )        
-                throw new EmfException("Unable to fetch lock user");
-            user.setLoggedIn(false);
-            userService.updateUser(user);
+            if (user != null) { //Let it be silent if lock cannot be obtained.
+                user.setLoggedIn(false);
+                userService.updateUser(user);
+            }
         }
     }
 
     public boolean exit() throws EmfException {
         String message = "Do you want to exit the Emission Modeling Framework?";
+        
         if (confirm(message)) {
             if (desktopManager.closeAll()) {
-                updateUser();
+                logoutUser();
                 emfConsole.disposeView();
                 emfConsole.logExitMessage();
                 System.exit(0);
             }
         }
+        
         return false;
     }
 

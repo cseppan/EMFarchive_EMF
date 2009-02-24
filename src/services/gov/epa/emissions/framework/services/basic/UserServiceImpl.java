@@ -145,12 +145,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public synchronized void updateUser(User user) throws EmfException {
-        User existingUser = this.getUserByEmail(user.getId(), user.getEmail());
-
-        if (existingUser != null)
-            throw new EmfException("The same email address has already been used by user '"
-                    + existingUser.getUsername() + "'.");
-        
         Session session = sessionFactory.getSession();
         
         try {
@@ -162,6 +156,14 @@ public class UserServiceImpl implements UserService {
             if (session != null && session.isConnected())
                 session.close();
         }
+    }
+
+    public void checkDuplicatesByEmail(User user) throws EmfException {
+        User existingUser = this.getUserByEmail(user.getId(), user.getEmail());
+
+        if (existingUser != null)
+            throw new EmfException("The same email address has already been used by user '"
+                    + existingUser.getUsername() + "'.");
     }
 
     public synchronized void deleteUser(User user) throws EmfException {

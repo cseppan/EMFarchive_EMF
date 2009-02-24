@@ -37,6 +37,7 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
     }
 
     public void doSave() throws EmfException {
+        service.checkDuplicatesByEmail(user);
         service.updateUser(user);
         this.userDataChanged = false;// reset
     }

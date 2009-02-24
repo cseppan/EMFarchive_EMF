@@ -31,15 +31,18 @@ public class LoginPresenter {
         }
         
         User user = userAdmin.getUser(username);
+        
         if (!user.isLoggedIn()){
             user = userAdmin.obtainLocked(userAdmin.getUser(username), userAdmin.getUser(username));
+            
             if ( user == null )        
-                throw new EmfException("Unable to fetch lock user");
+                throw new EmfException("Unable to fetch lock on user: " + username + ".");
+            
             user.setLoggedIn(true);
             userAdmin.updateUser(user);
         }
+        
         return user;
-        //return userAdmin.getUser(username);
     }
 
     public boolean checkEmfVersion(String current) throws EmfException {

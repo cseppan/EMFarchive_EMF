@@ -55,6 +55,16 @@ public class UserServiceTransport implements UserService {
         return (User) call.requestResponse(new Object[] { user });
     }
 
+    public void checkDuplicatesByEmail(User user) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("checkDuplicatesByEmail");
+        call.addParam("user", mappings.user());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user });
+    }
+    
     public synchronized void updateUser(User user) throws EmfException {
         EmfCall call = call();
 
