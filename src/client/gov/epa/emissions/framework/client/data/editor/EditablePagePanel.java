@@ -234,20 +234,20 @@ public class EditablePagePanel extends JPanel {
         clearMessagesWithTableRefresh();
 
         int selected = tableData.getSelected().length;
-        
+
         if (selected == 0) {
             messagePanel.setError("Please select at least one row to delete.");
             return;
         }
 
-        int option = JOptionPane.NO_OPTION; 
+        int option = JOptionPane.NO_OPTION;
 
-        if (selected == tableData.rows().size()) 
-            option = deleteRecords(tableData);
+        if (selected == tableData.rows().size())
+            option = deleteRecords(tableData, getRowCount(tableData));
 
         if (option != JOptionPane.NO_OPTION)
             return;
-        
+
         String msg = "Are you sure you want to delete the selected " + selected + " row" + (selected > 1 ? "s" : "")
                 + "?";
         int regularDel = JOptionPane.showConfirmDialog((Component) listOfChangeables, msg, "Confirm Deletion",
@@ -261,7 +261,7 @@ public class EditablePagePanel extends JPanel {
         }
     }
 
-    private int deleteRecords(final EditablePage tableData) throws EmfException {
+    private int deleteRecords(final EditablePage tableData, int rowCount) throws EmfException {
         String ls = System.getProperty("line.separator");
         String msg = "You have chosen to delete all records on the current page. " + ls
                 + "Would you also like to delete records not shown on this page";
@@ -274,22 +274,20 @@ public class EditablePagePanel extends JPanel {
         msg += "?";
 
         String title = "Delete All Records";
-        int option = JOptionPane.showConfirmDialog((Component) listOfChangeables, msg, title,
-                JOptionPane.YES_NO_CANCEL_OPTION);
 
-        if (option == JOptionPane.CANCEL_OPTION)
-            return JOptionPane.CANCEL_OPTION;
+        int option = JOptionPane.YES_OPTION;
+        
+        if (rowCount > tableData.rows().size()) {
+            option = JOptionPane.showConfirmDialog((Component) listOfChangeables, msg, title,
+                    JOptionPane.YES_NO_CANCEL_OPTION);
+
+            if (option == JOptionPane.CANCEL_OPTION)
+                return JOptionPane.CANCEL_OPTION;
+        }
 
         if (option == JOptionPane.YES_OPTION) {
-            int rowCount = 0;
-            
-            try {
-                rowCount = getRowCount(tableData);
-            } catch (Exception e) {
-                throw new EmfException(e.getMessage());
-            }
-            
-            String confirm = "This deletion of " + rowCount + " records is not reversible. Are you sure you want to proceed?";
+            String confirm = "This deletion of " + rowCount
+                    + " records is not reversible. Are you sure you want to proceed?";
             int goDelete = JOptionPane.showConfirmDialog((Component) listOfChangeables, confirm, title,
                     JOptionPane.YES_NO_OPTION);
 
@@ -309,7 +307,7 @@ public class EditablePagePanel extends JPanel {
 
             return JOptionPane.YES_OPTION;
         }
-        
+
         return JOptionPane.NO_OPTION;
     }
 
@@ -327,7 +325,7 @@ public class EditablePagePanel extends JPanel {
             messagePanel.setError(e.getMessage());
         }
     }
-    
+
     private int getRowCount(EditablePage tableData) throws EmfException {
         DataService service = emfSession.dataService();
         Version version = tableData.getVersion();
