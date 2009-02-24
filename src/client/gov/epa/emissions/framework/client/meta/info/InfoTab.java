@@ -33,6 +33,8 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
     private EmfConsole parentConsole;
 
     private JPanel sourcesPanel;
+    
+    private JPanel filter;
 
     private JTextField nameFilter;
 
@@ -62,18 +64,18 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
     private JPanel createLayout() {
         JPanel container = new JPanel(new BorderLayout());
 
-        JPanel filter = new JPanel();
-        filter.add(new JLabel("Source Name Contains: "));
+        filter = new JPanel();
+        filter.add(new JLabel("External Source Name Contains: "));
         nameFilter = new JTextField();
-        nameFilter.setPreferredSize(new Dimension(100, 20));
-        nameFilter.setToolTipText("Use as a source name filter. Press enter to refresh.");
+        nameFilter.setPreferredSize(new Dimension(120, 20));
+        nameFilter.setToolTipText("An external name filter. Press enter to refresh.");
 
         ActionListener actionListener = new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 try {
                     doRefresh();
                 } catch (EmfException e) {
-                    msgPanel.setError("Cannot retrieve dataset sources.");
+                    msgPanel.setError("Cannot retrieve sources.");
                 }
             }
         };
@@ -93,11 +95,12 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
     }
 
     public void displayInternalSources(InternalSource[] sources) throws EmfException {
+        this.filter.setVisible(false);
         displaySources("Data Tables", new InternalSourcesTableData(sources), false);
     }
 
     public void displayExternalSources(int numOfSrcs) throws EmfException {
-        if (numOfSrcs > 20) {
+        if (numOfSrcs > 30) {
             SourcesInfoDialog dialog = new SourcesInfoDialog("Limit the Number of Sources to View", numOfSrcs, this,
                     parentConsole);
             sourceLimit = dialog.showDialog();
