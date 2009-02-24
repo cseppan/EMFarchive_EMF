@@ -32,6 +32,8 @@ public class DataSortFilterPanel extends JPanel {
 
     private JPanel actionPanel;
 
+    private boolean forEditor = true;
+
     public DataSortFilterPanel(MessagePanel messagePanel, EmfDataset dataset, String rowFilters) {
         this.messagePanel = messagePanel;
         this.dataset = dataset;
@@ -75,7 +77,7 @@ public class DataSortFilterPanel extends JPanel {
 
     private JPanel rowFilterPanel(String rowFilters) {
         JPanel panel = new JPanel(new BorderLayout());
-        //System.out.println("row filter is " + rowFilters);
+        // System.out.println("row filter is " + rowFilters);
         panel.add(new Label("Row Filter  "), BorderLayout.WEST);
         rowFilter = new TextArea("rowFilter", rowFilters, 25, 2);
         rowFilter.setToolTipText(rowFilter.getText());
@@ -98,6 +100,7 @@ public class DataSortFilterPanel extends JPanel {
 
     private void doApplyConstraints(final TablePresenter presenter) {
         try {
+            messagePanel.clear();
             String rowFilterValue = rowFilter.getText().trim();
             String sortOrderValue = sortOrder.getText().trim();
             presenter.doApplyConstraints(rowFilterValue, sortOrderValue);
@@ -108,22 +111,32 @@ public class DataSortFilterPanel extends JPanel {
             if (sortMessage.length() == 0)
                 sortMessage = "No sort";
 
-            messagePanel.setMessage("Saved any changes and applied Sort '" + sortMessage + "' and Filter '" + rowFilterValue + "'");
+            if (isForEditor())
+                messagePanel.setMessage("Saved any changes and applied Sort '" + sortMessage + "' and Filter '"
+                        + rowFilterValue + "'");
         } catch (EmfException ex) {
             messagePanel.setError(ex.getMessage());
         }
     }
-    
-    public void setSortFilter(String filter){
+
+    public void setSortFilter(String filter) {
         rowFilter.setText(filter);
     }
-    
+
     public JTextArea getRowFilter() {
         return rowFilter;
     }
-    
+
     public JTextArea getSortOrder() {
         return sortOrder;
+    }
+
+    public boolean isForEditor() {
+        return forEditor;
+    }
+
+    public void setForEditor(boolean forEditor) {
+        this.forEditor = forEditor;
     }
 
 }

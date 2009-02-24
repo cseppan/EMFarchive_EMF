@@ -84,6 +84,7 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
 
     private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
         sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset, rowFilter);
+        sortFilterPanel.setForEditor(false);
         return sortFilterPanel;
     }
 
