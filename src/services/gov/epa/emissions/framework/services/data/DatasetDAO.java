@@ -533,9 +533,10 @@ public class DatasetDAO {
         InternalSource[] sources = dataset.getInternalSources();
 
         if (type != null) {
-            String name = type.getName().toUpperCase();
+            String importerclass = type.getImporterClassName();
 
-            if (name.contains("SMOKE REPORT") || name.contains("SMKREPORT"))
+            if (importerclass.equals("gov.epa.emissions.commons.io.other.SMKReportImporter") 
+                    || importerclass.equals("gov.epa.emissions.commons.io.csv.CSVImporter"))
                 return false;
         }
 
@@ -864,7 +865,7 @@ public class DatasetDAO {
 
         for (int i = 0; i < sources.length; i++) {
             try {
-                dropIndividualTable(tableTool, sources[i], (type != null) ? type.getName() : "", dataset.getId());
+                dropIndividualTable(tableTool, sources[i], type, dataset.getId());
             } catch (Exception exc) { // if there is a problem with one table, keep going
                 problemCount++;
                 LOG.error(exc);
@@ -876,15 +877,17 @@ public class DatasetDAO {
                     + " tables for dataset " + dataset.getName());
     }
 
-    private void dropIndividualTable(TableCreator tableTool, InternalSource source, String type, int dsID)
+    private void dropIndividualTable(TableCreator tableTool, InternalSource source, DatasetType type, int dsID)
             throws EmfException {
         String table = source.getTable();
-        type = type.toUpperCase();
+        String importerclass = (type == null ? "" : type.getImporterClassName());
+        importerclass = (importerclass == null ? "" : importerclass.trim());
 
         try {
-            if (type.contains("A/M/PTPRO") || type.contains("TEMPORAL PROFILE") || type.contains("COSTCY")
-                    || type.contains("COUNTRY, STATE, AND COUNTY") || type.contains("SMOKE REPORT")
-                    || type.contains("SMKREPORT"))
+            if (importerclass.equals("gov.epa.emissions.commons.io.temporal.TemporalProfileImporter") 
+                    || importerclass.equals("gov.epa.emissions.commons.io.other.CountryStateCountyDataImporter")
+                    || importerclass.equals("gov.epa.emissions.commons.io.other.SMKReportImporter")
+                    || importerclass.equals("gov.epa.emissions.commons.io.csv.CSVImporter"))
                 tableTool.deleteRecords(table, source.getCols()[1], "integer", "" + dsID); // 2nd column: dataset_id
             else {
                 if (DebugLevels.DEBUG_16)

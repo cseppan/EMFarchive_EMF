@@ -815,3 +815,7 @@ insert into emf.dataset_types values(DEFAULT,'Strategy Impact Summary','Strategy
 
 2/17/2009 add new column to emf.users
 ALTER TABLE emf.users ADD COLUMN is_login boolean NOT NULL DEFAULT false;
+
+--2/25/2009 consolidate smoke report tables and csv data tables
+update emf.dataset_types set table_per_dataset=0 where importer_classname='gov.epa.emissions.commons.io.other.SMKReportImporter';
+update emf.dataset_types set table_per_dataset=0 where importer_classname='gov.epa.emissions.commons.io.csv.CSVImporter';
