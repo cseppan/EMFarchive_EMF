@@ -166,7 +166,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     public void checkIfLockedByCurrentUser() throws EmfException {
         Case reloaded = session.caseService().reloadCase(caseObj.getId());
 
-        if (!reloaded.isLocked(session.user()))
+        if (reloaded.isLocked() && !reloaded.isLocked(session.user()))
             throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
                     + " has it now.");
     }

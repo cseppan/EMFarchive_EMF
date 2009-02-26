@@ -647,10 +647,16 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     public void checkIfLockedByCurrentUser() throws EmfException {
         Case reloaded = session.caseService().reloadCase(caseObj.getId());
-
-        if (!reloaded.isLocked(session.user()))
+        
+        if (reloaded.isLocked() && !reloaded.isLocked(session.user()))
             throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner()
                     + " has it now.");
+        
+        if (!reloaded.isLocked())
+            reloaded = session.caseService().obtainLocked(session.user(), caseObj);
+        
+        if (reloaded == null)
+            throw new EmfException("Acquire lock on case failed. Please exit editing the case.");
         
         this.caseObj = reloaded;
     }
