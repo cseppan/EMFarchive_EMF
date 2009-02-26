@@ -33,5 +33,10 @@ public class DataTabPresenter {
         VersionsViewPresenter versionsPresenter = new VersionsViewPresenter(dataset, session);
         versionsPresenter.display(versionsView);
     }
+    
+    public EmfDataset reloadDataset() throws EmfException{
+        this.dataset = session.dataService().getDataset(dataset.getId());
+        return dataset; 
+    } 
 
 }

@@ -2,10 +2,13 @@ package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DatasetNote;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -15,7 +18,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class NotesTab extends JPanel implements NotesTabView {
+public class NotesTab extends JPanel implements NotesTabView, RefreshObserver {
 
     private EmfConsole parentConsole;
 
@@ -36,10 +39,10 @@ public class NotesTab extends JPanel implements NotesTabView {
     public void display(DatasetNote[] notes, NotesTabPresenter presenter) {
         this.presenter = presenter;
         super.removeAll();
-        super.add(createLayout(notes, parentConsole));
+        super.add(createLayout(notes));
     }
 
-    private JPanel createLayout(DatasetNote[] notes, EmfConsole parentConsole) {
+    private JPanel createLayout(DatasetNote[] notes) {
         JPanel layout = new JPanel(new BorderLayout());
 
         layout.add(tablePanel(notes, parentConsole), BorderLayout.CENTER);
@@ -77,6 +80,20 @@ public class NotesTab extends JPanel implements NotesTabView {
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             ViewNoteWindow view = new ViewNoteWindow(desktopManager);
             presenter.doViewNote((DatasetNote) iter.next(), view);    
+        }
+    }
+    
+    public void doRefresh() throws EmfException {        
+        try {           
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            //presenter.display();
+            super.removeAll();
+            super.add(createLayout(presenter.getDatasetNotes()));
+            super.validate();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
         }
     }
 }

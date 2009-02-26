@@ -17,10 +17,12 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
@@ -29,7 +31,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 
-public class EditableQATab extends JPanel implements EditableQATabView {
+public class EditableQATab extends JPanel implements EditableQATabView, RefreshObserver {
 
     private EditableQATabPresenter presenter;
 
@@ -61,10 +63,15 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     public void display(Dataset dataset, QAStep[] steps, QAStepResult[] qaStepResults, Version[] versions) {
         this.datasetID = dataset.getId(); // for uniqueness of window naming
         this.versions = new VersionsSet(versions);
+        
+        createLayout(steps, qaStepResults);
+ 
+    }
+    
+    private void createLayout(QAStep[] steps, QAStepResult[] qaStepResults) {
         super.setLayout(new BorderLayout());
         super.add(tablePanel(steps, qaStepResults), BorderLayout.CENTER);
         super.add(createButtonsSection(), BorderLayout.PAGE_END);
-
         super.setSize(new Dimension(700, 300));
     }
 
@@ -317,6 +324,27 @@ public class EditableQATab extends JPanel implements EditableQATabView {
                 + type.getName();
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
+    }
+
+    public void doRefresh() {
+        try {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            messagePanel.setMessage("Please wait while loading dataset QA...");
+            super.removeAll();
+            presenter.display();
+            super.validate();
+            messagePanel.setMessage("Finished loading dataset QA.");
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+            try {
+                presenter.checkIfLockedByCurrentUser();
+            } catch (Exception e) {
+                messagePanel.setMessage(e.getMessage());
+            }
+        }
+        
     }
 
 }

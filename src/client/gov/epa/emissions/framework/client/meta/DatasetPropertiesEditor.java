@@ -15,7 +15,7 @@ import gov.epa.emissions.framework.client.exim.ExportPresenterImpl;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.info.InfoTab;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
-import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenterImpl;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.logs.LogsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTab;
@@ -44,11 +44,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class DatasetPropertiesEditor extends DisposableInteralFrame implements DatasetPropertiesEditorView {
+public class DatasetPropertiesEditor extends DisposableInteralFrame implements DatasetPropertiesEditorView{
 
     private PropertiesEditorPresenter presenter;
 
-    private EditableKeywordsTabPresenterImpl keywordsPresenter;
+    private EditableKeywordsTabPresenter keywordsPresenter;
 
     private MessagePanel messagePanel;
 
@@ -97,8 +97,8 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
                 int tabIndex = tabbedPane.getSelectedIndex();
                 String tabTitle = tabbedPane.getTitleAt(tabIndex);
 
-                if (tabIndex == 2) // Keywords tab
-                    keywordsPresenter.refreshView();
+//                if (tabIndex == 2) // Keywords tab
+//                    keywordsPresenter.refreshView();
 
                 if (previousTab == 2 && tabIndex != 2 && DatasetPropertiesEditor.this.hasChanges()) {
                     try {
@@ -141,7 +141,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private JPanel createDataTab(EmfConsole parentConsole) {
-        DataTab view = new DataTab(parentConsole, desktopManager);
+        DataTab view = new DataTab(parentConsole, desktopManager, messagePanel);
         presenter.set(view);
         return view;
     }
@@ -207,7 +207,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private JPanel createLogsTab(EmfDataset dataset, EmfConsole parentConsole) {
         try {
             LogsTab view = new LogsTab(parentConsole);
-            LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session.loggingService());
+            LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session);
             presenter.display();
 
             return view;
@@ -252,6 +252,18 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
+        
+        Button refresh = new Button("Refresh", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    refreshCurrentTab();
+                } catch (EmfException e) {
+                    showError(e.getMessage());
+                }
+            }
+        });
+        buttonsPanel.add(refresh);
+        refresh.setToolTipText("Refresh only the current tab with focus.");
 
         Button save = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -277,6 +289,17 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         buttonsPanel.add(close);
 
         return buttonsPanel;
+    }
+    
+    private void refreshCurrentTab() throws EmfException {
+        RefreshObserver tab = (RefreshObserver) tabbedPane.getSelectedComponent();
+
+        try {
+            messagePanel.clear();
+            tab.doRefresh();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
     }
 
     public void observe(PropertiesEditorPresenter presenter) {

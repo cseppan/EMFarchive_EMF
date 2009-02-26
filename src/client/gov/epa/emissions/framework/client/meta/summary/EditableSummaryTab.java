@@ -25,10 +25,12 @@ import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,7 +40,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class EditableSummaryTab extends JPanel implements EditableSummaryTabView {
+public class EditableSummaryTab extends JPanel implements EditableSummaryTabView, RefreshObserver {
 
     private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(CustomDateFormat.PATTERN_MMddYYYY_HHmm);
 
@@ -75,10 +77,14 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     private EmfSession session;
 
     private IntendedUse[] allIntendedUses;
+    
+    private Version[] versions;
 
     private ManageChangeables changeablesList;
 
     private DefaultVersionPanel defaultVersionPanel;
+    
+    private EditableSummaryTabPresenter presenter;
 
     public EditableSummaryTab(EmfDataset dataset, Version[] versions, EmfSession session,
             MessagePanel messagePanel, ManageChangeables changeablesList) throws EmfException {
@@ -88,25 +94,31 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         this.service = session.dataCommonsService();
         this.messagePanel = messagePanel;
         this.changeablesList = changeablesList;
+        this.versions = versions; 
 
+        setLayout();
+        
+    }
+    
+    private void setLayout() throws EmfException {
         super.setLayout(new BorderLayout());
         super.add(createOverviewSection(), BorderLayout.PAGE_START);
-        super.add(createLowerSection(versions), BorderLayout.CENTER);
+        super.add(createLowerSection(), BorderLayout.CENTER);
     }
 
-    private JPanel createLowerSection(Version[] versions) throws EmfException {
+    private JPanel createLowerSection() throws EmfException {
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
         container.add(createTimeSpaceSection());
-        container.add(createLowerRightSection(versions));
+        container.add(createLowerRightSection());
 
         panel.add(container, BorderLayout.LINE_START);
 
         return panel;
     }
 
-    private JPanel createLowerRightSection(Version[] versions) throws EmfException {
+    private JPanel createLowerRightSection() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -358,6 +370,32 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private IntendedUse intendedUse(String name) {
         return new IntendedUses(allIntendedUses).get(name);
+    }
+
+    public void doRefresh() throws EmfException {  
+
+        try {
+            messagePanel.setMessage("Please wait while retrieving dataset summary...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            this.dataset = presenter.reloadDataset();
+            super.removeAll();
+            setLayout();
+            super.validate();
+            messagePanel.setMessage("Finished loading dataset summary.");
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+//            try {
+//                presenter.checkIfLockedByCurrentUser();
+//            } catch (Exception e) {
+//                messagePanel.setMessage(e.getMessage());
+//            }
+        }
+    }
+    
+    public void observe(EditableSummaryTabPresenter presenter){
+        this.presenter = presenter;
     }
 
 }

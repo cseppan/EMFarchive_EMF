@@ -6,27 +6,31 @@ import gov.epa.emissions.framework.client.meta.versions.VersionsPanel;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-public class DataTab extends JPanel implements DataTabView {
+public class DataTab extends JPanel implements DataTabView, RefreshObserver {
 
     private EmfConsole parentConsole;
 
-    private SingleLineMessagePanel messagePanel;
+    private MessagePanel messagePanel;
 
     private DesktopManager desktopManager;
 
     private DataTabPresenter presenter;
+    
+    private EmfDataset dataset; 
 
-    public DataTab(EmfConsole parentConsole, DesktopManager desktopManager) {
+    public DataTab(EmfConsole parentConsole, DesktopManager desktopManager, MessagePanel messagePanel) {
         setName("dataTab");
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
+        this.messagePanel = messagePanel;
     }
 
     public void observe(DataTabPresenter presenter) {
@@ -34,23 +38,23 @@ public class DataTab extends JPanel implements DataTabView {
     }
 
     public void display(EmfDataset dataset) {
-        super.setLayout(new BorderLayout());
-
-        messagePanel = new SingleLineMessagePanel();
-        add(messagePanel, BorderLayout.PAGE_START);
-        add(createLayout(dataset, messagePanel), BorderLayout.CENTER);
+        this.dataset = dataset; 
+        
+        createLayout();
     }
 
-    private JPanel createLayout(EmfDataset dataset, MessagePanel messagePanel) {
+    private void createLayout() {
+        super.setLayout(new BorderLayout());
+        //super.add(messagePanel, BorderLayout.PAGE_START);
+        
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+        container.add(versionsPanel());
 
-        container.add(versionsPanel(dataset, messagePanel));
-
-        return container;
+        super.add(container);
     }
 
-    private VersionsPanel versionsPanel(EmfDataset dataset, MessagePanel messagePanel) {
+    private VersionsPanel versionsPanel() {
         VersionsPanel versionsPanel = new VersionsPanel(dataset, messagePanel, parentConsole, desktopManager);
         try {
             presenter.displayVersions(versionsPanel);
@@ -59,6 +63,21 @@ public class DataTab extends JPanel implements DataTabView {
         }
 
         return versionsPanel;
+    }
+
+    public void doRefresh(){
+        try {           
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            this.dataset = presenter.reloadDataset();
+            super.removeAll();
+            createLayout();
+            super.validate();
+            messagePanel.setMessage("Finished loading dataset versions.");
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+        }        
     }
 
 }

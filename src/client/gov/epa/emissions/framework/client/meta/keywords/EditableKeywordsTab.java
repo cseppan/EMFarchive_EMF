@@ -8,10 +8,11 @@ import gov.epa.emissions.framework.client.data.datasettype.DatasetTypeKeyValueTa
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
-import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -19,9 +20,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabView, Editor {
+public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabView, Editor, RefreshObserver {
 
     private EditableKeyValueTableData tableData;
+    
+    private EditableKeywordsTabPresenter presenter;
 
     private EditableKeywordsPanel editableKeywordsPanel;
 
@@ -31,25 +34,27 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
     
     private EmfDataset dataset;
 
-    private SingleLineMessagePanel messagePanel;
+    //private SingleLineMessagePanel messagePanel;
 
     public EditableKeywordsTab(ManageChangeables changeablesList, EmfConsole parent) {
         this.changeablesList = changeablesList;
         this.parent = parent;
+        //messagePanel = new SingleLineMessagePanel();
         super.setName("editKeywordsTab");
-        super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        //super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     }
 
-    public void display(EmfDataset dataset, Keywords masterKeywords) {
-        super.removeAll();
+    public void display(EmfDataset dataset, Keywords masterKeywords) {       
         this.dataset = dataset;
-        messagePanel = new SingleLineMessagePanel();
-        super.add(messagePanel);
+        //super.removeAll();
+        super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        //super.add(messagePanel);
         super.add(createDSTypeKeywordsPanel(dataset.getDatasetType().getKeyVals()));
-        super.add(createDSKeywordsPanel(dataset, masterKeywords));
+        super.add(createDSKeywordsPanel(masterKeywords));
+        //super.validate();
     }
 
-    private JPanel createDSKeywordsPanel(EmfDataset dataset, Keywords masterKeywords) {
+    private JPanel createDSKeywordsPanel(Keywords masterKeywords) {
         tableData = new EditableKeyValueTableData(dataset.getKeyVals(), masterKeywords);
         editableKeywordsPanel = new EditableKeywordsPanel("", tableData, masterKeywords, changeablesList, parent);
         editableKeywordsPanel.setBorder(BorderFactory.createTitledBorder("Keywords Specific to Dataset"));
@@ -80,6 +85,30 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
     
     public EmfDataset getDataset() {
         return this.dataset;
+    }
+
+    public void doRefresh() throws EmfException {
+        try {           
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            super.removeAll();
+            presenter.refresh();
+            super.validate();
+            //messagePanel.setMessage("Finished loading keywords.");
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+//            try {
+//                presenter.checkIfLockedByCurrentUser();
+//            } catch (Exception e) {
+//                throw new EmfException(e.getMessage());
+//            }
+        }           
+    }
+
+    public void observe(EditableKeywordsTabPresenter presenter) {
+        this.presenter = presenter;
+        
     }
 
 }

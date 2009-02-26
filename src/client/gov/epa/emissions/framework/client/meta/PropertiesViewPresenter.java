@@ -60,12 +60,12 @@ public class PropertiesViewPresenter {
 //        }
 //    }
     public void set(SummaryTabView summary) {
-        SummaryTabPresenter summaryPresenter = new SummaryTabPresenter();
+        SummaryTabPresenter summaryPresenter = new SummaryTabPresenter(summary, dataset, session);
         summaryPresenter.display();
     }
 
     public void set(KeywordsTabView keywordsView) {
-        KeywordsTabPresenter keywordsPresenter = new KeywordsTabPresenter(keywordsView, dataset);
+        KeywordsTabPresenter keywordsPresenter = new KeywordsTabPresenter(keywordsView, dataset, session);
         keywordsPresenter.display();
     }
 
@@ -79,7 +79,7 @@ public class PropertiesViewPresenter {
     }
 
     public void set(LogsTabView view) throws EmfException {
-        LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session.loggingService());
+        LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session);
         presenter.display();
     }
 
@@ -89,7 +89,7 @@ public class PropertiesViewPresenter {
     }
 
     public void set(RevisionsTabView view) throws EmfException {
-        RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, session.dataCommonsService());
+        RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, session);
         presenter.display(view);
     }
 

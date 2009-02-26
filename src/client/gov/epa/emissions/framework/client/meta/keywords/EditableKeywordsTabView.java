@@ -10,4 +10,6 @@ public interface EditableKeywordsTabView {
     EmfDataset getDataset();
 
     KeyVal[] updates() throws EmfException;
+    
+    void observe(EditableKeywordsTabPresenter presenter);
 }

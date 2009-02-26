@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
 import gov.epa.emissions.framework.client.meta.PropertiesEditorTabPresenter;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public interface EditableSummaryTabPresenter extends PropertiesEditorTabPresenter {
-    // tagging interface
+    EmfDataset reloadDataset() throws EmfException;
 }

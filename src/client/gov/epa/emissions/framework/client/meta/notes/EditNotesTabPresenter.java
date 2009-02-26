@@ -19,4 +19,6 @@ public interface EditNotesTabPresenter extends PropertiesEditorTabPresenter {
     
     Note[] getNotes(String nameContains) throws EmfException;
     
+    DatasetNote[] getDatasetNotes() throws EmfException;
+    
 }

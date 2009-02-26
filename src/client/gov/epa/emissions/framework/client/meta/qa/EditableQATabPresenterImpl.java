@@ -24,13 +24,13 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         this.dataset = dataset;
         this.session = session;
         this.view = view;
+        view.observe(this);
     }
 
     public void display() throws EmfException {
         QAStep[] steps = qaService().getQASteps(dataset);
         QAStepResult[] qaStepResults =qaService().getQAStepResults(dataset);
         view.display(dataset, steps, qaStepResults,  versions());
-        view.observe(this);
     }
 
     private Version[] versions() throws EmfException {
@@ -100,4 +100,12 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         session.qaService().copyQAStepsToDatasets(session.user(), steps, datasetIds, replace);
     }
 
+    public void checkIfLockedByCurrentUser() throws EmfException{
+        EmfDataset reloaded = session.dataService().getDataset(dataset.getId());
+        if (!reloaded.isLocked())
+            throw new EmfException("Lock on current dataset object expired. " );  
+        if (!reloaded.isLocked(session.user()))
+            throw new EmfException("Lock on current dataset object expired. User " + reloaded.getLockOwner()
+                    + " has it now.");    
+    }
 }

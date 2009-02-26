@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -14,18 +15,22 @@ public class EditableKeywordsTabPresenterImpl implements EditableKeywordsTabPres
     private EmfDataset dataset;
     
     private Keywords masterKeywords;
+    
+    private EmfSession session; 
 
-    public EditableKeywordsTabPresenterImpl(EditableKeywordsTabView view, EmfDataset dataset) {
+    public EditableKeywordsTabPresenterImpl(EditableKeywordsTabView view, EmfDataset dataset, EmfSession session) {
         this.view = view;
         this.dataset = dataset;
+        this.session = session; 
     }
 
     public void display(Keywords masterKeywords) {
         this.masterKeywords = masterKeywords;
+        view.observe(this);
         view.display(dataset, masterKeywords);
     }
     
-    public void refreshView() {
+    public void refreshView() {     
         view.display(dataset, masterKeywords);
     }
 
@@ -43,6 +48,20 @@ public class EditableKeywordsTabPresenterImpl implements EditableKeywordsTabPres
             if (!set.add(name))
                 throw new EmfException("duplicate keyword '" + name + "'");
         }
+    }
+
+    public void checkIfLockedByCurrentUser() throws EmfException {
+        EmfDataset reloaded = session.dataService().getDataset(dataset.getId());
+        if (!reloaded.isLocked())
+            throw new EmfException("Lock on current dataset object expired. " );  
+        if (!reloaded.isLocked(session.user()))
+            throw new EmfException("Lock on current dataset object expired. User " + reloaded.getLockOwner()
+                    + " has it now.");        
+    }
+    
+    public void refresh() throws EmfException { 
+        this.dataset = session.dataService().getDataset(dataset.getId());
+        refreshView();
     }
 
 }

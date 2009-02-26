@@ -8,10 +8,12 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +22,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class QATab extends JPanel implements QATabView {
+public class QATab extends JPanel implements QATabView, RefreshObserver {
 
     private DesktopManager desktopManager;
 
@@ -108,6 +110,21 @@ public class QATab extends JPanel implements QATabView {
                 messagePanel.setError(e.getMessage());
             }
         }
+    }
+    
+    public void doRefresh() {
+        try {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            messagePanel.setMessage("Please wait while loading dataset QA...");
+            super.removeAll();
+            presenter.display();
+            super.validate();
+            messagePanel.setMessage("Finished loading dataset QA.");
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+        }       
     }
 
 }

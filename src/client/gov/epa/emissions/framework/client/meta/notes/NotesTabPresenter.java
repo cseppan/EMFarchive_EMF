@@ -17,11 +17,15 @@ public class NotesTabPresenter {
     }
 
     public void display(NotesTabView view) throws EmfException {
-        DatasetNote[] notes = service.getDatasetNotes(dataset.getId());
-        view.display(notes, this);
+        //DatasetNote[] notes = service.getDatasetNotes(dataset.getId());
+        view.display(getDatasetNotes(), this);
     }
 
     public void doViewNote(DatasetNote note, NoteView view) {
         view.display(note);
+    }
+    
+    public DatasetNote[] getDatasetNotes() throws EmfException{
+        return service.getDatasetNotes(dataset.getId());
     }
 }

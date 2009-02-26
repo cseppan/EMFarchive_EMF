@@ -29,12 +29,17 @@ public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
     }
 
     public void display() throws EmfException {
-        DatasetNote[] datasetNotes = service().getDatasetNotes(dataset.getId());
-        view.display(datasetNotes, this);
+        //DatasetNote[] datasetNotes = service().getDatasetNotes(dataset.getId());
+        view.observe(this);
+        view.display(getDatasetNotes());
     }
 
     private DataCommonsService service() {
         return session.dataCommonsService();
+    }
+    
+    public DatasetNote[] getDatasetNotes() throws EmfException{
+        return service().getDatasetNotes(dataset.getId());
     }
 
     public void doSave() throws EmfException {
@@ -114,6 +119,15 @@ public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
 
     public Note[] getNotes(String nameContains) throws EmfException {
         return service().getNameContainNotes(nameContains);
+    }
+    
+    public void checkIfLockedByCurrentUser() throws EmfException{
+        EmfDataset reloaded = session.dataService().getDataset(dataset.getId());
+        if (!reloaded.isLocked())
+            throw new EmfException("Lock on current dataset object expired. " );  
+        if (!reloaded.isLocked(session.user()))
+            throw new EmfException("Lock on current dataset object expired. User " + reloaded.getLockOwner()
+                    + " has it now.");    
     }
 
 }

@@ -69,4 +69,7 @@ public class InfoTabPresenter implements PropertiesEditorTabPresenter {
         return dataset.getId();
     }
 
+    public void checkIfLockedByCurrentUser(){
+        //
+    }
 }

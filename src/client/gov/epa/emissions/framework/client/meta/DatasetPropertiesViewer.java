@@ -127,7 +127,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     }
 
     private JPanel createDataTab(EmfConsole parentConsole) {
-        DataTab view = new DataTab(parentConsole, desktopManager);
+        DataTab view = new DataTab(parentConsole, desktopManager, messagePanel);
         presenter.set(view);
         return view;
     }
@@ -207,6 +207,18 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         left.add(data);
 
         JPanel right = new JPanel();
+        Button refresh = new Button("Refresh", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    refreshCurrentTab();
+                } catch (EmfException e) {
+                    showError(e.getMessage());
+                }
+            }
+        });
+        right.add(refresh);
+        refresh.setToolTipText("Refresh only the current tab with focus.");
+        
         Button exportButton = new ExportButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 exportDataset(dataset);
@@ -227,6 +239,17 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         panel.add(right, BorderLayout.LINE_END);
 
         return panel;
+    }
+    
+    private void refreshCurrentTab() throws EmfException {
+        RefreshObserver tab = (RefreshObserver) tabbedPane.getSelectedComponent();
+
+        try {
+            messagePanel.clear();
+            tab.doRefresh();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
     }
 
     private void exportDataset(EmfDataset dataset) {

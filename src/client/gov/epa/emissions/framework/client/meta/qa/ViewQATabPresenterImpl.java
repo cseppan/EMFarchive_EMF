@@ -21,10 +21,11 @@ public class ViewQATabPresenterImpl implements ViewQATabPresenter {
         this.view = view;
         this.dataset = dataset;
         this.session = session;
+        view.observe(this);
     }
 
     public void display() throws EmfException {
-        view.observe(this);
+        //view.observe(this);
         QAStepResult[] results = session.qaService().getQAStepResults(dataset);
         view.display(session.qaService().getQASteps(dataset), results, session);
     }

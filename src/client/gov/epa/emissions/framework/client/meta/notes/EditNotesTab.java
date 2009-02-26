@@ -9,9 +9,11 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
 import java.util.List;
@@ -19,7 +21,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 
-public class EditNotesTab extends JPanel implements EditNotesTabView {
+public class EditNotesTab extends JPanel implements EditNotesTabView, RefreshObserver {
 
     private EmfConsole parentConsole;
 
@@ -32,6 +34,8 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
     private ManageChangeables changeables;
 
     private MessagePanel messagePanel;
+    
+    private EditNotesTabPresenter presenter;
 
     private DesktopManager desktopManager;
 
@@ -46,21 +50,21 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         super.setLayout(new BorderLayout());
     }
 
-    public void display(DatasetNote[] datasetNotes, EditNotesTabPresenter presenter) {
+    public void display(DatasetNote[] datasetNotes) {
         super.removeAll();
-        super.add(createLayout(datasetNotes, presenter, parentConsole), BorderLayout.CENTER);
+        super.add(createLayout(datasetNotes), BorderLayout.CENTER);
     }
 
-    private JPanel createLayout(DatasetNote[] datasetNotes, EditNotesTabPresenter presenter, EmfConsole parentConsole) {
+    private JPanel createLayout(DatasetNote[] datasetNotes) {
         JPanel layout = new JPanel(new BorderLayout());
 
-        layout.add(tablePanel(datasetNotes, parentConsole), BorderLayout.CENTER);
-        layout.add(controlPanel(presenter), BorderLayout.PAGE_END);
+        layout.add(tablePanel(datasetNotes), BorderLayout.CENTER);
+        layout.add(controlPanel(), BorderLayout.PAGE_END);
 
         return layout;
     }
 
-    private JPanel tablePanel(DatasetNote[] datasetNotes, EmfConsole parentConsole) {
+    private JPanel tablePanel(DatasetNote[] datasetNotes) {
         setupTableModel(datasetNotes);
         changeables.addChangeable(tableData);
         
@@ -74,12 +78,12 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         tableData = new NotesTableData(datasetNotes);
     }
 
-    private JPanel controlPanel(final EditNotesTabPresenter presenter) {
+    private JPanel controlPanel() {
         JPanel container = new JPanel();
 
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doNewNote(presenter);
+                doNewNote();
             }
         });
         add.setToolTipText("add a new note");
@@ -87,7 +91,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         
         Button addExisting = new AddButton("Add Existing", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                addExistingNotes(presenter);
+                addExistingNotes();
             }
         });
         addExisting.setToolTipText("add an existing note");
@@ -95,7 +99,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
         Button view = new ViewButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doViewNote(presenter);
+                doViewNote();
             }
         });
         container.add(view);
@@ -106,7 +110,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         return panel;
     }
 
-    protected void doViewNote(EditNotesTabPresenter presenter) {
+    protected void doViewNote() {
         List notes = table.selected();
         for (Iterator iter = notes.iterator(); iter.hasNext();) {
             ViewNoteWindow window = new ViewNoteWindow(desktopManager);
@@ -114,7 +118,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         }
     }
 
-    protected void doNewNote(EditNotesTabPresenter presenter) {
+    protected void doNewNote() {
         NewNoteDialog view = new NewNoteDialog(parentConsole);
         try {
             presenter.doAddNote(view);
@@ -123,7 +127,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         }
     }
     
-    protected void addExistingNotes(EditNotesTabPresenter presenter) {
+    protected void addExistingNotes() {
         AddExistingNotesDialog view = new AddExistingNotesDialog(parentConsole);
         try {
             presenter.addExistingNotes(view);
@@ -160,6 +164,26 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
     public DatasetNote[] additions() {
         return tableData.additions();
+    }
+    
+    public void doRefresh() throws EmfException {        
+        try {
+            messagePanel.setMessage("Please wait while retrieving all dataset notes...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            //presenter.display();
+            super.removeAll();
+            super.add(createLayout(presenter.getDatasetNotes()));
+            super.validate();
+            messagePanel.setMessage("Finished loading dataset notes.");
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+        }
+    }
+    
+    public void observe(EditNotesTabPresenter presenter){
+        this.presenter = presenter; 
     }
 
 }

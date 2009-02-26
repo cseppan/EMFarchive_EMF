@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.info.InfoTabPresenter;
 import gov.epa.emissions.framework.client.meta.info.InfoTabView;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
@@ -36,7 +37,7 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
 
     private List presenters;
     
-    private EditableKeywordsTabPresenterImpl keywordsPresenter;
+    private EditableKeywordsTabPresenter keywordsPresenter;
 
     public PropertiesEditorPresenterImpl(EmfDataset dataset, DatasetPropertiesEditorView view, EmfSession session) {
         this.dataset = dataset;
@@ -77,19 +78,32 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
             PropertiesEditorTabPresenter element = (PropertiesEditorTabPresenter) iter.next();
             element.doSave();
         }
-        
+        checkIfLockedByCurrentUser();
         service.updateDataset(dataset);
 
         view.disposeView();
     }
+    
+    public void checkIfLockedByCurrentUser() throws EmfException {
+        EmfDataset reloaded = dataService().getDataset(dataset.getId());
+        
+        if (reloaded.isLocked() && !reloaded.isLocked(session.user()))
+            throw new EmfException("Lock on current case object expired. User " + reloaded.getLockOwner() + " has it now.");
+        if (!reloaded.isLocked())
+            reloaded = dataService().obtainLockedDataset(session.user(), reloaded);
+        
+        if (reloaded == null)
+            throw new EmfException("Acquire lock on case failed. Please exit editing the case.");
+    
+    }
 
     public void set(EditableSummaryTabView summary) {
-        EditableSummaryTabPresenterImpl summaryPresenter = new EditableSummaryTabPresenterImpl(dataset, summary);
+        EditableSummaryTabPresenterImpl summaryPresenter = new EditableSummaryTabPresenterImpl(dataset, summary, session);
         presenters.add(summaryPresenter);
     }
 
     public void set(EditableKeywordsTabView keywordsView) throws EmfException {
-        keywordsPresenter = new EditableKeywordsTabPresenterImpl(keywordsView, dataset);
+        keywordsPresenter = new EditableKeywordsTabPresenterImpl(keywordsView, dataset, session);
 
         Keywords keywords = new Keywords(session.dataCommonsService().getKeywords());
         keywordsPresenter.display(keywords);
@@ -97,7 +111,7 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
         presenters.add(keywordsPresenter);
     }
     
-    public EditableKeywordsTabPresenterImpl getKeywordsPresenter() {
+    public EditableKeywordsTabPresenter getKeywordsPresenter() {
         return keywordsPresenter;
     }
 
@@ -129,7 +143,7 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
     }
 
     public void set(RevisionsTabView view) throws EmfException {
-        RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, session.dataCommonsService());
+        RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, session);
         presenter.display(view);
     }
 

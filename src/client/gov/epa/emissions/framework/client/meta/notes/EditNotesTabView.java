@@ -4,10 +4,12 @@ import gov.epa.emissions.framework.services.data.DatasetNote;
 
 public interface EditNotesTabView {
 
-    void display(DatasetNote[] notes, EditNotesTabPresenter presenter);
+    void display(DatasetNote[] notes);
 
     DatasetNote[] additions();
 
     void addNote(DatasetNote note);
+    
+    void observe(EditNotesTabPresenter presenter);
 
 }
