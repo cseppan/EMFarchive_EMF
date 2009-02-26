@@ -20,7 +20,7 @@ public class KeywordsTabPresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getDatasetType").will(returnValue(datasetType));
 
         KeywordsTabPresenter presenter = new KeywordsTabPresenter(((KeywordsTabView) view.proxy()),
-                (EmfDataset) dataset.proxy());
+                (EmfDataset) dataset.proxy(), null);
 
         presenter.display();
     }

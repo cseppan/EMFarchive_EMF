@@ -25,7 +25,7 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getDatasetType").withNoArguments().will(returnValue(type.proxy()));
 
         EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenterImpl((EditableKeywordsTabView) view.proxy(), (EmfDataset) dataset
-                .proxy());
+                .proxy(), null);
 
         presenter.display(keywords);
     }
@@ -49,7 +49,7 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").with(eq(dataset.proxy()), same(keywords));
 
         EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenterImpl((EditableKeywordsTabView) view.proxy(), (EmfDataset) dataset
-                .proxy());
+                .proxy(), null);
 
         presenter.display(keywords);
     }
@@ -62,7 +62,7 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("updates").withNoArguments().will(returnValue(keyvals));
 
         EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenterImpl((EditableKeywordsTabView) view.proxy(), ((EmfDataset) dataset
-                .proxy()));
+                .proxy()), null);
 
         presenter.doSave();
     }
@@ -77,7 +77,7 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("updates").withNoArguments().will(returnValue(keyvals));
 
         EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenterImpl((EditableKeywordsTabView) view.proxy(), ((EmfDataset) dataset
-                .proxy()));
+                .proxy()), null);
 
         try {
             presenter.doSave();

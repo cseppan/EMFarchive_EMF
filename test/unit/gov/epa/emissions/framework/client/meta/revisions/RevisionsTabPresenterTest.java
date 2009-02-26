@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.revisions;
 
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.Revision;
@@ -14,11 +15,13 @@ public class RevisionsTabPresenterTest extends MockObjectTestCase {
         Mock view = mock(RevisionsTabView.class);
 
         Mock service = mock(DataCommonsService.class);
+        Mock session = mock(EmfSession.class);
         EmfDataset dataset = new EmfDataset();
         dataset.setId(2);
         service.stubs().method("getRevisions").with(eq(dataset.getId())).will(returnValue(revisions));
 
-        RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, (DataCommonsService) service.proxy());
+        //RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, (DataCommonsService) service.proxy());
+        RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, (EmfSession) session.proxy());
         view.expects(once()).method("display").with(eq(revisions), same(presenter));
 
         presenter.display((RevisionsTabView) view.proxy());

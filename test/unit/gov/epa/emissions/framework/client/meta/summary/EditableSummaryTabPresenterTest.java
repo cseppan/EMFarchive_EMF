@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -14,11 +15,12 @@ public class EditableSummaryTabPresenterTest extends MockObjectTestCase {
         dataset.expects(once()).method("getName").withNoArguments().will(returnValue("test"));
         
         Mock view = mock(EditableSummaryTabView.class);
+        Mock session = mock (EmfSession.class);
         Object datasetProxy = dataset.proxy();
         view.expects(once()).method("save").with(eq(datasetProxy));
 
         EditableSummaryTabPresenter presenter = new EditableSummaryTabPresenterImpl((EmfDataset) datasetProxy, (EditableSummaryTabView) view
-                .proxy());
+                .proxy(), (EmfSession) session.proxy());
 
         presenter.doSave();
     }
@@ -29,11 +31,12 @@ public class EditableSummaryTabPresenterTest extends MockObjectTestCase {
         dataset.expects(once()).method("getName").withNoArguments().will(returnValue(" "));
         
         Mock view = mock(EditableSummaryTabView.class);
+        Mock session = mock (EmfSession.class);
         Object datasetProxy = dataset.proxy();
         view.expects(once()).method("save").with(eq(datasetProxy));
 
         EditableSummaryTabPresenter presenter = new EditableSummaryTabPresenterImpl((EmfDataset) datasetProxy, (EditableSummaryTabView) view
-                .proxy());
+                .proxy(), (EmfSession) session.proxy());
 
         try {
             presenter.doSave();

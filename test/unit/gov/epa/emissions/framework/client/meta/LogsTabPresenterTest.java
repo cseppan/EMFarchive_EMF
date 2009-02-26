@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabView;
 import gov.epa.emissions.framework.services.EmfException;
@@ -18,11 +19,12 @@ public class LogsTabPresenterTest extends MockObjectTestCase {
         dataset.setId(6);
 
         Mock loggingServices = mock(LoggingService.class);
+        Mock session = mock (EmfSession.class);
         AccessLog[] accessLogs = new AccessLog[0];
         loggingServices.expects(once()).method("getAccessLogs").with(eq(dataset.getId())).will(returnValue(accessLogs));
 
         LogsTabPresenter presenter = new LogsTabPresenter((LogsTabView) view.proxy(), dataset,
-                (LoggingService) loggingServices.proxy());
+                (EmfSession) session.proxy());
 
         view.expects(once()).method("display").with(eq(accessLogs));
 
