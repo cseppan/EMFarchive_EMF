@@ -156,6 +156,10 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         crudPanel.add(viewButton);
         crudPanel.add(editButton);
         crudPanel.add(newButton);
+        if (!session.user().isAdmin()){
+            editButton.setEnabled(false);
+            newButton.setEnabled(false);
+        }
 
         return crudPanel;
     }
