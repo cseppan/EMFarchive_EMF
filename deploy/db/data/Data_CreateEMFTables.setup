@@ -381,6 +381,7 @@ CREATE TABLE emf.table_consolidations
   col_names text,
   col_types text,
   size_limit real,
+  number_records int8 DEFAULT 0,
   UNIQUE(dataset_type_id, output_table)
 ) 
 WITHOUT OIDS;

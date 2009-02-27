@@ -819,3 +819,5 @@ ALTER TABLE emf.users ADD COLUMN is_login boolean NOT NULL DEFAULT false;
 --2/25/2009 consolidate smoke report tables and csv data tables
 update emf.dataset_types set table_per_dataset=0 where importer_classname='gov.epa.emissions.commons.io.other.SMKReportImporter';
 update emf.dataset_types set table_per_dataset=0 where importer_classname='gov.epa.emissions.commons.io.csv.CSVImporter';
+update emf.dataset_types set table_per_dataset=0 where importer_classname='gov.epa.emissions.commons.io.generic.LineImporter';
+alter table emf.table_consolidations add column number_records int8 default 0;

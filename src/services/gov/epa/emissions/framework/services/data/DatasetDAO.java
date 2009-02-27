@@ -533,10 +533,12 @@ public class DatasetDAO {
         InternalSource[] sources = dataset.getInternalSources();
 
         if (type != null) {
-            String importerclass = type.getImporterClassName();
+            String importerclass = (type == null ? "" : type.getImporterClassName());
+            importerclass = (importerclass == null ? "" : importerclass.trim());
 
             if (importerclass.equals("gov.epa.emissions.commons.io.other.SMKReportImporter") 
-                    || importerclass.equals("gov.epa.emissions.commons.io.csv.CSVImporter"))
+                    || importerclass.equals("gov.epa.emissions.commons.io.csv.CSVImporter")
+                    || importerclass.equals("gov.epa.emissions.commons.io.generic.LineImporter"))
                 return false;
         }
 
@@ -887,7 +889,8 @@ public class DatasetDAO {
             if (importerclass.equals("gov.epa.emissions.commons.io.temporal.TemporalProfileImporter") 
                     || importerclass.equals("gov.epa.emissions.commons.io.other.CountryStateCountyDataImporter")
                     || importerclass.equals("gov.epa.emissions.commons.io.other.SMKReportImporter")
-                    || importerclass.equals("gov.epa.emissions.commons.io.csv.CSVImporter"))
+                    || importerclass.equals("gov.epa.emissions.commons.io.csv.CSVImporter")
+                    || importerclass.equals("gov.epa.emissions.commons.io.generic.LineImporter"))
                 tableTool.deleteRecords(table, source.getCols()[1], "integer", "" + dsID); // 2nd column: dataset_id
             else {
                 if (DebugLevels.DEBUG_16)
