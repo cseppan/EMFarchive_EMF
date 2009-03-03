@@ -164,7 +164,7 @@ public class ImportTask extends Task {
 
     protected void addDataset(EmfDataset dataset, Session session) throws EmfException {
         try {
-            if (dao.datasetNameUsed(dataset.getName()))
+            if (dao.datasetNameUsed(dataset.getName(), session))
                 throw new EmfException("The selected Dataset name is already in use");
         } catch (Exception e) {
             e.printStackTrace();

@@ -22,6 +22,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
@@ -64,12 +65,14 @@ public class ImportService {
 
     private void isNameUnique(String name) throws Exception {
         DatasetDAO dao = new DatasetDAO();
-        boolean nameUsed = dao.datasetNameUsed(name);
+        Session session = sessionFactory.getSession();
 
-        if (nameUsed) {
-            // AME: no need to log this as an error
-            // log.error("Dataset name " + dataset.getName() + " is already used");
-            throw new EmfException("Dataset name is already used");
+        try {
+            if (dao.datasetNameUsed(name, session))
+                throw new EmfException("Dataset name is already used");
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -78,7 +81,8 @@ public class ImportService {
             File path = validatePath(folderPath);
 
             isNameUnique(dataset.getName());
-            ImportTask eximTask = new ImportTask(dataset, fileNames, path, user, services, DbServerFactory.get(), sessionFactory);
+            ImportTask eximTask = new ImportTask(dataset, fileNames, path, user, services, DbServerFactory.get(),
+                    sessionFactory);
 
             threadPool.execute(new GCEnforcerTask("Import of Dataset: " + dataset.getName(), eximTask));
         } catch (Exception e) {
@@ -116,7 +120,8 @@ public class ImportService {
         services.getStatus().add(endStatus);
     }
 
-    private EmfDataset createDataset(String folder, String filename, String datasetName, User user, DatasetType datasetType) {
+    private EmfDataset createDataset(String folder, String filename, String datasetName, User user,
+            DatasetType datasetType) {
         EmfDataset dataset = new EmfDataset();
         File file = new File(folder, filename);
 
@@ -124,10 +129,10 @@ public class ImportService {
         dataset.setCreator(user.getUsername());
         dataset.setDatasetType(datasetType);
         dataset.setCreatedDateTime(new Date());
-        //dataset.setModifiedDateTime(new Date());
+        // dataset.setModifiedDateTime(new Date());
         dataset.setModifiedDateTime(file.exists() ? new Date(file.lastModified()) : new Date());
         dataset.setAccessedDateTime(new Date());
- 
+
         return dataset;
     }
 

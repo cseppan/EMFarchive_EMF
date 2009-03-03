@@ -101,7 +101,7 @@ public class ManagedImportService {
 
         if (System.getProperty("IMPORT_EXPORT_TEMP_DIR") == null)
             setTempDirProperties();
-        
+
         if (System.getProperty("MASS_STORAGE_ROOT") == null)
             setMassStorageProperties();
 
@@ -130,8 +130,15 @@ public class ManagedImportService {
     }
 
     private synchronized boolean isNameUsed(String name) throws Exception {
-        DatasetDAO dao = new DatasetDAO(dbServerFactory);
-        return dao.datasetNameUsed(name);
+        Session session = sessionFactory.getSession();
+        DatasetDAO dao = new DatasetDAO();
+
+        try {
+            return dao.datasetNameUsed(name, session);
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
     }
 
     public synchronized String importDatasetsForClient(User user, String folderPath, String[] filenames,
@@ -390,7 +397,8 @@ public class ManagedImportService {
         if ((startDate != null && !startDate.before(CustomDateFormat.parse_MMddyyyy("1/1/2200")))
                 || (endDate != null && !endDate.before(CustomDateFormat.parse_MMddyyyy("1/1/2200")))) {
             log.warn("EMF_START_DATE: " + startDate + "; EMF_END_DATE: " + endDate);
-            throw new EmfException("Invalid year or date format for EMF start/end date in file header (use MM/dd/YYYY hh:mm).");
+            throw new EmfException(
+                    "Invalid year or date format for EMF start/end date in file header (use MM/dd/YYYY hh:mm).");
         }
 
         dataset.setName(name);
@@ -402,13 +410,13 @@ public class ManagedImportService {
         dataset.setStartDateTime(startDate);
         dataset.setStopDateTime(endDate);
         dataset.setTemporalResolution(headerReader.getTemporalResolution());
-        
+
         return setDatasetProperties(folder, dataset, headerReader.getRegion(), headerReader.getProject(), headerReader
                 .getSector(), headerReader.getCountry());
     }
 
-    private synchronized EmfDataset setDatasetProperties(String folder, EmfDataset dataset, String region, String project,
-            String sector, String country) {
+    private synchronized EmfDataset setDatasetProperties(String folder, EmfDataset dataset, String region,
+            String project, String sector, String country) {
         SectorsDAO sectorsDao = new SectorsDAO();
         ProjectsDAO projectsDao = new ProjectsDAO();
         RegionsDAO regionsDao = new RegionsDAO();
@@ -438,8 +446,8 @@ public class ManagedImportService {
                 log.error("Sector " + sector + " does not exist in sectors table.");
             else
                 dataset.setSectors(new Sector[] { sectorObj });
-            
-            if(folder.startsWith(massStorageRoot)) {
+
+            if (folder.startsWith(massStorageRoot)) {
                 Keyword massKey = new Keyword("MASS_STORAGE_LOCATION");
                 Keyword loaded = keywordsDAO.add(massKey, session);
                 KeyVal keyval = new KeyVal(loaded, folder);
@@ -507,8 +515,7 @@ public class ManagedImportService {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Bad Folder+Pattern: " + folder + File.pathSeparator + pattern);
-            throw new EmfException("No files found for pattern: "+pattern+" in folder "+
-                    folder);
+            throw new EmfException("No files found for pattern: " + pattern + " in folder " + folder);
         }
     }
 
@@ -669,8 +676,8 @@ public class ManagedImportService {
             session.close();
         }
     }
-    
-    private void setMassStorageProperties(){
+
+    private void setMassStorageProperties() {
         Session session = sessionFactory.getSession();
         try {
             EmfProperty massStorageRoot = new EmfPropertiesDAO().getProperty("MASS_STORAGE_ROOT", session);

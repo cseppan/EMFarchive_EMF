@@ -229,7 +229,7 @@ public class ImportCaseOutputTask extends Task {
         try {
             String name = dataset.getName();
 
-            if (datasetDao.datasetNameUsed(name)) {
+            if (datasetDao.datasetNameUsed(name, session)) {
                 name += "_" + CustomDateFormat.format_yyyy_MM_dd_HHmmssSS(new Date());
                 dataset.setName(name);
             }

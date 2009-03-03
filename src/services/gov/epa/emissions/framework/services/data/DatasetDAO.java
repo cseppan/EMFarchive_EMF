@@ -100,7 +100,7 @@ public class DatasetDAO {
         if (current.getName().equalsIgnoreCase(newName))
             return true;
 
-        return !datasetNameUsed(newName);
+        return !datasetNameUsed(newName, session);
     }
 
     public boolean exists(String name, Session session) {
@@ -567,30 +567,14 @@ public class DatasetDAO {
         sources[0].setTable(newTableName);
     }
 
-    public boolean datasetNameUsed(String name) throws Exception {
-        String getDSNamesQuery = "SELECT name FROM emf.datasets";
-        boolean nameexists = false;
-        DbServer dbServer = null;
-
-        try {
-            dbServer = getDbServer();
-            Datasource datasource = dbServer.getEmfDatasource();
-            Connection connection = datasource.getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(getDSNamesQuery);
-
-            while (resultSet.next())
-                if (resultSet.getString(1).trim().equalsIgnoreCase(name.trim())) {
-                    LOG.warn("dataset name: " + name + " already exists.");
-                    nameexists = true;
-                    break;
-                }
-        } finally {
-            if (dbServer != null)
-                dbServer.disconnect();
-        }
-
-        return nameexists;
+    public boolean datasetNameUsed(String name, Session session) throws Exception {
+        Criterion crit = Restrictions.eq("name", name).ignoreCase();
+        EmfDataset ds = (EmfDataset)hibernateFacade.load(EmfDataset.class, crit, session);
+        
+        if (ds == null)
+            return false;
+        
+        return true;
     }
 
     private DbServer getDbServer() throws Exception {

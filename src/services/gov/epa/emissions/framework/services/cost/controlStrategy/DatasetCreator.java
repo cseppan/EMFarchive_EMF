@@ -313,7 +313,7 @@ public class DatasetCreator {
         Session session = sessionFactory.getSession();
         try {
             DatasetDAO dao = new DatasetDAO(dbServerFactory);
-            if (dao.datasetNameUsed(dataset.getName()))
+            if (dao.datasetNameUsed(dataset.getName(), session))
                 throw new EmfException("The selected dataset name is already in use.");
 
             dao.add(dataset, session);

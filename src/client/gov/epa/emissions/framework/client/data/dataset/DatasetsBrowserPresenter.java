@@ -120,25 +120,27 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         try {
             dataService().deleteDatasets(getUser(), lockedDatasets);
         } catch (EmfException e) {
-            releaseLocked(lockedDatasets);
             throw new EmfException(e.getMessage());
+        } finally {
+            releaseLocked(lockedDatasets);
         }
     }
     
     private EmfDataset[] getLockedDatasets(EmfDataset[] datasets) throws EmfException {
-        List lockedList = new ArrayList();
+        List<EmfDataset> lockedList = new ArrayList<EmfDataset>();
         
         for (int i = 0; i < datasets.length; i++) {
             EmfDataset locked = obtainDatasetLocks(datasets[i]);
+            
             if (locked == null) {
-                releaseLocked((EmfDataset[])lockedList.toArray(new EmfDataset[0]));
+                releaseLocked(lockedList.toArray(new EmfDataset[0]));
                 return null;
             }
             
             lockedList.add(locked);
         }
         
-        return (EmfDataset[])lockedList.toArray(new EmfDataset[0]);
+        return lockedList.toArray(new EmfDataset[0]);
     }
 
     private EmfDataset obtainDatasetLocks(EmfDataset dataset) throws EmfException {
@@ -151,12 +153,17 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         return locked;
     }
     
-    private void releaseLocked(EmfDataset[] lockedDatasets) throws EmfException {
+    private void releaseLocked(EmfDataset[] lockedDatasets) {
         if (lockedDatasets.length == 0)
             return;
         
-        for(int i = 0; i < lockedDatasets.length; i++)
-            dataService().releaseLockedDataset(session.user(), lockedDatasets[i]);
+        for(int i = 0; i < lockedDatasets.length; i++) {
+            try {
+                dataService().releaseLockedDataset(session.user(), lockedDatasets[i]);
+            } catch (Exception e) { //so that it go release locks continuously
+                e.printStackTrace();
+            }
+        }
     }
 
     public EmfDataset[] getEmfDatasets(DatasetType type, String nameContains) throws EmfException {
