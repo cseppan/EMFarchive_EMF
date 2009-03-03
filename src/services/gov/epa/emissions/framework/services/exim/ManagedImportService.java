@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.exim;
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
@@ -25,6 +26,7 @@ import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUsesDAO;
+import gov.epa.emissions.framework.services.data.KeywordsDAO;
 import gov.epa.emissions.framework.services.data.ProjectsDAO;
 import gov.epa.emissions.framework.services.data.RegionsDAO;
 import gov.epa.emissions.framework.services.data.SectorsDAO;
@@ -98,7 +100,10 @@ public class ManagedImportService {
         this.dbServerFactory = dbServerFactory;
 
         if (System.getProperty("IMPORT_EXPORT_TEMP_DIR") == null)
-            setProperties();
+            setTempDirProperties();
+        
+        if (System.getProperty("MASS_STORAGE_ROOT") == null)
+            setMassStorageProperties();
 
         if (DebugLevels.DEBUG_17)
             System.out.println("ManagedImportService: At the class initialization -- numOfRunningThread: "
@@ -397,20 +402,22 @@ public class ManagedImportService {
         dataset.setStartDateTime(startDate);
         dataset.setStopDateTime(endDate);
         dataset.setTemporalResolution(headerReader.getTemporalResolution());
-
-        return setDatasetProperties(dataset, headerReader.getRegion(), headerReader.getProject(), headerReader
+        
+        return setDatasetProperties(folder, dataset, headerReader.getRegion(), headerReader.getProject(), headerReader
                 .getSector(), headerReader.getCountry());
     }
 
-    private synchronized EmfDataset setDatasetProperties(EmfDataset dataset, String region, String project,
+    private synchronized EmfDataset setDatasetProperties(String folder, EmfDataset dataset, String region, String project,
             String sector, String country) {
         SectorsDAO sectorsDao = new SectorsDAO();
         ProjectsDAO projectsDao = new ProjectsDAO();
         RegionsDAO regionsDao = new RegionsDAO();
         IntendedUsesDAO intendedUsesDao = new IntendedUsesDAO();
         CountriesDAO countriesDao = new CountriesDAO();
+        KeywordsDAO keywordsDAO = new KeywordsDAO();
 
         Session session = sessionFactory.getSession();
+        String massStorageRoot = System.getProperty("MASS_STORAGE_ROOT");
 
         try {
             Project projectObj = projectsDao.getProject(project, session);
@@ -431,6 +438,13 @@ public class ManagedImportService {
                 log.error("Sector " + sector + " does not exist in sectors table.");
             else
                 dataset.setSectors(new Sector[] { sectorObj });
+            
+            if(folder.startsWith(massStorageRoot)) {
+                Keyword massKey = new Keyword("MASS_STORAGE_LOCATION");
+                Keyword loaded = keywordsDAO.add(massKey, session);
+                KeyVal keyval = new KeyVal(loaded, folder);
+                dataset.addKeyVal(keyval);
+            }
 
             dataset.setIntendedUse(intendedUsesDao.getIntendedUse("public", sessionFactory.getSession()));
         } catch (HibernateException e) {
@@ -644,13 +658,25 @@ public class ManagedImportService {
         importOutputTasks.removeAll(importOutputTasks); // make sure the list is cleared once all tasks done
     }
 
-    private void setProperties() {
+    private void setTempDirProperties() {
         Session session = sessionFactory.getSession();
         try {
             EmfProperty eximTempDir = new EmfPropertiesDAO().getProperty("ImportExportTempDir", session);
 
             if (eximTempDir != null)
                 System.setProperty("IMPORT_EXPORT_TEMP_DIR", eximTempDir.getValue());
+        } finally {
+            session.close();
+        }
+    }
+    
+    private void setMassStorageProperties(){
+        Session session = sessionFactory.getSession();
+        try {
+            EmfProperty massStorageRoot = new EmfPropertiesDAO().getProperty("MASS_STORAGE_ROOT", session);
+
+            if (massStorageRoot != null)
+                System.setProperty("MASS_STORAGE_ROOT", massStorageRoot.getValue());
         } finally {
             session.close();
         }

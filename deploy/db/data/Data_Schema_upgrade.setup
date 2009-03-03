@@ -821,3 +821,6 @@ update emf.dataset_types set table_per_dataset=0 where importer_classname='gov.e
 update emf.dataset_types set table_per_dataset=0 where importer_classname='gov.epa.emissions.commons.io.csv.CSVImporter';
 update emf.dataset_types set table_per_dataset=0 where importer_classname='gov.epa.emissions.commons.io.generic.LineImporter';
 alter table emf.table_consolidations add column number_records int8 default 0;
+
+--3/2/2009 add a new property for mass storage root
+insert into emf.properties values(DEFAULT, 'MASS_STORAGE_ROOT', '/asm');
