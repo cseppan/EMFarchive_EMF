@@ -26,7 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class CaseFileParser {
+    private static Log log = LogFactory.getLog(CaseFileParser.class);
+    
     private File sum_file;
 
     private File inputs_file;
@@ -80,6 +85,10 @@ public class CaseFileParser {
         return this.inputColNames;
     }
 
+    public List<CaseJob> getJobs() {
+        return this.jobs;
+    }
+    
     public List<CaseParameter> getParameters() {
         return this.params;
     }
@@ -113,44 +122,61 @@ public class CaseFileParser {
     }
 
     private void readProcessAllSummaryLines(File file) throws Exception {
+        DelimitedFileReader reader = new DelimitedFileReader(file, new CommaDelimitedTokenizer());
+        
         try {
-            DelimitedFileReader reader = new DelimitedFileReader(file, new CommaDelimitedTokenizer());
             Record record = null;
 
             for (record = reader.read(); !record.isEnd(); record = reader.read())
                 processSummary(record.getTokens());
         } catch (ParseException e) {
+            log.error("Summary field not in correct format.", e);
             throw new Exception("Summary field not in correct format: " + e.getMessage());
         } catch (Exception e) {
+            log.error("Could not read summary info.", e);
             throw new Exception("Could not read summary info: " + e.getMessage());
+        } finally {
+            if (reader != null)
+                reader.close();
         }
     }
 
     private void readProcessAllInputsLines(File file) throws Exception {
+        DelimitedFileReader reader = new DelimitedFileReader(file, new CommaDelimitedTokenizer());
+
         try {
-            DelimitedFileReader reader = new DelimitedFileReader(file, new CommaDelimitedTokenizer());
             Record record = null;
 
             for (record = reader.read(); !record.isEnd(); record = reader.read())
                 processInputs(record.getTokens());
         } catch (ParseException e) {
+            log.error("Inputs field not in correct format.", e);
             throw new Exception("Inputs field not in correct format: " + e.getMessage());
         } catch (Exception e) {
             throw new Exception("Could not read inputs info: " + e.getMessage());
+        } finally {
+            if (reader != null)
+                reader.close();
         }
     }
 
     private void readProcessAllJobsLines(File file) throws Exception {
+        DelimitedFileReader reader = new DelimitedFileReader(file, new CommaDelimitedTokenizer());
+        
         try {
-            DelimitedFileReader reader = new DelimitedFileReader(file, new CommaDelimitedTokenizer());
             Record record = null;
 
             for (record = reader.read(); !record.isEnd(); record = reader.read())
                 processJobs(record.getTokens());
         } catch (ParseException e) {
+            log.error("Jobs field not in correct format.", e);
             throw new Exception("Jobs field not in correct format: " + e.getMessage());
         } catch (Exception e) {
+            log.error("Could not read jobs info.", e);
             throw new Exception("Could not read jobs info: " + e.getMessage());
+        } finally {
+            if (reader != null)
+                reader.close();
         }
     }
 
@@ -387,15 +413,15 @@ public class CaseFileParser {
         job.setRunCompletionDate(data[6].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[6]));
         job.setExecutable(new Executable(data[7]));
         job.setArgs(data[8]);
-        job.setPath(data[8]);
-        job.setQueOptions(data[9]);
-        job.setJobGroup(data[10]);
-        job.setLocal(data[11].equalsIgnoreCase("TRUE"));
-        job.setIdInQueue(data[12]);
-        job.setUser(new User(data[13]));
-        job.setHost(new Host(data[14]));
-        job.setRunNotes(data[15]);
-        job.setPurpose(data[16]);
+        job.setPath(data[9]);
+        job.setQueOptions(data[10]);
+        job.setJobGroup(data[11]);
+        job.setLocal(data[12].equalsIgnoreCase("TRUE"));
+        job.setIdInQueue(data[13]);
+        job.setUser(new User(data[14]));
+        job.setHost(new Host(data[15]));
+        job.setRunNotes(data[16]);
+        job.setPurpose(data[17]);
 
         this.jobs.add(job);
     }

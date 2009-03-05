@@ -12,6 +12,9 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
+import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
@@ -113,11 +116,13 @@ public class CaseAssistanceService {
 
                 session.clear(); // NOTE: to clear up the old object images
                 Case loadedCase = caseDao.getCaseFromName(newCase.getName(), session);
-                insertParameters(loadedCase.getId(), loadedCase.getModel().getId(), caseParser.getParameters(), helper);
-                insertInputs(loadedCase.getId(), loadedCase.getModel().getId(), caseParser.getInputs(), helper);
+                int caseId = loadedCase.getId();
+                int modId = loadedCase.getModel().getId();
+                insertJobs(caseId, user, caseParser.getJobs(), helper);
+                insertParameters(caseId, modId, caseParser.getParameters(), helper);
+                insertInputs(caseId, modId, caseParser.getInputs(), helper);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("Could not import case", e);
 
             if (e instanceof EmfException)
@@ -315,6 +320,32 @@ public class CaseAssistanceService {
         return temp;
     }
 
+    private void insertJobs(int caseId, User user, List<CaseJob> jobs, CaseDaoHelper helper) throws EmfException {
+        for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
+            CaseJob job = iter.next();
+            job.setCaseId(caseId);
+
+            Sector sector = job.getSector();
+            job.setSector(helper.getSector(sector));
+            
+            job.setUser(helper.getUser(user));
+            
+            User runUser = job.getRunJobUser();
+            job.setRunJobUser(helper.getUser(runUser));
+            
+            Host host = job.getHost();
+            job.setHost(helper.getHost(host));
+            
+            JobRunStatus runStatus = job.getRunstatus();
+            job.setRunstatus(helper.getJobRunStatus(runStatus));
+            
+            Executable exec = job.getExecutable();
+            job.setExecutable(helper.getExcutable(exec));
+
+            helper.insertCaseJob(job);
+        }
+    }
+    
     private void insertParameters(int caseId, int model2RunId, List<CaseParameter> parameters, CaseDaoHelper helper)
             throws Exception {
         for (Iterator<CaseParameter> iter = parameters.iterator(); iter.hasNext();) {

@@ -552,21 +552,21 @@ public class CaseDAO {
 
         return hibernateFacade.get(CaseInput.class, crits, session);
     }
-    
+
     public List<CaseInput> getInputsBySector(int caseId, Sector sector, Session session) {
         Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion c2 = Restrictions.eq("sector", sector);
 
         return hibernateFacade.get(CaseInput.class, new Criterion[] { c1, c2 }, session);
     }
-    
+
     public List<CaseInput> getInputsForAllSectors(int caseId, Session session) {
         Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion c2 = Restrictions.isNull("sector");
 
         return hibernateFacade.get(CaseInput.class, new Criterion[] { c1, c2 }, session);
     }
-    
+
     public List<CaseInput> getInputs4AllJobsAllSectors(int caseId, Session session) {
         return getJobInputs(caseId, 0, null, session);
     }
@@ -1057,7 +1057,14 @@ public class CaseDAO {
         hibernateFacade.updateOnly(parameter, session);
     }
 
-    public Object loadCaseJobByName(CaseJob job) {
+    public CaseJob loadCaseJob(CaseJob job, Session session) {
+        Criterion c1 = Restrictions.eq("caseId", new Integer(job.getCaseId()));
+        Criterion c2 = Restrictions.eq("name", job.getName());
+        Criterion[] criterions = { c1, c2 };
+        return (CaseJob) hibernateFacade.load(CaseJob.class, criterions, session);
+    }
+
+    public CaseJob loadCaseJobByName(CaseJob job) {
         Session session = sessionFactory.getSession();
         Object obj = null;
         try {
@@ -1070,7 +1077,7 @@ public class CaseDAO {
         } finally {
             session.close();
         }
-        return obj;
+        return (CaseJob) obj;
 
     }
 
@@ -1109,7 +1116,7 @@ public class CaseDAO {
     public String[] getDependentJobs(int jobId) {
         if (jobId <= 0)
             return new String[0];
-        
+
         DependentJob[] dependentJobs = getCaseJob(jobId).getDependentJobs();
         String[] dependentJobNames = new String[dependentJobs.length];
 
@@ -1126,7 +1133,7 @@ public class CaseDAO {
         // to avoid cycle dependencies.
         if (jobId <= 0) // a new job
             return true;
-        
+
         if (jobId == dependentJobId)
             return false;
 
@@ -1676,20 +1683,20 @@ public class CaseDAO {
     public void checkJobDependency(CaseJob[] jobs, Session session) throws EmfException {
         Criterion c1 = Restrictions.isNotNull("dependentJobs");
         Criterion c2 = Restrictions.isNotEmpty("dependentJobs");
-        
+
         List<CaseJob> jobsDeps = hibernateFacade.get(CaseJob.class, new Criterion[] { c1, c2 }, session);
-        
+
         for (Iterator<CaseJob> iter = jobsDeps.iterator(); iter.hasNext();) {
             CaseJob jobDeps = iter.next();
             DependentJob[] depJobs = jobDeps.getDependentJobs();
-            
+
             for (DependentJob depJob : depJobs) {
                 int depJobId = depJob.getJobId();
-                
+
                 for (CaseJob del : jobs)
                     if (depJobId == del.getId())
-                        throw new EmfException("job '" + del.getName() 
-                                + "', because job '" + jobDeps.getName() + "' depends on it.");
+                        throw new EmfException("job '" + del.getName() + "', because job '" + jobDeps.getName()
+                                + "' depends on it.");
             }
         }
     }
@@ -1721,38 +1728,39 @@ public class CaseDAO {
 
     public CaseParameter getCaseParameter(int caseId, ParameterEnvVar var, Session session) {
         ParameterEnvVar loadedVar = this.getParameterEnvVar(var.getName(), var.getModelToRunId(), session);
-        
+
         if (loadedVar == null)
             return null;
-        
-        String query = "SELECT obj.id FROM " + CaseParameter.class.getSimpleName() + " obj WHERE " +
-        		"obj.caseID = " + caseId + " AND obj.envVar.id = " + loadedVar.getId();
+
+        String query = "SELECT obj.id FROM " + CaseParameter.class.getSimpleName() + " obj WHERE " + "obj.caseID = "
+                + caseId + " AND obj.envVar.id = " + loadedVar.getId();
         List ids = session.createQuery(query).list();
-        
+
         if (ids == null || ids.size() == 0)
             return null;
-        
+
         return getCaseParameter(Integer.parseInt(ids.get(0).toString()), session);
     }
-    
+
     public int[] getExternalDatasetIds(String source, Session session) {
         if (source == null || source.trim().isEmpty())
             return new int[0];
-        //NOTE: emf.external_sources and emf.datasets tables are hardwired here, not a desirable
+        // NOTE: emf.external_sources and emf.datasets tables are hardwired here, not a desirable
         // way but necessary, because ExternalSource object is not explicitly mapped through hibernate
         // Another way to access the tables is to use DbServer object.
-        String queryAll = "SELECT DISTINCT ex.dataset_id FROM emf.external_sources ex WHERE ex.datasource=" +
-        		"'" + source.replaceAll("\\\\", "\\\\\\\\") + "'";
-        
-        String queryNonDeleted = "SELECT ds.id FROM emf.datasets ds WHERE lower(ds.status) <> 'deleted' AND ds.id IN (" + queryAll + ")";
+        String queryAll = "SELECT DISTINCT ex.dataset_id FROM emf.external_sources ex WHERE ex.datasource=" + "'"
+                + source.replaceAll("\\\\", "\\\\\\\\") + "'";
+
+        String queryNonDeleted = "SELECT ds.id FROM emf.datasets ds WHERE lower(ds.status) <> 'deleted' AND ds.id IN ("
+                + queryAll + ")";
         List ids = session.createSQLQuery(queryNonDeleted).list();
 
         int[] dsIds = new int[ids.size()];
-        
+
         for (int i = 0; i < dsIds.length; i++) {
             dsIds[i] = Integer.parseInt(ids.get(i).toString());
         }
-        
+
         return dsIds;
     }
 }
