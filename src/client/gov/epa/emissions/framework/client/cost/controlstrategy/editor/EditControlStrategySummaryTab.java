@@ -188,7 +188,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate(), panel);
         layoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), panel);
-        layoutGenerator.addLabelWidgetPair("Include Unspecified Costs:", includeUnspecifiedCostsCheckBox(), panel);
+        layoutGenerator.addLabelWidgetPair("<html>Include Measures with<br/>No Cost Information:</html>", includeUnspecifiedCostsCheckBox(), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
