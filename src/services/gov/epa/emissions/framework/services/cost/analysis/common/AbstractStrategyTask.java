@@ -33,7 +33,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -177,12 +176,24 @@ public abstract class AbstractStrategyTask implements Strategy {
         if (controlStrategy.getDeleteResults()){
             Session session = sessionFactory.getSession();
             try {
-                EmfDataset[] dsList = controlStrategyDAO.getResultDatasets(controlStrategy.getId(), session);
+                List<EmfDataset> dsList = new ArrayList<EmfDataset>();
+                //first get the datasets to delete
+                EmfDataset[] datasets = controlStrategyDAO.getResultDatasets(controlStrategy.getId(), session);
+                if (datasets != null) {
+                    for (EmfDataset dataset : datasets) {
+                        if (!user.isAdmin() && !dataset.getCreator().equalsIgnoreCase(user.getUsername())) {
+                            setStatus("The control strategy result dataset, " + dataset.getName() + ", will not be deleted since you are not the creator of, this control strategy result will not be deleted.");
+                        } else {
+                            dsList.add(dataset);
+                        }
+                    }
+                }
+//                EmfDataset[] dsList = controlStrategyDAO.getResultDatasets(controlStrategy.getId(), session);
                 //get rid of old strategy results...
                 removeControlStrategyResults();
                 //delete and purge datasets
-                if (dsList != null){
-                    controlStrategyDAO.removeResultDatasets(dsList, user, session, dbServer);
+                if (dsList != null && dsList.size() > 0){
+                    controlStrategyDAO.removeResultDatasets(dsList.toArray(new EmfDataset[0]), user, session, dbServer);
                 }
             } catch (RuntimeException e) {
                 e.printStackTrace();
@@ -199,10 +210,21 @@ public abstract class AbstractStrategyTask implements Strategy {
             Session session = sessionFactory.getSession();
             try {
                 List<EmfDataset> dsList = new ArrayList<EmfDataset>();
-                for (ControlStrategyResult result : results) {
-                    dsList.add((EmfDataset) Arrays.asList(controlStrategyDAO.getResultDatasets(controlStrategy.getId(), result.getId(), session)));
-                    //get rid of old strategy results...
-                    removeControlStrategyResult(result.getId());
+                //first ge tthe datasets to delete
+                if (results != null) {
+                    for (ControlStrategyResult result : results) {
+                        for (EmfDataset dataset : controlStrategyDAO.getResultDatasets(controlStrategy.getId(), result.getId(), session)) {
+                            if (!user.isAdmin() && !dataset.getCreator().equalsIgnoreCase(user.getUsername())) {
+                                setStatus("Since you are not the creator of " + dataset.getName() + ", this control strategy result will not be deleted.");
+                            } else {
+                                dsList.add(dataset);
+                            }
+                        }
+                    }
+                    for (ControlStrategyResult result : results) {
+                        //get rid of old strategy results...
+                        removeControlStrategyResult(result.getId());
+                    }
                 }
                 //delete and purge datasets
                 if (dsList != null && dsList.size() > 0) {

@@ -41,7 +41,7 @@ public class RunControlStrategy {
     }
 
     public void run(User user, ControlStrategy controlStrategy, ControlStrategyService service) throws EmfException {
-        currentLimitations(controlStrategy);
+        currentLimitations(user, controlStrategy);
         try {
             Strategy strategy = factory.create(controlStrategy, user, 
                     sessionFactory, dbServerFactory);
@@ -55,9 +55,13 @@ public class RunControlStrategy {
         }
     }
 
-    private void currentLimitations(ControlStrategy controlStrategy) throws EmfException {
-//        if (controlStrategy.getStrategyType().getName().equalsIgnoreCase("Least Cost"))
-//            throw new EmfException("Least Cost Analysis is not supported.");
+    private void currentLimitations(User user, ControlStrategy controlStrategy) throws EmfException {
+//      if (controlStrategy.getStrategyType().getName().equalsIgnoreCase("Least Cost"))
+//      throw new EmfException("Least Cost Analysis is not supported.");
+
+        //only the creator can run the control strategy
+        if (!controlStrategy.getCreator().getName().equals(user.getName()))
+            throw new EmfException("Only the creator, " + controlStrategy.getCreator().getName() + ", can run the control strategy.");
 
         ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
         if (controlStrategyInputDatasets.length == 0)
