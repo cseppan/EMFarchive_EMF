@@ -16,12 +16,14 @@ import gov.epa.emissions.framework.services.basic.EmfFilePatternMatcher;
 import gov.epa.emissions.framework.services.basic.EmfFileSerializer;
 import gov.epa.emissions.framework.services.basic.EmfServerFileSystemView;
 import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -807,7 +809,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public void copyQAStepTemplates(User user, QAStepTemplate[] templates, int[] datasetTypeIds, boolean replace) throws EmfException {
         Session session = sessionFactory.getSession();
-
+        String datasetTypeNameList = "";
         try {
             DatasetType[] datasetTypes = new DatasetType[datasetTypeIds.length];
             //get lock first, if you can't then throw an error
@@ -818,7 +820,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
                 if (!datasetType.isLocked(user)) throw new EmfException("Could not copy QA Step Templates to " + datasetType.getName() + " its locked by " + datasetType.getLockOwner() + ".");
                 datasetTypes[i] = datasetType;
             }
+            int i = 0;
             for (DatasetType datasetType : datasetTypes) {
+                ++i;
                 QAStepTemplate[] existingQaStepTemplates = datasetType.getQaStepTemplates();
                 boolean exists = false;
                 //add qa templates to dataset type
@@ -847,7 +851,16 @@ public class DataCommonsServiceImpl implements DataCommonsService {
                 }
                 //update the dataset type
                 dao.updateDatasetType(datasetType, session);
+                datasetTypeNameList += (i > 1 ? ", " : "") + datasetType.getName();
             }
+
+            Status endStatus = new Status();
+            endStatus.setUsername(user.getUsername());
+            endStatus.setType("CopyQAStepTemplate");
+            endStatus.setMessage("Copied " + templates.length + " QA Step Templates to Dataset Types: " + datasetTypeNameList + ".");
+            endStatus.setTimestamp(new Date());
+
+            new StatusDAO(sessionFactory).add(endStatus);
 
         } catch (RuntimeException e) {
             LOG.error("Could not copy QAStepTemplates to Dataset Types.", e);
