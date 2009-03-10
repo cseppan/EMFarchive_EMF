@@ -3540,7 +3540,7 @@ public class ManagedCaseService {
             System.out.println("Incoming userid= " + uid + " acquired userName= " + user.getName());
 
         // Get All persisted wait jobs for this user
-        List allPersistedTasks = getPersistedTasksForUser(uid);
+        List<PersistedWaitTask> allPersistedTasks = getPersistedTasksForUser(uid);
         if (allPersistedTasks == null) {
             if (DebugLevels.DEBUG_9)
                 System.out.println("allPersistedTasks is null WHY?");
@@ -3551,16 +3551,16 @@ public class ManagedCaseService {
             jobIds = new Integer[allPersistedTasks.size()];
 
             for (int i = 0; i < allPersistedTasks.size(); i++) {
-                PersistedWaitTask pwTask = (PersistedWaitTask) allPersistedTasks.get(i);
+                PersistedWaitTask pwTask = allPersistedTasks.get(i);
                 if (caseId == -9) {
                     caseId = pwTask.getCaseId();
                 }
                 jobIds[i] = new Integer(pwTask.getJobId());
-
-                // Task has been acquired so delete from persisted wait task table
-                dao.removePersistedTasks(pwTask);
             }
 
+            // Task has been acquired so delete from persisted wait task table
+            dao.removePersistedTasks(allPersistedTasks.toArray(new PersistedWaitTask[0]));
+            
             if (DebugLevels.DEBUG_9)
                 System.out.println("After the loop jobId array of ints size= " + jobIds.length);
             if (DebugLevels.DEBUG_9)
@@ -3611,9 +3611,9 @@ public class ManagedCaseService {
         return user;
     }
 
-    private List getPersistedTasksForUser(int uid) throws EmfException {
+    private List<PersistedWaitTask> getPersistedTasksForUser(int uid) throws EmfException {
         Session session = this.sessionFactory.getSession();
-        List allPersistTasks = null;
+        List<PersistedWaitTask> allPersistTasks = null;
 
         try {
             allPersistTasks = dao.getPersistedWaitTasksByUser(uid);

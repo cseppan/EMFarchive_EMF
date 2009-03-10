@@ -1167,7 +1167,7 @@ public class CaseDAO {
         return ids;
     }
 
-    public synchronized List<?> getPersistedWaitTasksByUser(int userId) {
+    public synchronized List<PersistedWaitTask> getPersistedWaitTasksByUser(int userId) {
         if (DebugLevels.DEBUG_9)
             System.out.println("CaseDAO::getPersistedWaitTasks Start method");
 
@@ -1212,15 +1212,21 @@ public class CaseDAO {
         return userIds;
     }
 
-    public void removePersistedTasks(PersistedWaitTask pwTask) {
+    public void removePersistedTasks(PersistedWaitTask[] pwTasks) {
         if (DebugLevels.DEBUG_9)
-            System.out.println("CaseDAO::removePersistedTasks BEFORE num of tasks is pwTask null " + (pwTask == null));
+            System.out
+                    .println("CaseDAO::removePersistedTasks BEFORE num of tasks is pwTask null? " + (pwTasks == null));
+
+        if (pwTasks == null || pwTasks.length == 0)
+            return;
 
         Session session = sessionFactory.getSession();
 
         try {
-            session.clear();
-            hibernateFacade.delete(pwTask, session);
+            for (int i = 0; i < pwTasks.length; i++) {
+                session.clear();
+                hibernateFacade.delete(pwTasks[i], session);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -1734,7 +1740,7 @@ public class CaseDAO {
 
         String query = "SELECT obj.id FROM " + CaseParameter.class.getSimpleName() + " obj WHERE " + "obj.caseID = "
                 + caseId + " AND obj.envVar.id = " + loadedVar.getId();
-        List ids = session.createQuery(query).list();
+        List<?> ids = session.createQuery(query).list();
 
         if (ids == null || ids.size() == 0)
             return null;
@@ -1753,7 +1759,7 @@ public class CaseDAO {
 
         String queryNonDeleted = "SELECT ds.id FROM emf.datasets ds WHERE lower(ds.status) <> 'deleted' AND ds.id IN ("
                 + queryAll + ")";
-        List ids = session.createSQLQuery(queryNonDeleted).list();
+        List<?> ids = session.createSQLQuery(queryNonDeleted).list();
 
         int[] dsIds = new int[ids.size()];
 
