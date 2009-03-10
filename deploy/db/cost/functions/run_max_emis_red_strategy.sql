@@ -572,9 +572,14 @@ BEGIN
 
 				where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 					and p.id = ' ||  target_pollutant_id || '
-					
+
+					-- dont include sources that have been fully controlled...
 					and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0) <> 100.0
-					and (inv.ceff is null or er.efficiency - coalesce(inv.ceff, 0) >= ' || replacement_control_min_eff_diff_constraint || ')
+
+					-- make sure the new control is worthy, compare existing emis with new resulting emis, see if you get required percent decrease in emissions ((orig emis - new resulting emis) / orig emis * 100 ...
+--					and (inv.ceff is null or er.efficiency - coalesce(inv.ceff, 0) >= ' || replacement_control_min_eff_diff_constraint || ')
+					and (inv.ceff is null or ((' ||  emis_sql || ' - ' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100)) / ' ||  emis_sql || ' * 100 >= ' || replacement_control_min_eff_diff_constraint || '))
+
 					-- measure region filter
 					' || case when measure_with_region_count > 0 then '
 					and 
