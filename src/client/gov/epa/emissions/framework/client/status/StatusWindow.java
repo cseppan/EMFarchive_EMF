@@ -125,9 +125,10 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
     private void position(Container parent) {
         Dimension parentSize = parent.getSize();
 
-        int width = (int) parentSize.getWidth() - 5;
+        int width = (int) parentSize.getWidth() - 20;
         int height = 150;
         super.dimensions(width, height);
+        super.setMinimumSize(new Dimension(width / 15, height));
 
         int x = 0;
         int y = (int) parentSize.getHeight() - height - 90;
