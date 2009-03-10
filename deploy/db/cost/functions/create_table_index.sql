@@ -13,16 +13,16 @@ BEGIN
 
 	IF has_columns THEN
 	
-	-- create record_id btree index
-	IF length(index_name_prefix || '_' || table_name) >= 63 - length(index_name_prefix) THEN
-		index_name := index_name_prefix || '_' || substr(table_name, length(index_name_prefix) + 1, 63);
-	ELSE
-		index_name := index_name_prefix || '_' || table_name;
-	END IF;
-	execute 'CREATE INDEX ' || index_name || '
-			ON emissions.' || table_name || '
-			USING btree
-			(' || table_col_list || ')';
+		-- create record_id btree index
+		IF length(index_name_prefix || '_' || table_name) >= 63 - length(index_name_prefix) THEN
+			index_name := index_name_prefix || '_' || substr(table_name, length(index_name_prefix) + 1, 63);
+		ELSE
+			index_name := index_name_prefix || '_' || table_name;
+		END IF;
+		execute 'CREATE INDEX ' || index_name || '
+				ON emissions.' || table_name || '
+				USING btree
+				(' || table_col_list || ')';
 	END IF;
 END;
 $BODY$

@@ -315,7 +315,7 @@ BEGIN
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 			has_control_measures_col := true;
 		ELSIF column_name = 'pct_reduction' THEN
-			select_column_list_sql := select_column_list_sql || ', case when pct_reduction is null or length(pct_reduction) = 0 then efficiency::text else pct_reduction || ''&'' || efficiency::text end as pct_reduction';
+			select_column_list_sql := select_column_list_sql || ', case when pct_reduction is null or length(pct_reduction) = 0 then (inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ' * 100)::text else pct_reduction || ''&'' || (inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ' * 100)::text end as pct_reduction';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 			has_pct_reduction_col := true;
 		ELSE
@@ -331,7 +331,7 @@ BEGIN
 			insert_column_list_sql := insert_column_list_sql || ',control_measures';
 		END IF;
 		IF has_pct_reduction_col = false THEN
-			select_column_list_sql := select_column_list_sql || ', efficiency::text as pct_reduction';
+			select_column_list_sql := select_column_list_sql || ', (inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ' * 100)::text as pct_reduction';
 			insert_column_list_sql := insert_column_list_sql || ',pct_reduction';
 		END IF;
 	END IF;

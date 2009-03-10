@@ -813,7 +813,7 @@ insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'ag');
 -- 9/23/2008 add a new strategy impact summary dataset type
 insert into emf.dataset_types values(DEFAULT,'Strategy Impact Summary','Strategy Impact Summary', '1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 
-2/17/2009 add new column to emf.users
+-- 2/17/2009 add new column to emf.users
 ALTER TABLE emf.users ADD COLUMN is_login boolean NOT NULL DEFAULT false;
 
 --2/25/2009 consolidate smoke report tables and csv data tables
