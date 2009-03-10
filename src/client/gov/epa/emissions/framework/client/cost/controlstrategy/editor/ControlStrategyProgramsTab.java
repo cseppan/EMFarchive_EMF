@@ -98,7 +98,7 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
         Button removeButton = new RemoveButton(removeAction());
         removeButton.setMargin(new Insets(2, 5, 2, 5));
         panel.add(removeButton);
-        SelectAwareButton viewButton = new SelectAwareButton("view", viewAction(), table, confirmDialog);
+        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction(), table, confirmDialog);
         removeButton.setMargin(new Insets(2, 5, 2, 5));
         panel.add(viewButton);
 
