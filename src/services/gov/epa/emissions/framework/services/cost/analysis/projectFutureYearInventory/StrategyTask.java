@@ -102,9 +102,12 @@ public class StrategyTask extends AbstractStrategyTask {
 
     public void beforeRun() throws EmfException {
         try {
-            //next lets replace missing data and index the control program packet tables...
+            //lets clean the control program dataset tables, make sure missing values are converted to nulls (i.e., -9), 
+            //trim fipscode to 5 characters not 6, etc...
+            cleanControlPrograms();
+            //next lets vacuum the tables and index the control program packet tables...
             for (ControlProgram controlProgram : controlStrategy.getControlPrograms()) {
-                    convertMissingColumnValues(controlProgram);
+                    vacuumControlProgramTables(controlProgram);
                     indexTable(controlProgram);
             }
             //next lets validate the control program dataset tables, make sure format is correct, no data is missing, etc...
@@ -124,69 +127,32 @@ public class StrategyTask extends AbstractStrategyTask {
         }
     }
 
-    private void convertMissingColumnValues(ControlProgram controlProgram) {
+    private void cleanControlPrograms() throws EmfException {
+        try {
+            datasource.query().execute("select public.clean_project_future_year_inventory_control_programs(" + controlStrategy.getId() + "::integer);");
+        } catch (SQLException e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            //
+        }
+    }
+
+    private void vacuumControlProgramTables(ControlProgram controlProgram) {
         String query = "";
         EmfDataset dataset = controlProgram.getDataset();
         if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.plantClosure)) {
-            query = "update " + qualifiedEmissionTableName(dataset)
-            + "         set plantid = case when plantid is null or trim(plantid) = '0' or trim(plantid) = '-9' or trim(plantid) = '' then null::character varying(15) else plantid end,"
-            + "         pointid = case when pointid is null or trim(pointid) = '0' or trim(pointid) = '-9' or trim(pointid) = '' then null::character varying(15) else pointid end,"
-            + "         stackid = case when stackid is null or trim(stackid) = '0' or trim(stackid) = '-9' or trim(stackid) = '' then null::character varying(15) else stackid end,"
-            + "         segment = case when segment is null or trim(segment) = '0' or trim(segment) = '-9' or trim(segment) = '' then null::character varying(15) else segment end,"
-            + "         fips = case when fips is null or trim(fips) = '0' or trim(fips) = '-9' or trim(fips) = '' then null::character varying(6) else fips end "
-            + "where trim(plantid) in ('0','-9','')"
-            + "         or trim(pointid) in ('0','-9','')"
-            + "         or trim(stackid) in ('0','-9','')"
-            + "         or trim(segment) in ('0','-9','')"
-            + "         or trim(fips) in ('0','-9','');"
-            + "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
+            query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
         } else if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.projection)) {
             if (dataset.getDatasetType().getName().equals(DatasetType.projectionPacket)) {
-                query = "update " + qualifiedEmissionTableName(dataset)
-                + "         set plantid = case when plantid is null or trim(plantid) = '0' or trim(plantid) = '-9' or trim(plantid) = '' then null::character varying(15) else plantid end,"
-                + "         pointid = case when pointid is null or trim(pointid) = '0' or trim(pointid) = '-9' or trim(pointid) = '' then null::character varying(15) else pointid end,"
-                + "         stackid = case when stackid is null or trim(stackid) = '0' or trim(stackid) = '-9' or trim(stackid) = '' then null::character varying(15) else stackid end,"
-                + "         segment = case when segment is null or trim(segment) = '0' or trim(segment) = '-9' or trim(segment) = '' then null::character varying(15) else segment end,"
-                + "         fips = case when fips is null or trim(fips) = '0' or trim(fips) = '-9' or trim(fips) = '' then null::character varying(6) else fips end,"
-                + "         scc = case when scc is null or trim(scc) = '0' or trim(scc) = '-9' or trim(scc) = '' then null::character varying(10) else scc end,"
-                + "         mact = case when mact is null or trim(mact) = '0' or trim(mact) = '-9' or trim(mact) = '' then null::character varying(6) else mact end,"
-                + "         sic = case when sic is null or trim(sic) = '0' or trim(sic) = '-9' or trim(sic) = '' then null::character varying(4) else sic end "
-                + "where trim(plantid) in ('0','-9','')"
-                + "         or trim(pointid) in ('0','-9','')"
-                + "         or trim(stackid) in ('0','-9','')"
-                + "         or trim(segment) in ('0','-9','')"
-                + "         or trim(fips) in ('0','-9','')"
-                + "         or trim(scc) in ('0','-9','')"
-                + "         or trim(mact) in ('0','-9','')"
-                + "         or trim(sic) in ('0','-9','');"
-                + "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
+                query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
             }
         } else if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.control)) {
             if (dataset.getDatasetType().getName().equals(DatasetType.controlPacket)) {
-                query = "update " + qualifiedEmissionTableName(dataset)
-                + "         set plantid = case when plantid is null or trim(plantid) = '0' or trim(plantid) = '-9' or trim(plantid) = '' then null::character varying(15) else plantid end,"
-                + "         pointid = case when pointid is null or trim(pointid) = '0' or trim(pointid) = '-9' or trim(pointid) = '' then null::character varying(15) else pointid end,"
-                + "         stackid = case when stackid is null or trim(stackid) = '0' or trim(stackid) = '-9' or trim(stackid) = '' then null::character varying(15) else stackid end,"
-                + "         segment = case when segment is null or trim(segment) = '0' or trim(segment) = '-9' or trim(segment) = '' then null::character varying(15) else segment end,"
-                + "         fips = case when fips is null or trim(fips) = '0' or trim(fips) = '-9' or trim(fips) = '' then null::character varying(6) else fips end,"
-                + "         scc = case when scc is null or trim(scc) = '0' or trim(scc) = '-9' or trim(scc) = '' then null::character varying(10) else scc end,"
-                + "         mact = case when mact is null or trim(mact) = '0' or trim(mact) = '-9' or trim(mact) = '' then null::character varying(6) else mact end,"
-                + "         sic = case when sic is null or trim(sic) = '0' or trim(sic) = '-9' or trim(sic) = '' then null::character varying(4) else sic end,"
-                + "         pri_cm_abbrev = case when pri_cm_abbrev is null or trim(pri_cm_abbrev) = '0' or trim(pri_cm_abbrev) = '-9' or trim(pri_cm_abbrev) = '' then null::character varying(4) else pri_cm_abbrev end "
-                + "where trim(plantid) in ('0','-9','')"
-                + "         or trim(pointid) in ('0','-9','')"
-                + "         or trim(stackid) in ('0','-9','')"
-                + "         or trim(segment) in ('0','-9','')"
-                + "         or trim(fips) in ('0','-9','')"
-                + "         or trim(scc) in ('0','-9','')"
-                + "         or trim(mact) in ('0','-9','')"
-                + "         or trim(sic) in ('0','-9','')"
-                + "         or trim(pri_cm_abbrev) in ('0','-9','');"
-                + "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
+                query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
             }
         }
         
-//        System.out.println(System.currentTimeMillis() + " " + query);
+        System.out.println(System.currentTimeMillis() + " " + query);
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
