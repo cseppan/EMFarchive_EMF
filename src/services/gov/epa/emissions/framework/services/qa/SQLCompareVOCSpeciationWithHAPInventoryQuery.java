@@ -164,8 +164,8 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         summaryType = parseSummaryType(programArguments, sumTypeIndex, programArguments.indexOf("\n-", sumTypeIndex) != -1 ? programArguments.indexOf("\n-", sumTypeIndex) : programArguments.length());
         filter = parseSummaryType(programArguments, filterIndex, programArguments.indexOf("\n-", filterIndex) != -1 ? programArguments.indexOf("\n-", filterIndex) : programArguments.length());
 
-        System.out.println(summaryType);
-        System.out.println(filter);
+//        System.out.println(summaryType);
+//        System.out.println(filter);
         
         //validate everything has been specified...
         String errors = "";
@@ -627,7 +627,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             capSql += "       select scc, code \n"
                 + "        from " + table + " s \n"
                 + "        where pollutant = ''VOC'' \n"
-                + "        and " + version;
+                + "        and " + version.replaceAll("'", "''");
         }
         capSql += "        ) r \n"
         + "        on i.scc = r.scc \n"
@@ -636,7 +636,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "    inner join " + pollToPollConversionDatasetTable + " g \n"
         + "    on g.speciation_code = r.code \n"
         + "    and g.pollutant_1 = ''VOC'' \n"
-        + "    and " + pollToPollConversionDatasetVersion + " \n"
+        + "    and " + pollToPollConversionDatasetVersion.replaceAll("'", "''") + " \n"
         + " \n"
         + "    -- speciate based on raw profile data \n"
         + "    inner join ( \n";
@@ -649,7 +649,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             capSql += "       select profile, percent, specie_id \n"
                 + "       from " + table + " s \n"
                 + "       where specie_id in (''302'',''465'',''279'',''531'') \n"
-                + "       and " + version;
+                + "       and " + version.replaceAll("'", "''");
         }
         }
 
@@ -658,7 +658,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         
         + " \n"
         + "where i.poll = ''VOC''  \n"
-        + "and (" + capInventoryVersion + ") \n"
+        + "and (" + capInventoryVersion.replaceAll("'", "''") + ") \n"
         + (filter.length() > 0 ? "and (" + filter + ") \n" : "") 
         + " \n";
         
@@ -740,7 +740,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             hapSql += "       select scc, code \n"
                 + "        from " + table + " s \n"
                 + "        where pollutant = ''VOC'' \n"
-                + "        and " + version;
+                + "        and " + version.replaceAll("'", "''");
         }
         hapSql += "        ) r \n"
         + "        on i.scc = r.scc \n"
@@ -749,10 +749,10 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "    left outer join " + pollToPollConversionDatasetTable + " g \n"
         + "    on g.speciation_code = r.code \n"
         + "    and g.pollutant_1 = ''VOC'' \n"
-        + "    and " + pollToPollConversionDatasetVersion + " \n"
+        + "    and " + pollToPollConversionDatasetVersion.replaceAll("'", "''") + " \n"
         + " \n"
         + "where i.poll in (''71432'',''50000'',''75070'',''67561'') \n"
-        + "and (" + hapInventoryVersion + ") \n"
+        + "and (" + hapInventoryVersion.replaceAll("'", "''") + ") \n"
         + (filter.length() > 0 ? "and (" + filter + ") \n" : "") 
         + " \n";
         
@@ -825,7 +825,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             capDatasourceSql += "       select scc, code \n"
                 + "        from " + table + " s \n"
                 + "        where pollutant = ''VOC'' \n"
-                + "        and " + version;
+                + "        and " + version.replaceAll("'", "''");
         }
         capDatasourceSql += "        ) r \n"
         + "        on i.scc = r.scc \n"
@@ -834,10 +834,10 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "    left outer join " + pollToPollConversionDatasetTable + " g \n"
         + "    on g.speciation_code = r.code \n"
         + "    and g.pollutant_1 = ''VOC'' \n"
-        + "    and " + pollToPollConversionDatasetVersion + " \n"
+        + "    and " + pollToPollConversionDatasetVersion.replaceAll("'", "''") + " \n"
         + " \n"
         + " where i.poll = ''VOC'' \n"
-        + " and (" + capInventoryVersion + ") \n"
+        + " and (" + capInventoryVersion.replaceAll("'", "''") + ") \n"
         + (filter.length() > 0 ? "and (" + filter + ") \n" : "") 
         + " \n";
 
@@ -916,7 +916,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             hapDatasourceSql += "       select scc, code \n"
                 + "        from " + table + " s \n"
                 + "        where pollutant = ''VOC'' \n"
-                + "        and " + version;
+                + "        and " + version.replaceAll("'", "''");
         }
         hapDatasourceSql += "        ) r \n"
         + "        on i.scc = r.scc \n"
@@ -925,10 +925,10 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "    left outer join " + pollToPollConversionDatasetTable + " g \n"
         + "    on g.speciation_code = r.code \n"
         + "    and g.pollutant_1 = ''VOC'' \n"
-        + "    and " + pollToPollConversionDatasetVersion + " \n"
+        + "    and " + pollToPollConversionDatasetVersion.replaceAll("'", "''") + " \n"
         + " \n"
         + " where i.poll in (''71432'',''50000'',''75070'',''67561'') \n"
-        + " and (" + hapInventoryVersion + ") \n"
+        + " and (" + hapInventoryVersion.replaceAll("'", "''") + ") \n"
         + (filter.length() > 0 ? "and (" + filter + ") \n" : "");
         
         sql += hapDatasourceSql;
@@ -1430,7 +1430,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
 //        
 //        sql = query(sql, true);
         sql = "CREATE TABLE " + emissionDatasourceName + "." + tableName + " AS " + sql;
-        System.out.println(sql);
+//        System.out.println(sql);
         
         return sql;
     }
@@ -1476,10 +1476,10 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
 
     private void populateSourcesTable(String qualifiedTable, String filter) throws EmfException { 
         String sql = "select public.populate_sources_table('" + qualifiedTable + "'," + (filter.length() == 0 ? "null::text" : "'" + filter.replaceAll("'", "''") + "'") + ");";
-        System.out.println(System.currentTimeMillis() + " " + sql);
+//        System.out.println(System.currentTimeMillis() + " " + sql);
         try {
             dbServer.getEmissionsDatasource().query().execute(sql);
-            System.out.println(System.currentTimeMillis() + " analyze emf.sources;");
+//            System.out.println(System.currentTimeMillis() + " analyze emf.sources;");
             dbServer.getEmissionsDatasource().query().execute("analyze emf.sources;");
         } catch (SQLException e) {
             throw new EmfException("Error occured when populating the sources table " + "\n" + e.getMessage());
@@ -1489,74 +1489,74 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
     private void indexORLInventory(String table) {
         String query = "SELECT public.create_orl_table_indexes('" + table.toLowerCase() + "');";
 //public.create_table_index(table_name character varying, table_col_list character varying, index_name_prefix character varying)
-        System.out.println(query);
+//        System.out.println(query);
         try {
             try {
                 query = "SELECT public.create_table_index('" + table.toLowerCase() + "','record_id','recordid');";
-                System.out.println(System.currentTimeMillis() + " " + query);
+//                System.out.println(System.currentTimeMillis() + " " + query);
                 dbServer.getEmissionsDatasource().query().execute(query);
             } catch (SQLException e) {
                 //e.printStackTrace();
             }
             try {
                 query = "SELECT public.create_table_index('" + table.toLowerCase() + "','fips','fips');";
-                System.out.println(System.currentTimeMillis() + " " + query);
+//                System.out.println(System.currentTimeMillis() + " " + query);
                 dbServer.getEmissionsDatasource().query().execute(query);
             } catch (SQLException e) {
                 //e.printStackTrace();
             }
             try {
                 query = "SELECT public.create_table_index('" + table.toLowerCase() + "','poll','poll');";
-                System.out.println(System.currentTimeMillis() + " " + query);
+//                System.out.println(System.currentTimeMillis() + " " + query);
                 dbServer.getEmissionsDatasource().query().execute(query);
             } catch (SQLException e) {
                 //e.printStackTrace();
             }
             try {
                 query = "SELECT public.create_table_index('" + table.toLowerCase() + "','scc','scc');";
-                System.out.println(System.currentTimeMillis() + " " + query);
+//                System.out.println(System.currentTimeMillis() + " " + query);
                 dbServer.getEmissionsDatasource().query().execute(query);
             } catch (SQLException e) {
                 //e.printStackTrace();
             }
             try {
                 query = "SELECT public.create_table_index('" + table.toLowerCase() + "','plantid','plantid');";
-                System.out.println(System.currentTimeMillis() + " " + query);
+//                System.out.println(System.currentTimeMillis() + " " + query);
                 dbServer.getEmissionsDatasource().query().execute(query);
             } catch (SQLException e) {
                 //e.printStackTrace();
             }
             try {
                 query = "SELECT public.create_table_index('" + table.toLowerCase() + "','pointid','pointid');";
-                System.out.println(System.currentTimeMillis() + " " + query);
+//                System.out.println(System.currentTimeMillis() + " " + query);
                 dbServer.getEmissionsDatasource().query().execute(query);
             } catch (SQLException e) {
                 //e.printStackTrace();
             }
             try {
                 query = "SELECT public.create_table_index('" + table.toLowerCase() + "','stackid','stackid');";
-                System.out.println(System.currentTimeMillis() + " " + query);
+//                System.out.println(System.currentTimeMillis() + " " + query);
                 dbServer.getEmissionsDatasource().query().execute(query);
             } catch (SQLException e) {
                 //e.printStackTrace();
             }
             try {
                 query = "SELECT public.create_table_index('" + table.toLowerCase() + "','segment','segment');";
-                System.out.println(System.currentTimeMillis() + " " + query);
+//                System.out.println(System.currentTimeMillis() + " " + query);
                 dbServer.getEmissionsDatasource().query().execute(query);
             } catch (SQLException e) {
                 //e.printStackTrace();
             }
             try {
                 query = "SELECT public.create_table_index('" + table.toLowerCase() + "','mact','mact');";
-                System.out.println(System.currentTimeMillis() + " " + query);
+//                System.out.println(System.currentTimeMillis() + " " + query);
                 dbServer.getEmissionsDatasource().query().execute(query);
             } catch (SQLException e) {
                 //e.printStackTrace();
             }
             try {
                 query = "SELECT public.create_table_index('" + table.toLowerCase() + "','sic','sic');";
-                System.out.println(System.currentTimeMillis() + " " + query);
+//                System.out.println(System.currentTimeMillis() + " " + query);
                 dbServer.getEmissionsDatasource().query().execute(query);
             } catch (SQLException e) {
                 //e.printStackTrace();
@@ -1574,7 +1574,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
 //sic
             
 //            dbServer.getEmissionsDatasource().query().execute(query);
-            System.out.println(System.currentTimeMillis() + " " + "analyze ");
+//            System.out.println(System.currentTimeMillis() + " " + "analyze ");
             dbServer.getEmissionsDatasource().query().execute("analyze " + emissionDatasourceName + "." + table.toLowerCase() + ";");
         } catch (SQLException e) {
             e.printStackTrace();
