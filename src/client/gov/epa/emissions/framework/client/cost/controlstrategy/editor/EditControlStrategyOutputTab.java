@@ -367,7 +367,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private JPanel buttonPanel() {
         exportButton = new ExportButton(exportAction());
         analysisButton = new Button("Analyze", analysisAction());
-        analysisButton.setVisible(false);
+//        analysisButton.setVisible(false);
 //        view = new ViewButton("View", viewAction());
         viewDataButton = new Button("View Data", viewDataAction());
         editButton = new Button("Edit", editAction());
