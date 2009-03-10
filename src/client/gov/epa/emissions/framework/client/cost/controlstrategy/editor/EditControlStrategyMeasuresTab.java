@@ -302,8 +302,10 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
             cms = controlStrategy.getControlMeasures();
         }
         
-        if (cms != null && cms.length == 0 && controlMeasureClasses.length == 0) 
-            throw new EmfException("At least one measure class must be selected.");
+        //this is not relevant to the project inventory strategy type
+        if (!controlStrategy.getStrategyType().getName().equals(StrategyType.projectFutureYearInventory)) 
+            if (cms != null && cms.length == 0 && controlMeasureClasses.length == 0) 
+                throw new EmfException("At least one measure class must be selected.");
 
         controlStrategy.setControlMeasures(cms);
         controlStrategy.setControlMeasureClasses(controlMeasureClasses);
