@@ -181,6 +181,89 @@ public class ExportTask extends Task {
         }
     }
 
+    public String[] quickRunExternalExport() {
+        DbServer dbServer = null;
+        Session session = sessionFactory.getSession();
+        extSrcs = getExternalSrcs(session);
+        String[] sts = new String[2];
+
+        if (DebugLevels.DEBUG_1)
+            System.out.println(">>## ExportTask:run() " + createId() + " for datasetId: " + this.dataset.getId());
+        if (DebugLevels.DEBUG_1)
+            System.out.println("Task#" + taskId + " RUN @@@@@ THREAD ID: " + Thread.currentThread().getId());
+
+        if (DebugLevels.DEBUG_1)
+            if (DebugLevels.DEBUG_1)
+                System.out.println("Task# " + taskId + " running");
+
+        try {
+            accesslog.setTimestamp(new Date());
+            long exportedLineCount = 0;
+            accesslog.setFolderPath("");
+
+            dbServer = this.dbFactory.getDbServer();
+            VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer
+                    .getSqlDataTypes(), batchSize(session));
+            Exporter exporter = exporterFactory.create(dataset, version);
+
+            if (exporter instanceof ExternalFilesExporter)
+                ((ExternalFilesExporter) exporter).setExternalSources(extSrcs);
+
+            exporter.export(file);
+
+            exportedLineCount = exporter.getExportedLinesCount();
+
+            if (DebugLevels.DEBUG_1)
+                printLogInfo(accesslog);
+
+            accesslog.setEnddate(new Date());
+            accesslog.setLinesExported(exportedLineCount);
+
+            String msghead = "Completed export of " + dataset.getName();
+            String msgend = " in " + accesslog.getTimereqrd() + " seconds.";
+
+            sts[0] = "completed";
+            sts[1] = msghead + msgend;
+
+            // NOTE: want to check if accesslog exists for the same dataset, version, and description.
+            // If it is there, don't set accesslog.
+
+            String query = "SELECT obj.id from " + AccessLog.class.getSimpleName() + " obj WHERE obj.datasetId = "
+                    + accesslog.getDatasetId() + " AND obj.version = '" + accesslog.getVersion() + "' "
+                    + "AND obj.description = '" + accesslog.getDescription() + "'";
+            List<?> list = session.createQuery(query).list();
+
+            if (list == null || list.size() == 0) {
+                loggingService.setAccessLog(accesslog);
+            }
+
+            return sts;
+        } catch (Exception e) {
+            sts[0] = "failed";
+            sts[1] = "Export failure. " + ((e == null) ? "" : e.getMessage());
+            return sts;
+        } finally {
+            try {
+                // check for isConnected before disconnecting
+                if ((dbServer != null) && (dbServer.isConnected()))
+                    dbServer.disconnect();
+
+                if (session != null && session.isConnected())
+                    session.close();
+            } catch (Exception e) {
+                log.error("Error closing db connections.", e);
+            }
+        }
+    }
+
+    public boolean fileExists() {
+        return file != null && file.exists();
+    }
+
+    public boolean isExternal() {
+        return type.isExternal();
+    }
+
     private ExternalSource[] getExternalSrcs(Session session) {
         DatasetDAO dao = new DatasetDAO();
 
