@@ -51,6 +51,8 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
 
     private int datasetID;
 
+    private Dataset dataset;
+
     private EmfSession session;
     
     public EditableQATab(EmfSession session, EmfConsole parent, DesktopManager desktop, MessagePanel messagePanel) {
@@ -62,6 +64,7 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
 
     public void display(Dataset dataset, QAStep[] steps, QAStepResult[] qaStepResults, Version[] versions) {
         this.datasetID = dataset.getId(); // for uniqueness of window naming
+        this.dataset = dataset;
         this.versions = new VersionsSet(versions);
         
         createLayout(steps, qaStepResults);
@@ -200,7 +203,7 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
         CopyQAStepToDatasetSelectionView view = new CopyQAStepToDatasetSelectionDialog(parentConsole);
         CopyQAStepToDatasetSelectionPresenter presenter = new CopyQAStepToDatasetSelectionPresenter(view, session);
         try {
-            presenter.display(null, false);
+            presenter.display(dataset.getDatasetType(), false);
             Dataset[] datasets = presenter.getDatasets();
 //            boolean copyToExistingDatasetType = false;
             if (datasets.length > 0) {
