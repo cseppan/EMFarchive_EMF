@@ -97,15 +97,22 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     }
 
     private EditablePagePanel createEditablePage(Page page) {
-        editablePage = new EditablePage(dataset.getId(), version, page, tableMetadata);
-        editablePage.setDatasetName(dataset.getName());
-        
-        editablePagePanel = new EditablePagePanel(editablePage, paginationPanel, messagePanel, changeablesList);
-        editablePagePanel.setDesktopManager(desktopManager);
-        editablePagePanel.setEmfSession(emfSession);
-        editablePagePanel.setRowFilter(sortFilterPanel.getRowFilter());
-        editablePagePanel.setSortOrder(sortFilterPanel.getSortOrder());
-        editablePagePanel.setTablePresenter(tablePresenter);
+        if ( editablePagePanel == null) {
+            editablePage = new EditablePage(dataset.getId(), version, page, tableMetadata);
+            editablePage.setDatasetName(dataset.getName());
+
+            editablePagePanel = new EditablePagePanel(editablePage, paginationPanel, messagePanel, changeablesList);
+            editablePagePanel.setDesktopManager(desktopManager);
+            editablePagePanel.setEmfSession(emfSession);
+            editablePagePanel.setRowFilter(sortFilterPanel.getRowFilter());
+            editablePagePanel.setSortOrder(sortFilterPanel.getSortOrder());
+            editablePagePanel.setTablePresenter(tablePresenter);
+        }
+        else {
+            editablePage = new EditablePage(dataset.getId(), version, page, tableMetadata);
+            editablePage.setDatasetName(dataset.getName());
+            editablePagePanel.refresh(editablePage);
+        }
 
         return editablePagePanel;
     }

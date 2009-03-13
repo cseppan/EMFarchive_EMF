@@ -61,27 +61,36 @@ public class EditablePagePanel extends JPanel {
     private EmfSession emfSession;
 
     private TablePresenter tablePresenter;
+    
+    private EditablePage tableData;
 
     public EditablePagePanel(EditablePage page, ObserverPanel observer, MessagePanel messagePanel,
             ManageChangeables listOfChangeables) {
         this.listOfChangeables = listOfChangeables;
         this.messagePanel = messagePanel;
+        this.tableData = page; 
         this.observer = observer;
+        setupLayout();
+    }
+    
+    private void setupLayout(){
+        super.removeAll();
         super.setLayout(new BorderLayout());
-        super.add(doLayout(page), BorderLayout.CENTER);
+        super.add(mainPanel(), BorderLayout.CENTER);
+        super.validate();
     }
 
-    private JPanel doLayout(EditablePage tableData) {
+    private JPanel mainPanel() {
         JPanel container = new JPanel(new BorderLayout());
-        JToolBar toolBar = toolBar(tableData);
+        JToolBar toolBar = toolBar();
         container.add(toolBar, BorderLayout.PAGE_START);
-        container.add(table(tableData), BorderLayout.CENTER);
+        container.add(table(), BorderLayout.CENTER);
 
         setBorder();
         return container;
     }
 
-    private JToolBar toolBar(EditablePage tableData) {
+    private JToolBar toolBar() {
         JToolBar toolbar = new JToolBar();
         String insertAbove = "/toolbarButtonGraphics/table/RowInsertBefore" + 24 + ".gif";
         ImageIcon iconAbove = createImageIcon(insertAbove);
@@ -130,14 +139,21 @@ public class EditablePagePanel extends JPanel {
         super.setBorder(border);
     }
 
-    private JScrollPane table(EditablePage tableData) {
-        Font monospacedFont = new Font("Monospaced", Font.LAYOUT_NO_LIMIT_CONTEXT, 12);
-        tableModel = new EditableEmfTableModel(tableData);
-        editableTable = new DataEditorTable(tableModel, tableData.getTableMetadata(), messagePanel);
-        listOfChangeables.addChangeable(editableTable);
+    private JScrollPane table() {
+        if ( tableModel == null ){
+            Font monospacedFont = new Font("Monospaced", Font.LAYOUT_NO_LIMIT_CONTEXT, 12);
+            tableModel = new EditableEmfTableModel(tableData);
+            editableTable = new DataEditorTable(tableModel, tableData.getTableMetadata(), messagePanel);
+            listOfChangeables.addChangeable(editableTable);
 
-        table = new ScrollableTable(editableTable, monospacedFont);
-        addCopyPasteClipBoard(editableTable);
+            table = new ScrollableTable(editableTable, monospacedFont);
+            addCopyPasteClipBoard(editableTable);
+        }
+        else{
+            tableModel.refresh(tableData);
+            editableTable.setModel(tableModel);
+            table.repaint();
+        }
         return table;
     }
 
@@ -206,6 +222,11 @@ public class EditablePagePanel extends JPanel {
     private void refresh() {
         tableModel.refresh();
         super.revalidate();
+    }
+    
+    public void refresh(EditablePage page){
+        this.tableData =page; 
+        setupLayout();
     }
 
     private void doAdd(final EditablePage tableData, DataEditorTable editableTable, boolean above) {
@@ -380,5 +401,6 @@ public class EditablePagePanel extends JPanel {
     public void setSortOrder(JTextArea sortOrderText) {
         this.sortOrder = sortOrderText;
     }
+    
 
 }

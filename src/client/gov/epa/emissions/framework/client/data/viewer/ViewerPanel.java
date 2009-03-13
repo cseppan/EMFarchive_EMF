@@ -28,6 +28,10 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
     private EmfTableModel tableModel;
 
     private JPanel pageContainer;
+    
+    private JTable viewTable;
+    
+    private ViewablePage tableData;
 
     private PaginationPanel paginationPanel;
 
@@ -98,15 +102,25 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
 
         paginationPanel.updateStatus(page);
         pageContainer.add(table(page), BorderLayout.CENTER);
+        pageContainer.validate();
     }
 
     private ScrollableTable table(Page page) {
-        Font monospacedFont = new Font("Monospaced", Font.LAYOUT_NO_LIMIT_CONTEXT, 12);
-        tableModel = new EmfTableModel(new ViewablePage(tableMetadata, page));
-        JTable viewTable = new JTable(tableModel);
-        viewTableConfig(viewTable);
-        table = new ScrollableTable(viewTable, monospacedFont);
-        addCopyPasteClipBoard(viewTable);
+        if ( tableModel == null ){ 
+            Font monospacedFont = new Font("Monospaced", Font.LAYOUT_NO_LIMIT_CONTEXT, 12);
+            tableData = new ViewablePage(tableMetadata, page);
+            tableModel = new EmfTableModel(tableData);
+            viewTable = new JTable(tableModel);
+            viewTableConfig(viewTable);
+            table = new ScrollableTable(viewTable, monospacedFont);
+            addCopyPasteClipBoard(viewTable);
+            }
+        else {
+            tableData = new ViewablePage(tableMetadata, page);
+            tableModel.refresh(tableData);
+            viewTable.setModel(tableModel);
+            table.repaint();
+        }
         return table;
     }
 
