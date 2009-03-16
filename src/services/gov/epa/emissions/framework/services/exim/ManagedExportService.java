@@ -88,7 +88,7 @@ public class ManagedExportService {
         return file;
     }
 
-    private Services services() {
+    public Services services() {
         Services services = new Services();
         services.setLoggingService(new LoggingServiceImpl(sessionFactory));
         services.setStatusService(new StatusDAO(sessionFactory));
@@ -108,7 +108,7 @@ public class ManagedExportService {
 
     private File validatePath(String folderPath) throws EmfException {
         File file = new File(folderPath);
-        
+
         if (!file.canWrite()) {
             log.error("Folder " + folderPath + " is not writable by tomcat.");
             throw new EmfException("Folder is not writable by tomcat: " + folderPath);
@@ -124,7 +124,7 @@ public class ManagedExportService {
     private boolean isExportable(EmfDataset dataset, Version version, Services services, User user) {
         DatasetType datasetType = dataset.getDatasetType();
         String message = null;
-        
+
         if (version == null)
             return false;
 
@@ -199,9 +199,9 @@ public class ManagedExportService {
         String fileSeparator = System.getProperty("file.separator");
         CaseDAO caseDao = new CaseDAO(this.sessionFactory);
         String inputDir = caseObj.getInputFileDir();
-        if ((inputDir ==null) || (inputDir.length()==0))
-            throw new EmfException("Please specify an Input Folder on the Inputs tab"); 
-            
+        if ((inputDir == null) || (inputDir.length() == 0))
+            throw new EmfException("Please specify an Input Folder on the Inputs tab");
+
         String inputDirExpanded;
         try {
             inputDirExpanded = caseDao.replaceEnvVarsCase(inputDir, fileSeparator, caseObj, job.getId());
@@ -210,14 +210,14 @@ public class ManagedExportService {
             e1.printStackTrace();
             throw new EmfException("Input folder: " + e1.getMessage());
         }
-        
+
         File inputsDir = new File(inputDirExpanded);
-        
+
         if (!inputsDir.exists()) {
             inputsDir.mkdirs();
             inputsDir.setWritable(true, false);
         }
-        
+
         Iterator<CaseInput> iter = inputs.iterator();
 
         // Make parent directory if doesn't exist
@@ -232,8 +232,7 @@ public class ManagedExportService {
             if (DebugLevels.DEBUG_9)
                 System.out.println("CleanDataset Name: " + fullPath);
             if ((subdir != null) && !(subdir.toString()).equals("")) {
-                fullPath = inputDirExpanded + fileSeparator + subdir
-                        + System.getProperty("file.separator");
+                fullPath = inputDirExpanded + fileSeparator + subdir + System.getProperty("file.separator");
             } else {
                 fullPath = inputDirExpanded + fileSeparator;
             }
@@ -244,7 +243,7 @@ public class ManagedExportService {
                 System.out.println("FULL PATH= " + fullPath);
 
             toSubDir = new File(fullPath);
-            
+
             if (!toSubDir.exists()) {
                 toSubDir.mkdirs();
                 setDirsWritable(new File(inputDirExpanded), toSubDir);
@@ -272,15 +271,6 @@ public class ManagedExportService {
             System.out.println("Before exportTaskSubmitter.addTasksToSubmitter # of elements in eximTasks array= "
                     + eximTasks.size());
 
-        // Iterator iter2 = eximTasks.iterator();
-        // while (iter2.hasNext()) {
-        // Task tsk = (Task) iter2.next();
-        // if (DebugLevels.DEBUG_9)
-        // System.out
-        // .println("&&&&& In ManagedExportService::exportForJob the types of TASK objects in eximTasks: "
-        // + tsk.getClass().getName());
-        // }
-
         // All eximTasks have been created...so add to the submitter
         exportJobTaskSubmitter.addTasksToSubmitter(eximTasks);
 
@@ -303,7 +293,7 @@ public class ManagedExportService {
 
         return exportJobTaskSubmitter.getSubmitterId();
     }
-    
+
     private void setDirsWritable(File base, File dir) {
         while (dir != null) {
             try {
@@ -313,9 +303,9 @@ public class ManagedExportService {
             } catch (Exception e) {
                 return;
             }
-            
+
             dir = dir.getParentFile();
-            
+
             if (dir.compareTo(base) == 0)
                 return;
         }
@@ -439,6 +429,44 @@ public class ManagedExportService {
         // eximTask.setSubmitterId(exportTaskSubmitter.getSubmitterId());
 
         return eximTask;
+    }
+
+    public synchronized void logExportedTask(LoggingServiceImpl logSvr, User user, String purpose, String path, CaseInput input) throws EmfException {
+        EmfDataset dataset = input.getDataset();
+        Version version = input.getVersion();
+        AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset.getAccessedDateTime(),
+                "Version " + version.getVersion(), purpose, path);
+        accesslog.setDatasetname(dataset.getName());
+        accesslog.setEnddate(new Date());
+        accesslog.setLinesExported(0);
+
+        DatasetType type = dataset.getDatasetType();
+        String importerclass = (type == null ? "" : type.getImporterClassName());
+        importerclass = (importerclass == null ? "" : importerclass.trim());
+        
+        if (importerclass.equals("gov.epa.emissions.commons.io.external.ExternalFilesExporter"))
+            accesslog.setFolderPath("");
+
+        // NOTE: want to check if accesslog exists for the same dataset, version, and description.
+        // If it is there, don't set accesslog.
+        Session session = sessionFactory.getSession();
+        
+        try {
+            String query = "SELECT obj.id from " + AccessLog.class.getSimpleName() + " obj WHERE obj.datasetId = "
+                    + accesslog.getDatasetId() + " AND obj.version = '" + accesslog.getVersion() + "' "
+                    + "AND obj.description = '" + accesslog.getDescription() + "'";
+            List<?> list = session.createQuery(query).list();
+
+            if (list == null || list.size() == 0) {
+                logSvr.setAccessLog(accesslog);
+            }
+        } catch (Exception e) {
+            log.error("Errror logging exported task for dataset: " + dataset.getName() + ".", e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
     }
 
     public Version getVersion(Dataset dataset, int version) throws EmfException {

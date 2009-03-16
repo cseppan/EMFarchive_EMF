@@ -142,13 +142,12 @@ public class ExportTask extends Task {
                 } else
                     setStatus("completed", msghead + " to " + file.getAbsolutePath() + msgend);
 
-            }
+            } // if file exists
             // NOTE: want to check if accesslog exists for the same dataset, version, and description.
             // If it is there, don't set accesslog.
 
             String query = "SELECT obj.id from " + AccessLog.class.getSimpleName() + " obj WHERE obj.datasetId = "
                     + accesslog.getDatasetId() + " AND obj.version = '" + accesslog.getVersion() + "' "
-                    // + "AND obj.description LIKE '%%" + accesslog.getDescription() + "%%'";
                     + "AND obj.description = '" + accesslog.getDescription() + "'";
             List<?> list = session.createQuery(query).list();
 
@@ -257,7 +256,7 @@ public class ExportTask extends Task {
     }
 
     public boolean fileExists() {
-        return file != null && file.exists();
+        return file != null && file.exists() && !type.isExternal();
     }
 
     public boolean isExternal() {
@@ -281,10 +280,12 @@ public class ExportTask extends Task {
 
     private boolean compareDatasetRecordsNumbers(long linesExported, Session session, DbServer dbServer)
             throws Exception {
-        String type = dataset.getDatasetType().getName();
-        // COSTCY & A/M/PTPRO types temporarily disabled
-        if (type.equalsIgnoreCase("Country, state, and county names and data (COSTCY)")
-                || type.equalsIgnoreCase("Temporal Profile (A/M/PTPRO)"))
+        DatasetType type = dataset.getDatasetType();
+        String importerclass = (type == null ? "" : type.getImporterClassName());
+        importerclass = (importerclass == null ? "" : importerclass.trim());
+
+        if (importerclass.equals("gov.epa.emissions.commons.io.temporal.TemporalProfileImporter")
+                || importerclass.equals("gov.epa.emissions.commons.io.other.CountryStateCountyDataImporter"))
             return true;
 
         DatasetDAO datasetDao = new DatasetDAO();
@@ -292,8 +293,9 @@ public class ExportTask extends Task {
 
         try {
             records = datasetDao.getDatasetRecordsNumber(dbServer, session, dataset, version);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            throw new Exception("Error determining number of records: " + e.getMessage());
         }
 
         if (records != linesExported) {

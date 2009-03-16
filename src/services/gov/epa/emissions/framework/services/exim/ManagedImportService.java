@@ -447,7 +447,7 @@ public class ManagedImportService {
             else
                 dataset.setSectors(new Sector[] { sectorObj });
 
-            if (folder.startsWith(massStorageRoot)) {
+            if (massStorageRoot != null && folder.startsWith(massStorageRoot)) {
                 Keyword massKey = new Keyword("MASS_STORAGE_LOCATION");
                 Keyword loaded = keywordsDAO.add(massKey, session);
                 KeyVal keyval = new KeyVal(loaded, folder);

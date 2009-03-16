@@ -60,6 +60,9 @@ public class ExportClientSubmitter extends ExportSubmitter {
         StatusDAO statusServices = null;
         Task task = null;
 
+//        if (submittedTable.get(taskId) == null)
+//            return;
+//        
         task = submittedTable.get(taskId).getExportTask();
         user = task.getUser();
         statusServices = task.getStatusServices();

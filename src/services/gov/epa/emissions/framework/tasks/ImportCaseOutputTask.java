@@ -226,19 +226,22 @@ public class ImportCaseOutputTask extends Task {
 
     protected void addDataset() throws EmfException {
         Session session = sessionFactory.getSession();
-        try {
-            String name = dataset.getName();
+        String name = dataset.getName();
 
+        try {
             if (datasetDao.datasetNameUsed(name, session)) {
                 name += "_" + CustomDateFormat.format_yyyy_MM_dd_HHmmssSS(new Date());
                 dataset.setName(name);
             }
 
+            session.clear();
             datasetDao.add(dataset, session);
         } catch (Exception e) {
+            log.error("Error adding new dataset: " + name, e);
             throw new EmfException(e.getMessage() == null ? "" : e.getMessage());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 

@@ -15,6 +15,7 @@ import gov.epa.emissions.commons.util.CustomStringTools;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.RemoteCommand;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
@@ -2514,8 +2515,22 @@ public class ManagedCaseService {
 
                 List<CaseInput> inputs = getAllJobInputs(caseJob, session);
 
-                if (DebugLevels.DEBUG_6)
+                // test inputs for which need to be exported
+                List<CaseInput> inputs2Export = getInputs2Export(expSvc, inputs, caseJob, jobCase, user, purpose);
+
+                
+                // if no inputs need to be exported, set job tasks exports to success and set status to waiting
+                String runStatusValue = "Exporting";
+                if (inputs2Export == null || inputs2Export.size() == 0) {
+                    cjt.setExportsSuccess(true);
+                    runStatusValue = "Waiting";
+                }
+
+                if (DebugLevels.DEBUG_9)
                     System.out.println("Number of inputs for this job: " + inputs.size());
+
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("Number of inputs to be exported for this job: " + inputs2Export.size());
 
                 if (DebugLevels.DEBUG_15) {
                     logNumDBConn("beginning of adding job task (jobID: " + cjt.getJobId() + ")");
@@ -2527,24 +2542,23 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_15) {
                     logNumDBConn("before submitting to export (jobID: " + cjt.getJobId() + ")");
                 }
+
+                // Now update the casejob in the database
+                caseJob.setRunstatus(getJobRunStatus(runStatusValue, session));
+                caseJob.setRunStartDate(new Date());
+                updateJob(caseJob, session);
+
                 // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
-                if (!this.doNotExportJobs(session))
-                    caseJobExportSubmitterId = expSvc.exportForJob(user, inputs, cjt.getTaskId(), purpose, caseJob,
-                            jobCase);
-                else
+                if (!cjt.isExportsSuccess() && !this.doNotExportJobs(session)) {
+                    caseJobExportSubmitterId = expSvc.exportForJob(user, inputs2Export, cjt.getTaskId(), purpose,
+                            caseJob, jobCase);
+                } else {
                     log.warn("ManagedCaseService: case jobs related datasets are not exported.");
+                }
 
                 if (DebugLevels.DEBUG_15) {
                     logNumDBConn("after submitted to export (jobID: " + cjt.getJobId() + ")");
                 }
-
-                String runStatusExporting = "Exporting";
-
-                caseJob.setRunstatus(getJobRunStatus(runStatusExporting, session));
-                caseJob.setRunStartDate(new Date());
-
-                // Now update the casejob in the database
-                updateJob(caseJob, session);
 
                 if (DebugLevels.DEBUG_6)
                     System.out.println("Added caseJobTask to collection");
@@ -2569,6 +2583,88 @@ public class ManagedCaseService {
             if (session != null && session.isConnected())
                 session.close();
         }
+    }
+
+    private List<CaseInput> getInputs2Export(ManagedExportService exptSrv, List<CaseInput> inputs, CaseJob job, Case caseObj, User user, String purpose) throws EmfException {
+        // Determining which inputs already have been exported
+        // return a list of those inputs which still need to be exported
+        if (inputs == null || inputs.size() == 0)
+            return inputs;
+        
+        List<CaseInput> toExport = new ArrayList<CaseInput>();
+        String delimeter = System.getProperty("file.separator");
+        LoggingServiceImpl logSvr = exptSrv.services().getLoggingService();
+        
+        Session session = this.sessionFactory.getSession();
+        DatasetDAO dsdao = new DatasetDAO();
+        
+        for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
+            CaseInput input = iter.next();
+            boolean needExport = false; 
+            EmfDataset dataset = input.getDataset();
+            SubDir subdir = input.getSubdirObj();
+            String fullPath = null;
+
+            // check if dataset is null, if so exception
+            if (dataset == null) {
+                throw new EmfException("Input (" + input.getName() + ") must have a dataset");
+            }
+
+            // check for external dataset
+            if (dataset.isExternal()) {
+                ExternalSource[] extSrcs = null;
+
+                try {
+                    extSrcs = dsdao.getExternalSrcs(dataset.getId(), -1, null, session);
+                } catch (Exception e) {
+                    log.error("Could not get external sources for dataset " + dataset.getName(), e);
+                    throw new EmfException("Could not get external sources for dataset " + dataset.getName() + ".");
+                } 
+
+                // test that all the external files in the dataset exist
+                if (extSrcs == null || extSrcs.length == 0) {
+                    throw new EmfException("Input (" + input.getName() + ") must have at least 1 external dataset");
+                }
+                
+                //loop of external ds, if all there add to toExport list
+                for (int i = 0; i < extSrcs.length; i++) {
+                    fullPath = extSrcs[i].getDatasource();
+                    
+                    if (!new File(fullPath).exists()) {
+                        needExport = true;
+                        break;
+                    }
+                }
+            } else {
+                // internal dataset
+                // Create a full path to the input file
+                fullPath = exptSrv.getCleanDatasetName(input.getDataset(), input.getVersion());
+                
+                if ((subdir != null) && !(subdir.toString()).equals("")) {
+                    fullPath = caseObj.getInputFileDir() + delimeter + input.getSubdirObj() + delimeter + fullPath;
+                } else {
+                    fullPath = caseObj.getInputFileDir() + delimeter + fullPath;
+                }
+                
+                // Expand input director, ie. remove env variables
+                try {
+                    fullPath = dao.replaceEnvVarsCase(fullPath, delimeter, caseObj, job.getId());
+                } catch (Exception e) {
+                    throw new EmfException("Input folder: " + e.getMessage());
+                }
+                
+                if (!new File(fullPath).exists())
+                    needExport = true;
+            }
+            
+            if (needExport)
+                toExport.add(input);
+            
+            if (!needExport)
+                exptSrv.logExportedTask(logSvr, user, purpose, fullPath, input);
+        }
+        
+        return toExport;
     }
 
     private JobRunStatus getJobRunStatus(String runStatus, Session session) throws EmfException {
@@ -2862,7 +2958,7 @@ public class ManagedCaseService {
             Session session = this.sessionFactory.getSession();
             ExternalSource[] externalDatasets = null;
             DatasetDAO dsdao = new DatasetDAO();
-            
+
             try {
                 externalDatasets = dsdao.getExternalSrcs(dataset.getId(), -1, null, session);
             } catch (Exception e) {
@@ -2871,7 +2967,7 @@ public class ManagedCaseService {
             } finally {
                 session.close();
             }
-            
+
             // set the full path to the first external file in the dataset
             if (externalDatasets == null || externalDatasets.length == 0) {
                 throw new EmfException("Input (" + input.getName() + ") must have at least 1 external dataset");
@@ -3560,7 +3656,7 @@ public class ManagedCaseService {
 
             // Task has been acquired so delete from persisted wait task table
             dao.removePersistedTasks(allPersistedTasks.toArray(new PersistedWaitTask[0]));
-            
+
             if (DebugLevels.DEBUG_9)
                 System.out.println("After the loop jobId array of ints size= " + jobIds.length);
             if (DebugLevels.DEBUG_9)
@@ -4817,17 +4913,17 @@ public class ManagedCaseService {
             String sumParamFile = prefix + "Summary_Parameters.csv";
             String inputsFile = prefix + "Inputs.csv";
             String jobsFile = prefix + "Jobs.csv";
-            
-            //First buffer: parameter
-            //Second buffer: inputs
-            //third buffer: jobs
-            String[] caseExportString = getCaseExportString(currentCase,parameters, jobs, inputs, session);
-            
+
+            // First buffer: parameter
+            // Second buffer: inputs
+            // third buffer: jobs
+            String[] caseExportString = getCaseExportString(currentCase, parameters, jobs, inputs, session);
+
             printCaseSumParams(caseExportString[0], folder, sumParamFile);
             printCaseInputs(caseExportString[1], folder, inputsFile);
             printCaseJobs(caseExportString[2], folder, jobsFile);
 
-            //return caseExportString;
+            // return caseExportString;
         } catch (Exception e) {
             log.error("Could not export case "
                     + (currentCase == null ? " (id = " + caseId + ")." : currentCase.getName() + "."), e);
@@ -4840,7 +4936,7 @@ public class ManagedCaseService {
                 session.close();
         }
     }
-    
+
     public String[] printLocalCase(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
         Case currentCase = null;
@@ -4853,12 +4949,12 @@ public class ManagedCaseService {
             List<CaseJob> jobs = dao.getCaseJobs(caseId);
             List<CaseInput> inputs = dao.getCaseInputs(caseId, session);
             List<CaseParameter> parameters = dao.getCaseParameters(caseId, session);
-            
-            //First buffer: parameter
-            //Second buffer: inputs
-            //third buffer: jobs
-            String[] caseExportString = getCaseExportString(currentCase,parameters, jobs, inputs, session);
-           
+
+            // First buffer: parameter
+            // Second buffer: inputs
+            // third buffer: jobs
+            String[] caseExportString = getCaseExportString(currentCase, parameters, jobs, inputs, session);
+
             return caseExportString;
         } catch (Exception e) {
             log.error("Could not export case "
@@ -4872,10 +4968,10 @@ public class ManagedCaseService {
                 session.close();
         }
     }
-    
-    private synchronized String[] getCaseExportString(Case currentCase, List<CaseParameter> parameters, 
+
+    private synchronized String[] getCaseExportString(Case currentCase, List<CaseParameter> parameters,
             List<CaseJob> jobs, List<CaseInput> inputs, Session session) {
-        
+
         List<String> caseExportList = new ArrayList<String>();
         caseExportList.add(bufferCaseSumParams(currentCase, parameters, jobs));
         caseExportList.add(bufferCaseInputs(inputs, jobs, session));
@@ -4883,27 +4979,24 @@ public class ManagedCaseService {
         return caseExportList.toArray(new String[0]);
     }
 
-    private synchronized void printCaseSumParams(String sb, String folder, String sumParamFile) 
-        throws IOException {        
+    private synchronized void printCaseSumParams(String sb, String folder, String sumParamFile) throws IOException {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, sumParamFile))));
         writer.println(sb.toString());
         writer.close();
     }
-    
-    private synchronized void printCaseInputs(String sb, String folder,
-            String inputsFile) throws IOException {
+
+    private synchronized void printCaseInputs(String sb, String folder, String inputsFile) throws IOException {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, inputsFile))));
         writer.println(sb.toString());
         writer.close();
     }
-    
-    private synchronized void printCaseJobs(String sb, String folder, String jobsFile)
-    throws IOException {
+
+    private synchronized void printCaseJobs(String sb, String folder, String jobsFile) throws IOException {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, jobsFile))));
         writer.println(sb.toString());
         writer.close();
     }
-    
+
     private synchronized String bufferCaseSumParams(Case currentCase, List<CaseParameter> parameters, List<CaseJob> jobs) {
         String ls = System.getProperty("line.separator");
         String model = (currentCase.getModel() == null) ? "" : currentCase.getModel().getName();
@@ -5057,8 +5150,7 @@ public class ManagedCaseService {
         return lastAmp < 0 ? sb.toString() : sb.toString().substring(0, lastAmp);
     }
 
-    private synchronized String bufferCaseInputs(List<CaseInput> inputs, List<CaseJob> jobs, 
-            Session session) {
+    private synchronized String bufferCaseInputs(List<CaseInput> inputs, List<CaseJob> jobs, Session session) {
         String ls = System.getProperty("line.separator");
         String columns = "Tab,Inputname,Envt Variable,Sector,Job,Program,Dataset,Version,QA status,DS Type,Reqd?,Local?,Subdir,Last Modified,Parentcase"
                 + ls;
@@ -5089,13 +5181,13 @@ public class ManagedCaseService {
                     + clean(qaStatus) + ",\"" + clean(dsType) + "\"," + reqrd + "," + local + "," + clean(subdir) + ","
                     + lstMod + ",\"" + clean(parentName) + "\"" + ls);
         }
-        return sb.toString(); 
-        //PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, inputsFile))));
-        //writer.println(sb.toString());
-        //writer.close();
+        return sb.toString();
+        // PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, inputsFile))));
+        // writer.println(sb.toString());
+        // writer.close();
     }
 
-    private String  bufferCaseJobs(List<CaseJob> jobs, Session session) {
+    private String bufferCaseJobs(List<CaseJob> jobs, Session session) {
         String ls = System.getProperty("line.separator");
         String columns = "Tab,JobName,Order,Sector,RunStatus,StartDate,CompletionDate,Executable,Arguments,Path,QueueOptions,JobGroup,Local,QueueID,User,Host,Notes,Purpose,DependsOn"
                 + ls;
@@ -5142,6 +5234,5 @@ public class ManagedCaseService {
 
         return temp.replaceAll("\\\\", "/");
     }
-    
-}
 
+}

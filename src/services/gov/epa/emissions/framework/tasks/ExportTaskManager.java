@@ -12,6 +12,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -178,8 +179,6 @@ public class ExportTaskManager implements TaskManager {
                 System.out.println("SIZE OF waiting list-table: " + waitTable.size());
             }
 
-            preProcessWaitTable();
-            
             if (DebugLevels.DEBUG_9) {
                 System.out.println("Number of waitTasks acquired from waitTable: " + waitTable.values().size());
                 System.out.println("Number of tasks acquired from runTable: " + runTable.size());
@@ -243,7 +242,7 @@ public class ExportTaskManager implements TaskManager {
                     break;
                 }
 
-            }
+            }  // iterating over waiting tasks
 
             if (DebugLevels.DEBUG_9)
                 System.out.println("SIZE OF TASKQUEUE: " + getSizeofTaskQueue());
@@ -314,19 +313,22 @@ public class ExportTaskManager implements TaskManager {
                     }
                 }// more tasks in taskQueue
 
-            }// while not done
+            }// while not done (more tasks available in task queue)
 
+            //postProcessWaitTable();
+            
             // Now do other processing and maintenance work
             // if taskQueue is empty then this processing will be the only thing that happens
             // during this callback
 
             // TODO:
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9) {
+                System.out.println("ExportTaskManager::processTaskQueue() after postProcessWaitTable, Wait table size: " + waitTable.size());
+                System.out.println("ExportTaskManager::processTaskQueue() after postProcessWaitTable,  Run table size: " + runTable.size());
                 System.out.println("*** END ExportTaskManager::processTaskQueue() *** " + new Date());
-            if (DebugLevels.DEBUG_9)
                 System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-
+            }
         } catch (ConcurrentModificationException cmex) {
             // do nothing
             log.info("Java is complaining about a ConcurrentModificationException again");
@@ -416,15 +418,16 @@ public class ExportTaskManager implements TaskManager {
         // done with the call back ... so process the two tables and task queue
         processTaskQueue();
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9) 
             System.out.println("*** END ExportTaskManager::callBackFromThread() *** " + new Date());
 
     }
 
-    private static synchronized void preProcessWaitTable() {
+    public static synchronized void postProcessWaitTable() {
+        List<Task> toBRemoved = new ArrayList<Task>();
         Collection<Task> waitTasks = waitTable.values();
         if (DebugLevels.DEBUG_9)
-            System.out.println("preProcessWaitTable(): Number of waitTasks acquired from waitTable: "
+            System.out.println("postProcessWaitTable(): Number of waitTasks acquired from waitTable: "
                     + waitTasks.size());
 
         Iterator<Task> iter = waitTasks.iterator();
@@ -437,18 +440,31 @@ public class ExportTaskManager implements TaskManager {
             if (tsk.fileExists()) {
                 status = "completed";
                 msg = "FILE EXISTS: Completed export of " + tsk.getDataset().getName() + ".";
+                
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("postProcessWaitTable(): File exists tested. Wait table size: " + waitTable.size() + ".");
+                
                 byPassExport(tsk.getTaskId(), tsk.getSubmitterId(), status, 0, msg);
-                waitTable.remove(tsk.getTaskId());
+                toBRemoved.add(tsk);
             }
 
             if (tsk.isExternal()) {
                 String[] statuses = tsk.quickRunExternalExport();
                 status = statuses[0];
                 msg = statuses[1];
+                
+                if (DebugLevels.DEBUG_9)
+                    System.out.println("postProcessWaitTable(): External dataset exported. Wait table size: " + waitTable.size() + ".");
+                
                 byPassExport(tsk.getTaskId(), tsk.getSubmitterId(), status, 0, msg);
-                waitTable.remove(tsk.getTaskId());
+                toBRemoved.add(tsk);
             }
         }
+        
+        for (Iterator<Task> task = toBRemoved.iterator(); iter.hasNext();) {
+            waitTable.remove(task.next().getTaskId());
+        }
+            
     }
 
     private static synchronized void byPassExport(String taskId, String submitterId, String status, long id, String mesg) {
@@ -463,8 +479,8 @@ public class ExportTaskManager implements TaskManager {
             System.out.println("SIZE OF RUN TABLE BEFORE REMOVE= " + runTable.size());
         }
 
-        if (runTable.contains(taskId))
-            runTable.remove(taskId);
+//        if (runTable.contains(taskId))
+//            runTable.remove(taskId);
 
         if (DebugLevels.DEBUG_9)
             System.out.println("SIZE OF RUN TABLE AFTER REMOVE= " + runTable.size());
