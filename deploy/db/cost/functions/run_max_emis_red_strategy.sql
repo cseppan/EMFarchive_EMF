@@ -10,6 +10,7 @@ DECLARE
 	county_dataset_version integer := null;
 	region RECORD;
 	target_pollutant_id integer := 0;
+	target_pollutant character varying(255) := '';
 	measures_count integer := 0;
 	measure_with_region_count integer := 0;
 	measure_classes_count integer := 0;
@@ -47,6 +48,7 @@ DECLARE
 	percent_reduction_sql character varying;
 	inventory_sectors character varying := '';
 	include_unspecified_costs boolean := true; 
+	has_pm_target_pollutant boolean := false; 
 BEGIN
 --	SET work_mem TO '256MB';
 --	SET enable_seqscan TO 'off';
@@ -101,8 +103,11 @@ BEGIN
 		cs.county_dataset_version,
 		cs.use_cost_equations,
 		cs.discount_rate / 100,
-		coalesce(cs.include_unspecified_costs,true)
+		coalesce(cs.include_unspecified_costs,true),
+		p.name
 	FROM emf.control_strategies cs
+		inner join emf.pollutants p
+		on p.id = cs.pollutant_id
 	where cs.id = control_strategy_id
 	INTO target_pollutant_id,
 		inv_filter,
@@ -112,7 +117,11 @@ BEGIN
 		county_dataset_version,
 		use_cost_equations,
 		discount_rate,
-		include_unspecified_costs;
+		include_unspecified_costs,
+		target_pollutant;
+
+	-- see if there are pm target pollutant for the stategy...
+	has_pm_target_pollutant := case when target_pollutant = 'PM10' or target_pollutant = 'PM2_5' then true else false end;
 
 	-- see if there are point specific columns in the inventory
 	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
@@ -244,7 +253,7 @@ BEGIN
 			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
 	END IF;
 	-- build version info into where clause filter
-	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version) || ')' || coalesce(' and ' || inv_filter, '');
+	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
 
 /*	EXECUTE '
 		SELECT DISTINCT ON (poll) 1::integer as Found 
@@ -267,9 +276,9 @@ BEGIN
 	uncontrolled_emis_sql := 
 			case 
 				when dataset_month != 0 then 
-					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+					'case when (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) / (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
 				else 
-					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+					'case when (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
 			end;
 	emis_sql := 
 			case 
@@ -281,10 +290,13 @@ BEGIN
 	annualized_uncontrolled_emis_sql := 
 			case 
 				when dataset_month != 0 then 
-					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * 365, inv.ann_emis) / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+					'case when (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * 365, inv.ann_emis) / (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
 				else 
-					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+					'case when (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
 			end;
+
+
+
 	percent_reduction_sql := 'er.efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' / 100 / 100';
 	get_strategt_cost_sql := '(public.get_strategy_costs(' || case when use_cost_equations then 'true' else 'false' end || '::boolean, m.control_measures_id, 
 			abbreviation, ' || discount_rate|| ', 
@@ -316,6 +328,7 @@ BEGIN
 
 	-- add both target and cobenefit pollutants, first get best target pollutant measure, then use that to apply to other pollutants.
 	execute
+--	raise notice '%', 
 	'insert into emissions.' || detailed_result_table_name || ' 
 		(
 		dataset_id,
@@ -373,9 +386,9 @@ BEGIN
 		' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' as rule_pen,
 		' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
 		' || percent_reduction_sql || ' as percent_reduction,
-		inv.ceff,
-		' || case when is_point_table = false then 'inv.rpen' else '100' end || ',
-		inv.reff,
+		' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ',
+		' || case when is_point_table = false then '' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || '' else '100' end || ',
+		' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ',
 		' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
 		' || emis_sql || ' - ' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as emis_reduction,
 		' || emis_sql || ' as inv_emissions,
@@ -399,6 +412,38 @@ BEGIN
 
 		inner join emf.pollutants p
 		on p.name = inv.poll
+
+		' || 
+				case 
+					when target_pollutant = 'PM10' or target_pollutant = 'PM2_5' then '
+
+		left outer join emissions.' || inv_table_name || ' invpm25or10
+		on invpm25or10.fips = inv.fips
+		and invpm25or10.scc = inv.scc
+
+				' || case when is_point_table then 
+		'and invpm25or10.plantid = inv.plantid
+		and invpm25or10.pointid = inv.pointid
+		and invpm25or10.stackid = inv.stackid
+		and invpm25or10.segment = inv.segment' 
+				else 
+					''
+				end || '
+		and (
+			(invpm25or10.poll = ''PM2_5''
+			and inv.poll = ''PM10''
+			--and inv.ceff is null
+			) 
+		or 
+			(invpm25or10.poll = ''PM10''
+			and inv.poll = ''PM2_5''
+			--and inv.ceff is null
+			)
+		)
+		and (' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'invpm25or10') || ')' 
+			else 
+		'' 
+		end || '
 
 		' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
 		on fipscode.state_county_fips = inv.fips
@@ -430,16 +475,39 @@ BEGIN
 
 					inner join emf.pollutants p
 					on p.name = inv.poll
-
---					inner join (
---						select fips, scc, plantid, poll, sum(' || uncontrolled_emis_sql || ') as total_ann_emis
---						from emissions.' || inv_table_name || ' as inv
---						group by fips, scc, plantid, poll) source_total
---					on source_total.fips = inv.fips
---					and source_total.scc = inv.scc
---					and source_total.plantid = inv.plantid
---					and source_total.poll = inv.poll
 					
+					' || 
+							case 
+								when target_pollutant = 'PM10' or target_pollutant = 'PM2_5' then '
+
+					left outer join emissions.' || inv_table_name || ' invpm25or10
+					on invpm25or10.fips = inv.fips
+					and invpm25or10.scc = inv.scc
+
+							' || case when is_point_table then 
+					'and invpm25or10.plantid = inv.plantid
+					and invpm25or10.pointid = inv.pointid
+					and invpm25or10.stackid = inv.stackid
+					and invpm25or10.segment = inv.segment' 
+							else 
+								''
+							end || '
+					and (
+						(invpm25or10.poll = ''PM2_5''
+						and inv.poll = ''PM10''
+						--and inv.ceff is null
+						) 
+					or 
+						(invpm25or10.poll = ''PM10''
+						and inv.poll = ''PM2_5''
+						--and inv.ceff is null
+						)
+					)
+					and (' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'invpm25or10') || ')' 
+						else 
+					'' 
+					end || '
+
 					inner join emf.control_measure_sccs scc
 					on scc.name = inv.scc
 					
@@ -449,7 +517,8 @@ BEGIN
 					and csm.control_strategy_id = ' || control_strategy_id || '
 					' else '' end || '
 
-			--this part will get applicable measure based on the target pollutant, use this measure for target and cobenefit pollutants...
+					--this part will get applicable measure based on the target pollutant, 
+					-- use this measure for target and cobenefit pollutants...
 					inner join emf.control_measures m
 					on m.id = scc.control_measures_id
 
@@ -504,6 +573,36 @@ BEGIN
 							inner join emf.pollutants p
 							on p.name = inv.poll
 							
+							' || 
+									case 
+										when target_pollutant = 'PM10' or target_pollutant = 'PM2_5' then '
+
+							left outer join emissions.' || inv_table_name || ' invpm25or10
+							on invpm25or10.fips = inv.fips
+							and invpm25or10.scc = inv.scc
+
+									' || case when is_point_table then 
+							'and invpm25or10.plantid = inv.plantid
+							and invpm25or10.pointid = inv.pointid
+							and invpm25or10.stackid = inv.stackid
+							and invpm25or10.segment = inv.segment' 
+									else 
+										''
+									end || '
+							and (
+								(invpm25or10.poll = ''PM2_5''
+								and inv.poll = ''PM10''
+								and inv.ceff is null) 
+							or 
+								(invpm25or10.poll = ''PM10''
+								and inv.poll = ''PM2_5''
+								and inv.ceff is null)
+							)
+							and (' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'invpm25or10') || ')' 
+								else 
+							'' 
+							end || '
+
 							inner join emf.control_measure_sccs scc
 							on scc.name = inv.scc
 
@@ -574,11 +673,11 @@ BEGIN
 					and p.id = ' ||  target_pollutant_id || '
 
 					-- dont include sources that have been fully controlled...
-					and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0) <> 100.0
+					and coalesce(100 * ' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0) <> 100.0
 
 					-- make sure the new control is worthy, compare existing emis with new resulting emis, see if you get required percent decrease in emissions ((orig emis - new resulting emis) / orig emis * 100 ...
---					and (inv.ceff is null or er.efficiency - coalesce(inv.ceff, 0) >= ' || replacement_control_min_eff_diff_constraint || ')
-					and (inv.ceff is null or ((' ||  emis_sql || ' - ' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100)) / ' ||  emis_sql || ' * 100 >= ' || replacement_control_min_eff_diff_constraint || '))
+--					and (' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' is null or er.efficiency - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ', 0) >= ' || replacement_control_min_eff_diff_constraint || ')
+					and (' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' is null or ((' ||  emis_sql || ' - ' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100)) / ' ||  emis_sql || ' * 100 >= ' || replacement_control_min_eff_diff_constraint || '))
 
 					-- measure region filter
 					' || case when measure_with_region_count > 0 then '
@@ -683,7 +782,7 @@ BEGIN
 --		and cstp.control_strategy_id = ' || control_strategy_id || '
 
 	where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
---		and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0) * ' || case when has_rpen_column then 'coalesce(inv.rpen / 100, 1.0)' else '1.0' end || ', 0) <> 100.0
+--		and coalesce(100 * inv.ceff / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0) * ' || case when has_rpen_column then 'coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '1.0' end || ', 0) <> 100.0
 		-- TODO:  I don''t think this is needed, seems redundant
 --		and (	p.id <> ' ||  target_pollutant_id || '
 --			or 
