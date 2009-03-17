@@ -68,6 +68,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             return;
         }
         ControlStrategyResult[] controlStrategyResults = getResult();
+        hasResults = false;
         if (controlStrategyResults!= null && controlStrategyResults.length > 0) hasResults = true;
         view.display(controlStrategy, controlStrategyResults);
     }
@@ -167,6 +168,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         //ControlStrategyResult result = session.controlStrategyService().controlStrategyResults(controlStrategy);
         ControlStrategyResult[] controlStrategyResults = getResult();
         ControlStrategy strategy = getControlStrategy(controlStrategy.getId());
+        hasResults = false;
         if (controlStrategyResults!= null && controlStrategyResults.length > 0) hasResults = true;
 //        String runStatus = service().controlStrategyRunStatus(controlStrategy.getId());
 //        if (runStatus == null || !runStatus.equalsIgnoreCase("Running")) {
