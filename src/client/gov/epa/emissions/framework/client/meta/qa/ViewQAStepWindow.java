@@ -309,6 +309,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         layoutGenerator.addLabelWidgetPair("Name:", new Label(step.getName()), panel);
 
         program = new EditableComboBox(qaPrograms.names());
+        program.setPreferredSize(new Dimension(250, 20));
         program.setEditable(false);
         program.setPrototypeDisplayValue(EmptyStrings.create(20));
         QAProgram qaProgram = step.getProgram();
