@@ -17,6 +17,8 @@ import javax.swing.JScrollPane;
 public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
 
     private EmfConsole parentConsole;
+    
+    private EmfTableModel tableModel; 
 
     private SortFilterSelectModel selectModel;
 
@@ -34,9 +36,9 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
     }
 
     private JScrollPane setLayout(EmfConsole parentConsole, TableData tableData) {
-        EmfTableModel model = new EmfTableModel(tableData);
+        tableModel = new EmfTableModel(tableData);
         //get the old sort & filter criteria before creating new SortFilterSelectionPanel
-        SortFilterSelectModel selectModel = new SortFilterSelectModel(model);
+        SortFilterSelectModel selectModel = new SortFilterSelectModel(tableModel);
         this.selectModel = selectModel;
         selectModel.refresh();
         return sortFilterPane(parentConsole, selectModel);
@@ -53,15 +55,25 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
     public void refresh(TableData tableData) {
         // TBD: refine this to get the sort criteria and filter criteria from the SFSP
         //      this may require adding some new methods to get this info from that class
+     
         SortCriteria currentSort = sortFilterSelectionpanel.getSortCriteria();
         FilterCriteria currentFilter = sortFilterSelectionpanel.getFilterCriteria();
-        this.removeAll();
-        this.add(setLayout(parentConsole, tableData));
-        // TBD: restore the sort and filter criteria (maybe after repaint??)
-        // TBD: if possible, retain the column widths and order in addition to sort and filter info
-        sortFilterSelectionpanel.sort(currentSort);
-        sortFilterSelectionpanel.filter(currentFilter);
-        repaint();
+        if (selectModel == null ){    
+            this.removeAll();
+            this.add(setLayout(parentConsole, tableData));
+            // Restore the sort and filter criteria (maybe after repaint??)
+            sortFilterSelectionpanel.sort(currentSort);
+            sortFilterSelectionpanel.filter(currentFilter); 
+            repaint();
+        }
+        else{
+         // Retain the column widths and order in addition to sort and filter info
+            tableModel.refresh(tableData);
+            selectModel.refresh(tableModel);
+            sortFilterSelectionpanel.setModel(selectModel);
+            repaint();
+        }
+        // Retain the column widths and order in addition to sort and filter info
     }
 
     public List<?> selected() {
