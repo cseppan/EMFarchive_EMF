@@ -194,6 +194,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         
         if (type.getName().equalsIgnoreCase("All"))
             return dataService().getNumOfDatasets(nameContains);
+        
         return dataService().getNumOfDatasets(type.getId(), nameContains);
     }
 

@@ -205,9 +205,9 @@ public class DataServiceImpl implements DataService {
         Session session = sessionFactory.getSession();
         try {
             if (nameContains == null || nameContains.trim().length() == 0)
-                return dao.allNonDeleted(session).size();
-            return dao.allNonDeleted(session, nameContains).size();
-
+                return dao.getNumOfDatasets(session);
+            
+            return dao.getNumOfDatasets(session, nameContains);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets", e);
             throw new EmfException("Could not get all Datasets");
@@ -220,8 +220,9 @@ public class DataServiceImpl implements DataService {
         Session session = sessionFactory.getSession();
         try {
             if (nameContains == null || nameContains.trim().length() == 0)
-                return dao.getDatasets(session, datasetTypeId).size();
-            return dao.getDatasets(session, datasetTypeId, nameContains).size();
+                return dao.getNumOfDatasets(session, datasetTypeId);
+            
+            return dao.getNumOfDatasets(session, datasetTypeId, nameContains);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets for dataset type " + datasetTypeId, e);
             throw new EmfException("Could not get all Datasets for dataset type " + datasetTypeId);

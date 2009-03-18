@@ -110,6 +110,32 @@ public class DatasetDAO {
     public List all(Session session) {
         return hibernateFacade.getAll(EmfDataset.class, session);
     }
+    
+    public int getNumOfDatasets(Session session) {
+        List<?> num = session.createQuery("SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted'").list();
+        return Integer.parseInt(num.get(0).toString());
+    }
+    
+    public int getNumOfDatasets(Session session, String name) {
+        List<?> num = session.createQuery("SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " +
+        		" AND lower(ds.name) like '%%" + name.toLowerCase().trim() + "%%'").list();
+        return Integer.parseInt(num.get(0).toString());
+    }
+    
+    public int getNumOfDatasets(Session session, int dsTypeId) {
+        List<?> num = session.createQuery("SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " +
+                " AND ds.datasetType.id = " + dsTypeId).list();
+        
+        return Integer.parseInt(num.get(0).toString());
+    }
+    
+    public int getNumOfDatasets(Session session, int dsTypeId, String name) {
+        List<?> num = session.createQuery("SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " +
+                " AND ds.datasetType.id = " + dsTypeId +
+                " AND lower(ds.name) like '%%" + name.toLowerCase().trim() + "%%'").list();
+        
+        return Integer.parseInt(num.get(0).toString());
+    }
 
     // FIXME: to be deleted after dataset removed from db
     public List allNonDeleted(Session session) {
