@@ -188,7 +188,6 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
         if (delimiter.equals(","))
             reader = new CSVFileReader(csvFile);
         else{
-            reader.close();
             throw new EmfException("File " + csvFile + " is not csv format. Sorry, I cannot read it.");       
         }
             
