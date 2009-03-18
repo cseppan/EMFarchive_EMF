@@ -187,9 +187,11 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
 
         if (delimiter.equals(","))
             reader = new CSVFileReader(csvFile);
-        else
-            throw new EmfException("File " + csvFile + " is not csv format. Sorry, I cannot read it.");
-
+        else{
+            reader.close();
+            throw new EmfException("File " + csvFile + " is not csv format. Sorry, I cannot read it.");       
+        }
+            
         String[] rowHeader = new String[0];
         String fileHeader = ((reader.getHeader() == null) ? "" : reader.headerToString());
         String[][] colHeader = new String[1][];
@@ -199,7 +201,7 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
         Class<?>[] colClasses = getColumnClass(reader.comments(), reader.getCols().length);
 
         ArrayList<ArrayList<?>> tableData = getTableData(reader, colClasses);
-
+        reader.close();
         return new SpecialTableModel(fileHeader, rowHeader, colHeader, tableData, "", colClasses);
     }
 
