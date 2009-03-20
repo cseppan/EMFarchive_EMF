@@ -80,17 +80,25 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
 
     protected JPanel tablePanel(QAStep[] steps, QAStepResult[] qaStepResults) {
         setupTableModel(steps, qaStepResults);
-
-        tablePanel = new JPanel(new BorderLayout());
-        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
-        tablePanel.add(table, BorderLayout.CENTER);
-
+        if (table == null){
+            tablePanel = new JPanel(new BorderLayout());
+            table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+            tablePanel.add(table, BorderLayout.CENTER);
+        }else {
+            refreshTable(steps, qaStepResults);
+        }
         return tablePanel;
     }
     
     private void setupTableModel(QAStep[] steps, QAStepResult[] qaStepResults) {
         tableData = new EditableQAStepsTableData(steps, qaStepResults);
     }
+    
+    private void refreshTable(QAStep[] steps, QAStepResult[] qaStepResults){
+        setupTableModel(steps, qaStepResults);
+        table.refresh(tableData);
+        super.validate();
+    }  
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Version", "Order", "Name" };

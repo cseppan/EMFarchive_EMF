@@ -73,7 +73,6 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
             sortFilterSelectionpanel.setModel(selectModel);
             repaint();
         }
-        // Retain the column widths and order in addition to sort and filter info
     }
 
     public List<?> selected() {
