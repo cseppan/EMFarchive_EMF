@@ -27,6 +27,8 @@ public class QATab extends JPanel implements QATabView, RefreshObserver {
     private DesktopManager desktopManager;
 
     private ViewQATabPresenter presenter;
+    
+    private QAStepsTableData tableData;
 
     private SelectableSortFilterWrapper table;
 
@@ -62,7 +64,11 @@ public class QATab extends JPanel implements QATabView, RefreshObserver {
 
     private JPanel tablePanel(QAStep[] steps, QAStepResult[] results) {
         JPanel container = new JPanel(new BorderLayout());
-        table = new SelectableSortFilterWrapper(parentConsole, new QAStepsTableData(steps, results), sortCriteria());
+        tableData = new QAStepsTableData(steps, results);
+        if (table == null )
+            table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        else
+            table.refresh(tableData);
         container.add(table, BorderLayout.CENTER);
         return container;
     }
