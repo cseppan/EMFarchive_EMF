@@ -17,6 +17,8 @@ public class LogsTab extends JPanel implements LogsTabView, RefreshObserver{
 
     private EmfConsole parentConsole;
     
+    private SelectableSortFilterWrapper table; 
+    
     private LogsTabPresenter presenter;
 
     public LogsTab(EmfConsole parentConsole) {
@@ -44,9 +46,10 @@ public class LogsTab extends JPanel implements LogsTabView, RefreshObserver{
     private JPanel tablePanel(AccessLog[] logs) {
         JPanel tablePanel = new JPanel(new BorderLayout());
         //SimpleTableModel wrapperModel = new SimpleTableModel(model);
-
-        SelectableSortFilterWrapper table = new SelectableSortFilterWrapper(parentConsole, new LogsTableData(logs), null);
-
+        if ( table ==null )
+            table = new SelectableSortFilterWrapper(parentConsole, new LogsTableData(logs), null);
+        else
+             table.refresh(new LogsTableData(logs)); 
         tablePanel.add(table);
         return tablePanel;
     }

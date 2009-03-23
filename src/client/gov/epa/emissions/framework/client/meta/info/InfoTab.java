@@ -43,6 +43,8 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
     private ManageChangeables changeablesList;
 
     private InfoTabPresenter sourceTabPresenter;
+    
+    private SelectableSortFilterWrapper table;
 
     private MessagePanel msgPanel;
 
@@ -121,8 +123,11 @@ public class InfoTab extends JPanel implements InfoTabView, RefreshObserver {
     private JPanel createSortFilterPane(TableData tableData, EmfConsole parentConsole, boolean external)
             throws EmfException {
         JPanel tablePanel = new JPanel(new BorderLayout());
-
-        SelectableSortFilterWrapper table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
+        if ( table == null )
+            table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
+        else
+            table.refresh(tableData);
+        
         tablePanel.add(table, BorderLayout.CENTER);
 
         EmfDataset dataset = sourceTabPresenter.getDataset();

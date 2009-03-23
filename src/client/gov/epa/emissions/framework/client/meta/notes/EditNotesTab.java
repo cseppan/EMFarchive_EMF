@@ -67,10 +67,12 @@ public class EditNotesTab extends JPanel implements EditNotesTabView, RefreshObs
     private JPanel tablePanel(DatasetNote[] datasetNotes) {
         setupTableModel(datasetNotes);
         changeables.addChangeable(tableData);
-        
-        tablePanel = new JPanel(new BorderLayout());
-        table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
-        tablePanel.add(table);
+        if ( table == null){
+            tablePanel = new JPanel(new BorderLayout());
+            table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
+            tablePanel.add(table);
+        }else
+            refresh();
         return tablePanel;
     }
     
