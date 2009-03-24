@@ -76,7 +76,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
         tableData = new UsersTableData(users);
 
         model.refresh(tableData);
-        selectModel.refresh();
+        selectModel.refresh(model);
         createLayout(selectModel, layout);
         super.refreshLayout();
     }
