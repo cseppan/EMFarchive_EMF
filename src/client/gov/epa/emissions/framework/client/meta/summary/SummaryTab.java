@@ -83,7 +83,7 @@ public class SummaryTab extends JPanel implements SummaryTabView, RefreshObserve
         layoutGenerator.addLabelWidgetPair("Intended Use:", new Label("intendedUse", intendedUseName), panel);
 
         layoutGenerator.addLabelWidgetPair("Default Version:", new Label("defaultVersion", ""
-                + version.toString()), panel);
+                + (version != null ? version.toString() : "" )), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
