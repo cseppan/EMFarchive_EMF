@@ -25,6 +25,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.CompoundBorder;
 
@@ -149,6 +150,13 @@ public class VersionsPanel extends JPanel implements VersionsView {
         
         return panel;
     }
+ 
+    private int getYesNoSelection(){
+        String message = " Would you like to copy a version to new dataset? ";
+        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+        return selection;
+    }
 
     private void copyDataSet(Object table) {
         Version[] versions = tableData.selected();
@@ -164,7 +172,10 @@ public class VersionsPanel extends JPanel implements VersionsView {
         }
         
         try {
-            presenter.copyDataset(versions[0]);
+            if ( getYesNoSelection() == JOptionPane.YES_OPTION)
+                presenter.copyDataset(versions[0]);
+            else
+                return; 
         } catch (EmfException e) {
             displayError(e.getMessage());
             return;

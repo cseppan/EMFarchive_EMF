@@ -135,4 +135,11 @@ public class EditVersionsPresenter {
     public void releaseLock(Version lockedVersion) throws EmfException {
         dataService().updateVersionNReleaseLock(lockedVersion);
     }
+    
+    public void copyDataset(Version version) throws EmfException {
+        if (!version.isFinalVersion())
+            throw new EmfException("Can only copy a version that is Final");
+
+        session.dataService().copyDataset(dataset.getId(), version, session.user());
+    }
 }

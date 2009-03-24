@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.versions;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
@@ -300,6 +301,12 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             edit.setEnabled(false);
         }
         panel.add(edit);
+        
+        Button copy = copyButton(tableCombo);
+        if (dataset.getInternalSources().length == 0) {
+            edit.setEnabled(false);
+        }
+        panel.add(copy);
 
         container.add(panel, BorderLayout.CENTER);
 
@@ -324,6 +331,17 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         });
         edit.setToolTipText("Edit the specified table for the selected versions");
         return edit;
+    }
+    
+    private Button copyButton(final JComboBox tableCombo) {
+        Button copy = new CopyButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                clear();
+                copyDataSet(tableCombo.getSelectedItem());
+            }
+        });
+        copy.setToolTipText("Copy a Version to New Dataset");
+        return copy;
     }
 
     private void doView(final JComboBox tableCombo) {
@@ -350,6 +368,39 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         } catch (EmfException e) {
             displayError(e.getMessage());
         }
+    }
+    
+    private void copyDataSet(Object table) {
+        Version[] versions = tableData.selected();
+        
+        if (versions.length < 1) {
+            displayError("Please select a final version to copy");
+            return;
+        }
+        
+        if (versions.length > 1) {
+            displayError("Please select only one final version to copy");
+            return;
+        }
+        
+        try {
+            if ( getYesNoSelection() == JOptionPane.YES_OPTION)
+                presenter.copyDataset(versions[0]);
+            else
+                return; 
+        } catch (EmfException e) {
+            displayError(e.getMessage());
+            return;
+        }
+        
+        messagePanel.setMessage("Please go to the dataset manager window and Refresh to see the copied dataset.");
+    }
+    
+    private int getYesNoSelection(){
+        String message = " Would you like to copy a version to new dataset? ";
+        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+        return selection;
     }
 
     private void displayError(String message) {
