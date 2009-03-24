@@ -2465,8 +2465,9 @@ public class ManagedCaseService {
                 // If other parameters are in the queue options, translate them to their
                 // string values in the queue
                 try {
-                    queueOptions = dao.replaceEnvVarsCase(queueOptions, " ", jobCase, jobId);
+                    queueOptions = dao.replaceEnvVarsCase(queueOptions, " ", jobCase, jobId, caseJob.getSector());
                 } catch (Exception e) {
+                    System.out.println(e);
                     throw new EmfException("Job (" + cjt.getJobName() + "): " + e.getMessage());
                 }
                 if (DebugLevels.DEBUG_6)
@@ -2648,7 +2649,7 @@ public class ManagedCaseService {
                 
                 // Expand input director, ie. remove env variables
                 try {
-                    fullPath = dao.replaceEnvVarsCase(fullPath, delimeter, caseObj, job.getId());
+                    fullPath = dao.replaceEnvVarsCase(fullPath, delimeter, caseObj, job.getId(), job.getSector());
                 } catch (Exception e) {
                     throw new EmfException("Input folder: " + e.getMessage());
                 }
@@ -2802,7 +2803,7 @@ public class ManagedCaseService {
 
             String delimeter = System.getProperty("file.separator");
             String exportDir = caseObj.getInputFileDir() + delimeter + subDir;
-            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, caseInput.getCaseJobID());
+            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, caseInput.getCaseJobID(),null);
             getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version },
                     exportDirExpanded, purpose, false);
 
@@ -2829,7 +2830,7 @@ public class ManagedCaseService {
 
             String delimeter = System.getProperty("file.separator");
             String exportDir = caseObj.getInputFileDir() + delimeter + subDir;
-            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, caseInput.getCaseJobID());
+            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, caseInput.getCaseJobID(), null);
 
             getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version },
                     exportDirExpanded, purpose, true);
@@ -2993,7 +2994,7 @@ public class ManagedCaseService {
 
         // Expand input director, ie. remove env variables
         try {
-            setenvLine = dao.replaceEnvVarsCase(setenvLine, delimeter, caseObj, job.getId());
+            setenvLine = dao.replaceEnvVarsCase(setenvLine, delimeter, caseObj, job.getId(), job.getSector());
             return setenvLine;
         } catch (Exception e) {
             throw new EmfException("Input folder: " + e.getMessage());
@@ -3170,7 +3171,7 @@ public class ManagedCaseService {
         if (outputFileDir == null || (outputFileDir.length() == 0))
             throw new EmfException("The Output Job Scripts folder has not been specified");
         try {
-            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, job.getId());
+            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, job.getId(), job.getSector());
             sbuf.append(shellSetenv("EMF_SCRIPTDIR", outputDirExpanded));
         } catch (Exception e) {
             throw new EmfException("Output folder: " + e.getMessage());
@@ -3424,7 +3425,7 @@ public class ManagedCaseService {
         String delimeter = System.getProperty("file.separator");
         String outputFileDir = caseObj.getOutputFileDir();
         try {
-            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, job.getId());
+            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, job.getId(), job.getSector());
 
             // Test output directory to place job script
             if ((outputDirExpanded == null) || (outputDirExpanded.equals(""))) {

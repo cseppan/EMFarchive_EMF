@@ -1517,7 +1517,7 @@ public class CaseDAO {
         return envVars.toArray(new String[0]);
     }
 
-    public String replaceEnvVars(String input, String delimiter, int caseId, int jobId, int model_to_run_id)
+    public String replaceEnvVars(String input, String delimiter, int caseId, int jobId, int model_to_run_id, Sector jobSector)
             throws EmfException {
         // replace any environemental variables with their values
         // use the delimiter to separate out environment variables
@@ -1531,7 +1531,7 @@ public class CaseDAO {
                         // loop over env variable names, get the parameter,
                         // and replace the env name in input string w/ that value
                         CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId,
-                                model_to_run_id);
+                                model_to_run_id, jobSector);
 
                         // Replace exact matches of environmental variable name
 
@@ -1574,8 +1574,8 @@ public class CaseDAO {
         }
     }
 
-    public String replaceEnvVarsCase(String input, String delimiter, Case caseObj, int jobId) throws EmfException {
-        // replace any environemental variables with their values
+    public String replaceEnvVarsCase(String input, String delimiter, Case caseObj, int jobId, Sector jobSector) throws EmfException {
+        // replace any environmental variables with their values
         // use the delimiter to separate out environment variables
         // If $CASE is found, replace it from the case summary abbreviation
         try {
@@ -1611,7 +1611,7 @@ public class CaseDAO {
             // replace any remaining environmental variables
             int caseId = caseObj.getId();
             int model_to_run_id = caseObj.getModel().getId();
-            tempInput = replaceEnvVars(tempInput, delimiter, caseId, jobId, model_to_run_id);
+            tempInput = replaceEnvVars(tempInput, delimiter, caseId, jobId, model_to_run_id, jobSector);
             return tempInput;
 
         } catch (Exception e) {
@@ -1619,7 +1619,8 @@ public class CaseDAO {
         }
     }
 
-    public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId, int model_to_run_id)
+    public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId, int model_to_run_id,
+              Sector jobSector)
             throws EmfException {
         // Get case parameters that match a specific environment variables name
         // If more than 1 matches the environmental variable name, uses the job Id to find unique one
@@ -1629,17 +1630,40 @@ public class CaseDAO {
             if (tempParams.length == 1) {
                 params.add(tempParams[0]);
             } else if (tempParams.length > 1) {
+                boolean found = false;
                 // loop over params and find any that match jobId
                 for (CaseParameter param : tempParams) {
-                    if (param.getJobId() == jobId) {
+                     if (param.getJobId() == jobId) {
+                        params.clear(); // clear because we've found one more specific
                         params.add(param);
+                        found = true;
+                        break;
+                     }
+                }
+                if (!found) // have not found job-specific param
+                {    
+                    for (CaseParameter param : tempParams) {
+                        if (param.getSector() == jobSector) {
+                           params.clear();   // if there was already one found, clear it since this is more specific
+                           params.add(param);
+                           break;
+                        }
+                        else if ((param.getSector() == null) || 
+                                param.getSector().getName().equalsIgnoreCase("All sectors")) // all sectors case
+                        {
+                           params.add(param);
+                        }
+                        System.out.println("Expanding envt vars: "+param.getName()+",sector="+
+                                ((param.getSector()!=null)?param.getSector().getName():"param sector null")+
+                                        ", jobsector="+((jobSector!=null)?jobSector.getName():"job sector null"));
                     }
                 }
             }
-
-            if (params.size() > 1 || params.size() == 0) {
+            if (params.size() > 1) {
                 throw new EmfException("Could not find a unique case parameter for " + envName + ", jobId" + jobId);
-
+            }
+            if  (params.size() == 0) {
+                throw new EmfException("Could not find any matching case parameters for " + envName + ", jobId" + jobId);
             }
             // return the matching param
             return params.get(0);

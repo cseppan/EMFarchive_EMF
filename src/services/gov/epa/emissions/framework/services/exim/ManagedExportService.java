@@ -204,7 +204,7 @@ public class ManagedExportService {
 
         String inputDirExpanded;
         try {
-            inputDirExpanded = caseDao.replaceEnvVarsCase(inputDir, fileSeparator, caseObj, job.getId());
+            inputDirExpanded = caseDao.replaceEnvVarsCase(inputDir, fileSeparator, caseObj, job.getId(), job.getSector());
         } catch (RuntimeException e1) {
             // NOTE Auto-generated catch block
             e1.printStackTrace();
