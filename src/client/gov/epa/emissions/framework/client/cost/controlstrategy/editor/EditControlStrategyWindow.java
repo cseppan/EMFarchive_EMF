@@ -391,7 +391,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     protected void save() throws EmfException {
         clearMessage();
-        presenter.doSave();
+        presenter.doSave(controlStrategy);
         messagePanel
             .setMessage("Strategy was saved successfully.");
         resetChanges();

@@ -47,7 +47,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     
     private boolean inputsLoaded = false;
     
-    private boolean hasResults = false;
+//    private boolean hasResults = false;
     
     public EditControlStrategyPresenterImpl(ControlStrategy controlStrategy, EmfSession session, 
             EditControlStrategyView view, ControlStrategiesManagerPresenter controlStrategiesManagerPresenter) {
@@ -68,8 +68,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             return;
         }
         ControlStrategyResult[] controlStrategyResults = getResult();
-        hasResults = false;
-        if (controlStrategyResults!= null && controlStrategyResults.length > 0) hasResults = true;
+//        hasResults = false;
+//        if (controlStrategyResults!= null && controlStrategyResults.length > 0) hasResults = true;
         view.display(controlStrategy, controlStrategyResults);
     }
 
@@ -90,8 +90,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         view.disposeView();
     }
 
-    public void doSave() throws EmfException {
-        saveTabs();
+    public void doSave(ControlStrategy controlStrategy) throws EmfException {
+        saveTabs(controlStrategy);
         validateName(controlStrategy);
         controlStrategy.setCreator(session.user());
         controlStrategy.setLastModifiedDate(new Date());
@@ -99,7 +99,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 //        managerPresenter.doRefresh();
     }
 
-    private void saveTabs() throws EmfException {
+    private void saveTabs(ControlStrategy controlStrategy) throws EmfException {
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {
             EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
             element.doSave(controlStrategy);
@@ -168,8 +168,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         //ControlStrategyResult result = session.controlStrategyService().controlStrategyResults(controlStrategy);
         ControlStrategyResult[] controlStrategyResults = getResult();
         ControlStrategy strategy = getControlStrategy(controlStrategy.getId());
-        hasResults = false;
-        if (controlStrategyResults!= null && controlStrategyResults.length > 0) hasResults = true;
+//        hasResults = false;
+//        if (controlStrategyResults!= null && controlStrategyResults.length > 0) hasResults = true;
 //        String runStatus = service().controlStrategyRunStatus(controlStrategy.getId());
 //        if (runStatus == null || !runStatus.equalsIgnoreCase("Running")) {
             for (Iterator iter = presenters.iterator(); iter.hasNext();) {
@@ -242,8 +242,11 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             return session.dataService().getDatasets(type);
     }
 
-    public boolean hasResults() {
-        return this.hasResults;
+    public boolean hasResults() throws EmfException {
+        boolean hasStratResults = false;
+        ControlStrategyResult[] controlStrategyResults = getResult();
+        if (controlStrategyResults != null && controlStrategyResults.length > 0) hasStratResults = true;
+        return hasStratResults;
     }
     
     public EmfDataset getDataset(int id) throws EmfException {

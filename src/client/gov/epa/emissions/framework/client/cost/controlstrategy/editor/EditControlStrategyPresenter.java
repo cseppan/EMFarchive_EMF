@@ -15,7 +15,7 @@ public interface EditControlStrategyPresenter {
 
     void doClose() throws EmfException;
 
-    void doSave() throws EmfException;
+    void doSave(ControlStrategy controlStrategy) throws EmfException;
 
     void set(EditControlStrategyTabView view);
 
@@ -55,7 +55,7 @@ public interface EditControlStrategyPresenter {
 
     EmfDataset getDataset(int id) throws EmfException;
 
-    boolean hasResults();
+    boolean hasResults() throws EmfException;
     
     void doChangeStrategyType(StrategyType strategyType);
     

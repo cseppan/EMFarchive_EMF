@@ -80,7 +80,7 @@ public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
                 .proxy(), (EditControlStrategyView) view.proxy(), (ControlStrategiesManagerPresenter) managerPresenter
                 .proxy());
 
-        p.doSave();
+        p.doSave(comtrolStrategy);
     }
 
     public void testShouldRaiseErrorIfDuplicateControlStrategyNameOnSave() {
@@ -106,7 +106,7 @@ public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
                 .proxy(), (EditControlStrategyView) view.proxy(), null);
 
         try {
-            p.doSave();
+            p.doSave(controlStrategyObj);
         } catch (EmfException e) {
             assertEquals("A Control Strategy named 'controlStrategy2' already exists.", e.getMessage());
             return;
