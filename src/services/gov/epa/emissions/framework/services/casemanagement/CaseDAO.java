@@ -1631,43 +1631,53 @@ public class CaseDAO {
                 params.add(tempParams[0]);
             } else if (tempParams.length > 1) {
                 boolean found = false;
-                // loop over params and find any that match jobId
+                 
+                // loop over params and find any that match job
                 for (CaseParameter param : tempParams) {
                      if (param.getJobId() == jobId) {
                         params.clear(); // clear because we've found one more specific
                         params.add(param);
                         found = true;
                         break;
-                     }
+                                 }
                 }
                 if (!found) // have not found job-specific param
                 {    
                     for (CaseParameter param : tempParams) {
-                        if (param.getSector() == jobSector) {
+                        // found matching sector for all jobs
+                        if ((param.getSector() != null) && (param.getSector().equals(jobSector)) && (param.getJobId() == 0)) {
                            params.clear();   // if there was already one found, clear it since this is more specific
                            params.add(param);
+                           found = true;
                            break;
                         }
-                        else if ((param.getSector() == null) || 
-                                param.getSector().getName().equalsIgnoreCase("All sectors")) // all sectors case
-                        {
-                           params.add(param);
-                        }
-                        System.out.println("Expanding envt vars: "+param.getName()+",sector="+
-                                ((param.getSector()!=null)?param.getSector().getName():"param sector null")+
-                                        ", jobsector="+((jobSector!=null)?jobSector.getName():"job sector null"));
                     }
+                    if (!found){
+                        for (CaseParameter param : tempParams) {
+
+                        // found all sectors for all jobs
+                            if ((param.getJobId() == 0) && ((param.getSector() == null) || 
+                                    (param.getSector().getName().equalsIgnoreCase("All sectors"))))
+                            {   
+                                params.add(param);
+                            }
+                        }
+                    }
+                    
                 }
             }
+            
             if (params.size() > 1) {
                 throw new EmfException("Could not find a unique case parameter for " + envName + ", jobId" + jobId);
             }
             if  (params.size() == 0) {
                 throw new EmfException("Could not find any matching case parameters for " + envName + ", jobId" + jobId);
             }
+            
+            
             // return the matching param
             return params.get(0);
-
+    
         } catch (Exception e) {
             e.printStackTrace();
             throw new EmfException("Could not get unique case parameters for " + envName);
