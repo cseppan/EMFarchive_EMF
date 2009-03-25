@@ -71,7 +71,8 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
             tableModel.refresh(tableData);
             selectModel.refresh(tableModel);
             sortFilterSelectionpanel.setModel(selectModel);
-            repaint();
+            sortFilterSelectionpanel.revalidate();
+            sortFilterSelectionpanel.repaint();
         }
     }
 
