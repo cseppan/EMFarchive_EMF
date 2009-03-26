@@ -4,7 +4,6 @@ DECLARE
 BEGIN
 
   
-	-- process each dataset to consolidate, only insert when a new dataset_new_table is encountered...
 	FOR version_record IN EXECUTE 
 		'select versions.id,
 			versions.dataset_id,
@@ -18,8 +17,9 @@ BEGIN
 			on lower(relname) = lower(internal_sources.table_name)'
 	LOOP
 		--raise notice '%', 
-		execute 'update emissions.versions
-		set number_records = coalesce((SELECT count(1) from emissions.' || version_record.table_name || ' where dataset_id = ' || version_record.dataset_id || ' and "version" = ' || version_record."version" || '),0),
+		execute 
+		'update emissions.versions
+		set number_records = coalesce((SELECT count(1) from emissions.' || version_record.table_name || ' where ' || public.build_version_where_filter(version_record.dataset_id, version_record."version") || '),0),
 			creator = coalesce((SELECT users.id from emf.datasets inner join emf.users on users.username = datasets.creator where datasets.id = ' || version_record.dataset_id || '),2)
 		where id = ' || version_record.id || ';';
 
