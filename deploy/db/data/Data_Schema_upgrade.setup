@@ -38,7 +38,6 @@ set value = value || '|Summarize by US State and Pollutant'
 where name = 'defaultQASummaries'
 
 
-
 -- 7/31/2007 
 -- update control strategy dataset types to use new qa engine format...
 -- Summarize by Pollutant - ORL Types
@@ -824,3 +823,7 @@ alter table emf.table_consolidations add column number_records int8 default 0;
 
 --3/2/2009 add a new property for mass storage root
 insert into emf.properties values(DEFAULT, 'MASS_STORAGE_ROOT', '/asm');
+
+--3/26/2008 add column creator to emissions.version, may need to change the default value accordingly
+ALTER TABLE emissions.versions ADD COLUMN creator int4 NOT NULL REFERENCES emf.users(id) default 2;
+ALTER TABLE emissions.versions ADD COLUMN number_records int4 default 0;
