@@ -13,6 +13,7 @@ public class ControlProgramType implements Serializable, Comparable {
     public static final String plantClosure = "Plant Closure";
     public static final String projection = "Projection";
     public static final String control = "Control";
+    public static final String allowable = "Allowable";
 
     public ControlProgramType() {
         //
