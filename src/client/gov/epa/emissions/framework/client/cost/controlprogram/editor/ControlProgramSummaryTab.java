@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.cost.controlprogram.editor;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
@@ -17,6 +19,8 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
+import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
+import gov.epa.emissions.framework.client.data.viewer.DataViewer;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -185,10 +189,14 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
         selectButton = new AddButton("Select", selectAction());
         selectButton.setMargin(new Insets(1, 2, 1, 2));
         Button viewButton = new BorderlessButton("View", viewDatasetAction()); 
+        Button viewDataButton = new BorderlessButton("View Data", viewDataAction()); 
         JPanel invPanel = new JPanel(new BorderLayout(5,0));
+        JPanel subPanel = new JPanel(new BorderLayout(5,0));
 
         invPanel.add(dataset, BorderLayout.LINE_START);
-        invPanel.add(selectButton);
+        subPanel.add(selectButton, BorderLayout.LINE_START);
+        subPanel.add(viewDataButton, BorderLayout.LINE_END);
+        invPanel.add(subPanel);
         invPanel.add(viewButton, BorderLayout.LINE_END );
         return invPanel;
     }
@@ -365,6 +373,51 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
         };
     }
     
+    private Action viewDataAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
+                viewDataSetData();
+            }
+        };
+    }
+
+    private void viewDataSetData() {
+        EmfDataset dataset = controlProgram.getDataset();
+        if (dataset == null) {
+            messagePanel.setMessage("Dataset is not available.");
+            return;
+        }
+
+        Version[] versions = getVersions(controlProgram.getDataset());
+        Version version = null;
+        
+        if (controlProgram.getDatasetVersion() != null) {
+            for (Version v : versions) {
+                if (v.getVersion() == controlProgram.getDatasetVersion())
+                    version = v;
+            }
+        }
+
+        showDatasetDataViewer(dataset, version);
+    }
+    
+    private void showDatasetDataViewer(EmfDataset dataset, Version version) {
+        try {
+            DataViewer dataViewerView = new DataViewer(dataset, parentConsole, desktopManager);
+            DataViewPresenter dataViewPresenter = new DataViewPresenter(dataset, version, getTableName(dataset), dataViewerView, session);
+            dataViewPresenter.display();
+        } catch (EmfException e) {
+//            displayError(e.getMessage());
+        }
+    }
+    protected String getTableName(Dataset dataset) {
+        InternalSource[] internalSources = dataset.getInternalSources();
+        String tableName = "";
+        if (internalSources.length > 0)
+            tableName = internalSources[0].getTable();
+        return tableName;
+    }
     private void doAddWindow() throws Exception {
         DatasetType type = (DatasetType) dsType.getSelectedItem();
         
@@ -401,4 +454,8 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
         DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
         datasetViewPresenter.doDisplay(view);
     }
+    public void clearMsgPanel() {
+        this.messagePanel.clear();
+    }
+
 }

@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.cost.controlprogram.editor;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.meta.PropertiesView;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlProgram;
 import gov.epa.emissions.framework.services.cost.ControlProgramType;
@@ -55,6 +57,12 @@ public class ControlProgramSummaryTabPresenter  implements ControlProgramTabPres
          return session.dataEditorService().getVersions(dataset.getId());
      }
      
+     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {
+         view.clearMsgPanel();
+         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
+         presenter.doDisplay(propertiesView);
+     }
+
      public EmfDataset getDataset(int id) throws EmfException {
          return session.dataService().getDataset(id);
      }

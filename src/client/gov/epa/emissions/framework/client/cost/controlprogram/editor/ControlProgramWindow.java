@@ -53,7 +53,7 @@ public class ControlProgramWindow extends DisposableInteralFrame implements Cont
     protected ControlMeasure[] controlMeasures;
     
     public ControlProgramWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole, ControlMeasure[] controlMeasures) {
-        super("Edit Control Program", new Dimension(700, 580), desktopManager);
+        super("Edit Control Program", new Dimension(760, 580), desktopManager);
 //        this.setMinimumSize(new Dimension(700, 300));
         this.session = session;
         this.desktopManager = desktopManager;
