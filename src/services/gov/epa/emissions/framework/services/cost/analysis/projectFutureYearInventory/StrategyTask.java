@@ -150,6 +150,10 @@ public class StrategyTask extends AbstractStrategyTask {
             if (dataset.getDatasetType().getName().equals(DatasetType.controlPacket)) {
                 query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
             }
+        } else if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.allowable)) {
+            if (dataset.getDatasetType().getName().equals(DatasetType.allowablePacket)) {
+                query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
+            }
         }
         
         System.out.println(System.currentTimeMillis() + " " + query);
@@ -163,133 +167,81 @@ public class StrategyTask extends AbstractStrategyTask {
     }
 
     private void indexTable(ControlProgram controlProgram) {
-        String query = "";
         EmfDataset dataset = controlProgram.getDataset();
         String tableName = emissionTableName(dataset);
         String qualifiedTableName = qualifiedEmissionTableName(dataset);
         if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.plantClosure)) {
-            query = "CREATE INDEX " + (("comp_" + tableName).length() >= 63 - 5 ? "comp_" + tableName.substring(6, (tableName.length() > 63 ? 63 : tableName.length())) : "comp_" + tableName) + " "
-                + "ON "  + qualifiedTableName + " "
-                + "USING btree "
-                + "(fips, plantid, pointid, stackid, segment); "
-                + "CREATE INDEX " + (("fips_" + tableName).length() >= 63 - 5 ? "fips_" + tableName.substring(6, (tableName.length() > 63 ? 63 : tableName.length())) : "fips_" + tableName) + " "
-            + "ON "  + qualifiedTableName + " "
-            + "USING btree "
-            + "(fips); "
-            + "CREATE INDEX " + (("plantid_" + tableName).length() >= 63 - 8 ? "plantid_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "plantid_" + tableName) + " "
-            + "ON "  + qualifiedTableName + " "
-            + "USING btree "
-            + "(plantid); "
-            + "CREATE INDEX " + (("pointid_" + tableName).length() >= 63 - 8 ? "pointid_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "pointid_" + tableName) + " "
-            + "ON "  + qualifiedTableName + " "
-            + "USING btree "
-            + "(pointid); "
-            + "CREATE INDEX " + (("segment_" + tableName).length() >= 63 - 8 ? "segment_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "segment_" + tableName) + " "
-            + "ON "  + qualifiedTableName + " "
-            + "USING btree "
-            + "(segment); "
-            + "CREATE INDEX " + (("stackid_" + tableName).length() >= 63 - 8 ? "stackid_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "stackid_" + tableName) + " "
-            + "ON "  + qualifiedTableName + " "
-            + "USING btree "
-            + "(stackid);"
-            + "analyze "  + qualifiedTableName + ";";
+            indexTable(tableName, "fips,plantid,pointid,stackid,segment", "comp");
+            indexTable(tableName, "fips", "fips");
+            indexTable(tableName, "plantid", "plantid");
+            indexTable(tableName, "pointid", "pointid");
+            indexTable(tableName, "segment", "segment");
+            indexTable(tableName, "stackid", "stackid");
+
+            analyzeTable(qualifiedTableName);
         } else if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.projection)) {
             if (dataset.getDatasetType().getName().equals(DatasetType.projectionPacket)) {
-                query = "CREATE INDEX " + (("comp_" + tableName).length() >= 63 - 5 ? "comp_" + tableName.substring(6, (tableName.length() > 63 ? 63 : tableName.length())) : "comp_" + tableName) + " "
-                + "ON "  + qualifiedTableName + " "
-                + "USING btree "
-                + "(fips, plantid, pointid, stackid, segment, scc, poll, sic, mact); "
-                + "CREATE INDEX " + (("fips_" + tableName).length() >= 63 - 5 ? "fips_" + tableName.substring(6, (tableName.length() > 63 ? 63 : tableName.length())) : "fips_" + tableName) + " "
-                + "ON "  + qualifiedTableName + " "
-                + "USING btree "
-                + "(fips); "
-                + "CREATE INDEX " + (("mact_" + tableName).length() >= 63 - 5 ? "mact_" + tableName.substring(6, (tableName.length() > 63 ? 63 : tableName.length())) : "mact_" + tableName) + " "
-                + "ON "  + qualifiedTableName + " "
-                + "USING btree "
-                + "(mact); "
-                + "CREATE INDEX " + (("plantid_" + tableName).length() >= 63 - 8 ? "plantid_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "plantid_" + tableName) + " "
-                + "ON "  + qualifiedTableName + " "
-                + "USING btree "
-                + "(plantid); "
-                + "CREATE INDEX " + (("pointid_" + tableName).length() >= 63 - 8 ? "pointid_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "pointid_" + tableName) + " "
-                + "ON "  + qualifiedTableName + " "
-                + "USING btree "
-                + "(pointid); "
-                + "CREATE INDEX " + (("poll_" + tableName).length() >= 63 - 5 ? "poll_" + tableName.substring(6, (tableName.length() > 63 ? 63 : tableName.length())) : "poll_" + tableName) + " "
-                + "ON "  + qualifiedTableName + " "
-                + "USING btree "
-                + "(poll); "
-                + "CREATE INDEX " + (("scc_" + tableName).length() >= 63 - 4 ? "scc_" + tableName.substring(5, (tableName.length() > 63 ? 63 : tableName.length())) : "scc_" + tableName) + " "
-                + "ON "  + qualifiedTableName + " "
-                + "USING btree "
-                + "(scc); "
-                + "CREATE INDEX " + (("segment_" + tableName).length() >= 63 - 8 ? "segment_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "segment_" + tableName) + " "
-                + "ON "  + qualifiedTableName + " "
-                + "USING btree "
-                + "(segment); "
-                + "CREATE INDEX " + (("sic_" + tableName).length() >= 63 - 4 ? "sic_" + tableName.substring(5, (tableName.length() > 63 ? 63 : tableName.length())) : "sic_" + tableName) + " "
-                + "ON "  + qualifiedTableName + " "
-                + "USING btree "
-                + "(sic); "
-                + "CREATE INDEX " + (("stackid_" + tableName).length() >= 63 - 8 ? "stackid_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "stackid_" + tableName) + " "
-                + "ON "  + qualifiedTableName + " "
-                + "USING btree "
-                + "(stackid);"
-                + "analyze "  + qualifiedTableName + ";";
+                indexTable(tableName, "fips,plantid,pointid,stackid,segment,scc,poll,sic,mact", "comp");
+                indexTable(tableName, "fips", "fips");
+                indexTable(tableName, "mact", "mact");
+                indexTable(tableName, "plantid", "plantid");
+                indexTable(tableName, "pointid", "pointid");
+                indexTable(tableName, "poll", "poll");
+                indexTable(tableName, "scc", "scc");
+                indexTable(tableName, "segment", "segment");
+                indexTable(tableName, "sic", "sic");
+                indexTable(tableName, "stackid", "stackid");
+
+                analyzeTable(qualifiedTableName);
+           }
+        } else if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.allowable)) {
+            if (dataset.getDatasetType().getName().equals(DatasetType.allowablePacket)) {
+                
+                indexTable(tableName, "fips,plantid,pointid,stackid,segment,scc,poll,sic", "comp");
+                indexTable(tableName, "fips", "fips");
+                indexTable(tableName, "plantid", "plantid");
+                indexTable(tableName, "pointid", "pointid");
+                indexTable(tableName, "poll", "poll");
+                indexTable(tableName, "scc", "scc");
+                indexTable(tableName, "segment", "segment");
+                indexTable(tableName, "sic", "sic");
+                indexTable(tableName, "stackid", "stackid");
+
+                analyzeTable(qualifiedTableName);
            }
         } else if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.control)) {
             if (dataset.getDatasetType().getName().equals(DatasetType.controlPacket)) {
-                query = "CREATE INDEX " + (("comp_" + tableName).length() >= 63 - 5 ? "comp_" + tableName.substring(6, (tableName.length() > 63 ? 63 : tableName.length())) : "comp_" + tableName) + " "
-                    + "ON "  + qualifiedTableName + " "
-                    + "USING btree "
-                    + "(fips, plantid, pointid, stackid, segment, scc, poll, sic, mact); "
-                    + "CREATE INDEX " + (("fips_" + tableName).length() >= 63 - 5 ? "fips_" + tableName.substring(6, (tableName.length() > 63 ? 63 : tableName.length())) : "fips_" + tableName) + " "
-                    + "ON "  + qualifiedTableName + " "
-                    + "USING btree "
-                    + "(fips); "
-                    + "CREATE INDEX " + (("mact_" + tableName).length() >= 63 - 5 ? "mact_" + tableName.substring(6, (tableName.length() > 63 ? 63 : tableName.length())) : "mact_" + tableName) + " "
-                    + "ON "  + qualifiedTableName + " "
-                    + "USING btree "
-                    + "(mact); "
-                    + "CREATE INDEX " + (("plantid_" + tableName).length() >= 63 - 8 ? "plantid_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "plantid_" + tableName) + " "
-                    + "ON "  + qualifiedTableName + " "
-                    + "USING btree "
-                    + "(plantid); "
-                    + "CREATE INDEX " + (("pointid_" + tableName).length() >= 63 - 8 ? "pointid_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "pointid_" + tableName) + " "
-                    + "ON "  + qualifiedTableName + " "
-                    + "USING btree "
-                    + "(pointid); "
-                    + "CREATE INDEX " + (("poll_" + tableName).length() >= 63 - 5 ? "poll_" + tableName.substring(6, (tableName.length() > 63 ? 63 : tableName.length())) : "poll_" + tableName) + " "
-                    + "ON "  + qualifiedTableName + " "
-                    + "USING btree "
-                    + "(poll); "
-                    + "CREATE INDEX " + (("scc_" + tableName).length() >= 63 - 4 ? "scc_" + tableName.substring(5, (tableName.length() > 63 ? 63 : tableName.length())) : "scc_" + tableName) + " "
-                    + "ON "  + qualifiedTableName + " "
-                    + "USING btree "
-                    + "(scc); "
-                    + "CREATE INDEX " + (("segment_" + tableName).length() >= 63 - 8 ? "segment_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "segment_" + tableName) + " "
-                    + "ON "  + qualifiedTableName + " "
-                    + "USING btree "
-                    + "(segment); "
-                    + "CREATE INDEX " + (("sic_" + tableName).length() >= 63 - 4 ? "sic_" + tableName.substring(5, (tableName.length() > 63 ? 63 : tableName.length())) : "sic_" + tableName) + " "
-                    + "ON "  + qualifiedTableName + " "
-                    + "USING btree "
-                    + "(sic); "
-                    + "CREATE INDEX " + (("stackid_" + tableName).length() >= 63 - 8 ? "stackid_" + tableName.substring(9, (tableName.length() > 63 ? 63 : tableName.length())) : "stackid_" + tableName) + " "
-                    + "ON "  + qualifiedTableName + " "
-                    + "USING btree "
-                    + "(stackid);"
-                    + "analyze "  + qualifiedTableName + ";";
+                indexTable(tableName, "fips,plantid,pointid,stackid,segment,scc,poll,sic,mact", "comp");
+                indexTable(tableName, "fips", "fips");
+                indexTable(tableName, "mact", "mact");
+                indexTable(tableName, "plantid", "plantid");
+                indexTable(tableName, "pointid", "pointid");
+                indexTable(tableName, "poll", "poll");
+                indexTable(tableName, "scc", "scc");
+                indexTable(tableName, "segment", "segment");
+                indexTable(tableName, "sic", "sic");
+                indexTable(tableName, "stackid", "stackid");
+
+                analyzeTable(qualifiedTableName);
             }
         }
-        
-//        System.out.println(System.currentTimeMillis() + " " + query);
+    }
+    
+    private void analyzeTable(String qualifiedTableName) {
         try {
-            datasource.query().execute(query);
+            String query = "analyze " + qualifiedTableName.toLowerCase() + ";";
+            dbServer.getEmissionsDatasource().query().execute(query);
         } catch (SQLException e) {
-            //throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
-        } finally {
-            //
+            //e.printStackTrace();
+        }
+    }
+
+    private void indexTable(String tableName, String columnList, String indexNamePrefix) {
+        try {
+            String query = "SELECT public.create_table_index('" + tableName.toLowerCase() + "','" + columnList.toLowerCase() + "','" + indexNamePrefix.toLowerCase() + "');";
+            dbServer.getEmissionsDatasource().query().execute(query);
+        } catch (SQLException e) {
+            //e.printStackTrace();
         }
     }
 }
