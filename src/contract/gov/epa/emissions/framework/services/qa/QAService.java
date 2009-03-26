@@ -20,6 +20,8 @@ public interface QAService {
     void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException;
 
     void update(QAStep step) throws EmfException;
+    
+    boolean getSameAsTemplate(QAStep step) throws EmfException;
 
     void runQAStep(QAStep step, User user) throws EmfException;
 

@@ -317,6 +317,23 @@ public class QAServiceImpl implements QAService {
         }
 
     }
+    
+    public boolean getSameAsTemplate(QAStep step) throws EmfException{
+        DbServer dbServer = dbServerFactory.getDbServer();
+        try {
+            return dao.getSameAsTemplate(step, dbServer); 
+        } catch (RuntimeException e) {
+            LOG.error("Error in getting sameAstemplate", e);
+            throw new EmfException("Error in getting sameAstemplate");
+        } finally {
+            try {
+                dbServer.disconnect();
+            } catch (Exception e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
 
     public synchronized QAStepResult getQAStepResult(QAStep step) throws EmfException {
         Session session = sessionFactory.getSession();

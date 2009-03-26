@@ -2,11 +2,14 @@ package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
@@ -80,6 +83,36 @@ public class QADAO {
     
     public void removeQAStepResult(QAStepResult stepResult, Session session) {
         hibernateFacade.remove(stepResult, session);
+    }
+    
+    public boolean getSameAsTemplate(QAStep step, DbServer dbServer) {
+        
+        String query = "select 1 as found from emf.dataset_types_qa_step_templates "
+            + " where name = '" + step.getName().replace("'", "''") + "' "
+            + " and program_arguments = '" + step.getProgramArguments().replace("'", "''") + "' "
+            + " and dataset_type_id = (select dataset_type from emf.datasets where id = " + step.getDatasetId() + ")";
+        
+        ResultSet rs;
+        boolean found = false;
+        try {
+            rs = dbServer.getEmissionsDatasource().query().executeQuery(query);
+            if (rs.next()) found = true;
+        } catch (SQLException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+//        select 1 as found
+//        from emf.dataset_types_qa_step_templates 
+//        where name = 'Summarize by US State and Pollutant'
+//            and program_arguments = 'select fips.state_name, fips.state_abbr, fips.fipsst, e.POLL, sum(ann_emis) as ann_emis from $TABLE[1] e inner join reference.fips on fips.state_county_fips = e.FIPS where fips.country_num = ''0'' group by fips.state_name, fips.state_abbr, fips.fipsst, POLL order by fips.state_name, POLL'
+//            and dataset_type_id = (select dataset_type from emf.datasets where id = 16)
+//        List count = session.createQuery( query )
+//        .setString("qaStepName", step.getName())
+//        .setString("qaStepArgument", step.getProgramArguments())
+//        .setInteger("datasetId", step.getDatasetId())
+//        .list();
+       
+        return found;//count != null && count.size() > 0;
     }
 
     public void removeQAStep(QAStep step, Session session) {

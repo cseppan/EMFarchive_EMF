@@ -95,7 +95,6 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
     }
     
     private void refreshTable(QAStep[] steps, QAStepResult[] qaStepResults){
-        setupTableModel(steps, qaStepResults);
         table.refresh(tableData);
         super.validate();
     }  

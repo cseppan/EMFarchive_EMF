@@ -162,5 +162,15 @@ public class QAServiceTransport implements QAService {
 
         call.request(new Object[] { user, steps, datasetIds, new Boolean(replace) });
     }
+    
+    public boolean getSameAsTemplate(QAStep step) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getSameAsTemplate");
+        call.addParam("steps", mappings.qaSteps());
+        call.setBooleanReturnType();
+        
+        return (Boolean)call.requestResponse(new Object[]{step});
+    }
 
 }

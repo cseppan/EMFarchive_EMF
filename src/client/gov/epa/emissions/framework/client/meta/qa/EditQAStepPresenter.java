@@ -28,7 +28,7 @@ public class EditQAStepPresenter {
 
     private EditableQATabView tabView;
 
-    private QAStep qastep;
+    private QAStep qaStep;
 
     private EmfSession session;
 
@@ -43,15 +43,20 @@ public class EditQAStepPresenter {
 
     public void display(QAStep step, String versionName) throws EmfException {
         view.observe(this);
-        QAService qaService = session.qaService();
-        QAProgram[] programs = qaService.getQAPrograms();
-        QAStepResult result = qaService.getQAStepResult(step);
-        view.display(step, result, programs, dataset, versionName, session);
+        this.qaStep = step;
+        
+        QAProgram[] programs = qaService().getQAPrograms();
+        QAStepResult result = qaService().getQAStepResult(step);
+        Boolean sameAstemplate = getSameAsTemplate(step);
+        view.display(step, result, programs, dataset, versionName, sameAstemplate, session);
 
         // Reversed the following line from behind the one after it to make sure that most recent folder
         // is displayed properly.
-        this.qastep = step;
         view.setMostRecentUsedFolder(getFolder());
+    }
+    
+    private QAService qaService(){
+        return session.qaService();
     }
 
     public void close() {
@@ -71,7 +76,7 @@ public class EditQAStepPresenter {
         step.setDate(new Date());
         step.setWho(session.user().getUsername());
         tabView.refresh();
-        session.qaService().runQAStep(step, session.user());
+        qaService().runQAStep(step, session.user());
         //view.resetChanges();
     }
 
@@ -82,8 +87,12 @@ public class EditQAStepPresenter {
             throw new EmfException("You must have run the QA step successfully before exporting ");
 
         qaStep.setOutputFolder(dirName);
-        session.qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
-        session.qaService().exportQAStep(qaStep, session.user(), dirName);
+        qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
+        qaService().exportQAStep(qaStep, session.user(), dirName);
+    }
+    
+    public boolean getSameAsTemplate(QAStep qaStep) throws EmfException{       
+        return qaService().getSameAsTemplate(qaStep); 
     }
 
     public void exportToShapeFile(QAStep qaStep, 
@@ -109,8 +118,8 @@ public class EditQAStepPresenter {
         // Added code here to fix the Null Pointer exception that occurs at first launch of Edit Window
         // because qastep is null.
         String folder;
-        if (qastep != null) {
-            folder = qastep.getOutputFolder();
+        if (qaStep != null) {
+            folder = qaStep.getOutputFolder();
         } else {
             folder = session.preferences().outputFolder();
         }

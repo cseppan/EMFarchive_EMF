@@ -90,6 +90,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private FormattedDateField date;
 
     private CheckBox required;
+    
+    //private CheckBox sameAstemplate;
 
     private User user;
 
@@ -171,7 +173,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset,
-            String versionName, EmfSession session) {
+            String versionName, boolean astemplate, EmfSession session) {
         this.session = session;
         this.step = step;
         this.qaStepResult = qaStepResult;
@@ -181,7 +183,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         super.setLabel(super.getTitle() + ": " + step.getName() + " - " + dataset.getName() + " (v" + step.getVersion()
                 + ")");
 
-        JPanel layout = createLayout(qaStepResult, versionName);
+        JPanel layout = createLayout(qaStepResult, versionName, astemplate);
         super.getContentPane().add(layout);
         super.display();
     }
@@ -194,24 +196,25 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         this.presenter = presenter;
     }
 
-    private JPanel createLayout(QAStepResult qaStepResult, String versionName) {
+    private JPanel createLayout(QAStepResult qaStepResult, String versionName, 
+            boolean astemplate) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
 
-        panel.add(inputPanel(qaStepResult, versionName));
+        panel.add(inputPanel(qaStepResult, versionName, astemplate));
         panel.add(buttonsPanel());
 
         return panel;
     }
 
-    private JPanel inputPanel(QAStepResult qaStepResult, String versionName) {
+    private JPanel inputPanel(QAStepResult qaStepResult, String versionName, boolean astemplate) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(upperPanel(versionName));
+        panel.add(upperPanel(versionName, astemplate));
         panel.add(lowerPanel(qaStepResult));
 
         return panel;
@@ -270,6 +273,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 10, 10);// xPad, yPad
         return panel;
     }
+    
+    
 
     private JPanel lowerBottomPanel() {
         JPanel panel = new JPanel(new SpringLayout());
@@ -372,7 +377,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return step.getStatus() != null ? step.getStatus() : QAProperties.initialStatus();
     }
 
-    private JPanel upperPanel(String versionName) {
+    private JPanel upperPanel(String versionName, boolean astemplate) {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -425,6 +430,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         required = new CheckBox("", step.isRequired());
         if (step.isRequired())
             required.setEnabled(false);
+        
+        CheckBox sameAstemplate = new CheckBox("", astemplate);
+        sameAstemplate.setEnabled(false);
 
         order = new NumberFormattedTextField(3, orderAction());
         order.setText(step.getOrder() + "");
@@ -434,9 +442,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         JPanel checkBoxPanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layout = new SpringLayoutGenerator();
         JPanel reqirepanel = new JPanel();
-        reqirepanel.add(new JLabel(EmptyStrings.create(57)));
+        reqirepanel.add(new JLabel(EmptyStrings.create(15)));
         reqirepanel.add(new JLabel("Required?"));
         reqirepanel.add(required);
+        reqirepanel.add(new JLabel(EmptyStrings.create(15)));
+        reqirepanel.add(new JLabel("Same as template?"));
+        reqirepanel.add(sameAstemplate);
         layout.addWidgetPair(order, reqirepanel, checkBoxPanel);
         layout.makeCompactGrid(checkBoxPanel, 1, 2, 0, 0, 0, 0);
         layoutGenerator.addLabelWidgetPair("Order:", checkBoxPanel, panel);
@@ -449,7 +460,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
+                5, 5);// xPad, yPad
 
         return panel;
     }
