@@ -824,6 +824,57 @@ alter table emf.table_consolidations add column number_records int8 default 0;
 --3/2/2009 add a new property for mass storage root
 insert into emf.properties values(DEFAULT, 'MASS_STORAGE_ROOT', '/asm');
 
+--3/20/09 new qa step template for strat detailed result
+-- Summarize by U.S. County and Pollutant - Control Strategy Detailed Result
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'Summarize by U.S. County and Pollutant', 1, 'select e.sector, fips.state_county_fips as fips, fips.county, fips.state_name, fips.state_abbr, e.POLL, TO_CHAR(case when coalesce(sum(Emis_Reduction),0) <> 0 then sum(Annual_Cost) / sum(Emis_Reduction) else null end, ''FM999999999999999990.09'')::double precision as avg_cost_per_ton, TO_CHAR(sum(e.Annual_Cost), ''FM999999999999999990.09'')::double precision as Annual_Cost, TO_CHAR(sum(e.Final_emissions), ''FM999999999999999990.09'')::double precision as Final_emissions, TO_CHAR(sum(e.Emis_Reduction), ''FM999999999999999990.09'')::double precision as Emis_Reduction, TO_CHAR(sum(e.Inv_emissions), ''FM999999999999999990.09'')::double precision as Inv_emissions, TO_CHAR(fips.centerlon, ''FM990.000009'')::double precision as longitude, TO_CHAR(fips.centerlat, ''FM990.000009'')::double precision as latitude from $TABLE[1] e inner join reference.fips on fips.state_county_fips = e.FIPS where fips.country_num = ''0'' group by sector, fips.state_county_fips, fips.county, fips.state_name, fips.state_abbr, fips.fipsst, POLL, fips.centerlat, fips.centerlon order by sector, fips.state_name, fips.county, POLL', false, 1, ''
+from emf.dataset_types dt
+where name in ('Control Strategy Detailed Result')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Summarize by U.S. County and Pollutant');
+
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select e.sector, fips.state_county_fips as fips, fips.county, fips.state_name, fips.state_abbr, e.POLL, TO_CHAR(case when coalesce(sum(Emis_Reduction),0) <> 0 then sum(Annual_Cost) / sum(Emis_Reduction) else null end, ''FM999999999999999990.09'')::double precision as avg_cost_per_ton, TO_CHAR(sum(e.Annual_Cost), ''FM999999999999999990.09'')::double precision as Annual_Cost, TO_CHAR(sum(e.Final_emissions), ''FM999999999999999990.09'')::double precision as Final_emissions, TO_CHAR(sum(e.Emis_Reduction), ''FM999999999999999990.09'')::double precision as Emis_Reduction, TO_CHAR(sum(e.Inv_emissions), ''FM999999999999999990.09'')::double precision as Inv_emissions, TO_CHAR(fips.centerlon, ''FM990.000009'')::double precision as longitude, TO_CHAR(fips.centerlat, ''FM990.000009'')::double precision as latitude from $TABLE[1] e inner join reference.fips on fips.state_county_fips = e.FIPS where fips.country_num = ''0'' group by sector, fips.state_county_fips, fips.county, fips.state_name, fips.state_abbr, fips.fipsst, POLL, fips.centerlat, fips.centerlon order by sector, fips.state_name, fips.county, POLL
+'
+where name = 'Summarize by U.S. County and Pollutant'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('Control Strategy Detailed Result'));
+
+
 --3/26/2008 add column creator to emissions.version, may need to change the default value accordingly
 ALTER TABLE emissions.versions ADD COLUMN creator int4 NOT NULL REFERENCES emf.users(id) default 2;
 ALTER TABLE emissions.versions ADD COLUMN number_records int4 default 0;
+
+--3/26/2008 DCD -- populate new columns creator and number_records columns
+CREATE OR REPLACE FUNCTION public.populate_version_table_creator_and_record_count_columns() RETURNS void AS $$
+DECLARE
+	version_record RECORD;
+BEGIN
+
+	FOR version_record IN EXECUTE 
+		'select versions.id,
+			versions.dataset_id,
+			versions."version",
+			internal_sources.table_name
+		from emissions.versions
+			inner join emf.internal_sources
+			on internal_sources.dataset_id = versions.dataset_id
+			-- make sure the table exists
+			inner join pg_class
+			on lower(relname) = lower(internal_sources.table_name)'
+	LOOP
+		--raise notice '%', 
+		execute 'update emissions.versions
+		set number_records = coalesce((SELECT count(1) from emissions.' || version_record.table_name || ' where dataset_id = ' || version_record.dataset_id || ' and "version" = ' || version_record."version" || '),0),
+			creator = coalesce((SELECT users.id from emf.datasets inner join emf.users on users.username = datasets.creator where datasets.id = ' || version_record.dataset_id || '),2)
+		where id = ' || version_record.id || ';';
+
+	END LOOP;
+
+	return;
+END;
+$$ LANGUAGE plpgsql;
+
+-- run populate procedure
+select public.populate_version_table_creator_and_record_count_columns();
