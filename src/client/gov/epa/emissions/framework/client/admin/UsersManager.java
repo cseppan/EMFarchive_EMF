@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.security.User;
@@ -12,10 +11,10 @@ import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -28,11 +27,14 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class UsersManager extends ReusableInteralFrame implements UsersManagerView, RefreshObserver {
 
     private UsersManagerPresenter presenter;
+    
+    private SelectableSortFilterWrapper table;
+    
+    private JPanel tablePanel;
 
     private JPanel layout;
 
@@ -41,8 +43,6 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     private EmfConsole parentConsole;
 
     private UsersTableData tableData;
-
-    private EmfTableModel model;
 
     private SortFilterSelectModel selectModel;
 
@@ -57,10 +57,12 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     public void display(User[] users) {
-        tableData = new UsersTableData(users);
-        model = new EmfTableModel(tableData);
-        selectModel = new SortFilterSelectModel(model);
-        createLayout(selectModel, layout);
+        layout.setLayout(new BorderLayout());
+
+        layout.add(topPanel(), BorderLayout.NORTH);
+        layout.add(tablePanel(users), BorderLayout.CENTER);
+        layout.add(createControlPanel(), BorderLayout.SOUTH);
+        
         super.display();
     }
 
@@ -75,9 +77,9 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
         // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
         tableData = new UsersTableData(users);
 
-        model.refresh(tableData);
-        selectModel.refresh(model);
-        createLayout(selectModel, layout);
+        //model.refresh(tableData);
+        table.refresh(tableData);
+        panelRefresh();
         super.refreshLayout();
     }
 
@@ -85,13 +87,10 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
         presenter.doRefresh();
     }
 
-    private void createLayout(SortFilterSelectModel selectModel, JPanel layout) {
-        layout.removeAll();
-        layout.setLayout(new BorderLayout());
-
-        layout.add(topPanel(), BorderLayout.NORTH);
-        layout.add(sortFilterScrollPane(selectModel), BorderLayout.CENTER);
-        layout.add(createControlPanel(), BorderLayout.SOUTH);
+    private void panelRefresh() {
+        tablePanel.removeAll();
+        tablePanel.add(table);
+        super.refreshLayout();
     }
 
     private JPanel topPanel() {
@@ -106,13 +105,13 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
         return panel;
     }
 
-    private JScrollPane sortFilterScrollPane(SortFilterSelectModel selectModel) {
-        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
-
-        JScrollPane scrollPane = new JScrollPane(panel);
-        panel.setPreferredSize(new Dimension(450, 120));
-
-        return scrollPane;
+    private JPanel tablePanel(User[] users) {
+        tablePanel = new JPanel(new BorderLayout());
+        tableData = new UsersTableData(users);
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, null);
+        tablePanel.add(table);
+        return tablePanel;
+        
     }
 
     private JPanel createControlPanel() {
