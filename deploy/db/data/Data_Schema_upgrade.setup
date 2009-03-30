@@ -844,7 +844,7 @@ where name in ('Control Strategy Detailed Result'));
 
 --3/26/2008 add column creator to emissions.version, may need to change the default value accordingly
 ALTER TABLE emissions.versions ADD COLUMN creator int4 NOT NULL REFERENCES emf.users(id) default 2;
-ALTER TABLE emissions.versions ADD COLUMN number_records int4 default 0;
+ALTER TABLE emissions.versions ADD COLUMN number_records int8 default 0;
 
 --3/26/2008 DCD -- populate new columns creator and number_records columns
 CREATE OR REPLACE FUNCTION public.populate_version_table_creator_and_record_count_columns() RETURNS void AS $$
