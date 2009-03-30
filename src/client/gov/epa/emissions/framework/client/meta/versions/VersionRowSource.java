@@ -19,7 +19,8 @@ public class VersionRowSource implements RowSource {
 
     public Object[] values() {
         return new Object[] { selected, source.getName(), new Integer(source.getVersion()), new Long(source.getBase()),
-                Boolean.valueOf(source.isFinalVersion()), format(source.getLastModifiedDate()) };
+                source.getCreator().getUsername(), Boolean.valueOf(source.isFinalVersion()), source.getNumberRecords(),
+                format(source.getLastModifiedDate()) };
     }
 
     private Object format(Date date) {
@@ -45,7 +46,6 @@ public class VersionRowSource implements RowSource {
     }
 
     public void validate(int rowNumber) {
-        //FIXME: validate row source
-        
+        //FIXME: validate row source        
     }
 }

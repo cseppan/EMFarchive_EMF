@@ -90,6 +90,10 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
 
         refreshLayout();
     }
+    
+//    public void doRefresh(){
+//        tableModel.refresh();
+//    }
 
     public void add(Version version) {
         tableData.add(version);
@@ -110,7 +114,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         tableModel = new EmfTableModel(tableData);
 
         ScrollableTable table = new ScrollableTable(tableModel, null);
-
+        //"Select", "Name", "Version", "Base", "Creator", "Is Final?", "#Records", "Date" 
         // set maximum column width
         String[] columns = { "Select", "Version", "Base", "Is Final?" }; // table.setColWidthsBasedOnColNames();
         table.setMaxColWidth(columns);
