@@ -90,16 +90,16 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public Version derive(Version base, User user, String name) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             Version derived = versions.derive(base, name, user, session);
-            session.close();
-
             return derived;
         } catch (HibernateException e) {
             LOG.error("Could not derive a new Version from the base Version: " + base.getVersion() + " of Dataset: "
                     + base.getDatasetId(), e);
             throw new EmfException("Could not create a new Version using " + base.getVersion() + " as the base");
+        }finally{
+            session.close();
         }
     }
 

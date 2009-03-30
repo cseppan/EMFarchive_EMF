@@ -48,8 +48,8 @@ public class EditVersionsPresenter {
     }
 
     public void doNew(Version base, String name) throws EmfException {
-        Version derived = editorService().derive(base, session.user(), name);
-        view.add(derived);
+        editorService().derive(base, session.user(), name);
+        reload();
     }
 
     public void doView(Version version, String table, DataView view) throws EmfException {
@@ -81,14 +81,14 @@ public class EditVersionsPresenter {
             editorService().markFinal(token(versions[i]));
         }
 
-        reload(dataset);
+        reload();
     }
 
     private DataAccessToken token(Version version) {
         return new DataAccessToken(version, null);
     }
 
-    private void reload(EmfDataset dataset) throws EmfException {
+    private void reload() throws EmfException {
         Version[] updatedVersions = editorService().getVersions(dataset.getId());
         view.reload(updatedVersions);
     }
@@ -99,7 +99,7 @@ public class EditVersionsPresenter {
 
     public void doChangeVersionName(Version version) throws EmfException {
         dataService().updateVersionNReleaseLock(version);
-        reload(dataset);
+        reload();
     }
 
     private User getUser() {
@@ -125,9 +125,9 @@ public class EditVersionsPresenter {
             locked.setDefaultVersion(version.getVersion());
             dataservice().updateDataset(locked);
         }
-        
-        reload(dataset);
-        
+
+        reload();
+
         if (locked == null || !locked.isLocked(getUser()))
             throw new EmfException("Cannot obtain lock on dataset. Set default version failed.");
     }
@@ -135,7 +135,7 @@ public class EditVersionsPresenter {
     public void releaseLock(Version lockedVersion) throws EmfException {
         dataService().updateVersionNReleaseLock(lockedVersion);
     }
-    
+
     public void copyDataset(Version version) throws EmfException {
         if (!version.isFinalVersion())
             throw new EmfException("Can only copy a version that is Final");

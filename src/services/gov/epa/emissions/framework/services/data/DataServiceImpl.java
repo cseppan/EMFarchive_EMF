@@ -839,6 +839,7 @@ public class DataServiceImpl implements DataService {
             defaultVersion.setCreator(user);
             defaultVersion.setDatasetId(locked.getId());
             defaultVersion.setLastModifiedDate(time);
+            defaultVersion.setNumberRecords(version.getNumberRecords());
             defaultVersion.setFinalVersion(true);
             dao.add(defaultVersion, session);
         } catch (Exception e) {
