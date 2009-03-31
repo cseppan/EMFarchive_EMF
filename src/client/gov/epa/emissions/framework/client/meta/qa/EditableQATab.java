@@ -343,7 +343,7 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
             super.removeAll();
             presenter.display();
             super.validate();
-            messagePanel.setMessage("Finished loading dataset QA.");
+            messagePanel.setMessage("Finished loading dataset QA steps.");
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
         } finally {
