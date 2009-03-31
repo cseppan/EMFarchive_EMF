@@ -56,7 +56,7 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     private void setupLayout(ManageChangeables changeables) {
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5)); 
-        this.add(getBorderedPanel(createAllStrategiesPanel(changeables), "All Strategies"), BorderLayout.NORTH);
+        this.add(getBorderedPanel(createAllStrategiesPanel(changeables), "All Strategy Types"), BorderLayout.NORTH);
         leastCostPanelContainer = new JPanel(new BorderLayout());
         leastCostPanel = getBorderedPanel(createLeastCostPanel(changeables), "Least Cost");
         leastCostCurvePanel = getBorderedPanel(createLeastCostCurvePanel(changeables), "Least Cost Curve");
