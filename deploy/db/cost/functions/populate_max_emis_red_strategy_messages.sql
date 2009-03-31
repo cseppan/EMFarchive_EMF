@@ -101,7 +101,7 @@ BEGIN
 
 	-- get target pollutant, inv filter, and county dataset info if specified
 	SELECT cs.pollutant_id,
-		case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
+		case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'a') || ')' else null end,
 		cs.cost_year,
 		cs.analysis_year,
 		cs.county_dataset_id,
@@ -205,14 +205,15 @@ BEGIN
 
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
-		county_dataset_filter_sql := ' and inv.fips in (SELECT fips
+		county_dataset_filter_sql := ' and a.fips in (SELECT fips
 			FROM emissions.' || (SELECT table_name FROM emf.internal_sources where dataset_id = county_dataset_id) || '
 			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
 	END IF;
 	-- build version info into where clause filter
-	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv'::character varying(63)) || ')' || coalesce(' and ' || inv_filter, '');
+	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'a'::character varying(63)) || ')' || coalesce(' and ' || inv_filter, '');
 
 
+	-- look for negative emissions in detailed result...
 	execute
 	--raise notice '%',
 	 'insert into emissions.' || strategy_messages_table_name || ' 
@@ -243,6 +244,67 @@ BEGIN
 		''Emission reduction is negative, '' || emis_reduction || ''.'' as "comment"
 	from emissions.' || strategy_detailed_result_table_name || ' dr
 	where 	emis_reduction < 0.0';
+
+	-- if PM target pollutant run, then see if any of the CEFF are missing from the PM 10 vs 2.5 pollutant sources
+	execute 'insert into emissions.' || strategy_messages_table_name || ' 
+		(
+		dataset_id, 
+		fips, 
+		scc, 
+		plantid, 
+		pointid, 
+		stackid, 
+		segment, 
+		poll, 
+		status,
+		control_program,
+		message
+		)
+	select 
+		' || strategy_messages_dataset_id || '::integer,
+		a.fips,
+		a.scc,
+		a.plantid, 
+		a.pointid, 
+		a.stackid, 
+		a.segment, 
+		a.poll,
+		''Warning''::character varying(11) as status,
+		null::character varying(255) as control_program,
+		case 
+			when a.poll = ''PM10'' and a.ceff is not null then 
+				''PM2_5 is missing CEFF, '' || a.ceff || ''%.''
+			when a.poll = ''PM2_5'' and a.ceff is null then 
+				''PM2_5 is missing CEFF, '' || b.ceff || ''%.''
+			when a.poll = ''PM2_5'' and a.ceff is not null then 
+				''PM10 is missing CEFF, '' || a.ceff || ''%.''
+			when a.poll = ''PM10'' and a.ceff is null then 
+				''PM10 is missing CEFF, '' || b.ceff || ''%.''
+			else ''''
+			end  as "comment"
+	FROM emissions.' || inv_table_name || ' a
+
+		full join emissions.' || inv_table_name || ' b
+		on b.fips = a.fips
+		and b.scc = a.scc
+
+		and b.plantid = a.plantid
+		and b.pointid = a.pointid
+		and b.stackid = a.stackid
+		and b.segment = a.segment
+	where ' || inv_filter || ' and b.poll in (''PM2_5'',''PM10'')
+		and a.poll in (''PM2_5'',''PM10'')
+		and (
+			(b.ceff is null and a.ceff is not null)
+			or (b.ceff is not null and a.ceff is null)
+		)
+	order by a.fips,
+		a.scc, 
+		a.plantid, 
+		a.pointid, 
+		a.stackid, 
+		a.segment, 
+		a.poll';
 
 END;
 $BODY$

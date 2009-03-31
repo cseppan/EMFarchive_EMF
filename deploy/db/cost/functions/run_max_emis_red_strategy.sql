@@ -650,6 +650,9 @@ BEGIN
 
 						where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 							and ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton is not null 
+							-- dont include sources that have no emissions...
+							and ' || uncontrolled_emis_sql || ' <> 0.0
+
 --						group by scc.control_measures_id, er.id, inv.fips, inv.scc, inv.poll
 --							' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || '
 
@@ -671,6 +674,9 @@ BEGIN
 
 				where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 					and p.id = ' ||  target_pollutant_id || '
+
+					-- dont include sources that have no emissions...
+					and ' || uncontrolled_emis_sql || ' <> 0.0
 
 					-- dont include sources that have been fully controlled...
 					and coalesce(100 * ' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0) <> 100.0
@@ -782,6 +788,9 @@ BEGIN
 --		and cstp.control_strategy_id = ' || control_strategy_id || '
 
 	where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+		-- dont include sources that have no emissions...
+		and ' || uncontrolled_emis_sql || ' <> 0.0
+
 --		and coalesce(100 * inv.ceff / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0) * ' || case when has_rpen_column then 'coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '1.0' end || ', 0) <> 100.0
 		-- TODO:  I don''t think this is needed, seems redundant
 --		and (	p.id <> ' ||  target_pollutant_id || '
