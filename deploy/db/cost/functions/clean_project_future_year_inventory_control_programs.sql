@@ -143,8 +143,31 @@ vacuum analyze emissions.ds_deletions_2005_1050880615;
 					or trim(sic) in (''0'',''-9'','''');';
 
 
+		-- look at the cap control program table format (make sure all the right columns are in the table)
+		ELSIF control_program.type = 'Allowable' THEN --and control_program.dataset_type = 'Projection Packet' THEN
+
+			execute 
+				'update emissions.' || control_program.table_name || '
+				set plantid = case when plantid is null or trim(plantid) = ''0'' or trim(plantid) = ''-9'' or trim(plantid) = '''' then null::character varying(15) else plantid end,
+					pointid = case when pointid is null or trim(pointid) = ''0'' or trim(pointid) = ''-9'' or trim(pointid) = '''' then null::character varying(15) else pointid end,
+					stackid = case when stackid is null or trim(stackid) = ''0'' or trim(stackid) = ''-9'' or trim(stackid) = '''' then null::character varying(15) else stackid end,
+					segment = case when segment is null or trim(segment) = ''0'' or trim(segment) = ''-9'' or trim(segment) = '''' then null::character varying(15) else segment end,
+					fips = case when fips is null or trim(fips) = ''0'' or trim(fips) = ''-9'' or trim(fips) = '''' then null::character varying(6) else fips end,
+					scc = case when scc is null or trim(scc) = ''0'' or trim(scc) = ''-9'' or trim(scc) = '''' then null::character varying(10) else scc end,
+--					mact = case when mact is null or trim(mact) = ''0'' or trim(mact) = ''-9'' or trim(mact) = '''' then null::character varying(6) else mact end,
+					sic = case when sic is null or trim(sic) = ''0'' or trim(sic) = ''-9'' or trim(sic) = '''' then null::character varying(4) else sic end 
+				where trim(plantid) in (''0'',''-9'','''')
+					or trim(pointid) in (''0'',''-9'','''')
+					or trim(stackid) in (''0'',''-9'','''')
+					or trim(segment) in (''0'',''-9'','''')
+					or trim(fips) in (''0'',''-9'','''')
+					or trim(scc) in (''0'',''-9'','''')
+--					or trim(mact) in (''0'',''-9'','''')
+					or trim(sic) in (''0'',''-9'','''');';
+
+
 		-- look at the projection control program table format (make sure all the right columns are in the table)
-		ELSIF control_program.type = 'Plant Closure' THEN
+		ELSIF control_program.type = 'Plant Closure' and control_program.dataset_type = 'Plant Closure (CSV)' THEN
 
 			execute 
 				'update emissions.' || control_program.table_name || '
@@ -168,6 +191,6 @@ vacuum analyze emissions.ds_deletions_2005_1050880615;
 
 END;
 $BODY$
-  LANGUAGE 'plpgsql' IMMUTABLE;
+  LANGUAGE 'plpgsql' VOLATILE;
 ALTER FUNCTION public.clean_project_future_year_inventory_control_programs(int) OWNER TO emf;
 
