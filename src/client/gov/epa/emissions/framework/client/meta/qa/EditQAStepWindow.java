@@ -446,7 +446,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         reqirepanel.add(new JLabel("Required?"));
         reqirepanel.add(required);
         reqirepanel.add(new JLabel(EmptyStrings.create(15)));
-        reqirepanel.add(new JLabel("Same as template?"));
+        reqirepanel.add(new JLabel("Arguments same as template?"));
         reqirepanel.add(sameAstemplate);
         layout.addWidgetPair(order, reqirepanel, checkBoxPanel);
         layout.makeCompactGrid(checkBoxPanel, 1, 2, 0, 0, 0, 0);
