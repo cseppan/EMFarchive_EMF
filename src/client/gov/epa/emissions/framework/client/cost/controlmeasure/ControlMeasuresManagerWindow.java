@@ -225,6 +225,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
 //        JScrollPane sortFilterPane = sortFilterPane(parentConsole);
         table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        
         tablePanel.add(table);
 
         return tablePanel;
@@ -283,6 +284,14 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         showDetailsCheckBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED || e.getStateChange() == ItemEvent.DESELECTED) {
+                    //lets rebuild the table first, the table structure changes...
+                    try {
+                        setupTableModel(new ControlMeasure[] {});
+                    } catch (EmfException e1) {
+                        // NOTE Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                    table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
                     doRefresh();
                 }
             }
