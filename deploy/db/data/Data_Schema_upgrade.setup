@@ -880,3 +880,6 @@ $$ LANGUAGE plpgsql;
 
 -- run populate procedure
 select public.populate_version_table_creator_and_record_count_columns();
+
+--3/31/09 add new dataset type
+insert into emf.dataset_types values(DEFAULT,'Allowable Packet','Allowable Packet', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.AllowablePacketImporter', 'gov.epa.emissions.commons.io.other.AllowablePacketExporter');
