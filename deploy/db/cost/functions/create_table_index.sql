@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION public.create_table_index(table_name character varyin
   RETURNS void AS
 $BODY$
 DECLARE
-	index_name varchar(63) := '';
+	index_name varchar(64) := '';
 	has_columns boolean := false;
 BEGIN
 

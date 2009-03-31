@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION public.create_orl_table_indexes(table_name character 
   RETURNS void AS
 $BODY$
 DECLARE
-	index_name varchar(63) := '';
+	index_name varchar(64) := '';
 	is_point_table boolean := false;
 	has_poll_column boolean := false;
 	has_scc_column boolean := false;
