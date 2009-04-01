@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.security.User;
@@ -44,8 +43,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
     private UsersTableData tableData;
 
-    private SortFilterSelectModel selectModel;
-
+  
     public UsersManager(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("User Manager", new Dimension(730, 400), desktopManager);
         super.setName("userManager");
@@ -164,7 +162,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
                 updateUsers();
             }
         };
-        SelectAwareButton updateButton = new SelectAwareButton("Edit", updateAction, selectModel, confirmUpdateDialog);
+        SelectAwareButton updateButton = new SelectAwareButton("Edit", updateAction, table, confirmUpdateDialog);
 
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
@@ -208,7 +206,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     private User[] getSelectedUsers() {
-        List selected = selectModel.selected();
+        List selected = table.selected();
         return (User[]) selected.toArray(new User[0]);
     }
 
