@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteView;
+import gov.epa.emissions.framework.client.meta.versions.EditVersionsView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DatasetNote;
@@ -32,11 +33,20 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
     private EmfDataset dataset;
 
     private boolean changesSaved;
-
+    private EditVersionsView parentview;
     public DataEditorPresenterImpl(EmfDataset dataset, Version version, String table, EmfSession session) {
         this.dataset = dataset;
         this.version = version;
         this.table = table;
+        this.session = session;
+    }
+    
+    public DataEditorPresenterImpl(EmfDataset dataset, Version version, String table, 
+            EditVersionsView parentview, EmfSession session) {
+        this.dataset = dataset;
+        this.version = version;
+        this.table = table;
+        this.parentview = parentview;
         this.session = session;
     }
 
@@ -114,6 +124,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
 
     public void doSave() throws EmfException {
         save(view, token, tablePresenter, dataEditorService(), closingRule());
+        parentview.refresh();
     }
 
     void save(DataEditorView view, DataAccessToken token, EditableTablePresenter tablePresenter,
@@ -123,6 +134,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
         Date currentDate = new Date();
         dataset.setModifiedDateTime(currentDate);
         token.getVersion().setLastModifiedDate(currentDate);
+        token.getVersion().setNumberRecords(service.getTotalRecords(token));
 
         try {
             token = service.save(token, dataset, version);

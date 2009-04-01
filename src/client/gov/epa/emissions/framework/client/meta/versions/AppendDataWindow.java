@@ -72,10 +72,13 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
     private Button okButton;
 
     private DoubleValue startLineNum;
+    
+    private VersionedDataView parentView; 
 
-    public AppendDataWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
+    public AppendDataWindow(EmfConsole parentConsole, DesktopManager desktopManager, 
+            VersionedDataView parentView) {
         super("Append Data Window", new Dimension(700, 450), desktopManager);
-
+        this.parentView = parentView;
         this.parentConsole = parentConsole;
         layout = new JPanel();
         this.getContentPane().add(layout);
@@ -356,7 +359,6 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
                         msg += " Error deleting dataset: " + e.getMessage();
                     }
                 }
-
                 setMsg(msg);
             }
         };
@@ -422,6 +424,8 @@ public class AppendDataWindow extends ReusableInteralFrame implements AppendData
     private Action closeWindowAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
+                if (!okButton.isEnabled())
+                    parentView.refresh();
                 disposeView();
             }
         };

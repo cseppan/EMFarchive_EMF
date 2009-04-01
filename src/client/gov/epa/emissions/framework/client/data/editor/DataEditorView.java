@@ -25,6 +25,8 @@ public interface DataEditorView extends ManagedView {
     boolean confirmDiscardChanges();
 
     Revision revision();
+    
+    //void reloadVersions();
 
     boolean verifyRevisionInput();
     

@@ -191,15 +191,15 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     Version doMarkFinal(Version derived) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             Version version = versions.markFinal(derived, session);
-            session.close();
-
             return version;
         } catch (HibernateException e) {
             LOG.error("Could not mark a derived Version: " + derived.getDatasetId() + " as Final" + "." + e);
             throw new EmfException("Could not mark a derived Version: " + derived.getDatasetId() + " as Final");
+        }finally{
+            session.close();
         }
     }
 

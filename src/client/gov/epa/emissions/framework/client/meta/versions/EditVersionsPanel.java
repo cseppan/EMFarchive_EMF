@@ -436,9 +436,19 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
                 displayError("Could not open data editor: the Dataset references external files.");
                 return;
             }
-            presenter.doEdit(version, table, view);
+            presenter.doEdit(version, table, view, this);
         } catch (EmfException e) {
             displayError(e.getMessage());
+        }
+    }
+    
+    public void refresh(){
+        try {
+            presenter.reload();
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+            messagePanel.setError(e.getMessage());
         }
     }
 

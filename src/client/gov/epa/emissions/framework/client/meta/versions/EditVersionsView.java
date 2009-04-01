@@ -10,6 +10,8 @@ public interface EditVersionsView {
     void add(Version version);
 
     void reload(Version[] versions);
+    
+    void refresh(); 
 
     void display(Version[] versions, InternalSource[] sources);
 

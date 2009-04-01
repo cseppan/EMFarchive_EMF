@@ -5,6 +5,8 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public interface VersionedDataView extends ManagedView {
     void observe(VersionedDataPresenter presenter);
+    
+    void refresh(); 
 
     void display(EmfDataset dataset, EditVersionsPresenter versionsPresenter);
 }

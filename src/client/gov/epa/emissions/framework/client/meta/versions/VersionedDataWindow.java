@@ -38,6 +38,8 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
 
     private JLabel defaultVersion;
     
+    private EditVersionsPanel versionsPanel; 
+    
     public VersionedDataWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Data Versions Editor", new Dimension(750, 350), desktopManager);
 
@@ -72,7 +74,7 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
 
     private EditVersionsPanel createVersionsPanel(EditVersionsPresenter versionsPresenter, EmfDataset dataset,
             MessagePanel messagePanel) {
-        EditVersionsPanel versionsPanel = new EditVersionsPanel(dataset, messagePanel, parentConsole, desktopManager);
+        versionsPanel = new EditVersionsPanel(dataset, messagePanel, parentConsole, desktopManager);
         try {
             versionsPresenter.display(versionsPanel);
         } catch (EmfException e) {
@@ -106,7 +108,7 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
     private JPanel rightControlPanel() {
         JPanel panel = new JPanel();
 
-        Button appendData = new Button("Append Data", appendDataAction());
+        Button appendData = new Button("Append Data", appendDataAction(this));
         
         if (dataset.isExternal())
             appendData.setEnabled(false);
@@ -129,17 +131,22 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
         return panel;
     }
 
-    private Action appendDataAction() {
+    private Action appendDataAction(final VersionedDataView view) {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clear();
 
-                AppendDataWindowView dialog = new AppendDataWindow(parentConsole, desktopManager);
+                AppendDataWindowView dialog = new AppendDataWindow(parentConsole, desktopManager, view);
                 AppendDataViewPresenter appendDataPresenter = new AppendDataViewPresenter(dataset, dialog,
                         presenter.getSession());
                 appendDataPresenter.displayView();
             }
         };
+    }
+    
+    public void refresh(){
+        versionsPanel.refresh();
+        super.validate();
     }
 
     private Action editPropAction() {

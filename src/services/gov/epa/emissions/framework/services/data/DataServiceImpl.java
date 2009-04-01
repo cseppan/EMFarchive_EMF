@@ -439,6 +439,30 @@ public class DataServiceImpl implements DataService {
         }
         return recordCount;
     }
+    
+    private synchronized int getVersionRecordCount(Version version, String table) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        int recordCount = 0;
+        String query = "select count(1) as record_count from " + table + " WHERE version IN ("
+        + version.getVersion() + ")";
+        try {
+            if (DebugLevels.DEBUG_17) {
+                LOG.warn("Versioned table data query: " + query);
+            }
+            ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(query);
+            if (rs.next())
+                recordCount = rs.getInt(1);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve table record count: " + table, e);
+            throw new EmfException("Could not retrieve table record count: " + table);
+        } catch (SQLException e) {
+            LOG.error("Could not retrieve table record count: " + table, e);
+            throw new EmfException("Could not retrieve table record count: " + table);
+        } finally {
+            closeDB(dbServer);
+        }
+        return recordCount;
+    }
 
     public synchronized void appendData(User user, int srcDSid, int srcDSVersion, String filter, int targetDSid,
             int targetDSVersion, DoubleValue targetStartLineNumber) throws EmfException {
@@ -469,18 +493,33 @@ public class DataServiceImpl implements DataService {
 
                 appendLineBasedData(filter, srcVersion, srcDS, srcTable, targetTable, targetDSid, targetDSVersion,
                         dataModifier, targetStartLineNumber.getValue());
-                return;
             }
+            else {
+                for (int i = 0; i < targetSources.length; i++) {
+                    String srcTable = datasource.getName() + "." + srcSources[i].getTable();
+                    String targetTable = datasource.getName() + "." + targetSources[i].getTable();
 
-            for (int i = 0; i < targetSources.length; i++) {
-                String srcTable = datasource.getName() + "." + srcSources[i].getTable();
-                String targetTable = datasource.getName() + "." + targetSources[i].getTable();
-
-                appendData2SingleTable(filter, srcVersion, srcDS, srcTable, targetTable, targetDSid, targetDSVersion,
-                        dataModifier);
+                    appendData2SingleTable(filter, srcVersion, srcDS, srcTable, targetTable, targetDSid, targetDSVersion,
+                            dataModifier);
+                }
             }
+            //dao.releaseLocked(user, locked, session);
+            Version tarVersion = dao.getVersion(session, targetDSid, targetDSVersion);
+            Version lockedVersion = obtainedLockOnVersion(user, tarVersion.getId());
+            
+            lockedVersion.setLastModifiedDate(new Date());
+            int num = getVersionRecordCount(lockedVersion, datasource.getName() + "." + targetSources[0].getTable());
+            lockedVersion.setNumberRecords(num);
+            updateVersionNReleaseLock(lockedVersion);
             
             dao.releaseLocked(user, locked, session);
+            if (DebugLevels.DEBUG_17) {
+                LOG.warn("Update version : "+ lockedVersion.getName());
+                LOG.warn("Table name : "+ datasource.getName() + "." + targetSources[0].getTable());
+                LOG.warn("Table row count : "+ num);
+            }
+            
+            
         } catch (Exception e) {
             LOG.error("Could not query table : ", e);
             throw new EmfException("Could not query table: " + e.getMessage());
