@@ -10,7 +10,8 @@ import gov.epa.emissions.framework.services.data.QAStepResult;
 
 public interface EditQAStepView extends ManagedView {
 
-    void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, String versionName, boolean sameAstemplate, EmfSession session);
+    void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, 
+            String versionName, boolean sameAstemplate, EmfSession session);
 
     void observe(EditQAStepPresenter presenter);
     

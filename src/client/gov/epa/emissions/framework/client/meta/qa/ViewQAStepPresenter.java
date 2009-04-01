@@ -30,12 +30,19 @@ public class ViewQAStepPresenter {
     }
 
     public void display(QAStep step, String versionName) throws EmfException {
-        QAService qaService = session.qaService();
-        QAProgram[] programs = qaService.getQAPrograms();
-        QAStepResult result = qaService.getQAStepResult(step);
-        view.display(step, result, programs, dataset, session.user(), versionName);
+        QAProgram[] programs = qaService().getQAPrograms();
+        QAStepResult result = qaService().getQAStepResult(step);
+        Boolean sameAstemplate = getSameAsTemplate(step);
+        view.display(step, result, programs, dataset, session.user(), versionName, sameAstemplate);
     }
 
+    public boolean getSameAsTemplate(QAStep qaStep) throws EmfException{       
+        return qaService().getSameAsTemplate(qaStep); 
+    }
+    
+    private QAService qaService(){
+        return session.qaService();
+    }
     public void doClose() {
         view.disposeView();
     }

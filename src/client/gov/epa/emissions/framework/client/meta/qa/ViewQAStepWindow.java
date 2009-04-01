@@ -109,14 +109,14 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     }
 
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, User user,
-            String versionName) {
+            String versionName, boolean asTemplate) {
         this.step = step;
         this.user = user;
         this.qaPrograms = new QAPrograms(null, programs);
         super.setLabel(super.getTitle() + ": " + step.getName() + " - " + dataset.getName() + " (v" + step.getVersion()
                 + ")");
 
-        JPanel layout = createLayout(step, qaStepResult, versionName);
+        JPanel layout = createLayout(step, qaStepResult, versionName, asTemplate);
         super.getContentPane().add(layout);
         super.display();
     }
@@ -129,24 +129,25 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         this.presenter = presenter;
     }
 
-    private JPanel createLayout(QAStep step, QAStepResult qaStepResult, String versionName) {
+    private JPanel createLayout(QAStep step, QAStepResult qaStepResult, 
+            String versionName, boolean asTemplate) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
 
-        panel.add(inputPanel(step, qaStepResult, versionName));
+        panel.add(inputPanel(step, qaStepResult, versionName, asTemplate));
         panel.add(buttonsPanel());
 
         return panel;
     }
 
-    private JPanel inputPanel(QAStep step, QAStepResult qaStepResult, String versionName) {
+    private JPanel inputPanel(QAStep step, QAStepResult qaStepResult, String versionName, boolean asTemplate) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(upperPanel(step, versionName));
+        panel.add(upperPanel(step, versionName, asTemplate));
         panel.add(lowerPanel(step, qaStepResult));
 
         return panel;
@@ -301,7 +302,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         return step.getStatus() != null ? step.getStatus() : QAProperties.initialStatus();
     }
 
-    private JPanel upperPanel(QAStep step, String versionName) {
+    private JPanel upperPanel(QAStep step, String versionName, boolean asTemplate) {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -338,6 +339,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         required = new CheckBox("", step.isRequired());
         if (step.isRequired())
             required.setEnabled(false);
+        CheckBox sameAstemplate = new CheckBox("", asTemplate);
+        sameAstemplate.setEnabled(false);
         
         order = new NumberFormattedTextField(5, orderAction());
         order.setText(step.getOrder() + "");
@@ -349,8 +352,10 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         JPanel reqirepanel = new JPanel();
         reqirepanel.add(new JLabel(EmptyStrings.create(20)));
         reqirepanel.add(new JLabel("Required?"));
-        reqirepanel.add(new JLabel(EmptyStrings.create(20)));
         reqirepanel.add(required);
+        reqirepanel.add(new JLabel(EmptyStrings.create(20)));
+        reqirepanel.add(new JLabel("Arguments same as template?"));
+        reqirepanel.add(sameAstemplate);
         layout.addWidgetPair(order, reqirepanel, checkBoxPanel);
         layout.makeCompactGrid(checkBoxPanel, 1, 2, 0, 0, 0, 0);
         layoutGenerator.addLabelWidgetPair("Order:", checkBoxPanel, panel);

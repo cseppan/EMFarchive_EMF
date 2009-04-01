@@ -90,8 +90,6 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private FormattedDateField date;
 
     private CheckBox required;
-    
-    //private CheckBox sameAstemplate;
 
     private User user;
 
@@ -173,7 +171,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset,
-            String versionName, boolean astemplate, EmfSession session) {
+            String versionName, boolean asTemplate, EmfSession session) {
         this.session = session;
         this.step = step;
         this.qaStepResult = qaStepResult;
@@ -183,7 +181,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         super.setLabel(super.getTitle() + ": " + step.getName() + " - " + dataset.getName() + " (v" + step.getVersion()
                 + ")");
 
-        JPanel layout = createLayout(qaStepResult, versionName, astemplate);
+        JPanel layout = createLayout(qaStepResult, versionName, asTemplate);
         super.getContentPane().add(layout);
         super.display();
     }
@@ -197,14 +195,14 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     private JPanel createLayout(QAStepResult qaStepResult, String versionName, 
-            boolean astemplate) {
+            boolean asTemplate) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
 
-        panel.add(inputPanel(qaStepResult, versionName, astemplate));
+        panel.add(inputPanel(qaStepResult, versionName, asTemplate));
         panel.add(buttonsPanel());
 
         return panel;
@@ -442,10 +440,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         JPanel checkBoxPanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layout = new SpringLayoutGenerator();
         JPanel reqirepanel = new JPanel();
-        reqirepanel.add(new JLabel(EmptyStrings.create(15)));
+        reqirepanel.add(new JLabel(EmptyStrings.create(20)));
         reqirepanel.add(new JLabel("Required?"));
         reqirepanel.add(required);
-        reqirepanel.add(new JLabel(EmptyStrings.create(15)));
+        reqirepanel.add(new JLabel(EmptyStrings.create(20)));
         reqirepanel.add(new JLabel("Arguments same as template?"));
         reqirepanel.add(sameAstemplate);
         layout.addWidgetPair(order, reqirepanel, checkBoxPanel);
