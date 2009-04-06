@@ -28,6 +28,8 @@ public class ControlStrategyConstraint implements Serializable {
     
     private Double replacementControlMinEfficiencyDiff;
     
+    private Double controlProgramMeasureMinPctRedDiff;
+    
     public ControlStrategyConstraint() {
         //
     }
@@ -133,5 +135,13 @@ public class ControlStrategyConstraint implements Serializable {
 
     public Double getReplacementControlMinEfficiencyDiff() {
         return replacementControlMinEfficiencyDiff;
+    }
+
+    public void setControlProgramMeasureMinPctRedDiff(Double controlProgramMeasureMinPctRedDiff) {
+        this.controlProgramMeasureMinPctRedDiff = controlProgramMeasureMinPctRedDiff;
+    }
+
+    public Double getControlProgramMeasureMinPctRedDiff() {
+        return controlProgramMeasureMinPctRedDiff;
     }
 }

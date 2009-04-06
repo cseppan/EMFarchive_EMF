@@ -34,6 +34,7 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     private TextField domainWidePctReductionStart;
     private TextField domainWidePctReductionEnd;
     private TextField replacementControlMinEfficiencyDiff;
+    private TextField controlProgramMeasureMinPctRedDiff;
     
     private ManageChangeables changeablesList;
 
@@ -44,6 +45,8 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     private JPanel leastCostPanel;
 
     private JPanel leastCostCurvePanel;
+
+    private JPanel controlProgramPanel;
     
     private JPanel leastCostPanelContainer;
 
@@ -60,10 +63,15 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         leastCostPanelContainer = new JPanel(new BorderLayout());
         leastCostPanel = getBorderedPanel(createLeastCostPanel(changeables), "Least Cost");
         leastCostCurvePanel = getBorderedPanel(createLeastCostCurvePanel(changeables), "Least Cost Curve");
-        if (controlStrategy.getStrategyType() != null && controlStrategy.getStrategyType().getName().equals(StrategyType.leastCost)) {
-            leastCostPanelContainer.add(leastCostPanel, BorderLayout.NORTH);
-        }else if (controlStrategy.getStrategyType() != null && controlStrategy.getStrategyType().getName().equals(StrategyType.leastCostCurve)) {
-            leastCostPanelContainer.add(leastCostCurvePanel, BorderLayout.NORTH);
+        controlProgramPanel = getBorderedPanel(createControlProgramPanel(changeables), "Project Future Year Inventory");
+        if (controlStrategy.getStrategyType() != null) {
+            if (controlStrategy.getStrategyType().getName().equals(StrategyType.leastCost)) {
+                leastCostPanelContainer.add(leastCostPanel, BorderLayout.NORTH);
+            } else if (controlStrategy.getStrategyType().getName().equals(StrategyType.leastCostCurve)) {
+                leastCostPanelContainer.add(leastCostCurvePanel, BorderLayout.NORTH);
+            } else if (controlStrategy.getStrategyType().getName().equals(StrategyType.projectFutureYearInventory)) {
+                leastCostPanelContainer.add(controlProgramPanel, BorderLayout.NORTH);
+            }
         }
         this.add(leastCostPanelContainer, BorderLayout.CENTER);
         notifyStrategyTypeChange(controlStrategy.getStrategyType());
@@ -121,6 +129,31 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
                 10, 10); // xPad, yPad
 
         return panel;
+    }
+
+    private JPanel createControlProgramPanel(ManageChangeables changeables) {
+        ControlStrategyConstraint constraint = presenter.getConstraint();
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(5,10,10,10)); 
+        mainPanel.add(new JLabel("Specify EITHER an emission reduction (tons) or percent reduction (%) for the Target Pollutant:"),
+           BorderLayout.WEST);
+
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        controlProgramMeasureMinPctRedDiff = new TextField("domain wide percent reduction", 10);
+        controlProgramMeasureMinPctRedDiff.setText(constraint != null ? (constraint.getControlProgramMeasureMinPctRedDiff() != null ? constraint.getControlProgramMeasureMinPctRedDiff() + "" : "") : "");
+        controlProgramMeasureMinPctRedDiff.setToolTipText("Enter the minimum control percent reduction difference for predicting controls.");
+        changeables.addChangeable(controlProgramMeasureMinPctRedDiff);
+        layoutGenerator.addLabelWidgetPair("Minimum Percent Reduction Difference for Predicting Controls (%)", controlProgramMeasureMinPctRedDiff, panel);
+
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                10, 10, // initialX, initialY
+                10, 10); // xPad, yPad
+
+        mainPanel.add(panel,BorderLayout.SOUTH);
+        return mainPanel;
     }
 
     private JPanel createLeastCostPanel(ManageChangeables changeables) {
@@ -209,6 +242,7 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         if (domainWidePctReductionStart.getText().trim().length() > 0) constraint.setDomainWidePctReductionStart(erValidation.parseDouble("domain wide percent reduction start", domainWidePctReductionStart.getText()));
         if (domainWidePctReductionEnd.getText().trim().length() > 0) constraint.setDomainWidePctReductionEnd(erValidation.parseDouble("domain wide percent reduction end", domainWidePctReductionEnd.getText()));
         if (replacementControlMinEfficiencyDiff.getText().trim().length() > 0) constraint.setReplacementControlMinEfficiencyDiff(erValidation.parseDouble("replacement control minimum  control efficiency difference", replacementControlMinEfficiencyDiff.getText()));
+        if (controlProgramMeasureMinPctRedDiff.getText().trim().length() > 0) constraint.setControlProgramMeasureMinPctRedDiff(erValidation.parseDouble("control program minimum percent reduction difference", controlProgramMeasureMinPctRedDiff.getText()));
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.leastCost)) {
             //make sure that either Emis OR Pct Reduction was specified for the Least Cost.  This is needed for the run.
             if (constraint.getReplacementControlMinEfficiencyDiff() == null || constraint.getReplacementControlMinEfficiencyDiff() <= 0.0D) 
@@ -234,8 +268,8 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
                 throw new EmfException("Constraints Tab: Please specify a replacement control minimum control efficiencny difference for the Max Emissions Reduction strategy type.");
         }
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.projectFutureYearInventory)) {
-            if (constraint.getReplacementControlMinEfficiencyDiff() == null || constraint.getReplacementControlMinEfficiencyDiff() <= 0.0D) 
-                throw new EmfException("Constraints Tab: Please specify a replacement control minimum control efficiencny difference for the Project Future Year Inventory strategy type.");
+            if (constraint.getControlProgramMeasureMinPctRedDiff() == null || constraint.getControlProgramMeasureMinPctRedDiff() <= 0.0D) 
+                throw new EmfException("Constraints Tab: Please specify a control program measure minimum percent reduction difference for the Project Future Year Inventory strategy type.");
         }
         presenter.setConstraint(constraint);
     }
@@ -258,16 +292,21 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
 
     public void notifyStrategyTypeChange(StrategyType strategyType) {
         leastCostPanelContainer.removeAll();
-        if (strategyType != null && strategyType.getName().equals(StrategyType.leastCost)) {
-            leastCostPanelContainer.add(leastCostPanel, BorderLayout.NORTH);
-            replacementControlMinEfficiencyDiff.setEnabled(true);
-        } else if (strategyType != null && strategyType.getName().equals(StrategyType.leastCostCurve)) {
-            leastCostPanelContainer.add(leastCostCurvePanel, BorderLayout.NORTH);
-            replacementControlMinEfficiencyDiff.setEnabled(true);
-        } else if (strategyType != null && strategyType.getName().equals(StrategyType.maxEmissionsReduction)) {
-            replacementControlMinEfficiencyDiff.setEnabled(true);
-        } else if (strategyType != null && strategyType.getName().equals(StrategyType.projectFutureYearInventory)) {
-            replacementControlMinEfficiencyDiff.setEnabled(true);
+        if (strategyType != null) {
+            if (strategyType.getName().equals(StrategyType.leastCost)) {
+                leastCostPanelContainer.add(leastCostPanel, BorderLayout.NORTH);
+                replacementControlMinEfficiencyDiff.setEnabled(true);
+            } else if (strategyType.getName().equals(StrategyType.leastCostCurve)) {
+                leastCostPanelContainer.add(leastCostCurvePanel, BorderLayout.NORTH);
+                replacementControlMinEfficiencyDiff.setEnabled(true);
+            } else if (strategyType.getName().equals(StrategyType.maxEmissionsReduction)) {
+                replacementControlMinEfficiencyDiff.setEnabled(true);
+            } else if (strategyType.getName().equals(StrategyType.projectFutureYearInventory)) {
+                leastCostPanelContainer.add(controlProgramPanel, BorderLayout.NORTH);
+                replacementControlMinEfficiencyDiff.setEnabled(false);
+            } else {
+                replacementControlMinEfficiencyDiff.setEnabled(false);
+            }
         } else {
             replacementControlMinEfficiencyDiff.setEnabled(false);
         }

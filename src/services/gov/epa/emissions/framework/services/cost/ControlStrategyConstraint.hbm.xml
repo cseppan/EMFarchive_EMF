@@ -16,5 +16,6 @@
 	<property name="domainWidePctReductionStart" column="domain_wide_pct_reduction_start" type="double"  not-null="false" />
 	<property name="domainWidePctReductionEnd" column="domain_wide_pct_reduction_end" type="double"  not-null="false" />
 	<property name="replacementControlMinEfficiencyDiff" column="replacement_control_min_eff_diff" type="double"  not-null="false" />
+	<property name="controlProgramMeasureMinPctRedDiff" column="control_program_measure_min_pct_red_diff" type="double"  not-null="false" />
   </class> 
 </hibernate-mapping>  
