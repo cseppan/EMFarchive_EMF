@@ -241,35 +241,35 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         if (domainWidePctReductionIncrement.getText().trim().length() > 0) constraint.setDomainWidePctReductionIncrement(erValidation.parseDouble("domain wide percent reduction increment", domainWidePctReductionIncrement.getText()));
         if (domainWidePctReductionStart.getText().trim().length() > 0) constraint.setDomainWidePctReductionStart(erValidation.parseDouble("domain wide percent reduction start", domainWidePctReductionStart.getText()));
         if (domainWidePctReductionEnd.getText().trim().length() > 0) constraint.setDomainWidePctReductionEnd(erValidation.parseDouble("domain wide percent reduction end", domainWidePctReductionEnd.getText()));
-        if (replacementControlMinEfficiencyDiff.getText().trim().length() > 0) constraint.setReplacementControlMinEfficiencyDiff(erValidation.parseDouble("replacement control minimum  control efficiency difference", replacementControlMinEfficiencyDiff.getText()));
+        if (replacementControlMinEfficiencyDiff.getText().trim().length() > 0) constraint.setReplacementControlMinEfficiencyDiff(erValidation.parseDouble("replacement control minimum control efficiency difference", replacementControlMinEfficiencyDiff.getText()));
         if (controlProgramMeasureMinPctRedDiff.getText().trim().length() > 0) constraint.setControlProgramMeasureMinPctRedDiff(erValidation.parseDouble("control program minimum percent reduction difference", controlProgramMeasureMinPctRedDiff.getText()));
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.leastCost)) {
             //make sure that either Emis OR Pct Reduction was specified for the Least Cost.  This is needed for the run.
             if (constraint.getReplacementControlMinEfficiencyDiff() == null || constraint.getReplacementControlMinEfficiencyDiff() <= 0.0D) 
-                throw new EmfException("Constraints Tab: Please specify a replacement control minimum control efficiencny difference for the Least Cost strategy type.");
+                throw new EmfException("Constraints Tab: The replacement control minimum control efficiencny difference is missing.");
             if (constraint.getDomainWideEmisReduction() == null && constraint.getDomainWidePctReduction() == null) 
-                throw new EmfException("Constraints Tab: Please specify either an emission reduction or percent reduction for the Least Cost strategy type.");
+                throw new EmfException("Constraints Tab: Please specify either an emission reduction or percent reduction.");
             if (constraint.getDomainWideEmisReduction() != null && constraint.getDomainWidePctReduction() != null) 
-                throw new EmfException("Constraints Tab: Specify only an emission reduction or a percent reduction for the Least Cost strategy type.");
+                throw new EmfException("Constraints Tab: Specify only an emission reduction or a percent reduction.");
         }
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.leastCostCurve)) {
             //make sure that the Pct Reduction Increment was specified for the Least Cost Curve.  This is needed for the run.
             if (constraint.getReplacementControlMinEfficiencyDiff() == null || constraint.getReplacementControlMinEfficiencyDiff() <= 0.0D) 
-                throw new EmfException("Constraints Tab: Please specify a replacement control minimum control efficiencny difference for the Least Cost Curve strategy type.");
+                throw new EmfException("Constraints Tab: The replacement control minimum control efficiencny difference is missing.");
             if (constraint.getDomainWidePctReductionIncrement() == null || constraint.getDomainWidePctReductionIncrement() <= 0.0D) 
-                throw new EmfException("Constraints Tab: Please specify a percent reduction increment for the Least Cost Curve strategy type.");
+                throw new EmfException("Constraints Tab: The percent reduction increment is missing.");
             if (constraint.getDomainWidePctReductionStart() == null) 
-                throw new EmfException("Constraints Tab: Please specify a percent reduction starting percentage for the Least Cost Curve strategy type.");
+                throw new EmfException("Constraints Tab: The percent reduction starting percentage is missing.");
             if (constraint.getDomainWidePctReductionEnd() == null) 
-                throw new EmfException("Constraints Tab: Please specify a percent reduction ending percentage for the Least Cost Curve strategy type.");
+                throw new EmfException("Constraints Tab: The percent reduction ending percentage is missing.");
         }
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.maxEmissionsReduction)) {
             if (constraint.getReplacementControlMinEfficiencyDiff() == null || constraint.getReplacementControlMinEfficiencyDiff() <= 0.0D) 
-                throw new EmfException("Constraints Tab: Please specify a replacement control minimum control efficiencny difference for the Max Emissions Reduction strategy type.");
+                throw new EmfException("Constraints Tab: The replacement control minimum control efficiencny difference is missing.");
         }
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.projectFutureYearInventory)) {
             if (constraint.getControlProgramMeasureMinPctRedDiff() == null || constraint.getControlProgramMeasureMinPctRedDiff() <= 0.0D) 
-                throw new EmfException("Constraints Tab: Please specify a control program measure minimum percent reduction difference for the Project Future Year Inventory strategy type.");
+                throw new EmfException("Constraints Tab: The measure minimum percent reduction difference is missing.");
         }
         presenter.setConstraint(constraint);
     }
