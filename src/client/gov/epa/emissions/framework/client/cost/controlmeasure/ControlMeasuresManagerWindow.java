@@ -277,7 +277,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         JPanel panel = new JPanel(new BorderLayout());
         JPanel innerPanel = new JPanel(new BorderLayout());
 
-        innerPanel.add(getItem("Major Pollutant:", majorPollutant), BorderLayout.WEST);
+        innerPanel.add(getItem("Pollutant Filter:", majorPollutant), BorderLayout.WEST);
         innerPanel.setBorder(BorderFactory.createEmptyBorder(4,5,4,4));
         majorPollutant.setPreferredSize(new Dimension(100, 30));
 //        showDetailsCheckBox = new JCheckBox("Show Details?", false);
