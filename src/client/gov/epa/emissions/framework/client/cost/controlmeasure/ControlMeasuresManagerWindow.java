@@ -121,7 +121,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                     setButton(false);
                     messagePanel.setMessage("Please wait while retrieving control measures...");
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    refresh(new ControlMeasure[0]);
+//                    refresh(new ControlMeasure[0]);
                     refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs, showDetailsCheckBox.isSelected()));
                     messagePanel.clear();
                 } catch (Exception e) {
@@ -213,6 +213,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         panel.setLayout(new BorderLayout());
 
         panel.add(createTopPanel(), BorderLayout.NORTH);
+        tableData = new LightControlMeasureTableData(measures, costYearTable, selectedPollutant(), selectedCostYear());
         panel.add(tablePanel(parentConsole), BorderLayout.CENTER);
         panel.add(createControlPanel(), BorderLayout.SOUTH);
 
@@ -285,13 +286,26 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED || e.getStateChange() == ItemEvent.DESELECTED) {
                     //lets rebuild the table first, the table structure changes...
+//                    try {
+//                        setupTableModel(new ControlMeasure[] {});
+//                    } catch (EmfException e1) {
+//                        // NOTE Auto-generated catch block
+//                        e1.printStackTrace();
+//                    }
+//                    table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+
                     try {
-                        setupTableModel(new ControlMeasure[] {});
+                        if (showDetailsCheckBox.isSelected())
+                            tableData = new ControlMeasureTableData(new ControlMeasure[0], costYearTable, selectedPollutant(), selectedCostYear());
+                        else
+                            tableData = new LightControlMeasureTableData(new ControlMeasure[0], costYearTable, selectedPollutant(), selectedCostYear());
                     } catch (EmfException e1) {
                         // NOTE Auto-generated catch block
                         e1.printStackTrace();
                     }
                     table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+                    tablePanel.removeAll();
+                    tablePanel.add(table);
                     doRefresh();
                 }
             }
@@ -607,7 +621,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         try {
             setupTableModel(measures);
             table.refresh(tableData);
-            panelRefresh();
+//            panelRefresh();
         } catch (EmfException e) {
             messagePanel.setError("Error refreshing table: " + e.getMessage());
         }
@@ -618,17 +632,17 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         try {
             tableData.refresh(selectedPollutant(), selectedCostYear());
             table.refresh(tableData); // AME: added to fix refresh issue
-            panelRefresh();
+//            panelRefresh();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
     }
 
-    private void panelRefresh() {
-        tablePanel.removeAll();
-        tablePanel.add(table);
-        super.refreshLayout();
-    }
+//    private void panelRefresh() {
+//        tablePanel.removeAll();
+//        tablePanel.add(table);
+//        super.refreshLayout();
+//    }
     
     private String selectedCostYear() throws EmfException {
 //        if (costYear == null) return null;
