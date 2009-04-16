@@ -2569,6 +2569,11 @@ public class ManagedCaseService {
 
             }// for cjt
 
+            // Process the case job task manager wait queue
+            // if a job has no new exports, this signals the task queue to
+            // process it           
+            TaskManagerFactory.getCaseJobTaskManager(sessionFactory).processTaskQueue();
+
             if (DebugLevels.DEBUG_0)
                 System.out.println("Case Job Submitter Id for case job:" + caseJobSubmitterId);
 
