@@ -202,7 +202,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         createYearsComboBox();
 
         doLayout(this.parentConsole, measures);
-        this.messagePanel.setMessage("Please select a major pollutant to retrieve related control measures.");
+        this.messagePanel.setMessage("Please select a pollutant to retrieve related control measures.");
         super.display();
     }
 
