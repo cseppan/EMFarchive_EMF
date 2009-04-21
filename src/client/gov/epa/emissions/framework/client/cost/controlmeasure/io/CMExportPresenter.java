@@ -43,6 +43,7 @@ public class CMExportPresenter {
 
     private void doExport(int[] controlMeasureIds, String folder, boolean overwrite, String prefix) throws EmfException {
         ControlMeasureExportService service = session.controlMeasureExportService();
+        lastFolder=folder;
         
         if (overwrite)
             service.exportControlMeasuresWithOverwrite(folder, prefix, controlMeasureIds, session.user());
@@ -59,6 +60,8 @@ public class CMExportPresenter {
 
     private String getDefaultFolder() {
         String folder = session.preferences().outputFolder();
+        if (folder == null) return "";
+        
         if (!new File(folder).isDirectory())
             folder = "";// default, if unspecified
 
