@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.tasks;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.basic.RemoteCommand;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
@@ -11,8 +13,10 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -28,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 
 public class CaseJobTaskManager implements TaskManager {
     private static Log log = LogFactory.getLog(CaseJobTaskManager.class);
@@ -60,6 +65,8 @@ public class CaseJobTaskManager implements TaskManager {
     private static Hashtable<String, Task> waitTable = new Hashtable<String, Task>();
 
     private static Timer timer;
+
+    private static HibernateSessionFactory sessionFactory;
 
     public static synchronized int getSizeofTaskQueue() {
         return taskQueue.size();
@@ -130,6 +137,7 @@ public class CaseJobTaskManager implements TaskManager {
         if (DebugLevels.DEBUG_4)
             System.out.println("Initial # of jobs in Thread Pool: " + threadPool.getPoolSize());
 
+        CaseJobTaskManager.sessionFactory = sessionFactory;
         caseDAO = new CaseDAO(sessionFactory);
         statusDAO = new StatusDAO(sessionFactory);
 
@@ -176,8 +184,8 @@ public class CaseJobTaskManager implements TaskManager {
         }// synchronized
     }
 
-    public static synchronized void callBackFromThread(String taskId, String submitterId, String status, String[] msgs, String[] msgTypes, boolean regHistory)
-            throws EmfException {
+    public static synchronized void callBackFromThread(String taskId, String submitterId, String status, String[] msgs,
+            String[] msgTypes, boolean regHistory) throws EmfException {
         if (DebugLevels.DEBUG_2)
             System.out.println("CaseJobTaskManager::callBackFromThread  refCount= " + refCount);
         if (DebugLevels.DEBUG_2)
@@ -206,7 +214,8 @@ public class CaseJobTaskManager implements TaskManager {
         processTaskQueue();
     }
 
-    private static boolean updateRunStatus(String taskId, String status, String[] msgs, String[] msgTypes, boolean regHistory) throws EmfException {
+    private static boolean updateRunStatus(String taskId, String status, String[] msgs, String[] msgTypes,
+            boolean regHistory) throws EmfException {
         System.out.println("CaseJobTaskManager::updateRunStatus: " + taskId + " status= " + status);
 
         CaseJobTask cjt = null;
@@ -391,27 +400,8 @@ public class CaseJobTaskManager implements TaskManager {
                 toUpdate = true;
             }
 
-            if (toUpdate) {
-                JobRunStatus jrStat = caseDAO.getJobRunStatuse(jobStatus);
-                caseJob.setRunstatus(jrStat);
-                caseJob.setRunLog(msgs[msgs.length-1]);
-                caseDAO.updateCaseJob(caseJob);
-                
-                if (regHistory) {
-                    for (int i = 0; i < msgs.length; i++){
-                        if (msgs != null && !msgs[i].isEmpty()) {
-                            JobMessage jobMsg = new JobMessage();
-                            jobMsg.setCaseId(caseJob.getCaseId());
-                            jobMsg.setJobId(caseJob.getId());
-                            jobMsg.setMessageType(msgTypes[i]);
-                            jobMsg.setMessage(msgs[i]);
-                            jobMsg.setStatus(jrStat.getName());
-                            jobMsg.setReceivedTime(new Date());
-                            caseDAO.add(jobMsg);
-                        }
-                    }
-                }
-            }
+            if (toUpdate)
+                updateJobWithHistory(msgs, msgTypes, regHistory, jobStatus, caseJob);
         } catch (Exception e) {
             if (DebugLevels.DEBUG_9)
                 System.out.println("^^^^^^^^^^^^^^");
@@ -423,6 +413,29 @@ public class CaseJobTaskManager implements TaskManager {
         }
 
         return toRemove;
+    }
+
+    private static void updateJobWithHistory(String[] msgs, String[] msgTypes, boolean regHistory, String jobStatus,
+            CaseJob caseJob) {
+        JobRunStatus jrStat = caseDAO.getJobRunStatuse(jobStatus);
+        caseJob.setRunstatus(jrStat);
+        caseJob.setRunLog(msgs[msgs.length - 1]);
+        caseDAO.updateCaseJob(caseJob);
+
+        if (regHistory) {
+            for (int i = 0; i < msgs.length; i++) {
+                if (msgs != null && !msgs[i].isEmpty()) {
+                    JobMessage jobMsg = new JobMessage();
+                    jobMsg.setCaseId(caseJob.getCaseId());
+                    jobMsg.setJobId(caseJob.getId());
+                    jobMsg.setMessageType(msgTypes[i]);
+                    jobMsg.setMessage(msgs[i]);
+                    jobMsg.setStatus(jrStat.getName());
+                    jobMsg.setReceivedTime(new Date());
+                    caseDAO.add(jobMsg);
+                }
+            }
+        }
     }
 
     public static synchronized void processTaskQueue() throws EmfException {
@@ -676,7 +689,7 @@ public class CaseJobTaskManager implements TaskManager {
 
             if (status.equals("completed")) {
                 cjt.setExportsSuccess(true);
-                if (updateRunStatus(cjtId, "export succeeded", new String[]{mesg}, new String[]{"i"}, false))
+                if (updateRunStatus(cjtId, "export succeeded", new String[] { mesg }, new String[] { "i" }, false))
                     synchronized (waitTable) {
                         waitTable.remove(cjtId);
                     }
@@ -684,7 +697,7 @@ public class CaseJobTaskManager implements TaskManager {
 
             if (status.equals("failed")) {
                 cjt.setExportsSuccess(false);
-                if (updateRunStatus(cjtId, "export failed", new String[]{mesg}, new String[]{"i"}, false))
+                if (updateRunStatus(cjtId, "export failed", new String[] { mesg }, new String[] { "i" }, false))
                     synchronized (waitTable) {
                         waitTable.remove(cjtId);
                     }
@@ -828,7 +841,8 @@ public class CaseJobTaskManager implements TaskManager {
                             User user = caseJob.getUser();
 
                             // set the CaseJob jobstatus (casejob table) to Failed
-                            if (updateRunStatus(cjt.getTaskId(), "failed", new String[]{""}, new String[]{"i"}, false))
+                            if (updateRunStatus(cjt.getTaskId(), "failed", new String[] { "" }, new String[] { "i" },
+                                    false))
                                 tasks2Remove.add(cjt.getTaskId());
 
                             String message = "Job name= " + cjt.getJobName()
@@ -970,6 +984,57 @@ public class CaseJobTaskManager implements TaskManager {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new EmfException("System error in CaseJobTaskManager" + ex.getMessage());
+        }
+    }
+
+    public static synchronized void cancelJob(int jobId, User user) throws EmfException {
+        CaseJob caseJob = caseDAO.getCaseJob(jobId);
+        String status = caseJob.getRunstatus().getName();
+        String host = (caseJob.getHost() == null ? "localhost" : caseJob.getHost().getName());
+
+        if (status != null && (status.equalsIgnoreCase("Submitted") || status.equalsIgnoreCase("Running"))) {
+            String qid = caseJob.getIdInQueue();
+            
+            if (qid == null || qid.trim().isEmpty())
+                throw new EmfException("Host (" + host + ") doesn't have queue id: " + qid);
+            
+            String command = getQueCommand(qid, host);
+
+            if (DebugLevels.DEBUG_14)
+                System.out.println("CANCEL JOBS: " + command);
+            
+            InputStream inStream = RemoteCommand.execute(user.getUsername(), host, command);
+            String outTitle = "stdout from (" + host + "): " + command;
+            RemoteCommand.logStdout(outTitle, inStream);
+            String[] msgs = new String[] { "Job cancelled from '" + status + "' state by user '" + user.getUsername()
+                    + "'." };
+            String[] msgTypes = new String[] { "i" };
+            String cancelStatus = "Failed";
+            updateJobWithHistory(msgs, msgTypes, true, cancelStatus, caseJob);
+            return;
+        }
+
+        throw new EmfException("To cancel a job in '" + status + "' status is not supported yet");
+    }
+
+    private static String getQueCommand(String qid, String hostName) throws EmfException {
+        Session session = CaseJobTaskManager.sessionFactory.getSession();
+
+        if (!hostName.equals("localhost")) {
+            int firstDot = hostName.indexOf(".");
+            hostName = hostName.substring(0, firstDot);
+        }
+
+        try {
+            EmfProperty command = new EmfPropertiesDAO().getProperty("CANCEL_JOB_COMMAND_" + hostName.toUpperCase(),
+                    session);
+
+            if (command == null || command.getValue().isEmpty())
+                throw new EmfException("Can't get cancel job command from db table (emf.properties).");
+
+            return command.getValue() + " " + qid;
+        } finally {
+            session.close();
         }
     }
 }

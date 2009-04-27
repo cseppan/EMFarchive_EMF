@@ -219,6 +219,19 @@ public class ViewableJobsTab extends JPanel implements JobsTabView, RefreshObser
         });
         set.setMargin(insets);
         container.add(set);
+        
+        Button cancelJobs = new Button("Cancel Jobs", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clearMessage();
+                    cancelJobs();
+                } catch (Exception ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        });
+        cancelJobs.setMargin(insets);
+        container.add(cancelJobs);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
@@ -418,6 +431,18 @@ public class ViewableJobsTab extends JPanel implements JobsTabView, RefreshObser
         setMessage("Finished submitting jobs to run.");
     }
 
+    private void cancelJobs() throws EmfException {
+        List<CaseJob> jobs = getSelectedJobs();
+        
+        if (jobs == null || jobs.size() == 0)
+            throw new EmfException("Please select a job to cancel.");
+        
+        String msg = presenter.cancelJobs(jobs);
+        
+        if (msg != null && msg.length() > 0)
+            messagePanel.setError(msg);
+    }
+    
     private List<CaseJob> getSelectedJobs() {
         return (List<CaseJob>) table.selected();
     }

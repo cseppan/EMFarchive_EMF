@@ -1204,4 +1204,15 @@ public class CaseServiceTransport implements CaseService {
         return (CaseParameter)call.requestResponse(new Object[]{new Integer(caseId), var});
     }
 
+    public int cancelJobs(int[] cancelJobs, User user) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("cancelJobs");
+        call.addIntArrayParam();
+        call.addParam("user", dataMappings.user());
+        call.setIntegerReturnType();
+
+        return (Integer) call.requestResponse(new Object[] { cancelJobs, user });
+    }
+
 }

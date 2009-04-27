@@ -751,4 +751,8 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
+    public int cancelJobs(int[] jobIds, User user) throws EmfException {
+        return getCaseService().cancelJobs(jobIds, user);
+    }
+
 }

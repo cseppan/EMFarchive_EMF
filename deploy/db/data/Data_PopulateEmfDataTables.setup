@@ -50,6 +50,8 @@ insert into emf.properties values(DEFAULT, 'postgres-db', 'EMF');
 insert into emf.properties values(DEFAULT, 'postgres-user', 'emf');
 --NOTE THIS stores the postgres password, the name is different to hide its true purpose...
 insert into emf.properties values(DEFAULT, 'pgsql2shp-info', 'emf');
+INSERT into emf.properties values(DEFAULT, 'CANCEL_JOB_COMMAND_AMBER', 'qdel');
+INSERT into emf.properties values(DEFAULT, 'CANCEL_JOB_COMMAND_GARNET01', 'qdel');
 --emf.properties
 
 -- DO NOT CHANGE THE ORDER OF THE DATASET TYPE

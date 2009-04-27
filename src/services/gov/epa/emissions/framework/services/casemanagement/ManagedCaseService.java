@@ -5241,4 +5241,28 @@ public class ManagedCaseService {
         return temp.replaceAll("\\\\", "/");
     }
 
+    public synchronized int cancelJobs(int[] jobIds, User user) throws EmfException {
+        if (jobIds == null || jobIds.length == 0)
+            return 0;
+        
+        int jobCancelled = 0;
+        
+        for (int id : jobIds) {
+            CaseJob job = dao.getCaseJob(id);
+            
+            if (job == null)
+                continue;
+            
+            User runUser = job.getRunJobUser();
+            
+            if (!user.equals(runUser) && !user.isAdmin())
+                continue;
+            
+            TaskManagerFactory.getCaseJobTaskManager(sessionFactory).cancelJob(id, user);
+            jobCancelled++;
+        }
+        
+        return jobCancelled;
+    }
+
 }

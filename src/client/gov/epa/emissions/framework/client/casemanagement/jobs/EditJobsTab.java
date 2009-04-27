@@ -283,6 +283,19 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         });
         set.setMargin(insets);
         container.add(set);
+        
+        Button cancelJobs = new Button("Cancel Jobs", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clearMessage();
+                    cancelJobs();
+                } catch (Exception ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        });
+        cancelJobs.setMargin(insets);
+        container.add(cancelJobs);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
@@ -548,6 +561,18 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(message);
         // descScrollableTextArea.setMinimumSize(new Dimension(width * 3, height * 2));
         return descScrollableTextArea;
+    }
+    
+    private void cancelJobs() throws EmfException {
+        List<CaseJob> jobs = getSelectedJobs();
+        
+        if (jobs == null || jobs.size() == 0)
+            throw new EmfException("Please select a job to cancel.");
+        
+        String msg = presenter.cancelJobs(jobs);
+        
+        if (msg != null && msg.length() > 0)
+            messagePanel.setError(msg);
     }
 
     public void refresh() {

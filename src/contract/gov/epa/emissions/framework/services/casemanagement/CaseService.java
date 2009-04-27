@@ -224,4 +224,5 @@ public interface CaseService {
     
     String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException;
 
+    int cancelJobs(int[] jobIds, User user) throws EmfException;
  }

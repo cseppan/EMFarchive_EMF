@@ -18,6 +18,8 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
     private Case caseObj;
 
     private ViewableJobsTab view;
+    
+    private List<Integer> jobs2Cancel = new ArrayList<Integer>();
 
     private EmfSession session;
 
@@ -88,9 +90,11 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
         List<String> ok = new ArrayList<String>();
         List<String> cancel = new ArrayList<String>();
         List<String> warning = new ArrayList<String>();
-        
+        jobs2Cancel.clear();
+
         for (int i = 0; i < jobs.length; i++) {
-            String status = service().getCaseJob(jobs[i].getId()).getRunstatus().getName();
+            int jobId = jobs[i].getId();
+            String status = service().getCaseJob(jobId).getRunstatus().getName();
 
             if (status == null || status.trim().isEmpty())
                 ok.add(status);
@@ -107,19 +111,27 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
             if (status != null && status.equalsIgnoreCase("Failed"))
                 warning.add(status);
 
-            if (status != null && status.equalsIgnoreCase("Running"))
+            if (status != null && status.equalsIgnoreCase("Running")) {
                 cancel.add(status);
+                jobs2Cancel.add(jobId);
+            }
 
-            if (status != null && status.equalsIgnoreCase("Submitted"))
+            if (status != null && status.equalsIgnoreCase("Submitted")) {
                 cancel.add(status);
+                jobs2Cancel.add(jobId);
+            }
 
-            if (status != null && status.equalsIgnoreCase("Exporting"))
+            if (status != null && status.equalsIgnoreCase("Exporting")) {
                 cancel.add(status);
+                jobs2Cancel.add(jobId);
+            }
 
-            if (status != null && status.equalsIgnoreCase("Waiting"))
+            if (status != null && status.equalsIgnoreCase("Waiting")) {
                 cancel.add(status);
+                jobs2Cancel.add(jobId);
+            }
         }
-        
+
         if (ok.size() == jobs.length)
             return "OK";
 
@@ -194,6 +206,38 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
     public void refreshJobList() {
         // NOTE Auto-generated method stub
         
+    }
+
+    public String cancelJobs(List<CaseJob> jobs) {
+        try {
+            String status = getJobsStatus(jobs.toArray(new CaseJob[0]));
+
+            if (status != null && status.equalsIgnoreCase("OK"))
+                return "None of the selected jobs is in an active state. No job is cancelled.";
+
+            if (status.equalsIgnoreCase("CANCEL")) {
+                int count = service().cancelJobs(getJobIds(jobs2Cancel), session.user());
+                return count + " jobs have been successfully cancelled.";
+            }
+            
+            return "No job has been cancelled.";
+        } catch (EmfException e) {
+            return "Error cancelling jobs: " + e.getMessage() + ".";
+        }
+    }
+
+    private int[] getJobIds(List<Integer> jobIds) {
+        int size = jobIds.size();
+
+        if (jobIds == null || size == 0)
+            return new int[0];
+
+        int[] ids = new int[size];
+
+        for (int i = 0; i < size; i++)
+            ids[i] = jobIds.get(i);
+
+        return ids;
     }
 
     
