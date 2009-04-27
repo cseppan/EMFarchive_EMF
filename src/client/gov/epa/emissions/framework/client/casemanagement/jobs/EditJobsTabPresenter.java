@@ -46,6 +46,6 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
     
     void doSave(CaseJob[] jobs) throws EmfException;
 
-    String cancelJobs(List<CaseJob> jobs);
+    String cancelJobs(List<CaseJob> jobs) throws EmfException;
 
 }

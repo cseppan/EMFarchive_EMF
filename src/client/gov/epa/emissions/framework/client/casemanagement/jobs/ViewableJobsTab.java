@@ -224,7 +224,7 @@ public class ViewableJobsTab extends JPanel implements JobsTabView, RefreshObser
             public void actionPerformed(ActionEvent e) {
                 try {
                     clearMessage();
-                    cancelJobs();
+                    kickOfCancelJobs();
                 } catch (Exception ex) {
                     messagePanel.setError(ex.getMessage());
                 }
@@ -431,16 +431,37 @@ public class ViewableJobsTab extends JPanel implements JobsTabView, RefreshObser
         setMessage("Finished submitting jobs to run.");
     }
 
-    private void cancelJobs() throws EmfException {
+    private void kickOfCancelJobs() {
+        Thread populateThread = new Thread(new Runnable() {
+            public void run() {
+                startCancelJobs();
+            }
+        });
+        populateThread.start();
+    }
+    
+    private synchronized void startCancelJobs() {
+        try {
+            messagePanel.setMessage("Please wait while all selected jobs being cancelled...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            String msg = cancelJobs();
+
+            if (msg != null && !msg.trim().isEmpty())
+                messagePanel.setMessage(msg);
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+        }
+    }
+    
+    private String cancelJobs() throws EmfException {
         List<CaseJob> jobs = getSelectedJobs();
-        
+
         if (jobs == null || jobs.size() == 0)
             throw new EmfException("Please select a job to cancel.");
-        
-        String msg = presenter.cancelJobs(jobs);
-        
-        if (msg != null && msg.length() > 0)
-            messagePanel.setError(msg);
+
+        return presenter.cancelJobs(jobs);
     }
     
     private List<CaseJob> getSelectedJobs() {

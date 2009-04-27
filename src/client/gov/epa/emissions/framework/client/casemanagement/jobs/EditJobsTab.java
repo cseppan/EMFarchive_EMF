@@ -68,8 +68,8 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     private EmfSession session;
 
     private DesktopManager desktopManager;
-    
-    private CaseEditorPresenter parentPresenter; 
+
+    private CaseEditorPresenter parentPresenter;
 
     public EditJobsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager, EmfSession session) {
@@ -83,7 +83,8 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         super.setLayout(new BorderLayout());
     }
 
-    public void display(EmfSession session, Case caseObj, EditJobsTabPresenter presenter, CaseEditorPresenter parentPresenter) {
+    public void display(EmfSession session, Case caseObj, EditJobsTabPresenter presenter,
+            CaseEditorPresenter parentPresenter) {
         super.removeAll();
         this.outputDir = new TextField("outputdir", 50);
         outputDir.setText(caseObj.getOutputFileDir());
@@ -109,6 +110,15 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         populateThread.start();
     }
 
+    private void kickOfCancelJobs() {
+        Thread populateThread = new Thread(new Runnable() {
+            public void run() {
+                startCancelJobs();
+            }
+        });
+        populateThread.start();
+    }
+
     public synchronized void retrieveJobs() {
         try {
             messagePanel.setMessage("Please wait while retrieving all case jobs...");
@@ -125,6 +135,21 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             } catch (Exception e) {
                 messagePanel.setMessage(e.getMessage());
             }
+        }
+    }
+
+    private synchronized void startCancelJobs() {
+        try {
+            messagePanel.setMessage("Please wait while all selected jobs being cancelled...");
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            String msg = cancelJobs();
+
+            if (msg != null && !msg.trim().isEmpty())
+                messagePanel.setMessage(msg);
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
         }
     }
 
@@ -215,7 +240,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     private JPanel controlPanel() {
         Insets insets = new Insets(1, 2, 1, 2);
         JPanel container = new JPanel();
-        
+
         Button add = new AddButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMessage();
@@ -237,7 +262,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         });
         remove.setMargin(insets);
         container.add(remove);
-        
+
         String message1 = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmDialog1 = new ConfirmDialog(message1, "Warning", this);
         SelectAwareButton edit = new SelectAwareButton("Edit", editAction(), table, confirmDialog1);
@@ -274,7 +299,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         });
         validate.setMargin(insets);
         container.add(validate);
-        
+
         Button set = new Button("Set Status", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMessage();
@@ -283,12 +308,12 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         });
         set.setMargin(insets);
         container.add(set);
-        
+
         Button cancelJobs = new Button("Cancel Jobs", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     clearMessage();
-                    cancelJobs();
+                    kickOfCancelJobs();
                 } catch (Exception ex) {
                     messagePanel.setError(ex.getMessage());
                 }
@@ -302,7 +327,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         return panel;
     }
-    
+
     private Action editAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -314,7 +339,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
                 }
             }
         };
-        return action; 
+        return action;
     }
 
     private Action copyAction() {
@@ -402,8 +427,9 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
 
         Object[] selected = presenter.getAllCaseNameIDs();
-        String selectedCase = (String)JOptionPane.showInputDialog(parentConsole, "Copy " + jobs.size() + " job(s) to case: ",
-                "Copy Case Jobs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected, selected[getDefultIndex(selected)]);
+        String selectedCase = (String) JOptionPane.showInputDialog(parentConsole, "Copy " + jobs.size()
+                + " job(s) to case: ", "Copy Case Jobs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected,
+                selected[getDefultIndex(selected)]);
 
         if ((selectedCase != null) && (selectedCase.length() > 0)) {
             presenter.copyJobs(getCaseId(selectedCase), jobs);
@@ -413,31 +439,31 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     private int getDefultIndex(Object[] selected) {
         int currentCaseId = this.caseObj.getId();
         int length = selected.length;
-        
+
         for (int i = 0; i < length; i++)
             if (selected[i].toString().contains("(" + currentCaseId + ")"))
                 return i;
-        
+
         return 0;
     }
 
     private int getCaseId(String selectedCase) {
         int index1 = selectedCase.indexOf("(") + 1;
         int index2 = selectedCase.indexOf(")");
-         
+
         return Integer.parseInt(selectedCase.substring(index1, index2));
     }
 
     private Icon getCopyIcon() {
         URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
-        
+
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         }
-        
+
         return null;
     }
-    
+
     private void validateJobDatasets() throws EmfException {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 
@@ -448,11 +474,11 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         String validationMsg = presenter.validateJobs(jobs);
         int width = 50;
-        int height = (validationMsg.length() / 50)+3;
-        
+        int height = (validationMsg.length() / 50) + 3;
+
         if (height > 30)
             height = 30;
-        
+
         String title = "Possible Issues with Datasets Selected for Job Inputs";
 
         showMessageDialog(createMsgScrollPane(validationMsg, width, height), title);
@@ -467,9 +493,9 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
 
         SetjobsStatusDialog setDialog = new SetjobsStatusDialog(parentConsole, this, jobs, presenter);
-        setDialog.run();    
+        setDialog.run();
     }
-    
+
     private void runJobs() throws Exception {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
 
@@ -562,17 +588,14 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         // descScrollableTextArea.setMinimumSize(new Dimension(width * 3, height * 2));
         return descScrollableTextArea;
     }
-    
-    private void cancelJobs() throws EmfException {
+
+    private String cancelJobs() throws EmfException {
         List<CaseJob> jobs = getSelectedJobs();
-        
+
         if (jobs == null || jobs.size() == 0)
             throw new EmfException("Please select a job to cancel.");
-        
-        String msg = presenter.cancelJobs(jobs);
-        
-        if (msg != null && msg.length() > 0)
-            messagePanel.setError(msg);
+
+        return presenter.cancelJobs(jobs);
     }
 
     public void refresh() {
@@ -599,8 +622,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
     public void addJob(CaseJob job) {
         tableData.add(job);
-        setMessage("Added \"" + job.getName() 
-                + "\".  Click Refresh to see it in the table.");
+        setMessage("Added \"" + job.getName() + "\".  Click Refresh to see it in the table.");
     }
 
     private void panelRefresh() {
@@ -630,7 +652,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
     public void addSector(Sector sector) {
         if (sector == null)
             return;
-        
+
         parentPresenter.addSectorBacktoCase(sector);
     }
 

@@ -313,7 +313,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         return CaseObjectManager.getCaseObjectManager(session).getJobRunStatuses();
     }
 
-    public String cancelJobs(List<CaseJob> jobs) {
+    public String cancelJobs(List<CaseJob> jobs) throws EmfException {
         try {
             String status = getJobsStatus(jobs.toArray(new CaseJob[0]));
 
@@ -327,7 +327,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             
             return "No job has been cancelled.";
         } catch (EmfException e) {
-            return "Error cancelling jobs: " + e.getMessage() + ".";
+            throw new EmfException("Error: " + e.getMessage() + ".");
         }
     }
 
