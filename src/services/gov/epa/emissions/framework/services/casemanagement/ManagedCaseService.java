@@ -1469,6 +1469,7 @@ public class ManagedCaseService {
         copied.setRunCompletionDate(null);
         copied.setRunJobUser(null); // no running user at this time
         copied.setUser(user); // the user who makes the copy should be the owner of the copy
+        copied.setIdInQueue(null);
 
         return addCaseJob(user, copied, true);
     }

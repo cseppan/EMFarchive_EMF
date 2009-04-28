@@ -532,6 +532,7 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().recordJobMessage(message, jobKey);
     }
 
+    //NOTE: not used any more
     public int recordJobMessage(JobMessage[] msgs, String[] keys) throws EmfException {
         int msgLength = msgs.length;
         int returnVal = 0;
