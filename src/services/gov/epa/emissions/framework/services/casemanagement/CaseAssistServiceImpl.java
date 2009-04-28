@@ -162,7 +162,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
                 if (!(status.equalsIgnoreCase("Running"))) {
                     // status is Completed or Failed - set completion date
                     job.setRunCompletionDate(new Date());
-
+                    job.setIdInQueue(null);
                 } else {
                     // status is running - set running date
                     job.setRunStartDate(new Date());

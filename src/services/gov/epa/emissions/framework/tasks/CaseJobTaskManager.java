@@ -1010,6 +1010,7 @@ public class CaseJobTaskManager implements TaskManager {
                     + "'." };
             String[] msgTypes = new String[] { "i" };
             String cancelStatus = "Failed";
+            caseJob.setIdInQueue(null);
             updateJobWithHistory(msgs, msgTypes, true, cancelStatus, caseJob);
             return;
         }
