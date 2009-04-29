@@ -2410,6 +2410,9 @@ public class ManagedCaseService {
 
                 // reset job run log
                 caseJob.setRunLog("");
+                
+                // clear previous job queue id
+                caseJob.setIdInQueue(null);
 
                 // NOTE: does this affect job run???
                 this.updateCaseJob(user, caseJob);
@@ -3504,7 +3507,6 @@ public class ManagedCaseService {
                 if (!(status.equalsIgnoreCase("Running"))) {
                     // status is Completed or Failed - set completion date
                     job.setRunCompletionDate(new Date());
-                    job.setIdInQueue(null);
                 } else {
                     // status is running - set running date
                     job.setRunStartDate(new Date());
@@ -4025,7 +4027,7 @@ public class ManagedCaseService {
         String logNumDBConnCmd = "ps aux | grep postgres | wc -l";
         InputStream inStream = RemoteCommand.executeLocal(logNumDBConnCmd);
 
-        RemoteCommand.logStdout("Logged DB connections: " + prefix, inStream);
+        RemoteCommand.logRemoteStdout("Logged DB connections: " + prefix, inStream);
     }
 
     public synchronized AirQualityModel addAirQualityModel(AirQualityModel airQModel) throws EmfException {
@@ -5246,7 +5248,7 @@ public class ManagedCaseService {
         if (jobIds == null || jobIds.length == 0)
             return 0;
         
-        int jobCancelled = 0;
+        int jobCanceled = 0;
         
         for (int id : jobIds) {
             CaseJob job = dao.getCaseJob(id);
@@ -5257,13 +5259,14 @@ public class ManagedCaseService {
             User runUser = job.getRunJobUser();
             
             if (!user.equals(runUser) && !user.isAdmin())
-                continue;
+                throw new EmfException("only the user who is running the job '" +
+                        job.getName() + "' or an administrator can cancel it");
             
             TaskManagerFactory.getCaseJobTaskManager(sessionFactory).cancelJob(id, user);
-            jobCancelled++;
+            jobCanceled++;
         }
         
-        return jobCancelled;
+        return jobCanceled;
     }
 
 }

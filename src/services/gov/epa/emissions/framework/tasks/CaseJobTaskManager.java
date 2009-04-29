@@ -996,7 +996,7 @@ public class CaseJobTaskManager implements TaskManager {
             String qid = caseJob.getIdInQueue();
             
             if (qid == null || qid.trim().isEmpty())
-                throw new EmfException("Host (" + host + ") doesn't have queue id: " + qid);
+                throw new EmfException("Queue ID '" + qid + "' is invalid");
             
             String command = getQueCommand(qid, host);
 
@@ -1005,12 +1005,11 @@ public class CaseJobTaskManager implements TaskManager {
             
             InputStream inStream = RemoteCommand.execute(user.getUsername(), host, command);
             String outTitle = "stdout from (" + host + "): " + command;
-            RemoteCommand.logStdout(outTitle, inStream);
-            String[] msgs = new String[] { "Job cancelled from '" + status + "' state by user '" + user.getUsername()
+            RemoteCommand.logRemoteStdout(outTitle, inStream);
+            String[] msgs = new String[] { "Job canceled from '" + status + "' state by user '" + user.getUsername()
                     + "'." };
             String[] msgTypes = new String[] { "i" };
             String cancelStatus = "Failed";
-            caseJob.setIdInQueue(null);
             updateJobWithHistory(msgs, msgTypes, true, cancelStatus, caseJob);
             return;
         }
@@ -1031,7 +1030,7 @@ public class CaseJobTaskManager implements TaskManager {
                     session);
 
             if (command == null || command.getValue().isEmpty())
-                throw new EmfException("Can't get cancel job command from db table (emf.properties).");
+                throw new EmfException("Can't get cancel job command from db table (emf.properties)");
 
             return command.getValue() + " " + qid;
         } finally {

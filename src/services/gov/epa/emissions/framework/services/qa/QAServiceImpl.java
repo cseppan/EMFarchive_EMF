@@ -144,7 +144,7 @@ public class QAServiceImpl implements QAService {
             String logNumDBConnCmd = "ps aux | grep postgres | wc -l";
             InputStream inStream = RemoteCommand.executeLocal(logNumDBConnCmd);
 
-            RemoteCommand.logStdout("Logged DB connections (" + prefix + ")", inStream);
+            RemoteCommand.logRemoteStdout("Logged DB connections (" + prefix + ")", inStream);
             return;
         }
 

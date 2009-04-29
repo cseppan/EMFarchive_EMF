@@ -165,12 +165,12 @@ public class CaseJobTask extends Task {
                 executionStr = executionStr + " " + this.runRedirect + " " + this.logFile;
                 msg1 = "Submitted job to " + hostName + ". Execution string: " + executionStr + lineSep;
                 InputStream inStream = RemoteCommand.executeLocal(executionStr);
-                processLogs(executionStr, inStream, "localhost");
+                processLogs(executionStr, inStream, "localhost", true);
             } else {
                 // execute on remote machine and log stdout
                 msg1 = "Submitted job to " + hostName + ". Execution string: " + executionStr + lineSep;
                 InputStream inStream = RemoteCommand.execute(username, hostName, executionStr);
-                processLogs(executionStr, inStream, hostName);
+                processLogs(executionStr, inStream, hostName, false);
                 // capture PBSqueueId and send back to case job submitter
                 // TODO:
             }
@@ -199,9 +199,9 @@ public class CaseJobTask extends Task {
         }
     }
 
-    private void processLogs(String executionStr, InputStream inStream, String host) throws EmfException {
+    private void processLogs(String executionStr, InputStream inStream, String host, boolean local) throws EmfException {
         String outTitle = "stdout from (" + host + "): " + executionStr;
-        RemoteCommand.logStdout(outTitle, inStream);
+        RemoteCommand.logStdout(outTitle, inStream, local);
         qId = RemoteCommand.getQueueId();
     }
 

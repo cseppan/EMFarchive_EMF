@@ -22,7 +22,7 @@ public class RemoteCommand {
 
     private static final String lineSep = System.getProperty("line.separator");
 
-    public static void logStdout(String title, InputStream inStream) throws EmfException {
+    public static void logStdout(String title, InputStream inStream, boolean localHost) throws EmfException {
         /**
          * log the stdout from a remote command to the log
          */
@@ -36,19 +36,60 @@ public class RemoteCommand {
         if (reader != null) {
             try {
                 String message = reader.readLine();
-                boolean processQId = true;
+                String lstNonNullMsg = message;
+                boolean foundQid = false;
 
+                if (message == null) {
+                    message = reader.readLine();
+                    lstNonNullMsg = message;
+                }
+                
                 while (message != null) {
+                    lstNonNullMsg = message;
                     LOG.warn(message);
 
-                    if (processQId)
-                        processQId = extractQId(message);
-
+                    if (!foundQid)
+                        foundQid = extractQId(message);
+                    
                     message = reader.readLine();
                 }
+                
                 reader.close();
+                
+                if (!foundQid && !localHost)
+                    throw new EmfException("please check your queue options " + (lstNonNullMsg == null ? "" : "(" + lstNonNullMsg + ")"));
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new EmfException("Error logging remote command's stdout/stderr: " + e.getMessage());
+            }
+        }
+    }
+    
+    public static void logRemoteStdout(String title, InputStream inStream) throws EmfException {
+        /**
+         * log the stdout from a remote command to the log
+         */
+        BufferedReader reader = null;
+
+        // log the title of this series of message to the LOG
+        LOG.warn(title);
+
+        reader = new BufferedReader(new InputStreamReader(inStream));
+
+        if (reader != null) {
+            try {
+                String message = reader.readLine();
+
+                if (message == null)
+                    message = reader.readLine();
+                
+                while (message != null) {
+                    LOG.warn(message);
+                    message = reader.readLine();
+                }
+                
+                reader.close();
+            } catch (Exception e) {
                 throw new EmfException("Error logging remote command's stdout/stderr: " + e.getMessage());
             }
         }
@@ -56,17 +97,19 @@ public class RemoteCommand {
 
     private static boolean extractQId(String message) {
         if (message == null || message.trim().isEmpty())
-            return true;
+            return false;
 
+        // TBD: need to generalize this to accept other queue ID formats - perhaps with
+        //      new property
         Pattern p = Pattern.compile("^[0-9]*\\.(.)*");
         Matcher m = p.matcher(message.trim());
 
         if (m.find()) {
             qID = message.trim();
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     public static String logStderr(String title, InputStream inStream) throws Exception {
@@ -232,9 +275,8 @@ public class RemoteCommand {
             return p.getInputStream();
 
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.error("ERROR executing remote command: " + executeCmd);
-            throw new EmfException("ERROR from remote command: " + e.getMessage());
+            LOG.error("ERROR executing remote command: " + executeCmd, e);
+            throw new EmfException("ERROR executing remote command: " + executeCmd);
         }
     }
 
