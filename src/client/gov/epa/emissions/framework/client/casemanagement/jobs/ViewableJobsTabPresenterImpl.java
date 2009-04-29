@@ -213,14 +213,14 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
             String status = getJobsStatus(jobs.toArray(new CaseJob[0]));
 
             if (status != null && status.equalsIgnoreCase("OK"))
-                return "None of the selected jobs is in an active state. No job is cancelled.";
+                return "None of the selected jobs is in an active state. No job is canceled.";
 
             if (status.equalsIgnoreCase("CANCEL")) {
                 int count = service().cancelJobs(getJobIds(jobs2Cancel), session.user());
-                return count + " jobs have been successfully cancelled.";
+                return count + " jobs have been successfully canceled.";
             }
             
-            return "No job has been cancelled.";
+            return "No job has been canceled.";
         } catch (EmfException e) {
             throw new EmfException("Error: " + e.getMessage());
         }

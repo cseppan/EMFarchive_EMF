@@ -140,7 +140,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
     private synchronized void startCancelJobs() {
         try {
-            messagePanel.setMessage("Please wait while all selected jobs being cancelled...");
+            messagePanel.setMessage("Please wait while all selected jobs are being canceled...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             String msg = cancelJobs();
 
@@ -309,7 +309,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         set.setMargin(insets);
         container.add(set);
 
-        Button cancelJobs = new Button("Cancel Jobs", new AbstractAction() {
+        Button cancelJobs = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     clearMessage();
