@@ -992,29 +992,103 @@ public class CaseJobTaskManager implements TaskManager {
         String status = caseJob.getRunstatus().getName();
         String host = (caseJob.getHost() == null ? "localhost" : caseJob.getHost().getName());
 
-        if (status != null && (status.equalsIgnoreCase("Submitted") || status.equalsIgnoreCase("Running"))) {
-            String qid = caseJob.getIdInQueue();
-            
-            if (qid == null || qid.trim().isEmpty())
-                throw new EmfException("Queue ID '" + qid + "' is invalid");
-            
-            String command = getQueCommand(qid, host);
+        if (status == null)
+            throw new EmfException("Status for job '" + caseJob.getName() + "' is undefined.");
 
-            if (DebugLevels.DEBUG_14)
-                System.out.println("CANCEL JOBS: " + command);
-            
-            InputStream inStream = RemoteCommand.execute(user.getUsername(), host, command);
-            String outTitle = "stdout from (" + host + "): " + command;
-            RemoteCommand.logRemoteStdout(outTitle, inStream);
-            String[] msgs = new String[] { "Job canceled from '" + status + "' state by user '" + user.getUsername()
-                    + "'." };
-            String[] msgTypes = new String[] { "i" };
-            String cancelStatus = "Failed";
-            updateJobWithHistory(msgs, msgTypes, true, cancelStatus, caseJob);
-            return;
+        if (status.equalsIgnoreCase("Submitted") || status.equalsIgnoreCase("Running"))
+            remoteCancel(user, caseJob, host);
+
+        if (status.equalsIgnoreCase("Waiting"))
+            cancelTempTables(user, caseJob, host);
+
+        if (status.equalsIgnoreCase("Exporting")) {
+            boolean found = TaskManagerFactory.getExportTaskManager().cancelExports2Job(jobId, user);
+
+            if (!found)
+                cancelTempTables(user, caseJob, host);
         }
 
-        throw new EmfException("To cancel a job in '" + status + "' status is not supported yet");
+        updateCancelStatus(user, caseJob, status);
+    }
+
+    private static void cancelTempTables(User user, CaseJob job, String host) throws EmfException {
+        // 1. remove it from persisted tasks table so it won't start if service crashes
+        // 2. lock wait table and remove it from wait table
+        // 3. lock run table and remove it from run table
+        // 4a. if none is found, check job status one more time
+        // 4b. if status is 'Submitted' or 'Running', then remoteCncel()
+        try {
+            caseDAO
+                    .removePersistedTask(new PersistedWaitTask(job.getId(), job.getCaseId(), job.getRunJobUser()
+                            .getId()));
+        } catch (Exception e) {
+            log.warn("Persisted job (" + job.getName() + "): not found in db table.");
+        }
+
+        boolean found = findNRemove(job, waitTable, user);
+
+        if (!found)
+            found = findNRemove(job, runTable, user);
+
+        if (!found) {
+            CaseJob fresh = caseDAO.getCaseJob(job.getId());
+            JobRunStatus status = fresh.getRunstatus();
+
+            if (status != null
+                    && (status.getName().equalsIgnoreCase("Submitted") || status.getName().equalsIgnoreCase("Running")))
+                remoteCancel(user, fresh, host);
+        }
+    }
+
+    private static boolean findNRemove(CaseJob job, Hashtable<String, Task> tempTable, User user) {
+        boolean found = false;
+
+        synchronized (tempTable) {
+            Collection<Task> allTasks = tempTable.values();
+            Iterator<Task> iter = allTasks.iterator();
+            CaseJobTask cjt = null;
+
+            while (iter.hasNext()) {
+                cjt = (CaseJobTask) iter.next();
+
+                if (cjt.getJobId() == job.getId() && cjt.getUser().getId() == job.getRunJobUser().getId())
+                    found = true;
+
+                if (user.isAdmin() && job.getId() == cjt.getCaseId())
+                    found = true;
+
+                if (found)
+                    break;
+            }
+
+            if (found && cjt != null)
+                tempTable.remove(cjt);
+        }
+
+        return found;
+    }
+
+    private static void remoteCancel(User user, CaseJob caseJob, String host) throws EmfException {
+        String qid = caseJob.getIdInQueue();
+
+        if (qid == null || qid.trim().isEmpty())
+            throw new EmfException("Queue ID '" + qid + "' is invalid");
+
+        String command = getQueCommand(qid, host);
+
+        if (DebugLevels.DEBUG_14)
+            System.out.println("CANCEL JOBS: " + command);
+
+        InputStream inStream = RemoteCommand.execute(user.getUsername(), host, command);
+        String outTitle = "stdout from (" + host + "): " + command;
+        RemoteCommand.logRemoteStdout(outTitle, inStream);
+    }
+
+    private static void updateCancelStatus(User user, CaseJob caseJob, String status) {
+        String[] msgs = new String[] { "Job canceled from '" + status + "' state by user '" + user.getUsername() + "'." };
+        String[] msgTypes = new String[] { "i" };
+        String cancelStatus = "Failed";
+        updateJobWithHistory(msgs, msgTypes, true, cancelStatus, caseJob);
     }
 
     private static String getQueCommand(String qid, String hostName) throws EmfException {

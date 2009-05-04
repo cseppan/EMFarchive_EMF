@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.tasks;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.exim.ExportTask;
@@ -183,7 +184,7 @@ public class ExportTaskManager implements TaskManager {
                 System.out.println("Number of waitTasks acquired from waitTable: " + waitTable.values().size());
                 System.out.println("Number of tasks acquired from runTable: " + runTable.size());
             }
-            
+
             // iterate over the tasks in the waitTable and find as many that can
             // be run in all available threads
             Collection<Task> waitTasks = waitTable.values();
@@ -242,7 +243,7 @@ public class ExportTaskManager implements TaskManager {
                     break;
                 }
 
-            }  // iterating over waiting tasks
+            } // iterating over waiting tasks
 
             if (DebugLevels.DEBUG_9)
                 System.out.println("SIZE OF TASKQUEUE: " + getSizeofTaskQueue());
@@ -315,8 +316,8 @@ public class ExportTaskManager implements TaskManager {
 
             }// while not done (more tasks available in task queue)
 
-            //postProcessWaitTable();
-            
+            // postProcessWaitTable();
+
             // Now do other processing and maintenance work
             // if taskQueue is empty then this processing will be the only thing that happens
             // during this callback
@@ -324,8 +325,12 @@ public class ExportTaskManager implements TaskManager {
             // TODO:
 
             if (DebugLevels.DEBUG_9) {
-                System.out.println("ExportTaskManager::processTaskQueue() after postProcessWaitTable, Wait table size: " + waitTable.size());
-                System.out.println("ExportTaskManager::processTaskQueue() after postProcessWaitTable,  Run table size: " + runTable.size());
+                System.out
+                        .println("ExportTaskManager::processTaskQueue() after postProcessWaitTable, Wait table size: "
+                                + waitTable.size());
+                System.out
+                        .println("ExportTaskManager::processTaskQueue() after postProcessWaitTable,  Run table size: "
+                                + runTable.size());
                 System.out.println("*** END ExportTaskManager::processTaskQueue() *** " + new Date());
                 System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
             }
@@ -398,27 +403,32 @@ public class ExportTaskManager implements TaskManager {
 
         TaskSubmitter submitter = getCurrentSubmitter(submitterId);
 
-        try {
-            submitter.callbackFromTaskManager(taskId, status, mesg);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        }
+        if (submitter != null) {
+            try {
+                submitter.callbackFromTaskManager(taskId, status, mesg);
+            } catch (Exception e) {
+                log.warn("ERROR calling back to ExportSubmitter. ", e);
+            }
 
-        if (submitter instanceof ExportJobSubmitter && ((ExportJobSubmitter) submitter).finished()) {
-            if (DebugLevels.DEBUG_15)
-                System.out.println("ExportJobSubmitter " + submitter.getSubmitterId() + " is deregistering itself. ");
+            if (submitter instanceof ExportJobSubmitter && ((ExportJobSubmitter) submitter).finished()) {
+                if (DebugLevels.DEBUG_15)
+                    System.out.println("ExportJobSubmitter " + submitter.getSubmitterId()
+                            + " is deregistering itself. ");
 
-            submitter.deregisterSubmitterFromRunManager(submitter);
+                submitter.deregisterSubmitterFromRunManager(submitter);
 
-            if (DebugLevels.DEBUG_15)
-                System.out.println("After deregistering itself, the number of submitters in import task manager: "
-                        + submitters.size());
+                if (DebugLevels.DEBUG_15)
+                    System.out.println("After deregistering itself, the number of submitters in import task manager: "
+                            + submitters.size());
+            }
+        } else {
+            log.warn("Submitter with id = " + submitterId + " had an early exit (could be due to job cancelation).");
         }
 
         // done with the call back ... so process the two tables and task queue
         processTaskQueue();
 
-        if (DebugLevels.DEBUG_9) 
+        if (DebugLevels.DEBUG_9)
             System.out.println("*** END ExportTaskManager::callBackFromThread() *** " + new Date());
 
     }
@@ -440,10 +450,11 @@ public class ExportTaskManager implements TaskManager {
             if (tsk.fileExists()) {
                 status = "completed";
                 msg = "FILE EXISTS: Completed export of " + tsk.getDataset().getName() + ".";
-                
+
                 if (DebugLevels.DEBUG_9)
-                    System.out.println("postProcessWaitTable(): File exists tested. Wait table size: " + waitTable.size() + ".");
-                
+                    System.out.println("postProcessWaitTable(): File exists tested. Wait table size: "
+                            + waitTable.size() + ".");
+
                 byPassExport(tsk.getTaskId(), tsk.getSubmitterId(), status, 0, msg);
                 toBRemoved.add(tsk);
             }
@@ -452,19 +463,20 @@ public class ExportTaskManager implements TaskManager {
                 String[] statuses = tsk.quickRunExternalExport();
                 status = statuses[0];
                 msg = statuses[1];
-                
+
                 if (DebugLevels.DEBUG_9)
-                    System.out.println("postProcessWaitTable(): External dataset exported. Wait table size: " + waitTable.size() + ".");
-                
+                    System.out.println("postProcessWaitTable(): External dataset exported. Wait table size: "
+                            + waitTable.size() + ".");
+
                 byPassExport(tsk.getTaskId(), tsk.getSubmitterId(), status, 0, msg);
                 toBRemoved.add(tsk);
             }
         }
-        
+
         for (Iterator<Task> task = toBRemoved.iterator(); iter.hasNext();) {
             waitTable.remove(task.next().getTaskId());
         }
-            
+
     }
 
     private static synchronized void byPassExport(String taskId, String submitterId, String status, long id, String mesg) {
@@ -479,8 +491,8 @@ public class ExportTaskManager implements TaskManager {
             System.out.println("SIZE OF RUN TABLE BEFORE REMOVE= " + runTable.size());
         }
 
-//        if (runTable.contains(taskId))
-//            runTable.remove(taskId);
+        // if (runTable.contains(taskId))
+        // runTable.remove(taskId);
 
         if (DebugLevels.DEBUG_9)
             System.out.println("SIZE OF RUN TABLE AFTER REMOVE= " + runTable.size());
@@ -586,6 +598,59 @@ public class ExportTaskManager implements TaskManager {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new EmfException("System error in ExportTaskManager" + ex.getMessage());
+        }
+    }
+
+    public static synchronized boolean cancelExports2Job(int jobId, User user) throws EmfException {
+        boolean found = false;
+
+        synchronized (submitters) {
+            Iterator<TaskSubmitter> iter = submitters.iterator();
+
+            while (iter.hasNext()) {
+                TaskSubmitter submitter = iter.next();
+                if (submitter instanceof ExportJobSubmitter) {
+                    ExportJobSubmitter jobSM = (ExportJobSubmitter) submitter;
+                    if ((jobSM.getJobId() == jobId && jobSM.getRunUser().equals(user))
+                            || (jobSM.getJobId() == jobId && user.isAdmin())) {
+                        found = true;
+                        findNRemoveTasksFromWaitTable(jobSM);
+
+                        if (DebugLevels.DEBUG_14)
+                            System.out.println("---Found a submitter in the taskmanager collection of submitters: "
+                                    + jobSM.getSubmitterId());
+
+                        jobSM.deregisterSubmitterFromRunManager(jobSM);
+                        String message = "Exports canceled by user '" + user.getUsername() + "'";
+                        CaseJobTaskManager.callBackFromExportJobSubmitter(jobSM.getCaseJobTaskId(), "failed", message);
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return found;
+    }
+
+    private static void findNRemoveTasksFromWaitTable(ExportJobSubmitter jobSM) {
+        Hashtable<String, ExportTaskStatus> taskStatuses = jobSM.getAllTaskStatus();
+        Collection<ExportTaskStatus> allSubTaskStatus = taskStatuses.values();
+        Iterator<ExportTaskStatus> iter = allSubTaskStatus.iterator();
+
+        synchronized (waitTable) {
+            while (iter.hasNext()) {
+                ExportTaskStatus tas = iter.next();
+                String tid = tas.getExportTask().getTaskId();
+
+                if (waitTable.containsKey(tid)) {
+                    waitTable.remove(tid);
+
+                    if (DebugLevels.DEBUG_14)
+                        System.out.println("---Export task (to " + tas.getFullExportPath() + ") removed from "
+                                + " ExportTaskManager waitTable.");
+                }
+            }
         }
     }
 

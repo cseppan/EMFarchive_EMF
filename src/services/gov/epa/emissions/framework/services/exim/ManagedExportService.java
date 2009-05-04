@@ -187,6 +187,8 @@ public class ManagedExportService {
             // the casejobTask for these exports.
             exportJobTaskSubmitter.setCaseJobTaskId(cjtId);
             exportJobTaskSubmitter.setJobName(job.getName());
+            exportJobTaskSubmitter.setJobId(job.getId());
+            exportJobTaskSubmitter.setRunUser(job.getRunJobUser());
             TaskManagerFactory.getExportTaskManager().registerTaskSubmitter(exportJobTaskSubmitter);
         }
 

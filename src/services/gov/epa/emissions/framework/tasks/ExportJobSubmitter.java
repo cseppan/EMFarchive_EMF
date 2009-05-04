@@ -10,11 +10,15 @@ import java.util.Iterator;
 public class ExportJobSubmitter extends ExportSubmitter {
 
     String caseJobTaskId = null;
-    
+
     private String caseJobName = null;
-    
+
+    private int jobId;
+
+    private User runUser;
+
     private boolean finished = false;
-    
+
     public String getCaseJobTaskId() {
         return caseJobTaskId;
     }
@@ -36,14 +40,14 @@ public class ExportJobSubmitter extends ExportSubmitter {
     /**
      * Set the job name for this submitter
      */
-    public void setJobName(String jobName){
+    public void setJobName(String jobName) {
         this.caseJobName = jobName;
     }
-    
-    public String getJobName(){
+
+    public String getJobName() {
         return this.caseJobName;
     }
-    
+
     public synchronized void callbackFromTaskManager(String taskId, String status, String mesg) {
         if (DebugLevels.DEBUG_9)
             System.out
@@ -82,44 +86,36 @@ public class ExportJobSubmitter extends ExportSubmitter {
                 System.out.println("STATIS set = " + statis);
         }
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9) {
             System.out.println("STATIS VALUE after switch= " + statis);
-        if (DebugLevels.DEBUG_9)
             System.out.println("SubmittedTable STATIS for this taskId before setStatus= "
                     + (submittedTable.get(taskId).getStatus()));
+        }
 
         // Set the status of the TastStatus object for this taskId
         submittedTable.get(taskId).setStatus(statis);
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9) {
             System.out.println("SubmittedTable STATIS for this taskId after setStatus= "
                     + (submittedTable.get(taskId).getStatus()));
-
-        if (DebugLevels.DEBUG_9)
             System.out.println("DID THE STATUS GET SET IN THE TABLE? "
                     + (submittedTable.get(taskId).getStatus() == statis));
+        }
 
         // remove completed and failed export tasks from the submitted list
         if (!(status.equals("started"))) {
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9) {
                 System.out.println("In submitter staus of task was : " + status);
-            if (DebugLevels.DEBUG_9)
                 System.out.println("In submitter: " + submitterId);
-            if (DebugLevels.DEBUG_9)
                 System.out.println("$$$$ Size of export tasks list before remove: " + exportTasks.size());
-            if (DebugLevels.DEBUG_9)
                 System.out.println("$$$$ Size of submitted tasks table before remove: " + submittedTable.size());
 
-            // Since this is the Export Client Submitter, remove the taskstatus form the submitted Table
-            // after the status has been logged and sent for completed or failed task statuses
-            if (DebugLevels.DEBUG_9)
+                // Since this is the Export Client Submitter, remove the taskstatus form the submitted Table
+                // after the status has been logged and sent for completed or failed task statuses
                 System.out.println("Size of submitted table before ETS removed= " + submittedTable.size());
-            if (DebugLevels.DEBUG_9)
                 System.out.println("Size of submitted table after ETS removed= " + submittedTable.size());
-
-            if (DebugLevels.DEBUG_9)
                 System.out.println("$$$$ Size of submitted tasks table after remove: " + submittedTable.size());
-
+            }
         }
 
         int start = 0;
@@ -156,18 +152,18 @@ public class ExportJobSubmitter extends ExportSubmitter {
         if (DebugLevels.DEBUG_9)
             System.out.println(" Size of submittedTable: " + submittedTable.size());
 
-        // jobName) are completed: 
+        // jobName) are completed:
         String message = null;
         if (submittedTable.size() == (done + fail + canned)) {
-            message = "Exports for job (" + this.caseJobName + ") are completed. Total exports submitted=" + submittedTable.size()
-                    + " Completed= " + done + " Failed= " + fail + " Canceled= " + canned;
+            message = "Exports for job (" + this.caseJobName + ") are completed. Total exports submitted="
+                    + submittedTable.size() + " Completed= " + done + " Failed= " + fail + " Canceled= " + canned;
 
             this.setStatus(user, statusServices, message);
-            
+
             if (submittedTable.size() == done) {
                 status = "completed";
-                
-            }else{
+
+            } else {
                 status = "failed";
             }
 
@@ -185,9 +181,40 @@ public class ExportJobSubmitter extends ExportSubmitter {
             System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from TaskManager for Task: "
                     + taskId + " status= " + status + " message= " + message);
     }
-    
+
+    // WARNING: Call this method IF AND ONLY IF you know what you are doing!!!
+    // Method used to cancel the export tasks in the submitter
+    public synchronized void setTaskStatusFailed() {
+        Collection<ExportTaskStatus> allSubTaskStatus = submittedTable.values();
+        Iterator<ExportTaskStatus> iter = allSubTaskStatus.iterator();
+
+        synchronized (submittedTable) {
+            while (iter.hasNext()) {
+                ExportTaskStatus tas = iter.next();
+                String tid = tas.getExportTask().getTaskId();
+                submittedTable.get(tid).setStatus(TaskStatus.FAILED);
+            }
+        }
+    }
+
     public synchronized boolean finished() {
         return finished;
+    }
+
+    public int getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(int jobId) {
+        this.jobId = jobId;
+    }
+
+    public User getRunUser() {
+        return runUser;
+    }
+
+    public void setRunUser(User runUser) {
+        this.runUser = runUser;
     }
 
 }

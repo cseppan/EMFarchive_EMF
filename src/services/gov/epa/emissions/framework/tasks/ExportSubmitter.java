@@ -150,6 +150,10 @@ public abstract class ExportSubmitter implements TaskSubmitter {
     public synchronized int getTaskCount() {
         return this.submittedTable.size();
     }
+    
+    public Hashtable<String, ExportTaskStatus> getAllTaskStatus() {
+        return this.submittedTable;
+    }
 
     public synchronized void deregisterSubmitterFromRunManager(TaskSubmitter ts) {
         ExportTaskManager.deregisterSubmitter(ts);
