@@ -1006,6 +1006,9 @@ public class CaseJobTaskManager implements TaskManager {
 
             if (!found)
                 cancelTempTables(user, caseJob, host);
+            
+            if (found)
+                return;
         }
 
         updateCancelStatus(user, caseJob, status);
@@ -1054,7 +1057,7 @@ public class CaseJobTaskManager implements TaskManager {
                 if (cjt.getJobId() == job.getId() && cjt.getUser().getId() == job.getRunJobUser().getId())
                     found = true;
 
-                if (user.isAdmin() && job.getId() == cjt.getCaseId())
+                if (user.isAdmin() && job.getId() == cjt.getJobId())
                     found = true;
 
                 if (found)
@@ -1062,7 +1065,7 @@ public class CaseJobTaskManager implements TaskManager {
             }
 
             if (found && cjt != null)
-                tempTable.remove(cjt);
+                tempTable.remove(cjt.getTaskId());
         }
 
         return found;
