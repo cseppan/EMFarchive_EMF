@@ -616,11 +616,17 @@ public class ExportTaskManager implements TaskManager {
                         found = true;
                         findNRemoveTasksFromWaitTable(jobSM);
 
-                        if (DebugLevels.DEBUG_14)
+                        if (DebugLevels.DEBUG_14) {
                             System.out.println("---Found a submitter in the taskmanager collection of submitters: "
                                     + jobSM.getSubmitterId());
-
+                            System.out.println("Before deregister export job submitter (job id = " + jobId + "), submitters size: " + submitters.size());
+                        }
+                        
                         jobSM.deregisterSubmitterFromRunManager(jobSM);
+                        
+                        if (DebugLevels.DEBUG_14) 
+                            System.out.println("After deregister export job submitter, submitters size: " + submitters.size());
+                        
                         String message = "Exports canceled by user '" + user.getUsername() + "'";
                         CaseJobTaskManager.callBackFromExportJobSubmitter(jobSM.getCaseJobTaskId(), "failed", message);
 
