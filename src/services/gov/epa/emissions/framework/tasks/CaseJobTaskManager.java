@@ -1006,7 +1006,7 @@ public class CaseJobTaskManager implements TaskManager {
 
             if (!found)
                 cancelTempTables(user, caseJob, host);
-            
+
             if (found)
                 return;
         }
@@ -1033,14 +1033,12 @@ public class CaseJobTaskManager implements TaskManager {
         if (!found)
             found = findNRemove(job, runTable, user);
 
-        if (!found) {
-            CaseJob fresh = caseDAO.getCaseJob(job.getId());
-            JobRunStatus status = fresh.getRunstatus();
+        CaseJob fresh = caseDAO.getCaseJob(job.getId());
+        JobRunStatus status = fresh.getRunstatus();
 
-            if (status != null
-                    && (status.getName().equalsIgnoreCase("Submitted") || status.getName().equalsIgnoreCase("Running")))
-                remoteCancel(user, fresh, host);
-        }
+        if (status != null
+                && (status.getName().equalsIgnoreCase("Submitted") || status.getName().equalsIgnoreCase("Running")))
+            remoteCancel(user, fresh, host);
     }
 
     private static boolean findNRemove(CaseJob job, Hashtable<String, Task> tempTable, User user) {
@@ -1078,7 +1076,7 @@ public class CaseJobTaskManager implements TaskManager {
             updateCancelStatus(user, caseJob, caseJob.getRunstatus().getName());
             throw new EmfException("Please cancel the job command manually.");
         }
-        
+
         if (qid == null || qid.trim().isEmpty())
             throw new EmfException("Queue ID '" + qid + "' is invalid");
 
