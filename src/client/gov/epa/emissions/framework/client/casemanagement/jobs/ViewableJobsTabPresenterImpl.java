@@ -222,7 +222,7 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
             
             return "No job has been canceled.";
         } catch (EmfException e) {
-            throw new EmfException("Error: " + e.getMessage());
+            throw new EmfException("Error: " + e.getMessage() + ".");
         }
     }
 

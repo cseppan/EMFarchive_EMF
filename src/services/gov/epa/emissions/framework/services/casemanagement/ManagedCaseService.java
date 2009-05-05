@@ -5260,7 +5260,7 @@ public class ManagedCaseService {
             
             if (!user.equals(runUser) && !user.isAdmin())
                 throw new EmfException("only the user who is running the job '" +
-                        job.getName() + "' or an administrator can cancel it");
+                        job.getName() + "' or an administrator can cancel the job");
             
             TaskManagerFactory.getCaseJobTaskManager(sessionFactory).cancelJob(id, user);
             jobCanceled++;

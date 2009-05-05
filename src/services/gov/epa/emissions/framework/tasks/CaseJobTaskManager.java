@@ -1074,8 +1074,10 @@ public class CaseJobTaskManager implements TaskManager {
     private static void remoteCancel(User user, CaseJob caseJob, String host) throws EmfException {
         String qid = caseJob.getIdInQueue();
 
-        if (host.equalsIgnoreCase("localhost"))
+        if (host.equalsIgnoreCase("localhost")) {
+            updateCancelStatus(user, caseJob, caseJob.getRunstatus().getName());
             throw new EmfException("Please cancel the job command manually.");
+        }
         
         if (qid == null || qid.trim().isEmpty())
             throw new EmfException("Queue ID '" + qid + "' is invalid");

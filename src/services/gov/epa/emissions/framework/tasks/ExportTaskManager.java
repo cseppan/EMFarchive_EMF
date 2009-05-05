@@ -645,6 +645,9 @@ public class ExportTaskManager implements TaskManager {
         Iterator<ExportTaskStatus> iter = allSubTaskStatus.iterator();
 
         synchronized (waitTable) {
+            if (DebugLevels.DEBUG_14)
+                System.out.println("---Before removing export tasks, waitTable size: " + waitTable.size() + ".");
+            
             while (iter.hasNext()) {
                 ExportTaskStatus tas = iter.next();
                 String tid = tas.getExportTask().getTaskId();
@@ -652,9 +655,11 @@ public class ExportTaskManager implements TaskManager {
                 if (waitTable.containsKey(tid)) {
                     waitTable.remove(tid);
 
-                    if (DebugLevels.DEBUG_14)
-                        System.out.println("---Export task (to " + tas.getFullExportPath() + ") removed from "
+                    if (DebugLevels.DEBUG_14) {
+                        System.out.println("---Export task (ID: " + tid + ") removed from "
                                 + " ExportTaskManager waitTable.");
+                        System.out.println("---After removing task '" + tid + "', waitTable size: " + waitTable.size() + ".");
+                    }
                 }
             }
         }
