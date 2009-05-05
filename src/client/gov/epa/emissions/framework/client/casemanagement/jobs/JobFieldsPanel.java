@@ -260,6 +260,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("Host:", host, panel);
 
         status = new ComboBox(presenter.getRunStatuses());
+        status.setToolTipText("CAUTION: use 'Cancel' button in Jobs tab instead of " +
+        		"setting an active status (Exporting, Waiting, Submitted, and Running).");
         status.setPreferredSize(comboSize);
         status.setSelectedItem(job.getRunstatus());
         addPopupMenuListener(status, "status");
