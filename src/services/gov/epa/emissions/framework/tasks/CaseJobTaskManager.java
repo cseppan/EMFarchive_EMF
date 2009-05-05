@@ -253,24 +253,36 @@ public class CaseJobTaskManager implements TaskManager {
                             .println("CaseJobTask was null because it was not a running job therefore get from waitTable");
                     synchronized (waitTable) {
                         cjt = (CaseJobTask) waitTable.get(taskId);
-                        System.out.println("Details of CJT: " + cjt.getJobName());
-                        System.out.println("CaseJobTask Id for failed exports = " + cjt.getJobId());
-                        System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
-                        System.out.println("Size of the waitTable before remove: " + waitTable.size());
-                        // waitTable.remove(taskId);
-                        toRemove = true;
-                        if (DebugLevels.DEBUG_0)
-                            System.out
-                                    .println("updateRunStatus Before remove from runTable on completed or failed job in thread");
 
-                        // Now remove the task from the persisted wait table
-                        caseDAO.removePersistedTask(new PersistedWaitTask(cjt.getJobId(), cjt.getCaseId(), cjt
-                                .getUser().getId()));
-                        if (DebugLevels.DEBUG_0)
+                        if (cjt == null) {
                             System.out
-                                    .println("updateRunStatus After remove from runTable on completed or failed job in thread");
-                        if (DebugLevels.DEBUG_9)
-                            System.out.println("Size of the waitTable after remove: " + waitTable.size());
+                                    .println("Job task (ID: " + taskId + ") has already been removed from waitTable.");
+                            toRemove = false;
+                        } else {
+                            System.out.println("Details of CJT: " + cjt.getJobName());
+                            System.out.println("CaseJobTask Id for failed exports = " + cjt.getJobId());
+                            System.out.println("CaseJobTask Id for failed exports = " + cjt.getTaskId());
+                            System.out.println("Size of the waitTable before remove: " + waitTable.size());
+                            // waitTable.remove(taskId);
+                            toRemove = true;
+                            if (DebugLevels.DEBUG_0)
+                                System.out
+                                        .println("updateRunStatus Before remove from runTable on completed or failed job in thread");
+
+                            if (DebugLevels.DEBUG_0)
+                                System.out
+                                        .println("updateRunStatus After remove from runTable on completed or failed job in thread");
+                            if (DebugLevels.DEBUG_9)
+                                System.out.println("Size of the waitTable after remove: " + waitTable.size());
+                        }
+
+                        try {
+                            // Now remove the task from the persisted wait table
+                            caseDAO.removePersistedTask(new PersistedWaitTask(cjt.getJobId(), cjt.getCaseId(), cjt
+                                    .getUser().getId()));
+                        } catch (Exception e) {
+                            log.warn("Job task (ID: " + taskId + ") is no longer in the persisted table.", e);
+                        }
                     }
                 }
             }
