@@ -1018,7 +1018,7 @@ public class CaseJobTaskManager implements TaskManager {
         // 1. remove it from persisted tasks table so it won't start if service crashes
         // 2. lock wait table and remove it from wait table
         // 3. lock run table and remove it from run table
-        // 4a. if none is found, check job status one more time
+        // 4a. check job status one more time
         // 4b. if status is 'Submitted' or 'Running', then remoteCncel()
         try {
             caseDAO
@@ -1031,7 +1031,7 @@ public class CaseJobTaskManager implements TaskManager {
         boolean found = findNRemove(job, waitTable, user);
 
         if (!found)
-            found = findNRemove(job, runTable, user);
+            findNRemove(job, runTable, user);
 
         CaseJob fresh = caseDAO.getCaseJob(job.getId());
         JobRunStatus status = fresh.getRunstatus();
