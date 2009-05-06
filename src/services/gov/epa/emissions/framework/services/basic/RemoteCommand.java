@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.regex.Matcher;
@@ -18,15 +19,14 @@ public class RemoteCommand {
      */
     private static Log LOG = LogFactory.getLog(RemoteCommand.class);
 
-    private static String qID;
-
     private static final String lineSep = System.getProperty("line.separator");
 
-    public static void logStdout(String title, InputStream inStream, boolean localHost) throws EmfException {
+    public synchronized static String logStdout(String title, InputStream inStream, boolean localHost) throws EmfException {
         /**
          * log the stdout from a remote command to the log
          */
         BufferedReader reader = null;
+        String qId = null;
 
         // log the title of this series of message to the LOG
         LOG.warn(title);
@@ -37,7 +37,6 @@ public class RemoteCommand {
             try {
                 String message = reader.readLine();
                 String lstNonNullMsg = message;
-                boolean foundQid = false;
 
                 if (message == null) {
                     message = reader.readLine();
@@ -48,21 +47,27 @@ public class RemoteCommand {
                     lstNonNullMsg = message;
                     LOG.warn(message);
 
-                    if (!foundQid)
-                        foundQid = extractQId(message);
+                    if (qId == null)
+                        qId = extractQId(message);
                     
                     message = reader.readLine();
                 }
                 
-                reader.close();
-                
-                if (!foundQid && !localHost)
+                if (qId == null && !localHost)
                     throw new EmfException("please check your queue options " + (lstNonNullMsg == null ? "" : "(" + lstNonNullMsg + ")"));
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new EmfException("Error logging remote command's stdout/stderr: " + e.getMessage());
+            } finally {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+        
+        return qId;
     }
     
     public static void logRemoteStdout(String title, InputStream inStream) throws EmfException {
@@ -87,29 +92,31 @@ public class RemoteCommand {
                     LOG.warn(message);
                     message = reader.readLine();
                 }
-                
-                reader.close();
             } catch (Exception e) {
                 throw new EmfException("Error logging remote command's stdout/stderr: " + e.getMessage());
+            } finally {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    LOG.error("", e);
+                }
             }
         }
     }
 
-    private static boolean extractQId(String message) {
+    private static String extractQId(String message) {
         if (message == null || message.trim().isEmpty())
-            return false;
+            return null;
 
         // TBD: need to generalize this to accept other queue ID formats - perhaps with
         //      new property
         Pattern p = Pattern.compile("^[0-9]*\\.(.)*");
         Matcher m = p.matcher(message.trim());
 
-        if (m.find()) {
-            qID = message.trim();
-            return true;
-        }
+        if (m.find())
+            return message.trim();
 
-        return false;
+        return null;
     }
 
     public static String logStderr(String title, InputStream inStream) throws Exception {
@@ -325,9 +332,4 @@ public class RemoteCommand {
             throw new EmfException("ERROR executing local command: " + e.getMessage());
         }
     }
-
-    public static String getQueueId() {
-        return qID;
-    }
-
 }
