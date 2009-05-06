@@ -201,8 +201,7 @@ public class CaseJobTask extends Task {
 
     private void processLogs(String executionStr, InputStream inStream, String host, boolean local) throws EmfException {
         String outTitle = "stdout from (" + host + "): " + executionStr;
-        RemoteCommand.logStdout(outTitle, inStream, local);
-        qId = RemoteCommand.getQueueId();
+        qId = RemoteCommand.logStdout(outTitle, inStream, local);
     }
 
     /**
