@@ -251,10 +251,12 @@ BEGIN
 		dataset_id, 
 		fips, 
 		scc, 
+		' || case when is_point_table then '
 		plantid, 
 		pointid, 
 		stackid, 
 		segment, 
+		' else '' end || ' 
 		poll, 
 		status,
 		control_program,
@@ -264,10 +266,12 @@ BEGIN
 		' || strategy_messages_dataset_id || '::integer,
 		a.fips,
 		a.scc,
+		' || case when is_point_table then '
 		a.plantid, 
 		a.pointid, 
 		a.stackid, 
 		a.segment, 
+		' else '' end || ' 
 		a.poll,
 		''Warning''::character varying(11) as status,
 		null::character varying(255) as control_program,
@@ -288,10 +292,12 @@ BEGIN
 		on b.fips = a.fips
 		and b.scc = a.scc
 
+		' || case when is_point_table then '
 		and b.plantid = a.plantid
 		and b.pointid = a.pointid
 		and b.stackid = a.stackid
 		and b.segment = a.segment
+		' else '' end || ' 
 	where ' || inv_filter || ' and b.poll in (''PM2_5'',''PM10'')
 		and a.poll in (''PM2_5'',''PM10'')
 		and (
@@ -300,10 +306,12 @@ BEGIN
 		)
 	order by a.fips,
 		a.scc, 
+		' || case when is_point_table then '
 		a.plantid, 
 		a.pointid, 
 		a.stackid, 
 		a.segment, 
+		' else '' end || ' 
 		a.poll';
 
 END;
