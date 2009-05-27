@@ -61,6 +61,12 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     public void doDisplay() throws EmfException {
         view.observe(this);
         
+        //make sure the editor is EITHER the admin or creator of the strategy...
+        if (!controlStrategy.getCreator().equals(session.user()) && !session.user().isAdmin()) {
+            view.notifyEditFailure(controlStrategy);
+            return;
+        }
+        
         controlStrategy = service().obtainLocked(session.user(), controlStrategy.getId());
         
         if (!controlStrategy.isLocked(session.user())) {// view mode, locked by another user

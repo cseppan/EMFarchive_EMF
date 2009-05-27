@@ -15,6 +15,8 @@ public interface EditControlStrategyView extends ManagedView {
     
     void notifyLockFailure(ControlStrategy controlStrategy);
 
+    void notifyEditFailure(ControlStrategy controlStrategy);
+
     void notifyStrategyTypeChange(StrategyType strategyType);
 
     public void startControlMeasuresRefresh();

@@ -444,6 +444,13 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         dialog.confirm();
     }
 
+    public void notifyEditFailure(ControlStrategy controlStrategy) {
+        String message = "Cannot edit Properties of Control Strategy: " + controlStrategy.getName()
+                + "; as you must be the administrator or creator of the strategy";
+        InfoDialog dialog = new InfoDialog(this, "Message", message);
+        dialog.confirm();
+    }
+
     private String format(Date lockDate) {
         return CustomDateFormat.format_YYYY_MM_DD_HH_MM(lockDate);
     }
