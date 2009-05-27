@@ -846,10 +846,10 @@ where name in ('Control Strategy Detailed Result'));
 ALTER TABLE emissions.versions ADD COLUMN creator int4 NOT NULL REFERENCES emf.users(id) default 2;
 ALTER TABLE emissions.versions ADD COLUMN number_records int8 default 0;
 
---3/26/2008 DCD -- populate new columns creator and number_records columns
 CREATE OR REPLACE FUNCTION public.populate_version_table_creator_and_record_count_columns() RETURNS void AS $$
 DECLARE
 	version_record RECORD;
+	counter int := 0;
 BEGIN
 
   
@@ -865,12 +865,17 @@ BEGIN
 			inner join pg_class
 			on lower(relname) = lower(internal_sources.table_name)'
 	LOOP
-		--raise notice '%', 
-		execute 
-		'update emissions.versions
-		set number_records = coalesce((SELECT count(1) from emissions.' || version_record.table_name || ' where ' || public.build_version_where_filter(version_record.dataset_id, version_record."version") || '),0),
-			creator = coalesce((SELECT users.id from emf.datasets inner join emf.users on users.username = datasets.creator where datasets.id = ' || version_record.dataset_id || '),2)
-		where id = ' || version_record.id || ';';
+		counter := counter + 1;
+		--raise notice '%', 'update ' || counter || ' table ' || version_record.table_name;
+		raise notice '%', 
+		--execute 
+		'
+begin;update emissions.versions
+set number_records = coalesce((SELECT count(1) from emissions.' || version_record.table_name || ' where ' || public.build_version_where_filter(version_record.dataset_id, version_record."version") || '),0),
+	creator = coalesce((SELECT users.id from emf.datasets inner join emf.users on users.username = datasets.creator where datasets.id = ' || version_record.dataset_id || '),2)
+where id = ' || version_record.id || ';
+commit;
+		';
 
 	END LOOP;
 
@@ -881,6 +886,7 @@ $$ LANGUAGE plpgsql;
 -- run populate procedure
 select public.populate_version_table_creator_and_record_count_columns();
 
+
 --3/31/09 add new dataset type
 insert into emf.dataset_types values(DEFAULT,'Allowable Packet','Allowable Packet', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.AllowablePacketImporter', 'gov.epa.emissions.commons.io.other.AllowablePacketExporter');
 
@@ -890,3 +896,8 @@ ALTER TABLE emf.users ALTER phone TYPE varchar(128);
 --4/27/2009 add another property of cancel job command
 INSERT into emf.properties values(DEFAULT, 'CANCEL_JOB_COMMAND_AMBER', 'qdel');
 INSERT into emf.properties values(DEFAULT, 'CANCEL_JOB_COMMAND_GARNET01', 'qdel');
+
+--5/20/09 added a new QA program
+insert into emf.qa_programs values(DEFAULT,'Create monthly emissions by county from annual emissions','gov.epa.emissions.framework.services.qa.SQLQACreateMoEmisByCtyFromAnnEmisQueryRunner');
+insert into emf.dataset_types values(DEFAULT,'Smkreport county-moncode annual','Smkreport county-moncode annual', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.SMKReportImporter', 'gov.epa.emissions.commons.io.other.SMKReportExporter', '', null, 0);
+

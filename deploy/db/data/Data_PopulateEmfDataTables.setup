@@ -103,6 +103,7 @@ insert into emf.dataset_types values(DEFAULT,'Mobile Source Codes (Line-based)',
 insert into emf.dataset_types values(DEFAULT,'NonHAP VOC Calculation Exclusions (Line-based)','NonHAP VOC Calculation Exclusions (Line-based)', '1', '1', false,'LINE_NUMBER', 'gov.epa.emissions.commons.io.generic.LineImporter', 'gov.epa.emissions.commons.io.generic.LineExporter');
 insert into emf.dataset_types values(DEFAULT,'SIC Descriptions (Line-based)','SIC Descriptions (Line-based)', '1', '1', false,'LINE_NUMBER', 'gov.epa.emissions.commons.io.generic.LineImporter', 'gov.epa.emissions.commons.io.generic.LineExporter');
 insert into emf.dataset_types values(DEFAULT,'SCC Descriptions (Line-based)','SCC Descriptions (Line-based)', '1', '1', false,'LINE_NUMBER', 'gov.epa.emissions.commons.io.generic.LineImporter', 'gov.epa.emissions.commons.io.generic.LineExporter');
+insert into emf.dataset_types values(DEFAULT,'Smkreport county-moncode annual','Smkreport county-moncode annual', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.SMKReportImporter', 'gov.epa.emissions.commons.io.other.SMKReportExporter', '', null, 0);
 -- for control strategy result
 insert into emf.dataset_types values(DEFAULT,'Control Strategy Detailed Result','Control Strategy Detailed Result', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter', '', null, 0);
 insert into emf.dataset_types values(DEFAULT,'Pollutant to Pollutant Conversion (GSCNV)','Pollutant to Pollutant Conversion (GSCNV)', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.GSCNVImporter', 'gov.epa.emissions.commons.io.other.GSCNVExporter');
@@ -195,6 +196,7 @@ insert into emf.qa_programs values(DEFAULT,'Multi-inventory column report','gov.
 insert into emf.qa_programs values(DEFAULT,'Multi-inventory difference report','gov.epa.emissions.framework.services.qa.MultiInvDiffProgramRunner');
 insert into emf.qa_programs values(DEFAULT,'Compare Control Strategies','gov.epa.emissions.framework.services.qa.SQLQACompareControlStrategiesQueryRunner');
 insert into emf.qa_programs values(DEFAULT,'Compare VOC Speciation with HAP inventory','gov.epa.emissions.framework.services.qa.SQLQACompareVOCSpeciationWithHAPInventoryQueryRunner');
+insert into emf.qa_programs values(DEFAULT,'Create monthly emissions by county from annual emissions','gov.epa.emissions.framework.services.qa.SQLQACreateMoEmisByCtyFromAnnEmisQueryRunner');
 
 
 --
