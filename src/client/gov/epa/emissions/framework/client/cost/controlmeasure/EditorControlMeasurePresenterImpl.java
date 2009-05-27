@@ -39,11 +39,15 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
 
     public void doDisplay() throws EmfException {
         view.observe(this);
+        
+        //make sure the editor is EITHER the admin or creator of the measure...
+        //need to load a full object for this check, the initialized measure is light in scope
         measure = session.controlMeasureService().getMeasure(measure.getId());
-        if (!(measure.getCreator().equals(session.user()) || session.user().isAdmin())) {
+        if (!measure.getCreator().equals(session.user()) && !session.user().isAdmin()) {
             view.notifyEditFailure(measure);
             return;
         }
+
         measure = session.controlMeasureService().obtainLockedMeasure(session.user(), measure.getId());
         if (!measure.isLocked(session.user())) {// view mode, locked by another user
             view.notifyLockFailure(measure);

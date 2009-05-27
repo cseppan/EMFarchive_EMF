@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.EditableComboBox;
-import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
@@ -357,14 +356,11 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
         
-        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
-        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
-
-        SelectAwareButton view = new SelectAwareButton("View", viewAction(), table, confirmDialog);
+        Button view = new Button("View", viewAction());
 //        Button view = new ViewButton(viewAction());
         panel.add(view);
 
-        SelectAwareButton edit = new SelectAwareButton("Edit", editAction(), table, confirmDialog);
+        Button edit = new Button("Edit", editAction());
         panel.add(edit);
 
         copyButton = new CopyButton(new AbstractAction() {
@@ -478,12 +474,17 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private Action viewAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
+                messagePanel.clear();
                 ControlMeasure[] measures = getSelectedMeasures().toArray(new ControlMeasure[0]);
                 if (measures.length == 0)
                     showError("Please select a control measure.");
                 try {
-                    for (int i = 0; i < measures.length; i++)
-                        presenter.doView(parentConsole, measures[i], desktopManager);
+                    String message = "You have asked to open a lot of windows. Do you wish to proceed?";
+                    ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", parentConsole);
+                    if ((measures.length > 5 && confirmDialog.confirm()) || measures.length <= 5) {
+                        for (int i = 0; i < measures.length; i++)
+                            presenter.doView(parentConsole, measures[i], desktopManager);
+                    }
 
                 } catch (EmfException e) {
                     showError(e.getMessage());
@@ -497,12 +498,17 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private Action editAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
+                messagePanel.clear();
                 ControlMeasure[] measures = getSelectedMeasures().toArray(new ControlMeasure[0]);
                 if (measures.length == 0)
                     showError("Please select a control measure.");
                 try {
-                    for (int i = 0; i < measures.length; i++)
-                        presenter.doEdit(parentConsole, measures[i], desktopManager);
+                    String message = "You have asked to open a lot of windows. Do you wish to proceed?";
+                    ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", parentConsole);
+                    if ((measures.length > 5 && confirmDialog.confirm()) || measures.length <= 5) {
+                        for (int i = 0; i < measures.length; i++)
+                            presenter.doEdit(parentConsole, measures[i], desktopManager);
+                    }
 
                 } catch (EmfException e) {
                     showError(e.getMessage());
@@ -552,6 +558,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                 messagePanel.setError(e.getMessage());
             }
         }
+        messagePanel.setMessage("Please refresh to see the new measure" + (cmList.size() > 1 ? "s" : "") + ".");
     }
 
     private Action newControlMeasureAction() {

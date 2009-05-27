@@ -86,7 +86,8 @@ public class ControlMeasureTableData extends AbstractTableData {
             found = false;
             for (int j = 0; j < apers.length; j++) {
                 SumEffRec aper = apers[j];
-                if (majorPollutant && measure.getMajorPollutant().equals(measure.getMajorPollutant())) {
+                
+                if (majorPollutant && measure.getMajorPollutant().equals(aper.getPollutant())) {
                     Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(measure),
                             getCostPerTon(aper.getAvgCPT()), new Double(aper.getAvgCE()), new Double(aper.getMinCE()), 
                             new Double(aper.getMaxCE()), getCostPerTon(aper.getMinCPT()), getCostPerTon(aper.getMaxCPT()), 
