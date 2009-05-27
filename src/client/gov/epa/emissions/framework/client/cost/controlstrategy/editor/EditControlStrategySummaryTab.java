@@ -72,9 +72,9 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private ComboBox majorPollutant;
 
-    private Region[] allRegions;
+//    private Region[] allRegions;
 
-    private Project[] allProjects;
+//    private Project[] allProjects;
 
     protected EmfConsole parentConsole;
 
@@ -256,9 +256,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return name;
     }
 
+    private Project[] getProjects() throws EmfException {
+        return session.dataCommonsService().getProjects();
+    }
+    
     private EditableComboBox projects() throws EmfException {
-        allProjects = session.dataCommonsService().getProjects();
-        projectsCombo = new EditableComboBox(allProjects);
+        projectsCombo = new EditableComboBox(getProjects());
         projectsCombo.setSelectedItem(controlStrategy.getProject());
         projectsCombo.setPreferredSize(comboSize);
         changeablesList.addChangeable(projectsCombo);
@@ -267,8 +270,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private EditableComboBox regions() throws EmfException {
-        allRegions = session.dataCommonsService().getRegions();
-        regionsCombo = new EditableComboBox(allRegions);
+        regionsCombo = new EditableComboBox(session.dataCommonsService().getRegions());
         regionsCombo.setSelectedItem(controlStrategy.getRegion());
         regionsCombo.setPreferredSize(comboSize);
 
@@ -391,7 +393,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     // }
     // }
 
-    private void updateRegion() {
+    private void updateRegion() throws EmfException {
         Object selected = regionsCombo.getSelectedItem();
         if (selected instanceof String) {
             String regionName = ((String) selected).trim();
@@ -404,11 +406,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         }
     }
 
-    private Region region(String regionName) {
-        return new Regions(allRegions).get(regionName);
+    private Region region(String regionName) throws EmfException {
+        return new Regions(session.dataCommonsService().getRegions()).get(regionName);
     }
 
-    private void updateProject() {
+    private void updateProject() throws EmfException {
         Object selected = projectsCombo.getSelectedItem();
         if (selected instanceof String) {
             String projectName = ((String) selected).trim();
@@ -421,8 +423,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         }
     }
 
-    private Project project(String projectName) {
-        return new Projects(allProjects).get(projectName);
+    private Project project(String projectName) throws EmfException {
+        return new Projects(session.dataCommonsService().getProjects()).get(projectName);
     }
 
     public void setRunMessage(ControlStrategy controlStrategy) {
