@@ -157,6 +157,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private static final String MultiInvDifRepProgram = "Multi-inventory difference report";
     private static final String CompareControlStrategies = "Compare Control Strategies";
+    private static final String createMoEmisByCountyFromAnnEmisProgram = "Create monthly emissions by county from annual emissions";
     
     private static final String sqlProgram = "SQL";
     
@@ -680,6 +681,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             check = checkMultiInvDiff(programSwitches) ;
             if (!check)
                 throw new EmfException (" Both base and compare inventories are needed ");
+        } else if (createMoEmisByCountyFromAnnEmisProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+            //
         }
         return check;
     }
@@ -864,6 +867,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     showMultiInvDiffWindow();
                 } else if (CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showMultiInvDiffWindow();
+                } else if (createMoEmisByCountyFromAnnEmisProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                    showCreateMoEmisByCountyFromAnnEmisWindow();
                 }else{
                     doSetWindow();
                 }
@@ -1237,6 +1242,57 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         }
     }
 
+    private void showCreateMoEmisByCountyFromAnnEmisWindow() {
+        // When there is no data in window, set button causes new window to pop up,
+        // with the warning message to also show up. When data in window is invalid, a new window still
+        // pops up, but with a different warning message.
+        // Also change the window name to EditQASetArgumentsWindow
+        invBase = null;
+        invCompare = null;
+        invTables = null;
+        summaryType = "";
+
+        String programVal = program.getSelectedItem().toString();
+        String programSwitches = programArguments.getText();        
+        try {
+            int smkRptIndex = programSwitches.indexOf("-smkrpt");
+            int temporalIndex = programSwitches.indexOf("-temporal");
+            int yearIndex = programSwitches.indexOf("-year");
+            EmfDataset temporal = null;
+            EmfDataset [] smkRptDatasets = null; 
+            EmfDataset[] datasets;
+            String[] tokens = null;
+            Integer year = null;
+
+            if (temporalIndex != -1) {
+                datasets = getDatasets(programSwitches, temporalIndex, programSwitches.indexOf("\n-", temporalIndex) != -1 ? programSwitches.indexOf("\n-", temporalIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) temporal = datasets[0];
+            }
+            if (smkRptIndex != -1) {
+                datasets = getDatasets(programSwitches, smkRptIndex, programSwitches.indexOf("\n-", smkRptIndex) != -1 ? programSwitches.indexOf("\n-", smkRptIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) smkRptDatasets = datasets;
+            }
+            if (yearIndex != -1) {
+                tokens = getDatasetNames(programSwitches, yearIndex, programSwitches.indexOf("\n-", yearIndex) != -1 ? programSwitches.indexOf("\n-", yearIndex) : programSwitches.length()).toArray(new String[0]);
+                try {
+                    if (tokens != null && tokens.length > 0) year = Integer.parseInt(tokens[0]);
+                } catch (NumberFormatException ex) {
+                    throw new EmfException("The year is not valid format, it must be a number. ");
+                }
+            }
+            QACreateMoEmisByCountyFromAnnEmisWindow view = new QACreateMoEmisByCountyFromAnnEmisWindow(desktopManager, 
+                programVal, 
+                session, 
+                temporal, 
+                smkRptDatasets,
+                year);
+            EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
+            presenter.display(origDataset, step);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
     private void doSetWindow() {
         String argumentsText = programArguments.getText();
         EditQAArgumentsWindow view = new EditQAArgumentsWindow(desktopManager, argumentsText);
@@ -1502,6 +1558,16 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QA Step Results: " + qaStepName,
                 new Dimension(800, 500), desktopManager, parentConsole);
         app.display(new String[] { exportedFileName });
+    }
+
+    public void updateArguments(Object temporalProfile, Object[] smkRpts, Object year) {
+        clear();
+        String arguments = "";
+        if (temporalProfile != null) arguments += "-temporal" + lineFeeder + ((EmfDataset) temporalProfile).getName() + lineFeeder;
+        if (smkRpts != null) arguments += getInvString("-smkrpt", smkRpts);
+        if (year != null) arguments += "-year" + lineFeeder + year + lineFeeder;
+
+        updateArgumentsTextArea(arguments);
     }
 
 }

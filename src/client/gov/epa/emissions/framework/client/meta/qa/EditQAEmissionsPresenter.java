@@ -58,4 +58,10 @@ public class EditQAEmissionsPresenter {
     public DatasetType getDatasetType(String name) throws EmfException {
         return session.dataCommonsService().getDatasetType(name);
     }
+
+    public void updateDatasets(Object temporalProfile, Object[] smkRpts, Object year) {
+        editQAStepView.updateArguments(temporalProfile, 
+                smkRpts,
+                year);
+    }
 }

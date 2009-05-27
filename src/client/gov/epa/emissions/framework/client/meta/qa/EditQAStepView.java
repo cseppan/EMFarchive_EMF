@@ -39,4 +39,8 @@ public interface EditQAStepView extends ManagedView {
             Object[] speciationCrossReferenceDatasets, 
             String filter,
             String summaryType);
+
+    void updateArguments(Object temporalProfile, 
+            Object[] smkRpts,
+            Object year);
 }
