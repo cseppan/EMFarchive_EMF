@@ -199,7 +199,47 @@ BEGIN
 	-- build version info into where clause filter
 	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
 
-  	FOR control_program IN EXECUTE 
+
+	--give warning if CE is 100 and was assumed to be 0
+	execute
+	--raise notice '%',
+	 'insert into emissions.' || strategy_messages_table_name || ' 
+		(
+		dataset_id, 
+		fips, 
+		scc, 
+		plantid, 
+		pointid, 
+		stackid, 
+		segment, 
+		poll, 
+		status,
+		control_program,
+		message
+		)
+	select 
+		' || strategy_messages_dataset_id || '::integer,
+		inv.fips,
+		inv.scc,
+		' || case when is_point_table then '
+		inv.plantid, 
+		inv.pointid, 
+		inv.stackid, 
+		inv.segment, 
+		' else '
+		null::character varying(15) as plantid, 
+		null::character varying(15) as pointid, 
+		null::character varying(15) as stackid, 
+		null::character varying(15) as segment, 
+		' end || '
+		inv.poll,
+		''Warning''::character varying(11) as status,
+		''None''::character varying(255) as control_program,
+		''Source has a 100 ceff but has an emission.'' as "comment"
+	FROM emissions.' || inv_table_name || ' inv
+	where 	inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) <> 0.0';
+
+	FOR control_program IN EXECUTE 
 		'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
 			cp.start_date, cp.end_date, 
 			cp.dataset_id, cp.dataset_version,
@@ -286,13 +326,15 @@ BEGIN
 				and ' || replace(replace(replace(public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version), 'version ', 'pc.version '), 'delete_versions ', 'pc.delete_versions '), 'dataset_id', 'pc.dataset_id') || '
 				and inv.record_id is null';
 
-		-- see if there any issues with the projection packet
-		ELSIF control_program.type = 'Projection' THEN
+		-- see if there any matching issues with the projection, control, or allowable packet
+		ELSIF control_program.type = 'Projection' or control_program.type = 'Control' or control_program.type = 'Allowable' THEN
 
 			-- make sure the dataset type is right...
-			IF control_program.dataset_type = 'Projection Packet' THEN
+			IF (control_program.type = 'Projection' and control_program.dataset_type = 'Projection Packet') 
+				or (control_program.type = 'Control' and control_program.dataset_type = 'Control Packet')  
+				or (control_program.type = 'Allowable' and control_program.dataset_type = 'Allowable Packet') THEN
 				--store control dataset version filter in variable
-				select public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'proj')
+				select public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'packet')
 				into control_program_dataset_filter_sql;
 				
 				--see http://www.smoke-model.org/version2.4/html/ch06s02.html for source matching hierarchy
@@ -332,773 +374,1073 @@ BEGIN
 					where 1 = 0
 
 					' || case when is_point_table then '
-					--1
+					--1 - Country/State/County code, plant ID, point ID, stack ID, segment, 8-digit SCC code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
-						and proj.plantid = inv.plantid
-						and proj.pointid = inv.pointid
-						and proj.stackid = inv.stackid
-						and proj.segment = inv.segment
-						and proj.scc = inv.scc
-						and proj.poll = inv.poll
+						on packet.fips = inv.fips
+						and packet.plantid = inv.plantid
+						and packet.pointid = inv.pointid
+						and packet.stackid = inv.stackid
+						and packet.segment = inv.segment
+						and packet.scc = inv.scc
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is not null 
-						and proj.stackid is not null 
-						and proj.segment is not null 
-						and proj.scc is not null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is not null 
+						and packet.stackid is not null 
+						and packet.segment is not null 
+						and packet.scc is not null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--2
+					--2 - Country/State/County code, plant ID, point ID, stack ID, segment, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
+						on packet.fips = inv.fips
 						
-						and proj.plantid = inv.plantid
-						and proj.pointid = inv.pointid
-						and proj.stackid = inv.stackid
-						and proj.segment = inv.segment
-						and proj.poll = inv.poll
+						and packet.plantid = inv.plantid
+						and packet.pointid = inv.pointid
+						and packet.stackid = inv.stackid
+						and packet.segment = inv.segment
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is not null 
-						and proj.stackid is not null 
-						and proj.segment is not null 
-						and proj.scc is null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is not null 
+						and packet.stackid is not null 
+						and packet.segment is not null 
+						and packet.scc is null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--3
+					--3 - Country/State/County code, plant ID, point ID, stack ID, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
+						on packet.fips = inv.fips
 						
-						and proj.plantid = inv.plantid
-						and proj.pointid = inv.pointid
-						and proj.stackid = inv.stackid
-						and proj.poll = inv.poll
+						and packet.plantid = inv.plantid
+						and packet.pointid = inv.pointid
+						and packet.stackid = inv.stackid
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is not null 
-						and proj.stackid is not null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is not null 
+						and packet.stackid is not null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--4
+					--4 - Country/State/County code, plant ID, point ID, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
+						on packet.fips = inv.fips
 						
-						and proj.plantid = inv.plantid
-						and proj.pointid = inv.pointid
-						and proj.poll = inv.poll
+						and packet.plantid = inv.plantid
+						and packet.pointid = inv.pointid
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is not null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is not null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--5
+					--5 - Country/State/County code, plant ID, 8-digit SCC code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
+						on packet.fips = inv.fips
 						
-						and proj.plantid = inv.plantid
-						and proj.scc = inv.scc
-						and proj.poll = inv.poll
+						and packet.plantid = inv.plantid
+						and packet.scc = inv.scc
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is not null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--6
+					' || case when has_mact_column and control_program.type <> 'Allowable' then '
+					--5.5 - Country/State/County code, plant ID, MACT code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. mact = '' || packet.mact as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
+						on packet.fips = inv.fips
 						
-						and proj.plantid = inv.plantid
-						and proj.poll = inv.poll
+						and packet.plantid = inv.plantid
+						and packet.mact = inv.mact
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is not null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
+						and inv.record_id is null
+					' else '' end || '
+
+					--6 - Country/State/County code, plant ID, pollutant
+					union all
+					select 
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on packet.fips = inv.fips
+						
+						and packet.plantid = inv.plantid
+						and packet.poll = inv.poll
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
+						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--7
+					--7 - Country/State/County code, plant ID, point ID, stack ID, segment, 8-digit SCC code
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
+						on packet.fips = inv.fips
 						
-						and proj.plantid = inv.plantid
-						and proj.pointid = inv.pointid
-						and proj.stackid = inv.stackid
-						and proj.segment = inv.segment
-						and proj.scc = inv.scc
+						and packet.plantid = inv.plantid
+						and packet.pointid = inv.pointid
+						and packet.stackid = inv.stackid
+						and packet.segment = inv.segment
+						and packet.scc = inv.scc
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is not null 
-						and proj.stackid is not null 
-						and proj.segment is not null 
-						and proj.scc is not null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is not null 
+						and packet.stackid is not null 
+						and packet.segment is not null 
+						and packet.scc is not null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--8
+					--8- Country/State/County code, plant ID, point ID, stack ID, segment
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
+						on packet.fips = inv.fips
 						
-						and proj.plantid = inv.plantid
-						and proj.pointid = inv.pointid
-						and proj.stackid = inv.stackid
-						and proj.segment = inv.segment
+						and packet.plantid = inv.plantid
+						and packet.pointid = inv.pointid
+						and packet.stackid = inv.stackid
+						and packet.segment = inv.segment
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is not null 
-						and proj.stackid is not null 
-						and proj.segment is not null 
-						and proj.scc is null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is not null 
+						and packet.stackid is not null 
+						and packet.segment is not null 
+						and packet.scc is null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--9
+					--9 - Country/State/County code, plant ID, point ID, stack ID
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
+						on packet.fips = inv.fips
 						
-						and proj.plantid = inv.plantid
-						and proj.pointid = inv.pointid
-						and proj.stackid = inv.stackid
+						and packet.plantid = inv.plantid
+						and packet.pointid = inv.pointid
+						and packet.stackid = inv.stackid
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is not null 
-						and proj.stackid is not null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is not null 
+						and packet.stackid is not null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--10
+					--10 - Country/State/County code, plant ID, point id
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
+						on packet.fips = inv.fips
 						
-						and proj.plantid = inv.plantid
-						and proj.pointid = inv.pointid
+						and packet.plantid = inv.plantid
+						and packet.pointid = inv.pointid
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is not null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is not null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--11
+					--11 - Country/State/County code, plant ID, 8-digit SCC code
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
+						on packet.fips = inv.fips
 						
-						and proj.plantid = inv.plantid
-						and proj.scc = inv.scc
+						and packet.plantid = inv.plantid
+						and packet.scc = inv.scc
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is not null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--12
+					' || case when has_mact_column and control_program.type <> 'Allowable' then '
+					--12 - Country/State/County code, plant ID, MACT code
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. mact = '' || packet.mact as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.fips = inv.fips
+						on packet.fips = inv.fips
 						
-						and proj.plantid = inv.plantid
+						and packet.plantid = inv.plantid
+						and packet.mact = inv.mact
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is not null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is not null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
+						and inv.record_id is null
+					' else '' end || '
+
+					--13 - Country/State/County code, plant ID
+					union all
+					select 
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on packet.fips = inv.fips
+						
+						and packet.plantid = inv.plantid
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where packet.fips is not null 
+						and packet.plantid is not null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
+						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 					' else '' end || '
 					
-					' || case when has_mact_column then '
-					--13,15
+					' || case when has_mact_column and control_program.type <> 'Allowable' then '
+					--14,16 - Country/State/County code or Country/State code, MACT code, 8-digit SCC code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. mact = '' || packet.mact as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
 						
-						and proj.mact = inv.mact
-						and proj.scc = inv.scc
-						and proj.poll = inv.poll
+						and packet.mact = inv.mact
+						and packet.scc = inv.scc
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is not null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is not null
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is not null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--14,16
+					--15,17 - Country/State/County code or Country/State code, MACT code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. mact = '' || packet.mact as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
 						
-						and proj.mact = inv.mact
-						and proj.poll = inv.poll
+						and packet.mact = inv.mact
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is not null
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is not null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--17
+					--18 - MACT code, 8-digit SCC code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. mact = '' || packet.mact as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.mact = inv.mact
-						and proj.scc = inv.scc
-						and proj.poll = inv.poll
+						on packet.mact = inv.mact
+						and packet.scc = inv.scc
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is not null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is not null
+					where packet.fips is null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is not null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--18
+					--19 - MACT code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. mact = '' || packet.mact as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.mact = inv.mact
-						and proj.poll = inv.poll
+						on packet.mact = inv.mact
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is not null
+					where packet.fips is null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is not null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--19,21
+					--20,22 - Country/State/County code or Country/State code, 8-digit SCC code, MACT code
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. mact = '' || packet.mact as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
 						
-						and proj.mact = inv.mact
-						and proj.scc = inv.scc
+						and packet.mact = inv.mact
+						and packet.scc = inv.scc
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is not null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is not null
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is not null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--20,22
+					--21,23 - Country/State/County code or Country/State code, MACT code
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. mact = '' || packet.mact as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
 						
-						and proj.mact = inv.mact
+						and packet.mact = inv.mact
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is not null
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is not null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--23
+					--24 - MACT code, 8-digit SCC code
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. mact = '' || packet.mact as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.mact = inv.mact
-						and proj.scc = inv.scc
+						on packet.mact = inv.mact
+						and packet.scc = inv.scc
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is not null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is not null
+					where packet.fips is null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is not null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--24
+					--25 - MACT code
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. mact = '' || proj.mact as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. mact = '' || packet.mact as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.mact = inv.mact
+						on packet.mact = inv.mact
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is not null
+					where packet.fips is null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is not null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 					' else '' end || '
 
 					' || case when has_sic_column then '
-					--25,27
+					--25.5,27.5 - Country/State/County code or Country/State code, 8-digit SCC code, 4-digit SIC code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. sic = '' || proj.sic as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. sic = '' || packet.sic as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
-						and proj.sic = inv.sic
-						and proj.poll = inv.poll
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
+						and packet.sic = inv.sic
+						and packet.scc = inv.scc
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is not null
-						and proj.sic is not null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is not null
+						and packet.sic is not null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--29
+					--26,28 - Country/State/County code or Country/State code, 4-digit SIC code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. sic = '' || proj.sic as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. sic = '' || packet.sic as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.sic = inv.sic
-						and proj.poll = inv.poll
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
+						and packet.sic = inv.sic
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is not null
-						and proj.sic is not null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is not null
+						and packet.sic is not null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--31,33
+					--29.5 - 4-digit SIC code, SCC code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. sic = '' || proj.sic as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. sic = '' || packet.sic as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
-						and proj.sic = inv.sic
+						on packet.sic = inv.sic
+						and packet.scc = inv.scc
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is null
-						and proj.sic is not null
-						and proj.mact is null
+					where packet.fips is null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is not null
+						and packet.sic is not null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--35
+					--30 - 4-digit SIC code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records. sic = '' || proj.sic as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. sic = '' || packet.sic as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.sic = inv.sic
+						on packet.sic = inv.sic
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is null
-						and proj.sic is not null
-						and proj.mact is null
+					where packet.fips is null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is not null
+						and packet.sic is not null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
+						and inv.record_id is null
+
+					--31.5,33.5 - Country/State/County code or Country/State code, 4-digit SIC code, SCC code
+					union all
+					select 
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. sic = '' || packet.sic as message
+					FROM emissions.' || control_program.table_name || ' packet
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
+						and packet.sic = inv.sic
+						and packet.scc = inv.scc
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is null
+						and packet.sic is not null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
+						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
+						and inv.record_id is null
+
+					--32,34 - Country/State/County code or Country/State code, 4-digit SIC code
+					union all
+					select 
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. sic = '' || packet.sic as message
+					FROM emissions.' || control_program.table_name || ' packet
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
+						and packet.sic = inv.sic
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is null
+						and packet.sic is not null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
+						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
+						and inv.record_id is null
+
+					--35.5 - 4-digit SIC code, SCC code
+					union all
+					select 
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. sic = '' || packet.sic as message
+					FROM emissions.' || control_program.table_name || ' packet
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on packet.sic = inv.sic
+						and packet.scc = inv.scc
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where packet.fips is null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is null
+						and packet.sic is not null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
+						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
+						and inv.record_id is null
+
+					--36 - 4-digit SIC code
+					union all
+					select 
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records. sic = '' || packet.sic as message
+					FROM emissions.' || control_program.table_name || ' packet
+						left outer join emissions.' || inv_table_name || ' inv
+								
+						on packet.sic = inv.sic
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+					where packet.fips is null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is null
+						and packet.sic is not null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
+						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 					' else '' end || '
 
-					--37,41
+					--38,42 - Country/State/County code or Country/State code, 8-digit SCC code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
-						and proj.scc = inv.scc
-						and proj.poll = inv.poll
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
+						and packet.scc = inv.scc
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is not null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--45
+					--46 - 8-digit SCC code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.scc = inv.scc
-						and proj.poll = inv.poll
+						on packet.scc = inv.scc
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is not null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--49,53
+					--50,54 - Country/State/County code or Country/State code, 8-digit SCC code
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
-						and proj.scc = inv.scc
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
+						and packet.scc = inv.scc
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is not null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--57
+					--58 - 8-digit SCC code
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.scc = inv.scc
+						on packet.scc = inv.scc
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is not null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is not null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--61,63
+					--62,64 - Country/State/County code or Country/State code, pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
-						and proj.poll = inv.poll
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
+						and packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--62,64
+					--63,65 - Country/State/County code or Country/State code
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2))
+						on (packet.fips = inv.fips or packet.fips = substr(inv.fips, 1, 2) or (substr(packet.fips,3,3) = ''000'' and substr(packet.fips, 1, 2) = substr(inv.fips, 1, 2)))
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is not null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is not null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 
-					--65
+					--66 - Pollutant
 					union all
 					select 
-						proj.fips,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.scc,proj.poll,''Projection packet record does not affect any inventory records.'' as message
-					FROM emissions.' || control_program.table_name || ' proj
+						packet.fips,packet.plantid,packet.pointid,packet.stackid,packet.segment,packet.scc,packet.poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message
+					FROM emissions.' || control_program.table_name || ' packet
 						left outer join emissions.' || inv_table_name || ' inv
 								
-						on proj.poll = inv.poll
+						on packet.poll = inv.poll
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					where proj.fips is null 
-						and proj.plantid is null 
-						and proj.pointid is null 
-						and proj.stackid is null 
-						and proj.segment is null 
-						and proj.scc is null 
-						and proj.poll is not null
-						and proj.sic is null
-						and proj.mact is null
+					where packet.fips is null 
+						and packet.plantid is null 
+						and packet.pointid is null 
+						and packet.stackid is null 
+						and packet.segment is null 
+						and packet.scc is null 
+						and packet.poll is not null
+						and packet.sic is null
+						' || case when control_program.type <> 'Allowable' then 'and packet.mact is null' else '' end || '
 						and ' || control_program_dataset_filter_sql || '
+						' || case when control_program.type <> 'Projection' then '
+						-- make the compliance date has been met
+						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						' else '' end || '
 						and inv.record_id is null
 				) tbl';
 
 			END IF;
 		END IF;
+
 
 
 	END LOOP;
