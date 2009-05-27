@@ -289,8 +289,9 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
             ControlStrategy strategy = getById(controlStrategyId);
             validateSectors(strategy);
-            // make sure a valid server-side export path was specified
-            validateExportPath(strategy.getExportDirectory());
+            //get rid of for now, since we don't auto export anything
+            //make sure a valid server-side export path was specified
+            //validateExportPath(strategy.getExportDirectory());
             
             //make the runner of the strategy is the owner of the strategy...
             //NEED TO TALK TO ALISON ABOUT ISSUES, LOCEKD owner might not be the creator of resulting datsets,
@@ -302,11 +303,14 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             dao.setControlStrategyRunStatusAndCompletionDate(controlStrategyId, "Waiting", null, session);
 
             StrategyFactory factory = new StrategyFactory();
-            validatePath(strategy.getExportDirectory());
+//            validatePath(strategy.getExportDirectory());
             RunControlStrategy runStrategy = new RunControlStrategy(factory, sessionFactory, dbServerFactory,
                     threadPool);
             runStrategy.run(user, strategy, this);
         } catch (EmfException e) {
+            // queue up the strategy to be run, by setting runStatus to Waiting
+            dao.setControlStrategyRunStatusAndCompletionDate(controlStrategyId, "Failed", null, session);
+
             throw new EmfException(e.getMessage());
         } finally {
             session.close();
@@ -345,8 +349,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         for (ControlStrategyInputDataset dataset : inputDatasets) {
             Sector[] sectors = dataset.getInputDataset().getSectors();
             if (sectors == null || sectors.length == 0)
-                throw new EmfException("Please use Edit Properties to select a sector for: "
-                        + dataset.getInputDataset().getName());
+                throw new EmfException("Inventory, " + dataset.getInputDataset().getName() + ", is missing a sector.  Edit dataset to add sector.");
         }
     }
 
@@ -384,15 +387,15 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
-    private File validatePath(String folderPath) throws EmfException {
-        File file = new File(folderPath);
-
-        if (!file.exists() || !file.isDirectory()) {
-            LOG.error("Folder " + folderPath + " does not exist");
-            throw new EmfException("Export folder does not exist: " + folderPath);
-        }
-        return file;
-    }
+//    private File validatePath(String folderPath) throws EmfException {
+//        File file = new File(folderPath);
+//
+//        if (!file.exists() || !file.isDirectory()) {
+//            LOG.error("Folder " + folderPath + " does not exist");
+//            throw new EmfException("Export folder does not exist: " + folderPath);
+//        }
+//        return file;
+//    }
 
     public synchronized void stopRunStrategy(int controlStrategyId) throws EmfException {
         Session session = sessionFactory.getSession();
