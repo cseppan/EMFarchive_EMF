@@ -33,7 +33,8 @@ public class RetrieveEfficiencyRecord {
         effRecColumnMap.put("Existing Measure", "er.existing_measure_abbr");
         effRecColumnMap.put("Existing NEI Dev", "er.existing_dev_code");
         effRecColumnMap.put("Cost Year", "er.cost_year");
-        effRecColumnMap.put("Cost Per Ton", "er.cost_per_ton");
+        effRecColumnMap.put("CPT", "er.cost_per_ton");
+        effRecColumnMap.put("Ref Yr CPT", "er.ref_yr_cost_per_ton");
         effRecColumnMap.put("Control Efficiency", "er.efficiency");
         effRecColumnMap.put("Rule Effectiveness", "er.rule_effectiveness");
         effRecColumnMap.put("Rule Penetration", "er.rule_penetration");
@@ -45,6 +46,8 @@ public class RetrieveEfficiencyRecord {
         effRecColumnMap.put("Details", "er.detail");
         effRecColumnMap.put("Cap Ann Ratio", "er.cap_ann_ratio");
         effRecColumnMap.put("Incremental CPT", "er.incremental_cost_per_ton");
+        effRecColumnMap.put("Min Emis", "er.min_emis");
+        effRecColumnMap.put("Max Emis", "er.max_emis");
     }
 
     public EfficiencyRecord[] getEfficiencyRecords(int recordLimit, String filter) throws SQLException, EmfException {
