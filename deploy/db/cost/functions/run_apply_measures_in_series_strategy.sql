@@ -237,7 +237,9 @@ BEGIN
 
 
 --	EXECUTE 
-	EXECUTE 'insert into emissions.' || detailed_result_table_name || ' 
+	EXECUTE 
+	--raise notice '%',
+	'insert into emissions.' || detailed_result_table_name || ' 
 		(
 		dataset_id,
 		cm_abbrev,
