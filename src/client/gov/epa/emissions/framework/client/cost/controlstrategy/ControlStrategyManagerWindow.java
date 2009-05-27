@@ -258,6 +258,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     }
 
     private void editControlStrategies() {
+        messagePanel.clear();
         List controlStrategies = selected();
         if (controlStrategies.isEmpty()) {
             messagePanel.setMessage("Please select one or more Control Strategies");
