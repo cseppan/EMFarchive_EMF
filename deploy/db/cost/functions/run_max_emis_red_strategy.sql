@@ -760,61 +760,21 @@ BEGIN
 		left outer join reference.gdplev
 		on gdplev.annual = eq.cost_year
 
---					inner join (
---						select fips, scc, plantid, poll, sum(' || uncontrolled_emis_sql || ') as total_ann_emis
---						from emissions.' || inv_table_name || ' as inv
---						group by fips, scc, plantid, poll) source_total
---					on source_total.fips = inv.fips
---					and source_total.scc = inv.scc
---					and source_total.plantid = inv.plantid
---					and source_total.poll = inv.poll
-					
---this part will get best eff rec...
+		--this part will get best eff rec...
 		inner join emf.control_measure_efficiencyrecords er
 		on er.control_measures_id = m.control_measures_id
 		-- pollutant filter
 		and er.pollutant_id = p.id
 		-- min and max emission filter
 		and ' || annualized_uncontrolled_emis_sql || ' between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
---		and source_total.total_ann_emis between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
 		-- locale filter
 		and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
 		-- effecive date filter
 		and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)
 
-		-- target pollutant filter
---		left outer join emf.control_strategy_target_pollutants cstp
---		on cstp.pollutant_id = p.id
---		and cstp.control_strategy_id = ' || control_strategy_id || '
-
 	where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 		-- dont include sources that have no emissions...
 		and ' || uncontrolled_emis_sql || ' <> 0.0
-
---		and coalesce(100 * inv.ceff / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0) * ' || case when has_rpen_column then 'coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '1.0' end || ', 0) <> 100.0
-		-- TODO:  I don''t think this is needed, seems redundant
---		and (	p.id <> ' ||  target_pollutant_id || '
---			or 
---			(
---				p.id = ' ||  target_pollutant_id || '
---				and er.efficiency - coalesce(inv.ceff, 0) >= ' || replacement_control_min_eff_diff_constraint || '
---			)
---		)
-		-- constraint filter, BUT ONLY for target pollutants
-		-- TODO:  I don''t think this is needed, seems redundant
-		' || case when has_constraints then '
---		and (	p.id <> ' ||  target_pollutant_id || ' --cstp.pollutant_id is null 
---			or 
---			(
---				p.id = ' ||  target_pollutant_id || '-- cstp.pollutant_id is not null  
---				and (
---					' || percent_reduction_sql || ' >= ' || coalesce(min_control_efficiency_constraint, -100.0) || '
---					' || coalesce(' and ' || percent_reduction_sql || ' / 100 * ' || annualized_uncontrolled_emis_sql || ' >= ' || min_emis_reduction_constraint, '')  || '
---					' || coalesce(' and coalesce(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.computed_cost_per_ton, -1E+308) <= ' || max_cost_per_ton_constraint, '')  || '
---					' || coalesce(' and coalesce(' || percent_reduction_sql || ' / 100 * ' || annualized_uncontrolled_emis_sql || ' * ' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.computed_cost_per_ton, -1E+308) <= ' || max_ann_cost_constraint, '')  || '
---				)
---			)
---		)' else '' end || '
 
 	order by inv.fips, 
 		inv.scc, 
