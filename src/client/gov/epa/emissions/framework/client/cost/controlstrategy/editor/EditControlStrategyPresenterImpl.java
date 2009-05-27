@@ -45,10 +45,6 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     private EditControlStrategyConstraintsTabPresenter constraintsTabPresenter;
     
-    private boolean inputsLoaded = false;
-    
-//    private boolean hasResults = false;
-    
     public EditControlStrategyPresenterImpl(ControlStrategy controlStrategy, EmfSession session, 
             EditControlStrategyView view, ControlStrategiesManagerPresenter controlStrategiesManagerPresenter) {
         this.controlStrategy = controlStrategy;
@@ -185,10 +181,11 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 //        }
     }
 
-    public void set(ControlStrategyMeasuresTabView view) {
+    public void set(ControlStrategyMeasuresTabView view) throws EmfException {
         measuresTabPresenter = new EditControlStrategyMeasuresTabPresenter(view,
                 controlStrategy, session, 
                 managerPresenter);
+        measuresTabPresenter.doDisplay();
         presenters.add(measuresTabPresenter);
     }
 
@@ -214,10 +211,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void doLoad(String tabTitle) throws EmfException {
-        if (!inputsLoaded && tabTitle.equalsIgnoreCase("Measures")) {
-            measuresTabPresenter.doDisplay();
-            inputsLoaded = true;
-        }
+        measuresTabPresenter.doDisplay();
     }
     
     public CostYearTable getCostYearTable() throws EmfException {
