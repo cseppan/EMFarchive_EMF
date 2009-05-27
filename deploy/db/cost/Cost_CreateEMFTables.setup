@@ -443,6 +443,7 @@ CREATE TABLE emf.control_strategy_constraints
   domain_wide_pct_reduction_start double precision,
   domain_wide_pct_reduction_end double precision,
   replacement_control_min_eff_diff double precision,
+  control_program_measure_min_pct_red_diff double precision,
   CONSTRAINT control_strategy_constraints_pkey PRIMARY KEY (control_strategy_id),
   CONSTRAINT control_strategy_constraints_control_strategy_id_fkey FOREIGN KEY (control_strategy_id)
       REFERENCES emf.control_strategies (id) MATCH SIMPLE

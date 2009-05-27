@@ -831,3 +831,5 @@ drop FUNCTION public.get_strategy_costs(
 	OUT computed_cost_per_ton double precision, 
 	OUT actual_equation_type character varying(255));
 
+ALTER TABLE emf.control_strategy_constraints
+   ADD COLUMN control_program_measure_min_pct_red_diff double precision;
