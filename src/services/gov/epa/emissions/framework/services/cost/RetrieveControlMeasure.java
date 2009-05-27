@@ -207,8 +207,6 @@ public class RetrieveControlMeasure {
         "aer.avg_rule_effectiveness, aer.avg_rule_penetration, " +
         "cm.equipment_life, cm.data_souce, cms.sector_id " +
         "from emf.control_measures cm " +
-        "inner join emf.aggregrated_efficiencyrecords mpers " +
-        "on mpers.control_measures_id = cm.id " +
         "left outer join emf.control_measure_sectors cms " +
         "on cms.control_measure_id = cm.id " +
         "left outer join emf.sectors s " +
@@ -244,7 +242,9 @@ public class RetrieveControlMeasure {
         "left outer join emf.pollutants mp " +
         "on mp.id = cm.major_pollutant " +
 //        if (whereFilter.trim().equals("") )
-         "where mpers.pollutant_id = " + majorPollutantId + " " +
+         "where (cm.major_pollutant = " + majorPollutantId + " " +
+         "    or cm.id in (select distinct control_measures_id from emf.aggregrated_efficiencyrecords mpers " +
+         "where mpers.pollutant_id = " + majorPollutantId + " )) " +
             //don't include filter if no sccs
         (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + 
          " order by cm.name, cm.id, s.name, p.name";
