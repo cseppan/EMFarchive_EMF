@@ -22,7 +22,8 @@ public class ViewEfficiencyRecordWindow extends EditEfficiencyRecordWindow {
 
 
     public void viewOnly() {
-       saveRecord.setVisible(false);
+        saveRecord.setVisible(false);
+        cancel.setText("Close");
     }
 
 //    private void updateControlMeasureEfficiencyTab(EfficiencyRecord record) throws EmfException {

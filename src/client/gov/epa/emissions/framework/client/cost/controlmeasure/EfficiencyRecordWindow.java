@@ -103,6 +103,8 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     static int counter = 0;
     
     protected SaveButton saveRecord;
+    
+    protected Button cancel;
 
     public EfficiencyRecordWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session, CostYearTable costYearTable) {
@@ -369,7 +371,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         getRootPane().setDefaultButton(saveRecord);
         panel.add(saveRecord);
 
-        Button cancel = new CancelButton(new AbstractAction() {
+        cancel = new CancelButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 closeWindow();
             }
