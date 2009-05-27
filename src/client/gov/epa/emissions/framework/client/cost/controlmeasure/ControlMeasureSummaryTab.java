@@ -401,6 +401,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         measure.setAbbreviation(abbreviation.getText());
         measure.setDataSouce(dataSources.getText());
         measure.setSectors(sectorsWidget.getSectors());
+        if (monthsWidget.getMonths() == null || monthsWidget.getMonths().length == 0)
+            throw new EmfException("Summary tab: The months the measure can used is missing.");
         measure.setMonths(monthsWidget.getMonths());
         
         // save items modified in efficiency tab
