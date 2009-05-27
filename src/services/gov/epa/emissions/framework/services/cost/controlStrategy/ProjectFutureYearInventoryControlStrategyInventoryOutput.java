@@ -11,6 +11,8 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Date;
 
 public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends AbstractControlStrategyInventoryOutput {
 
@@ -29,6 +31,20 @@ public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends Ab
     protected void doCreateInventory(EmfDataset inputDataset, String inputTable) throws EmfException, Exception, SQLException {
         startStatus(statusServices);
         try {
+            //we need to change the year on the start and stop datetime.
+            Date startDate = inputDataset.getStartDateTime();
+            Date stopDate = inputDataset.getStopDateTime();
+            
+            if (startDate != null && stopDate != null) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(startDate);
+                calendar.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+                inputDataset.setStartDateTime(calendar.getTime());
+                calendar.setTime(stopDate);
+                calendar.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+                inputDataset.setStopDateTime(calendar.getTime());
+            }
+            
             EmfDataset dataset = creator.addDataset(creator.createDatasetName(inputDataset + "_CntlInv"), 
                     inputDataset, inputDataset.getDatasetType(), 
                     tableFormat, description(inputDataset));
