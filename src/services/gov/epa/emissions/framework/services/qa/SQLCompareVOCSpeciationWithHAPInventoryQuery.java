@@ -264,13 +264,13 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
-                sql += "       select profile, percent \n"
+                sql += "       select profile_id, percent::double precision \n"
                     + "       from " + table + " s \n"
                     + "       where specie_id = '302' \n"
                     + "       and " + version;
             }
             sql += "        ) rp \n"
-                + "        where rp.profile = tbl.profile_code::integer \n"
+                + "        where rp.profile_id = tbl.profile_code \n"
                 + "        limit 1) as benzene_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
@@ -278,13 +278,13 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
-                sql += "       select profile, percent \n"
+                sql += "       select profile_id, percent::double precision \n"
                     + "       from " + table + " s \n"
                     + "       where specie_id = '465' \n"
                     + "       and " + version;
             }
             sql += "        ) rp \n"
-                + "        where rp.profile = tbl.profile_code::integer \n"
+                + "        where rp.profile_id = tbl.profile_code \n"
                 + "        limit 1) as formaldehyde_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
@@ -292,13 +292,13 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
-                sql += "       select profile, percent \n"
+                sql += "       select profile_id, percent::double precision \n"
                     + "       from " + table + " s \n"
                     + "       where specie_id = '279' \n"
                     + "       and " + version;
             }
             sql += "        ) rp \n"
-                + "        where rp.profile = tbl.profile_code::integer \n"
+                + "        where rp.profile_id = tbl.profile_code \n"
                 + "        limit 1) as acetaldehyde_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
@@ -306,13 +306,13 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
-                sql += "       select profile, percent \n"
+                sql += "       select profile_id, percent::double precision \n"
                     + "       from " + table + " s \n"
                     + "       where specie_id = '531' \n"
                     + "       and " + version;
             }
             sql += "        ) rp \n"
-                + "        where rp.profile = tbl.profile_code::integer \n"
+                + "        where rp.profile_id = tbl.profile_code \n"
                 + "        limit 1) as methanol_percent, \n";
 
         
@@ -496,13 +496,13 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
-                sql += "       select profile, percent \n"
+                sql += "       select profile_id, percent::double precision \n"
                     + "       from " + table + " s \n"
                     + "       where specie_id = '302' \n"
                     + "       and " + version;
             }
             sql += "        ) rp \n"
-                + "        where rp.profile = c.speciated_code::integer \n"
+                + "        where rp.profile_id = c.speciated_code \n"
                 + "        limit 1) as benzene_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
@@ -510,13 +510,13 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
-                sql += "       select profile, percent \n"
+                sql += "       select profile_id, percent::double precision \n"
                     + "       from " + table + " s \n"
                     + "       where specie_id = '465' \n"
                     + "       and " + version;
             }
             sql += "        ) rp \n"
-                + "        where rp.profile = c.speciated_code::integer \n"
+                + "        where rp.profile_id = c.speciated_code \n"
                 + "        limit 1) as formaldehyde_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
@@ -524,13 +524,13 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
-                sql += "       select profile, percent \n"
+                sql += "       select profile_id, percent::double precision \n"
                     + "       from " + table + " s \n"
                     + "       where specie_id = '279' \n"
                     + "       and " + version;
             }
             sql += "        ) rp \n"
-                + "        where rp.profile = c.speciated_code::integer \n"
+                + "        where rp.profile_id = c.speciated_code \n"
                 + "        limit 1) as acetaldehyde_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
@@ -538,13 +538,13 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
-                sql += "       select profile, percent \n"
+                sql += "       select profile_id, percent::double precision \n"
                     + "       from " + table + " s \n"
                     + "       where specie_id = '531' \n"
                     + "       and " + version;
             }
             sql += "        ) rp \n"
-                + "        where rp.profile = c.speciated_code::integer \n"
+                + "        where rp.profile_id = c.speciated_code \n"
                 + "        limit 1) as methanol_percent \n";
         }
             
@@ -646,7 +646,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             dataset = getDataset(speciationProfileWeightDatasets[i]);
             version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
             table = qualifiedEmissionTableName(dataset);
-            capSql += "       select profile, percent, specie_id \n"
+            capSql += "       select profile_id, percent::double precision, specie_id::integer \n"
                 + "       from " + table + " s \n"
                 + "       where specie_id in (''302'',''465'',''279'',''531'') \n"
                 + "       and " + version.replaceAll("'", "''");
@@ -654,7 +654,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         }
 
         capSql += "        ) rp \n"
-        + "        on rp.profile = g.speciation_code::integer \n"
+        + "        on rp.profile_id = g.speciation_code \n"
         
         + " \n"
         + "where i.poll = ''VOC''  \n"
@@ -1430,7 +1430,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
 //        
 //        sql = query(sql, true);
         sql = "CREATE TABLE " + emissionDatasourceName + "." + tableName + " AS " + sql;
-//        System.out.println(sql);
+        System.out.println(sql);
         
         return sql;
     }
