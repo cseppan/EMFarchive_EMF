@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
@@ -122,7 +123,7 @@ public class ControlMeasureDAO {
         session.clear();//must do this
         
         //set the name and give a random abbrev...
-        cm.setName("Copy of " + cm.getName());
+        cm.setName(creator.getName() + "'s " + cm.getName() + " " + CustomDateFormat.format_YYYYMMDDHHMMSS(new Date()));
         cm.setAbbreviation(Math.round(Math.random() * 1000000000) % 1000000000 + "");
         
         //make sure the name and abbrev are unique
@@ -184,7 +185,7 @@ public class ControlMeasureDAO {
         ControlMeasure cm = current(controlMeasureId, session);
         lockingScheme.releaseLock(user, cm, session);
     }
-
+    
     public ControlMeasure update(ControlMeasure locked, Scc[] sccs, Session session) throws EmfException {
         checkForConstraints(locked, session);
         ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, current(locked.getId(),
@@ -500,7 +501,7 @@ public class ControlMeasureDAO {
     public List getControlMeasures(int majorPollutantId, Session session, String whereFilter) {
         return session.createQuery("select new ControlMeasure(cM.id, cM.name, " +
                 "cM.abbreviation, cM.majorPollutant.name) " +
-                "from ControlMeasure cM where cM.id in (select distinct controlMeasureId from EfficiencyRecord where pollutant.id = " + majorPollutantId + ")" + (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + " order by cM.name").list();
+                "from ControlMeasure cM where (cM.majorPollutant.id = " + majorPollutantId + " or cM.id in (select distinct controlMeasureId from EfficiencyRecord where pollutant.id = " + majorPollutantId + "))" + (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + " order by cM.name").list();
                 //"from ControlMeasure cM where cM.majorPollutant.id=" + majorPollutantId + (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + " order by cM.name").list();
     }
 
