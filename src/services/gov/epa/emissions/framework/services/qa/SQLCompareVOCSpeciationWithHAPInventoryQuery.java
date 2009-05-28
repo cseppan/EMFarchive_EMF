@@ -1430,7 +1430,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
 //        
 //        sql = query(sql, true);
         sql = "CREATE TABLE " + emissionDatasourceName + "." + tableName + " AS " + sql;
-        System.out.println(sql);
+//        System.out.println(sql);
         
         return sql;
     }
