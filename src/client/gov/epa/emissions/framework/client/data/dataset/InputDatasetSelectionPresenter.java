@@ -43,8 +43,19 @@ public class InputDatasetSelectionPresenter {
         view.refreshDatasets(session.dataService().getDatasets(datasetType.getId(), nameContaining));
     }
     
-    public EmfDataset[] getDatasets() {
-        return view.getDatasets();
+    public EmfDataset[] getDatasets() throws EmfException {
+        //get full, becuase future methods/functions might expect the fully populated object.
+        return getFullDatasets(view.getDatasets());
+    }
+    
+    private EmfDataset[] getFullDatasets(EmfDataset[] lightDatasets) throws EmfException {
+        EmfDataset[] datasets = new EmfDataset[lightDatasets.length];
+
+        for(int i = 0; i < lightDatasets.length; ++i) {
+            datasets[i] = session.dataService().getDataset(lightDatasets[i].getId());
+        }
+            
+        return datasets;
     }
     
     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {
