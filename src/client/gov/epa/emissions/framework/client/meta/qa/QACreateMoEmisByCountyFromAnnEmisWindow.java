@@ -103,7 +103,7 @@ public class QACreateMoEmisByCountyFromAnnEmisWindow extends DisposableInteralFr
        
         layoutGenerator.addLabelWidgetPair("Temporal Profile:", temporalProfilePanel(dataset), content);
         layoutGenerator.addLabelWidgetPair("Smkreport county-moncode annual Datasets:",  smokeReportDatasetsPanel(), content);
-        yearTextField = new TextField("year", year + "", 40);
+        yearTextField = new TextField("year", year != null ? year + "" : "", 40);
         layoutGenerator.addLabelWidgetPair("Year:", yearTextField, content);
         
         layoutGenerator.makeCompactGrid(content, 3, 2, // rows, cols
