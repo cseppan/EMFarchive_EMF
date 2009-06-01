@@ -1933,6 +1933,7 @@ public class ManagedCaseService {
                 job.setRunLog(null);
                 job.setRunStartDate(null);
                 job.setRunCompletionDate(null);
+                job.setIdInQueue(null);
                 job.setRunstatus(dao.getJobRunStatuse("Not Started"));
                 dao.add(job, session);
                 Sector sector = job.getSector();
@@ -1994,6 +1995,7 @@ public class ManagedCaseService {
             if (job.getRunstatus() == null)
                 job.setRunstatus(dao.getJobRunStatuse("Not Started"));
 
+            job.setIdInQueue(null);
             dao.add(job, session);
             return dao.loadCaseJobByName(job);
         } catch (Exception e) {
