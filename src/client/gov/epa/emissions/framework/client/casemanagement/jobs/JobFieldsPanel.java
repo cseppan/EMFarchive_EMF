@@ -45,6 +45,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -265,6 +266,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         status.setPreferredSize(comboSize);
         status.setSelectedItem(job.getRunstatus());
         addPopupMenuListener(status, "status");
+        addActionListener(status);
         layoutGenerator.addLabelWidgetPair("Run Status:", status, panel);
         // layoutGenerator.addLabelWidgetPair("Local?",localBox,panel);
 
@@ -274,6 +276,38 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
                 5, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private void addActionListener(final ComboBox status) {
+        status.addActionListener(new AbstractAction(){
+            public void actionPerformed(ActionEvent arg0) {
+                JobRunStatus st =  job.getRunstatus();
+                JobRunStatus sl =  (JobRunStatus)status.getSelectedItem();
+                
+                if (isActive(st) && !st.equals(sl)) {
+                    JOptionPane.showMessageDialog(JobFieldsPanel.this, 
+                            "Can't change status. Please use 'Cancel' button on Jobs tab instead.");
+                    status.setSelectedItem(st);
+                }
+                
+                if (!isActive(st) && isActive(sl)) {
+                    JOptionPane.showMessageDialog(JobFieldsPanel.this, "Can't change to an active status.");
+                    status.setSelectedItem(st);
+                }
+            }
+        });
+    }
+
+    private boolean isActive(JobRunStatus runstatus) {
+        String st = runstatus.getName();
+        
+        if (st != null && (st.equalsIgnoreCase("Exporting")
+                || st.equalsIgnoreCase("Waiting")
+                || st.equalsIgnoreCase("Running")
+                || st.equalsIgnoreCase("Submitted")))
+            return true;
+            
+        return false;
     }
 
     private void addPopupMenuListener(final JComboBox box, final String toget) {
