@@ -286,12 +286,15 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
                 
                 if (isActive(st) && !st.equals(sl)) {
                     JOptionPane.showMessageDialog(JobFieldsPanel.this, 
-                            "Can't change status. Please use 'Cancel' button on Jobs tab instead.");
+                            "Please use the 'Cancel' button on the Jobs tab instead of changing the status.",
+                            "Cannot Change Run Status", JOptionPane.ERROR_MESSAGE);
                     status.setSelectedItem(st);
                 }
                 
                 if (!isActive(st) && isActive(sl)) {
-                    JOptionPane.showMessageDialog(JobFieldsPanel.this, "Can't change to an active status.");
+                    JOptionPane.showMessageDialog(JobFieldsPanel.this, 
+                            "Please use the 'Run' button on the Jobs tab instead of changing the status.",
+                            "Cannot Change Run Status", JOptionPane.ERROR_MESSAGE);
                     status.setSelectedItem(st);
                 }
             }
