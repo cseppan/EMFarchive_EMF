@@ -1,3 +1,22 @@
+-- emf.users
+CREATE TABLE emf.users
+(
+  id SERIAL PRIMARY KEY,
+  username varchar(255) NOT NULL UNIQUE,
+  password varchar(255) NOT NULL,
+  name varchar(255) NOT NULL,
+  affiliation varchar(255) NOT NULL,
+  phone varchar(15) NOT NULL,
+  email varchar(255) NOT NULL,
+  is_admin bool NOT NULL DEFAULT false,
+  is_login bool NOT NULL DEFAULT false,
+  is_account_disabled bool NOT NULL DEFAULT false,
+  lock_owner varchar(255),  
+  lock_date timestamp
+) 
+WITHOUT OIDS;
+-- emf.users
+--
 -- emissions.versions
 CREATE TABLE emissions.versions
 (
@@ -19,25 +38,6 @@ WITHOUT OIDS;
 --emissions.versions
 --
 
--- emf.users
-CREATE TABLE emf.users
-(
-  id SERIAL PRIMARY KEY,
-  username varchar(255) NOT NULL UNIQUE,
-  password varchar(255) NOT NULL,
-  name varchar(255) NOT NULL,
-  affiliation varchar(255) NOT NULL,
-  phone varchar(15) NOT NULL,
-  email varchar(255) NOT NULL,
-  is_admin bool NOT NULL DEFAULT false,
-  is_login bool NOT NULL DEFAULT false,
-  is_account_disabled bool NOT NULL DEFAULT false,
-  lock_owner varchar(255),  
-  lock_date timestamp
-) 
-WITHOUT OIDS;
--- emf.users
---
 -- emf.note_types
 CREATE TABLE emf.note_types
 (
@@ -401,3 +401,15 @@ CREATE TABLE reference.rsm_inv_sectors
 ) 
 WITHOUT OIDS;
 -- reference.rsm_inv_sectors
+
+-- emf.external_dataset_access
+CREATE TABLE emf.external_dataset_access
+(
+  id SERIAL PRIMARY KEY,
+  dataset_id integer NOT NULL,
+  "version" integer NOT NULL,
+  external_app character varying(128) NOT NULL
+)
+WITH (OIDS=FALSE);
+ALTER TABLE emf.external_dataset_access OWNER TO emf;
+-- emf.external_dataset_access
