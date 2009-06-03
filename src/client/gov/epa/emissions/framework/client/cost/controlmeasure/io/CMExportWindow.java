@@ -63,7 +63,7 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
 
     private static String title(ControlMeasure[] controlMeasures, int total) {
         int num = controlMeasures.length;
-        StringBuffer buf = new StringBuffer("Exporting " + num + " of the " + total + " Control Measures.");
+        StringBuffer buf = new StringBuffer("Exporting " + num + " of the " + total + " Control Measures");
 
         return buf.toString();
     }
@@ -107,7 +107,7 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
         // purpose
         prefix = new JTextField(30);
         prefix.setName("prefix");
-        layoutGenerator.addLabelWidgetPair("Prefix:", prefix, panel);
+        layoutGenerator.addLabelWidgetPair("Prefix", prefix, panel);
 
         // overwrite
         JPanel overwritePanel = new JPanel(new BorderLayout());
