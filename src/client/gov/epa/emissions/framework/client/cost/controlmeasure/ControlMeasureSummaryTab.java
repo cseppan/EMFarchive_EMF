@@ -87,10 +87,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     protected Pollutant[] allPollutants;
 
-    protected SourceGroup[] allSourceGroups;
-
-    protected ControlTechnology[] allControlTechnologies;
-
     private NumberFieldVerifier verifier;
 
     private EmfConsole parentConsole;
@@ -263,8 +259,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         layoutGenerator.addLabelWidgetPair("Major Pollutant:", majorPollutant, panel);
 
         try {
-            allControlTechnologies = session.controlMeasureService().getControlTechnologies();
-            controlTechnology = new EditableComboBox(allControlTechnologies);
+            controlTechnology = new EditableComboBox(getControlTechnologies());
             controlTechnology.setPreferredSize(new Dimension(250, 25));
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve all Control Technologies");
@@ -273,8 +268,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         layoutGenerator.addLabelWidgetPair("Control Technology:", controlTechnology, panel);
 
         try {
-            allSourceGroups = session.dataCommonsService().getSourceGroups();
-            sourceGroup = new EditableComboBox(allSourceGroups);
+            sourceGroup = new EditableComboBox(getSourceGroups());
             sourceGroup.setPreferredSize(new Dimension(250, 25));
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve Source Groups");
@@ -425,7 +419,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 //        return selectedItem == null ? "" : selectedItem + "";
 //    }
 
-    private void updateControlTechnology() {
+    private void updateControlTechnology() throws EmfException {
         Object selected = controlTechnology.getSelectedItem();
         if (selected instanceof String) {
             String controltechnologyName = (String) selected;
@@ -441,11 +435,15 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         }
     }
 
-    private ControlTechnology controltechnology(String name) {
-        return new ControlTechnologies(allControlTechnologies).get(name);
+    private ControlTechnology controltechnology(String name) throws EmfException {
+        return new ControlTechnologies(getControlTechnologies()).get(name);
+    }
+    
+    private ControlTechnology[] getControlTechnologies() throws EmfException {
+        return session.controlMeasureService().getControlTechnologies();
     }
 
-    private void updateSourceGroup() {
+    private void updateSourceGroup() throws EmfException {
         Object selected = sourceGroup.getSelectedItem();
 
         if (selected instanceof String) {
@@ -462,10 +460,14 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         }
     }
 
-    private SourceGroup sourcegroup(String name) {
-        return new SourceGroups(allSourceGroups).get(name);
+    private SourceGroup sourcegroup(String name) throws EmfException {
+        return new SourceGroups(getSourceGroups()).get(name);
     }
 
+   private SourceGroup[] getSourceGroups() throws EmfException {
+       return session.dataCommonsService().getSourceGroups();
+   }
+    
     private void updatePollutant() {
         Object selected = majorPollutant.getSelectedItem();
         measure.setMajorPollutant((Pollutant) selected);
