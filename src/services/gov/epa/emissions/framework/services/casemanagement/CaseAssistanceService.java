@@ -29,6 +29,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -118,9 +119,10 @@ public class CaseAssistanceService {
                 Case loadedCase = caseDao.getCaseFromName(newCase.getName(), session);
                 int caseId = loadedCase.getId();
                 int modId = loadedCase.getModel().getId();
-                insertJobs(caseId, user, caseParser.getJobs(), helper);
-                insertParameters(caseId, modId, caseParser.getParameters(), helper);
-                insertInputs(caseId, modId, caseParser.getInputs(), helper);
+                insertJobs(caseId, user, caseParser.getJobs(), helper); //NOTE: Have to insert jobs before inserting inputs/parameters
+                HashMap<String, Integer> jobIds = getJobIds(caseDao.getCaseJobs(caseId, session));
+                insertParameters(caseId, modId, caseParser.getParameters(), helper, jobIds);
+                insertInputs(caseId, modId, caseParser.getInputs(), helper, jobIds);
             }
         } catch (Exception e) {
             log.error("Could not import case", e);
@@ -137,6 +139,17 @@ public class CaseAssistanceService {
         } finally {
             session.close();
         }
+    }
+
+    private HashMap<String, Integer> getJobIds(List<CaseJob> caseJobs) {
+        HashMap<String, Integer> jobIds = new HashMap<String, Integer>();
+        
+        if (caseJobs != null && caseJobs.size() > 0) {
+            for (CaseJob job : caseJobs)
+                jobIds.put(job.getName(), new Integer(job.getId()));
+        }
+        
+        return jobIds;
     }
 
     private void addNewCaseObject(Case newCase) throws Exception {
@@ -346,7 +359,7 @@ public class CaseAssistanceService {
         }
     }
     
-    private void insertParameters(int caseId, int model2RunId, List<CaseParameter> parameters, CaseDaoHelper helper)
+    private void insertParameters(int caseId, int model2RunId, List<CaseParameter> parameters, CaseDaoHelper helper, HashMap<String, Integer> jobIds)
             throws Exception {
         for (Iterator<CaseParameter> iter = parameters.iterator(); iter.hasNext();) {
             CaseParameter param = iter.next();
@@ -375,12 +388,17 @@ public class CaseAssistanceService {
             prog = helper.getCaseProgram(prog);
             param.setProgram(prog);
 
+            String jobName = param.getJobName();
+            
+            if (jobName != null && !jobName.trim().equalsIgnoreCase("All jobs for sector") && !jobName.trim().isEmpty())
+                param.setJobId(jobIds.get(jobName) == null ? 0 : jobIds.get(jobName));
+                
             helper.insertCaseParameter(param);
         }
 
     }
 
-    private void insertInputs(int caseId, int model2RunId, List<CaseInput> inputs, CaseDaoHelper helper)
+    private void insertInputs(int caseId, int model2RunId, List<CaseInput> inputs, CaseDaoHelper helper, HashMap<String, Integer> jobIds)
             throws Exception {
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
@@ -417,6 +435,11 @@ public class CaseAssistanceService {
             // NOTE: temporarily set to null to make input insertion to work
             input.setDataset(null);
             input.setVersion(null);
+            
+            String jobName = input.getJobName();
+            
+            if (jobName != null && !jobName.trim().equalsIgnoreCase("All jobs for sector") && !jobName.trim().isEmpty())
+                input.setCaseJobID(jobIds.get(jobName) == null ? 0 : jobIds.get(jobName));
 
             helper.insertCaseInput(input);
         }
