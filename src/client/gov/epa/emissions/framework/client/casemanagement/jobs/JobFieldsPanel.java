@@ -302,6 +302,9 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
 
     private boolean isActive(JobRunStatus runstatus) {
+        if (runstatus == null)
+            return false;
+        
         String st = runstatus.getName();
         
         if (st != null && (st.equalsIgnoreCase("Exporting")
