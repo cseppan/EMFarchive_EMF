@@ -190,11 +190,12 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
         for (int i = 0; i < jobs.length; i++) {
             int jobId = jobs[i].getId();
-            String status = service().getCaseJob(jobId).getRunstatus().getName();
+            JobRunStatus statusObj = service().getCaseJob(jobId).getRunstatus();
+            String status = (statusObj == null ? "" : statusObj.getName());
 
             if (status == null || status.trim().isEmpty())
                 ok.add(status);
-
+            
             if (status != null && status.equalsIgnoreCase("Not Started"))
                 ok.add(status);
 
@@ -313,7 +314,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         return CaseObjectManager.getCaseObjectManager(session).getJobRunStatuses();
     }
 
-    public String cancelJobs(List<CaseJob> jobs) throws EmfException {
+    public String cancelJobs(List<CaseJob> jobs) {
         try {
             String status = getJobsStatus(jobs.toArray(new CaseJob[0]));
 
@@ -327,7 +328,18 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             
             return "No job has been canceled.";
         } catch (EmfException e) {
-            throw new EmfException("Error: " + e.getMessage() + ".");
+            String msg = e.getMessage();
+            
+            if (msg == null || msg.trim().isEmpty())
+                msg = "error cancelling jobs.";
+            
+            if (msg.length() > 80)
+                msg = msg.substring(0, 78) + "...";
+            
+            if (!msg.endsWith("."))
+                msg += ".";
+                
+            return "Warning: " + msg;
         }
     }
 

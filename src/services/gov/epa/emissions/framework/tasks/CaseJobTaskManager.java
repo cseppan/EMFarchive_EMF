@@ -983,27 +983,29 @@ public class CaseJobTaskManager implements TaskManager {
         String status = caseJob.getRunstatus().getName();
         String host = (caseJob.getHost() == null ? "localhost" : caseJob.getHost().getName());
 
-        if (status == null)
-            throw new EmfException("Status for job '" + caseJob.getName() + "' is undefined.");
+        try {
+            if (status == null) 
+                throw new EmfException("Job status is null.");
 
-        log.warn("User '" + user.getUsername() + "' tried to cancel job '" + caseJob.getName() + "' " + " on " + status
-                + " stage @" + new Date());
+            log.warn("User '" + user.getUsername() + "' tried to cancel job '" + caseJob.getName() + "' " + " on " + status
+                    + " stage @" + new Date());
 
-        if (status.equalsIgnoreCase("Submitted") || status.equalsIgnoreCase("Running"))
-            remoteCancel(user, caseJob, host);
+            if (status.equalsIgnoreCase("Submitted") || status.equalsIgnoreCase("Running"))
+                remoteCancel(user, caseJob, host);
 
-        if (status.equalsIgnoreCase("Waiting"))
-            cancelTempTables(user, caseJob, host);
-
-        if (status.equalsIgnoreCase("Exporting")) {
-            boolean found = TaskManagerFactory.getExportTaskManager().cancelExports2Job(jobId, user);
-
-            if (!found)
+            if (status.equalsIgnoreCase("Waiting"))
                 cancelTempTables(user, caseJob, host);
-        }
 
-        updateCancelStatus(user, caseJob, status);
-        testAndSetWaitingTasksDependencies();
+            if (status.equalsIgnoreCase("Exporting")) {
+                boolean found = TaskManagerFactory.getExportTaskManager().cancelExports2Job(jobId, user);
+
+                if (!found)
+                    cancelTempTables(user, caseJob, host);
+            }
+        } finally {
+            updateCancelStatus(user, caseJob, status);
+            testAndSetWaitingTasksDependencies();
+        }
     }
 
     private static void cancelTempTables(User user, CaseJob job, String host) throws EmfException {
@@ -1027,9 +1029,9 @@ public class CaseJobTaskManager implements TaskManager {
         CaseJob fresh = caseDAO.getCaseJob(job.getId());
         JobRunStatus status = fresh.getRunstatus();
 
-        while (status != null && status.getName().equalsIgnoreCase("Waiting")) {
+        if (status != null && status.getName().equalsIgnoreCase("Waiting")) {
             try {
-                Thread.sleep(3000); // stop for 3 seconds
+                Thread.sleep(5000); // stop for 5 seconds
             } catch (InterruptedException e) {
                 // no-op
             }
@@ -1044,6 +1046,9 @@ public class CaseJobTaskManager implements TaskManager {
 
     private static boolean findNRemove(CaseJob job, Hashtable<String, Task> tempTable, User user) {
         boolean found = false;
+        
+        if (tempTable == null || tempTable.size() == 0)
+            return found;
 
         synchronized (tempTable) {
             Collection<Task> allTasks = tempTable.values();
@@ -1079,7 +1084,7 @@ public class CaseJobTaskManager implements TaskManager {
         }
 
         if (qid == null || qid.trim().isEmpty())
-            throw new EmfException("Queue ID '" + qid + "' is invalid");
+            return;
 
         String command = getQueCommand(qid, host);
 
