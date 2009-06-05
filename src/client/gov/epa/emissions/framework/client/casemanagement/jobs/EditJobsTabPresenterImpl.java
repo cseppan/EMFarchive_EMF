@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
@@ -60,6 +61,8 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     public void doSave(CaseJob[] jobs) throws EmfException {
         for (CaseJob job : jobs)
             service().updateCaseJobStatus(job);
+        
+        view.refresh();
     }
 
     public void addNewJobDialog(NewJobView dialog) {
@@ -180,6 +183,16 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         System.out.println("Start running jobs");
         service().runJobs(jobIds, caseObj.getId(), session.user());
         System.out.println("Finished running jobs");
+    }
+    
+    public Host[] getJobHosts() throws EmfException {
+        caseObjectManager.refresh();
+        return this.caseObjectManager.getJobHosts();
+    }
+    
+    public Sector[] getJobSectors() throws EmfException {
+        caseObjectManager.refresh();
+        return this.caseObjectManager.getSectors();
     }
 
     public String getJobsStatus(CaseJob[] jobs) throws EmfException {
@@ -355,6 +368,11 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             ids[i] = jobIds.get(i);
 
         return ids;
+    }
+
+    public void modifyJobs(ModifyJobsDialog dialog) {
+        dialog.register(this);
+        dialog.display();
     }
 
 }

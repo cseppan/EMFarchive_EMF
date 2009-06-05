@@ -252,5 +252,10 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
         return ids;
     }
 
+    public void modifyJobs(ModifyJobsDialog dialog) {
+        // NOTE Auto-generated method stub
+        
+    }
+
     
 }

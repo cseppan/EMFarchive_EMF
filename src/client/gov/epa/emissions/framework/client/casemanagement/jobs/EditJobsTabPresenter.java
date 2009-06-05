@@ -48,4 +48,6 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
 
     String cancelJobs(List<CaseJob> jobs) throws EmfException;
 
+    void modifyJobs(ModifyJobsDialog dialog);
+
 }

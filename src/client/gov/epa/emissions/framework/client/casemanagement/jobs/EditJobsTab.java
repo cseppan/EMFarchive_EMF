@@ -273,6 +273,10 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         copy.setMargin(insets);
         container.add(copy);
 
+        Button modify = new Button("Modify", modifyAction());
+        modify.setMargin(insets);
+        container.add(modify);
+
         Button run = new RunButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -355,6 +359,19 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         };
     }
 
+    private Action modifyAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    clearMessage();
+                    modifyJobs();
+                } catch (Exception ex) {
+                    messagePanel.setError(ex.getMessage());
+                }
+            }
+        };
+    }
+
     private void addNewJob() {
         NewJobDialog view = new NewJobDialog(parentConsole, caseObj, session);
         try {
@@ -412,10 +429,14 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
         for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
-            String title = "Edit Case Job: " + job.getName() + " (" + job.getId() + ") (" + caseObj.getName() + ")";
+            String title = getWindowName(job);
             EditCaseJobView jobEditor = new EditCaseJobWindow(title, desktopManager, parentConsole, session);
             presenter.editJob(job, jobEditor);
         }
+    }
+
+    private String getWindowName(CaseJob job) {
+        return "Edit Case Job: " + job.getName() + " (" + job.getId() + ") (" + caseObj.getName() + ")";
     }
 
     private void copyJobs() throws Exception {
@@ -434,6 +455,26 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         if ((selectedCase != null) && (selectedCase.length() > 0)) {
             presenter.copyJobs(getCaseId(selectedCase), jobs);
         }
+    }
+
+    private void modifyJobs() throws Exception {
+        List<CaseJob> jobs = getSelectedJobs();
+
+        if (jobs.size() == 0) {
+            messagePanel.setMessage("Please select job(s) to modify.");
+            return;
+        }
+
+        for (CaseJob job : jobs) {
+            if (desktopManager.getWindow(getWindowName(job)) != null) {
+                JOptionPane.showMessageDialog(parentConsole, "Please close the editor for job '" + job.getName() + "'.",
+                        "Close Job Editors", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+
+        ModifyJobsDialog dialog = new ModifyJobsDialog(this.parentConsole, jobs.toArray(new CaseJob[0]), session);
+        presenter.modifyJobs(dialog);
     }
 
     private int getDefultIndex(Object[] selected) {
