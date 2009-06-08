@@ -348,7 +348,7 @@ public class SetCaseWindow extends DisposableInteralFrame implements SetCaseView
     }
 
     public void notifyLockFailure(Case caseObj) {
-        String message = "Cannot edit Properties of Case: " + caseObj + System.getProperty("line.separator")
+        String message = "Cannot edit Case: " + caseObj + System.getProperty("line.separator")
         + " as it was locked by User: " + caseObj.getLockOwner() + "(at " + format(caseObj.getLockDate()) + ")";
         InfoDialog dialog = new InfoDialog(parentConsole, "Message", message);
         dialog.confirm();
