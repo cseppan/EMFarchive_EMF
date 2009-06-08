@@ -437,7 +437,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     public void notifyLockFailure(ControlStrategy controlStrategy) {
-        String message = "Cannot edit Properties of Control Strategy: " + controlStrategy
+        String message = "Cannot edit Control Strategy: " + controlStrategy
                 + System.getProperty("line.separator") + " as it was locked by User: " + controlStrategy.getLockOwner()
                 + "(at " + format(controlStrategy.getLockDate()) + ")";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
@@ -445,8 +445,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     public void notifyEditFailure(ControlStrategy controlStrategy) {
-        String message = "Cannot edit Properties of Control Strategy: " + controlStrategy.getName()
-                + "; as you must be the administrator or creator of the strategy";
+        String message = "Cannot edit Control Strategy: " + controlStrategy.getName()
+                + " because you must be the creator of the strategy or and Administrator";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }

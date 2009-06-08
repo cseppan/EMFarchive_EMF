@@ -220,7 +220,7 @@ public class ControlProgramWindow extends DisposableInteralFrame implements Cont
     }
 
     public void notifyLockFailure(ControlProgram controlProgram) {
-        String message = "Cannot edit Properties of Control Program: " + controlProgram
+        String message = "Cannot edit Control Program: " + controlProgram
                 + System.getProperty("line.separator") + " as it was locked by User: " + controlProgram.getLockOwner()
                 + "(at " + format(controlProgram.getLockDate()) + ")";
         InfoDialog dialog = new InfoDialog(this, "Message", message);

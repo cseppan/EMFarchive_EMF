@@ -136,7 +136,7 @@ public class ControlProgramTechnologiesTab extends JPanel implements ControlProg
             return;
 
         String title = "Warning";
-        String message = "Are you sure you want to remove the selected row(s)?";
+        String message = "Are you sure you want to remove the "+records.length+" selected items?";
         int selection = JOptionPane.showConfirmDialog(parent, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 

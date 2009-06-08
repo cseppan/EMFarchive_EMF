@@ -286,7 +286,7 @@ public class ControlProgramManagerWindow extends ReusableInteralFrame implements
         }
 
         String title = "Warning";
-        String message = "Are you sure you want to remove the selected row(s)?";
+        String message = "Are you sure you want to remove the "+records.length+" selected control program(s)?";
         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 

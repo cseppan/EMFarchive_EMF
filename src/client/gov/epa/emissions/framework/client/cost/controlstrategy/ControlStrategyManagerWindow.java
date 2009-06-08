@@ -287,8 +287,10 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         }
 
         String title = "Warning";
-        String message = "Are you sure you want to remove the selected row(s)?";
-        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+        String message = (records.length == 1) ? 
+                "Are you sure you want to remove the selected strategy?" :
+                "Are you sure you want to remove the "+records.length+" selected strategies?";
+       int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

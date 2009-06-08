@@ -227,7 +227,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         //get a single selected item
         List selected = table.selected();
         if (selected.size() != 1) {
-            messagePanel.setMessage("Please select a single item to set version.");
+            messagePanel.setMessage("Please select only a single inventory to set its version.");
             return;
         }
         ControlStrategyInputDataset[] controlStrategyInputDatasets = (ControlStrategyInputDataset[]) selected.toArray(new ControlStrategyInputDataset[0]);
@@ -299,7 +299,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         List selected = table.selected();
 
         if (selected.size() == 0) {
-            messagePanel.setError("Please select an item to remove.");
+            messagePanel.setError("Please select an inventory to remove.");
             return;
         }
 
@@ -309,7 +309,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             return;
 
         String title = "Warning";
-        String message = "Are you sure you want to remove the selected row(s)?";
+        String message = "Are you sure you want to remove the selected inventories?";
         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 

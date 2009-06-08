@@ -188,7 +188,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate(), panel);
         layoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), panel);
-        layoutGenerator.addLabelWidgetPair("<html>Include Measures with<br/>No Cost Information:</html>", includeUnspecifiedCostsCheckBox(), panel);
+        layoutGenerator.addLabelWidgetPair("<html>Include Measures<br/>with No Cost Data:</html>", includeUnspecifiedCostsCheckBox(), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
@@ -325,7 +325,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         layoutGenerator.addLabelWidgetPair("Start Date:", startDate, panel);
         layoutGenerator.addLabelWidgetPair("Completion Date:", completionDate, panel);
-        layoutGenerator.addLabelWidgetPair("User:", user, panel);
+        layoutGenerator.addLabelWidgetPair("Running User:", user, panel);
         layoutGenerator.addLabelWidgetPair("Total Annualized Cost:", costValue, panel);
         layoutGenerator.addLabelWidgetPair("Target Poll. Reduction (tons):", emissionReductionValue, panel);
 

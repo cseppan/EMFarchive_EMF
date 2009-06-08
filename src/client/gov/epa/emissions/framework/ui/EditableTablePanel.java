@@ -106,7 +106,7 @@ public class EditableTablePanel extends JPanel implements Editor {
             return;
 
         String title = "Warning";
-        String message = "Are you sure you want to remove the selected row(s)?";
+        String message = "Are you sure you want to remove the "+rows.length+" selected items?";
         int selection = JOptionPane.showConfirmDialog(parent, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 

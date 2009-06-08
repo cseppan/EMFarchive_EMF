@@ -197,7 +197,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     }
 
     public void notifyLockFailure(ControlMeasure measure) {
-        String message = "Cannot edit Properties of ControlMeasure: " + measure.getName()
+        String message = "Cannot edit ControlMeasure: " + measure.getName()
                 + System.getProperty("line.separator") + " as it was locked by User: " + measure.getLockOwner()
                 + "(at " + CustomDateFormat.format_YYYY_MM_DD_HH_MM(measure.getLockDate()) + ")";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
@@ -206,8 +206,8 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
 
 
     public void notifyEditFailure(ControlMeasure measure) {
-        String message = "Cannot edit Properties of ControlMeasure: " + measure.getName()
-                + "; as you must be the administrator or creator of the measure";
+        String message = "Cannot edit ControlMeasure: " + measure.getName()
+                + " because you must be the creator of the measure or an Administrator";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }
