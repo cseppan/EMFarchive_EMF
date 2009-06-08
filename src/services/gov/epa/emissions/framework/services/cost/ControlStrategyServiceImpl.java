@@ -221,7 +221,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
                     else
                         remove(cs);
                 } else {
-                    exception += "Permission denied to the strategy: " + cs.getName() + ". ";
+                    exception += "You do not have permission to remove the strategy: " + cs.getName() + ". ";
                 }
             }
 
