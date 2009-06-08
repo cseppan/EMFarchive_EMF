@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.io.VersionedDatasetQuery;
@@ -639,6 +640,35 @@ public class DataServiceImpl implements DataService {
 
         return cols.toArray(new String[0]);
     }
+    
+    private String getColTypesString(DataModifier mod, String table) throws Exception {
+        ResultSetMetaData md = null;
+        String query = "SELECT * FROM " + table + " LIMIT 0";
+
+        try {
+            md = mod.getMetaData(query);
+        } catch (SQLException e) {
+            throw new Exception(e.getMessage());
+        }
+
+        // Asumming firt 4 columns are record_id, dataset_id, version, and delete_versions
+        // which is common to all emf datasets
+        String cols = "SERIAL,Primary Key(Record_Id),BIGINT,INTEGER,TEXT";
+        int colCount = md.getColumnCount();
+
+        for (int i = 5; i <= colCount; i++) {
+            String type = md.getColumnTypeName(i);
+
+            if (type.toUpperCase().startsWith("VARCHAR"))
+                cols += "," + type.toUpperCase() + "(" + md.getPrecision(i) + ")";
+            else if (type.toUpperCase().startsWith("FLOAT"))
+                cols += ",double precision";
+            else
+                cols += "," + type;
+        }
+
+        return cols;
+    }
 
     public boolean checkTableDefinitions(int srcDSid, int targetDSid) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
@@ -880,19 +910,31 @@ public class DataServiceImpl implements DataService {
         String schema = emisSrc.getName() + ".";
         InternalSource src = sources[0];
         DataTable tableData = new DataTable(copied, emisSrc);
-        String newTable = tableData.name();
+        TableCreator tCreator = new TableCreator(emisSrc);
+        
         String origTable = schema + src.getTable();
+        String[] cols = getTableColumns(emisSrc.dataModifier(), origTable, "");
+        String[] colNameTypes = getColNameTypes(emisSrc.dataModifier(), origTable);
+        String colNameString = colString(cols, 0);
+        String colTypesString = getColTypesString(emisSrc.dataModifier(), origTable);
+        
+        String newTable = tableData.name();
+        String consldTable = getConsldTableName(dataset, tCreator,  colNameString, colTypesString, newTable, cols.length);
+            
         VersionedDatasetQuery queryOrigData = new VersionedDatasetQuery(version, dataset);
 
         if (sources.length == 1) {
-            String[] cols = getTableColumns(emisSrc.dataModifier(), origTable, "");
-            String[] colNameTypes = getColNameTypes(emisSrc.dataModifier(), origTable);
             String create = "CREATE TABLE " + schema + newTable + " (" + colString(colNameTypes, 0) + ")";
-            String insert = "INSERT INTO " + schema + newTable + "(" + colString(cols, 1) + ") SELECT "
-                    + getSrcColString(copied.getId(), 0, cols, cols) + " FROM " + origTable + " "
-                    + queryOrigData.versionWhereClause();
 
-            emisSrc.tableDefinition().execute(create);
+            if (consldTable == null)
+                emisSrc.tableDefinition().execute(create);
+            else
+                newTable = consldTable;
+            
+            String insert = "INSERT INTO " + schema + newTable + "(" + colString(cols, 1) + ") SELECT "
+                + getSrcColString(copied.getId(), 0, cols, cols) + " FROM " + origTable + " "
+                + queryOrigData.versionWhereClause();
+            
             emisSrc.tableDefinition().execute(insert);
 
             src.setSource(dataset.getName() + " version: " + version.getVersion());
@@ -902,6 +944,25 @@ public class DataServiceImpl implements DataService {
             dao.releaseLocked(user, copied, session);
         }
 
+    }
+
+    private String getConsldTableName(EmfDataset dataset, TableCreator tCreator, String colNameString,
+            String colTypesString, String newTable, int numOfCols) throws Exception {
+        DatasetType type = dataset.getDatasetType();
+        String imptrClass = type.getImporterClassName();
+        
+        if (imptrClass.equals("gov.epa.emissions.commons.io.other.SMKReportImporter") //These datasets' tables are consolidated
+                || imptrClass.equals("gov.epa.emissions.commons.io.csv.CSVImporter")
+                || imptrClass.equals("gov.epa.emissions.commons.io.generic.LineImporter")) {
+            String existedTable = tCreator.checkTableConsolidation(colNameString, colTypesString, dataset);
+            
+            if (existedTable != null && !existedTable.isEmpty())
+                return existedTable;
+                
+            tCreator.addConsolidationItem(numOfCols, newTable,  colNameString, colTypesString, dataset);
+        }
+        
+        return null;
     }
 
     private String colString(String[] cols, int start) {
