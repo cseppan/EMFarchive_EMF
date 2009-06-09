@@ -183,12 +183,12 @@ public class CaseFileParser {
     private void processSummary(String[] data) throws Exception {
         String line = data[0];
 
-        if (line.isEmpty())
-            return;
+        if (line.startsWith("\""))
+            line = line.substring(1);
 
-        if (line.startsWith("\"") && line.endsWith("\""))
-            line = line.substring(1, line.length() - 1);
-
+        if (line.endsWith("\""))
+            line = line.substring(0, line.length() - 1);
+        
         if (line.startsWith("#")) {
             populateCaseMainFields(line);
             return;

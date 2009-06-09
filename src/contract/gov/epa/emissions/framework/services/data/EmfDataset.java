@@ -417,16 +417,23 @@ public class EmfDataset implements Dataset, Lockable {
         return "#";
     }
     
-    public boolean getCSVHeaderLineSetting() {
+    public int getCSVHeaderLineSetting() {
         KeyVal[] keyvals = mergeKeyVals();
         for (int i = 0; i < keyvals.length; i++) {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();
-            if (keyword.equalsIgnoreCase(csv_header_line))
-                return (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes")) ? true : false;
+            if (keyword.equalsIgnoreCase(csv_header_line)) {
+                if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes"))
+                    return lower_case;
+                
+                if (value.toUpperCase().equals(csv_header_line_value))
+                    return upper_case;
+                
+                return no_head_line;
+            }
         }
 
-        return true;
+        return lower_case;
     }
 
     public boolean isExternal() {

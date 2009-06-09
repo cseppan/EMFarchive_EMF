@@ -5023,7 +5023,7 @@ public class ManagedCaseService {
                 .format_MM_DD_YYYY_HH_mm(currentCase.getStartDate());
         String endDate = (currentCase.getEndDate() == null) ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(currentCase
                 .getEndDate());
-
+        
         String summary = "\"#EMF_CASE_NAME="
                 + clean(currentCase.getName())
                 + "\""
@@ -5122,7 +5122,7 @@ public class ManagedCaseService {
 
         return sb.toString();
     }
-
+    
     private String getSectors(Sector[] sectors) {
         StringBuffer sb = new StringBuffer();
 
