@@ -204,6 +204,9 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 try {
+                    if (envVarContains.getText() == null || envVarContains.getText().trim().isEmpty())
+                        return;
+                    
                     if (sectorsComboBox != null)
                         sectorsComboBox.setSelectedItem(new Sector("All", "All"));
                     
