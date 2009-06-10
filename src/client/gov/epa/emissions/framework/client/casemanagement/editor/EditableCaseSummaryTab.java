@@ -551,6 +551,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     public void save(Case caseObj) throws EmfException {
+        if (categoriesCombo.getSelectedItem() == null)
+            throw new EmfException("Please select a valid case category from the Summary tab.");
+        
         caseObj.setName(name.getText());
         saveFutureYear();
         caseObj.setDescription(description.getText());
