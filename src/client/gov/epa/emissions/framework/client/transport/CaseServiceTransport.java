@@ -424,19 +424,20 @@ public class CaseServiceTransport implements CaseService {
         return (CaseInput[]) call.requestResponse(new Object[] { new Integer(caseId), jobIds });
     }
 
-    public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll)
-            throws EmfException {
+    public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, 
+            String envNameContains, boolean showAll) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getCaseInputs");
         call.addParam("pageSize", dataMappings.integer());
         call.addParam("caseId", dataMappings.integer());
         call.addParam("sector", dataMappings.sector());
+        call.addStringParam("envNameContains");
         call.addBooleanParameter("showAll");
         call.setReturnType(caseMappings.caseinputs());
 
         return (CaseInput[]) call.requestResponse(new Object[] { new Integer(pageSize), new Integer(caseId), sector,
-                showAll });
+                envNameContains, showAll });
     }
 
     public synchronized Case[] copyCaseObject(int[] toCopy, User user) throws EmfException {
@@ -683,19 +684,20 @@ public class CaseServiceTransport implements CaseService {
         return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(caseId), jobIds });
     }
 
-    public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll)
-            throws EmfException {
+    public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, 
+            String envNameContains, boolean showAll) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getCaseParameters");
         call.addIntegerParam("pageSize");
         call.addIntegerParam("caseId");
         call.addParam("sector", dataMappings.sector());
+        call.addStringParam("envNameContains");
         call.addBooleanParameter("showAll");
         call.setReturnType(caseMappings.caseParameters());
 
         return (CaseParameter[]) call.requestResponse(new Object[] { new Integer(pageSize), new Integer(caseId),
-                sector, showAll });
+                sector, envNameContains, showAll });
     }
 
     public synchronized void removeCaseParameters(CaseParameter[] params) throws EmfException {

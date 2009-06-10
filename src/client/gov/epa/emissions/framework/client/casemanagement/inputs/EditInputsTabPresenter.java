@@ -32,7 +32,7 @@ public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
     
     void removeInputs(CaseInput[] inputs) throws EmfException;
     
-    CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException;
+    CaseInput[] getCaseInput(int caseId, Sector sector, String nameContains, boolean showAll) throws EmfException;
 
     void copyInput(CaseInput input, NewInputView dialog) throws Exception;
     

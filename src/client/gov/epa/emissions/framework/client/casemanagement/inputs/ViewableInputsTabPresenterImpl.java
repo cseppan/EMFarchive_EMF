@@ -103,8 +103,8 @@ public class ViewableInputsTabPresenterImpl {
         return this.defaultPageSize;
     }
 
-    public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
-        return service().getCaseInputs(defaultPageSize, caseId, sector, showAll);
+    public CaseInput[] getCaseInput(int caseId, Sector sector, String envNameContains, boolean showAll) throws EmfException {
+        return service().getCaseInputs(defaultPageSize, caseId, sector, envNameContains, showAll);
     }
     
     public Sector[] getAllSetcors() {

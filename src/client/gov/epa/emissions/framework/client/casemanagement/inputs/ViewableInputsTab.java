@@ -29,6 +29,7 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,8 +40,11 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
 
 public class ViewableInputsTab extends JPanel implements RefreshObserver {
@@ -72,6 +76,8 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
     private EmfSession session;
 
     private Sector selectedSector;
+
+    private TextField envVarContains;
 
     public ViewableInputsTab(EmfConsole parentConsole, MessagePanel messagePanel, DesktopManager desktopManager) {
         super.setName("viewInputsTab");
@@ -168,22 +174,51 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
         layoutGenerator.addLabelWidgetPair("Input Folder:", inputDir, panel);
 
         sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors());
-        sectorsComboBox.addActionListener(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
+        sectorsComboBox.addActionListener(filterAction());
+        
+        envVarContains = new TextField("envVarFilter", 10);
+        envVarContains.setToolTipText("Environment variable name filter. Press enter to refresh.");
+        KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
+        envVarContains.registerKeyboardAction(filterActionByName(), keystroke, JComponent.WHEN_FOCUSED);
+        
+        JPanel selection = new JPanel(new BorderLayout(20, 0));
+        selection.add(sectorsComboBox, BorderLayout.LINE_START);
+        selection.add(new JLabel("Environment Variable Contains:"));
+        selection.add(envVarContains, BorderLayout.LINE_END);
+
+        layoutGenerator.addLabelWidgetPair("Sector:", selection, panel);
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+                5, 5, // initialX, initialY
+                5, 5);// xPad, yPad
+
+        return panel;
+    }
+    
+    private AbstractAction filterAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
                 try {
                     doRefresh(listFreshInputs());
                 } catch (Exception exc) {
                     setErrorMessage(exc.getMessage());
                 }
             }
-        });
-
-        layoutGenerator.addLabelWidgetPair("Sector:", sectorsComboBox, panel);
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
-                5, 5, // initialX, initialY
-                5, 5);// xPad, yPad
-
-        return panel;
+        };
+    }
+    
+    private AbstractAction filterActionByName() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    if (sectorsComboBox != null)
+                        sectorsComboBox.setSelectedItem(new Sector("All", "All"));
+                    
+                    doRefresh(listFreshInputs());
+                } catch (Exception exc) {
+                    setErrorMessage(exc.getMessage());
+                }
+            }
+        };
     }
 
     private SortCriteria sortCriteria() {
@@ -483,7 +518,7 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
 
     private CaseInput[] listFreshInputs() throws EmfException {
         this.selectedSector = getSelectedSector();
-        CaseInput[] freshList = presenter.getCaseInput(caseId, selectedSector, showAll.isSelected());
+        CaseInput[] freshList = presenter.getCaseInput(caseId, selectedSector, nameContains(), showAll.isSelected());
 
         if (selectedSector == null && freshList.length == presenter.getPageSize())
             setMessage("Please select a sector to see full list of inputs.");
@@ -491,6 +526,10 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
             messagePanel.clear();
 
         return freshList;
+    }
+    
+    private String nameContains() {
+        return envVarContains == null ? "" : envVarContains.getText().trim();
     }
 
     private Sector getSelectedSector() {

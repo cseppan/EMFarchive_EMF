@@ -57,7 +57,7 @@ public class SetCasePresenterImpl implements SetCasePresenter {
     }
 
     public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
-        return service().getCaseInputs(defaultPageSize, caseId, sector, showAll);
+        return service().getCaseInputs(defaultPageSize, caseId, sector, "", showAll);
     }
     
     public String validateNLInputs(int caseId) throws EmfException{
@@ -96,7 +96,7 @@ public class SetCasePresenterImpl implements SetCasePresenter {
             sector = null; // to trigger select all on the server side
 
         //return service().getcasgetCaseParameters(caseId, sector, showAll);
-        return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
+        return service().getCaseParameters(defaultPageSize, caseId, sector, "", showAll);
 
     }
     

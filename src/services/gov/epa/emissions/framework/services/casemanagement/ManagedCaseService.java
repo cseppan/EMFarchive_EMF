@@ -1219,12 +1219,12 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll)
+    public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, String envNameContains, boolean showAll)
             throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
-            List<CaseInput> inputs = dao.getCaseInputs(pageSize, caseId, sector, showAll, session);
+            List<CaseInput> inputs = dao.getCaseInputs(pageSize, caseId, sector, envNameContains, showAll, session);
 
             Collections.sort(inputs, new Comparator<CaseInput>() {
                 public int compare(CaseInput o1, CaseInput o2) {
@@ -1756,12 +1756,12 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll)
+    public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, String envNameContains, boolean showAll)
             throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
-            List<CaseParameter> params = dao.getCaseParameters(pageSize, caseId, sector, showAll, session);
+            List<CaseParameter> params = dao.getCaseParameters(pageSize, caseId, sector, envNameContains, showAll, session);
 
             Collections.sort(params, new Comparator<CaseParameter>() {
                 public int compare(CaseParameter o1, CaseParameter o2) {

@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -23,6 +24,7 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
@@ -32,8 +34,11 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
 
 public class EditParametersTab extends JPanel implements EditCaseParametersTabView, RefreshObserver {
@@ -63,6 +68,8 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     private EmfSession session;
 
     private Sector selectedSector;
+
+    private TextField envVarContains;
 
     public EditParametersTab(EmfConsole parentConsole, MessagePanel messagePanel, DesktopManager desktopManager) {
         super.setName("editParametersTab");
@@ -161,22 +168,51 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         sectorsComboBox = new ComboBox("Select a Sector", presenter.getAllSetcors());
-        sectorsComboBox.addActionListener(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
+        sectorsComboBox.addActionListener(filterAction());
+        
+        envVarContains = new TextField("envVarFilter", 10);
+        envVarContains.setToolTipText("Environment variable name filter. Press enter to refresh.");
+        KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
+        envVarContains.registerKeyboardAction(filterActionByName(), keystroke, JComponent.WHEN_FOCUSED);
+        
+        JPanel selection = new JPanel(new BorderLayout(20, 0));
+        selection.add(sectorsComboBox, BorderLayout.LINE_START);
+        selection.add(new JLabel("Environment Variable Contains:"));
+        selection.add(envVarContains, BorderLayout.LINE_END);
+
+        layoutGenerator.addLabelWidgetPair("Sector:", selection, panel);
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                5, 5, // initialX, initialY
+                5, 5);// xPad, yPad
+
+        return panel;
+    }
+    
+    private AbstractAction filterAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
                 try {
                     doRefresh(listFreshParameters());
                 } catch (Exception exc) {
                     setErrorMessage(exc.getMessage());
                 }
             }
-        });
-
-        layoutGenerator.addLabelWidgetPair("Sector:", sectorsComboBox, panel);
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                5, 5, // initialX, initialY
-                5, 5);// xPad, yPad
-
-        return panel;
+        };
+    }
+    
+    private AbstractAction filterActionByName() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    if (sectorsComboBox != null)
+                        sectorsComboBox.setSelectedItem(new Sector("All", "All"));
+                    
+                    doRefresh(listFreshParameters());
+                } catch (Exception exc) {
+                    setErrorMessage(exc.getMessage());
+                }
+            }
+        };
     }
 
     private JPanel controlPanel(final EditParametersTabPresenter presenter) {
@@ -432,7 +468,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
     
     private CaseParameter[] listFreshParameters() throws EmfException {
         this.selectedSector = (Sector) sectorsComboBox.getSelectedItem();
-        CaseParameter[] freshList = presenter.getCaseParameters(caseId, selectedSector, showAll.isSelected());
+        CaseParameter[] freshList = presenter.getCaseParameters(caseId, selectedSector, nameContains(), showAll.isSelected());
         
         if (selectedSector == null && freshList.length == presenter.getPageSize())
             setMessage("Please select a sector to see full list of parameters.");
@@ -440,6 +476,10 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             messagePanel.clear();
         
         return freshList;
+    }
+    
+    private String nameContains() {
+        return envVarContains == null ? "" : envVarContains.getText().trim();
     }
 
     public void doRefresh() throws EmfException {

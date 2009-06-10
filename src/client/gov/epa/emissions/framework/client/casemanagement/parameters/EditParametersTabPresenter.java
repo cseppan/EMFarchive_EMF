@@ -19,7 +19,7 @@ public interface EditParametersTabPresenter extends CaseEditorTabPresenter {
 
    // void doCheckDuplicate(CaseInput input, CaseInput[] existingInputs) throws EmfException;
 
-    CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException;
+    CaseParameter[] getCaseParameters(int caseId, Sector sector, String envNameContains, boolean showAll) throws EmfException;
 
     void removeParameters(CaseParameter[] params) throws EmfException;
 

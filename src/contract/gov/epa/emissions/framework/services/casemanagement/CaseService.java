@@ -98,7 +98,7 @@ public interface CaseService {
     
     CaseInput[] getCaseInputs(int caseId, int[] jobIds) throws EmfException;
     
-    CaseInput[] getCaseInputs(int defaultPageSize, int caseId, Sector sector, boolean showAll) throws EmfException;
+    CaseInput[] getCaseInputs(int pagesize, int caseId, Sector sector, String envNameContains, boolean showAll) throws EmfException;
     
     String validateNLInputs(int caseId) throws EmfException;
     
@@ -154,7 +154,7 @@ public interface CaseService {
     
     CaseParameter[] getCaseParameters(int caseId, int[] jobIds) throws EmfException;
     
-    CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll) throws EmfException;
+    CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, String envNameContains, boolean showAll) throws EmfException;
     
     CaseParameter getCaseParameter(int caseId, ParameterEnvVar var) throws EmfException;
     

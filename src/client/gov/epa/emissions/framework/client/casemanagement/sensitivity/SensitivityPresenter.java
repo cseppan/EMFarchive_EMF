@@ -168,7 +168,7 @@ public class SensitivityPresenter {
     }
     
     public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
-        return service().getCaseInputs(defaultPageSize, caseId, sector, showAll);
+        return service().getCaseInputs(defaultPageSize, caseId, sector, "", showAll);
     }
     
     public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
@@ -180,7 +180,7 @@ public class SensitivityPresenter {
             sector = null; // to trigger select all on the server side
 
         //return service().getcasgetCaseParameters(caseId, sector, showAll);
-        return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
+        return service().getCaseParameters(defaultPageSize, caseId, sector, "", showAll);
     }
     
     public String[] getGridNameValues(String[] names, int caseId, int modelId) throws EmfException {

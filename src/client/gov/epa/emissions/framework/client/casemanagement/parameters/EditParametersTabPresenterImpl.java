@@ -102,8 +102,8 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         parameterFieldsPresenter.display(newParameter, caseObj.getModel().getId(), container);
     }
 
-    public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
-        return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
+    public CaseParameter[] getCaseParameters(int caseId, Sector sector, String envNameContains, boolean showAll) throws EmfException {
+        return service().getCaseParameters(defaultPageSize, caseId, sector, envNameContains, showAll);
     }
 
     public void removeParameters(CaseParameter[] params) throws EmfException {

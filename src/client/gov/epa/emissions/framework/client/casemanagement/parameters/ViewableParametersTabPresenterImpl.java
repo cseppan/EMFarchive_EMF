@@ -61,8 +61,8 @@ public class ViewableParametersTabPresenterImpl {
         return service().getCaseParameters(caseId);
     }
     
-    public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
-        return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
+    public CaseParameter[] getCaseParameters(int caseId, Sector sector, String envNameContains, boolean showAll) throws EmfException {
+        return service().getCaseParameters(defaultPageSize, caseId, sector, envNameContains, showAll);
     }
 
     public Sector[] getAllSetcors() {

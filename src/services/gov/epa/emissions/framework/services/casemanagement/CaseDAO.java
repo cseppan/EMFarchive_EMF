@@ -475,19 +475,19 @@ public class CaseDAO {
         return inputs;
     }
 
-    public List<CaseInput> getCaseInputs(int pageSize, int caseId, Sector sector, boolean showAll, Session session) {
+    public List<CaseInput> getCaseInputs(int pageSize, int caseId, Sector sector, String envNameContains, boolean showAll, Session session) {
         if (sector == null)
-            return getAllInputs(pageSize, caseId, showAll, session);
+            return filterInputs(getAllInputs(pageSize, caseId, showAll, session), envNameContains);
 
         String sectorName = sector.getName().toUpperCase();
 
         if (sectorName.equals("ALL"))
-            return getCaseInputsWithLocal(showAll, caseId, session);
+            return filterInputs(getCaseInputsWithLocal(showAll, caseId, session), envNameContains);
 
         if (sectorName.equals("ALL SECTORS"))
-            return getCaseInputsWithNullSector(showAll, caseId, session);
+            return filterInputs(getCaseInputsWithNullSector(showAll, caseId, session), envNameContains);
 
-        return getCaseInputsWithSector(showAll, sector, caseId, session);
+        return filterInputs(getCaseInputsWithSector(showAll, sector, caseId, session), envNameContains);
     }
 
     private List<CaseInput> getAllInputs(int pageSize, int caseId, boolean showAll, Session session) {
@@ -505,6 +505,22 @@ public class CaseDAO {
         Criterion[] crits = (showAll) ? new Criterion[] { crit1 } : new Criterion[] { crit1, crit2 };
 
         return hibernateFacade.get(CaseInput.class, crits, session);
+    }
+    
+    private List<CaseInput> filterInputs(List<CaseInput> allInputs, String envNameContains) {
+        if (envNameContains == null || envNameContains.trim().isEmpty())
+            return allInputs;
+        
+        List<CaseInput> filtered = new ArrayList<CaseInput>();
+        
+        for (CaseInput input : allInputs) {
+            InputEnvtVar envVar = input.getEnvtVars();
+            
+            if (envVar != null && envVar.getName().toUpperCase().contains(envNameContains.toUpperCase()))
+                filtered.add(input);
+        }
+        
+        return filtered;
     }
 
     private List<CaseInput> getCaseInputsWithNullSector(boolean showAll, int caseId, Session session) {
@@ -610,6 +626,22 @@ public class CaseDAO {
 
     }
 
+    private List<CaseParameter> filterParameters(List<CaseParameter> allParams, String envNameContains) {
+        if (envNameContains == null || envNameContains.trim().isEmpty())
+            return allParams;
+        
+        List<CaseParameter> filtered = new ArrayList<CaseParameter>();
+        
+        for (CaseParameter param : allParams) {
+            ParameterEnvVar envVar = param.getEnvVar();
+            
+            if (envVar != null && envVar.getName().toUpperCase().contains(envNameContains.toUpperCase()))
+                filtered.add(param);
+        }
+        
+        return filtered;
+    }
+    
     public List<?> getAllCaseInputs(Session session) {
         return hibernateFacade.getAll(CaseInput.class, Order.asc("id"), session);
     }
@@ -977,20 +1009,20 @@ public class CaseDAO {
         return getJobParameters(caseId, 0, null, session);
     }
 
-    public List<CaseParameter> getCaseParameters(int pageSize, int caseId, Sector sector, boolean showAll,
+    public List<CaseParameter> getCaseParameters(int pageSize, int caseId, Sector sector, String envNameContains, boolean showAll,
             Session session) {
         if (sector == null)
-            return getAllParameters(pageSize, caseId, showAll, session);
+            return  filterParameters(getAllParameters(pageSize, caseId, showAll, session), envNameContains);
 
         String sectorName = sector.getName().toUpperCase();
 
         if (sectorName.equals("ALL"))
-            return getCaseParametersWithLocal(showAll, caseId, session);
+            return filterParameters(getCaseParametersWithLocal(showAll, caseId, session), envNameContains);
 
         if (sectorName.equals("ALL SECTORS"))
-            return getCaseParametersWithNullSector(showAll, caseId, session);
+            return filterParameters(getCaseParametersWithNullSector(showAll, caseId, session), envNameContains);
 
-        return getCaseParametersWithSector(showAll, sector, caseId, session);
+        return filterParameters(getCaseParametersWithSector(showAll, sector, caseId, session), envNameContains);
     }
 
     private List<CaseParameter> getAllParameters(int pageSize, int caseId, boolean showAll, Session session) {
