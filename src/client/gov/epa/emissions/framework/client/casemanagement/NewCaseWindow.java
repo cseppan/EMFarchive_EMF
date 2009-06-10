@@ -1,9 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
 import gov.epa.emissions.commons.gui.Button;
-//import gov.epa.emissions.commons.gui.ScrollableComponent;
-import gov.epa.emissions.commons.gui.TextArea;
-import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -11,6 +9,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -22,6 +21,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 public class NewCaseWindow extends DisposableInteralFrame implements NewCaseView {
@@ -31,12 +31,14 @@ public class NewCaseWindow extends DisposableInteralFrame implements NewCaseView
 
     private SingleLineMessagePanel messagePanel;
 
-    private TextField name;
+    private JTextField name;
 
-    private TextArea description;
+    private ComboBox categoriesCombo;
+    
+    private Dimension defaultDimension = new Dimension(255, 22);
 
     public NewCaseWindow(DesktopManager desktopManager) {
-        super("Create a Case", new Dimension(450, 150), desktopManager);
+        super("Create a Case", new Dimension(400, 200), desktopManager);
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -45,7 +47,13 @@ public class NewCaseWindow extends DisposableInteralFrame implements NewCaseView
     private void doLayout(JPanel layout) {
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
-        layout.add(createInputPanel());
+        
+        try {
+            layout.add(createInputPanel());
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+        
         layout.add(createButtonsPanel());
     }
 
@@ -61,34 +69,50 @@ public class NewCaseWindow extends DisposableInteralFrame implements NewCaseView
         super.display();
     }
 
-    private JPanel createInputPanel() {
+    private JPanel createInputPanel() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        name = new TextField("name", 30);
-        addChangeable(name);
+        name = new JTextField();
+        name.setPreferredSize(defaultDimension);
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
-
-        description = new TextArea("Description", "", 30, 4);
-        //addChangeable(description);
-        //layoutGenerator.addLabelWidgetPair("Description:",
-        //        ScrollableComponent.createWithVerticalScrollBar(description), panel);
+        layoutGenerator.addLabelWidgetPair("Category:", categories(), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                5, 0, // initialX, initialY
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+                10, 0, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
+    }
+    
+    private ComboBox categories() throws EmfException {
+        categoriesCombo = new ComboBox(presenter.getCaseCategories());
+        categoriesCombo.setSelectedItem(presenter.getSelectedCategory());
+        categoriesCombo.setPreferredSize(defaultDimension);
+
+        return categoriesCombo;
     }
 
     private Action saveAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 resetChanges();
+                CaseCategory cat = (CaseCategory)categoriesCombo.getSelectedItem();
 
+                if (name.getText() == null || name.getText().trim().isEmpty()) {
+                    messagePanel.setError("Please give a name for the new case.");
+                    return;
+                }
+                    
+                if (cat == null) {
+                    messagePanel.setError("Please select a valid category.");
+                    return;
+                }
+                
                 Case newCase = new Case(name.getText());
-                newCase.setDescription(description.getText());
+                newCase.setCaseCategory(cat);
+                
                 try {
                     presenter.doSave(newCase);
                 } catch (EmfException e) {

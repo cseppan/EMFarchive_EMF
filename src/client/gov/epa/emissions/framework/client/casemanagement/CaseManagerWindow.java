@@ -171,7 +171,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         });
     }
 
-    private CaseCategory getSelectedCategory() {
+    public CaseCategory getSelectedCategory() {
         this.selectedCategory = (CaseCategory) categoriesBox.getSelectedItem();
         return selectedCategory;
     }

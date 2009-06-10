@@ -134,4 +134,8 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
     public String checkParentCase(Case caseObj) throws EmfException {
         return service().checkParentCase(caseObj);
     }
+
+    public CaseCategory getSelectedCategory() {
+        return view.getSelectedCategory();
+    }
 }

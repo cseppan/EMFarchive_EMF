@@ -39,6 +39,8 @@ public interface CaseManagerPresenter {
     
     CaseCategory[] getCategories() throws EmfException;
     
+    CaseCategory getSelectedCategory();
+    
     Case[] getCases(CaseCategory category) throws EmfException;
 
 }

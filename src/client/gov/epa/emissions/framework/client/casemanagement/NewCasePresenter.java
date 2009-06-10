@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.casemanagement;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 
 import java.util.Date;
@@ -58,6 +59,14 @@ public class NewCasePresenter {
 
     private CaseService service() {
         return session.caseService();
+    }
+    
+    public CaseCategory[] getCaseCategories() throws EmfException {
+        return managerPresenter.getCategories();
+    }
+    
+    public CaseCategory getSelectedCategory() {
+        return managerPresenter.getSelectedCategory();
     }
 
 }
