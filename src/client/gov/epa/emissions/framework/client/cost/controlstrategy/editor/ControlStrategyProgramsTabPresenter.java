@@ -48,6 +48,11 @@ public class ControlStrategyProgramsTabPresenter implements EditControlStrategyT
         view.save(controlStrategy);
     }
     
+    public void doRun(ControlStrategy controlStrategy) {
+        this.controlStrategy = controlStrategy;
+        view.run(controlStrategy);
+    }
+    
     public void doEdit(ControlProgramView view, ControlProgram controlProgram) throws EmfException {
         ControlProgramPresenter presenter = new ControlProgramPresenterImpl(controlProgram, session, view);
         presenter.doDisplay();

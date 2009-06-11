@@ -41,6 +41,11 @@ public class EditControlStrategyConstraintsTabPresenter  implements EditControlS
         view.save(controlStrategy);
     }
 
+    public void doRun(ControlStrategy controlStrategy) throws EmfException {
+        this.strategy = controlStrategy;
+        view.run(controlStrategy);
+    }
+
     public void doChangeStrategyType(StrategyType strategyType) {
         if (view != null)
             view.notifyStrategyTypeChange(strategyType);

@@ -10,6 +10,8 @@ public interface EditControlStrategyTabView {
     //  update with the view contents
     void save(ControlStrategy controlStrategy) throws EmfException;
     
+    void run(ControlStrategy controlStrategy) throws EmfException;
+    
     void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults);
 
     void notifyStrategyTypeChange(StrategyType strategyType);

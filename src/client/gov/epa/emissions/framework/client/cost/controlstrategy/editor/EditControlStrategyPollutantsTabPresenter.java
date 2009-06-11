@@ -43,6 +43,11 @@ public class EditControlStrategyPollutantsTabPresenter  implements EditControlSt
         view.save(controlStrategy);
     }
 
+    public void doRun(ControlStrategy controlStrategy) throws EmfException {
+        this.strategy = controlStrategy;
+        view.run(controlStrategy);
+    }
+    
     public void doChangeStrategyType(StrategyType strategyType) {
         // NOTE Auto-generated method stub
         

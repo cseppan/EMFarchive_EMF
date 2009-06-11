@@ -41,6 +41,10 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         view.save(controlStrategy);
     }
 
+    public void doRun(ControlStrategy controlStrategy) throws EmfException {
+        view.run(controlStrategy);
+    }
+    
     public void doExport(EmfDataset[] datasets, String folder) throws EmfException {
         view.clearMsgPanel();
         

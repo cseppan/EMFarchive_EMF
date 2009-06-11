@@ -101,10 +101,21 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 //        managerPresenter.doRefresh();
     }
 
+    public void doRun(ControlStrategy controlStrategy) throws EmfException {
+        runTabs(controlStrategy);
+    }
+
     private void saveTabs(ControlStrategy controlStrategy) throws EmfException {
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {
             EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
             element.doSave(controlStrategy);
+        }
+    }
+
+    private void runTabs(ControlStrategy controlStrategy) throws EmfException {
+        for (Iterator iter = presenters.iterator(); iter.hasNext();) {
+            EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
+            element.doRun(controlStrategy);
         }
     }
 
@@ -163,6 +174,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void runStrategy() throws EmfException {
+        
         service().runStrategy(session.user(), controlStrategy.getId());
     }
 
@@ -208,10 +220,6 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
                 controlStrategy, session);
         constraintsTabPresenter.doDisplay();
         presenters.add(constraintsTabPresenter);
-    }
-
-    public void doLoad(String tabTitle) throws EmfException {
-        measuresTabPresenter.doDisplay();
     }
     
     public CostYearTable getCostYearTable() throws EmfException {

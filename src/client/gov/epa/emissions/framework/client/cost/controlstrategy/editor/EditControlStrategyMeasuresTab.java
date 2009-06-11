@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -101,13 +102,15 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
         }
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(mainPanel(), BorderLayout.CENTER);
 
         this.setLayout(new BorderLayout(5, 5));
         // this.setBorder(BorderFactory.createEmptyBorder(50,50,0,300));
         classesPanel = createClassesPanel(changeables);
-        this.add(classesPanel, BorderLayout.NORTH);
+        this.add(classesPanel, BorderLayout.CENTER);
         //buildSortFilterPanel();
-        this.add(mainPanel(), BorderLayout.CENTER);
+        this.add(panel, BorderLayout.SOUTH);
         
         // disable class filter since there are measures selected
         if (table.getModel().getRowCount() > 0) 
@@ -136,7 +139,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         panel.add(removeButton);
 
         JPanel container = new JPanel(new BorderLayout());
-        container.add(panel, BorderLayout.LINE_START);
+        container.add(panel,BorderLayout.LINE_END);
 
         return container;
     }
@@ -234,11 +237,12 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
 
     private JPanel mainPanel() {
         JPanel mainPanel = new JPanel(new BorderLayout(5, 5));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+//        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
       
-        mainPanel.removeAll();
-        mainPanel.add(new JLabel("Measures to Include:"), BorderLayout.NORTH);
-        mainPanel.add(tablePanel());
+//        mainPanel.removeAll();
+        mainPanel.setBorder(new Border("Measures to Include"));
+//        mainPanel.add(new JLabel("Measures to Include:"), BorderLayout.NORTH);
+        mainPanel.add(tablePanel(), BorderLayout.CENTER);
         mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
         return mainPanel; 
     }
@@ -431,4 +435,8 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         
     }
         
+    public void run(ControlStrategy controlStrategy) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

@@ -17,6 +17,8 @@ public interface EditControlStrategyPresenter {
 
     void doSave(ControlStrategy controlStrategy) throws EmfException;
 
+    void doRun(ControlStrategy controlStrategy) throws EmfException;
+
     void set(EditControlStrategyTabView view);
 
     void set(EditControlStrategySummaryTabView view);
@@ -38,8 +40,6 @@ public interface EditControlStrategyPresenter {
     void stopRun() throws EmfException;
 
     void doRefresh() throws EmfException;
-
-    void doLoad(String tabTitle) throws EmfException;
 
     CostYearTable getCostYearTable() throws EmfException;
     

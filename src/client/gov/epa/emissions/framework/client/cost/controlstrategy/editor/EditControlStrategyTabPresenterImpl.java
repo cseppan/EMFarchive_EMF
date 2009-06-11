@@ -21,6 +21,10 @@ public class EditControlStrategyTabPresenterImpl implements EditControlStrategyT
         view.refresh(controlStrategy, controlStrategyResults);
     }
 
+    public void doRun(ControlStrategy controlStrategy) throws EmfException {
+        view.run(controlStrategy);
+    }
+    
     public void doChangeStrategyType(StrategyType strategyType) {
         view.notifyStrategyTypeChange(strategyType);
     }

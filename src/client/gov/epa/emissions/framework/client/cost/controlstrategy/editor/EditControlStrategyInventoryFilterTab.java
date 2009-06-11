@@ -530,4 +530,9 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
             tableName = internalSources[0].getTable();
         return tableName;
     }
+
+    public void run(ControlStrategy controlStrategy) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

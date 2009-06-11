@@ -505,4 +505,9 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         // NOTE Auto-generated method stub
         
     }
+
+    public void run(ControlStrategy controlStrategy) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

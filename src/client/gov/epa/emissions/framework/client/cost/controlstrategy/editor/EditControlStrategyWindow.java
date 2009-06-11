@@ -34,8 +34,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 public class EditControlStrategyWindow extends DisposableInteralFrame implements EditControlStrategyView {
 
@@ -133,16 +131,16 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         tabbedPane.addTab("Constraints", createAppliedMeasuresTab(controlStrategy));
         tabbedPane.addTab("Outputs", outputPanel(controlStrategyResults));
 //        tabbedPane.removeTabAt(3);
-        tabbedPane.addChangeListener(new ChangeListener(){
-            public void stateChanged(ChangeEvent e) {
-                messagePanel.clear();
-                try {
-                    loadComponents(tabbedPane);
-                } catch (EmfException exc) {
-                    showError("Could not load component: "  + tabbedPane.getSelectedComponent().getName());
-                }
-            }
-        });
+//        tabbedPane.addChangeListener(new ChangeListener(){
+//            public void stateChanged(ChangeEvent e) {
+//                messagePanel.clear();
+//                try {
+//                    loadComponents(tabbedPane);
+//                } catch (EmfException exc) {
+//                    showError("Could not load component: "  + tabbedPane.getSelectedComponent().getName());
+//                }
+//            }
+//        });
         
 //DCD 1/26/07 -- see above for new listener code
 //        tabbedPane.addChangeListener(new ChangeListener() {
@@ -152,12 +150,6 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 //        });
 
         return tabbedPane;
-    }
-
-    protected void loadComponents(JTabbedPane tabbedPane) throws EmfException {
-        int tabIndex = tabbedPane.getSelectedIndex();
-        String tabTitle = tabbedPane.getTitleAt(tabIndex);
-        presenter.doLoad(tabTitle);
     }
 
     private JPanel createSummaryTab(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
@@ -333,7 +325,10 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         return new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    //check to see if really want to run strategy, we don't to overwrite if its already been run...
+                    //this step make sure all valid values were specified before running the strategy.
+                    presenter.doRun(controlStrategy);
+                    
+                    //check to see if really want to run strategy, we don't to overwrite if its already been run.
                     boolean deleteResults = false; 
                     if (presenter.hasResults()) {
                         String title = "Warning";
@@ -357,6 +352,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                     controlStrategy.setDeleteResults(deleteResults);
                     controlStrategy.setExportDirectory(outputTabView.getExportFolder());
                     controlStrategy.setRunStatus("Waiting");
+                    //get all values from various tabs and persist to strategy object
                     save();
                     controlStrategy.setStartDate(new Date());
                     

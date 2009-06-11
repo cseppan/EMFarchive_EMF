@@ -21,6 +21,10 @@ public class EditControlStrategySummaryTabPresenterImpl implements EditControlSt
         view.save(controlStrategy);
     }
 
+    public void doRun(ControlStrategy controlStrategy) throws EmfException {
+        view.run(controlStrategy);
+    }
+    
     public void setResults(ControlStrategy controlStrategy) {
         view.setRunMessage(controlStrategy);
     }

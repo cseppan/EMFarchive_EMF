@@ -9,6 +9,8 @@ public interface EditControlStrategyTabPresenter {
 
     void doSave(ControlStrategy controlStrategy) throws EmfException;
 
+    void doRun(ControlStrategy controlStrategy) throws EmfException;
+
     void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults);
 
     void doChangeStrategyType(StrategyType strategyType);

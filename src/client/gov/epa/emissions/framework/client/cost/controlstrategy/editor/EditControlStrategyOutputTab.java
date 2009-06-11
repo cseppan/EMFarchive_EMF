@@ -775,5 +775,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         }
     }
 
-
+    public void run(ControlStrategy controlStrategy) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

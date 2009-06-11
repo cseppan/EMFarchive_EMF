@@ -143,7 +143,7 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         controlProgramMeasureMinPctRedDiff = new TextField("domain wide percent reduction", 10);
-        controlProgramMeasureMinPctRedDiff.setText(constraint != null ? (constraint.getControlProgramMeasureMinPctRedDiff() != null ? constraint.getControlProgramMeasureMinPctRedDiff() + "" : "") : "");
+        controlProgramMeasureMinPctRedDiff.setText(constraint != null ? (constraint.getControlProgramMeasureMinPctRedDiff() != null ? constraint.getControlProgramMeasureMinPctRedDiff() + "" : "10") : "10");
         controlProgramMeasureMinPctRedDiff.setToolTipText("Enter the minimum control percent reduction difference for predicting controls.");
         changeables.addChangeable(controlProgramMeasureMinPctRedDiff);
         layoutGenerator.addLabelWidgetPair("Minimum Percent Reduction Difference for Predicting Controls (%)", controlProgramMeasureMinPctRedDiff, panel);
@@ -227,6 +227,18 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         return mainPanel;
     }
 
+    public void run(ControlStrategy controlStrategy) throws EmfException {
+        ControlStrategyConstraint constraint = null;
+        constraint = new ControlStrategyConstraint();
+        constraint.setControlStrategyId(controlStrategy.getId());
+        EfficiencyRecordValidation erValidation = new EfficiencyRecordValidation();
+        if (domainWideEmisReduction.getText().trim().length() > 0) constraint.setDomainWideEmisReduction(erValidation.parseDouble("domain wide emission reduction", domainWideEmisReduction.getText()));
+        if (domainWidePctReduction.getText().trim().length() > 0) constraint.setDomainWidePctReduction(erValidation.parseDouble("domain wide percent reduction", domainWidePctReduction.getText()));
+        if (constraint.getDomainWideEmisReduction() != null && constraint.getDomainWidePctReduction() != null) 
+            throw new EmfException("Constraints Tab: Specify only an emission reduction or a percent reduction.");
+
+    }
+    
     public void save(ControlStrategy controlStrategy) throws EmfException {
         ControlStrategyConstraint constraint = null;
         constraint = new ControlStrategyConstraint();
@@ -269,7 +281,7 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         }
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.projectFutureYearInventory)) {
             if (constraint.getControlProgramMeasureMinPctRedDiff() == null || constraint.getControlProgramMeasureMinPctRedDiff() <= 0.0D) 
-                throw new EmfException("Constraints Tab: The measure minimum percent reduction difference is missing.");
+                throw new EmfException("Constraints Tab: The measure minimum percent reduction difference for predicting controls is missing.");
         }
         presenter.setConstraint(constraint);
     }
