@@ -426,7 +426,11 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private Action importAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                controlMeasureImport();
+                try {
+                    controlMeasureImport();
+                } catch (EmfException e1) {
+                    showError(e1.getMessage());
+                }
             }
         };
     }
@@ -439,7 +443,9 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         };
     }
 
-    protected void controlMeasureImport() {
+    protected void controlMeasureImport() throws EmfException {
+        if (!session.user().isAdmin())
+            throw new EmfException("You must be an administrator to import measures.");
         CMImportView view = new CMImportWindow(parentConsole, desktopManager, session);
         CMImportPresenter presenter = new CMImportPresenter(session);
         presenter.display(view);
