@@ -34,14 +34,13 @@ import java.util.StringTokenizer;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-//import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
-// import google earth data file producer
 
 public class AnalysisEngineTableApp extends DisposableInteralFrame
 // implements google earth data file producer
@@ -395,16 +394,20 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
         JMenuItem exportMenu = new JMenuItem("Google Earth");
         exportMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //TablePanel table = (TablePanel) mainTabbedPane.getComponentAt(0);
-                int index = mainTabbedPane.getSelectedIndex();
-                String[] tabNames = createTabNames(1, 40, fileNames);
-                String subtitle = "Create Google Earth file: " + tabNames[index]+ "/" + title ;
-                PointSourceGeneratorFrame frame = new PointSourceGeneratorFrame(new File(fileNames[index]), subtitle);
-                        //"C:\\DOCUME~1\\CEPUSER\\LOCALS~1\\Temp\\QA_DSID243_V0_20080826140114Summarize_by_Plant.csv"));
-                //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.pack();
-                frame.centerFrame();
-                frame.setVisible(true);
+                try {
+                    //TablePanel table = (TablePanel) mainTabbedPane.getComponentAt(0);
+                  int index = mainTabbedPane.getSelectedIndex();
+                  String[] tabNames = createTabNames(1, 40, fileNames);
+                  String subtitle = "Create Google Earth file: " + tabNames[index]+ "/" + title ;
+                  PointSourceGeneratorFrame frame = new PointSourceGeneratorFrame(new File(fileNames[index]), subtitle);
+                          //"C:\\DOCUME~1\\CEPUSER\\LOCALS~1\\Temp\\QA_DSID243_V0_20080826140114Summarize_by_Plant.csv"));
+                  //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                  frame.pack();
+                  frame.centerFrame();
+                  frame.setVisible(true);
+              } catch (RuntimeException ex) {
+                  JOptionPane.showMessageDialog(parentConsole, ex.getLocalizedMessage(), "Google Earth Exception", JOptionPane.ERROR_MESSAGE);
+              }
             }// actionPerformed()
         });
         // create a file chooser
