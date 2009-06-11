@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
+import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -25,6 +26,7 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -218,8 +220,13 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
             if (sectorChkBx.isSelected())
                 job.setSector((Sector)sectors.getSelectedItem());
             
-            if (execChkBx.isSelected())
-                job.setExecutable(new Executable(exec.getText()));
+            if (execChkBx.isSelected()) {
+                String filePath = exec.getText().trim();
+                File file = new File(filePath);
+                
+                job.setPath(file.getParent());
+                job.setExecutable(getExecutable(new Executable(file.getName())));
+            }
             
             if (argChkBx.isSelected())
                 job.setArgs(args.getText());
@@ -249,14 +256,14 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
             passed = false;
         }
         
-        if (argChkBx.isSelected() && (args.getText() == null || args.getText().trim().isEmpty())) {
-            setMsg("Please input valid arguments.");
-            passed = false;
-        }
-        
-        if (qChkBx.isSelected() && (qOpt.getText() == null || qOpt.getText().trim().isEmpty())) {
-            setMsg("Please input valid queue options.");
-            passed = false;
+        if (execChkBx.isSelected()) {
+            String filePath = exec.getText().trim();
+            File file = new File(filePath);
+            
+            if (file.getParent() == null || file.getParent().isEmpty()) {
+                setMsg("Please specify a full path for the executable file.");
+                passed = false;
+            }
         }
         
         return passed;
@@ -273,6 +280,16 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
         };
     }
 
+    private Executable getExecutable(Executable exe) {
+        CaseService service = session.caseService();
+        try {
+            return service.addExecutable(exe);
+        } catch (EmfException e) {
+            setError("Could not add the new executable " + exe.getName());
+            return null;
+        }
+    }
+
     public void register(Object presenter) {
         this.presenter = (EditJobsTabPresenterImpl) presenter;
     }
@@ -283,6 +300,10 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
     
     private void setMsg(String msg) {
         this.messagePanel.setMessage(msg);
+    }
+
+    private void setError(String msg) {
+        this.messagePanel.setError(msg);
     }
 
     private void cleareMsg() {
