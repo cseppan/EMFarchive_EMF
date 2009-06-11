@@ -222,10 +222,16 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
             
             if (execChkBx.isSelected()) {
                 String filePath = exec.getText().trim();
-                File file = new File(filePath);
+                char separator = getFileSeparator(filePath);
+                int index = filePath.lastIndexOf(separator);
                 
-                job.setPath(file.getParent());
-                job.setExecutable(getExecutable(new Executable(file.getName())));
+                if (index >= 0)
+                    job.setPath(filePath.substring(0, index));
+
+                if (++index < filePath.length()) {
+                    Executable exe = new Executable(filePath.substring(index));
+                    job.setExecutable(getExecutable(exe));
+                }
             }
             
             if (argChkBx.isSelected())
@@ -278,6 +284,21 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
             }
             
         };
+    }
+    
+    private char getFileSeparator(String path) {
+        if (path == null || path.isEmpty()) {
+            // this assumes that the server and client are running on the same platform
+            return File.separatorChar;
+        }
+
+        if (path.contains("/"))
+            return '/';
+
+        if (path.contains("\\"))
+            return '\\';
+
+        return '/';
     }
 
     private Executable getExecutable(Executable exe) {
