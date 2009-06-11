@@ -207,8 +207,8 @@ public class DatasetCreator {
         //Add keywords to the dataset
         addKeyVal(dataset, "COST_YEAR", controlStrategy.getCostYear() + "");
         addKeyVal(dataset, "STRATEGY_TYPE", controlStrategy.getStrategyType().getName());
-        addKeyVal(dataset, "TARGET_POLLUTANT", controlStrategy.getTargetPollutant() != null ? controlStrategy.getTargetPollutant().getName() : "Not Specified");
-        addKeyVal(dataset, "REGION", controlStrategy.getRegion() != null ? controlStrategy.getRegion().getName() : "Not Specified");
+        addKeyVal(dataset, "TARGET_POLLUTANT", controlStrategy.getTargetPollutant() != null ? controlStrategy.getTargetPollutant().getName() : "Unspecified");
+        addKeyVal(dataset, "REGION", controlStrategy.getRegion() != null && controlStrategy.getRegion().getName().length() > 0 ? controlStrategy.getRegion().getName() : "Unspecified");
         addKeyVal(dataset, "STRATEGY_NAME", controlStrategy.getName());
         addKeyVal(dataset, "STRATEGY_ID", controlStrategy.getId()+"");
 //        addKeyVal(dataset, "STRATEGY_INVENTORY_NAME", inputDataset.getName());
