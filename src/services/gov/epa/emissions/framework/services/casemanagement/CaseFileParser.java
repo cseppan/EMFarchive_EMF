@@ -252,6 +252,16 @@ public class CaseFileParser {
             caseObj.setCaseTemplate(line.substring(index).equalsIgnoreCase("true"));
             return;
         }
+        
+        if (line.startsWith("#EMF_OUTPUT_JOB_SCRIPTS_FOLDER")) {
+            caseObj.setOutputFileDir(line.substring(index));
+            return;
+        }
+        
+        if (line.startsWith("#EMF_INPUT_FOLDER")) {
+            caseObj.setInputFileDir(line.substring(index));
+            return;
+        }
     }
 
     private void populateCase(String[] values) throws ParseException {

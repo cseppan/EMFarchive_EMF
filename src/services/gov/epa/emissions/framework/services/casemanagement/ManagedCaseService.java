@@ -5066,6 +5066,14 @@ public class ManagedCaseService {
                 + currentCase.isCaseTemplate()
                 + "\""
                 + ls
+                + "\"#EMF_OUTPUT_JOB_SCRIPTS_FOLDER="
+                + currentCase.getOutputFileDir()
+                + "\""
+                + ls
+                + "\"#EMF_INPUT_FOLDER="
+                + currentCase.getInputFileDir()
+                + "\""
+                + ls
                 + "Tab,Parameter,Order,Envt. Var.,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose"
                 + ls + "Summary,Model to Run,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,\""
                 + clean(model) + "\",String,TRUE,TRUE,,," + ls
