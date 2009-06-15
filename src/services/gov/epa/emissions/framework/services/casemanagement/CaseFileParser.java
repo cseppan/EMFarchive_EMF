@@ -406,7 +406,7 @@ public class CaseFileParser {
         // Tab,JobName,Order,Sector,RunStatus,StartDate,CompletionDate,Executable,Arguments,Path,QueueOptions,JobGroup,Local,QueueID,User,Host,Notes,Purpose,DependsOn
 
         job.setName(data[1]);
-        job.setOrder(Integer.parseInt(data[2]));
+        job.setJobNo(Float.parseFloat(data[2]));
         job.setSector(new Sector(data[3], data[3].equalsIgnoreCase("All sectors") ? "" : data[3]));
         job.setRunstatus(new JobRunStatus(data[4]));
         job.setRunStartDate(data[5].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[5]));

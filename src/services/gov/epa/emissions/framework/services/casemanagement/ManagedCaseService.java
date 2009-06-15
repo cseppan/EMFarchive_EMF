@@ -5208,7 +5208,7 @@ public class ManagedCaseService {
         for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
             String name = job.getName();
-            String order = job.getOrder() + "";
+            String order = job.getJobNo() + "";
             String sector = (job.getSector() == null) ? "All sectors" : job.getSector() + "";
             String status = job.getRunstatus() == null ? "" : job.getRunstatus() + "";
             String start = job.getRunStartDate() == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(job
