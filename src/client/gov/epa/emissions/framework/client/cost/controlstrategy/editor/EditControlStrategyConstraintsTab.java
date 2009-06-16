@@ -231,12 +231,13 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         ControlStrategyConstraint constraint = null;
         constraint = new ControlStrategyConstraint();
         constraint.setControlStrategyId(controlStrategy.getId());
-        EfficiencyRecordValidation erValidation = new EfficiencyRecordValidation();
-        if (domainWideEmisReduction.getText().trim().length() > 0) constraint.setDomainWideEmisReduction(erValidation.parseDouble("domain wide emission reduction", domainWideEmisReduction.getText()));
-        if (domainWidePctReduction.getText().trim().length() > 0) constraint.setDomainWidePctReduction(erValidation.parseDouble("domain wide percent reduction", domainWidePctReduction.getText()));
-        if (constraint.getDomainWideEmisReduction() != null && constraint.getDomainWidePctReduction() != null) 
-            throw new EmfException("Constraints Tab: Specify only an emission reduction or a percent reduction.");
-
+        if (controlStrategy.getStrategyType().equals(StrategyType.leastCost)) {
+            EfficiencyRecordValidation erValidation = new EfficiencyRecordValidation();
+            if (domainWideEmisReduction.getText().trim().length() > 0) constraint.setDomainWideEmisReduction(erValidation.parseDouble("domain wide emission reduction", domainWideEmisReduction.getText()));
+            if (domainWidePctReduction.getText().trim().length() > 0) constraint.setDomainWidePctReduction(erValidation.parseDouble("domain wide percent reduction", domainWidePctReduction.getText()));
+            if (constraint.getDomainWideEmisReduction() != null && constraint.getDomainWidePctReduction() != null) 
+                throw new EmfException("Constraints Tab: Specify only an emission reduction or a percent reduction.");
+        }
     }
     
     public void save(ControlStrategy controlStrategy) throws EmfException {
