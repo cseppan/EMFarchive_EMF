@@ -118,7 +118,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         super.setLayout(new BorderLayout());
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(getBorderedPanel(createmMainSection(), ""), BorderLayout.CENTER);
+        panel.add(getBorderedPanel(createmMainSection(), ""), BorderLayout.NORTH);
         panel.add(createLowerSection(), BorderLayout.SOUTH);
         super.add(panel, BorderLayout.CENTER);
     }
@@ -128,21 +128,49 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
         JPanel panelTop = new JPanel(new SpringLayout());
+        JPanel panelBottom = new JPanel(new BorderLayout());
         // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Name:", name(), panelTop);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panelTop);
+
+        JPanel middleLeftPanel = new JPanel(new SpringLayout());
+        // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        SpringLayoutGenerator middleLeftLayoutGenerator = new SpringLayoutGenerator();
+        middleLeftLayoutGenerator.addLabelWidgetPair("Creator:", creator(), middleLeftPanel);
+        middleLeftLayoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), middleLeftPanel);
+        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 2, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
+
+        JPanel middleRightPanel = new JPanel(new SpringLayout());
+        // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        SpringLayoutGenerator middleRightLayoutGenerator = new SpringLayoutGenerator();
+        middleRightLayoutGenerator.addLabelWidgetPair("Last Modified Date: ", lastModifiedDate(), middleRightPanel);
+        middleRightLayoutGenerator.addLabelWidgetPair("Copied From:", new JLabel("   "), middleRightPanel);
+        middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 2, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
+
+
+//        JPanel subPanel = new JPanel(new BorderLayout());
+//        subPanel.add(new JLabel("Project:"));
+//        subPanel.add(projects());
         
         layoutGenerator.addLabelWidgetPair("Project:", projects(), panelTop);
-        layoutGenerator.addLabelWidgetPair("Creator:", creator(), panelTop);
-        layoutGenerator.addLabelWidgetPair("Last Modified Date: ", lastModifiedDate(), panelTop);
-        layoutGenerator.addLabelWidgetPair("Copied From:", new JLabel("   "), panelTop);
-        layoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), panelTop);
-        layoutGenerator.makeCompactGrid(panelTop, 7, 2, // rows, cols
+        panelBottom.add(middleLeftPanel, BorderLayout.WEST);
+        panelBottom.add(middleRightPanel, BorderLayout.EAST);
+//        layoutGenerator.addWidgetPair(middleLeftPanel, middleRightPanel, panelBottom);
+//        layoutGenerator.addLabelWidgetPair("Creator:", creator(), panelTop);
+//        layoutGenerator.addLabelWidgetPair("Last Modified Date: ", lastModifiedDate(), panelTop);
+//        layoutGenerator.addLabelWidgetPair("Copied From:", new JLabel("   "), panelTop);
+//        layoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), panelTop);
+        layoutGenerator.makeCompactGrid(panelTop, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
         panel.add(panelTop);
+        panel.add(panelBottom);
         return panel;
     }
 
@@ -177,7 +205,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private JPanel createLowerLeftSection() throws EmfException {
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        
         JPanel panel = new JPanel(new SpringLayout());
+        JPanel panelBottom = new JPanel(new BorderLayout());
         // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -187,15 +219,33 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Region:", regions(), panel);
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate(), panel);
-        layoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), panel);
-        layoutGenerator.addLabelWidgetPair("<html>Include Measures<br/>with No Cost Data:</html>", includeUnspecifiedCostsCheckBox(), panel);
 
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
+        JPanel middleLeftPanel = new JPanel(new SpringLayout());
+        // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        SpringLayoutGenerator middleLeftLayoutGenerator = new SpringLayoutGenerator();
+        middleLeftLayoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), middleLeftPanel);
+        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
-        return panel;
+        JPanel middleRightPanel = new JPanel(new SpringLayout());
+        // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        SpringLayoutGenerator middleRightLayoutGenerator = new SpringLayoutGenerator();
+        middleRightLayoutGenerator.addLabelWidgetPair("<html>Include Measures<br/>with No Cost Data:</html>", includeUnspecifiedCostsCheckBox(), middleRightPanel);
+        middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 1, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
+
+        panelBottom.add(middleLeftPanel, BorderLayout.WEST);
+        panelBottom.add(middleRightPanel, BorderLayout.EAST);
+        
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
+        mainPanel.add(panel);
+        mainPanel.add(panelBottom);
+        return mainPanel;
     }
 
     private DoubleTextField discountRate() {
