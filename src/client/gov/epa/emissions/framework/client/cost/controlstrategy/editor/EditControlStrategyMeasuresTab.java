@@ -102,15 +102,13 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
         }
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(mainPanel(), BorderLayout.CENTER);
 
         this.setLayout(new BorderLayout(5, 5));
         // this.setBorder(BorderFactory.createEmptyBorder(50,50,0,300));
         classesPanel = createClassesPanel(changeables);
-        this.add(classesPanel, BorderLayout.CENTER);
+        this.add(classesPanel, BorderLayout.NORTH);
         //buildSortFilterPanel();
-        this.add(panel, BorderLayout.SOUTH);
+        this.add(mainPanel(), BorderLayout.CENTER);
         
         // disable class filter since there are measures selected
         if (table.getModel().getRowCount() > 0) 
