@@ -121,7 +121,7 @@ public class ExportSelectionDialog extends Dialog {
         projectionShapeFile = new ComboBox(projectionShapeFiles);
         projectionShapeFile.setEnabled(false);
         projectionShapeFile.setSelectedIndex(0);
-        layoutGenerator.addLabelWidgetPair("Output Shapefile Name:", projectionShapeFile, panel);
+        layoutGenerator.addLabelWidgetPair("Output Shapefile Template:", projectionShapeFile, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
