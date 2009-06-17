@@ -84,7 +84,7 @@ public class CaseAssistanceService {
 
     public synchronized void importCase(String folder, String[] files, User user) throws EmfException {
         Session session = sessionFactory.getSession();
-        CaseDaoHelper helper = new CaseDaoHelper(sessionFactory, caseDao, dataDao);
+        CaseDaoHelper helper = new CaseDaoHelper(sessionFactory, caseDao, dataDao, dsDao);
         String[][] cases = sortCaseFiles(getFiles(folder, files));
 
         Case newCase = null;
@@ -432,9 +432,13 @@ public class CaseAssistanceService {
             subDir = helper.getSubDir(subDir);
             input.setSubdirObj(subDir);
 
-            // NOTE: temporarily set to null to make input insertion to work
-            input.setDataset(null);
-            input.setVersion(null);
+            EmfDataset ds = helper.getDataset(input.getDataset().getName(), type);
+            Version version = input.getVersion();
+            
+            int verNum = version == null ? 0 : version.getVersion();
+            
+            input.setDataset(ds);
+            input.setVersion(ds == null ? null : helper.getDatasetVersion(ds.getId(), verNum));
             
             String jobName = input.getJobName();
             

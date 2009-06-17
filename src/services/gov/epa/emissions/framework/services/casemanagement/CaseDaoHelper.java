@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
@@ -13,6 +14,8 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterE
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Iterator;
@@ -57,13 +60,16 @@ public class CaseDaoHelper {
     private CaseDAO caseDao = null;
 
     private DataCommonsDAO dataDao = null;
+    
+    private DatasetDAO dsDao = null;
 
     private HibernateSessionFactory sessionFactory;
 
-    public CaseDaoHelper(HibernateSessionFactory sessionFactory, CaseDAO caseDao, DataCommonsDAO dataDao) {
+    public CaseDaoHelper(HibernateSessionFactory sessionFactory, CaseDAO caseDao, DataCommonsDAO dataDao, DatasetDAO dsDao) {
         this.sessionFactory = sessionFactory;
         this.caseDao = caseDao;
         this.dataDao = dataDao;
+        this.dsDao = dsDao;
     }
 
     private synchronized void resetCaseId(int caseId) {
@@ -540,6 +546,40 @@ public class CaseDaoHelper {
         }
 
         return null;
+    }
+    
+    public synchronized EmfDataset getDataset(String name, DatasetType type) {
+        if (name == null || name.trim().isEmpty())
+            return null;
+
+        Session session = sessionFactory.getSession();
+
+        try {
+            EmfDataset ds = dsDao.getDataset(session, name);
+            
+            if (ds.getDatasetType().equals(type))
+                return dsDao.getDataset(session, name);
+        } catch (Exception e) {
+            log.error("Error retrieving dataset '" + name + "'.", e);
+            return null;
+        } finally {
+            session.close();
+        }
+        
+        return null;
+    }
+    
+    public synchronized Version getDatasetVersion(int dsId, int version) {
+        Session session = sessionFactory.getSession();
+
+        try {
+            return dsDao.getVersion(session, dsId, version);
+        } catch (Exception e) {
+            log.error("Error retrieving dataset version for dataset id=" + version + ".", e);
+            return null;
+        } finally {
+            session.close();
+        }
     }
 
     public synchronized List<SubDir> getSubDirs() throws EmfException {
