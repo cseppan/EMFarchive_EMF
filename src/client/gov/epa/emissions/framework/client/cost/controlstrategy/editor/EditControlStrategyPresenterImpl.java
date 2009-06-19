@@ -102,6 +102,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void doRun(ControlStrategy controlStrategy) throws EmfException {
+        saveTabs(controlStrategy);
         runTabs(controlStrategy);
     }
 
