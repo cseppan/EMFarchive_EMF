@@ -442,7 +442,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     public void notifyEditFailure(ControlStrategy controlStrategy) {
         String message = "Cannot edit Control Strategy: " + controlStrategy.getName()
-                + " because you must be the creator of the strategy or and Administrator";
+                + " because you must be the creator of the strategy or an Administrator";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }
