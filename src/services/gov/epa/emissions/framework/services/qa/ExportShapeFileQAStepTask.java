@@ -244,7 +244,7 @@ public class ExportShapeFileQAStepTask implements Runnable {
             // point level...
         } else {
             throw new ExporterException(
-                    "QA result does have a fips, fips state code, or plantid/latitude/longitude columns.");
+                    "QA result does not have a fips, fips state code, or plantid/latitude/longitude columns.");
         }
         System.out.println(sql + " where " + pollCol + " = '" + poll + "'");
         return sql + " where " + pollCol + " = '" + poll + "'";
