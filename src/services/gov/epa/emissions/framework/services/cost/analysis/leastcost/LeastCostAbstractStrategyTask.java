@@ -66,7 +66,8 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractStrategyTask
                                 && (!startDate1.equals(startDate2) 
                                         || !stopDate1.equals(stopDate2))
                                         ) {
-                            setStatus("The datasets have different start or stop date times.");
+                            //only show a warning at this point, don't stop the strategy run
+                            setStatus("Warning: The datasets have different start or stop date times.");
                             break;
                         }
                         startDate2 = startDate1;
