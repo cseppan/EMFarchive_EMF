@@ -396,7 +396,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         measure.setDataSouce(dataSources.getText());
         measure.setSectors(sectorsWidget.getSectors());
         if (monthsWidget.getMonths() == null || monthsWidget.getMonths().length == 0)
-            throw new EmfException("Summary tab: The months the measure can used is missing.");
+            throw new EmfException("Summary tab: The months for the measure is missing.");
         measure.setMonths(monthsWidget.getMonths());
         
         // save items modified in efficiency tab
@@ -481,11 +481,24 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     private void validateFields() throws EmfException {
         messagePanel.clear();
 
-        if (name.getText().equals(""))
-            throw new EmfException("Summary tab: Name should be a non-empty string.");
+        if (name.getText().trim().length() == 0 && abbreviation.getText().trim().length() == 0)
+            throw new EmfException("Summary tab: A name and abbreviation must be specified");
 
-        if (abbreviation.getText().trim().length() < 1) {
+        if (name.getText().trim().length() == 0)
+            throw new EmfException("Summary tab: A name must be specified");
+
+        if (abbreviation.getText().trim().length() == 0) {
             throw new EmfException("Summary tab: An abbreviation must be specified");
+        }
+
+        //make sure its not longer than 10 characters
+        if (abbreviation.getText().trim().length() > 10) {
+            throw new EmfException("Summary tab: An abbreviation must not be longer than 10 characters");
+        }
+
+        //make sure its does not contain a space
+        if (abbreviation.getText().trim().indexOf(" ") > 0) {
+            throw new EmfException("Summary tab: An abbreviation can not contain a space");
         }
 
         if (majorPollutant.getSelectedItem() == null)
@@ -511,6 +524,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         return null;
     }
 
+    //A month of Zero indicates "All Months"
     private ControlMeasureMonth[] getAllMonths() {
         ControlMeasureMonth[] months = new ControlMeasureMonth[14];
         for (int i = -1; i < 13; i++) {
