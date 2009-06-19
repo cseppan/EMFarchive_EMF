@@ -95,6 +95,22 @@ public class ControlMeasureDAO {
 
     // NOTE: it't not happening in one transaction. modify?
     public int add(ControlMeasure measure, Scc[] sccs, Session session) throws EmfException {
+        //Validate control measure
+        //make sure abbreviation is not 
+        if (measure.getAbbreviation().trim().length() == 0) {
+            throw new EmfException("Summary tab: An abbreviation must be specified");
+        }
+        //make sure its not longer than 10 characters
+        if (measure.getAbbreviation().trim().length() > 10) {
+            throw new EmfException("Summary tab: An abbreviation must not be longer than 10 characters");
+        }
+        //make sure its does not contain a space
+        if (measure.getAbbreviation().trim().indexOf(" ") > 0) {
+            throw new EmfException("Summary tab: An abbreviation can not contain a space");
+        }
+
+        
+        
         checkForConstraints(measure, session);
         hibernateFacade.add(measure, session);
         int cmId = controlMeasureIds(measure, sccs, session);
@@ -123,8 +139,8 @@ public class ControlMeasureDAO {
         session.clear();//must do this
         
         //set the name and give a random abbrev...
-        cm.setName(creator.getName() + "'s " + cm.getName() + " " + CustomDateFormat.format_YYYYMMDDHHMMSS(new Date()));
-        cm.setAbbreviation(Math.round(Math.random() * 1000000000) % 1000000000 + "");
+        cm.setName("Copy of " + cm.getName() + " " + creator.getName() + " " + CustomDateFormat.format_HHMM(new Date()));
+        cm.setAbbreviation(CustomDateFormat.format_DDHHMMSSSS(new Date()));
         
         //make sure the name and abbrev are unique
         Criterion name = Restrictions.eq("name", cm.getName());
@@ -187,6 +203,19 @@ public class ControlMeasureDAO {
     }
     
     public ControlMeasure update(ControlMeasure locked, Scc[] sccs, Session session) throws EmfException {
+        //Validate control measure
+        //make sure abbreviation is not 
+        if (locked.getAbbreviation().trim().length() == 0) {
+            throw new EmfException("Summary tab: An abbreviation must be specified");
+        }
+        //make sure its not longer than 10 characters
+        if (locked.getAbbreviation().trim().length() > 10) {
+            throw new EmfException("Summary tab: An abbreviation must not be longer than 10 characters");
+        }
+        //make sure its does not contain a space
+        if (locked.getAbbreviation().trim().indexOf(" ") > 0) {
+            throw new EmfException("Summary tab: An abbreviation can not contain a space");
+        }
         checkForConstraints(locked, session);
         ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, current(locked.getId(),
                 session), session);
