@@ -137,7 +137,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
         panel.add(removeButton);
 
         JPanel container = new JPanel(new BorderLayout());
-        container.add(panel,BorderLayout.LINE_END);
+        container.add(panel,BorderLayout.LINE_START);
 
         return container;
     }
