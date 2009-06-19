@@ -19,6 +19,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class SCCSelectionDialog extends JDialog implements SCCSelectionView {
@@ -77,9 +78,15 @@ public class SCCSelectionDialog extends JDialog implements SCCSelectionView {
     private Action okAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                add();
-                setVisible(false);
-                dispose();
+                if (selectModel.selected().size() > 0) {
+                    add();
+                    setVisible(false);
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(parent, 
+                       "Please choose some SCCs", 
+                       "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         };
     }
