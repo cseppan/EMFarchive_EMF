@@ -843,18 +843,12 @@ public class DataServiceImpl implements DataService {
         try {
             EmfDataset dataset = dao.getDataset(session, datasetId);
             Date time = new Date();
-
             DatasetType type = dataset.getDatasetType();
-            String imprtClass = type.getImporterClassName();
-            InternalSource[] sources = dataset.getInternalSources();
 
-            boolean smkReport = (imprtClass == null ? false : imprtClass
-                    .equals("gov.epa.emissions.commons.io.other.SMKReportImporter"));
-
-            if (type.isExternal() || smkReport || (sources != null && sources.length > 1))
+            if (type.isExternal())
                 throw new Exception("Copying of a version to a new dataset is not supported for this dataset type: "
                         + type.getName() + ".");
-
+            
             EmfDataset copied = (EmfDataset) DeepCopy.copy(dataset);
             copied.setName(getUniqueNewName("Copy of " + dataset.getName() + "_v" + version.getVersion()));
             copied.setStatus(dataset.getStatus());
@@ -943,7 +937,23 @@ public class DataServiceImpl implements DataService {
             dao.update(copied, session);
             dao.releaseLocked(user, copied, session);
         }
-
+        
+        if (sources.length > 1) {
+            for (int i = 0; i < sources.length; i++) {
+                String table = schema + sources[i].getTable();
+                String[] tableCols = getTableColumns(emisSrc.dataModifier(), table, "");
+                String insert = "INSERT INTO " + table + " (" + colString(tableCols, 1) + ") SELECT "
+                    + getSrcColString(copied.getId(), 0, tableCols, tableCols) + " FROM " + table + " "
+                    + queryOrigData.versionWhereClause();
+            
+                emisSrc.tableDefinition().execute(insert);
+                sources[i].setSource(dataset.getName() + " version: " + version.getVersion());
+            }
+            
+            copied.setInternalSources(sources);
+            dao.update(copied, session);
+            dao.releaseLocked(user, copied, session);
+        }
     }
 
     private String getConsldTableName(EmfDataset dataset, TableCreator tCreator, String colNameString,
