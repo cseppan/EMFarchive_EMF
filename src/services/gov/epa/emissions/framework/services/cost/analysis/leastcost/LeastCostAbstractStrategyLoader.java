@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.Date;
 
 import org.hibernate.Session;
@@ -266,31 +267,32 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
     
     protected void addDetailedResultSummaryDatasetKeywords(EmfDataset dataset,
             double emisReduction) throws EmfException {
-        String query = "select TO_CHAR(sum(annual_cost), 'FM999999999999999990.09')::double precision as total_annual_cost, "
-            + "TO_CHAR(case when sum(emis_reduction) <> 0 then sum(annual_cost) / sum(emis_reduction) else null::double precision end, 'FM999999999999999990.09')::double precision as average_ann_cost_per_ton, "
-            + "TO_CHAR(sum(annual_oper_maint_cost), 'FM999999999999999990.09')::double precision as Total_Annual_Oper_Maint_Cost, "
-            + "TO_CHAR(sum(annualized_capital_cost), 'FM999999999999999990.09')::double precision as Total_Annualized_Capital_Cost, "
-            + "TO_CHAR(sum(total_capital_cost), 'FM999999999999999990.09')::double precision as Total_Capital_Cost, "
-            + "TO_CHAR(case when " + uncontrolledEmis + " <> 0 then " + emisReduction + " / " + uncontrolledEmis + " * 100 else null::double precision end, 'FM990.099')::double precision as Target_Percent_Reduction, " 
-            + "TO_CHAR(case when " + uncontrolledEmis + " <> 0 then sum(emis_reduction) / " + uncontrolledEmis + " * 100 else null::double precision end, 'FM990.099')::double precision as Actual_Percent_Reduction, "
+        String query = "select sum(annual_cost) as total_annual_cost, "
+            + "case when sum(emis_reduction) <> 0 then sum(annual_cost) / sum(emis_reduction) else null::double precision end as average_ann_cost_per_ton, "
+            + "sum(annual_oper_maint_cost) as Total_Annual_Oper_Maint_Cost, "
+            + "sum(annualized_capital_cost) as Total_Annualized_Capital_Cost, "
+            + "sum(total_capital_cost) as Total_Capital_Cost, "
+            + "case when " + uncontrolledEmis + " <> 0 then " + emisReduction + " / " + uncontrolledEmis + " * 100 else null::double precision end as Target_Percent_Reduction, " 
+            + "case when " + uncontrolledEmis + " <> 0 then sum(emis_reduction) / " + uncontrolledEmis + " * 100 else null::double precision end as Actual_Percent_Reduction, "
             + "sum(emis_reduction) as Total_Emis_Reduction " 
             + "FROM " + qualifiedEmissionTableName(dataset)
             + " where poll='" + controlStrategy.getTargetPollutant().getName() + "'"
             + " group by poll";
 //        System.out.println(System.currentTimeMillis() + " " + query);
         ResultSet rs = null;
+        DecimalFormat decFormat = new DecimalFormat("#,##0");
         try {
             rs = datasource.query().executeQuery(query);
             while (rs.next()) {
-                addKeyVal(dataset, "TOTAL_ANNUAL_COST", rs.getDouble("total_annual_cost") + "");
-                addKeyVal(dataset, "AVERAGE_ANNUAL_COST_PER_TON", rs.getDouble("average_ann_cost_per_ton") + "");
-                addKeyVal(dataset, "TOTAL_ANNUAL_OPERATION_MAINTENANCE_COST", rs.getDouble("Total_Annual_Oper_Maint_Cost") + "");
-                addKeyVal(dataset, "TOTAL_ANNUALIZED_CAPITAL_COST", rs.getDouble("Total_Annualized_Capital_Cost") + "");
-                addKeyVal(dataset, "TOTAL_CAPITAL_COST", rs.getDouble("Total_Capital_Cost") + "");
-                addKeyVal(dataset, "TARGET_PERCENT_REDUCTION", rs.getDouble("Target_Percent_Reduction") + "");
-                addKeyVal(dataset, "ACTUAL_PERCENT_REDUCTION", rs.getDouble("Actual_Percent_Reduction") + "");
-                addKeyVal(dataset, "TOTAL_EMISSION_REDUCTION", rs.getDouble("Total_Emis_Reduction") + "");
-                addKeyVal(dataset, "UNCONTROLLED_EMISSION", uncontrolledEmis + "");
+                addKeyVal(dataset, "TOTAL_ANNUAL_COST", decFormat.format(rs.getDouble("total_annual_cost")) + "");
+                addKeyVal(dataset, "AVERAGE_ANNUAL_COST_PER_TON", decFormat.format(rs.getDouble("average_ann_cost_per_ton")) + "");
+                addKeyVal(dataset, "TOTAL_ANNUAL_OPERATION_MAINTENANCE_COST", decFormat.format(rs.getDouble("Total_Annual_Oper_Maint_Cost")) + "");
+                addKeyVal(dataset, "TOTAL_ANNUALIZED_CAPITAL_COST", decFormat.format(rs.getDouble("Total_Annualized_Capital_Cost")) + "");
+                addKeyVal(dataset, "TOTAL_CAPITAL_COST", decFormat.format(rs.getDouble("Total_Capital_Cost")) + "");
+                addKeyVal(dataset, "TARGET_PERCENT_REDUCTION", decFormat.format(rs.getDouble("Target_Percent_Reduction")) + "%");
+                addKeyVal(dataset, "ACTUAL_PERCENT_REDUCTION", decFormat.format(rs.getDouble("Actual_Percent_Reduction")) + "%");
+                addKeyVal(dataset, "TOTAL_EMISSION_REDUCTION", decFormat.format(rs.getDouble("Total_Emis_Reduction")) + "");
+                addKeyVal(dataset, "UNCONTROLLED_EMISSION", decFormat.format(uncontrolledEmis) + "");
                 try {
                     updateDataset(dataset);
                 } catch (Exception e) {
