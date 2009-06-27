@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -49,11 +50,13 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     private JPanel controlProgramPanel;
     
     private JPanel leastCostPanelContainer;
+    private DecimalFormat decFormat;
 
     public EditControlStrategyConstraintsTab(ControlStrategy controlStrategy, ManageChangeables changeablesList,
             SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) {
         this.changeablesList = changeablesList;
         this.controlStrategy = controlStrategy;
+        this.decFormat = new DecimalFormat("###0.0#");
     }
     
     private void setupLayout(ManageChangeables changeables) {
@@ -168,13 +171,13 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         domainWideEmisReduction = new TextField("domain wide emission reduction", 10);
-        domainWideEmisReduction.setText(constraint != null ? (constraint.getDomainWideEmisReduction() != null ? constraint.getDomainWideEmisReduction() + "" : "") : "");
+        domainWideEmisReduction.setText(constraint != null ? (constraint.getDomainWideEmisReduction() != null ? decFormat.format(constraint.getDomainWideEmisReduction()) + "" : "") : "");
         domainWideEmisReduction.setToolTipText("Enter the target domain wide emission reduction (in tons for the target pollutant).");
         changeables.addChangeable(domainWideEmisReduction);
         layoutGenerator.addLabelWidgetPair("Domain Wide Emission Reduction (tons)", domainWideEmisReduction, panel);
 
         domainWidePctReduction = new TextField("domain wide percent reduction", 10);
-        domainWidePctReduction.setText(constraint != null ? (constraint.getDomainWidePctReduction() != null ? constraint.getDomainWidePctReduction() + "" : "") : "");
+        domainWidePctReduction.setText(constraint != null ? (constraint.getDomainWidePctReduction() != null ? decFormat.format(constraint.getDomainWidePctReduction()) + "" : "") : "");
         domainWidePctReduction.setToolTipText("Enter the target domain wide precent reduction (% for the target pollutant).");
         changeables.addChangeable(domainWidePctReduction);
         layoutGenerator.addLabelWidgetPair("Domain Wide Percent Reduction (%)", domainWidePctReduction, panel);
@@ -231,20 +234,8 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         ControlStrategyConstraint constraint = null;
         constraint = new ControlStrategyConstraint();
         constraint.setControlStrategyId(controlStrategy.getId());
-        if (controlStrategy.getStrategyType().equals(StrategyType.leastCost)) {
-            EfficiencyRecordValidation erValidation = new EfficiencyRecordValidation();
-            if (domainWideEmisReduction.getText().trim().length() > 0) constraint.setDomainWideEmisReduction(erValidation.parseDouble("domain wide emission reduction", domainWideEmisReduction.getText()));
-            if (domainWidePctReduction.getText().trim().length() > 0) constraint.setDomainWidePctReduction(erValidation.parseDouble("domain wide percent reduction", domainWidePctReduction.getText()));
-            if (constraint.getDomainWideEmisReduction() != null && constraint.getDomainWidePctReduction() != null) 
-                throw new EmfException("Constraints Tab: Specify only an emission reduction or a percent reduction.");
-        }
-    }
-    
-    public void save(ControlStrategy controlStrategy) throws EmfException {
-        ControlStrategyConstraint constraint = null;
-        constraint = new ControlStrategyConstraint();
-        constraint.setControlStrategyId(controlStrategy.getId());
         EfficiencyRecordValidation erValidation = new EfficiencyRecordValidation();
+        //make sure constraints are in the correct numerical format... validation will happen in the run method.
         if (contrlEff.getText().trim().length() > 0) constraint.setMaxControlEfficiency(erValidation.parseDouble("maximum control efficieny", contrlEff.getText()));
         if (emisReduction.getText().trim().length() > 0) constraint.setMaxEmisReduction(erValidation.parseDouble("maximum emission reduction", emisReduction.getText()));
         if (costPerTon.getText().trim().length() > 0) constraint.setMinCostPerTon(erValidation.parseDouble("minimum cost per ton", costPerTon.getText()));
@@ -284,14 +275,61 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
             if (constraint.getControlProgramMeasureMinPctRedDiff() == null || constraint.getControlProgramMeasureMinPctRedDiff() <= 0.0D) 
                 throw new EmfException("Constraints Tab: The measure minimum percent reduction difference for predicting controls is missing.");
         }
+    }
+    
+    public void save(ControlStrategy controlStrategy) throws EmfException {
+        ControlStrategyConstraint constraint = null;
+        constraint = new ControlStrategyConstraint();
+        constraint.setControlStrategyId(controlStrategy.getId());
+        EfficiencyRecordValidation erValidation = new EfficiencyRecordValidation();
+        //make sure constraints are in the correct numerical format... validation will happen in the run method.
+        if (contrlEff.getText().trim().length() > 0) constraint.setMaxControlEfficiency(erValidation.parseDouble("maximum control efficieny", contrlEff.getText()));
+        if (emisReduction.getText().trim().length() > 0) constraint.setMaxEmisReduction(erValidation.parseDouble("maximum emission reduction", emisReduction.getText()));
+        if (costPerTon.getText().trim().length() > 0) constraint.setMinCostPerTon(erValidation.parseDouble("minimum cost per ton", costPerTon.getText()));
+        if (annCost.getText().trim().length() > 0) constraint.setMinAnnCost(erValidation.parseDouble("minimum annualized cost", annCost.getText()));
+        if (domainWideEmisReduction.getText().trim().length() > 0) constraint.setDomainWideEmisReduction(erValidation.parseDouble("domain wide emission reduction", domainWideEmisReduction.getText()));
+        if (domainWidePctReduction.getText().trim().length() > 0) constraint.setDomainWidePctReduction(erValidation.parseDouble("domain wide percent reduction", domainWidePctReduction.getText()));
+        if (domainWidePctReductionIncrement.getText().trim().length() > 0) constraint.setDomainWidePctReductionIncrement(erValidation.parseDouble("domain wide percent reduction increment", domainWidePctReductionIncrement.getText()));
+        if (domainWidePctReductionStart.getText().trim().length() > 0) constraint.setDomainWidePctReductionStart(erValidation.parseDouble("domain wide percent reduction start", domainWidePctReductionStart.getText()));
+        if (domainWidePctReductionEnd.getText().trim().length() > 0) constraint.setDomainWidePctReductionEnd(erValidation.parseDouble("domain wide percent reduction end", domainWidePctReductionEnd.getText()));
+        if (replacementControlMinEfficiencyDiff.getText().trim().length() > 0) constraint.setReplacementControlMinEfficiencyDiff(erValidation.parseDouble("replacement control minimum control efficiency difference", replacementControlMinEfficiencyDiff.getText()));
+        if (controlProgramMeasureMinPctRedDiff.getText().trim().length() > 0) constraint.setControlProgramMeasureMinPctRedDiff(erValidation.parseDouble("control program minimum percent reduction difference", controlProgramMeasureMinPctRedDiff.getText()));
+//        if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.leastCost)) {
+//            //make sure that either Emis OR Pct Reduction was specified for the Least Cost.  This is needed for the run.
+//            if (constraint.getReplacementControlMinEfficiencyDiff() == null || constraint.getReplacementControlMinEfficiencyDiff() <= 0.0D) 
+//                throw new EmfException("Constraints Tab: The replacement control minimum control efficiencny difference is missing.");
+//            if (constraint.getDomainWideEmisReduction() == null && constraint.getDomainWidePctReduction() == null) 
+//                throw new EmfException("Constraints Tab: Please specify either an emission reduction or percent reduction.");
+//            if (constraint.getDomainWideEmisReduction() != null && constraint.getDomainWidePctReduction() != null) 
+//                throw new EmfException("Constraints Tab: Specify only an emission reduction or a percent reduction.");
+//        }
+//        if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.leastCostCurve)) {
+//            //make sure that the Pct Reduction Increment was specified for the Least Cost Curve.  This is needed for the run.
+//            if (constraint.getReplacementControlMinEfficiencyDiff() == null || constraint.getReplacementControlMinEfficiencyDiff() <= 0.0D) 
+//                throw new EmfException("Constraints Tab: The replacement control minimum control efficiencny difference is missing.");
+//            if (constraint.getDomainWidePctReductionIncrement() == null || constraint.getDomainWidePctReductionIncrement() <= 0.0D) 
+//                throw new EmfException("Constraints Tab: The percent reduction increment is missing.");
+//            if (constraint.getDomainWidePctReductionStart() == null) 
+//                throw new EmfException("Constraints Tab: The percent reduction starting percentage is missing.");
+//            if (constraint.getDomainWidePctReductionEnd() == null) 
+//                throw new EmfException("Constraints Tab: The percent reduction ending percentage is missing.");
+//        }
+//        if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.maxEmissionsReduction)) {
+//            if (constraint.getReplacementControlMinEfficiencyDiff() == null || constraint.getReplacementControlMinEfficiencyDiff() <= 0.0D) 
+//                throw new EmfException("Constraints Tab: The replacement control minimum control efficiencny difference is missing.");
+//        }
+//        if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.projectFutureYearInventory)) {
+//            if (constraint.getControlProgramMeasureMinPctRedDiff() == null || constraint.getControlProgramMeasureMinPctRedDiff() <= 0.0D) 
+//                throw new EmfException("Constraints Tab: The measure minimum percent reduction difference for predicting controls is missing.");
+//        }
         presenter.setConstraint(constraint);
     }
 
     public void refresh(ControlStrategy strategy, ControlStrategyResult[] controlStrategyResults) {
         ControlStrategyConstraint constraint = strategy.getConstraint();
         if (constraint != null) {
-            domainWideEmisReduction.setText(constraint.getDomainWideEmisReduction() != null ? constraint.getDomainWideEmisReduction() + "" : "");
-            domainWidePctReduction.setText(constraint.getDomainWidePctReduction() != null ? constraint.getDomainWidePctReduction() + "" : "");
+            domainWideEmisReduction.setText(constraint.getDomainWideEmisReduction() != null ? decFormat.format(constraint.getDomainWideEmisReduction()) + "" : "");
+            domainWidePctReduction.setText(constraint.getDomainWidePctReduction() != null ? decFormat.format(constraint.getDomainWidePctReduction()) + "" : "");
         }
     }
 
