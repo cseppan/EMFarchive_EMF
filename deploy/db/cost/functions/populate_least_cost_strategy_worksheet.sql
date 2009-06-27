@@ -2,11 +2,11 @@ CREATE OR REPLACE FUNCTION public.populate_least_cost_strategy_worksheet(control
 	input_dataset_id integer, 
 	input_dataset_version integer) RETURNS void AS $$
 DECLARE
-	inv_table_name varchar(63) := '';
+	inv_table_name varchar(64) := '';
 	inv_filter varchar := '';
 	inv_fips_filter text := '';
 	worksheet_dataset_id integer := null;
-	worksheet_table_name varchar(63) := '';
+	worksheet_table_name varchar(64) := '';
 	county_dataset_id integer := null;
 	county_dataset_version integer := null;
 	region RECORD;
@@ -309,7 +309,7 @@ BEGIN
 
 			-- update so its viewable for client, via the constraints tab
 			execute 'update emf.control_strategy_constraints 
-			set domain_wide_emis_reduction = ' || TO_CHAR(domain_wide_emis_reduction, 'FM999999999999999990.09')::double precision || '
+			set domain_wide_emis_reduction = ' || domain_wide_emis_reduction || '
 			where control_strategy_id = ' || control_strategy_id;
 		ELSE
 			execute 'select ' || domain_wide_emis_reduction || ' / sum(' || case when dataset_month != 0 then 'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' else 'inv.ann_emis' end || ') * 100.0 
@@ -320,7 +320,7 @@ BEGIN
 
 			-- update so its viewable for client, via the constraints tab
 			execute 'update emf.control_strategy_constraints 
-			set domain_wide_pct_reduction = ' || TO_CHAR(domain_wide_pct_reduction, 'FM990.099')::double precision || '
+			set domain_wide_pct_reduction = ' || domain_wide_pct_reduction || '
 			where control_strategy_id = ' || control_strategy_id;
 		END IF;
 	END IF;

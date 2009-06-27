@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION public.populate_sources_table(
-	inv_table_name varchar(63),
+	inv_table_name varchar(64),
 	inv_filter varchar
 ) RETURNS void AS $$
 DECLARE

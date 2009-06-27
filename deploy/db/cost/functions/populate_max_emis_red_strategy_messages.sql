@@ -210,7 +210,7 @@ BEGIN
 			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
 	END IF;
 	-- build version info into where clause filter
-	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'a'::character varying(63)) || ')' || coalesce(' and ' || inv_filter, '');
+	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'a'::character varying(64)) || ')' || coalesce(' and ' || inv_filter, '');
 
 
 	-- look for negative emissions in detailed result...
