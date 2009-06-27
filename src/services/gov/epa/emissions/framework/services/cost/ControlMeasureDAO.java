@@ -16,12 +16,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -140,13 +137,13 @@ public class ControlMeasureDAO {
         
         //set the name and give a random abbrev...
         cm.setName("Copy of " + cm.getName() + " " + creator.getName() + " " + CustomDateFormat.format_HHMM(new Date()));
-        cm.setAbbreviation(CustomDateFormat.format_DDHHMMSSSS(new Date()));
+        cm.setAbbreviation(CustomDateFormat.format_YYDDHHMMSS(new Date()));
         
         //make sure the name and abbrev are unique
-        Criterion name = Restrictions.eq("name", cm.getName());
+//        Criterion name = Restrictions.eq("name", cm.getName());
         Criterion abbrev = Restrictions.eq("abbreviation", cm.getAbbreviation());
         boolean abbrExist = abbrExist(new Criterion[] { abbrev }, session);
-        boolean nameExist = nameExist(new Criterion[] { name }, session);
+        boolean nameExist = nameExist(cm.getName(), session);
 
         if (abbrExist || nameExist)
             throw new EmfException("A control measure with the same name or abbreviation already exists.");
@@ -300,6 +297,12 @@ public class ControlMeasureDAO {
         return exists(ControlMeasure.class, criterions, session);
     }
 
+    private boolean nameExist(String name, Session session) {
+        Long count = (Long)session.createQuery("select count(cM) from ControlMeasure cM where trim(cM.name) =  '" + name.replaceAll("'", "''") + "'").uniqueResult();
+        
+        return count > 0 ? true : false;
+    }
+
     private boolean abbrExist(Criterion[] criterions, Session session) {
         return exists(ControlMeasure.class, criterions, session);
     }
@@ -311,10 +314,10 @@ public class ControlMeasureDAO {
 
     public int addFromImporter(ControlMeasure measure, Scc[] sccs, User user, Session session, DbServer dbServer) throws EmfException {
         int cmId = 0;
-        Criterion name = Restrictions.eq("name", measure.getName());
+//        Criterion name = Restrictions.eq("name", measure.getName());
         Criterion abbrev = Restrictions.eq("abbreviation", measure.getAbbreviation());
         boolean abbrExist = abbrExist(new Criterion[] { abbrev }, session);
-        boolean nameExist = nameExist(new Criterion[] { name }, session);
+        boolean nameExist = nameExist(measure.getName(), session);
 
         if (nameExist) {// overwrite if name exist regard less of abbrev
             cmId = controlMeasureId(measure, session);
@@ -345,19 +348,24 @@ public class ControlMeasureDAO {
     
     // use only after confirming measure is exist
     private int controlMeasureId(ControlMeasure measure, Session session) {
-        Criterion criterion = Restrictions.eq("name", measure.getName());
-
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            Criteria criteria = session.createCriteria(ControlMeasure.class);
-            criteria.add(criterion);
-            tx.commit();
-            return ((ControlMeasure) criteria.uniqueResult()).getId();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+//        Criterion criterion = Restrictions.eq("name", measure.getName());
+//
+//        Transaction tx = null;
+//        try {
+//            tx = session.beginTransaction();
+//            Criteria criteria = session.createCriteria(ControlMeasure.class);
+//            criteria.add(criterion);
+//            tx.commit();
+//            return ((ControlMeasure) criteria.uniqueResult()).getId();
+//        } catch (HibernateException e) {
+//            tx.rollback();
+//            throw e;
+//        }
+//
+        int id = (Integer)session.createQuery("select cM.id from ControlMeasure cM where trim(cM.name) =  '" + measure.getName().trim().replaceAll("'", "''") + "'").uniqueResult();
+        
+        return id;
+    
     }
 
     public void removeMeasureEquationType(int controlMeasureEquationTypeId, Session session) {
