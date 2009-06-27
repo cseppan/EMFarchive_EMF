@@ -38,8 +38,15 @@ public class AddRemoveMonthWidget extends JPanel {
     }
 
     public void setMonths(ControlMeasureMonth[] months) {
-        for (int i = 0; i < months.length; i++) {
-            monthsList.addElement(months[i]);
+        //if brand new measure then default to all months,
+        if (months != null && months.length > 0) {
+            for (int i = 0; i < months.length; i++) {
+                monthsList.addElement(months[i]);
+            }
+        } else {
+            ControlMeasureMonth month = new ControlMeasureMonth();
+            month.setMonth((short)0);
+            monthsList.addElement(month);
         }
     }
 
