@@ -234,9 +234,11 @@ public class ControlMeasuresImporter implements Importer {
                 cmId = controlMeasuresDao.addFromImporter(measures[i],measures[i].getSccs(), user, session, dbServer);
                 measures[i].setId(cmId);
             } catch (EmfException e) {
+                e.printStackTrace();
                 messages.add(e.getMessage() + "\n");
 //                throw new EmfException(e.getMessage() + " " + e.getMessage() + " " + measures[i].getName() + " " + measures[i].getAbbreviation());
             } catch (Exception e) {
+                e.printStackTrace();
                 messages.add(e.getMessage() + "\n");
 //              throw new EmfException(e.getMessage() + " " + e.getMessage() + " " + measures[i].getName() + " " + measures[i].getAbbreviation());
             } 

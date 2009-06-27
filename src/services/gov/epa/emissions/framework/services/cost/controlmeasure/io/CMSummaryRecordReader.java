@@ -127,7 +127,7 @@ public class CMSummaryRecordReader {
     }
 
     private void name(ControlMeasure cm, String token) {
-        cm.setName(token);
+        cm.setName(token.replaceAll("\"\"", "\""));
     }
 
     private void abbrev(ControlMeasure cm, String token) {
