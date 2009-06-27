@@ -142,7 +142,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
 
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                doClose();
+                close();
             }
         });
         buttonsPanel.add(close);
@@ -159,6 +159,10 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     }
 
     public void windowClosing() {
+        doClose();
+    }
+
+    public void close() {
         doClose();
     }
 

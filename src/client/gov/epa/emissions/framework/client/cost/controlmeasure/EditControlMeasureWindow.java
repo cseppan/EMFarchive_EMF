@@ -29,7 +29,7 @@ import javax.swing.event.ChangeListener;
 
 public class EditControlMeasureWindow extends DisposableInteralFrame implements ControlMeasureView {
 
-    private ControlMeasurePresenter presenter;
+    protected ControlMeasurePresenter presenter;
 
     private MessagePanel messagePanel;
 
@@ -156,7 +156,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
 
         Button close = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                doClose();
+                close();
             }
         });
         buttonsPanel.add(close);
@@ -175,6 +175,10 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     }
 
     public void windowClosing() {
+        doClose();
+    }
+
+    public void close() {
         doClose();
     }
 
