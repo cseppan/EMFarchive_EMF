@@ -26,13 +26,13 @@ public class ControlStrategiesTableData extends AbstractTableData {
 
     public String[] columns() {
         return new String[] { "Name", "Last Modified", "Run Status", "Region", 
-                "Target Pollutant", "Total Cost", "Reduction (tons)", 
+                "Target Pollutant", "Total Cost", "Reduction (tons)", "Average Cost Per Ton", 
                 "Project", "Strategy Type", "Cost Year", 
                 "Inv. Year", "Creator" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 6 || col == 5)
+        if (col == 6 || col == 5 || col == 7)
             return Double.class;
 
         return String.class;
@@ -51,7 +51,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
         for (int i = 0; i < controlStrategies.length; i++) {
             ControlStrategy element = controlStrategies[i];
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), element.getRunStatus(), region(element),
-                    element.getTargetPollutant(), element.getTotalCost() != null ? element.getTotalCost() : NAN_VALUE /*getTotalCost(element.getId())*/, element.getTotalReduction() != null ? element.getTotalReduction() : NAN_VALUE /*getReduction(element.getId())*/, 
+                    element.getTargetPollutant(), element.getTotalCost() != null ? element.getTotalCost() : NAN_VALUE /*getTotalCost(element.getId())*/, element.getTotalReduction() != null ? element.getTotalReduction() : NAN_VALUE /*getReduction(element.getId())*/, element.getTotalReduction() != null && element.getTotalReduction() != 0.0D && element.getTotalCost() != null ? element.getTotalCost() / element.getTotalReduction() : NAN_VALUE, 
                     project(element), analysisType(element), costYear(element), 
                     "" + (element.getInventoryYear() != 0 ? element.getInventoryYear() : ""), 
                     element.getCreator().getName() };
