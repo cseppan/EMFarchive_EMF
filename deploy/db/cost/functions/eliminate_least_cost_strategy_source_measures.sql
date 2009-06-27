@@ -2,9 +2,9 @@ CREATE OR REPLACE FUNCTION public.eliminate_least_cost_strategy_source_measures(
 	input_dataset_id integer, 
 	input_dataset_version integer) RETURNS void AS $$
 DECLARE
-	inv_table_name varchar(63) := '';
+	inv_table_name varchar(64) := '';
 	worksheet_dataset_id integer := null;
-	worksheet_table_name varchar(63) := '';
+	worksheet_table_name varchar(64) := '';
 	target_pollutant varchar;
 	gimme_count integer := 0;
 BEGIN

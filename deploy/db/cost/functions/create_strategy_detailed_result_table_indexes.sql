@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION public.create_strategy_detailed_result_table_indexes(
   RETURNS void AS
 $BODY$
 DECLARE
-	index_name varchar(63) := '';
+	index_name varchar(64) := '';
 BEGIN
 
 	-- create source_id btree index

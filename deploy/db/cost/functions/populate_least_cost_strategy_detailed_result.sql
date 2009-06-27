@@ -5,15 +5,15 @@ CREATE OR REPLACE FUNCTION public.populate_least_cost_strategy_detailed_result(c
 	strategy_result_id integer,
 	domain_wide_emis_reduction double precision) RETURNS integer AS $$
 DECLARE
-	inv_table_name varchar(63) := '';
+	inv_table_name varchar(64) := '';
 	inv_filter varchar := '';
 	inv_fips_filter text := '';
 	detailed_result_dataset_id integer := null;
-	detailed_result_table_name varchar(63) := '';
+	detailed_result_table_name varchar(64) := '';
 	worksheet_dataset_id integer := null;
-	worksheet_table_name varchar(63) := '';
+	worksheet_table_name varchar(64) := '';
 	costcurve_dataset_id integer := null;
-	costcurve_table_name varchar(63) := '';
+	costcurve_table_name varchar(64) := '';
 	county_dataset_id integer := null;
 	county_dataset_version integer := null;
 	region RECORD;
@@ -311,6 +311,7 @@ BEGIN
 		cs_id,
 		cm_id,
 		original_dataset_id,
+		equation_type,
 		sector,
 		xloc,
 		yloc,
@@ -348,6 +349,7 @@ BEGIN
 		' || control_strategy_id || '::integer,
 		cm_id,
 		original_dataset_id,
+		equation_type,
 		sector,
 		xloc,
 		yloc,

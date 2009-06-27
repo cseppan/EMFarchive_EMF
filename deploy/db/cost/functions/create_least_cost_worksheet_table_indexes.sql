@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION create_least_cost_worksheet_table_indexes(table_name 
   RETURNS void AS
 $BODY$
 DECLARE
-	index_name varchar(63) := '';
+	index_name varchar(64) := '';
 	is_point_table boolean := false;
 BEGIN
 

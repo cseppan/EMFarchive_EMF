@@ -3,11 +3,11 @@ CREATE OR REPLACE FUNCTION public.run_apply_measures_in_series_strategy(control_
 	input_dataset_version integer, 
 	strategy_result_id int) RETURNS integer AS $$
 DECLARE
-	inv_table_name varchar(63) := '';
+	inv_table_name varchar(64) := '';
 	inv_filter varchar := '';
 	inv_fips_filter text := '';
 	detailed_result_dataset_id integer := null;
-	detailed_result_table_name varchar(63) := '';
+	detailed_result_table_name varchar(64) := '';
 	county_dataset_id integer := null;
 	county_dataset_version integer := null;
 	region RECORD;
@@ -322,15 +322,15 @@ BEGIN
 			inv.fips,
 			' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
 
-			TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.operation_maintenance_cost, ''FM999999999999999990'')::double precision as operation_maintenance_cost,
-			TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.annualized_capital_cost, ''FM999999999999999990'')::double precision as annualized_capital_cost,
-			TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.capital_cost, ''FM999999999999999990'')::double precision as capital_cost,
-			TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.annual_cost, ''FM999999999999999990'')::double precision as ann_cost,
-			TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton, ''FM999999999999999990'')::double precision as computed_cost_per_ton,
-			TO_CHAR(er.efficiency, ''FM990.099'')::double precision as efficiency,
-			TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ', ''FM990.099'')::double precision as rule_pen,
-			TO_CHAR(' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ', ''FM990.099'')::double precision as rule_eff,
-			TO_CHAR(' || percent_reduction_sql || ', ''FM990.099'')::double precision as percent_reduction,
+			' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.operation_maintenance_cost as operation_maintenance_cost,
+			' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.annualized_capital_cost as annualized_capital_cost,
+			' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.capital_cost as capital_cost,
+			' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.annual_cost as ann_cost,
+			' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton as computed_cost_per_ton,
+			er.efficiency as efficiency,
+			' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' as rule_pen,
+			' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
+			' || percent_reduction_sql || ' as percent_reduction,
 			inv.ceff,
 			' || case when is_point_table = false then 'inv.rpen' else '100' end || ' as rpen,
 			inv.reff,
@@ -423,10 +423,10 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION public.run_apply_measures_in_series_strategy_finalize(control_strategy_id integer, input_dataset_id integer, 
 	input_dataset_version integer, strategy_result_id int) RETURNS integer AS $$
 DECLARE
-	inv_table_name varchar(63) := '';
+	inv_table_name varchar(64) := '';
 	inv_fips_filter text := '';
 	detailed_result_dataset_id integer := null;
-	detailed_result_table_name varchar(63) := '';
+	detailed_result_table_name varchar(64) := '';
 	region RECORD;
 	target_pollutant_id integer := 0;
 	target_pollutant varchar(255) := '';

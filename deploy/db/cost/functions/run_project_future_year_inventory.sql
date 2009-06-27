@@ -55,7 +55,8 @@ DECLARE
 	annualized_uncontrolled_emis_sql character varying;
 	uncontrolled_emis_sql character varying;
 	emis_sql character varying;
-	percent_reduction_sql character varying;
+	cont_packet_percent_reduction_sql character varying;
+	inv_percent_reduction_sql character varying;
 	insert_column_list_sql character varying := '';
 	select_column_list_sql character varying := '';
 	column_name character varying;
@@ -629,7 +630,7 @@ BEGIN
 			--see http://www.smoke-model.org/version2.4/html/ch06s02.html for source matching hierarchy
 			sql := sql || '
 			select distinct on (record_id)
-				record_id,ceff,rpen,reff,pri_cm_abbrev,
+				record_id,ceff,rpen,reff,pri_cm_abbrev,replacement,
 				' || quote_literal(control_program.control_program_name) || ' as control_program_name, ' || control_program.control_program_id || ' as control_program_id,
 				' || control_program.control_program_technologies_count || ' as control_program_technologies_count, ' || control_program.control_program_measures_count || ' as control_program_measures_count, 
 				ranking
@@ -637,10 +638,10 @@ BEGIN
 				--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
 				select 
 					null::integer as record_id, null::double precision as ceff, null::double precision as rpen,
-					null::double precision as reff, null::character varying(10) as pri_cm_abbrev, null::integer as ranking
+					null::double precision as reff, null::character varying(10) as pri_cm_abbrev, null::character varying(1) as replacement, null::integer as ranking
 				where 1 = 0
 
-				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.ceff,proj.rpen,proj.reff,proj.pri_cm_abbrev,',control_program_dataset_filter_sql || ' and application_control = ''Y'' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone') || '
+				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.ceff,proj.rpen,proj.reff,proj.pri_cm_abbrev,proj.replacement,',control_program_dataset_filter_sql || ' and proj.application_control = ''Y'' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone') || '
 			) tbl';
 		END IF;
 
@@ -649,14 +650,16 @@ BEGIN
 
 	IF length(sql) > 0 THEN
 		raise notice '%', 'next lets do controls ' || clock_timestamp();
-		sql := sql || ' order by record_id, ranking';
+		sql := sql || ' order by record_id, replacement desc, ranking';
 
+		inv_percent_reduction_sql := '(coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end, 0.0) * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end, 100) / 100 ' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end, 100.0) / 100.0 ' else '' end || ')';
+		cont_packet_percent_reduction_sql := '(cont.ceff * coalesce(cont.reff, 100) / 100 * coalesce(cont.rpen, 100) / 100)';
 		uncontrolled_emis_sql := 
 				case 
 					when dataset_month != 0 then 
-						'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when dr.record_id is not null then dr.final_emissions else coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+						'case when (1 - ' || inv_percent_reduction_sql || ' / 100) != 0 then case when dr.record_id is not null then dr.final_emissions else coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end' 
 					else 
-						'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when dr.record_id is not null then dr.final_emissions else inv.ann_emis end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+						'case when (1 - ' || inv_percent_reduction_sql || ' / 100) != 0 then case when dr.record_id is not null then dr.final_emissions else inv.ann_emis end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end' 
 				end;
 		emis_sql := 
 				case 
@@ -668,19 +671,22 @@ BEGIN
 		annualized_uncontrolled_emis_sql := 
 				case 
 					when dataset_month != 0 then 
-						'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when dr.record_id is not null then dr.final_emissions else coalesce(inv.avd_emis * 365, inv.ann_emis) end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+						'case when (1 - coalesce(' || inv_percent_reduction_sql || ' / 100, 0)) != 0 then case when dr.record_id is not null then dr.final_emissions else coalesce(inv.avd_emis * 365, inv.ann_emis) end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end'
 					else 
-						'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when dr.record_id is not null then dr.final_emissions else inv.ann_emis end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+						'case when (1 - coalesce(' || inv_percent_reduction_sql || ' / 100, 0)) != 0 then case when dr.record_id is not null then dr.final_emissions else inv.ann_emis end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end'
 				end;
 
 
 
-		percent_reduction_sql := 'cont.ceff * coalesce(cont.reff, 100) * coalesce(cont.rpen, 100) / 100 / 100';
 		get_strategt_cost_sql := '(public.get_strategy_costs(' || case when use_cost_equations then 'true' else 'false' end || '::boolean, m.id, 
 				abbreviation, ' || discount_rate|| ', 
 				m.equipment_life, er.cap_ann_ratio, 
 				er.cap_rec_factor, er.ref_yr_cost_per_ton, 
-				' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ' || ref_cost_year_chained_gdp || ' / cast(chained_gdp as double precision), 
+				case 
+					when cont.replacement = ''R'' then ' || uncontrolled_emis_sql || ' * ' || cont_packet_percent_reduction_sql || ' / 100.0
+					when cont.replacement = ''A'' then ' || emis_sql || ' * ' || cont_packet_percent_reduction_sql || ' / 100.0
+				end
+				, ' || ref_cost_year_chained_gdp || ' / cast(chained_gdp as double precision), 
 				' || case when use_cost_equations then 
 				'et.name, 
 				eq.value1, eq.value2, 
@@ -751,37 +757,56 @@ BEGIN
 			)
 		select distinct on (inv.record_id)
 			' || detailed_result_dataset_id || '::integer,
-			coalesce(cont.pri_cm_abbrev, case when cont.ceff <> 0 /*and abs(cont.ceff - er.efficiency) <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision */then m.abbreviation else null::character varying end, ''UNKNOWNMSR'') as abbreviation,
+			coalesce(cont.pri_cm_abbrev, case when cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision then m.abbreviation else null::character varying end, ''UNKNOWNMSR'') as abbreviation,
 			inv.poll,
 			inv.scc,
 			inv.fips,
 			' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
-			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 /*/*and abs(cont.ceff - er.efficiency) <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision */*/then TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.operation_maintenance_cost, ''FM999999999999999990'')::double precision else null::double precision end as operation_maintenance_cost,
-			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 /*and abs(cont.ceff - er.efficiency) <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision */then TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annualized_capital_cost, ''FM999999999999999990'')::double precision else null::double precision end as annualized_capital_cost,
-			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 /*and abs(cont.ceff - er.efficiency) <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision */then TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.capital_cost, ''FM999999999999999990'')::double precision else null::double precision end as capital_cost,
-			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 /*and abs(cont.ceff - er.efficiency) <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision */then TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annual_cost, ''FM999999999999999990'')::double precision else null::double precision end as ann_cost,
-			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 /*and abs(cont.ceff - er.efficiency) <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision */then TO_CHAR(' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.computed_cost_per_ton, ''FM999999999999999990'')::double precision else null::double precision end as computed_cost_per_ton,
-/*
-
-			null::double precision as operation_maintenance_cost,
-			null::double precision as annualized_capital_cost,
-			null::double precision as capital_cost,
-			null::double precision as ann_cost,
-			null::double precision as computed_cost_per_ton,
-*/			
-			cont.ceff as control_eff,
-			coalesce(cont.rpen, 100) as rule_pen,
-			coalesce(cont.reff, 100) as rule_eff,
-			cont.ceff * coalesce(cont.rpen, 100) * coalesce(cont.reff, 100) / 100 / 100 as percent_reduction,
-			inv.ceff,
-			' || case when is_point_table = false then 'case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end' else '100' end || ',
-			case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end,
-			cont.ceff * coalesce(cont.rpen, 100) * coalesce(cont.reff, 100) / 100 / 100 / 100 as adj_factor,
-			case when cont.ceff <> 0 then ' || uncontrolled_emis_sql || ' * (1 - cont.ceff * coalesce(cont.rpen, 100) * coalesce(cont.reff, 100) / 100 / 100 / 100) else ' || emis_sql || ' end as final_emissions,
-			case when cont.ceff <> 0 then ' || uncontrolled_emis_sql || ' * cont.ceff * coalesce(cont.rpen, 100) * coalesce(cont.reff, 100) / 100 / 100 / 100 else 0.0 end as emis_reduction,
-			case when cont.ceff <> 0 then ' || uncontrolled_emis_sql || ' else ' || emis_sql || ' end as inv_emissions,
-	--				' || uncontrolled_emis_sql || ' as input_emis,
-	--				0.0 as output_emis,
+			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0 then ' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.operation_maintenance_cost else null::double precision end as operation_maintenance_cost,
+			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0 then ' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annualized_capital_cost else null::double precision end as annualized_capital_cost,
+			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0 then ' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.capital_cost else null::double precision end as capital_cost,
+			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0 then ' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annual_cost else null::double precision end as ann_cost,
+			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0 then ' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.computed_cost_per_ton else null::double precision end as computed_cost_per_ton,
+			case 
+				when cont.replacement = ''R'' then cont.ceff 
+				when cont.replacement = ''A'' then ' || inv_percent_reduction_sql || ' + ' || cont_packet_percent_reduction_sql || ' * ( 100.0 - ' || inv_percent_reduction_sql || ') / 100.0
+			end as control_eff,
+			case 
+				when cont.replacement = ''R'' then coalesce(cont.rpen, 100)
+				when cont.replacement = ''A'' then 100.0
+			end as rule_pen,
+			case 
+				when cont.replacement = ''R'' then coalesce(cont.reff, 100)
+				when cont.replacement = ''A'' then 100.0
+			end as rule_eff,
+			case 
+				when cont.replacement = ''R'' then ' || cont_packet_percent_reduction_sql || '
+				when cont.replacement = ''A'' then ' || inv_percent_reduction_sql || ' + ' || cont_packet_percent_reduction_sql || ' * ( 100.0 - ' || inv_percent_reduction_sql || ') / 100.0
+			end as percent_reduction,
+			inv.ceff as inv_ceff,
+			' || case when is_point_table = false then 'case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end' else '100' end || ' as inv_rpen,
+			case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end as inv_reff,
+			' || inv_percent_reduction_sql || ' / 100 as inv_pct_red,
+			case 
+				when cont.replacement = ''R'' then 
+					case 
+						when cont.ceff <> 0 then 
+						' || uncontrolled_emis_sql || ' * (1 - ' || cont_packet_percent_reduction_sql || ' / 100) 
+						else ' || emis_sql || ' 
+					end 
+				when cont.replacement = ''A'' then ' || emis_sql || ' * (1 - ' || cont_packet_percent_reduction_sql || ' / 100)
+			end as final_emissions,
+			case 
+				when cont.replacement = ''R'' then 
+					case 
+						when cont.ceff <> 0 then ' || uncontrolled_emis_sql || ' * ' || cont_packet_percent_reduction_sql || ' / 100 
+						else 0.0 
+					end 
+				when cont.replacement = ''A'' then ' || emis_sql || ' * ' || cont_packet_percent_reduction_sql || ' / 100
+			end as emis_reduction,
+			' || emis_sql || '  as inv_emissions,
+--				' || uncontrolled_emis_sql || ' as input_emis,
+--				0.0 as output_emis,
 			2,
 			substr(inv.fips, 1, 2),
 			substr(inv.fips, 3, 3),
@@ -791,7 +816,7 @@ BEGIN
 			' || input_dataset_id || '::integer,
 			' || control_strategy_id || '::integer,
 			null::integer as control_measures_id,
-			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(cont.ceff - er.efficiency) / cont.ceff * 100 <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision then ' || get_strategt_cost_sql || '.actual_equation_type else null::varchar(255) end as equation_type,
+			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0  then ' || get_strategt_cost_sql || '.actual_equation_type else null::varchar(255) end as equation_type,
 			cont.control_program_name,
 			' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
 			' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
@@ -830,8 +855,9 @@ BEGIN
 			-- effecive date filter
 			and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)		
 			and abs(er.efficiency - cont.ceff) <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision
-
-
+			and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0
+--			and ' || cont_packet_percent_reduction_sql || ' <> 0.0
+			
 			left outer join emf.control_measures m
 			on m.id = er.control_measures_id
 			-- control program measure and technology filter
@@ -859,15 +885,22 @@ BEGIN
 			on gdplev.annual = eq.cost_year
 
 		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-			and (cont.ceff * coalesce(cont.rpen, 100.0) * coalesce(cont.reff, 100.0) >= coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end, 0.0) * ' || case when has_rpen_column then ' coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end, 100.0)' else '100.0' end || ' * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end, 100) or cont.ceff = 0.0)
-
+			and (
+				(cont.replacement = ''R'' 
+					and (
+						(' || cont_packet_percent_reduction_sql || ' >= ' || inv_percent_reduction_sql || ')
+						or cont.ceff = 0.0
+					)
+				)
+				or (cont.replacement = ''A'')
+			)
 
 		order by inv.record_id, 
 			--makes sure we get the highest ranking control packet record
 			cont.ranking,
 			case when length(er.locale) = 5 then 0 when length(er.locale) = 2 then 1 else 2 end, 	
 			cont.ceff - er.efficiency,
-			' || percent_reduction_sql || ' desc, 
+			' || cont_packet_percent_reduction_sql || ' desc, 
 			' || get_strategt_cost_sql || '.computed_cost_per_ton';
 	END IF;
 
@@ -989,33 +1022,6 @@ BEGIN
 					else 
 						'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else inv.ann_emis end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
 				end;
-
-		percent_reduction_sql := 'cont.ceff * coalesce(cont.reff, 100) * coalesce(cont.rpen, 100) / 100 / 100';
-		get_strategt_cost_sql := '(public.get_strategy_costs(' || case when use_cost_equations then 'true' else 'false' end || '::boolean, m.id, 
-				abbreviation, ' || discount_rate|| ', 
-				m.equipment_life, er.cap_ann_ratio, 
-				er.cap_rec_factor, er.ref_yr_cost_per_ton, 
-				' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ' || ref_cost_year_chained_gdp || ' / cast(chained_gdp as double precision), 
-				' || case when use_cost_equations then 
-				'et.name, 
-				eq.value1, eq.value2, 
-				eq.value3, eq.value4, 
-				eq.value5, eq.value6, 
-				eq.value7, eq.value8, 
-				eq.value9, eq.value10, 
-				' || case when not is_point_table then 'null' else 'inv.stkflow' end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity' end end || ', 
-				' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_numerator' end end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_denominator' end end 
-				else
-				'null, 
-				null, null, 
-				null, null, 
-				null, null, 
-				null, null, 
-				null, null, 
-				null, null, 
-				null, null'
-				end
-				|| '))';
 
 
 		-- make sure the apply order is 4,....this is important when the controlled inventpory is created.

@@ -8,7 +8,7 @@
 
 --SELECT public.populate_least_cost_strategy_detailed_result(9, 2474, 0, 224, 36797.935745::double precision);
 
-CREATE OR REPLACE FUNCTION public.narrow_in_on_least_cost_target(worksheet_table_name varchar(63), 
+CREATE OR REPLACE FUNCTION public.narrow_in_on_least_cost_target(worksheet_table_name varchar(64), 
 	target_pollutant varchar, 
 	domain_wide_emis_reduction double precision) RETURNS integer AS $$
 DECLARE
