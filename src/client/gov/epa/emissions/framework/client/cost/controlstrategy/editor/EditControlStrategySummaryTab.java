@@ -160,7 +160,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         
         layoutGenerator.addLabelWidgetPair("Project:", projects(), panelTop);
         panelBottom.add(middleLeftPanel, BorderLayout.WEST);
-        panelBottom.add(middleRightPanel, BorderLayout.EAST);
+        panelBottom.add(middleRightPanel, BorderLayout.CENTER);
 //        layoutGenerator.addWidgetPair(middleLeftPanel, middleRightPanel, panelBottom);
 //        layoutGenerator.addLabelWidgetPair("Creator:", creator(), panelTop);
 //        layoutGenerator.addLabelWidgetPair("Last Modified Date: ", lastModifiedDate(), panelTop);
