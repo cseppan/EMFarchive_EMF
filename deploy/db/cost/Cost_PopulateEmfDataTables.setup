@@ -9,7 +9,7 @@ insert into emf.strategy_types values(DEFAULT,'Project Future Year Inventory','P
 
 -- emf.strategy_result_types
 insert into emf.strategy_result_types (name, optional, classname) select 'Strategy Detailed Result', false, '';
-insert into emf.strategy_result_types (name, optional, classname) select 'Strategy Summary', false, '';
+insert into emf.strategy_result_types (name, optional, classname) select 'Strategy Measure Summary', false, '';
 insert into emf.strategy_result_types (name, optional, classname) select 'Least Cost Control Measure Worksheet', false, '';
 insert into emf.strategy_result_types (name, optional, classname) select 'Controlled Inventory', false, '';
 insert into emf.strategy_result_types (name, optional, classname) select 'Least Cost Curve Summary', false, '';
@@ -18,6 +18,8 @@ insert into emf.strategy_result_types (name, optional, classname) select 'Strate
 insert into emf.strategy_result_types (name, optional, classname) select 'Strategy County Summary', false, 'gov.epa.emissions.framework.services.cost.analysis.StrategyCountySummaryTask';
 insert into emf.strategy_result_types (name, optional, classname) select 'Strategy Impact Summary', true, 'gov.epa.emissions.framework.services.cost.analysis.StrategyCountyImpactSummaryTask';
 insert into emf.strategy_result_types (name, optional, classname) select 'RSM Percent Reduction Summary', true, 'gov.epa.emissions.framework.services.cost.analysis.StrategyRSMPctRedSummaryTask';
+insert into emf.strategy_result_types (name) select 'Projected Future Year Inventory';
+insert into emf.strategy_result_types (name) select 'Strategy Summary';
 
 
 -- emf.strategy_result_types
@@ -84,21 +86,21 @@ insert into emf.control_program_types values (DEFAULT, 'Allowable', 'Allowable',
 --emf.equation_types
 -- Add Equations
 insert into emf.equation_types (name, description)
-select 'Type 1', 'Type 1';
+select 'Type 1', 'EGU';
 insert into emf.equation_types (name, description)
-select 'Type 2', 'Type 2';
+select 'Type 2', 'Non-EGU NOx';
 insert into emf.equation_types (name, description)
-select 'Type 3', 'Type 3';
+select 'Type 3', 'Non-EGU SO2';
 insert into emf.equation_types (name, description)
-select 'Type 4', 'Type 4';
+select 'Type 4', 'Non-EGU SO2';
 insert into emf.equation_types (name, description)
-select 'Type 5', 'Type 5';
+select 'Type 5', 'Non-EGU SO2';
 insert into emf.equation_types (name, description)
-select 'Type 6', 'Type 6';
+select 'Type 6', 'Non-EGU SO2';
 insert into emf.equation_types (name, description)
 select 'Type 7', 'Type 7';
 insert into emf.equation_types (name, description)
-select 'Type 8', 'Type 8';
+select 'Type 8', 'Non-EGU PM';
 
 
 -- Add Eqaution Variables
