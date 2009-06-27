@@ -138,8 +138,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                     messagePanel.setMessage("Please wait while copying control measures...");
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     copySelectedControlMeasures();
-                    this.populateThread = null;
-                    doRefresh();
+                    refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs, showDetailsCheckBox.isSelected()));
                     messagePanel.clear();
                 } catch (Exception e) {
                     messagePanel.setError("Cannot copy control measures.  " + e.getMessage());
