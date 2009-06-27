@@ -280,9 +280,9 @@ public abstract class AbstractStrategyTask implements Strategy {
             //NOTE:  Still need to  support mobile monthly files
             String sql = "INSERT INTO " + qualifiedEmissionTableName(summaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, scc, poll, Control_Measure_Abbreviation, Control_Measure, Control_Technology, source_group, avg_ann_cost_per_ton, Annual_Cost, Emis_Reduction) " 
             + "select " + summaryResult.getDetailedResultDataset().getId() + ", 0, summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name as Control_Technology, sg.name, "
-            + "TO_CHAR(case when sum(summary.Emis_Reduction) <> 0 then sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) else null end, 'FM999999999999999990')::double precision as avg_cost_per_ton, " 
-            + "TO_CHAR(sum(summary.Annual_Cost), 'FM999999999999999990')::double precision as Annual_Cost, "
-            + "TO_CHAR(sum(summary.Emis_Reduction), 'FM999999999999999990.0099')::double precision as Emis_Reduction " 
+            + "case when sum(summary.Emis_Reduction) <> 0 then sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) else null::double precision end as avg_cost_per_ton, " 
+            + "sum(summary.Annual_Cost) as Annual_Cost, "
+            + "sum(summary.Emis_Reduction) as Emis_Reduction " 
             + "from (";
             int count = 0;
             for (int i = 0; i < results.length; i++) {
@@ -320,7 +320,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             //SET work_mem TO '512MB';
             //NOTE:  Still need to  support mobile monthly files
             String sql = "INSERT INTO " + qualifiedEmissionTableName(countySummaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, poll, Uncontrolled_Emis, Emis_Reduction, Remaining_Emis, Pct_Red, Annual_Cost, Annual_Oper_Maint_Cost, Annualized_Capital_Cost, Total_Capital_Cost, Avg_Ann_Cost_per_Ton) " 
-            + "select " + countySummaryResult.getDetailedResultDataset().getId() + ", 0, sector, fips, poll, TO_CHAR(Uncontrolled_Emis, 'FM999999999999999990.0099')::double precision, TO_CHAR(Emis_Reduction, 'FM999999999999999990.0099')::double precision, TO_CHAR(Remaining_Emis, 'FM999999999999999990.0099')::double precision, TO_CHAR(Pct_Red, 'FM999999999999999990.0099')::double precision, TO_CHAR(Annual_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Annual_Oper_Maint_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Annualized_Capital_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Total_Capital_Cost, 'FM999999999999999990')::double precision, TO_CHAR(Avg_Ann_Cost_per_Ton, 'FM999999999999999990')::double precision " 
+            + "select " + countySummaryResult.getDetailedResultDataset().getId() + ", 0, sector, fips, poll, Uncontrolled_Emis, Emis_Reduction, Remaining_Emis, Pct_Red, Annual_Cost, Annual_Oper_Maint_Cost, Annualized_Capital_Cost, Total_Capital_Cost, Avg_Ann_Cost_per_Ton " 
             + "from (";
             int count = 0;
             

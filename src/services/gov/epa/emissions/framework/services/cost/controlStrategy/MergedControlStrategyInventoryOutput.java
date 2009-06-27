@@ -154,7 +154,7 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
                 sql += ", 0 as version";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("ceff")) {
-                sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then TO_CHAR((1- b.final_emissions / b.starting_emissions) * 100, 'FM990.099')::double precision else null::double precision end else ceff end as ceff";
+                sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then (1- b.final_emissions / b.starting_emissions) * 100 else null::double precision end else ceff end as ceff";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("avd_emis")) {
                 sql += ", case when b.source_id is not null then b.final_emissions / " + (month != -1 ? noOfDaysInMonth : "365") + " else avd_emis end as avd_emis";
@@ -201,7 +201,7 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
         + "max(input_emis) as starting_emissions, "
         + "sum(annual_cost) as annual_cost, "
         + "public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list, "
-        + "public.concatenate_with_ampersand(TO_CHAR(percent_reduction, 'FM990.099')) as percent_reduction_list "
+        + "public.concatenate_with_ampersand(percent_reduction) as percent_reduction_list "
         + "FROM (select source_id, input_emis, final_emissions, annual_cost, cm_abbrev, percent_reduction "
         + "        FROM " + qualifiedTable(detailResultTableName, datasource)
         + "        WHERE ORIGINAL_DATASET_ID = " + invDataset.getId()

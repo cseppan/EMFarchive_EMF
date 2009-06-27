@@ -260,8 +260,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
                 sql += ", 0 as version";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("ceff")) {
-                sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then TO_CHAR((1- b.final_emissions / b.starting_emissions) * 100, 'FM990.099')::double precision else null::double precision end else ceff end as ceff";
-//              sql += ", case when b.source_id is not null then case when " + (month != -1 ? "coalesce(avd_emis, ann_emis)" : "ann_emis") + " <> 0 then TO_CHAR((1 - " + (month != -1 ? "b.final_emissions / " + noOfDaysInMonth + " / coalesce(avd_emis, ann_emis)" : "b.final_emissions / ann_emis") + ") * 100, 'FM990.099')::double precision else 0.0 end else ceff end as ceff";
+                sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then (1- b.final_emissions / b.starting_emissions) * 100 else null::double precision end else ceff end as ceff";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("avd_emis")) {
                 sql += ", case when b.source_id is not null then b.final_emissions / " + (month != -1 ? noOfDaysInMonth : "365") + " else avd_emis end as avd_emis";
@@ -309,7 +308,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
         + "max(input_emis) as starting_emissions, "
         + "sum(annual_cost) as annual_cost, "
         + "public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list, "
-        + "public.concatenate_with_ampersand(TO_CHAR(percent_reduction, 'FM990.099')) as percent_reduction_list "
+        + "public.concatenate_with_ampersand(percent_reduction) as percent_reduction_list "
         + "FROM (select source_id, input_emis, final_emissions, annual_cost, cm_abbrev, percent_reduction "
         + "        FROM " + qualifiedTable(detailResultTable, datasource)
         + "        order by source_id, apply_order "
