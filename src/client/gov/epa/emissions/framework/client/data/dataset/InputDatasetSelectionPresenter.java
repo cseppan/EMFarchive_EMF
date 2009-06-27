@@ -44,7 +44,7 @@ public class InputDatasetSelectionPresenter {
     }
     
     public EmfDataset[] getDatasets() throws EmfException {
-        //get full, becuase future methods/functions might expect the fully populated object.
+        //get full, because future methods/functions might expect the fully populated object.
         return getFullDatasets(view.getDatasets());
     }
     

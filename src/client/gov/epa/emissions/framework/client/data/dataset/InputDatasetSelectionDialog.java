@@ -25,6 +25,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
@@ -32,7 +33,7 @@ import javax.swing.SpringLayout;
 
 public class InputDatasetSelectionDialog extends JDialog implements InputDatasetSelectionView {
 
-//    private EmfConsole parent;
+    private EmfConsole parent;
 
     private InputDatasetSelectionPresenter presenter;
 
@@ -49,7 +50,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     public InputDatasetSelectionDialog(EmfConsole parent) {
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
-//        this.parent = parent;
+        this.parent = parent;
         setModal(true);
     }
 
@@ -175,19 +176,21 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private Action okAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if (datasetList.getSelectedValues() == null || datasetList.getSelectedValues().length == 0) 
+                if (datasetList.getSelectedValues() == null || datasetList.getSelectedValues().length == 0) { 
                     datasets = new EmfDataset[]{}; 
-                else {
+                    JOptionPane.showMessageDialog(parent, 
+                            "Please choose some datasets", 
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
                     // get selected datasets
                     List<EmfDataset> list = new ArrayList<EmfDataset>(datasetList.getSelectedValues().length);
                     for (int i = 0; i < datasetList.getSelectedValues().length; i++)
                         list.add((EmfDataset) datasetList.getSelectedValues()[i]);
                     datasets = list.toArray(new EmfDataset[0]);
-                }
-                if (datasets.length>0)
                     shouldCreate = true; 
-                setVisible(false);
-                dispose();
+                    setVisible(false);
+                    dispose();
+                }
             }
         };
     }
