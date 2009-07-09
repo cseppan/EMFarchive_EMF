@@ -43,4 +43,12 @@ public interface EditQAStepView extends ManagedView {
     void updateArguments(Object temporalProfile, 
             Object[] smkRpts,
             Object year);
+
+    void updateCompareAnnualStateSummariesArguments(Object[] inventories, 
+            Object[] smkRpts,
+            Object invTable,
+            Object tolerance, Object coStCy);
+
+    void updateCompareAnnualStateSummariesArguments(Object[] smkRpts, Object coStCy, Object[] polls, Object[] species,
+            Object[] exclPollutants);
 }
