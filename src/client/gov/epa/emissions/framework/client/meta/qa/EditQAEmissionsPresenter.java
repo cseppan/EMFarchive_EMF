@@ -64,4 +64,12 @@ public class EditQAEmissionsPresenter {
                 smkRpts,
                 year);
     }
+
+    public void updateCompareAnnualStateSummariesDatasets(Object[] inventories, Object[] smkRpts, Object invTable, Object tolerance, Object coStCy) {
+        editQAStepView.updateCompareAnnualStateSummariesArguments(inventories, 
+                smkRpts,
+                invTable,
+                tolerance,
+                coStCy);
+    }
 }
