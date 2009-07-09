@@ -1237,4 +1237,209 @@ public class DataServiceImpl implements DataService {
         }
     }
 
+//    public synchronized void importRemoteEMFDataset(int externalDatasetAccessId, User user) throws EmfException {
+//        Connection connection = null;
+//        Statement st = null;
+//        ResultSet rs = null;
+//        Connection connection2 = null;
+//        Statement st2 = null;
+//        String datasetName = "";
+//        String tableName = "";
+//        String newDatasetName = "";
+//        String datasetTypeName = "";
+//        String datasetDescription = "";
+//        Date time = new Date();
+//        Session session = sessionFactory.getSession();
+//        DbServer dbServer = dbServerFactory.getDbServer();
+//        
+//        //testing something here...
+//        try {
+//            connection = new DataSourceFactory().getEISDataSource().getConnection();
+//            System.out.println(new Date());
+//            System.out.println(System.currentTimeMillis());
+//            st = connection.createStatement();
+//            //lets get the remote dataset name and dataset type...
+//            rs = st.executeQuery("select * from emf.get_external_datasets where external_dataset_access_id = " + externalDatasetAccessId + ";");
+//            while (rs.next())
+//            {
+//                datasetName = rs.getString("dataset_name");
+//                datasetTypeName = rs.getString("dataset_type_name");
+//                datasetDescription = rs.getString("dataset_description");
+//                
+//            }
+//
+//
+//            DatasetType datasetType = new DataCommonsDAO().getDatasetType(datasetTypeName, session);
+//            if (datasetType == null) 
+//                throw new EmfException("Unknown dataset type from the remote EMF database.");
+//            System.out.println(new Date());
+//            System.out.println(System.currentTimeMillis());
+//            EmfDataset copied = new EmfDataset();
+//            newDatasetName = getUniqueNewName(datasetName);
+//            copied.setName(newDatasetName);
+//            copied.setDatasetType(datasetType);
+//            copied.setStatus("Started import");
+//            copied.setDescription(datasetDescription);
+//            copied.setCreator(user.getUsername());
+//            copied.setDefaultVersion(0);
+//            copied.setInternalSources(null);
+//
+//            copied.setCreatedDateTime(time);
+//            copied.setAccessedDateTime(time);
+//            copied.setModifiedDateTime(time);
+//
+//            tableName = createTableName(newDatasetName);
+//            TableFormat tableFormat = (new FileFormatFactory(dbServer)).tableFormat(datasetType);
+//            TableCreator creator = new TableCreator(dbServer.getEmissionsDatasource());
+//            try {
+//                if (creator.exists(tableName))
+//                    throw new EmfException("Dataset table '" + tableName + "' already exists.");
+//
+//                creator.create(tableName, tableFormat);
+//            } catch (Exception e) {
+//                throw new EmfException("Could not create table '" + tableName + "'+\n" + e.getMessage());
+//            }
+//
+//            InternalSource internalSource = new InternalSource();
+//            internalSource.setTable(tableName);
+//            internalSource.setType(tableFormat.identify());
+//            internalSource.setCols(colNames(tableFormat.cols()));
+//            internalSource.setSource(copied.getName());
+//            copied.setInternalSources(new InternalSource[] { internalSource });
+//
+////            session.clear();
+//            System.out.println(new Date());
+//            System.out.println(System.currentTimeMillis());
+//            dao.add(copied, session);
+//            System.out.println(new Date());
+//            System.out.println(System.currentTimeMillis());
+//            EmfDataset loaded = dao.getDataset(session, copied.getName());
+//            EmfDataset locked = dao.obtainLocked(user, loaded, session);
+//
+//            System.out.println(new Date());
+//            System.out.println(System.currentTimeMillis());
+//            if (locked == null)
+//                throw new EmfException("Errror importing dataset: can't obtain lock to update dataset.");
+//
+////            try {
+////                if (st != null) {
+////                    if (!st.isClosed()) st.close();
+////                    st = null;
+////                }
+////                if (connection != null) {
+////                    if (!connection.isClosed()) connection.close();
+////                    connection = null;
+////                }
+////            } catch (RuntimeException e) {
+////                // NOTE Auto-generated catch block
+////                e.printStackTrace();
+////            }
+//            
+////            copyDatasetTable(dataset, version, loaded, user, session);
+//            System.out.println(new Date());
+//            System.out.println(System.currentTimeMillis());
+//
+//            Version defaultVersion = new Version(0);
+//            defaultVersion.setName("Initial Version");
+//            defaultVersion.setPath("");
+//            defaultVersion.setCreator(user);
+//            defaultVersion.setDatasetId(locked.getId());
+//            defaultVersion.setLastModifiedDate(time);
+//            defaultVersion.setNumberRecords(0);
+//            defaultVersion.setFinalVersion(true);
+//            dao.add(defaultVersion, session);
+//            session.flush();
+//            
+//            connection2 = new DataSourceFactory().get().getConnection();
+//            System.out.println(new Date());
+//            System.out.println(System.currentTimeMillis());
+//            st2 = connection2.createStatement();
+//            st2.execute("select public.populate_external_dataset(" + externalDatasetAccessId + "::integer, " + locked.getId() + "::integer);");
+//            System.out.println(new Date());
+//            System.out.println(System.currentTimeMillis());
+//        } catch (SQLException e) {
+//            // NOTE Auto-generated catch block
+//            e.printStackTrace();
+//            throw new EmfException(e.getMessage());
+//        } catch (Exception e) {
+//            // NOTE Auto-generated catch block
+//            e.printStackTrace();
+//            throw new EmfException(e.getMessage());
+//        } finally {
+//            session.close();
+//            try {
+//                dbServer.disconnect();
+//                if (rs != null) {
+//                    if (!rs.isClosed()) rs.close();
+//                    rs = null;
+//                }
+//                if (st != null) {
+//                    if (!st.isClosed()) st.close();
+//                    st = null;
+//                }
+//                if (connection != null) {
+//                    if (!connection.isClosed()) connection.close();
+//                    connection = null;
+//                }
+//                if (st2 != null) {
+//                    if (!st2.isClosed()) st2.close();
+//                    st2 = null;
+//                }
+//                if (connection2 != null) {
+//                    if (!connection2.isClosed()) connection2.close();
+//                    connection2 = null;
+//                }
+//            } catch (SQLException e) {
+//                // NOTE Auto-generated catch block
+//                e.printStackTrace();
+//            } catch (Exception e) {
+//                // NOTE Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//                
+//        }
+//      }
+
+//    private String[] colNames(Column[] cols) {
+//        List names = new ArrayList();
+//        for (int i = 0; i < cols.length; i++)
+//            names.add(cols[i].name());
+//
+//        return (String[]) names.toArray(new String[0]);
+//    }
+//    private String createTableName(String name) {
+//        String table = name;
+//        //truncate if necessary so a unique timestamp can be added to ensure uniqueness
+//        if (table.length() > 46) {     //postgresql table name max length is 64
+//            table = table.substring(0, 45);
+//        }
+//
+//        for (int i = 0; i < table.length(); i++) {
+//            if (!Character.isLetterOrDigit(table.charAt(i))) {
+//                table = table.replace(table.charAt(i), '_');
+//            }
+//        }
+//
+//        //add unique timestamp to ensure uniqueness
+//        return table.trim().replaceAll(" ", "_") + "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date());
+//    }
+
+    public String[] getTableColumnDistinctValues(int datasetId, int datasetVersion, String columnName, String whereFilter,
+            String sortOrder) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getTableColumnDistinctValues(datasetId, datasetVersion, 
+                    columnName, whereFilter, 
+                    sortOrder, session, 
+                    dbServer);
+        } catch (Exception e) {
+            LOG.error("Error: ", e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+            closeDB(dbServer);
+        }
+    }
 }

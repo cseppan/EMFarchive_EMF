@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
@@ -9,6 +10,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
@@ -1150,4 +1152,46 @@ public class DatasetDAO {
         hibernateFacade.update(srcs, session);
     }
 
+    public String[] getTableColumnDistinctValues(int datasetId, int datasetVersion, String columnName, String whereFilter, String sortOrder, Session session, DbServer dbServer) throws EmfException {
+        List<String> values = new ArrayList<String>();
+        ResultSet rs = null;
+        try {
+            EmfDataset dataset = getDataset(session, datasetId);
+            Version version = version(session, datasetId, dataset.getDefaultVersion());
+            String datasetVersionedQuery = new VersionedQuery(version).query();
+            String query = "select distinct " + columnName + " from " + qualifiedEmissionTableName(dataset) + " where " + datasetVersionedQuery + (whereFilter != null && whereFilter.trim().length() > 0 ? " and (" + whereFilter + ")": "") + " order by " + (sortOrder != null && sortOrder.trim().length() > 0 ? sortOrder : columnName) + ";";
+            rs = dbServer.getEmissionsDatasource().query().executeQuery(query);
+            while (rs.next()) {
+                values.add(rs.getString(1));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new EmfException(e.getMessage());//new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            //
+        }
+        return values.toArray(new String[0]);
+    }
+
+    private Version version(Session session, int datasetId, int version) {
+        Versions versions = new Versions();
+        return versions.get(datasetId, version, session);
+    }
+    private String qualifiedEmissionTableName(Dataset dataset) {
+        return qualifiedName(emissionTableName(dataset));
+    }
+
+    private String emissionTableName(Dataset dataset) {
+        InternalSource[] internalSources = dataset.getInternalSources();
+        return internalSources[0].getTable();
+    }
+
+    private String qualifiedName(String table) {
+        return "emissions." + table;
+    }
+
+    public void importRemoteDataset() {
+        //
+        
+    }
 }

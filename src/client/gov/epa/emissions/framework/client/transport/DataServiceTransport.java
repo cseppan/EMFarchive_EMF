@@ -383,4 +383,32 @@ public class DataServiceTransport implements DataService {
         return (Integer)call.requestResponse(new Object[]{table, version, filter});
     }
 
+//    public void importRemoteEMFDataset(int externalDatasetAccessId, User user) throws EmfException {
+//        EmfCall call = call();
+//        
+//        call.setOperation("importRemoteEMFDataset");
+//        call.addIntegerParam("externalDatasetAccessId");
+//        call.addParam("user", mappings.user());
+//        call.setVoidReturnType();
+//        
+//        call.request(new Object[]{new Integer(externalDatasetAccessId), user});
+//    }
+
+    public String[] getTableColumnDistinctValues(int datasetId, int datasetVersion, String columnName, String whereFilter,
+            String sortOrder) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getTableColumnDistinctValues");
+        call.addIntegerParam("datasetId");
+        call.addIntegerParam("datasetVersion");
+        call.addStringParam("columnName");
+        call.addStringParam("whereFilter");
+        call.addStringParam("sortOrder");
+        call.setStringArrayReturnType();
+        
+        return (String[])call.requestResponse(new Object[] { new Integer(datasetId), new Integer(datasetVersion), 
+                columnName, whereFilter, sortOrder});
+        
+    }
+
 }
