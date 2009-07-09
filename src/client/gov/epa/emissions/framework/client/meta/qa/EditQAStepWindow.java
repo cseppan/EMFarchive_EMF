@@ -158,9 +158,24 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private static final String MultiInvDifRepProgram = "Multi-inventory difference report";
     private static final String CompareControlStrategies = "Compare Control Strategies";
     private static final String createMoEmisByCountyFromAnnEmisProgram = "Create monthly emissions by county from annual emissions";
+    private static final String compareAnnStateSummaryProgram = "Compare annual state summaries";
+    
+    private static final String annStateSummaryCrosstabProgram = "Annual state summaries crosstab";
     
     private static final String sqlProgram = "SQL";
     
+    public static final String smkRptTag = "-smkrpt";
+
+    public static final String coStCyTag = "-costcy";
+
+    public static final String pollListTag = "-polllist";
+
+    public static final String specieListTag = "-specielist";
+
+    public static final String exclPollTag = "-exclpoll";
+
+    public static final String sortPollTag = "-sortpoll";
+
     private String lineFeeder = System.getProperty("line.separator");
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
@@ -869,6 +884,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     showMultiInvDiffWindow();
                 } else if (createMoEmisByCountyFromAnnEmisProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showCreateMoEmisByCountyFromAnnEmisWindow();
+                } else if (compareAnnStateSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                    showCompareAnnualStateSummariesWindow();
+                } else if (annStateSummaryCrosstabProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                    showAnnualStateSummariesCrosstabWindow();
                 }else{
                     doSetWindow();
                 }
@@ -1293,6 +1312,126 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         }
     }
 
+    private void showCompareAnnualStateSummariesWindow() {
+        // When there is no data in window, set button causes new window to pop up,
+        // with the warning message to also show up. When data in window is invalid, a new window still
+        // pops up, but with a different warning message.
+        // Also change the window name to EditQASetArgumentsWindow
+        invBase = null;
+        invCompare = null;
+        invTables = null;
+        summaryType = "";
+
+        String programVal = program.getSelectedItem().toString();
+        String programSwitches = programArguments.getText();        
+        try {
+            int smkRptIndex = programSwitches.indexOf("-smkrpt");
+            int invIndex = programSwitches.indexOf("-inv");
+            int invTableIndex = programSwitches.indexOf("-invtable");
+            int toleranceIndex = programSwitches.indexOf("-tolerance");
+            int coStCyIndex = programSwitches.indexOf("-costcy");
+            EmfDataset[] inventories = null;
+            EmfDataset[] smkRptDatasets = null; 
+            EmfDataset invTableDataset = null; 
+            EmfDataset toleranceDataset = null; 
+            EmfDataset coStCyDataset = null; 
+            EmfDataset[] datasets;
+
+            if (invIndex != -1) {
+                datasets = getDatasets(programSwitches, invIndex, programSwitches.indexOf("\n-", invIndex) != -1 ? programSwitches.indexOf("\n-", invIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) inventories = datasets;
+            }
+            if (smkRptIndex != -1) {
+                datasets = getDatasets(programSwitches, smkRptIndex, programSwitches.indexOf("\n-", smkRptIndex) != -1 ? programSwitches.indexOf("\n-", smkRptIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) smkRptDatasets = datasets;
+            }
+            if (invTableIndex != -1) {
+                datasets = getDatasets(programSwitches, invTableIndex, programSwitches.indexOf("\n-", invTableIndex) != -1 ? programSwitches.indexOf("\n-", invTableIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) invTableDataset = datasets[0];
+            }
+            if (toleranceIndex != -1) {
+                datasets = getDatasets(programSwitches, toleranceIndex, programSwitches.indexOf("\n-", toleranceIndex) != -1 ? programSwitches.indexOf("\n-", toleranceIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) toleranceDataset = datasets[0];
+            }
+            if (coStCyIndex != -1) {
+                datasets = getDatasets(programSwitches, coStCyIndex, programSwitches.indexOf("\n-", coStCyIndex) != -1 ? programSwitches.indexOf("\n-", coStCyIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) coStCyDataset = datasets[0];
+            }
+            QACompareAnnualStateSummariesWindow view = new QACompareAnnualStateSummariesWindow(desktopManager, 
+                programVal, 
+                session, 
+                inventories, 
+                smkRptDatasets,
+                invTableDataset,
+                toleranceDataset,
+                coStCyDataset);
+            EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
+            presenter.display(origDataset, step);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void showAnnualStateSummariesCrosstabWindow() {
+
+        String programVal = program.getSelectedItem().toString();
+        String programSwitches = programArguments.getText();        
+        try {
+            int smkRptIndex = programSwitches.indexOf(smkRptTag);
+            int coStCyIndex = programSwitches.indexOf(coStCyTag);
+            int pollListIndex = programSwitches.indexOf(pollListTag);
+            int specieListIndex = programSwitches.indexOf(specieListTag);
+            int exclPollIndex = programSwitches.indexOf(exclPollTag);
+            int sortPollIndex = programSwitches.indexOf(sortPollTag);
+            EmfDataset[] smkRptDatasets = null; 
+            EmfDataset coStCyDataset = null; 
+            String[] pollList = null; 
+            String[] specieList = null; 
+            String[] exclPollList = null; 
+            String[] sortPollList = null; 
+            EmfDataset[] datasets;
+            String[] names;
+
+            if (smkRptIndex != -1) {
+                datasets = getDatasets(programSwitches, smkRptIndex, programSwitches.indexOf("\n-", smkRptIndex) != -1 ? programSwitches.indexOf("\n-", smkRptIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) smkRptDatasets = datasets;
+            }
+            if (coStCyIndex != -1) {
+                datasets = getDatasets(programSwitches, coStCyIndex, programSwitches.indexOf("\n-", coStCyIndex) != -1 ? programSwitches.indexOf("\n-", coStCyIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) coStCyDataset = datasets[0];
+            }
+            if (pollListIndex != -1) {
+                names = getDatasetNames(programSwitches, pollListIndex, programSwitches.indexOf("\n-", pollListIndex) != -1 ? programSwitches.indexOf("\n-", pollListIndex) : programSwitches.length()).toArray(new String[0]);
+                if (names != null && names.length > 0) pollList = names;
+            }
+            if (specieListIndex != -1) {
+                names = getDatasetNames(programSwitches, specieListIndex, programSwitches.indexOf("\n-", specieListIndex) != -1 ? programSwitches.indexOf("\n-", specieListIndex) : programSwitches.length()).toArray(new String[0]);
+                if (names != null && names.length > 0) specieList = names;
+            }
+            if (exclPollIndex != -1) {
+                names = getDatasetNames(programSwitches, exclPollIndex, programSwitches.indexOf("\n-", exclPollIndex) != -1 ? programSwitches.indexOf("\n-", exclPollIndex) : programSwitches.length()).toArray(new String[0]);
+                if (names != null && names.length > 0) exclPollList = names;
+            }
+            if (sortPollIndex != -1) {
+                names = getDatasetNames(programSwitches, sortPollIndex, programSwitches.indexOf("\n-", sortPollIndex) != -1 ? programSwitches.indexOf("\n-", sortPollIndex) : programSwitches.length()).toArray(new String[0]);
+                if (names != null && names.length > 0) sortPollList = names;
+            }
+            QAAnnualStateSummariesCrosstabWindow view = new QAAnnualStateSummariesCrosstabWindow(desktopManager, 
+                programVal, 
+                session, 
+                smkRptDatasets,
+                coStCyDataset,
+                pollList,
+                specieList,
+                exclPollList,
+                sortPollList);
+            EditQAAnnualStateSummariesCrosstabEmissionsPresenter presenter = new EditQAAnnualStateSummariesCrosstabEmissionsPresenter(view, this, session);
+            presenter.display(origDataset, step);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
     private void doSetWindow() {
         String argumentsText = programArguments.getText();
         EditQAArgumentsWindow view = new EditQAArgumentsWindow(desktopManager, argumentsText);
@@ -1382,6 +1521,14 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         String invString =tag + lineFeeder;
         for (int i = 0; i < inventories.length; i++) {
             invString += ((EmfDataset) inventories[i]).getName() + lineFeeder;
+        }   
+        return invString;
+    }
+
+    private String getTagString(String tag, Object[] tags){
+        String invString =tag + lineFeeder;
+        for (int i = 0; i < tags.length; i++) {
+            invString += tags[i] + lineFeeder;
         }   
         return invString;
     }
@@ -1570,4 +1717,29 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         updateArgumentsTextArea(arguments);
     }
 
+    public void updateCompareAnnualStateSummariesArguments(Object[] inventories, Object[] smkRpts, Object invTable, Object tolerance, Object coStCy) {
+        clear();
+        String arguments = "";
+        if (inventories != null) arguments += getInvString("-inv", inventories);
+        if (smkRpts != null) arguments += getInvString("-smkrpt", smkRpts);
+        if (invTable != null) arguments += getInvString("-invtable", new Object[] {invTable});
+        if (tolerance != null) arguments += getInvString("-tolerance", new Object[] {tolerance});
+        if (coStCy != null) arguments += getInvString("-costcy", new Object[] {coStCy}) + lineFeeder;
+
+        updateArgumentsTextArea(arguments);
+    }
+
+    public void updateCompareAnnualStateSummariesArguments(Object[] smkRpts, Object coStCy, Object[] polls,
+            Object[] species, Object[] exclPollutants) {
+        clear();
+        String arguments = "";
+        if (smkRpts != null) arguments += getInvString(smkRptTag, smkRpts);
+        if (coStCy != null) arguments += getInvString(coStCyTag, new Object[] {coStCy});
+        if (polls != null) arguments += getTagString(pollListTag, polls);
+        if (species != null) arguments += getTagString(specieListTag, species);
+        if (exclPollutants != null) arguments += getTagString(exclPollTag, exclPollutants) + lineFeeder;
+//        if (pollutantsSort != null) arguments += getInvString(sortPollTag, pollutantsSort) + lineFeeder;
+
+        updateArgumentsTextArea(arguments);
+    }
 }
