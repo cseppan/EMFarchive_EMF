@@ -10,27 +10,13 @@ insert into emf.countries values (DEFAULT, 'Canada');
 insert into emf.countries values (DEFAULT, 'Mexico');
 insert into emf.countries values (DEFAULT, 'US');
 -- emf.countries
---
+
 --emf.sectors
-insert into emf.sectors values (DEFAULT, 'Point', 'Point');
-insert into emf.sectors values (DEFAULT, 'Nonpoint', 'Nonpoint');
-insert into emf.sectors values (DEFAULT, 'Area','Area');
-insert into emf.sectors values (DEFAULT, 'Point IPM','Point IPM');
-insert into emf.sectors values (DEFAULT, 'Point Non-IPM','Point Non-IPM');
-insert into emf.sectors values (DEFAULT, 'Point Fugitive Dust','Point Fugitive Dust');
-insert into emf.sectors values (DEFAULT, 'Fire','Fire');
-insert into emf.sectors values (DEFAULT, 'Average Fire','Average Fire');
-insert into emf.sectors values (DEFAULT, 'Agricultural','Agricultural');
-insert into emf.sectors values (DEFAULT, 'Area Fugitive Dust','Area Fugitive Dust');
-insert into emf.sectors values (DEFAULT, 'Other Area','Other Area');
-insert into emf.sectors values (DEFAULT, 'Nonroad','Nonroad');
-insert into emf.sectors values (DEFAULT, 'On Road','On Road');
-insert into emf.sectors values (DEFAULT, 'Biogenic','Biogenic');
 --emf.sectors
 
 --emf.properties
 insert into emf.properties values(DEFAULT, 'lock.time-interval', '7200000');
-insert into emf.properties values(DEFAULT, 'page-size', '100');
+insert into emf.properties values(DEFAULT, 'page-size', '300');
 insert into emf.properties values(DEFAULT, 'batch-size', '10000');
 insert into emf.properties values(DEFAULT, 'export-batch-size', '150000');
 insert into emf.properties values(DEFAULT, 'defaultQASummaries', 'Summarize by Pollutant|Summarize by SCC and Pollutant|Summarize by County and Pollutant|Summarize by U.S. State and Pollutant');
@@ -104,7 +90,6 @@ insert into emf.dataset_types values(DEFAULT,'NonHAP VOC Calculation Exclusions 
 insert into emf.dataset_types values(DEFAULT,'SIC Descriptions (Line-based)','SIC Descriptions (Line-based)', '1', '1', false,'LINE_NUMBER', 'gov.epa.emissions.commons.io.generic.LineImporter', 'gov.epa.emissions.commons.io.generic.LineExporter');
 insert into emf.dataset_types values(DEFAULT,'SCC Descriptions (Line-based)','SCC Descriptions (Line-based)', '1', '1', false,'LINE_NUMBER', 'gov.epa.emissions.commons.io.generic.LineImporter', 'gov.epa.emissions.commons.io.generic.LineExporter');
 insert into emf.dataset_types values(DEFAULT,'Smkreport county-moncode annual','Smkreport county-moncode annual', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.SMKReportImporter', 'gov.epa.emissions.commons.io.other.SMKReportExporter', '', null, 0);
--- for control strategy result
 insert into emf.dataset_types values(DEFAULT,'Control Strategy Detailed Result','Control Strategy Detailed Result', '1', '1', false,'', '', 'gov.epa.emissions.commons.io.csv.CSVExporter', '', null, 0);
 insert into emf.dataset_types values(DEFAULT,'Pollutant to Pollutant Conversion (GSCNV)','Pollutant to Pollutant Conversion (GSCNV)', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.GSCNVImporter', 'gov.epa.emissions.commons.io.other.GSCNVExporter');
 insert into emf.dataset_types values(DEFAULT,'ORL Fires Inventory (PTINV)','ORL Fire Inventory (PTINV)', '1', '1', false,'', 'gov.epa.emissions.commons.io.orl.ORLFiresInvImporter', 'gov.epa.emissions.commons.io.orl.ORLFiresInvExporter');
@@ -121,6 +106,9 @@ insert into emf.dataset_types values(DEFAULT,'Strategy County Summary','Strategy
 insert into emf.dataset_types values(DEFAULT,'RSM Percent Reduction','RSM Percent Reduction', '1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter', '', null, 0);
 insert into emf.dataset_types values(DEFAULT,'Strategy Impact Summary','Strategy Impact Summary', '1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter', '', null, 0);
 insert into emf.dataset_types values(DEFAULT,'Allowable Packet','Allowable Packet', '1', '1', false,'', 'gov.epa.emissions.commons.io.other.AllowablePacketImporter', 'gov.epa.emissions.commons.io.other.AllowablePacketExporter');
+insert into emf.dataset_types values(DEFAULT,'Smkmerge report state annual summary (CSV)','Smkmerge report state annual summary (CSV)','1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter', '', null, 0);
+insert into emf.dataset_types values(DEFAULT,'ORL Merged Inventory','ORL Merged Inventory', '1', '1', false,'', 'gov.epa.emissions.commons.io.orl.ORLMergedImporter', 'gov.epa.emissions.commons.io.orl.ORLMergedExporter');
+insert into emf.dataset_types values(DEFAULT,'State Comparison Tolerance (CSV)','State Comparison Tolerance (CSV)', '1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 -- emf.dataset_types
 --
 -- emf.intended_uses
@@ -156,6 +144,31 @@ insert INTO emf.keywords VALUES (DEFAULT, 'EXPORT_COLUMN_LABEL');
 insert INTO emf.keywords VALUES (DEFAULT, 'COLUMN_TYPES');
 insert INTO emf.keywords VALUES (DEFAULT, 'PREVIOUS_LOCATION');
 insert INTO emf.keywords VALUES (DEFAULT, 'MASS_STORAGE_LOCATION');
+-- CoST Related
+insert INTO emf.keywords VALUES (DEFAULT, 'SECTORS');
+insert INTO emf.keywords VALUES (DEFAULT, 'COST_YEAR');
+insert INTO emf.keywords VALUES (DEFAULT, 'STRATEGY_TYPE');
+insert INTO emf.keywords VALUES (DEFAULT, 'TARGET_POLLUTANT');
+insert INTO emf.keywords VALUES (DEFAULT, 'REGION');
+insert INTO emf.keywords VALUES (DEFAULT, 'STRATEGY_NAME');
+insert INTO emf.keywords VALUES (DEFAULT, 'STRATEGY_ID');
+insert INTO emf.keywords VALUES (DEFAULT, 'STRATEGY_INVENTORY_NAME');
+insert INTO emf.keywords VALUES (DEFAULT, 'STRATEGY_INVENTORY_VERSION');
+insert INTO emf.keywords VALUES (DEFAULT, 'MEASURES_INCLUDED');
+insert INTO emf.keywords VALUES (DEFAULT, 'DISCOUNT_RATE');
+insert INTO emf.keywords VALUES (DEFAULT, 'USE_COST_EQUATION');
+insert INTO emf.keywords VALUES (DEFAULT, 'MEASURE_CLASSES');
+insert INTO emf.keywords VALUES (DEFAULT, 'TOTAL_ANNUAL_COST');
+insert INTO emf.keywords VALUES (DEFAULT, 'AVERAGE_ANNUAL_COST_PER_TON');
+insert INTO emf.keywords VALUES (DEFAULT, 'TOTAL_ANNUAL_OPERATION_MAINTENANCE_COST');
+insert INTO emf.keywords VALUES (DEFAULT, 'TOTAL_ANNUALIZED_CAPITAL_COST');
+insert INTO emf.keywords VALUES (DEFAULT, 'TOTAL_CAPITAL_COST');
+insert INTO emf.keywords VALUES (DEFAULT, 'TARGET_PERCENT_REDUCTION');
+insert INTO emf.keywords VALUES (DEFAULT, 'ACTUAL_PERCENT_REDUCTION');
+insert INTO emf.keywords VALUES (DEFAULT, 'TOTAL_EMISSION_REDUCTION');
+insert INTO emf.keywords VALUES (DEFAULT, 'UNCONTROLLED_EMISSION');
+insert INTO emf.keywords VALUES (DEFAULT, 'INCLUDE_UNSPECIFIED_COSTS');
+-- CoST Related
 -- emf.keywords
 --
 
@@ -181,6 +194,20 @@ select id as dataset_type_id,
   'varchar(6)|varchar(15)|varchar(15)|varchar(15)|varchar(15)|varchar(40)|varchar(10)|varchar(255)' as "value"
 from emf.dataset_types dt
 where name in ('Extended Projection (CSV)');
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+select id as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index,
+  (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
+  'varchar(64)|varchar(32)|varchar(32)|float8(17)' as "value"
+from emf.dataset_types dt
+where name in ('Smkmerge report state annual summary (CSV)');
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+select id as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index,
+  (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
+  'varchar(100)|varchar(255)|float8(17)' as "value"
+from emf.dataset_types dt
+where name in ('State Comparion Tolerance (CSV)');
 -- emf.dataset_type_keywords
 
 -- emf.qa_programs
@@ -197,6 +224,8 @@ insert into emf.qa_programs values(DEFAULT,'Multi-inventory difference report','
 insert into emf.qa_programs values(DEFAULT,'Compare Control Strategies','gov.epa.emissions.framework.services.qa.SQLQACompareControlStrategiesQueryRunner');
 insert into emf.qa_programs values(DEFAULT,'Compare VOC Speciation with HAP inventory','gov.epa.emissions.framework.services.qa.SQLQACompareVOCSpeciationWithHAPInventoryQueryRunner');
 insert into emf.qa_programs values(DEFAULT,'Create monthly emissions by county from annual emissions','gov.epa.emissions.framework.services.qa.SQLQACreateMoEmisByCtyFromAnnEmisQueryRunner');
+insert into emf.qa_programs values(DEFAULT,'Compare annual state summaries','gov.epa.emissions.framework.services.qa.SQLQACompareAnnualStateSummariesQueryRunner');
+insert into emf.qa_programs values(DEFAULT,'Annual state summaries crosstab','gov.epa.emissions.framework.services.qa.SQLQAAnnualStateSummariesCrosstabQueryRunner');
 
 
 --
