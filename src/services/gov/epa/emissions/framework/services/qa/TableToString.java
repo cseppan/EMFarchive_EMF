@@ -57,8 +57,9 @@ public class TableToString {
                 row = "";
                 for (int i = startingColumn; i <= columnCount; i++) {
                     value = rs.getString(i);
+                    String type = md.getColumnTypeName(i);
                     if (value != null) {
-                        if (value.indexOf(",") > 0 || value.indexOf(";") > 0 || value.indexOf(" ") > 0) 
+                        if (value.indexOf(",") > 0 || value.indexOf(";") > 0 || value.indexOf(" ") > 0 || type.equals("varchar")) 
                         {
                             value = "\"" + value + "\"";
                         }
