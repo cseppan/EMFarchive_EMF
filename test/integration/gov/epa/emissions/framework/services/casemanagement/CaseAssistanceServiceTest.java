@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 public class CaseAssistanceServiceTest extends ServiceTestCase {
@@ -43,8 +44,7 @@ public class CaseAssistanceServiceTest extends ServiceTestCase {
         dropAll(MeteorlogicalYear.class);
         dropAll(Project.class);
         dropAll(Region.class);
-        dropAll(Grid.class);
-        dropAll(GridResolution.class);
+        dropAll(GeoRegion.class);
         dropAll(AirQualityModel.class);
         dropAll(Speciation.class);
         dropAll(CaseCategory.class);

@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.Dimension;
@@ -33,6 +34,8 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
     private EditableComboBox parameterName;
 
     private EditableComboBox program;
+    
+    private ComboBox region;
 
     private ComboBox sector;
 
@@ -75,7 +78,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         String width = EmptyStrings.create(65);
-        Dimension preferredSize = new Dimension(300, 25);
+        Dimension preferredSize = new Dimension(300, 20);
 
         parameterName = new EditableComboBox(presenter.getParameterNames(model_id));
         addPopupMenuListener(parameterName, "parameternames");
@@ -113,6 +116,14 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         envValue.setPreferredSize(preferredSize);
         changeablesList.addChangeable(envValue);
         layoutGenerator.addLabelWidgetPair("Value:", envValue, panel);
+        
+        region = new ComboBox(presenter.getGeoRegions());
+        region.setSelectedItem(param.getRegion() == null ? region.getItemAt(0) : param.getRegion());
+        addPopupMenuListener(region, "grids");
+        region.setPreferredSize(preferredSize);
+        changeablesList.addChangeable(region);
+        region.setPrototypeDisplayValue(width);
+        layoutGenerator.addLabelWidgetPair("Region:", region, panel);
 
         sector = new ComboBox(presenter.getSectors());
         sector.setSelectedItem(param.getSector() == null ? sector.getItemAt(0) : param.getSector());
@@ -165,9 +176,9 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         layoutGenerator.addLabelWidgetPair("Parent case ID:", new JLabel("" + this.parameter.getParentCaseId()), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 12, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 13, 2, // rows, cols
                 10, 10, // initialX, initialY
-                10, 10);// xPad, yPad
+                10, 8);// xPad, yPad
 
         populateFields(parameter);
         container.add(panel);
@@ -207,6 +218,9 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
 
         if (toget.equals("vartypes"))
             return presenter.getValueTypes();
+        
+        if (toget.equals("grids"))
+            return presenter.getGeoRegions();
 
         if (toget.equals("sectors"))
             return presenter.getSectors();
@@ -228,6 +242,7 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         updateParameterName();
         updateProgram();
         updateEnvtVar();
+        updateRegion(); 
         updateSector();
         parameter.setRequired(required.isSelected());
         parameter.setLocal(local.isSelected());
@@ -275,6 +290,17 @@ public class ParameterFieldsPanel extends JPanel implements ParameterFieldsPanel
         }
 
         parameter.setEnvVar(presenter.getParameterEnvtVar(selected, model_id));
+    }
+    
+    private void updateRegion() {
+        GeoRegion selected = (GeoRegion) region.getSelectedItem();
+
+        if (selected.getName().equalsIgnoreCase("")) {
+            parameter.setRegion(null);
+            return;
+        }
+
+        parameter.setRegion(selected);
     }
 
     private void updateSector() {

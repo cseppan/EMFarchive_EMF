@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
@@ -227,11 +228,11 @@ public class CaseAssistanceService {
         Region modRegion = newCase.getModelingRegion();
         loadNSetObject(newCase, modRegion, Region.class, modRegion == null ? "" : modRegion.getName(), session);
 
-        Grid grid = newCase.getGrid();
-        loadNSetObject(newCase, grid, Grid.class, grid == null ? "" : grid.getName(), session);
-
-        GridResolution gResltn = newCase.getGridResolution();
-        loadNSetObject(newCase, gResltn, GridResolution.class, gResltn == null ? "" : gResltn.getName(), session);
+//        Grid grid = newCase.getGrid();
+//        loadNSetObject(newCase, grid, Grid.class, grid == null ? "" : grid.getName(), session);
+//
+//        GridResolution gResltn = newCase.getGridResolution();
+//        loadNSetObject(newCase, gResltn, GridResolution.class, gResltn == null ? "" : gResltn.getName(), session);
 
         AirQualityModel airMod = newCase.getAirQualityModel();
         loadNSetObject(newCase, airMod, AirQualityModel.class, airMod == null ? "" : airMod.getName(), session);
@@ -278,15 +279,15 @@ public class CaseAssistanceService {
             return;
         }
 
-        if (obj instanceof Grid) {
-            newCase.setGrid((Grid) temp);
-            return;
-        }
-
-        if (obj instanceof GridResolution) {
-            newCase.setGridResolution((GridResolution) temp);
-            return;
-        }
+//        if (obj instanceof Grid) {
+//            newCase.setGrid((Grid) temp);
+//            return;
+//        }
+//
+//        if (obj instanceof GridResolution) {
+//            newCase.setGridResolution((GridResolution) temp);
+//            return;
+//        }
 
         if (obj instanceof AirQualityModel) {
             newCase.setAirQualityModel((AirQualityModel) temp);
@@ -338,6 +339,9 @@ public class CaseAssistanceService {
             CaseJob job = iter.next();
             job.setCaseId(caseId);
 
+            GeoRegion region = job.getRegion();
+            job.setRegion(helper.getGeoRegion(region));
+            
             Sector sector = job.getSector();
             job.setSector(helper.getSector(sector));
             
@@ -379,6 +383,10 @@ public class CaseAssistanceService {
             type = helper.getValueType(type);
             param.setType(type);
 
+            GeoRegion region = param.getRegion();
+            region = helper.getGeoRegion(region);
+            param.setRegion(region);
+            
             Sector sector = param.getSector();
             sector = helper.getSector(sector);
             param.setSector(sector);
@@ -414,6 +422,10 @@ public class CaseAssistanceService {
             envVar = helper.getInputEnvVar(envVar);
             input.setEnvtVars(envVar);
 
+            GeoRegion region = input.getRegion();
+            region = helper.getGeoRegion(region);
+            input.setRegion(region);
+            
             Sector sector = input.getSector();
             sector = helper.getSector(sector);
             input.setSector(sector);
@@ -574,38 +586,38 @@ public class CaseAssistanceService {
                 }
             }
 
-            if (envVar.toUpperCase().equals("IOAPI_GRIDNAME_1")) {
-                Grid grid = caze.getGrid();
+//            if (envVar.toUpperCase().equals("IOAPI_GRIDNAME_1")) {
+//                Grid grid = caze.getGrid();
+//
+//                if (grid != null && grid.getName() != null && grid.getName().trim().equalsIgnoreCase(value))
+//                    continue;
+//
+//                if (grid != null && grid.getName() != null)
+//                    sb.append("WARNING: grid -- value replaced (previous: " + grid.getName() + ")" + lineSep);
+//
+//                grid = new Grid();
+//                grid.setName(value);
+//                grid = this.addGrid(grid);
+//
+//                caze.setGrid(grid);
+//            }
 
-                if (grid != null && grid.getName() != null && grid.getName().trim().equalsIgnoreCase(value))
-                    continue;
-
-                if (grid != null && grid.getName() != null)
-                    sb.append("WARNING: grid -- value replaced (previous: " + grid.getName() + ")" + lineSep);
-
-                grid = new Grid();
-                grid.setName(value);
-                grid = this.addGrid(grid);
-
-                caze.setGrid(grid);
-            }
-
-            if (envVar.toUpperCase().equals("EMF_GRID")) {
-                GridResolution resltn = caze.getGridResolution();
-
-                if (resltn != null && resltn.getName() != null && resltn.getName().trim().equalsIgnoreCase(value))
-                    continue;
-
-                if (resltn != null && resltn.getName() != null)
-                    sb.append("WARNING: grid resolution -- value replaced (previous: " + resltn.getName() + ")"
-                            + lineSep);
-
-                resltn = new GridResolution();
-                resltn.setName(value);
-                resltn = this.addGridResolution(resltn);
-
-                caze.setGridResolution(resltn);
-            }
+//            if (envVar.toUpperCase().equals("EMF_GRID")) {
+//                GridResolution resltn = caze.getGridResolution();
+//
+//                if (resltn != null && resltn.getName() != null && resltn.getName().trim().equalsIgnoreCase(value))
+//                    continue;
+//
+//                if (resltn != null && resltn.getName() != null)
+//                    sb.append("WARNING: grid resolution -- value replaced (previous: " + resltn.getName() + ")"
+//                            + lineSep);
+//
+//                resltn = new GridResolution();
+//                resltn.setName(value);
+//                resltn = this.addGridResolution(resltn);
+//
+//                caze.setGridResolution(resltn);
+//            }
 
             if (envVar.toUpperCase().equals("EMF_AQM")) {
                 AirQualityModel aqm = caze.getAirQualityModel();
@@ -1215,38 +1227,19 @@ public class CaseAssistanceService {
         }
     }
 
-    public synchronized Grid addGrid(Grid grid) throws EmfException {
+    public synchronized GeoRegion addGrid(GeoRegion grid) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            Grid temp = (Grid) caseDao.load(Grid.class, grid.getName(), session);
+            GeoRegion temp = (GeoRegion) caseDao.load(GeoRegion.class, grid.getName(), session);
 
             if (temp != null)
                 return temp;
 
             caseDao.add(grid, session);
-            return (Grid) caseDao.load(Grid.class, grid.getName(), session);
+            return (GeoRegion) caseDao.load(GeoRegion.class, grid.getName(), session);
         } catch (Exception e) {
             log.error("Could not add new Grid '" + grid.getName() + "'\n", e);
             throw new EmfException("Could not add new Grid '" + grid.getName() + "'");
-        } finally {
-            session.close();
-        }
-    }
-
-    public synchronized GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            GridResolution temp = (GridResolution) caseDao
-                    .load(GridResolution.class, gridResolution.getName(), session);
-
-            if (temp != null)
-                return temp;
-
-            caseDao.add(gridResolution, session);
-            return (GridResolution) caseDao.load(GridResolution.class, gridResolution.getName(), session);
-        } catch (Exception e) {
-            log.error("Could not add new Grid Resolution '" + gridResolution.getName() + "'\n", e);
-            throw new EmfException("Could not add new Grid Resolution '" + gridResolution.getName() + "'");
         } finally {
             session.close();
         }

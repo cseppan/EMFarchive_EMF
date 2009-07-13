@@ -13,10 +13,10 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
-import gov.epa.emissions.framework.services.casemanagement.Grid;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,12 +114,12 @@ public class SensitivityPresenter {
         return service().getCaseJobs(caseObj.getId());
     }
     
-    public CaseJob[] getCaseJobs(Case caseObj, Grid[] grids, Sector[] sectors) throws EmfException{
+    public CaseJob[] getCaseJobs(Case caseObj, GeoRegion[] grids, Sector[] sectors) throws EmfException{
         CaseJob[] jobs = getCaseJobs(caseObj);
         List<CaseJob> filteredJobs1 = new ArrayList<CaseJob>();
         //Find jobs contain selected grids
         if ( sectors != null && grids.length > 0 ){
-            for (Grid grid : grids){
+            for (GeoRegion grid : grids){
                 int parenth = grid.getName().indexOf("("); //strip off the grid value part plus a space
                 int end =  parenth < 0 ? grid.getName().length() : parenth - 1;
                 String gridName = grid.getName().substring(0, end).replace("_", " ");

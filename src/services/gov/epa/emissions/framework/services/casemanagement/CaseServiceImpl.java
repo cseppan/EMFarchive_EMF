@@ -150,14 +150,6 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getEmissionsYears();
     }
 
-    public Grid[] getGrids() throws EmfException {
-        return getCaseService().getGrids();
-    }
-
-    public GridResolution[] getGridResolutions() throws EmfException {
-        return getCaseService().getGridResolutions();
-    }
-
     public MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException {
         return getCaseService().getMeteorlogicalYears();
     }
@@ -208,10 +200,6 @@ public class CaseServiceImpl implements CaseService {
 
     public ModelToRun addModelToRun(ModelToRun model) throws EmfException {
         return getCaseService().addModelToRun(model);
-    }
-
-    public GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
-        return getCaseService().addGridResolution(gridResolution);
     }
 
     public SubDir[] getSubDirs() throws EmfException {
@@ -642,12 +630,6 @@ public class CaseServiceImpl implements CaseService {
     public EmissionsYear addEmissionsYear(EmissionsYear emissYear) throws EmfException {
         return getCaseService().addEmissionYear(emissYear);
     }
-
-    
-    public Grid addGrid(Grid grid) throws EmfException {
-        return getCaseService().addGrid(grid);
-    }
-
     
     public MeteorlogicalYear addMeteorologicalYear(MeteorlogicalYear metYear) throws EmfException {
         return getCaseService().addMeteorologicalYear(metYear);

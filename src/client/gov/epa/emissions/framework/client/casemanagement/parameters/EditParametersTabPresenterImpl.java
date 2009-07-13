@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,6 +64,7 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
             view.addParameter(loaded);
             //refreshView();
             addSectorBacktoCase(loaded.getSector());
+            addRegionBacktoCase(loaded.getRegion());
         }
     }
 
@@ -150,6 +152,10 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     
     public void addSectorBacktoCase(Sector updatedSector) {
         parentPresenter.addSectorBacktoCase(updatedSector);
+    }
+    
+    public void addRegionBacktoCase(GeoRegion updatedGrid) {
+        parentPresenter.addGridBacktoCase(updatedGrid);
     }
 
 }

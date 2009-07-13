@@ -8,8 +8,6 @@ import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
-import gov.epa.emissions.framework.services.casemanagement.Grid;
-import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
@@ -47,8 +45,6 @@ public class CasesTableDataTest extends TestCase {
         case1.setAbbreviation(new Abbreviation("abb1"));
         case1.setAirQualityModel(new AirQualityModel("aqm1"));
         case1.setSpeciation(new Speciation("sp1"));
-        case1.setGrid(new Grid("grid1"));
-        case1.setGridResolution(new GridResolution("res1"));
         case1.setFutureYear(1999);
         case1.setNumMetLayers(1);
         case1.setStartDate(new Date());

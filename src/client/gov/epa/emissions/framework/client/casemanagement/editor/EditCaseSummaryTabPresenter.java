@@ -10,11 +10,10 @@ import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
-import gov.epa.emissions.framework.services.casemanagement.Grid;
-import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 public class EditCaseSummaryTabPresenter {
     
@@ -96,24 +95,20 @@ public class EditCaseSummaryTabPresenter {
         return caseObjectManager.getOrAddSpeciation(selected);
     }
     
-    public GridResolution[] getGridResolutions() throws EmfException {
-        return caseObjectManager.getGridResolutions();
+    public GeoRegion[] getGrids() throws EmfException {
+        return caseObjectManager.getGeoRegions();
     }
     
-    public GridResolution getGridResolutionl(Object selected) throws EmfException {
-        return caseObjectManager.getOrAddGridResolution(selected);
-    }
-    
-    public Grid[] getGrids() throws EmfException {
-        return caseObjectManager.getGrids();
-    }
-    
-    public Grid getGrid(Object selected) throws EmfException {
+    public GeoRegion getGeoregion(Object selected) throws EmfException {
         return caseObjectManager.getOrAddGrid(selected);
     }
     
     public void refreshObjectManager() {
         caseObjectManager.refresh();
+    }
+
+    public GeoRegion[] getAllGeoRegions() throws EmfException {
+        return caseObjectManager.getGeoRegions();
     }
 
 }

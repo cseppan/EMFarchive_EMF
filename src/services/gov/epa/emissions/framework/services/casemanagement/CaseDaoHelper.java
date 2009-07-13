@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Iterator;
@@ -39,6 +40,8 @@ public class CaseDaoHelper {
 
     private List<ValueType> parameterValueTypes;
 
+    private List<GeoRegion> georegions;
+    
     private List<Sector> sectors;
 
     private List<CaseProgram> programs;
@@ -292,6 +295,19 @@ public class CaseDaoHelper {
         return newType;
     }
 
+    public synchronized List<GeoRegion> getGeoRegions() throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            return dataDao.getGeoRegions(session);
+        } catch (Exception e) {
+            log.error("Error retrieving regions.", e);
+            throw new EmfException("Couldn't get all GeoRegion objects from database -- " + e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+    
     public synchronized List<Sector> getSectors() throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -305,6 +321,20 @@ public class CaseDaoHelper {
         }
     }
 
+    public synchronized GeoRegion addGeoRegion(GeoRegion region) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            dataDao.add(region, session);
+            return (GeoRegion) dataDao.load(GeoRegion.class, region.getName(), session);
+        } catch (Exception e) {
+            log.error("Error adding region: " + region.getName() + ".", e);
+            throw new EmfException("Couldn't get all GeoRegion objects from database -- " + e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+    
     public synchronized Sector addSector(Sector sector) throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -344,6 +374,33 @@ public class CaseDaoHelper {
         sectors.add(newSector);
 
         return newSector;
+    }
+    
+    public synchronized GeoRegion getGeoRegion(Object selected) throws EmfException {
+        if (selected == null || selected.toString().equals(""))
+            return null;
+
+        GeoRegion region = null;
+        if (selected instanceof String) {
+            region = new GeoRegion(selected.toString(), selected.toString());
+        } else if (selected instanceof GeoRegion) {
+            region = (GeoRegion) selected;
+        }
+
+        if (region.getName() == null || region.getName().trim().isEmpty())
+            return null;
+
+        if (georegions == null || georegions.isEmpty())
+            georegions = getGeoRegions(); // make sure Sector have been retrieved
+
+        if (georegions.contains(region))
+            return georegions.get(georegions.indexOf(region));
+
+        // the Sector was not found in the list
+        GeoRegion newRegion = addGeoRegion(region);
+        georegions.add(newRegion);
+
+        return newRegion;
     }
 
     public synchronized List<CaseProgram> getCasePrograms() throws EmfException {

@@ -23,7 +23,7 @@ public class CaseJobsTableData extends ChangeableTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Order", "Sector", "Run Status", "Running User", "Last Message", "Start Date",  
+        return new String[] { "Name", "Order", "Region", "Sector", "Run Status", "Running User", "Last Message", "Start Date",  
                 "Completion Date", "Executable", "Arguments", "Exec. Version", "Job No.", "Path",    
                 "Queue Options", "Job Group", "Local?", "ID in Queue", "User", "Host", "Purpose", "Depends On" };
     }
@@ -32,7 +32,7 @@ public class CaseJobsTableData extends ChangeableTableData {
         if (col == 1)
             return Float.class;
         
-        if (col == 10 || col == 11)
+        if (col == 11 || col == 12)
             return Integer.class;
         
         return String.class;

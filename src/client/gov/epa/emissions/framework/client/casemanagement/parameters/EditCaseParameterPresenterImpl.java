@@ -53,6 +53,7 @@ public class EditCaseParameterPresenterImpl implements EditCaseParameterPresente
         parameterFieldsPresenter.doSave();
         parentView.setMessage("Saved \"" + parameter.getName() + "\". Refresh to see the changes in the table.");
         parentView.addSectorBacktoCase(parameterFieldsPresenter.getUpdatedSector());
+        parentView.addGridBacktoCase(parameterFieldsPresenter.getUpdatedRegion());
     }
 
 }

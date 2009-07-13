@@ -9,8 +9,6 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.CasesSens;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
-import gov.epa.emissions.framework.services.casemanagement.Grid;
-import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
@@ -46,8 +44,6 @@ public class CaseMappings extends Mappings {
         bean(call, AirQualityModel.class, airQualityModel());
         bean(call, CaseCategory.class, caseCategory());
         bean(call, EmissionsYear.class, emissionsYear());
-        bean(call, Grid.class, grid());
-        bean(call, GridResolution.class, gridResolution());
         bean(call, MeteorlogicalYear.class, meteorlogicalYear());
         bean(call, Speciation.class, speciation());
         bean(call, InputName.class, inputname());
@@ -78,8 +74,6 @@ public class CaseMappings extends Mappings {
         array(call, AirQualityModel[].class, airQualityModels());
         array(call, CaseCategory[].class, caseCategories());
         array(call, EmissionsYear[].class, emissionsYears());
-        array(call, Grid[].class, grids());
-        array(call, GridResolution[].class, gridResolutions());
         array(call, MeteorlogicalYear[].class, meteorlogicalYears());
         array(call, Speciation[].class, speciations());
         array(call, InputName[].class, inputnames());
@@ -142,22 +136,6 @@ public class CaseMappings extends Mappings {
         return qname("EmissionsYears");
     }
 
-    public QName grid() {
-        return qname("Grid");
-    }
-
-    public QName grids() {
-        return qname("Grids");
-    }
-
-    public QName gridResolution() {
-        return qname("GridResolution");
-    }
-    
-    public QName gridResolutions() {
-        return qname("GridResolutions");
-    }
-    
     public QName meteorlogicalYear() {
         return qname("MeteorlogicalYear");
     }

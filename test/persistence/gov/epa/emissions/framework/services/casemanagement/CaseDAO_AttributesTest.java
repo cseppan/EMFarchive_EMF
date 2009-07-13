@@ -131,35 +131,6 @@ public class CaseDAO_AttributesTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldPersistGridOnAdd() {
-        int totalBeforeAdd = dao.getGrids(session).size();
-        Grid element = new Grid("test" + Math.random());
-        dao.add(element, session);
-
-        session.clear();
-        try {
-            List list = dao.getGrids(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
-        } finally {
-            remove(element);
-        }
-    }
-
-    public void testShouldGetAllGrids() {
-        int totalBeforeAdd = dao.getGrids(session).size();
-        Grid element = new Grid("test" + Math.random());
-        add(element);
-
-        session.clear();
-        try {
-            List list = dao.getGrids(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
-            assertTrue(list.contains(element));
-        } finally {
-            remove(element);
-        }
-    }
-
     public void testShouldPersistMeteorlogicalYearOnAdd() {
         int totalBeforeAdd = dao.getMeteorlogicalYears(session).size();
         MeteorlogicalYear element = new MeteorlogicalYear("test" + Math.random());

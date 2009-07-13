@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class CasesTableData extends AbstractTableData {
-    private List rows;
+    private List<Row> rows;
 
     public CasesTableData(Case[] cases) {
         this.rows = createRows(cases);
@@ -18,18 +18,18 @@ public class CasesTableData extends AbstractTableData {
 
     public String[] columns() {
         return new String[] { "Name", "Project", "Model to Run", "Modeling Regn.", "Last Modified By", "Category", "Run Status", "Abbrev.",
-                "AQM", "Base Year", "Met. Year", "Future Year", "Grid Name", "Grid Resolution", "Num Met Layers",
+                "AQM", "Base Year", "Met. Year", "Future Year", "Num Met Layers",
                 "Start Date", "End Date", "Is Final", "Speciation", "Last Modified Date" };
     }
 
-    public Class getColumnClass(int col) {
-        if (col == 17)
+    public Class<?> getColumnClass(int col) {
+        if (col == 15)
             return Boolean.class;
         
         return String.class;
     }
 
-    public List rows() {
+    public List<Row> rows() {
         return rows;
     }
 
@@ -46,8 +46,8 @@ public class CasesTableData extends AbstractTableData {
     }
 
 
-    private List createRows(Case[] cases) {
-        List rows = new ArrayList();
+    private List<Row> createRows(Case[] cases) {
+        List<Row> rows = new ArrayList<Row>();
 
         for (int i = 0; i < cases.length; i++) 
             rows.add(row(cases[i]));
@@ -60,16 +60,16 @@ public class CasesTableData extends AbstractTableData {
     }
     
     public Case[] sources() {
-        List sources = sourcesList();
-        return (Case[]) sources.toArray(new Case[0]);
+        List<Case> sources = sourcesList();
+        return sources.toArray(new Case[0]);
     }
 
-    private List sourcesList() {
-        List sources = new ArrayList();
+    private List<Case> sourcesList() {
+        List<Case> sources = new ArrayList<Case>();
         
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+        for (Iterator<Row> iter = rows.iterator(); iter.hasNext();) {
             ViewableRow row = (ViewableRow) iter.next();
-            sources.add(row.source());
+            sources.add((Case)row.source());
         }
 
         return sources;
@@ -78,7 +78,7 @@ public class CasesTableData extends AbstractTableData {
     private Object[] rowValues(Case element) {
         Object[] values = { element.getName(), project(element), modelToRun(element), region(element), modifiedBy(element),
                 caseCategory(element), element.getRunStatus(), abbreviation(element), airQualityModel(element),
-                emissionsYear(element), meteorlogicalYear(element), futureYear(element), Grid(element), gridResolution(element),
+                emissionsYear(element), meteorlogicalYear(element), futureYear(element), 
                 numMetLayers(element), format(element.getStartDate()), format(element.getEndDate()),
                 isFinal(element), speciation(element), format(element.getLastModifiedDate()) };
         return values;
@@ -98,14 +98,6 @@ public class CasesTableData extends AbstractTableData {
 
     private String futureYear(Case element) {
         return element.getFutureYear()+"" != null ? element.getFutureYear()+"" : "";
-    }
-
-    private String gridResolution(Case element) {
-        return element.getGridResolution() != null ? element.getGridResolution().getName() : "";
-    }
-
-    private String Grid(Case element) {
-        return element.getGrid() != null ? element.getGrid().getName() : "";
     }
 
     private String abbreviation(Case element) {

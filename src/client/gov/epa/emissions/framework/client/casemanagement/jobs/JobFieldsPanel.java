@@ -24,6 +24,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -89,6 +90,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     private ComboBox status;
 
     private ComboBox sector;
+    
+    private ComboBox region;
 
     private Dimension comboSize = new Dimension(190, 25);
 
@@ -248,6 +251,12 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
 
         layoutGenerator.addLabelWidgetPair("<html>Depends on:<br><br><br></html>", jobDependencyPanel(), panel);
 
+        region = new ComboBox(presenter.getGeoRegions());
+        region.setPreferredSize(comboSize);
+        region.setSelectedItem(job.getRegion() == null ? region.getItemAt(0) : job.getRegion());
+        addPopupMenuListener(region, "grids");
+        layoutGenerator.addLabelWidgetPair("Region:", region, panel);
+        
         sector = new ComboBox(presenter.getSectors());
         sector.setPreferredSize(comboSize);
         sector.setSelectedItem(job.getSector() == null ? sector.getItemAt(0) : job.getSector());
@@ -271,7 +280,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         // layoutGenerator.addLabelWidgetPair("Local?",localBox,panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 10);// xPad, yPad
 
@@ -341,6 +350,9 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     protected Object[] getAllObjects(String toget) throws EmfException {
         if (toget.equals("hosts"))
             return presenter.getHosts();
+        
+        if (toget.equals("grids"))
+            return presenter.getGeoRegions();
 
         if (toget.equals("sectors"))
             return presenter.getSectors();
@@ -479,6 +491,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setArgs(args.getText().trim());
         setPathNExecutable();
         setHost();
+        setRegion();
         updateSector();
         job.setRunstatus((JobRunStatus) status.getSelectedItem());
         job.setVersion(Integer.parseInt(version.getText().trim()));
@@ -500,6 +513,15 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         }
 
         return job;
+    }
+
+    private void setRegion() {
+     GeoRegion selected = (GeoRegion)region.getSelectedItem();
+     
+     if (selected.getName().trim().isEmpty())
+         selected = null;
+         
+     job.setRegion(selected);
     }
 
     private void setPathNExecutable() {
@@ -655,6 +677,7 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         changeablesList.addChangeable(jobGroup);
         changeablesList.addChangeable(qoption);
         changeablesList.addChangeable(sector);
+        changeablesList.addChangeable(region);
         changeablesList.addChangeable(host);
         changeablesList.addChangeable(status);
         changeablesList.addChangeable(runNote);

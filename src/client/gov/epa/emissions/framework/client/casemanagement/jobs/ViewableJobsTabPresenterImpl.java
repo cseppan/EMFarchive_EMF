@@ -196,7 +196,10 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
 
     public void addNewSectorToSummary(CaseJob job) {
         // NOTE Auto-generated method stub
-        
+    }
+    
+    public void addNewRegionToSummary(CaseJob job) {
+        // NOTE Auto-generated method stub
     }
 
     public void display(CaseEditorPresenter parentPresenter) {

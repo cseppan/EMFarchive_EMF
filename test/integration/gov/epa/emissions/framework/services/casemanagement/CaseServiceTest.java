@@ -94,20 +94,6 @@ public class CaseServiceTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldGetGrids() throws Exception {
-        int totalBeforeAdd = service.getGrids().length;
-        Grid element = new Grid("test" + Math.random());
-        add(element);
-
-        try {
-            List list = Arrays.asList(service.getGrids());
-            assertEquals(totalBeforeAdd + 1, list.size());
-            assertTrue(list.contains(element));
-        } finally {
-            remove(element);
-        }
-    }
-
     public void testShouldGetMeteorlogicalYears() throws Exception {
         int totalBeforeAdd = service.getMeteorlogicalYears().length;
         MeteorlogicalYear element = new MeteorlogicalYear("test" + Math.random());
@@ -143,20 +129,6 @@ public class CaseServiceTest extends ServiceTestCase {
 
         try {
             List list = Arrays.asList(service.getSpeciations());
-            assertEquals(totalBeforeAdd + 1, list.size());
-            assertTrue(list.contains(element));
-        } finally {
-            remove(element);
-        }
-    }
-
-    public void testShouldGetGridResolutions() throws Exception {
-        int totalBeforeAdd = service.getGridResolutions().length;
-        GridResolution element = new GridResolution("test" + Math.random());
-        add(element);
-
-        try {
-            List list = Arrays.asList(service.getGridResolutions());
             assertEquals(totalBeforeAdd + 1, list.size());
             assertTrue(list.contains(element));
         } finally {

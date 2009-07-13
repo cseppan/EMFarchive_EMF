@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.casemanagement.parameters;
 
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -17,6 +18,8 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
     private ValueType type;
     
     private Sector sector;
+    
+    private GeoRegion region;
     
     private CaseProgram program;
     
@@ -232,6 +235,14 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
     
     public String getJobName() {
         return this.jobName;
+    }
+
+    public GeoRegion getRegion() {
+        return region;
+    }
+
+    public void setRegion(GeoRegion region) {
+        this.region = region;
     }
 
 }

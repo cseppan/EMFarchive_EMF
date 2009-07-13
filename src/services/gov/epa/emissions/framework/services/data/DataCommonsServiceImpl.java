@@ -352,6 +352,45 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
+    public synchronized GeoRegion addGeoRegion(GeoRegion newRegion) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            String name = newRegion.getName();
+            String abbr = newRegion.getAbbreviation();
+            
+            if (name == null || name.trim().isEmpty())
+                throw new EmfException("Region name cannot be null or empty.");
+            
+            List<?> num = session.createQuery("SELECT COUNT(gr.id) from GeoRegion as gr where " +
+                    "lower(gr.name) = '" + name.toLowerCase() + "'").list();
+            
+            if (Integer.parseInt(num.get(0).toString()) > 0)
+                throw new EmfException("Region name '" + name + "' has been used already.");
+            
+            if (abbr != null && abbr.trim().isEmpty()) 
+                abbr = null;
+            
+            if (abbr != null) {
+                num = session.createQuery("SELECT COUNT(gr.id) from GeoRegion as gr where " +
+                        "lower(gr.abbreviation) = '" + abbr.toLowerCase() + "'").list();
+                
+                if (Integer.parseInt(num.get(0).toString()) > 0)
+                    throw new EmfException("Abbreviation '" + abbr + "' has been used already.");
+            }
+            
+            newRegion.setAbbreviation(abbr);
+            dao.add(newRegion, session);
+            return (GeoRegion)dao.load(GeoRegion.class, newRegion.getName(), session);
+        } catch (Exception e) {
+            LOG.error("Could not add new GeoRegion", e);
+            throw new EmfException("Could not add new GeoRegion" + (e.getMessage() == null ? "." : ": " 
+                + e.getMessage().substring(1,50)));
+        } finally {
+            session.close();
+        }
+    }
+    
     public synchronized void addSector(Sector sector) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
@@ -556,6 +595,19 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
+    public synchronized GeoRegion[] getGeoRegions() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List<GeoRegion> results = dao.getGeoRegions(session);
+            return results.toArray(new GeoRegion[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Grids", e);
+            throw new EmfException("Could not get all Grids");
+        } finally {
+            session.close();
+        }
+    }
+    
     public synchronized EmfFileInfo createNewFolder(String folder, String subfolder) throws EmfException {
         try {
             if (folder == null || folder.trim().isEmpty())

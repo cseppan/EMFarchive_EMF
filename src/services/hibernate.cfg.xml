@@ -62,12 +62,12 @@
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/AirQualityModel.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/CaseCategory.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/EmissionsYear.hbm.xml"/>
-    	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Grid.hbm.xml"/>
+    	<mapping resource="gov/epa/emissions/framework/services/data/GeoRegion.hbm.xml"/>
+    	<mapping resource="gov/epa/emissions/framework/services/data/RegionType.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/MeteorlogicalYear.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Speciation.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Case.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/CaseInput.hbm.xml"/>
-    	<mapping resource="gov/epa/emissions/framework/services/casemanagement/GridResolution.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/InputEnvtVar.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/CaseProgram.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/InputName.hbm.xml"/>

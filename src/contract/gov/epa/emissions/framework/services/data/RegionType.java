@@ -1,21 +1,23 @@
-package gov.epa.emissions.framework.services.casemanagement;
+package gov.epa.emissions.framework.services.data;
 
 import java.io.Serializable;
 
-public class Grid implements Serializable, Comparable<Grid> {
+public class RegionType implements Serializable, Comparable<RegionType> {
 
     private int id;
 
     private String name;
-
+    
+    private String description;
+    
     /*
      * Default constructor needed for hibernate and axis serialization
      */
-    public Grid() {
+    public RegionType() {
         super();
     }
 
-    public Grid(String name) {
+    public RegionType(String name) {
         this.name = name;
     }
 
@@ -36,10 +38,10 @@ public class Grid implements Serializable, Comparable<Grid> {
     }
 
     public boolean equals(Object other) {
-        if (other == null || !(other instanceof Grid))
+        if (other == null || !(other instanceof RegionType))
             return false;
 
-        return ((Grid) other).name.equals(this.name);
+        return ((RegionType) other).name.equals(this.name);
     }
 
     public int hashCode() {
@@ -50,7 +52,15 @@ public class Grid implements Serializable, Comparable<Grid> {
         return getName();
     }
 
-    public int compareTo(Grid other) {
+    public int compareTo(RegionType other) {
         return name.compareToIgnoreCase(other.getName());
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

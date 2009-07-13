@@ -39,7 +39,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
     private DesktopManager desktopManager;
 
     public EditCaseInputWindow(String title, DesktopManager desktopManager, EmfConsole parentConsole) {
-        super(title, new Dimension(610, 540), desktopManager);
+        super(title, new Dimension(610, 550), desktopManager);
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
     }

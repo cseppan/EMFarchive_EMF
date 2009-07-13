@@ -30,6 +30,11 @@
    					name="sector" 
         			class="gov.epa.emissions.commons.data.Sector"
         			column="sector_id"/> 
+        			
+        		<many-to-one
+         			name="region" 
+        			class="gov.epa.emissions.framework.services.data.GeoRegion"
+        			column="region_id"/> 
 
     			<many-to-one
    					name="program" 

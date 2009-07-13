@@ -50,11 +50,13 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.cost.data.SumEffRec;
 import gov.epa.emissions.framework.services.data.DatasetNote;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
+import gov.epa.emissions.framework.services.data.RegionType;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.Revision;
 
@@ -85,6 +87,8 @@ public class DataMappings extends Mappings {
         bean(call, Project.class, project());
         bean(call, Region.class, region());
         bean(call, IntendedUse.class, intendeduse());
+        bean(call, GeoRegion.class, geoRegion());
+        bean(call, RegionType.class, regionType());
 
         bean(call, Sector.class, sector());
         bean(call, SectorCriteria.class, "SectorCriteria");
@@ -164,6 +168,9 @@ public class DataMappings extends Mappings {
 
         array(call, Sector[].class, sectors());
         array(call, SectorCriteria[].class, "SectorCriterias");
+        
+        array(call, GeoRegion[].class, geoRegions());
+        array(call, RegionType[].class, regionTypes());
 
         array(call, Page[].class, pages());
         array(call, VersionedRecord[].class, records());
@@ -619,4 +626,20 @@ public class DataMappings extends Mappings {
         return qname("ExternalSources");
     }
     
+    public QName geoRegion() {
+        return qname("GeoRegion");
+    }
+
+    public QName geoRegions() {
+        return qname("GeoRegions");
+    }
+    
+    public QName regionType() {
+        return qname("RegionType");
+    }
+
+    public QName regionTypes() {
+        return qname("RegionTypes");
+    }
+
 }

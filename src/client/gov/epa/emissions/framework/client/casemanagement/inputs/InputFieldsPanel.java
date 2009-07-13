@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
@@ -44,6 +45,8 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     private EditableComboBox inputName;
 
     private EditableComboBox program;
+    
+    private ComboBox region;
 
     private ComboBox sector;
 
@@ -83,7 +86,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
     
     protected DesktopManager desktopManager;
 
-    private Dimension preferredSize = new Dimension(450, 25);
+    private Dimension preferredSize = new Dimension(450, 20);
 
     public InputFieldsPanel(MessagePanel messagePanel, ManageChangeables changeablesList, EmfConsole parentConsole,
             DesktopManager desktopManager) {
@@ -122,6 +125,14 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         changeablesList.addChangeable(envtVar);
         envtVar.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("Envt. Variable:", envtVar, panel);
+        
+        region = new ComboBox(presenter.getGeoRegions());
+        region.setPreferredSize(preferredSize);
+        region.setSelectedItem(input.getRegion() == null ? region.getItemAt(0) : input.getRegion());
+        addPopupMenuListener(region, "grids");
+        changeablesList.addChangeable(region);
+        layoutGenerator.addLabelWidgetPair("Region:", region, panel);
+        
 
         sector = new ComboBox(presenter.getSectors());
         if (input.getSector() == null) {
@@ -187,9 +198,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("Parent case ID:", new JLabel("" + this.input.getParentCaseId()), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 13, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 14, 2, // rows, cols
                 10, 10, // initialX, initialY
-                10, 10);// xPad, yPad
+                10, 8);// xPad, yPad
 
         container.add(panel);
     }
@@ -292,6 +303,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
         else if (toget.equals("envtvars"))
             return presenter.getEnvtVars(modelToRunId);
+        
+        else if (toget.equals("grids"))
+            return presenter.getGeoRegions();
 
         else if (toget.equals("sectors"))
             return presenter.getSectors();
@@ -339,6 +353,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         updateInputName();
         updateProgram();
         updateEnvtVar();
+        updateRegion();
         updateSector();
         input.setDatasetType((DatasetType) dsType.getSelectedItem());
         // updateDataset();
@@ -398,6 +413,17 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         }
 
         input.setEnvtVars(presenter.getInputEnvtVar(selected, modelToRunId));
+    }
+    
+    private void updateRegion() {
+        GeoRegion selected = (GeoRegion) region.getSelectedItem();
+
+        if (selected.getName().equalsIgnoreCase("")) {
+            input.setRegion(null);
+            return;
+        }
+
+        input.setRegion(selected);
     }
 
     private void updateSector() {

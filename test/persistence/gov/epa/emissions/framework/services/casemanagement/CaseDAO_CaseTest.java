@@ -232,24 +232,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldPersistCaseWithGridOnAdd() {
-        Case element = new Case("test" + Math.random());
-        Grid attrib = new Grid("test" + Math.random());
-        add(attrib);
-        element.setGrid(attrib);
-
-        dao.add(element, session);
-
-        session.clear();
-        try {
-            List list = dao.getCases(session);
-            assertEquals(attrib, ((Case) list.get(0)).getGrid());
-        } finally {
-            remove(element);
-            remove(attrib);
-        }
-    }
-
     public void testShouldPersistCaseWithMeteorlogicalYearOnAdd() {
         Case element = new Case("test" + Math.random());
         MeteorlogicalYear attrib = new MeteorlogicalYear("test" + Math.random());

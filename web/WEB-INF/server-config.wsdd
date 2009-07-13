@@ -487,21 +487,21 @@
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Grid"
-		qname="ns1:Grid" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		languageSpecificType="java:gov.epa.emissions.framework.services.data.RegionType"
+		qname="ns1:RegionType" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
-	<arrayMapping qname="ns1:Grids" xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Grid[]"
-		innerType="ns1:Grid"
+	<arrayMapping qname="ns1:RegionTypes" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.data.RegionType[]"
+		innerType="ns1:RegionType"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.GridResolution"
-		qname="ns1:GridResolution" xmlns:ns1="urn:gov.epa.services.EmfService"/>
-		
-	<arrayMapping qname="ns1:GridResolutions" xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.GridResolution[]"
-		innerType="ns1:GridResolution"
+		languageSpecificType="java:gov.epa.emissions.framework.services.data.GeoRegion"
+		qname="ns1:GeoRegion" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<arrayMapping qname="ns1:GeoRegions" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.data.GeoRegion[]"
+		innerType="ns1:GeoRegion"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<beanMapping

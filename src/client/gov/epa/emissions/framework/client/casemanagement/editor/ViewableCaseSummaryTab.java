@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.AddRemoveRegionsWidget;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
@@ -67,13 +68,9 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
     private ComboBox emissionsYearCombo;
 
-    private ComboBox gridCombo;
-
     private ComboBox meteorlogicalYearCombo;
 
     private ComboBox speciationCombo;
-    
-    private ComboBox gridResolutionCombo;
     
     private CheckBox isFinal;
 
@@ -96,6 +93,8 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
     private TextField modelVersionField;
     
     private TextField numMetLayers, numEmissionLayers;
+
+    private AddRemoveRegionsWidget gridsWidget;
 
     public ViewableCaseSummaryTab(Case caseObj, EmfSession session,
             EmfConsole parentConsole) {
@@ -207,13 +206,11 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
         layoutGenerator.addLabelWidgetPair("Model & Version:", modelToRun(), panel);
         layoutGenerator.addLabelWidgetPair("Modeling Region:", modRegions(), panel);
-        //layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
-        layoutGenerator.addLabelWidgetPair("Grid Name:", grids(), panel);
-        layoutGenerator.addLabelWidgetPair("Grid Resolution:", gridResolution(), panel);
+        layoutGenerator.addLabelWidgetPair("<html>Grids:<br><br><br></html>", grids(), panel);
         layoutGenerator.addLabelWidgetPair("Met/Emis Layers:", metEmisLayers(), panel);
         layoutGenerator.addLabelWidgetPair("Start Date & Time: ", startDate(), panel);
 
-        layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 5, 10);
+        layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 5, 10);
 
         return panel;
     }
@@ -355,15 +352,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         return modRegionsCombo;
     }
 
-    private ComboBox gridResolution() throws EmfException {
-        gridResolutionCombo = new ComboBox(presenter.getGridResolutions());
-        gridResolutionCombo.setToolTipText("This value is set for the environment variable 'EMF_GRID'.");
-        gridResolutionCombo.setSelectedItem(caseObj.getGridResolution());
-        gridResolutionCombo.setPreferredSize(defaultDimension);
-
-        return gridResolutionCombo;
-    }
-
     private ComboBox abbreviations() throws EmfException {
         abbreviationsCombo = new ComboBox(presenter.getAbbreviations());
         abbreviationsCombo.setSelectedItem(caseObj.getAbbreviation());
@@ -397,6 +385,13 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         sectorsWidget.setPreferredSize(new Dimension(255, 80));
         return sectorsWidget;
     }
+    
+    private JPanel grids() throws EmfException {
+        gridsWidget = new AddRemoveRegionsWidget(presenter.getAllGeoRegions());
+        gridsWidget.setRegions(caseObj.getRegions());
+        gridsWidget.setPreferredSize(new Dimension(255, 80));
+        return gridsWidget;
+    }
 
     private ComboBox emissionsYears() throws EmfException {
         emissionsYearCombo = new ComboBox(presenter.getEmissionsYears());
@@ -405,15 +400,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         emissionsYearCombo.setPreferredSize(defaultDimension);
 
         return emissionsYearCombo;
-    }
-
-    private ComboBox grids() throws EmfException {
-        gridCombo = new ComboBox(presenter.getGrids());
-        gridCombo.setToolTipText("This value is set for the environment variable 'IOAPI_GRIDNAME_1'.");
-        gridCombo.setSelectedItem(caseObj.getGrid());
-        gridCombo.setPreferredSize(defaultDimension);
-
-        return gridCombo;
     }
 
     private ComboBox meteorlogicalYears() throws EmfException {
@@ -527,7 +513,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         caseObj.setAirQualityModel(presenter.getAirQualityModel(airQualityModelsCombo.getSelectedItem()));
         caseObj.setCaseCategory(presenter.getCaseCategory(categoriesCombo.getSelectedItem()));
         caseObj.setEmissionsYear(presenter.getEmissionsYear(emissionsYearCombo.getSelectedItem()));
-        caseObj.setGrid(presenter.getGrid(gridCombo.getSelectedItem()));
+//        caseObj.setGrid(presenter.getGrid(gridCombo.getSelectedItem()));
         caseObj.setMeteorlogicalYear(presenter.getMeteorlogicalYear(meteorlogicalYearCombo.getSelectedItem()));
         caseObj.setSpeciation(presenter.getSpeciation(speciationCombo.getSelectedItem()));
         caseObj.setRunStatus(runStatusCombo.getSelectedItem() + "");
@@ -535,7 +521,6 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         saveEndDate();
         caseObj.setSectors(sectorsWidget.getSectors());
         caseObj.setModel(presenter.getModelToRun(modelToRunCombo.getSelectedItem()));
-        caseObj.setGridResolution(presenter.getGridResolutionl(gridResolutionCombo.getSelectedItem()));
     }
 
     private void saveFutureYear() throws EmfException {

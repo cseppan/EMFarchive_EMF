@@ -28,12 +28,6 @@ public interface CaseService {
 
     EmissionsYear addEmissionsYear(EmissionsYear emissYear) throws EmfException;
     
-    GridResolution[] getGridResolutions() throws EmfException;
-
-    Grid[] getGrids() throws EmfException;
-
-    Grid addGrid(Grid grid) throws EmfException;
-
     MeteorlogicalYear addMeteorologicalYear(MeteorlogicalYear metYear) throws EmfException;
 
     MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException;
@@ -77,8 +71,6 @@ public interface CaseService {
     CaseProgram addProgram(CaseProgram program) throws EmfException;
     
     ModelToRun addModelToRun(ModelToRun model) throws EmfException;
-
-    GridResolution addGridResolution(GridResolution gridResolution) throws EmfException;
 
     InputEnvtVar addInputEnvtVar(InputEnvtVar inputEnvtVar) throws EmfException;
 

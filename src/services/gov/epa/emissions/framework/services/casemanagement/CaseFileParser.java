@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterE
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.io.File;
 import java.text.ParseException;
@@ -266,10 +267,10 @@ public class CaseFileParser {
 
     private void populateCase(String[] values) throws ParseException {
         // NOTE: the order of fields:
-        // Tab,Parameter,Order,Envt. Var.,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose
+        // Tab,Parameter,Order,Envt. Var.,Region,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose
         // pEnvVars.add(new ParameterEnvVar(values[3]));
-        String value = values[7];
-
+        String value = values[8];
+        
         if (values[1].equalsIgnoreCase("Model to Run")) {
             caseObj.setModel(new ModelToRun(value));
             return;
@@ -285,23 +286,13 @@ public class CaseFileParser {
             return;
         }
 
-        if (values[1].equalsIgnoreCase("Grid Name")) {
-            caseObj.setGrid(new Grid(value));
-            return;
-        }
-
-        if (values[1].equalsIgnoreCase("Grid Resolution")) {
-            caseObj.setGridResolution(new GridResolution(value));
-            return;
-        }
-
         if (values[1].equalsIgnoreCase("Met Layers")) {
-            caseObj.setNumMetLayers(value == null || value.equalsIgnoreCase("null") ? null : new Integer(value));
+            caseObj.setNumMetLayers(value == null || value.equalsIgnoreCase("null") || value.trim().isEmpty() ? null : new Integer(value));
             return;
         }
 
         if (values[1].equalsIgnoreCase("Emission Layers")) {
-            caseObj.setNumEmissionsLayers(value == null || value.equalsIgnoreCase("null") ? null : new Integer(value));
+            caseObj.setNumEmissionsLayers(value == null || value.equalsIgnoreCase("null") || value.trim().isEmpty() ? null : new Integer(value));
             return;
         }
 
@@ -350,23 +341,24 @@ public class CaseFileParser {
         CaseParameter newParam = new CaseParameter();
 
         // NOTE: the order of fields:
-        // Tab,Parameter,Order,Envt. Var.,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose
+        // Tab,Parameter,Order,Envt. Var.,Region,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose
 
         newParam.setParameterName(new ParameterName(fields[1]));
         newParam.setOrder(Float.valueOf(fields[2]));
         ParameterEnvVar envar = new ParameterEnvVar(fields[3]);
         pEnvVars.add(envar);
         newParam.setEnvVar(envar);
-        newParam.setSector(new Sector(fields[4], fields[4]));
-        newParam.setJobName(fields[5]);
-        newParam.setProgram(new CaseProgram(fields[6]));
-        newParam.setValue(fields[7]);
-        newParam.setType(new ValueType(fields[8]));
-        newParam.setRequired(fields[9].equalsIgnoreCase("TRUE"));
-        newParam.setLocal(fields[10].equalsIgnoreCase("TRUE"));
-        newParam.setLastModifiedDate(CustomDateFormat.parse_MM_DD_YYYY_HH_mm(fields[11]));
-        newParam.setNotes(fields[12]);
-        newParam.setPurpose(fields[13]);
+        newParam.setRegion(new GeoRegion(fields[4], fields[4]));
+        newParam.setSector(new Sector(fields[5], fields[5]));
+        newParam.setJobName(fields[6]);
+        newParam.setProgram(new CaseProgram(fields[7]));
+        newParam.setValue(fields[8]);
+        newParam.setType(new ValueType(fields[9]));
+        newParam.setRequired(fields[10].equalsIgnoreCase("TRUE"));
+        newParam.setLocal(fields[11].equalsIgnoreCase("TRUE"));
+        newParam.setLastModifiedDate(CustomDateFormat.parse_MM_DD_YYYY_HH_mm(fields[12]));
+        newParam.setNotes(fields[13]);
+        newParam.setPurpose(fields[14]);
 
         this.params.add(newParam);
     }
@@ -387,19 +379,20 @@ public class CaseFileParser {
         InputEnvtVar envVar = new InputEnvtVar(data[2]);
         this.inEnvVars.add(envVar);
         input.setEnvtVars(envVar);
-        input.setSector(new Sector(data[3], data[3].equalsIgnoreCase("All sectors") ? "" : data[3]));
-        input.setJobName(data[4].equalsIgnoreCase("All jobs for sector") ? "" : data[4]);
-        input.setProgram(new CaseProgram(data[5]));
-        input.setDataset(new EmfDataset(0, data[6], 0, 0, data[9]));
-        Version version = (data[7] == null || data[7].equalsIgnoreCase("null") || data[7].trim().isEmpty()) ? null
-                : new Version(Integer.parseInt(data[7]));
+        input.setRegion(new GeoRegion(data[3], data[3]));
+        input.setSector(new Sector(data[4], data[4].equalsIgnoreCase("All sectors") ? "" : data[4]));
+        input.setJobName(data[5].equalsIgnoreCase("All jobs for sector") ? "" : data[5]);
+        input.setProgram(new CaseProgram(data[6]));
+        input.setDataset(new EmfDataset(0, data[7], 0, 0, data[10]));
+        Version version = (data[8] == null || data[8].equalsIgnoreCase("null") || data[8].trim().isEmpty()) ? null
+                : new Version(Integer.parseInt(data[8]));
         input.setVersion(version);
-        input.setDatasetType(new DatasetType(data[9]));
-        input.setRequired(data[10].equalsIgnoreCase("TRUE"));
-        input.setLocal(data[11].equalsIgnoreCase("TRUE"));
-        input.setSubdirObj(new SubDir(data[12]));
-        input.setLastModifiedDate(data[13].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[13]));
-        input.setParentCase(data[14]);
+        input.setDatasetType(new DatasetType(data[10]));
+        input.setRequired(data[11].equalsIgnoreCase("TRUE"));
+        input.setLocal(data[12].equalsIgnoreCase("TRUE"));
+        input.setSubdirObj(new SubDir(data[13]));
+        input.setLastModifiedDate(data[14].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[14]));
+        input.setParentCase(data[15]);
 
         this.inputs.add(input);
     }
@@ -417,21 +410,22 @@ public class CaseFileParser {
 
         job.setName(data[1]);
         job.setJobNo(Float.parseFloat(data[2]));
-        job.setSector(new Sector(data[3], data[3].equalsIgnoreCase("All sectors") ? "" : data[3]));
-        job.setRunstatus(new JobRunStatus(data[4]));
-        job.setRunStartDate(data[5].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[5]));
-        job.setRunCompletionDate(data[6].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[6]));
-        job.setExecutable(new Executable(data[7]));
-        job.setArgs(data[8]);
-        job.setPath(data[9]);
-        job.setQueOptions(data[10]);
-        job.setJobGroup(data[11]);
-        job.setLocal(data[12].equalsIgnoreCase("TRUE"));
-        job.setIdInQueue(data[13]);
-        job.setUser(new User(data[14]));
-        job.setHost(new Host(data[15]));
-        job.setRunNotes(data[16]);
-        job.setPurpose(data[17]);
+        job.setRegion(new GeoRegion(data[3], data[3]));
+        job.setSector(new Sector(data[4], data[4].equalsIgnoreCase("All sectors") ? "" : data[4]));
+        job.setRunstatus(new JobRunStatus(data[5]));
+        job.setRunStartDate(data[6].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[6]));
+        job.setRunCompletionDate(data[7].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[7]));
+        job.setExecutable(new Executable(data[8]));
+        job.setArgs(data[9]);
+        job.setPath(data[10]);
+        job.setQueOptions(data[11]);
+        job.setJobGroup(data[12]);
+        job.setLocal(data[13].equalsIgnoreCase("TRUE"));
+        job.setIdInQueue(data[14]);
+        job.setUser(new User(data[15]));
+        job.setHost(new Host(data[16]));
+        job.setRunNotes(data[17]);
+        job.setPurpose(data[18]);
 
         this.jobs.add(job);
     }

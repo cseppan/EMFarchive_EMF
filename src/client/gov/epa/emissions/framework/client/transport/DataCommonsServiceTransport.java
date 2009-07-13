@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DatasetNote;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
@@ -476,5 +477,23 @@ public class DataCommonsServiceTransport implements DataCommonsService {
 
         call.request(new Object[] { user, templates, datasetTypeIds, new Boolean(replace) });
     }
+
+    public GeoRegion addGeoRegion(GeoRegion region) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addGeoRegion");
+        call.addParam("region", mappings.geoRegion());
+        call.setReturnType(mappings.geoRegion());
+
+        return (GeoRegion) call.requestResponse(new Object[] { region });
+    }
+
+    public GeoRegion[] getGeoRegions() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getGeoRegions");
+        call.setReturnType(mappings.geoRegions());
+
+        return (GeoRegion[]) call.requestResponse(new Object[] {});    }
 
 }

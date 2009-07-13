@@ -1,5 +1,9 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.version.Version;
@@ -18,6 +22,7 @@ import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 
 import javax.swing.JComponent;
@@ -107,6 +112,10 @@ public class InputFieldsPanelPresenter {
     public Sector getUpdatedSector() {
         return currentInput.getSector();
     }
+    
+    public GeoRegion getUpdatedRegion() {
+        return currentInput.getRegion();
+    }
 
     public void doValidateFields() throws EmfException {
         view.setFields(); // FIXME: should do more check here
@@ -162,6 +171,14 @@ public class InputFieldsPanelPresenter {
         PropertiesViewPresenter datasetViewPresenter = new PropertiesViewPresenter(getDataset(datasetId), session);
         DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
         datasetViewPresenter.doDisplay(view);
+    }
+    
+    public GeoRegion[] getGeoRegions() throws EmfException {
+        List<GeoRegion> all = new ArrayList<GeoRegion>();
+        all.add(new GeoRegion(""));
+        all.addAll(Arrays.asList(caseObjectManager.getGeoRegions()));
+        
+        return all.toArray(new GeoRegion[0]);
     }
 
 }

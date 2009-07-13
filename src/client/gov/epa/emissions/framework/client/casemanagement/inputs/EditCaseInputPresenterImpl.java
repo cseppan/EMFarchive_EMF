@@ -53,6 +53,7 @@ public class EditCaseInputPresenterImpl implements EditInputPresenter {
         inputFieldsPresenter.doSave();
         parentView.setMessage("Saved \"" + input.getName() + "\". Refresh to see the changes in the table.");
         parentView.addSectorBacktoCase(inputFieldsPresenter.getUpdatedSector());
+        parentView.addGridBacktoCase(inputFieldsPresenter.getUpdatedRegion());
     }
 
     public EmfSession getSession() {

@@ -19,14 +19,19 @@ public class InputsRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { getInputName(input), getEnvtVarName(input), getSectorName(input), 
-                getJob(input), getProgramName(input), getDatasetName(input), getVersion(input),
+        return new Object[] { getInputName(input), getEnvtVarName(input), getRegionName(input), 
+                getSectorName(input), getJob(input), getProgramName(input), 
+                getDatasetName(input), getVersion(input),
                 getQAStatus(input), getDSType(input), isRequired(input), isLocal(input), 
                 getSubDir(input), getLastModifiedDate(input)};
     }
     
     private String getInputName(CaseInput input) {
         return (input.getInputName() == null) ? "" : input.getInputName().getName();
+    }
+    
+    private String getRegionName(CaseInput input) {
+        return (input.getRegion() == null) ? "" : input.getRegion().getName();
     }
     
     private String getSectorName(CaseInput input) {

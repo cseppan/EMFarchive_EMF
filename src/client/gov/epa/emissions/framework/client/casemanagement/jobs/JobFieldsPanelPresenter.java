@@ -1,5 +1,9 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
@@ -11,6 +15,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import javax.swing.JComponent;
 
@@ -128,6 +133,14 @@ public class JobFieldsPanelPresenter {
             dependentJobs[i] = new DependentJob(jobIds[i]);
         
         return dependentJobs;
+    }
+
+    public GeoRegion[] getGeoRegions() throws EmfException {
+        List<GeoRegion> all = new ArrayList<GeoRegion>();
+        all.add(new GeoRegion(""));
+        all.addAll(Arrays.asList(caseObjectManager.getGeoRegions()));
+        
+        return all.toArray(new GeoRegion[0]);
     }
 
 }

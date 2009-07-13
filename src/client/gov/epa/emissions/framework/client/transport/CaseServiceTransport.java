@@ -11,8 +11,6 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
-import gov.epa.emissions.framework.services.casemanagement.Grid;
-import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
@@ -128,15 +126,6 @@ public class CaseServiceTransport implements CaseService {
         return (EmissionsYear[]) call.requestResponse(new Object[] {});
     }
 
-    public synchronized Grid[] getGrids() throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("getGrids");
-        call.setReturnType(caseMappings.grids());
-
-        return (Grid[]) call.requestResponse(new Object[] {});
-    }
-
     public synchronized MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException {
         EmfCall call = call();
 
@@ -206,15 +195,6 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.caseObject());
 
         return (Case) call.requestResponse(new Object[] { element });
-    }
-
-    public synchronized GridResolution[] getGridResolutions() throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("getGridResolutions");
-        call.setReturnType(caseMappings.gridResolutions());
-
-        return (GridResolution[]) call.requestResponse(new Object[] {});
     }
 
     public synchronized CaseInput[] getCaseInputs() throws EmfException {
@@ -315,16 +295,6 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.modelToRun());
 
         return (ModelToRun) call.requestResponse(new Object[] { model });
-    }
-
-    public synchronized GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("addGridResolution");
-        call.addParam("gridResolution", caseMappings.gridResolution());
-        call.setReturnType(caseMappings.gridResolution());
-
-        return (GridResolution) call.requestResponse(new Object[] { gridResolution });
     }
 
     public synchronized SubDir[] getSubDirs() throws EmfException {
@@ -963,16 +933,6 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.emissionsYear());
 
         return (EmissionsYear) call.requestResponse(new Object[] { emissYear });
-    }
-
-    public synchronized Grid addGrid(Grid grid) throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("addGrid");
-        call.addParam("grid", caseMappings.grid());
-        call.setReturnType(caseMappings.grid());
-
-        return (Grid) call.requestResponse(new Object[] { grid });
     }
 
     public synchronized MeteorlogicalYear addMeteorologicalYear(MeteorlogicalYear metYear) throws EmfException {

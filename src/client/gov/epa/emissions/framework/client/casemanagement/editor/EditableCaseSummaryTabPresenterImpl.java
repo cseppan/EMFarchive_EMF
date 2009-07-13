@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.casemanagement.editor;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.Date;
 
@@ -35,6 +36,13 @@ public class EditableCaseSummaryTabPresenterImpl implements EditableCaseSummaryT
             return;
         
         view.addSector(sector);
+    }
+    
+    public void addGrid(GeoRegion grid) {
+        if (grid == null)
+            return;
+        
+        view.addGrid(grid);
     }
 
 }

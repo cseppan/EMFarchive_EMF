@@ -217,6 +217,10 @@ public class DataCommonsDAO {
     public void add(Sector sector, Session session) {
         addObject(sector, session);
     }
+    
+    public void add(GeoRegion grid, Session session) {
+        addObject(grid, session);
+    }
 
     private void addObject(Object obj, Session session) {
         hibernateFacade.add(obj, session);
@@ -242,6 +246,10 @@ public class DataCommonsDAO {
         addObject(sourcegrp, session);
     }
 
+    public List<GeoRegion> getGeoRegions(Session session) {
+        return hibernateFacade.getAll(GeoRegion.class, Order.asc("name"), session);
+    }
+    
     public List getRevisions(int datasetId, Session session) {
         return session.createCriteria(Revision.class).add(Restrictions.eq("datasetId", new Integer(datasetId))).list();
     }

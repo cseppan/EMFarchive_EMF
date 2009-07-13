@@ -26,6 +26,7 @@ import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
@@ -728,4 +729,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         presenter.addSectorBacktoCase(updatedSector);
     }
 
+    public void addGridBacktoCase(GeoRegion updatedGrid) {
+        presenter.addGridBacktoCase(updatedGrid);
+    }
 }

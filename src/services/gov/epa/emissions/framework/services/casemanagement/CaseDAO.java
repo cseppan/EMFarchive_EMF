@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterN
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
@@ -144,10 +145,6 @@ public class CaseDAO {
         addObject(object, session);
     }
 
-    public void add(GridResolution object, Session session) {
-        addObject(object, session);
-    }
-
     public void add(CaseCategory object, Session session) {
         addObject(object, session);
     }
@@ -156,7 +153,7 @@ public class CaseDAO {
         addObject(object, session);
     }
 
-    public void add(Grid object, Session session) {
+    public void add(GeoRegion object, Session session) {
         addObject(object, session);
     }
 
@@ -230,14 +227,6 @@ public class CaseDAO {
 
     public List<EmissionsYear> getEmissionsYears(Session session) {
         return hibernateFacade.getAll(EmissionsYear.class, Order.asc("name"), session);
-    }
-
-    public List<Grid> getGrids(Session session) {
-        return hibernateFacade.getAll(Grid.class, Order.asc("name"), session);
-    }
-
-    public List<GridResolution> getGridResolutions(Session session) {
-        return hibernateFacade.getAll(GridResolution.class, Order.asc("name"), session);
     }
 
     public List<MeteorlogicalYear> getMeteorlogicalYears(Session session) {
@@ -352,16 +341,18 @@ public class CaseDAO {
     private Criterion[] uniqueCaseInputCriteria(int caseId, CaseInput input) {
         InputName inputname = input.getInputName();
         Sector sector = input.getSector();
+        GeoRegion region = input.getRegion();
         CaseProgram program = input.getProgram();
         Integer jobID = new Integer(input.getCaseJobID());
 
         Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion c2 = (inputname == null) ? Restrictions.isNull("inputName") : Restrictions.eq("inputName", inputname);
-        Criterion c3 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
-        Criterion c4 = (program == null) ? Restrictions.isNull("program") : Restrictions.eq("program", program);
-        Criterion c5 = Restrictions.eq("caseJobID", jobID);
+        Criterion c3 = (region == null) ? Restrictions.isNull("region") : Restrictions.eq("region", region);
+        Criterion c4 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
+        Criterion c5 = (program == null) ? Restrictions.isNull("program") : Restrictions.eq("program", program);
+        Criterion c6 = Restrictions.eq("caseJobID", jobID);
 
-        return new Criterion[] { c1, c2, c3, c4, c5 };
+        return new Criterion[] { c1, c2, c3, c4, c5, c6 };
     }
 
     public Object load(Class<?> clazz, String name, Session session) {
@@ -938,6 +929,7 @@ public class CaseDAO {
 
     private Criterion[] uniqueCaseParameterCriteria(int caseId, CaseParameter param) {
         ParameterName paramname = param.getParameterName();
+        GeoRegion region = param.getRegion();
         Sector sector = param.getSector();
         CaseProgram program = param.getProgram();
         Integer jobID = new Integer(param.getJobId());
@@ -945,11 +937,12 @@ public class CaseDAO {
         Criterion c1 = Restrictions.eq("caseID", new Integer(caseId));
         Criterion c2 = (paramname == null) ? Restrictions.isNull("parameterName") : Restrictions.eq("parameterName",
                 paramname);
-        Criterion c3 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
-        Criterion c4 = (program == null) ? Restrictions.isNull("program") : Restrictions.eq("program", program);
-        Criterion c5 = Restrictions.eq("jobId", jobID);
+        Criterion c3 = (region == null) ? Restrictions.isNull("region") : Restrictions.eq("region", region);
+        Criterion c4 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
+        Criterion c5 = (program == null) ? Restrictions.isNull("program") : Restrictions.eq("program", program);
+        Criterion c6 = Restrictions.eq("jobId", jobID);
 
-        return new Criterion[] { c1, c2, c3, c4, c5 };
+        return new Criterion[] { c1, c2, c3, c4, c5, c6 };
     }
 
     public List<CaseParameter> getCaseParameters(int caseId, Session session) {

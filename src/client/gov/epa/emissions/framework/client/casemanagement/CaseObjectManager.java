@@ -13,8 +13,6 @@ import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.CasesSens;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
-import gov.epa.emissions.framework.services.casemanagement.Grid;
-import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
@@ -28,6 +26,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterE
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,9 +94,7 @@ public class CaseObjectManager {
 
     private List<Speciation> speciations;
 
-    private List<GridResolution> gridResolutions;
-
-    private List<Grid> grids;
+    private List<GeoRegion> geoRegions;
 
     // up to here
 
@@ -130,8 +127,7 @@ public class CaseObjectManager {
         this.airQualityModels = null;
         this.categories = null;
         this.emissionsYears = null;
-        this.gridResolutions = null;
-        this.grids = null;
+        this.geoRegions = null;
         this.inputEnvtVars = null;
         this.inputNames = null;
         this.meteorlogicalYears =null;
@@ -476,11 +472,9 @@ public class CaseObjectManager {
             parameterName = (ParameterName) selected;
             parameterName.setModelToRunId(modelToRunId);
         }
-        this.getParameterNames(modelToRunId); // make sure parameterEnvtVar have been retrieved
+        ParameterName[] names = this.getParameterNames(modelToRunId); // make sure parameterEnvtVar have been retrieved
 
-        for (Iterator<ParameterName> iter = parameterNames.iterator(); iter.hasNext();) {
-            ParameterName name = iter.next();
-
+        for (ParameterName name : names) {
             if (name.equals(parameterName) && name.getModelToRunId() == parameterName.getModelToRunId())
                 return name;
         }
@@ -914,70 +908,37 @@ public class CaseObjectManager {
         return addSpeciation(speication);
     }
 
-    public synchronized GridResolution[] getGridResolutions() throws EmfException {
-        gridResolutions = Arrays.asList(caseService.getGridResolutions());
-        Collections.sort(gridResolutions);
+    public synchronized GeoRegion[] getGeoRegions() throws EmfException {
+        geoRegions = Arrays.asList(dataCommonsService.getGeoRegions());
+        Collections.sort(geoRegions);
 
-        return gridResolutions.toArray(new GridResolution[0]);
+        return geoRegions.toArray(new GeoRegion[0]);
     }
 
-    public synchronized GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
-        GridResolution newResolution = caseService.addGridResolution(gridResolution);
+    public synchronized GeoRegion addGeoregion(GeoRegion region) throws EmfException {
+        GeoRegion newRegion = dataCommonsService.addGeoRegion(region);
 
-        return newResolution;
+        return newRegion;
     }
 
-    public synchronized GridResolution getOrAddGridResolution(Object selected) throws EmfException {
+    public synchronized GeoRegion getOrAddGrid(Object selected) throws EmfException {
         if (selected == null)
             return null;
 
-        GridResolution gridResolution = null;
+        GeoRegion region = null;
         if (selected instanceof String) {
-            gridResolution = new GridResolution(selected.toString());
-        } else if (selected instanceof GridResolution) {
-            gridResolution = (GridResolution) selected;
+            region = new GeoRegion(selected.toString());
+        } else if (selected instanceof GeoRegion) {
+            region = (GeoRegion) selected;
         }
 
-        this.getGridResolutions(); // make sure GridResolution have been retrieved
+        this.getRegions(); // make sure Grid have been retrieved
 
-        if (gridResolutions.contains(gridResolution))
-            return gridResolutions.get(gridResolutions.indexOf(gridResolution));
-
-        // the GridResolution was not found in the list
-        return addGridResolution(gridResolution);
-    }
-
-    public synchronized Grid[] getGrids() throws EmfException {
-        grids = Arrays.asList(caseService.getGrids());
-        Collections.sort(grids);
-
-        return grids.toArray(new Grid[0]);
-    }
-
-    public synchronized Grid addGrid(Grid grid) throws EmfException {
-        Grid newGrid = caseService.addGrid(grid);
-
-        return newGrid;
-    }
-
-    public synchronized Grid getOrAddGrid(Object selected) throws EmfException {
-        if (selected == null)
-            return null;
-
-        Grid grid = null;
-        if (selected instanceof String) {
-            grid = new Grid(selected.toString());
-        } else if (selected instanceof Grid) {
-            grid = (Grid) selected;
-        }
-
-        this.getGrids(); // make sure Grid have been retrieved
-
-        if (grids.contains(grid))
-            return grids.get(grids.indexOf(grid));
+        if (geoRegions.contains(region))
+            return geoRegions.get(geoRegions.indexOf(region));
 
         // the Grid was not found in the list
-        return addGrid(grid);
+        return addGeoregion(region);
     }
 
     public synchronized CasesSens[] getCasesSens(int parentCaseId) {

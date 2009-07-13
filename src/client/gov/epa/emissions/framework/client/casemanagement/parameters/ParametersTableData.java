@@ -28,7 +28,7 @@ public class ParametersTableData extends ChangeableTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Parameter", "Order", "Envt. Var.", "Sector", 
+        return new String[] { "Parameter", "Order", "Envt. Var.", "Region", "Sector", 
                 "Job", "Program", "Value", "Type",
                 "Reqd?", "Local?", "Last Modified", "Notes", "Purpose" };
     }

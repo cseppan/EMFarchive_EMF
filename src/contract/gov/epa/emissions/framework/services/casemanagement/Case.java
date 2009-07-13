@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class Case implements Comparable, Lockable, Serializable {
+public class Case implements Comparable<Case>, Lockable, Serializable {
 
     private int id;
     
@@ -31,8 +32,6 @@ public class Case implements Comparable, Lockable, Serializable {
 
     private EmissionsYear emissionsYear;
 
-    private Grid grid;
-    
     private String gridDescription;
 
     private MeteorlogicalYear meteorlogicalYear;
@@ -63,8 +62,6 @@ public class Case implements Comparable, Lockable, Serializable {
     
     private boolean caseTemplate;
     
-    private GridResolution gridResolution;
-    
     private Integer numMetLayers;
 
     private Integer numEmissionsLayers;
@@ -78,6 +75,8 @@ public class Case implements Comparable, Lockable, Serializable {
     private Date endDate;
     
     private Sector[] sectors = new Sector[]{};
+    
+    private GeoRegion[] regions = new GeoRegion[]{};
 
     //private List caseInputs;
     
@@ -134,10 +133,6 @@ public class Case implements Comparable, Lockable, Serializable {
         return getName();
     }
 
-    public int compareTo(Object other) {
-        return name.compareToIgnoreCase(((Case) other).getName());
-    }
-
     public void setAbbreviation(Abbreviation abbreviation) {
         this.abbreviation = abbreviation;
     }
@@ -168,14 +163,6 @@ public class Case implements Comparable, Lockable, Serializable {
 
     public EmissionsYear getEmissionsYear() {
         return emissionsYear;
-    }
-
-    public void setGrid(Grid grid) {
-        this.grid = grid;
-    }
-
-    public Grid getGrid() {
-        return grid;
     }
 
     public void setMeteorlogicalYear(MeteorlogicalYear meteorlogicalYear) {
@@ -294,14 +281,6 @@ public class Case implements Comparable, Lockable, Serializable {
         this.futureYear = futureYear;
     }
 
-    public GridResolution getGridResolution() {
-        return gridResolution;
-    }
-
-    public void setGridResolution(GridResolution gridResolution) {
-        this.gridResolution = gridResolution;
-    }
-
     public boolean getIsFinal() {
         return isFinal;
     }
@@ -398,14 +377,6 @@ public class Case implements Comparable, Lockable, Serializable {
         this.outputFileDir = outputFileDir;
     }
 
-//    public CaseInput[] getCaseInputs() {
-//        return (CaseInput[])caseInputs.toArray(new CaseInput[0]);
-//    }
-
-//    public void setCaseInputs(CaseInput[] caseInputs) {
-//        this.caseInputs = Arrays.asList(caseInputs);
-//    }
-
     public User getCreator() {
         return creator;
     }
@@ -438,4 +409,19 @@ public class Case implements Comparable, Lockable, Serializable {
         this.modelVersion = modelVersion;
     }
 
+    public int compareTo(Case other) {
+        if (other == null)
+            return -1;
+        
+        return name.compareToIgnoreCase(other.getName());
+    }
+
+    public GeoRegion[] getRegions() {
+        return regions;
+    }
+
+    public void setRegions(GeoRegion[] regions) {
+        this.regions = regions;
+    }
+    
 }

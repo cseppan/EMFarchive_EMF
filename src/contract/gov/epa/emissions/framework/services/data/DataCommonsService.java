@@ -110,5 +110,7 @@ public interface DataCommonsService {
 
     EmfFileInfo getParentDirectory(EmfFileInfo file) throws EmfException;
 
+    GeoRegion[] getGeoRegions() throws EmfException;
 
+    GeoRegion addGeoRegion(GeoRegion grid) throws EmfException;
 }

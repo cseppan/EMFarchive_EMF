@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.casemanagement.jobs;
 
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -60,6 +61,8 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     private boolean local;
     
     private String jobGroup; 
+    
+    private GeoRegion region;
     
     private DependentJob[] dependentJobs = new DependentJob[] {};
 
@@ -303,4 +306,13 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     public String getJobGroup(){
         return jobGroup;
     }
+
+    public GeoRegion getRegion() {
+        return region;
+    }
+
+    public void setRegion(GeoRegion region) {
+        this.region = region;
+    }
+
 }

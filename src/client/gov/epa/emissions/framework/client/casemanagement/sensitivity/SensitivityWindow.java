@@ -17,9 +17,9 @@ import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
-import gov.epa.emissions.framework.services.casemanagement.Grid;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -275,8 +275,8 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         }
 
         grids = new JList();
-        grids.setListData(new Grid[] { new Grid("Select All"), new Grid(namevalues[0]), new Grid(namevalues[1]),
-                new Grid(namevalues[2]) });
+        grids.setListData(new GeoRegion[] { new GeoRegion("Select All"), new GeoRegion(namevalues[0]), new GeoRegion(namevalues[1]),
+                new GeoRegion(namevalues[2]) });
         grids.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane scrollPane = new JScrollPane(grids, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -576,15 +576,15 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         presenter.doClose();
     }
 
-    private Grid[] getSelectedGrids() {
+    private GeoRegion[] getSelectedGrids() {
 
-        List<Grid> list = new ArrayList<Grid>(grids.getSelectedValues().length);
+        List<GeoRegion> list = new ArrayList<GeoRegion>(grids.getSelectedValues().length);
         for (int i = 0; i < grids.getSelectedValues().length; i++) {
-            Grid grid = (Grid) grids.getSelectedValues()[i];
+            GeoRegion grid = (GeoRegion) grids.getSelectedValues()[i];
             if (!grid.getName().equalsIgnoreCase("Select All"))
-                list.add((Grid) grids.getSelectedValues()[i]);
+                list.add((GeoRegion) grids.getSelectedValues()[i]);
         }
-        return list.toArray(new Grid[0]);
+        return list.toArray(new GeoRegion[0]);
     }
 
     private Sector[] getSelectedSectors() {

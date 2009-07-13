@@ -15,12 +15,14 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.AddRemoveRegionsWidget;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.RunStatuses;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 import gov.epa.emissions.framework.ui.RefreshObserver;
@@ -82,19 +84,17 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox emissionsYearCombo;
 
-    private EditableComboBox gridCombo;
-
     private EditableComboBox meteorlogicalYearCombo;
 
     private EditableComboBox speciationCombo;
-
-    private EditableComboBox gridResolutionCombo;
 
     private CheckBox isFinal;
 
     private CheckBox isTemplate;
 
     private AddRemoveSectorWidget sectorsWidget;
+    
+    private AddRemoveRegionsWidget regionsWidget;
 
     private ComboBox runStatusCombo;
 
@@ -208,13 +208,11 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
         layoutGenerator.addLabelWidgetPair("Model & Version:", modelToRun(), panel);
         layoutGenerator.addLabelWidgetPair("Modeling Region:", modRegions(), panel);
-        // layoutGenerator.addLabelWidgetPair("Control Region:", controlRegions(), panel);
-        layoutGenerator.addLabelWidgetPair("Grid Name:", grids(), panel);
-        layoutGenerator.addLabelWidgetPair("Grid Resolution:", gridResolution(), panel);
+        layoutGenerator.addLabelWidgetPair("<html>Regions:<br><br><br></html>", regions(), panel);
         layoutGenerator.addLabelWidgetPair("Met/Emis Layers:", metEmisLayers(), panel);
         layoutGenerator.addLabelWidgetPair("Start Date & Time: ", startDate(), panel);
 
-        layoutGenerator.makeCompactGrid(panel, 6, 2, 10, 10, 5, 10);
+        layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 5, 10);
 
         return panel;
     }
@@ -369,25 +367,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return modRegionsCombo;
     }
 
-    private EditableComboBox gridResolution() throws EmfException {
-        gridResolutionCombo = new EditableComboBox(presenter.getGridResolutions());
-        gridResolutionCombo.setToolTipText("This value is set for the environment variable 'EMF_GRID'.");
-        gridResolutionCombo.setSelectedItem(caseObj.getGridResolution());
-        gridResolutionCombo.setPreferredSize(defaultDimension);
-        changeablesList.addChangeable(gridResolutionCombo);
-
-        return gridResolutionCombo;
-    }
-
-    // private ComboBox controlRegions() throws EmfException {
-    // controlRegionsCombo = new ComboBox(presenter.getRegions());
-    // controlRegionsCombo.setSelectedItem(caseObj.getControlRegion());
-    // controlRegionsCombo.setPreferredSize(defaultDimension);
-    // changeablesList.addChangeable(controlRegionsCombo);
-    //
-    // return controlRegionsCombo;
-    // }
-
     private EditableComboBox abbreviations() throws EmfException {
         abbreviationsCombo = new EditableComboBox(presenter.getAbbreviations());
         abbreviationsCombo.setSelectedItem(caseObj.getAbbreviation());
@@ -425,6 +404,13 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         sectorsWidget.setPreferredSize(new Dimension(255, 80));
         return sectorsWidget;
     }
+    
+    private JPanel regions() throws EmfException {
+        regionsWidget = new AddRemoveRegionsWidget(presenter.getAllGeoRegions(), changeablesList, parentConsole);
+        regionsWidget.setRegions(caseObj.getRegions());
+        regionsWidget.setPreferredSize(new Dimension(255, 80));
+        return regionsWidget;
+    }
 
     private EditableComboBox emissionsYears() throws EmfException {
         emissionsYearCombo = new EditableComboBox(presenter.getEmissionsYears());
@@ -434,16 +420,6 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         changeablesList.addChangeable(emissionsYearCombo);
 
         return emissionsYearCombo;
-    }
-
-    private EditableComboBox grids() throws EmfException {
-        gridCombo = new EditableComboBox(presenter.getGrids());
-        gridCombo.setToolTipText("This value is set for the environment variable 'IOAPI_GRIDNAME_1'.");
-        gridCombo.setSelectedItem(caseObj.getGrid());
-        gridCombo.setPreferredSize(defaultDimension);
-        changeablesList.addChangeable(gridCombo);
-
-        return gridCombo;
     }
 
     private EditableComboBox meteorlogicalYears() throws EmfException {
@@ -567,15 +543,14 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setAirQualityModel(presenter.getAirQualityModel(airQualityModelsCombo.getSelectedItem()));
         caseObj.setCaseCategory(presenter.getCaseCategory(categoriesCombo.getSelectedItem()));
         caseObj.setEmissionsYear(presenter.getEmissionsYear(emissionsYearCombo.getSelectedItem()));
-        caseObj.setGrid(presenter.getGrid(gridCombo.getSelectedItem()));
         caseObj.setMeteorlogicalYear(presenter.getMeteorlogicalYear(meteorlogicalYearCombo.getSelectedItem()));
         caseObj.setSpeciation(presenter.getSpeciation(speciationCombo.getSelectedItem()));
         caseObj.setRunStatus(runStatusCombo.getSelectedItem() + "");
         saveStartDate();
         saveEndDate();
         caseObj.setSectors(sectorsWidget.getSectors());
+        caseObj.setRegions(regionsWidget.getRegions());
         caseObj.setModel(presenter.getModelToRun(modelToRunCombo.getSelectedItem()));
-        caseObj.setGridResolution(presenter.getGridResolutionl(gridResolutionCombo.getSelectedItem()));
         caseObj.setModelVersion((modelVersionField.getText() == null) ? "" : modelVersionField.getText().trim());
     }
 
@@ -686,6 +661,31 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
                 msg = "";
                     
             messagePanel.setMessage(msg + " Sector \"" + sector.getName() + "\" added to the summary tab.");
+        }
+    }
+    
+    public void addGrid(GeoRegion grid) {
+        if (grid == null)
+            return;
+
+        List<GeoRegion> grids = new ArrayList<GeoRegion>();
+        grids.addAll(Arrays.asList(regionsWidget.getRegions()));
+        boolean found = false;
+
+        for (Iterator<GeoRegion> iter = grids.iterator(); iter.hasNext();) {
+            GeoRegion item = iter.next();
+            if (grid != null && grid.equals(item))
+                found = true;
+        }
+
+        if (!found) {
+            regionsWidget.addGrid(grid);
+            String msg = messagePanel.getMessage();
+            
+            if (msg == null || (msg != null && msg.toUpperCase().contains("SAVED")))
+                msg = "";
+                    
+            messagePanel.setMessage(msg + " Grid \"" + grid.getName() + "\" added to the summary tab.");
         }
     }
 

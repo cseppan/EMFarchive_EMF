@@ -21,6 +21,7 @@ public class ParametersRowSource implements RowSource {
 
     public Object[] values() {
         return new Object[] { getParameterName(parameter), getOrder(parameter),  getEnvtVarName(parameter),
+                getRegionName(parameter),
                 getSectorName(parameter), getJob(parameter), getProgramName(parameter), parameter.getValue(),
                 getValueType(parameter), isRequired(parameter), isLocal(parameter), getLastModified(parameter), 
                 parameter.getNotes(), parameter.getPurpose() };
@@ -38,6 +39,10 @@ public class ParametersRowSource implements RowSource {
         return (param.getParameterName() == null) ? "" : param.getParameterName().getName();
     }
 
+    private String getRegionName(CaseParameter parameter) {
+        return (parameter.getRegion() == null) ? "" : parameter.getRegion().getName();
+    }
+    
     private String getSectorName(CaseParameter param) {
         return (param.getSector() == null) ? "All sectors" : param.getSector().getName();
     }

@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -317,6 +318,15 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
             return;
 
         view.addSector(sector);
+    }
+    
+    public void addNewRegionToSummary(CaseJob job) {
+        GeoRegion region = job.getRegion();
+
+        if (region == null)
+            return;
+
+        view.addGrid(region);
     }
 
     public void refreshJobList() throws EmfException {

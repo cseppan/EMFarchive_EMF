@@ -35,6 +35,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterN
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.exim.ManagedExportService;
 import gov.epa.emissions.framework.services.exim.ManagedImportService;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
@@ -383,34 +384,6 @@ public class ManagedCaseService {
             e.printStackTrace();
             log.error("Could not get all Emissions Years", e);
             throw new EmfException("Could not get all Emissions Years");
-        } finally {
-            session.close();
-        }
-    }
-
-    public synchronized Grid[] getGrids() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            List results = dao.getGrids(session);
-            return (Grid[]) results.toArray(new Grid[0]);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            log.error("Could not get all Grids", e);
-            throw new EmfException("Could not get all Grids");
-        } finally {
-            session.close();
-        }
-    }
-
-    public synchronized GridResolution[] getGridResolutions() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            List results = dao.getGridResolutions(session);
-            return (GridResolution[]) results.toArray(new GridResolution[0]);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            log.error("Could not get all Grid Resolutions", e);
-            throw new EmfException("Could not get all Grid Resolutions");
         } finally {
             session.close();
         }
@@ -961,25 +934,6 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized GridResolution addGridResolution(GridResolution gridResolution) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            GridResolution temp = (GridResolution) dao.load(GridResolution.class, gridResolution.getName(), session);
-
-            if (temp != null)
-                return temp;
-
-            dao.add(gridResolution, session);
-            return (GridResolution) dao.load(GridResolution.class, gridResolution.getName(), session);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new Grid Resolution '" + gridResolution.getName() + "'\n" + e.getMessage());
-            throw new EmfException("Could not add new Grid Resolution '" + gridResolution.getName() + "'");
-        } finally {
-            session.close();
-        }
-    }
-
     public synchronized SubDir[] getSubDirs() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -1108,14 +1062,14 @@ public class ManagedCaseService {
         try {
             if (dao.caseInputExists(input, session))
                 throw new EmfException(
-                        "The combination of 'Input Name', 'Sector', 'Program', and 'Job' should be unique.");
+                        "The combination of 'Input Name', 'Region', 'Sector', 'Program', and 'Job' should be unique.");
 
             dao.add(input, session);
             return (CaseInput) dao.loadCaseInput(input, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new case input '" + input.getName() + "'\n" + e.getMessage());
-            throw new EmfException("Could not add new case input '" + input.getName() + "'");
+            throw new EmfException(e.getMessage() == null ? "Could not add new case input." : e.getMessage());
         } finally {
             session.close();
         }
@@ -1658,14 +1612,14 @@ public class ManagedCaseService {
         try {
             if (dao.caseParameterExists(param, session))
                 throw new EmfException(
-                        "The combination of 'Parameter Name', 'Sector', 'Program', and 'Job' should be unique.");
+                        "The combination of 'Parameter Name', 'Region', 'Sector', 'Program', and 'Job' should be unique.");
 
             dao.addParameter(param, session);
             return dao.loadCaseParameter(param, session);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new case parameter '" + param.getName() + "'\n" + e.getMessage());
-            throw new EmfException("Could not add new case parameter '" + param.getName() + "'");
+            throw new EmfException(e.getMessage() == null ? "Could not add new case parameter." : e.getMessage());
         } finally {
             session.close();
         }
@@ -3253,12 +3207,12 @@ public class ManagedCaseService {
             }
             sbuf.append(shellSetenv("MODEL_LABEL", modelName));
         }
-        if (caseObj.getGrid() != null) {
-            sbuf.append(shellSetenv("IOAPI_GRIDNAME_1", caseObj.getGrid().getName()));
-        }
-        if (caseObj.getGridResolution() != null) {
-            sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().getName()));
-        }
+//        if (caseObj.getGrid() != null) {
+//            sbuf.append(shellSetenv("IOAPI_GRIDNAME_1", caseObj.getGrid().getName()));
+//        }
+//        if (caseObj.getGridResolution() != null) {
+//            sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().getName()));
+//        }
         if (caseObj.getAirQualityModel() != null) {
             sbuf.append(shellSetenv("EMF_AQM", caseObj.getAirQualityModel().getName()));
         }
@@ -4065,25 +4019,6 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized Grid addGrid(Grid grid) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            Grid temp = (Grid) dao.load(Grid.class, grid.getName(), session);
-
-            if (temp != null)
-                return temp;
-
-            dao.add(grid, session);
-            return (Grid) dao.load(Grid.class, grid.getName(), session);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new Grid '" + grid.getName() + "'\n" + e.getMessage());
-            throw new EmfException("Could not add new Grid '" + grid.getName() + "'");
-        } finally {
-            session.close();
-        }
-    }
-
     public synchronized MeteorlogicalYear addMeteorologicalYear(MeteorlogicalYear metYear) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -4497,9 +4432,9 @@ public class ManagedCaseService {
         sensitivityCase.setDescription("Sensitivity on " + parent.getName() + ": " + parent.getDescription());
         sensitivityCase.setEmissionsYear(parent.getEmissionsYear());
         sensitivityCase.setFutureYear(parent.getFutureYear());
-        sensitivityCase.setGrid(parent.getGrid());
+//        sensitivityCase.setGrid(parent.getGrid());
         sensitivityCase.setGridDescription(parent.getGridDescription());
-        sensitivityCase.setGridResolution(parent.getGridResolution());
+//        sensitivityCase.setGridResolution(parent.getGridResolution());
         sensitivityCase.setMeteorlogicalYear(parent.getMeteorlogicalYear());
         sensitivityCase.setModel(parent.getModel());
         sensitivityCase.setModelVersion(parent.getModelVersion());
@@ -5012,9 +4947,9 @@ public class ManagedCaseService {
         String ls = System.getProperty("line.separator");
         String model = (currentCase.getModel() == null) ? "" : currentCase.getModel().getName();
         String modelRegion = (currentCase.getModelingRegion() == null) ? "" : currentCase.getModelingRegion().getName();
-        String gridName = (currentCase.getGrid() == null) ? "" : currentCase.getGrid().getName();
-        String gridResolution = (currentCase.getGridResolution() == null) ? "" : currentCase.getGridResolution()
-                .getName();
+//        String gridName = (currentCase.getGrid() == null) ? "" : currentCase.getGrid().getName();
+//        String gridResolution = (currentCase.getGridResolution() == null) ? "" : currentCase.getGridResolution()
+//                .getName();
         String dstrModel = (currentCase.getAirQualityModel() == null) ? "" : currentCase.getAirQualityModel().getName();
         String speciation = (currentCase.getSpeciation() == null) ? "" : currentCase.getSpeciation().getName();
         String metYear = (currentCase.getMeteorlogicalYear() == null) ? "" : currentCase.getMeteorlogicalYear()
@@ -5048,6 +4983,10 @@ public class ManagedCaseService {
                 + clean(getSectors(currentCase.getSectors()))
                 + "\""
                 + ls
+                + "\"#EMF_REGIONS="
+                + clean(getRegions(currentCase.getRegions()))
+                + "\""
+                + ls
                 + "\"#EMF_CASE_COPIED_FROM="
                 + clean(currentCase.getTemplateUsed())
                 + "\""
@@ -5074,34 +5013,30 @@ public class ManagedCaseService {
                 + currentCase.getInputFileDir()
                 + "\""
                 + ls
-                + "Tab,Parameter,Order,Envt. Var.,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose"
-                + ls + "Summary,Model to Run,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,\""
+                + "Tab,Parameter,Order,Envt. Var.,Region,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose"
+                + ls + "Summary,Model to Run,0,MODEL_LABEL,,All sectors,All jobs for sector,All programs,\""
                 + clean(model) + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Model Version,0,MODEL_LABEL,All sectors,All jobs for sector,All programs,\""
+                + "Summary,Model Version,0,MODEL_LABEL,,All sectors,All jobs for sector,All programs,\""
                 + clean(currentCase.getModelVersion()) + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Modeling Region,0,,All sectors,All jobs for sector,All programs,\"" + clean(modelRegion)
+                + "Summary,Modeling Region,0,,,All sectors,All jobs for sector,All programs,\"" + clean(modelRegion)
                 + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Grid Name,0,IOAPI_GRIDNAME_1,All sectors,All jobs for sector,All programs,\""
-                + clean(gridName) + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Grid Resolution,0,EMF_GRID,All sectors,All jobs for sector,All programs,\""
-                + clean(gridResolution) + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Met Layers,0,,All sectors,All jobs for sector,All programs," + currentCase.getNumMetLayers()
+                + "Summary,Met Layers,0,,,All sectors,All jobs for sector,All programs," + currentCase.getNumMetLayers()
                 + ",Integer,TRUE,TRUE,,," + ls
-                + "Summary,Emission Layers,0,,All sectors,All jobs for sector,All programs,"
+                + "Summary,Emission Layers,0,,,All sectors,All jobs for sector,All programs,"
                 + currentCase.getNumEmissionsLayers() + ",Integer,TRUE,TRUE,,," + ls
-                + "Summary,Downstream Model,0,EMF_AQM,All sectors,All jobs for sector,All programs,\""
+                + "Summary,Downstream Model,0,EMF_AQM,,All sectors,All jobs for sector,All programs,\""
                 + clean(dstrModel) + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Speciation,0,EMF_SPC,All sectors,All jobs for sector,All programs,\"" + clean(speciation)
+                + "Summary,Speciation,0,EMF_SPC,,All sectors,All jobs for sector,All programs,\"" + clean(speciation)
                 + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Meteorological Year,0,,All sectors,All jobs for sector,All programs," + metYear
+                + "Summary,Meteorological Year,0,,,All sectors,All jobs for sector,All programs," + metYear
                 + ",String,TRUE,TRUE,,," + ls
-                + "Summary,Base Year,0,BASE_YEAR,All sectors,All jobs for sector,All programs,"
+                + "Summary,Base Year,0,BASE_YEAR,,All sectors,All jobs for sector,All programs,"
                 + currentCase.getBaseYear() + ",String,TRUE,TRUE,,," + ls
-                + "Summary,Future Year,0,FUTURE_YEAR,All sectors,All jobs for sector,All programs,"
+                + "Summary,Future Year,0,FUTURE_YEAR,,All sectors,All jobs for sector,All programs,"
                 + currentCase.getFutureYear() + ",String,TRUE,TRUE,,," + ls
-                + "Summary,Start Date & Time,0,EPI_STDATE_TIME,All sectors,All jobs for sector,All programs,"
+                + "Summary,Start Date & Time,0,EPI_STDATE_TIME,,All sectors,All jobs for sector,All programs,"
                 + startDate + ",Date,TRUE,TRUE,,," + ls
-                + "Summary,End Date & Time,0,EPI_ENDATE_TIME,All sectors,All jobs for sector,All programs," + endDate
+                + "Summary,End Date & Time,0,EPI_ENDATE_TIME,,All sectors,All jobs for sector,All programs," + endDate
                 + ",Date,TRUE,TRUE,,," + ls;
 
         StringBuffer sb = new StringBuffer(summary);
@@ -5111,6 +5046,7 @@ public class ManagedCaseService {
             String name = param.getName();
             String order = param.getOrder() + "";
             String envVar = param.getEnvVar() == null ? "" : param.getEnvVar() + "";
+            String region = (param.getRegion() == null) ? "" : param.getRegion() + "";
             String sector = (param.getSector() == null) ? "All sectors" : param.getSector() + "";
             String job = getJobName(param.getJobId(), jobs);
             String prog = param.getProgram() == null ? "" : param.getProgram() + "";
@@ -5123,12 +5059,24 @@ public class ManagedCaseService {
             String notes = param.getNotes() == null ? "" : param.getNotes();
             String purpose = param.getPurpose() == null ? "" : param.getPurpose();
 
-            sb.append("Parameters,\"" + clean(name) + "\"," + order + ",\"" + clean(envVar) + "\",\"" + clean(sector)
+            sb.append("Parameters,\"" + clean(name) + "\"," + order + ",\"" + clean(envVar) + "\",\"" + clean(region)
+                    + "\",\"" + clean(sector)
                     + "\",\"" + clean(job) + "\",\"" + clean(prog) + "\",\"" + clean(value) + "\"," + clean(type) + ","
                     + reqrd + "," + local + "," + lstMod + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\"" + ls);
         }
 
         return sb.toString();
+    }
+    
+    private String getRegions(GeoRegion[] regions) {
+        StringBuffer sb = new StringBuffer();
+
+        for (GeoRegion region : regions)
+            sb.append(region.getName() + "&");
+
+        int lastAmp = sb.lastIndexOf("&");
+
+        return lastAmp < 0 ? sb.toString() : sb.toString().substring(0, lastAmp);
     }
     
     private String getSectors(Sector[] sectors) {
@@ -5171,7 +5119,7 @@ public class ManagedCaseService {
 
     private synchronized String bufferCaseInputs(List<CaseInput> inputs, List<CaseJob> jobs, Session session) {
         String ls = System.getProperty("line.separator");
-        String columns = "Tab,Inputname,Envt Variable,Sector,Job,Program,Dataset,Version,QA status,DS Type,Reqd?,Local?,Subdir,Last Modified,Parentcase"
+        String columns = "Tab,Inputname,Envt Variable,Region,Sector,Job,Program,Dataset,Version,QA status,DS Type,Reqd?,Local?,Subdir,Last Modified,Parentcase"
                 + ls;
 
         StringBuffer sb = new StringBuffer(columns);
@@ -5181,6 +5129,7 @@ public class ManagedCaseService {
             String name = input.getName();
             String envVar = input.getEnvtVars() == null ? "" : input.getEnvtVars() + "";
             String sector = (input.getSector() == null) ? "All sectors" : input.getSector() + "";
+            String region = (input.getRegion() == null) ? "" : input.getRegion() + "";
             String job = getJobName(input.getCaseJobID(), jobs);
             String prog = input.getProgram() == null ? "" : input.getProgram() + "";
             String dsName = input.getDataset() == null ? "" : input.getDataset().getName();
@@ -5195,7 +5144,8 @@ public class ManagedCaseService {
             Case parent = (input.getParentCaseId() > 0) ? dao.getCase(input.getParentCaseId(), session) : null;
             String parentName = parent != null ? parent.getName() : "";
 
-            sb.append("Inputs,\"" + clean(name) + "\",\"" + clean(envVar) + "\",\"" + clean(sector) + "\",\""
+            sb.append("Inputs,\"" + clean(name) + "\",\"" + clean(envVar) + "\",\"" + clean(region) + "\",\""
+                    + clean(sector) + "\",\""
                     + clean(job) + "\",\"" + clean(prog) + "\",\"" + clean(dsName) + "\"," + dsVersion + ","
                     + clean(qaStatus) + ",\"" + clean(dsType) + "\"," + reqrd + "," + local + "," + clean(subdir) + ","
                     + lstMod + ",\"" + clean(parentName) + "\"" + ls);
@@ -5208,7 +5158,7 @@ public class ManagedCaseService {
 
     private String bufferCaseJobs(List<CaseJob> jobs, Session session) {
         String ls = System.getProperty("line.separator");
-        String columns = "Tab,JobName,Order,Sector,RunStatus,StartDate,CompletionDate,Executable,Arguments,Path,QueueOptions,JobGroup,Local,QueueID,User,Host,Notes,Purpose,DependsOn"
+        String columns = "Tab,JobName,Order,Region,Sector,RunStatus,StartDate,CompletionDate,Executable,Arguments,Path,QueueOptions,JobGroup,Local,QueueID,User,Host,Notes,Purpose,DependsOn"
                 + ls;
 
         StringBuffer sb = new StringBuffer(columns);
@@ -5217,6 +5167,7 @@ public class ManagedCaseService {
             CaseJob job = iter.next();
             String name = job.getName();
             String order = job.getJobNo() + "";
+            String region = (job.getRegion() == null) ? "" : job.getRegion() + "";
             String sector = (job.getSector() == null) ? "All sectors" : job.getSector() + "";
             String status = job.getRunstatus() == null ? "" : job.getRunstatus() + "";
             String start = job.getRunStartDate() == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(job
@@ -5236,7 +5187,8 @@ public class ManagedCaseService {
             String purpose = job.getPurpose() == null ? "" : job.getPurpose();
             String dependsOn = getDependsOnJobsString(job.getDependentJobs(), session);
 
-            sb.append("Jobs,\"" + clean(name) + "\"," + order + ",\"" + clean(sector) + "\"," + clean(status) + ","
+            sb.append("Jobs,\"" + clean(name) + "\"," + order + ",\"" + clean(region) + "\","
+                    + clean(sector) + "\"," + clean(status) + ","
                     + start + "," + end + "," + clean(exec) + ",\"" + clean(args) + "\"," + clean(path) + ",\""
                     + clean(qOptns) + "\",\"" + clean(jobGrp) + "\"," + local + ",\"" + clean(qId) + "\",\""
                     + clean(user) + "\", " + clean(host) + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\",\""

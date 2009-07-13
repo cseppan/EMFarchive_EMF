@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.DependentJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobMessage;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -99,7 +100,7 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
         emisYear.setName("test" + Math.random());
         add(emisYear);
 
-        Grid grid = new Grid();
+        GeoRegion grid = new GeoRegion();
         grid.setName("test" + Math.random());
         add(grid);
 
@@ -128,10 +129,6 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
         add(contrlRegion);
 
         User owner = userService.getUser("emf");
-
-        GridResolution gridResltn = new GridResolution();
-        gridResltn.setName("test" + Math.random());
-        add(gridResltn);
 
         SectorCriteria crit = new SectorCriteria();
         crit.setCriteria("new rule");
@@ -272,9 +269,7 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
         toCopy.setEmissionsYear(emisYear);
         toCopy.setEndDate(new Date());
         toCopy.setFutureYear(2005);
-        toCopy.setGrid(grid);
         toCopy.setGridDescription("grid description");
-        toCopy.setGridResolution(gridResltn);
         toCopy.setInputFileDir("input/file/dir");
         toCopy.setIsFinal(true);
         toCopy.setLastModifiedBy(owner);
@@ -329,7 +324,6 @@ public class CaseDAO_CaseTest2 extends ServiceTestCase {
             remove(grid);
             remove(metYear);
             remove(spec);
-            remove(gridResltn);
             dropAll(InternalSource.class);
             dropAll(ExternalSource.class);
             dropAll(KeyVal.class);

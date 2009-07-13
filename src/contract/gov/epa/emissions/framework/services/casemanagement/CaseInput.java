@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -25,6 +26,8 @@ public class CaseInput implements Serializable, Comparable {
     private InputName inputName;
     
     private Sector sector;
+    
+    private GeoRegion region;
     
     private CaseProgram program;
     
@@ -242,6 +245,14 @@ public class CaseInput implements Serializable, Comparable {
     
     public String getParentCase() {
         return this.parentCase;
+    }
+
+    public GeoRegion getRegion() {
+        return region;
+    }
+
+    public void setRegion(GeoRegion region) {
+        this.region = region;
     }
 
 }
