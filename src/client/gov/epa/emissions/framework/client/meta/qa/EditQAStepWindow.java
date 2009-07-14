@@ -160,7 +160,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private static final String createMoEmisByCountyFromAnnEmisProgram = "Create monthly emissions by county from annual emissions";
     private static final String compareAnnStateSummaryProgram = "Compare annual state summaries";
     
-    private static final String annStateSummaryCrosstabProgram = "Annual state summaries crosstab";
+    private static final String smokeOutputAnnStateSummaryCrosstabProgram = "SMOKE output annual state summaries crosstab";
     
     private static final String sqlProgram = "SQL";
     
@@ -886,7 +886,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     showCreateMoEmisByCountyFromAnnEmisWindow();
                 } else if (compareAnnStateSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showCompareAnnualStateSummariesWindow();
-                } else if (annStateSummaryCrosstabProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                } else if (smokeOutputAnnStateSummaryCrosstabProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showAnnualStateSummariesCrosstabWindow();
                 }else{
                     doSetWindow();
