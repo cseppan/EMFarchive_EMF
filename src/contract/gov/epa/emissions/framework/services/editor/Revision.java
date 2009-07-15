@@ -126,11 +126,7 @@ public class Revision implements Lockable {
     }
 
     public void setLockOwner(String owner) {
-        
-        System.out.println("Locking revision for owner: " + owner);
-        System.out.println("Before call to setLockOwner: " + this);
         lock.setLockOwner(owner);
-        System.out.println("After call to setLockOwner: " + this);
     }
 
     public boolean isLocked(String owner) {
