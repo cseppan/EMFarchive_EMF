@@ -24,6 +24,7 @@ import gov.epa.emissions.framework.services.data.GeoRegion;
 import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -262,6 +263,36 @@ public class CaseFileParser {
         if (line.startsWith("#EMF_INPUT_FOLDER")) {
             caseObj.setInputFileDir(line.substring(index));
             return;
+        }
+        
+        if (line.startsWith("#EMF_SECTORS=")) {
+            String[] sectors = line.substring(index).split("&");
+            Sector[] sList = new Sector[sectors.length];
+            
+            for(int i = 0; i < sList.length; i++)
+                sList[i] = new Sector(sectors[i], sectors[i]);
+            
+            caseObj.setSectors(sList);
+            return;
+        }
+        
+        if (line.startsWith("#EMF_REGION")) {
+            GeoRegion[] regions = caseObj.getRegions();
+            
+            if (regions == null)
+                regions = new GeoRegion[0];
+            
+            List<GeoRegion> rList = new ArrayList<GeoRegion>();
+            rList.addAll(Arrays.asList(regions));
+            
+            GeoRegion region = new GeoRegion();
+            String[] rFields = line.substring(index).split("&");
+            region.setName(rFields[0]);
+            region.setAbbreviation(rFields[1]);
+            region.setIoapiName(rFields[2]);
+            
+            rList.add(region);
+            caseObj.setRegions(rList.toArray(new GeoRegion[0]));
         }
     }
 

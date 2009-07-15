@@ -415,3 +415,37 @@ CREATE TABLE emf.external_dataset_access
 WITH (OIDS=FALSE);
 ALTER TABLE emf.external_dataset_access OWNER TO emf;
 -- emf.external_dataset_access
+
+-- emf.region_type
+CREATE TABLE emf.region_type
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE,
+  description text
+) 
+WITHOUT OIDS;
+-- emf.region_type
+
+-- emf.georegions
+CREATE TABLE emf.georegions
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(128) NOT NULL UNIQUE,
+  description text,
+  abbr varchar(128),
+  type_id int4 DEFAULT 1 REFERENCES emf.region_type(id),
+  resltn varchar(255),
+  ioapi_name varchar(255),
+  map_projtn text,
+  xorig real DEFAULT 0,
+  yorig real DEFAULT 0,
+  xcell real DEFAULT 0,
+  ycell real DEFAULT 0,
+  ncols int4 DEFAULT 0,
+  nrows int4 DEFAULT 0,
+  nthik int4 DEFAULT 0,
+  ds_id int4 DEFAULT 0,
+  version_id int4 REFERENCES emissions.versions(id)
+) 
+WITHOUT OIDS;
+-- emf.georegions

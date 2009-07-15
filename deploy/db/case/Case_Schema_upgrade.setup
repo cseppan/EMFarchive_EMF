@@ -252,3 +252,25 @@ ALTER TABLE cases.subdirs ADD CONSTRAINT subdirs_uniqueness_key UNIQUE (name, mo
 --8/8/2008 change uniqueness constraint on case parameters table
 ALTER TABLE cases.cases_parameters DROP CONSTRAINT cases_parameters_case_id_key;
 ALTER TABLE cases.cases_parameters ADD CONSTRAINT cases_parameters_case_id_key UNIQUE (case_id,param_name_id,env_vars_id,sector_id,case_job_id);
+
+--6/24/2009 add a new table for case & grids
+-- cases.case_regions
+CREATE TABLE cases.case_regions
+(
+  id SERIAL PRIMARY KEY,
+  case_id int4 NOT NULL REFERENCES cases.cases(id) ,
+  list_index int4,
+  region_id int4 REFERENCES emf.georegions(id),
+  UNIQUE (case_id, region_id) 
+) 
+WITHOUT OIDS;
+-- cases.case_regions
+
+ALTER TABLE cases.cases_casejobs ADD COLUMN region_id int4 REFERENCES emf.georegions(id);
+ALTER TABLE cases.cases_caseinputs ADD COLUMN region_id int4 REFERENCES emf.georegions(id);
+ALTER TABLE cases.cases_parameters ADD COLUMN region_id int4 REFERENCES emf.georegions(id);
+
+ALTER TABLE cases.cases_caseinputs DROP CONSTRAINT caseinputs_uniqueness_key;
+ALTER TABLE cases.cases_caseinputs ADD CONSTRAINT cases_inputs_uniqueness_key UNIQUE (case_id, input_name_id, region_id, sector_id, program_id, case_job_id);
+ALTER TABLE cases.cases_parameters DROP CONSTRAINT cases_parameters_case_id_key;
+ALTER TABLE cases.cases_parameters ADD CONSTRAINT cases_parameters_uniqueness_key UNIQUE (case_id,param_name_id,env_vars_id,region_id,sector_id,case_job_id);

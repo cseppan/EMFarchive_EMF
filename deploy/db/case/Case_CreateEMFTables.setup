@@ -29,24 +29,6 @@ CREATE TABLE cases.air_quality_models
 WITHOUT OIDS;
 -- cases.air_quality_models
 
--- cases.grids
-CREATE TABLE cases.grids
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
-) 
-WITHOUT OIDS;
--- cases.grids
-
--- cases.grid_resolutions
-CREATE TABLE cases.grid_resolutions
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(128) NOT NULL UNIQUE
-) 
-WITHOUT OIDS;
--- cases.grid_resolutions
-
 -- cases.speciations
 CREATE TABLE cases.speciations
 (
@@ -180,6 +162,18 @@ CREATE TABLE cases.case_sectors
 WITHOUT OIDS;
 -- cases.case_sectors
 
+-- cases.case_regions
+CREATE TABLE cases.case_regions
+(
+  id SERIAL PRIMARY KEY,
+  case_id int4 NOT NULL REFERENCES cases.cases(id) ,
+  list_index int4,
+  region_id int4 REFERENCES emf.georegions(id),
+  UNIQUE (case_id, region_id) 
+) 
+WITHOUT OIDS;
+-- cases.case_regions
+
 -- cases.case_jobrunstatus
 CREATE TABLE cases.case_jobrunstatus
 (
@@ -219,6 +213,7 @@ CREATE TABLE cases.cases_casejobs
   purpose text,
   job_num float,
   sector_id int4 REFERENCES emf.sectors(id),
+  region_id int4 REFERENCES emf.georegions(id),
   arguments text,
   exec_order int4,
   version int4,
@@ -253,6 +248,7 @@ CREATE TABLE cases.cases_caseinputs
   local bool DEFAULT false,
   last_modified_date timestamp,
   sector_id int4  REFERENCES emf.sectors(id),
+  region_id int4 REFERENCES emf.georegions(id),
   program_id int4  REFERENCES cases.programs(id),
   envt_vars_id int4  REFERENCES cases.input_envt_vars(id),
   input_name_id int4  REFERENCES cases.inputnames(id),
@@ -260,7 +256,7 @@ CREATE TABLE cases.cases_caseinputs
   version_id int4  REFERENCES emissions.versions(id),
   dataset_type_id int4  REFERENCES emf.dataset_types(id),
   subdir_id int4  REFERENCES cases.subdirs(id),
-  UNIQUE (case_id, input_name_id, sector_id, program_id, case_job_id)
+  UNIQUE (case_id, input_name_id, region_id, sector_id, program_id, case_job_id)
 ) 
 WITHOUT OIDS;
 -- cases.cases_caseinputs
@@ -308,6 +304,7 @@ CREATE TABLE cases.cases_parameters
   local bool DEFAULT false,
   last_modified_date timestamp,
   sector_id int4  REFERENCES emf.sectors(id),
+  region_id int4 REFERENCES emf.georegions(id),
   program_id int4  REFERENCES cases.programs(id),
   env_vars_id int4  REFERENCES cases.parameter_env_vars(id),
   val_type_id int4  REFERENCES cases.value_types(id),
@@ -315,7 +312,7 @@ CREATE TABLE cases.cases_parameters
   env_value varchar(255),
   purpose varchar(255),
   notes text,
-  UNIQUE (case_id,param_name_id,env_vars_id,sector_id,case_job_id) 
+  UNIQUE (case_id,param_name_id,env_vars_id,region_id,sector_id,case_job_id) 
 ) 
 WITHOUT OIDS;
 -- cases.cases_parameters

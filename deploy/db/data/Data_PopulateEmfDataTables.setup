@@ -273,3 +273,17 @@ insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'PM2_5', 'nonpt', 
 insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'PM2_5', 'afdust', 'x24', 'x12');
 insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'PM2_5', 'ag', 'x24', 'x12');
 
+insert into emf.grids values (	default,	'EUS12_279X240','',		'36km, and BOTH 12km'	);
+insert into emf.grids values (	default,	'DETROIT12KM','',		'12km'	);
+insert into emf.grids values (	default,	'EUS12_216X240','',		'12km_test'	);
+insert into emf.grids values (	default,	'BALT4km','',		'4km'	);
+insert into emf.grids values (	default,	'US36KM_148X112,  U12KM_?','',		'36km, 12km-EUS'	);
+insert into emf.grids values (	default,	'US36KM_148X112','',		'36km'	);
+insert into emf.grids values (	default,	'2EUS12_148X112','',		'12km'	);
+insert into emf.grids values (	default,	'2EUS12_216X240','',		'12km'	);
+insert into emf.grids values (	default,	'12MW1_114x117','',		'12MW1'	);
+insert into emf.grids values (	default,	'12SE1','',		'12km'	);
+insert into emf.grids values (	default,	'12MIDATL1','',		'12km'	);
+insert into emf.grids values (	default,	'12MW2','',		'12km'	);
+insert into emf.grids values (	default,	'NG36_148X112','',		'36km'	);
+

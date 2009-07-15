@@ -120,7 +120,8 @@ public class CaseAssistanceService {
                 Case loadedCase = caseDao.getCaseFromName(newCase.getName(), session);
                 int caseId = loadedCase.getId();
                 int modId = loadedCase.getModel().getId();
-                insertJobs(caseId, user, caseParser.getJobs(), helper); //NOTE: Have to insert jobs before inserting inputs/parameters
+                insertJobs(caseId, user, caseParser.getJobs(), helper); // NOTE: Have to insert jobs before inserting
+                                                                        // inputs/parameters
                 HashMap<String, Integer> jobIds = getJobIds(caseDao.getCaseJobs(caseId, session));
                 insertParameters(caseId, modId, caseParser.getParameters(), helper, jobIds);
                 insertInputs(caseId, modId, caseParser.getInputs(), helper, jobIds);
@@ -144,12 +145,12 @@ public class CaseAssistanceService {
 
     private HashMap<String, Integer> getJobIds(List<CaseJob> caseJobs) {
         HashMap<String, Integer> jobIds = new HashMap<String, Integer>();
-        
+
         if (caseJobs != null && caseJobs.size() > 0) {
             for (CaseJob job : caseJobs)
                 jobIds.put(job.getName(), new Integer(job.getId()));
         }
-        
+
         return jobIds;
     }
 
@@ -228,12 +229,6 @@ public class CaseAssistanceService {
         Region modRegion = newCase.getModelingRegion();
         loadNSetObject(newCase, modRegion, Region.class, modRegion == null ? "" : modRegion.getName(), session);
 
-//        Grid grid = newCase.getGrid();
-//        loadNSetObject(newCase, grid, Grid.class, grid == null ? "" : grid.getName(), session);
-//
-//        GridResolution gResltn = newCase.getGridResolution();
-//        loadNSetObject(newCase, gResltn, GridResolution.class, gResltn == null ? "" : gResltn.getName(), session);
-
         AirQualityModel airMod = newCase.getAirQualityModel();
         loadNSetObject(newCase, airMod, AirQualityModel.class, airMod == null ? "" : airMod.getName(), session);
 
@@ -242,6 +237,12 @@ public class CaseAssistanceService {
 
         MeteorlogicalYear metYear = newCase.getMeteorlogicalYear();
         loadNSetObject(newCase, metYear, MeteorlogicalYear.class, metYear == null ? "" : metYear.getName(), session);
+
+        Sector[] sectors = newCase.getSectors();
+        loadNSetSectors(newCase, sectors, session);
+
+        GeoRegion[] regions = newCase.getRegions();
+        loadNSetRegions(newCase, regions, session);
 
         newCase.setLastModifiedBy(user);
         newCase.setLastModifiedDate(new Date());
@@ -279,16 +280,6 @@ public class CaseAssistanceService {
             return;
         }
 
-//        if (obj instanceof Grid) {
-//            newCase.setGrid((Grid) temp);
-//            return;
-//        }
-//
-//        if (obj instanceof GridResolution) {
-//            newCase.setGridResolution((GridResolution) temp);
-//            return;
-//        }
-
         if (obj instanceof AirQualityModel) {
             newCase.setAirQualityModel((AirQualityModel) temp);
             return;
@@ -303,6 +294,34 @@ public class CaseAssistanceService {
             newCase.setMeteorlogicalYear((MeteorlogicalYear) temp);
             return;
         }
+    }
+
+    private void loadNSetRegions(Case newCase, GeoRegion[] regions, Session session) {
+        if (regions == null || regions.length == 0)
+            return;
+
+        List<GeoRegion> all = new ArrayList<GeoRegion>();
+
+        for (GeoRegion region : regions) {
+            GeoRegion temp = (GeoRegion) checkDB(region, GeoRegion.class, region.getName(), session);
+            all.add(temp);
+        }
+
+        newCase.setRegions(all.toArray(new GeoRegion[0]));
+    }
+
+    private void loadNSetSectors(Case newCase, Sector[] sectors, Session session) {
+        if (sectors == null || sectors.length == 0)
+            return;
+
+        List<Sector> all = new ArrayList<Sector>();
+
+        for (Sector sector : sectors) {
+            Sector temp = (Sector) checkDB(sector, Sector.class, sector.getName(), session);
+            all.add(temp);
+        }
+
+        newCase.setSectors(all.toArray(new Sector[0]));
     }
 
     private Object checkDB(Object obj, Class<?> clazz, String name, Session session) {
@@ -341,30 +360,30 @@ public class CaseAssistanceService {
 
             GeoRegion region = job.getRegion();
             job.setRegion(helper.getGeoRegion(region));
-            
+
             Sector sector = job.getSector();
             job.setSector(helper.getSector(sector));
-            
+
             job.setUser(helper.getUser(user));
-            
+
             User runUser = job.getRunJobUser();
             job.setRunJobUser(helper.getUser(runUser));
-            
+
             Host host = job.getHost();
             job.setHost(helper.getHost(host));
-            
+
             JobRunStatus runStatus = job.getRunstatus();
             job.setRunstatus(helper.getJobRunStatus(runStatus));
-            
+
             Executable exec = job.getExecutable();
             job.setExecutable(helper.getExcutable(exec));
 
             helper.insertCaseJob(job);
         }
     }
-    
-    private void insertParameters(int caseId, int model2RunId, List<CaseParameter> parameters, CaseDaoHelper helper, HashMap<String, Integer> jobIds)
-            throws Exception {
+
+    private void insertParameters(int caseId, int model2RunId, List<CaseParameter> parameters, CaseDaoHelper helper,
+            HashMap<String, Integer> jobIds) throws Exception {
         for (Iterator<CaseParameter> iter = parameters.iterator(); iter.hasNext();) {
             CaseParameter param = iter.next();
             param.setCaseID(caseId);
@@ -386,7 +405,7 @@ public class CaseAssistanceService {
             GeoRegion region = param.getRegion();
             region = helper.getGeoRegion(region);
             param.setRegion(region);
-            
+
             Sector sector = param.getSector();
             sector = helper.getSector(sector);
             param.setSector(sector);
@@ -397,17 +416,17 @@ public class CaseAssistanceService {
             param.setProgram(prog);
 
             String jobName = param.getJobName();
-            
+
             if (jobName != null && !jobName.trim().equalsIgnoreCase("All jobs for sector") && !jobName.trim().isEmpty())
                 param.setJobId(jobIds.get(jobName) == null ? 0 : jobIds.get(jobName));
-                
+
             helper.insertCaseParameter(param);
         }
 
     }
 
-    private void insertInputs(int caseId, int model2RunId, List<CaseInput> inputs, CaseDaoHelper helper, HashMap<String, Integer> jobIds)
-            throws Exception {
+    private void insertInputs(int caseId, int model2RunId, List<CaseInput> inputs, CaseDaoHelper helper,
+            HashMap<String, Integer> jobIds) throws Exception {
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
             input.setCaseID(caseId);
@@ -425,7 +444,7 @@ public class CaseAssistanceService {
             GeoRegion region = input.getRegion();
             region = helper.getGeoRegion(region);
             input.setRegion(region);
-            
+
             Sector sector = input.getSector();
             sector = helper.getSector(sector);
             input.setSector(sector);
@@ -446,14 +465,14 @@ public class CaseAssistanceService {
 
             EmfDataset ds = helper.getDataset(input.getDataset().getName(), type);
             Version version = input.getVersion();
-            
+
             int verNum = version == null ? 0 : version.getVersion();
-            
+
             input.setDataset(ds);
             input.setVersion(ds == null ? null : helper.getDatasetVersion(ds.getId(), verNum));
-            
+
             String jobName = input.getJobName();
-            
+
             if (jobName != null && !jobName.trim().equalsIgnoreCase("All jobs for sector") && !jobName.trim().isEmpty())
                 input.setCaseJobID(jobIds.get(jobName) == null ? 0 : jobIds.get(jobName));
 
@@ -586,38 +605,38 @@ public class CaseAssistanceService {
                 }
             }
 
-//            if (envVar.toUpperCase().equals("IOAPI_GRIDNAME_1")) {
-//                Grid grid = caze.getGrid();
-//
-//                if (grid != null && grid.getName() != null && grid.getName().trim().equalsIgnoreCase(value))
-//                    continue;
-//
-//                if (grid != null && grid.getName() != null)
-//                    sb.append("WARNING: grid -- value replaced (previous: " + grid.getName() + ")" + lineSep);
-//
-//                grid = new Grid();
-//                grid.setName(value);
-//                grid = this.addGrid(grid);
-//
-//                caze.setGrid(grid);
-//            }
+            // if (envVar.toUpperCase().equals("IOAPI_GRIDNAME_1")) {
+            // Grid grid = caze.getGrid();
+            //
+            // if (grid != null && grid.getName() != null && grid.getName().trim().equalsIgnoreCase(value))
+            // continue;
+            //
+            // if (grid != null && grid.getName() != null)
+            // sb.append("WARNING: grid -- value replaced (previous: " + grid.getName() + ")" + lineSep);
+            //
+            // grid = new Grid();
+            // grid.setName(value);
+            // grid = this.addGrid(grid);
+            //
+            // caze.setGrid(grid);
+            // }
 
-//            if (envVar.toUpperCase().equals("EMF_GRID")) {
-//                GridResolution resltn = caze.getGridResolution();
-//
-//                if (resltn != null && resltn.getName() != null && resltn.getName().trim().equalsIgnoreCase(value))
-//                    continue;
-//
-//                if (resltn != null && resltn.getName() != null)
-//                    sb.append("WARNING: grid resolution -- value replaced (previous: " + resltn.getName() + ")"
-//                            + lineSep);
-//
-//                resltn = new GridResolution();
-//                resltn.setName(value);
-//                resltn = this.addGridResolution(resltn);
-//
-//                caze.setGridResolution(resltn);
-//            }
+            // if (envVar.toUpperCase().equals("EMF_GRID")) {
+            // GridResolution resltn = caze.getGridResolution();
+            //
+            // if (resltn != null && resltn.getName() != null && resltn.getName().trim().equalsIgnoreCase(value))
+            // continue;
+            //
+            // if (resltn != null && resltn.getName() != null)
+            // sb.append("WARNING: grid resolution -- value replaced (previous: " + resltn.getName() + ")"
+            // + lineSep);
+            //
+            // resltn = new GridResolution();
+            // resltn.setName(value);
+            // resltn = this.addGridResolution(resltn);
+            //
+            // caze.setGridResolution(resltn);
+            // }
 
             if (envVar.toUpperCase().equals("EMF_AQM")) {
                 AirQualityModel aqm = caze.getAirQualityModel();
@@ -984,7 +1003,7 @@ public class CaseAssistanceService {
 
             if (dataset == null)
                 return;
-            
+
             setInputDatasetValues(user, values, input, dataset);
         } catch (Exception e) {
             log.error("Error resetting input values.", e);
@@ -1010,7 +1029,7 @@ public class CaseAssistanceService {
 
         boolean massExists = false;
         String[] massSrcs = new String[0];
-        
+
         if (massdir != null && !massdir.trim().isEmpty()) {
             massSrcs = reconstructSources(values, massdir);
             massExists = allExist(massSrcs);
@@ -1024,7 +1043,7 @@ public class CaseAssistanceService {
 
             return add2tables(caseId, values[1], extSrcs, type, user, false, values[0], massdir);
         }
-        
+
         extSrcs = getExternalSrcs(massSrcs);
 
         return add2tables(caseId, values[1], extSrcs, type, user, true, values[0], massdir);
@@ -1102,7 +1121,7 @@ public class CaseAssistanceService {
     private synchronized boolean allExist(String[] srcs) {
         if (srcs == null || srcs.length == 0)
             return false;
-        
+
         boolean allExisted = true;
 
         for (String src : srcs) {

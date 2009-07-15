@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.TreeSet;
 
@@ -117,6 +118,24 @@ public class ManagedCaseService {
 
     // all sectors and all jobs id in the case inputs tb
     private final Sector ALL_SECTORS = null;
+    
+    private final GeoRegion ALL_REGIONS = null;
+    
+    private final String AAA = "all regions, all sectors, all jobs";
+    
+    private final String AAJ = "all regions, all sectors, specific job";
+    
+    private final String ASA = "all regions, specific sector, all jobs";
+    
+    private final String ASJ = "all regions, specific sector, specific job";
+    
+    private final String RAA = "specific region, all sectors, all jobs";
+    
+    private final String RSA = "specific region, specific sector, all jobs";
+    
+    private final String RAJ = "specific region, all sectors, specific job";
+    
+    private final String RSJ = "specific region, specific sector, specific job";
 
     private final int ALL_JOB_ID = 0;
 
@@ -1216,14 +1235,14 @@ public class ManagedCaseService {
     /**
      * Gets all the inputs for this job, selects based on: case ID, job ID, and sector
      */
-    private List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector, Session session) throws EmfException {
+    private List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector, GeoRegion region, Session session) throws EmfException {
         List<CaseInput> outInputs = new ArrayList<CaseInput>();
         EmfDataset cipDataset = null;
         String badCipName = null;
 
         // select the inputs based on 3 criteria
         try {
-            List<CaseInput> inputs = dao.getJobInputs(caseId, jobId, sector, session);
+            List<CaseInput> inputs = dao.getJobInputs(caseId, jobId, sector, region, session);
             if (DebugLevels.DEBUG_9)
                 System.out.println("Are inputs null?" + (inputs == null));
             Iterator<CaseInput> iter = inputs.iterator();
@@ -1250,15 +1269,82 @@ public class ManagedCaseService {
 
             return outInputs;
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n"
-                    + e.getMessage());
+            log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n", e);
             // throw new EmfException("Required dataset not set for Case Input name = " + badCipName);
             throw new EmfException(e.getMessage());
         }
     }
 
     private List<CaseInput> getAllJobInputs(CaseJob job, Session session) throws EmfException {
+        Map<String, List<CaseInput>> map = getInputHierarchy(job, session);
+        List<CaseInput> inputsAll = new ArrayList<CaseInput>(); // all inputs
+        List<CaseInput> inputsAAA = map.get(AAA);
+        List<CaseInput> inputsASA = map.get(ASA);
+        List<CaseInput> inputsAAJ = map.get(AAJ);
+        List<CaseInput> inputsASJ = map.get(ASJ);
+        List<CaseInput> inputsRAA = map.get(RAA);
+        List<CaseInput> inputsRSA = map.get(RSA);
+        List<CaseInput> inputsRAJ = map.get(RAJ);
+        List<CaseInput> inputsRSJ = map.get(RSJ);
+        
+        // append all the job inputs to the inputsAll list
+        if ((inputsAAA != null) && (inputsAAA.size() > 0)) {
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of AAA inputs = " + inputsAAA.size());
+            inputsAll.addAll(inputsAAA);
+        }
+        
+        if ((inputsASA != null) && (inputsASA.size() > 0)) {
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of ASA inputs = " + inputsASA.size());
+            inputsAll.addAll(inputsASA);
+        }
+        
+        if ((inputsAAJ != null) && (inputsAAJ.size() > 0)) {
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of AAJ inputs = " + inputsAAJ.size());
+            inputsAll.addAll(inputsAAJ);
+        }
+        
+        if ((inputsASJ != null) && (inputsASJ.size() > 0)) {
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of ASJ inputs = " + inputsASJ.size());
+            inputsAll.addAll(inputsASJ);
+        }
+        
+        if ((inputsRSA != null) && (inputsRSA.size() > 0)) {
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of RSA inputs = " + inputsRSA.size());
+            inputsAll.addAll(inputsRSA);
+        }
+        
+        if ((inputsRAJ != null) && (inputsRAJ.size() > 0)) {
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of RAJ inputs = " + inputsRAJ.size());
+            inputsAll.addAll(inputsRAJ);
+        }
+        
+        if ((inputsRAA != null) && (inputsRAA.size() > 0)) {
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of RAA inputs = " + inputsRAA.size());
+            inputsAll.addAll(inputsRAA);
+        }
+        
+        if ((inputsRSJ != null) && (inputsRSJ.size() > 0)) {
+            if (DebugLevels.DEBUG_0)
+                System.out.println("Number of RSJ inputs = " + inputsRSJ.size());
+            inputsAll.addAll(inputsRSJ);
+        }
+        
+        if (DebugLevels.DEBUG_0)
+            System.out.println("Total number of inputs = " + inputsAll.size());
+
+        return (inputsAll);
+    }
+    
+    private Map<String, List<CaseInput>> getInputHierarchy(CaseJob job, Session session) throws EmfException {
+        Map<String, List<CaseInput>> map = new HashMap<String, List<CaseInput>>();
+        
         /**
          * Gets all the inputs for a specific job
          */
@@ -1266,32 +1352,54 @@ public class ManagedCaseService {
         int jobId = job.getId();
 
         /*
-         * Need to get the inputs for 4 different scenarios: All sectors, all jobs Specific sector, all jobs All
-         * sectors, specific job specific sector, specific job
+         * Need to get the inputs for 8 different scenarios: All combinations of Region, Sector, and CaseJob.
          */
-        List<CaseInput> inputsAA = null; // inputs for all sectors and all jobs
-        List<CaseInput> inputsSA = null; // inputs for specific sector and all jobs
-        List<CaseInput> inputsAJ = null; // inputs for all sectors specific jobs
-        List<CaseInput> inputsSJ = null; // inputs for specific sectors specific jobs
-        List<CaseInput> inputsAll = new ArrayList<CaseInput>(); // all inputs
+        List<CaseInput> inputsAAA = null; // inputs for all regions, all sectors and all jobs
+        List<CaseInput> inputsASA = null; // inputs for all regions, specific sector and all jobs
+        List<CaseInput> inputsAAJ = null; // inputs for all regions, all sectors specific jobs
+        List<CaseInput> inputsASJ = null; // inputs for all regions, specific sectors specific jobs
+        List<CaseInput> inputsRAA = null; // inputs for specific region, all sectors and all jobs
+        List<CaseInput> inputsRSA = null; // inputs for specific region, specific sector and all jobs
+        List<CaseInput> inputsRAJ = null; // inputs for specific region, all sectors specific jobs
+        List<CaseInput> inputsRSJ = null; // inputs for specific region, specific sectors specific jobs
+        
         try {
-
-            // Get case inputs (the datasets associated w/ the case)
-            // All sectors, all jobs
-            inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, session);
-
-            // Sector specific, all jobs
             Sector sector = job.getSector();
+            GeoRegion region = job.getRegion();
+            
+            // Get case inputs (the datasets associated w/ the case)
+            // All regions, all sectors, all jobs
+            inputsAAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS, session);
+
+            // All regions, sector specific, all jobs
             if (sector != this.ALL_SECTORS) {
-                inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector, session);
+                inputsASA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector, this.ALL_REGIONS, session);
             }
 
-            // All sectors, job specific
-            inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS, session);
+            // All regions, all sectors, job specific
+            inputsAAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS, this.ALL_REGIONS, session);
 
-            // Specific sector and specific job
+            // All regions, specific sector and specific job
             if (sector != this.ALL_SECTORS) {
-                inputsSJ = this.getJobInputs(caseId, jobId, sector, session);
+                inputsASJ = this.getJobInputs(caseId, jobId, sector, this.ALL_REGIONS, session);
+            }
+            
+            // Specific region, all sectors, all jobs
+            if (region != this.ALL_REGIONS)
+                inputsRAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, region, session);
+
+            // Region specific, sector specific, all jobs
+            if (sector != this.ALL_SECTORS && region != this.ALL_REGIONS) {
+                inputsRSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector, region, session);
+            }
+
+            // Region specific, all sectors, job specific
+            if (region != this.ALL_REGIONS)
+                inputsRAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS, region, session);
+
+            // Region specific, specific sector and specific job
+            if (sector != this.ALL_SECTORS && region != this.ALL_REGIONS) {
+                inputsRSJ = this.getJobInputs(caseId, jobId, sector, region, session);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1302,31 +1410,16 @@ public class ManagedCaseService {
             throw new EmfException(e.getMessage());
         }
 
-        // append all the job inputs to the inputsAll list
-        if ((inputsAA != null) && (inputsAA.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
-                System.out.println("Number of AA inputs = " + inputsAA.size());
-            inputsAll.addAll(inputsAA);
-        }
-        if ((inputsSA != null) && (inputsSA.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
-                System.out.println("Number of SA inputs = " + inputsSA.size());
-            inputsAll.addAll(inputsSA);
-        }
-        if ((inputsAJ != null) && (inputsAJ.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
-                System.out.println("Number of AJ inputs = " + inputsAJ.size());
-            inputsAll.addAll(inputsAJ);
-        }
-        if ((inputsSJ != null) && (inputsSJ.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
-                System.out.println("Number of SJ inputs = " + inputsSJ.size());
-            inputsAll.addAll(inputsSJ);
-        }
-        if (DebugLevels.DEBUG_0)
-            System.out.println("Total number of inputs = " + inputsAll.size());
+        map.put(AAA, inputsAAA);
+        map.put(ASA, inputsASA);
+        map.put(ASJ, inputsASJ);
+        map.put(AAJ, inputsAAJ);
+        map.put(RAA, inputsRAA);
+        map.put(RSA, inputsRSA);
+        map.put(RAJ, inputsRAJ);
+        map.put(RSJ, inputsRSJ);
 
-        return (inputsAll);
+        return map;
     }
 
     public synchronized Case[] copyCaseObject(int[] toCopy, User user) throws EmfException {
@@ -2839,16 +2932,94 @@ public class ManagedCaseService {
         }
     }
 
-    private CaseParameter[] getJobParameters(int caseId, int jobId, Sector sector, Session session) throws EmfException {
+    private Map<String, List<CaseParameter>> getParameterHierarchy(CaseJob job, Session session) throws EmfException {
+        Map<String, List<CaseParameter>> map = new HashMap<String, List<CaseParameter>>();
+        
+        /**
+         * Gets all the inputs for a specific job
+         */
+        int caseId = job.getCaseId();
+        int jobId = job.getId();
+
+        /*
+         * Need to get the inputs for 8 different scenarios: All combinations of Region, Sector, and CaseJob.
+         */
+        List<CaseParameter> paramsAAA = null; // parameters for all regions, all sectors and all jobs
+        List<CaseParameter> paramsASA = null; // parameters for all regions, specific sector and all jobs
+        List<CaseParameter> paramsAAJ = null; // parameters for all regions, all sectors specific jobs
+        List<CaseParameter> paramsASJ = null; // parameters for all regions, specific sectors specific jobs
+        List<CaseParameter> paramsRAA = null; // parameters for specific region, all sectors and all jobs
+        List<CaseParameter> paramsRSA = null; // parameters for specific region, specific sector and all jobs
+        List<CaseParameter> paramsRAJ = null; // parameters for specific region, all sectors specific jobs
+        List<CaseParameter> paramsRSJ = null; // parameters for specific region, specific sectors specific jobs
+        
+        try {
+            Sector sector = job.getSector();
+            GeoRegion region = job.getRegion();
+            
+            // Get case inputs (the datasets associated w/ the case)
+            // All regions, all sectors, all jobs
+            paramsAAA = this.getJobParameters(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS, session);
+
+            // All regions, sector specific, all jobs
+            if (sector != this.ALL_SECTORS) {
+                paramsASA = this.getJobParameters(caseId, this.ALL_JOB_ID, sector, this.ALL_REGIONS, session);
+            }
+
+            // All regions, all sectors, job specific
+            paramsAAJ = this.getJobParameters(caseId, jobId, this.ALL_SECTORS, this.ALL_REGIONS, session);
+
+            // All regions, specific sector and specific job
+            if (sector != this.ALL_SECTORS) {
+                paramsASJ = this.getJobParameters(caseId, jobId, sector, this.ALL_REGIONS, session);
+            }
+            
+            // Specific region, all sectors, all jobs
+            if (region != this.ALL_REGIONS)
+                paramsRAA = this.getJobParameters(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, region, session);
+
+            // Region specific, sector specific, all jobs
+            if (sector != this.ALL_SECTORS && region != this.ALL_REGIONS) {
+                paramsRSA = this.getJobParameters(caseId, this.ALL_JOB_ID, sector, region, session);
+            }
+
+            // Region specific, all sectors, job specific
+            if (region != this.ALL_REGIONS)
+                paramsRAJ = this.getJobParameters(caseId, jobId, this.ALL_SECTORS, region, session);
+
+            // Region specific, specific sector and specific job
+            if (sector != this.ALL_SECTORS && region != this.ALL_REGIONS) {
+                paramsRSJ = this.getJobParameters(caseId, jobId, sector, region, session);
+            }
+        } catch (Exception e) {
+            log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n", e);
+            // throw new EmfException("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId +
+            // ").\n");
+            throw new EmfException(e.getMessage());
+        }
+
+        map.put(AAA, paramsAAA);
+        map.put(ASA, paramsASA);
+        map.put(ASJ, paramsASJ);
+        map.put(AAJ, paramsAAJ);
+        map.put(RAA, paramsRAA);
+        map.put(RSA, paramsRSA);
+        map.put(RAJ, paramsRAJ);
+        map.put(RSJ, paramsRSJ);
+
+        return map;
+    }
+    
+    private List<CaseParameter> getJobParameters(int caseId, int jobId, Sector sector, GeoRegion region, Session session) throws EmfException {
         /**
          * Gets all the parameters for this job, selects based on: case ID, job ID, and sector
          */
         // select the inputs based on 3 criteria
         try {
-            List<CaseParameter> parameters = dao.getJobParameters(caseId, jobId, sector, session);
+            List<CaseParameter> parameters = dao.getJobParameters(caseId, jobId, sector, region, session);
             // return an array of all type CaseParameter
             Collections.sort(parameters);
-            return parameters.toArray(new CaseParameter[0]);
+            return parameters;
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not get all parameters for case (id=" + caseId + "), job (id=" + jobId + ").\n"
@@ -2865,8 +3036,11 @@ public class ManagedCaseService {
          * NOTE: the # of elements of inputs is modified in the calling routine also, if an input has no environmental
          * variable, it will be treated as having the name ""
          */
-        List<CaseInput> exclInputs = new ArrayList();
+        List<CaseInput> exclInputs = new ArrayList<CaseInput>();
         String inputEnvName = "";
+        
+        if (inputs == null || inputs.size() == 0)
+            return exclInputs;
 
         // loop of inputs (using an iterator) and test for this env name
         Iterator<CaseInput> iter = inputs.iterator();
@@ -3015,11 +3189,6 @@ public class ManagedCaseService {
 
     public synchronized String createJobFileContent(CaseJob job, User user, String jobFileName,
             ManagedExportService expSvc, Session session) throws EmfException {
-        // String jobContent="";
-        String jobFileHeader = "";
-
-        StringBuffer sbuf = new StringBuffer();
-
         /**
          * Creates the content string for a job run file w/ all necessary inputs and parameters set.
          * 
@@ -3028,72 +3197,121 @@ public class ManagedCaseService {
          * Output: String - the job content
          */
 
+        
+        // String jobContent="";
+        String jobFileHeader = "";
+
+        StringBuffer sbuf = new StringBuffer();
+
         // Some objects needed for accessing data
         Case caseObj = this.getCase(job.getCaseId(), session);
-        int caseId = job.getCaseId();
         int jobId = job.getId();
 
         CaseInput headerInput = null; // input for the EMF Job header
-
-        List<CaseInput> inputsAA = null; // inputs for all sectors and all jobs
-        List<CaseInput> inputsSA = null; // inputs for specific sector and all jobs
-        List<CaseInput> inputsAJ = null; // inputs for all sectors specific jobs
-        List<CaseInput> inputsSJ = null; // inputs for specific sectors specific jobs
 
         // Make sure no spaces or strange characters in the job name
         String jobName = job.getName().replace(" ", "_");
         jobName = replaceNonDigitNonLetterChars(jobName);
         /*
-         * Get the inputs in the following order: all sectors, all jobs sector specific, all jobs all sectors, job
-         * specific sector specific, job specific
+         * Get the inputs in the based on hierarchy between region, sector, and job.
          * 
-         * Need to search for inputs now, b/c want to see if there is an EMF_HEADER
+         * Present hierarchy from general to specific
+         *    AAA - all regions, all sectors, all jobs
+         *    RAA - specific region, all sectors, all jobs
+         *    ASA - all regions, specific sector, all jobs
+         *    RSA - specific region, specific sector, all jobs
+         *    AAJ - all regions, all sectors, specific job
+         *    RAJ - specific region, all sectors, specific job
+         *    ASJ - all regions, specific sector, specific job
+         *    RSJ - specific region, specific sector, specific job
          */
 
+        // inputs based on all (A), specific region (R), specific sector (S), and/or specific job (J)
+        Map<String, List<CaseInput>> map = getInputHierarchy(job, session);
+        List<CaseInput> inputsAAA = map.get(AAA);
+        List<CaseInput> inputsASA = map.get(ASA);
+        List<CaseInput> inputsAAJ = map.get(AAJ);
+        List<CaseInput> inputsASJ = map.get(ASJ);
+        List<CaseInput> inputsRAA = map.get(RAA);
+        List<CaseInput> inputsRSA = map.get(RSA);
+        List<CaseInput> inputsRAJ = map.get(RAJ);
+        List<CaseInput> inputsRSJ = map.get(RSJ);
+        
+        // parameters based on all (A), specific region (R), specific sector (S), and/or specific job (J)
+        Map<String, List<CaseParameter>> paramsmap = getParameterHierarchy(job, session);
+        List<CaseParameter> paramsAAA = paramsmap.get(AAA);
+        List<CaseParameter> paramsASA = paramsmap.get(ASA);
+        List<CaseParameter> paramsAAJ = paramsmap.get(AAJ);
+        List<CaseParameter> paramsASJ = paramsmap.get(ASJ);
+        List<CaseParameter> paramsRAA = paramsmap.get(RAA);
+        List<CaseParameter> paramsRSA = paramsmap.get(RSA);
+        List<CaseParameter> paramsRAJ = paramsmap.get(RAJ);
+        List<CaseParameter> paramsRSJ = paramsmap.get(RSJ);
+        
         // Create an export service to get names of the datasets as inputs to Smoke script
         // ExportService exports = new ExportService(dbServerlocal, this.threadPool, this.sessionFactory);
         // Get case inputs (the datasets associated w/ the case)
-        // All sectors, all jobs
-        inputsAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, session);
 
-        // Exclude any inputs w/ environmental variable EMF_JOBHEADER
-        List<CaseInput> exclInputs = this.excludeInputsEnv(inputsAA, "EMF_JOBHEADER");
+        // Exclude any inputs w/ environmental variable EMF_JOBHEADER and see if the EMF_JOBHEADER exists at each level
+        /// AAA 
+        List<CaseInput> exclInputs = this.excludeInputsEnv(inputsAAA, "EMF_JOBHEADER");
 
         if (exclInputs.size() != 0) {
             headerInput = exclInputs.get(0); // get the first element as header
         }
 
-        // Sector specific, all jobs
+        /// RAA 
+        exclInputs = this.excludeInputsEnv(inputsRAA, "EMF_JOBHEADER");
+
+        if (exclInputs.size() != 0) {
+            headerInput = exclInputs.get(0); // get the first element as header
+        }
+
+        /// ASA 
+        exclInputs = this.excludeInputsEnv(inputsASA, "EMF_JOBHEADER");
+
+        if (exclInputs.size() != 0) {
+            headerInput = exclInputs.get(0); // get the first element as header
+        }
+        
+        /// RSA 
+        exclInputs = this.excludeInputsEnv(inputsRSA, "EMF_JOBHEADER");
+
+        if (exclInputs.size() != 0) {
+            headerInput = exclInputs.get(0); // get the first element as header
+        }
+        
+        /// AAJ 
+        exclInputs = this.excludeInputsEnv(inputsAAJ, "EMF_JOBHEADER");
+
+        if (exclInputs.size() != 0) {
+            headerInput = exclInputs.get(0); // get the first element as header
+        }
+        
+        /// RAJ 
+        exclInputs = this.excludeInputsEnv(inputsRAJ, "EMF_JOBHEADER");
+
+        if (exclInputs.size() != 0) {
+            headerInput = exclInputs.get(0); // get the first element as header
+        }
+        
+        /// ASJ 
+        exclInputs = this.excludeInputsEnv(inputsASJ, "EMF_JOBHEADER");
+
+        if (exclInputs.size() != 0) {
+            headerInput = exclInputs.get(0); // get the first element as header
+        }
+        
+        /// RSJ
+        exclInputs = this.excludeInputsEnv(inputsRSJ, "EMF_JOBHEADER");
+
+        if (exclInputs.size() != 0) {
+            headerInput = exclInputs.get(0); // get the first element as header
+        }
+
+        // Get the sector and region
         Sector sector = job.getSector();
-        if (sector != this.ALL_SECTORS) {
-            inputsSA = this.getJobInputs(caseId, this.ALL_JOB_ID, sector, session);
-
-            // Exclude any inputs w/ environmental variable EMF_JOBHEADER
-            exclInputs = this.excludeInputsEnv(inputsSA, "EMF_JOBHEADER");
-            if (exclInputs.size() != 0) {
-                headerInput = exclInputs.get(0); // get the first element as header
-            }
-        }
-
-        // All sectors, job specific
-        inputsAJ = this.getJobInputs(caseId, jobId, this.ALL_SECTORS, session);
-
-        // Exclude any inputs w/ environmental variable EMF_JOBHEADER
-        exclInputs = this.excludeInputsEnv(inputsAJ, "EMF_JOBHEADER");
-        if (exclInputs.size() != 0) {
-            headerInput = exclInputs.get(0); // get the first element as header
-        }
-
-        // Specific sector and specific job
-        if (sector != this.ALL_SECTORS) {
-            inputsSJ = this.getJobInputs(caseId, jobId, sector, session);
-
-            // Exclude any inputs w/ environmental variable EMF_JOBHEADER
-            exclInputs = this.excludeInputsEnv(inputsSJ, "EMF_JOBHEADER");
-            if (exclInputs.size() != 0) {
-                headerInput = exclInputs.get(0); // get the first element as header
-            }
-        }
+        GeoRegion region = job.getRegion();
 
         // Get header String:
         if (headerInput != null) {
@@ -3104,11 +3322,9 @@ public class ManagedCaseService {
                 jobFileHeader = getJobFileHeader(headerInput);
                 sbuf.append(jobFileHeader);
             } catch (Exception e) {
-                e.printStackTrace();
-                log.error("Could not write EMF header to job script file, " + e.getMessage());
+                log.error("Could not write EMF header to job script file. ", e);
                 throw new EmfException("Could not write EMF header to job script file");
             }
-
         } else {
             // Start the job file content string and append the end of line characters for this OS
             sbuf.append(this.runShell + this.eolString);
@@ -3154,43 +3370,94 @@ public class ManagedCaseService {
 
         /*
          * loop over inputs and write Env variables and input (full name and path) to job run file, print comments
+         * order of inputs based on above hierarchy
+         * 
          */
-        // All sectors and all jobs
+        
+        // AAA
         sbuf.append(eolString);
-        sbuf.append(this.runComment + " Inputs -- for all sectors and all jobs" + eolString);
-        if (inputsAA != null) {
-            for (CaseInput input : inputsAA) {
+        sbuf.append(this.runComment + " Inputs -- for all regions, all sectors and all jobs" + eolString);
+        if (inputsAAA != null) {
+            for (CaseInput input : inputsAAA) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
         }
 
-        // Sector specific and all jobs
+        // RAA
         sbuf.append(eolString);
-        sbuf.append(this.runComment + " Inputs -- sector (" + sector + ") and all jobs" + eolString);
-        if (inputsSA != null) {
-            for (CaseInput input : inputsSA) {
+        if (inputsRAA != null) {
+            sbuf.append(this.runComment + " Inputs -- region (" + region + ") and all sectors and all jobs" + eolString);
+            for (CaseInput input : inputsRAA) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
         }
-        // All sectors and specific job
+
+        // ASA
         sbuf.append(eolString);
-        sbuf.append(this.runComment + " Inputs -- for all sectors and job: " + job + eolString);
-        if (inputsAJ != null) {
-            for (CaseInput input : inputsAJ) {
+        if (inputsASA != null) {
+            sbuf.append(this.runComment + " Inputs -- all regions and  sector (" + sector + ") and all jobs" + eolString);
+            for (CaseInput input : inputsASA) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
         }
-        // Sector and Job specific
+        
+        // RSA
         sbuf.append(eolString);
-        sbuf.append(this.runComment + " Inputs -- sector (" + sector + ") and job: " + job + eolString);
-        if (inputsSJ != null) {
-            for (CaseInput input : inputsSJ) {
+        if (inputsRSA != null) {
+            sbuf.append(this.runComment + " Inputs -- region (" + region + ") and  sector (" + sector + ") and all jobs" + eolString);
+            for (CaseInput input : inputsRSA) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
         }
+        
+        // AAJ
+        sbuf.append(eolString);
+        if (inputsAAJ != null) {
+            sbuf.append(this.runComment + " Inputs -- all regions and  all sector and job ("  + job + ")" + eolString);
+            for (CaseInput input : inputsAAJ) {
+                sbuf.append(setenvInput(input, caseObj, job, expSvc));
+            }
+        }
+        
+        // RAJ
+        sbuf.append(eolString);
+        if (inputsRAJ != null) {
+            sbuf.append(this.runComment + " Inputs -- region (" + region + ") and  all sectors and job (" + job + ")" + eolString);
+            for (CaseInput input : inputsRAJ) {
+                sbuf.append(setenvInput(input, caseObj, job, expSvc));
+            }
+        }
+        
+        // ASJ
+        sbuf.append(eolString);
+        if (inputsASJ != null) {
+            sbuf.append(this.runComment + " Inputs -- all regions and  sector (" + sector + ") and job (" + job + ")" + eolString);
+            for (CaseInput input : inputsASJ) {
+                sbuf.append(setenvInput(input, caseObj, job, expSvc));
+            }
+        }
+        
+        // RSJ
+        sbuf.append(eolString);
+        if (inputsRSJ != null) {
+            sbuf.append(this.runComment + " Inputs -- region (" + region + ") and  sector (" + sector + ") and job ("  + job + ")" + eolString);
+            for (CaseInput input : inputsRSJ) {
+                sbuf.append(setenvInput(input, caseObj, job, expSvc));
+            }
+        }
+
         /*
-         * Get the parameters for this job in following order: from summary tab, all sectors, all jobs sector specific,
-         * all jobs all sectors, job specific sector specific, job specific
+         * Get the parameters for this job in following order: from summary tab, from job tab, 
+         * then in the same order as the inputs, ie.:
+         * Present hierarchy from general to specific
+         *    AAA - all regions, all sectors, all jobs
+         *    RAA - specific region, all sectors, all jobs
+         *    ASA - all regions, specific sector, all jobs
+         *    RSA - specific region, specific sector, all jobs
+         *    AAJ - all regions, all sectors, specific job
+         *    RAJ - specific region, all sectors, specific job
+         *    ASJ - all regions, specific sector, specific job
+         *    RSJ - specific region, specific sector, specific job
          */
 
         // Parameters from the summary tab
@@ -3207,12 +3474,6 @@ public class ManagedCaseService {
             }
             sbuf.append(shellSetenv("MODEL_LABEL", modelName));
         }
-//        if (caseObj.getGrid() != null) {
-//            sbuf.append(shellSetenv("IOAPI_GRIDNAME_1", caseObj.getGrid().getName()));
-//        }
-//        if (caseObj.getGridResolution() != null) {
-//            sbuf.append(shellSetenv("EMF_GRID", caseObj.getGridResolution().getName()));
-//        }
         if (caseObj.getAirQualityModel() != null) {
             sbuf.append(shellSetenv("EMF_AQM", caseObj.getAirQualityModel().getName()));
         }
@@ -3257,49 +3518,88 @@ public class ManagedCaseService {
         if (job.getJobGroup() != null && !job.getJobGroup().isEmpty()) {
             sbuf.append(shellSetenv("JOB_GROUP", job.getJobGroup()));
         }
-
-        // All sectors, all jobs
-        sbuf.append(eolString);
-        sbuf.append(this.runComment + " Parameters -- all sectors, all jobs " + eolString);
-        CaseParameter[] parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, session);
-        if (parameters != null) {
-            for (CaseParameter param : parameters) {
-                sbuf.append(setenvParameter(param));
+        if (region != null){
+            sbuf.append(shellSetenv("REGION", region.getName()));
+            if (region.getAbbreviation() != null && !region.getAbbreviation().isEmpty()){
+                sbuf.append(shellSetenv("REGION_ABBREV", region.getAbbreviation()));
             }
-
-        }
-
-        // Specific sector, all jobs
-        if (sector != this.ALL_SECTORS) {
-            sbuf.append(eolString);
-            sbuf.append(this.runComment + " Parameters -- sectors (" + sector + "), all jobs " + eolString);
-            parameters = this.getJobParameters(caseId, this.ALL_JOB_ID, sector, session);
-            if (parameters != null) {
-                for (CaseParameter param : parameters) {
-                    sbuf.append(setenvParameter(param));
-                }
+            if (region.getIoapiName() != null && !region.getIoapiName().isEmpty()){
+                sbuf.append(shellSetenv("REGION_IOAPI_GRIDNAME", region.getIoapiName()));
             }
         }
-        // All sectors, specific job
+        
+        // AAA
         sbuf.append(eolString);
-        sbuf.append(this.runComment + " Parameters -- all sectors, job: " + job + eolString);
-        parameters = this.getJobParameters(caseId, jobId, this.ALL_SECTORS, session);
-        if (parameters != null) {
-            for (CaseParameter param : parameters) {
+        if (paramsAAA != null) {
+            sbuf.append(this.runComment + " Parameters -- all regions, all sectors, all jobs " + eolString);
+            for (CaseParameter param : paramsAAA) {
                 sbuf.append(setenvParameter(param));
             }
         }
-        // Specific sector, specific job
-        if (sector != this.ALL_SECTORS) {
-            sbuf.append(eolString);
-            sbuf.append(this.runComment + " Parameters -- sectors (" + sector + "), job: " + job + eolString);
-            parameters = this.getJobParameters(caseId, jobId, sector, session);
-            if (parameters != null) {
-                for (CaseParameter param : parameters) {
-                    sbuf.append(setenvParameter(param));
-                }
+        
+        // RAA
+        sbuf.append(eolString);
+        if (paramsRAA != null) {
+            sbuf.append(this.runComment + " Parameters -- region (" + region + "), all sectors, all jobs " + eolString);
+            for (CaseParameter param : paramsRAA) {
+                sbuf.append(setenvParameter(param));
             }
         }
+        
+        // ASA
+        sbuf.append(eolString);
+        if (paramsASA != null) {
+            sbuf.append(this.runComment + " Parameters -- all regions, sector (" + sector + "), all jobs " + eolString);
+            for (CaseParameter param : paramsASA) {
+                sbuf.append(setenvParameter(param));
+            }
+        }
+        
+        // RSA
+        sbuf.append(eolString);
+        if (paramsRSA != null) {
+            sbuf.append(this.runComment + " Parameters -- region (" + region + "), sector (" + sector + "), all jobs " + eolString);
+            for (CaseParameter param : paramsRSA) {
+                sbuf.append(setenvParameter(param));
+            }
+        }
+        
+        // AAJ
+        sbuf.append(eolString);
+        if (paramsAAJ != null) {
+            sbuf.append(this.runComment + " Parameters -- all regions, all sectors, job (" + job + ")" + eolString);
+            for (CaseParameter param : paramsAAJ) {
+                sbuf.append(setenvParameter(param));
+            }
+        }
+        
+        // RAJ
+        sbuf.append(eolString);
+        if (paramsRAJ != null) {
+            sbuf.append(this.runComment + " Parameters -- region (" + region + "), all sectors, job (" + job + ")" + eolString);
+            for (CaseParameter param : paramsRAJ) {
+                sbuf.append(setenvParameter(param));
+            }
+        }
+        
+        // ASJ
+        sbuf.append(eolString);
+        if (paramsASJ != null) {
+            sbuf.append(this.runComment + " Parameters -- all regions, sector (" + sector + "), all job (" + job + ")" + eolString);
+            for (CaseParameter param : paramsASJ) {
+                sbuf.append(setenvParameter(param));
+            }
+        }
+        
+        // RSJ
+        sbuf.append(eolString);
+        if (paramsRSJ != null) {
+            sbuf.append(this.runComment + " Parameters -- region (" + region + "), sector (" + sector + "), job (" + job + ")" + eolString);
+            for (CaseParameter param : paramsRSJ) {
+                sbuf.append(setenvParameter(param));
+            }
+        }
+        
         // Getting the executable object from the job
         Executable execVal = job.getExecutable();
 
@@ -4983,10 +5283,7 @@ public class ManagedCaseService {
                 + clean(getSectors(currentCase.getSectors()))
                 + "\""
                 + ls
-                + "\"#EMF_REGIONS="
-                + clean(getRegions(currentCase.getRegions()))
-                + "\""
-                + ls
+                + getRegions(currentCase.getRegions(), ls)
                 + "\"#EMF_CASE_COPIED_FROM="
                 + clean(currentCase.getTemplateUsed())
                 + "\""
@@ -5068,15 +5365,13 @@ public class ManagedCaseService {
         return sb.toString();
     }
     
-    private String getRegions(GeoRegion[] regions) {
+    private String getRegions(GeoRegion[] regions, String ls) {
         StringBuffer sb = new StringBuffer();
 
         for (GeoRegion region : regions)
-            sb.append(region.getName() + "&");
+            sb.append("\"#EMF_REGION=" + region.getName() + "&" + region.getAbbreviation() + "&" + region.getIoapiName() + "\"" + ls);
 
-        int lastAmp = sb.lastIndexOf("&");
-
-        return lastAmp < 0 ? sb.toString() : sb.toString().substring(0, lastAmp);
+        return sb.toString();
     }
     
     private String getSectors(Sector[] sectors) {

@@ -22,6 +22,7 @@ DELETE FROM emf.notes;
 DELETE FROM emf.note_types;
 DELETE FROM emf.revisions;
 DELETE FROM emf.datasets_notes;
+DELETE FROM emf.grids;
 ----------------------------- QA Management tables -------------------------------
 DELETE FROM emf.qa_steps;
 DELETE FROM emf.dataset_types_qa_step_templates;
