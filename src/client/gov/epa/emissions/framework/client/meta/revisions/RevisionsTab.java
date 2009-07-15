@@ -10,11 +10,13 @@ import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -69,14 +71,26 @@ public class RevisionsTab extends JPanel implements RevisionsTabView, RefreshObs
     private JPanel createControlPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
+        Insets insets = new Insets(1, 2, 1, 2);
+
         JPanel buttonPanel = new JPanel();
         JButton viewButton = new JButton("View");
+        viewButton.setMargin(insets);
         viewButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 viewRevisions();
             }
         });
         buttonPanel.add(viewButton);
+
+        JButton editButton = new JButton(new AbstractAction("Edit"){
+            public void actionPerformed(ActionEvent event) {
+                editRevisions();
+            }
+        });
+        
+        editButton.setMargin(insets);
+        buttonPanel.add(editButton);
 
         panel.add(buttonPanel, BorderLayout.LINE_START);
 
@@ -93,6 +107,23 @@ public class RevisionsTab extends JPanel implements RevisionsTabView, RefreshObs
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             ViewRevisionWindow view = new ViewRevisionWindow(desktopManager);
             presenter.doViewRevision((Revision) iter.next(), view);
+        }
+    }
+
+    private void editRevisions() {
+
+        List<Revision> selected = (List<Revision>) table.selected();
+        if (selected == null || selected.size() == 0) {
+            messagePanel.setMessage("Please select a revision.");
+        }
+        else {
+            for (Revision revision : selected) {
+                try {
+                    presenter.doEditRevision(revision, new RevisionEditorViewImpl(this.parentConsole));
+                } catch (EmfException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
     

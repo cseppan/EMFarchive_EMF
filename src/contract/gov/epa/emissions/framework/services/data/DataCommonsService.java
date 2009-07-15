@@ -69,8 +69,11 @@ public interface DataCommonsService {
     Status[] getStatuses(String username) throws EmfException;
 
     // Revisions
+    Revision obtainLockedRevision(User owner, Revision revision) throws EmfException;
+    Revision releaseLockedRevision(User owner, Revision revision) throws EmfException;
     Revision[] getRevisions(int datasetId) throws EmfException;
     void addRevision(Revision revision) throws EmfException;
+    Revision updateRevision(Revision revision) throws EmfException;
 
     // Notes
     Note[] getNameContainNotes(String nameContains) throws EmfException;

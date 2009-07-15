@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.editor;
 
+import gov.epa.emissions.commons.data.Lockable;
+import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.security.User;
 
 import java.util.Date;
@@ -11,7 +13,7 @@ import java.util.Date;
  * @author Conrad F. D'Cruz
  * 
  */
-public class Revision {
+public class Revision implements Lockable {
 
     private int id;
 
@@ -29,10 +31,15 @@ public class Revision {
 
     private String references;
 
+    private Mutex lock;
+
     public Revision() {// No argument constructor needed for hibernate mapping
+        lock = new Mutex();
     }
 
     public Revision(User creator, int datasetId, Date date, int version, String what, String why, String references) {
+
+        this();
         this.creator = creator;
         this.datasetId = datasetId;
         this.date = date;
@@ -106,4 +113,42 @@ public class Revision {
         this.references = references;
     }
 
+    public Date getLockDate() {
+        return lock.getLockDate();
+    }
+
+    public void setLockDate(Date lockDate) {
+        lock.setLockDate(lockDate);
+    }
+
+    public String getLockOwner() {
+        return lock.getLockOwner();
+    }
+
+    public void setLockOwner(String owner) {
+        
+        System.out.println("Locking revision for owner: " + owner);
+        System.out.println("Before call to setLockOwner: " + this);
+        lock.setLockOwner(owner);
+        System.out.println("After call to setLockOwner: " + this);
+    }
+
+    public boolean isLocked(String owner) {
+        return lock.isLocked(owner);
+    }
+
+    public boolean isLocked(User owner) {
+        return lock.isLocked(owner);
+    }
+
+    public boolean isLocked() {
+        return lock.isLocked();
+    }
+
+    @Override
+    public String toString() {
+        return "Revision (" + super.toString() + ") with id " + this.getId() + " is locked by " + this.getLockOwner()
+                + " at " + this.getLockDate() + " (what: " + what + ", why: " + why + ", references: " + references
+                + ")";
+    }
 }

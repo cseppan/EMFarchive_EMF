@@ -500,6 +500,50 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
+    public synchronized Revision obtainLockedRevision(User owner, Revision revision) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            Revision lockedRevision = dao.obtainLockedRevision(owner, revision, session);
+            session.close();
+
+            return lockedRevision;
+        } catch (RuntimeException e) {
+            String message = "Could not obtain lock for revision with id: " + revision.getId() + " by owner: " + owner.getUsername();
+            LOG.error(message, e);
+            throw new EmfException(message);
+        }
+    }
+
+    public synchronized Revision releaseLockedRevision(User user, Revision revision) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            Revision released = dao.releaseLockedRevision(user, revision, session);
+            session.close();
+
+            return released;
+        } catch (RuntimeException e) {
+            LOG.error("Could not release lock for revision: " + revision.getId() + " by owner: " + revision.getLockOwner(),
+                    e);
+            throw new EmfException("Could not release lock for revision: " + revision.getId() + " by owner: "
+                    + revision.getLockOwner());
+        }
+    }
+
+    public synchronized Revision updateRevision(Revision revision) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+
+                Revision released = dao.updateRevision(revision, session);
+
+            session.close();
+
+            return released;
+        } catch (RuntimeException e) {
+            LOG.error("Could not update revisions", e);
+            throw new EmfException("One of the revisions is already in use");
+        }
+    }
+
     public synchronized Revision[] getRevisions(int datasetId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();

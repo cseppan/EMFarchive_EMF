@@ -10,17 +10,15 @@ public class RevisionsTabPresenter {
 
     private EmfDataset dataset;
 
-    //private DataCommonsService service;
-    
     private EmfSession session;
 
     public RevisionsTabPresenter(EmfDataset dataset, EmfSession session) {
+        
         this.dataset = dataset;
-        this.session = session; 
+        this.session = session;
     }
 
     public void display(RevisionsTabView view) throws EmfException {
-        //Revision[] revisions = service.getRevisions(dataset.getId());
         view.display(getRevisions(), this);
     }
     
@@ -35,7 +33,14 @@ public class RevisionsTabPresenter {
     public void doViewRevision(Revision revision, RevisionView view) {
         view.display(revision, dataset);
     }
-    
+
+    public void doEditRevision(Revision revision, RevisionEditorView view) throws EmfException {
+
+        RevisionEditorPresenter  presenter = new RevisionEditorPresenterImpl(revision, session);
+        view.observe(presenter);
+        presenter.display(view, revision, dataset);
+    }
+
     public void checkIfLockedByCurrentUser() throws EmfException{
         EmfDataset reloaded = session.dataService().getDataset(dataset.getId());
         if (!reloaded.isLocked())

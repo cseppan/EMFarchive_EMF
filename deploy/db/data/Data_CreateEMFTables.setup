@@ -222,7 +222,9 @@ CREATE TABLE emf.revisions
   date_time timestamp,
   what text NOT NULL,
   why text NOT NULL,
-  refers_notes text
+  refers_notes text,
+  lock_owner varchar(255),
+  lock_date timestamp
 ) 
 WITHOUT OIDS;
 -- emf.revisions

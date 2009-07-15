@@ -263,6 +263,18 @@ public class DatasetDAO {
         return (EmfDataset) lockingScheme.releaseLock(user, current(locked, session), session);
     }
 
+    public Revision update(Revision revision, Session session) throws EmfException {
+        return (Revision) lockingScheme.releaseLockOnUpdate(revision, current(revision, session), session);
+    }
+
+    public Revision obtainLocked(User user, Revision revision, Session session) {
+        return (Revision) lockingScheme.getLocked(user, current(revision, session), session);
+    }
+
+    public Revision releaseLocked(User user, Revision revision, Session session) {
+        return (Revision) lockingScheme.releaseLock(user, current(revision, session), session);
+    }
+
     public EmfDataset update(EmfDataset locked, Session session) throws Exception {
         EmfDataset toReturn = null;
 
@@ -300,6 +312,10 @@ public class DatasetDAO {
 
     private EmfDataset current(EmfDataset dataset, Session session) {
         return (EmfDataset) current(dataset.getId(), EmfDataset.class, session);
+    }
+
+    private Revision current(Revision revision, Session session) {
+        return (Revision) current(revision.getId(), Revision.class, session);
     }
 
     public List getDatasets(Session session, DatasetType datasetType) {

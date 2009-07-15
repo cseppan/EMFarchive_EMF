@@ -38,13 +38,17 @@ public class DataCommonsDAO {
 
     private SourceGroupsDAO sourceGroupsDAO;
 
+    private DatasetDAO datasetDAO;
+    
     public DataCommonsDAO() {
+        
         sectorsDao = new SectorsDAO();
         hibernateFacade = new HibernateFacade();
         keywordsDAO = new KeywordsDAO();
         datasetTypesDAO = new DatasetTypesDAO();
         pollutantsDAO = new PollutantsDAO();
         sourceGroupsDAO = new SourceGroupsDAO();
+        datasetDAO = new DatasetDAO();
     }
 
     public List getKeywords(Session session) {
@@ -105,6 +109,18 @@ public class DataCommonsDAO {
 
     public Sector updateSector(Sector sector, Session session) throws EmfException {
         return sectorsDao.update(sector, session);
+    }
+
+    public Revision obtainLockedRevision(User user, Revision revision, Session session) {
+        return datasetDAO.obtainLocked(user, revision, session);
+    }
+
+    public Revision releaseLockedRevision (User user, Revision locked, Session session) {
+        return datasetDAO.releaseLocked(user, locked, session);
+    }
+
+    public Revision updateRevision(Revision revision, Session session) throws EmfException {
+        return datasetDAO.update(revision, session);
     }
 
     public DatasetType updateDatasetType(DatasetType type, Session session) throws EmfException {

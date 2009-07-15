@@ -325,6 +325,39 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { revision });
     }
 
+    public synchronized Revision obtainLockedRevision(User owner, Revision revision) throws EmfException {
+        EmfCall call = call();
+
+        call.addParam("owner", mappings.user());
+        call.addParam("revision", mappings.revision());
+        call.setOperation("obtainLockedRevision");
+        call.setReturnType(mappings.revision());
+
+        return (Revision) call.requestResponse(new Object[] { owner, revision });
+    }
+
+    public synchronized Revision releaseLockedRevision(User user, Revision revision) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("releaseLockedRevision");
+        call.addParam("user", mappings.user());
+        call.addParam("revision", mappings.revision());
+        call.setReturnType(mappings.revision());
+
+        return (Revision) call.requestResponse(new Object[] { user, revision });
+    }
+
+    public synchronized Revision updateRevision(Revision revision) throws EmfException {
+
+        EmfCall call = call();
+
+        call.setOperation("updateRevision");
+        call.addParam("revision", mappings.revision());
+        call.setReturnType(mappings.revision());
+
+        return (Revision) call.requestResponse(new Object[] { revision });
+    }
+
     public synchronized Pollutant[] getPollutants() throws EmfException {
         EmfCall call = call();
 
