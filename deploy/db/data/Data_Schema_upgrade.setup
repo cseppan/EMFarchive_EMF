@@ -976,3 +976,7 @@ where name in ('State Comparison Tolerance (CSV)');
 
 
 insert into emf.qa_programs values(DEFAULT,'Annual state summaries crosstab','gov.epa.emissions.framework.services.qa.SQLQAAnnualStateSummariesCrosstabQueryRunner');
+
+--added (7/16) to allow locking of revisions for edit
+ALTER TABLE emf.revisions ADD COLUMN lock_owner varchar(255);
+ALTER TABLE emf.revisions ADD COLUMN lock_date timestamp;
