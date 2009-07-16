@@ -912,10 +912,6 @@ CREATE TABLE emf.region_type
 WITHOUT OIDS;
 -- emf.region_type
 
-insert into emf.region_type values (default, 'I/O API grid', 'I/O API grid');
-insert into emf.region_type values (default, 'List of Counties', 'List of Counties');
-insert into emf.region_type values (default, 'Label', 'Label');
-
 -- emf.georegions
 CREATE TABLE emf.georegions
 (
@@ -938,20 +934,6 @@ CREATE TABLE emf.georegions
   version_id int4 REFERENCES emissions.versions(id)
 ) 
 WITHOUT OIDS;
-
-insert into emf.geoRegions values (	default,	'EUS12_279X240','','', default,		'36km, and BOTH 12km','EUS12_279X240'	);
-insert into emf.geoRegions values (	default,	'DETROIT12KM','','', default,		'12km','DETROIT12KM'	);
-insert into emf.geoRegions values (	default,	'EUS12_216X240','','', default,		'12km_test','EUS12_216X240'	);
-insert into emf.geoRegions values (	default,	'BALT4km','','', default,		'4km','BALT4km'	);
-insert into emf.geoRegions values (	default,	'US36KM_148X112,  U12KM_?','','', default,		'36km, 12km-EUS','US36KM_148X112,  U12KM_?'	);
-insert into emf.geoRegions values (	default,	'US36KM_148X112','','', default,		'36km','US36KM_148X112'	);
-insert into emf.geoRegions values (	default,	'2EUS12_148X112','','', default,		'12km','2EUS12_148X112'	);
-insert into emf.geoRegions values (	default,	'2EUS12_216X240','','', default,		'12km','2EUS12_216X240'	);
-insert into emf.geoRegions values (	default,	'12MW1_114x117','','', default,		'12MW1','12MW1_114x117'	);
-insert into emf.geoRegions values (	default,	'12SE1','','', default,		'12km','12SE1'	);
-insert into emf.geoRegions values (	default,	'12MIDATL1','',	'', default,	'12km','12MIDATL1'	);
-insert into emf.geoRegions values (	default,	'12MW2','',	'', default,	'12km','12MW2'	);
-insert into emf.geoRegions values (	default,	'NG36_148X112','','', default,		'36km','NG36_148X112'	);
 
 --6/4/09 added a new QA program
 insert into emf.dataset_types values(DEFAULT,'Smkmerge report state annual summary (CSV)','Smkmerge report state annual summary (CSV)','1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter', '', null, 0);
