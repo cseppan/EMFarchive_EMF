@@ -195,6 +195,14 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         caseObjectManager.refresh();
         return this.caseObjectManager.getSectors();
     }
+    
+    public GeoRegion[] getGeoRegions() throws EmfException {
+        List<GeoRegion> all = new ArrayList<GeoRegion>();
+        all.add(new GeoRegion(""));
+        all.addAll(Arrays.asList(caseObjectManager.getGeoRegions()));
+        
+        return all.toArray(new GeoRegion[0]);
+    }
 
     public String getJobsStatus(CaseJob[] jobs) throws EmfException {
         List<String> ok = new ArrayList<String>();

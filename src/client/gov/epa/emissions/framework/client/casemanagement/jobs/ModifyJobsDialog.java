@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.Dialog;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -46,18 +47,24 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
     private JCheckBox execChkBx = new JCheckBox();
     private JCheckBox argChkBx = new JCheckBox();
     private JCheckBox qChkBx = new JCheckBox();
+    private JCheckBox regionChkBx = new JCheckBox();
+    private JCheckBox jobGroupChkBx = new JCheckBox();
+    private JCheckBox jobOrderChkBx = new JCheckBox();
     private ComboBox hosts;
+    private ComboBox regions;
     private ComboBox sectors;
     private JTextField exec;
     private JTextField args;
     private JTextField qOpt;
+    private JTextField jobGroup;
+    private JTextField jobOrder;
     private EmfSession session;
     private EmfConsole parent;
     private CaseJob[] jobs;
     
     public ModifyJobsDialog(EmfConsole parent, CaseJob[] jobs, EmfSession session) {
         super("Modify " + jobs.length + " jobs", parent);
-        super.setSize(new Dimension(620, 300));
+        super.setSize(new Dimension(620, 400));
         super.center();
         
         this.jobs = jobs;
@@ -90,22 +97,32 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
         JPanel left = new JPanel(new SpringLayout());
         SpringLayoutGenerator layout = new SpringLayoutGenerator();
         layout.addLabelWidgetPair("Modify hostname?", hostChkBx, left);
+        layout.addLabelWidgetPair("Modify region?", regionChkBx, left);
         layout.addLabelWidgetPair("Modify sector?", sectorChkBx, left);
         layout.addLabelWidgetPair("Modify executable?", execChkBx, left);
         layout.addLabelWidgetPair("Modify arguments?", argChkBx, left);
         layout.addLabelWidgetPair("Modify queue options?", qChkBx, left);
-        layout.makeCompactGrid(left, 5, 2, // rows, cols
+        layout.addLabelWidgetPair("Modify job order?", jobOrderChkBx, left);
+        layout.addLabelWidgetPair("Modify job group?", jobGroupChkBx, left);
+        layout.makeCompactGrid(left, 8, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
         //left.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 0));
         
+        Dimension preferredSize = new Dimension(200, 20);
         JPanel right = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         
         hosts = new ComboBox("Select a host", presenter.getJobHosts());
+        hosts.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("New Hostname:", hosts, right);
         
+        regions = new ComboBox("Select a sector", presenter.getGeoRegions());
+        regions.setPreferredSize(preferredSize);
+        layoutGenerator.addLabelWidgetPair("New region:", regions, right);
+        
         sectors = new ComboBox("Select a sector", presenter.getJobSectors());
+        sectors.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("New Sector:", sectors, right);
         
         exec = new JTextField(20);
@@ -118,12 +135,19 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
         qOpt = new JTextField(20);
         layoutGenerator.addLabelWidgetPair("New Queue Options:", qOpt, right);
         
-        layoutGenerator.makeCompactGrid(right, 5, 2, // rows, cols
+        jobOrder = new JTextField(20);
+        layoutGenerator.addLabelWidgetPair("New Job Order:", jobOrder, right);
+        
+        jobGroup = new JTextField(20);
+        layoutGenerator.addLabelWidgetPair("New Job Group:", jobGroup, right);
+      
+        layoutGenerator.makeCompactGrid(right, 8, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
         //right.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 5));
         
         hostChkBx.addActionListener(resetValidation());
+        regionChkBx.addActionListener(resetValidation());
         sectorChkBx.addActionListener(resetValidation());
         execChkBx.addActionListener(resetValidation());
         argChkBx.addActionListener(resetValidation());
@@ -133,6 +157,8 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
         exec.addActionListener(resetValidation());
         args.addActionListener(resetValidation());
         qOpt.addActionListener(resetValidation());
+        jobGroup.addActionListener(resetValidation());
+        jobOrder.addActionListener(resetValidation());
         
         panel.add(left, BorderLayout.WEST);
         panel.add(right, BorderLayout.EAST);
@@ -204,10 +230,13 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
 
     protected void modifyJobs() throws EmfException {
         if (!hostChkBx.isSelected() 
+                && !regionChkBx.isSelected() 
                 && !sectorChkBx.isSelected() 
                 && !execChkBx.isSelected() 
                 && !argChkBx.isSelected() 
-                && !qChkBx.isSelected())
+                && !qChkBx.isSelected()
+                && !jobOrderChkBx.isSelected()
+                && !jobGroupChkBx.isSelected())
             throw new EmfException("Please check a checkbox corresponding to one or more fields you wish to modify.");
         
         if (!validateInputs())
@@ -216,6 +245,9 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
         for (CaseJob job : jobs) {
             if (hostChkBx.isSelected())
                 job.setHost((Host)hosts.getSelectedItem());
+            
+            if (regionChkBx.isSelected())
+                job.setRegion((GeoRegion)regions.getSelectedItem());
             
             if (sectorChkBx.isSelected())
                 job.setSector((Sector)sectors.getSelectedItem());
@@ -239,6 +271,12 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
             
             if (qChkBx.isSelected())
                 job.setQueOptions(qOpt.getText());
+            
+            if (jobOrderChkBx.isSelected())
+                job.setJobNo(Float.parseFloat(jobOrder.getText()));
+            
+            if (jobGroupChkBx.isSelected())
+                job.setJobGroup(jobGroup.getText());
         }
         
         presenter.doSave(jobs);
@@ -252,22 +290,45 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
             passed = false;
         }
         
+        if (regionChkBx.isSelected() && regions.getSelectedItem() == null) {
+            setMsg("Please select a valid region.");
+            passed = false;
+        }
+        
         if (sectorChkBx.isSelected() && sectors.getSelectedItem() == null) {
             setMsg("Please select a valid sector.");
             passed = false;
         }
         
-        if (execChkBx.isSelected() && (exec.getText() == null || exec.getText().trim().isEmpty())) {
-            setMsg("Please select a valid executable file.");
-            passed = false;
+//        if (execChkBx.isSelected() && (exec.getText() == null || exec.getText().trim().isEmpty())) {
+//            setMsg("Please select a valid executable file.");
+//            passed = false;
+//        }
+//        
+        if (execChkBx.isSelected()) {
+            if (exec.getText() == null || exec.getText().trim().isEmpty()){
+                setMsg("Please select a valid executable file.");
+                passed = false;
+            }else {
+                String filePath = exec.getText().trim();
+                File file = new File(filePath);
+
+                if (file.getParent() == null || file.getParent().isEmpty()) {
+                    setMsg("Please specify a full path for the executable file.");
+                    passed = false;
+                }
+            }
         }
         
-        if (execChkBx.isSelected()) {
-            String filePath = exec.getText().trim();
-            File file = new File(filePath);
-            
-            if (file.getParent() == null || file.getParent().isEmpty()) {
-                setMsg("Please specify a full path for the executable file.");
+        if (jobOrderChkBx.isSelected()) {
+            if (jobOrder.getText() == null || jobOrder.getText().trim().isEmpty()){
+                setMsg("Please select a valid order.");
+                passed = false;
+            } else
+            try {
+                Float.parseFloat(jobOrder.getText());
+            } catch (NumberFormatException e) {
+                setMsg("Please enter a floating point number into the Job Order field.");
                 passed = false;
             }
         }
@@ -281,8 +342,7 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
             public void actionPerformed(ActionEvent arg0) {
                 cleareMsg();
                 validateInputs();
-            }
-            
+            }         
         };
     }
     
