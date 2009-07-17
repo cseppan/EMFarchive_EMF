@@ -34,9 +34,9 @@ public class RevisionsTabPresenter {
         view.display(revision, dataset);
     }
 
-    public void doEditRevision(Revision revision, RevisionEditorView view) throws EmfException {
+    public void doEditRevision(Revision revision, RevisionEditorView view, RevisionsTabView parentView) throws EmfException {
 
-        RevisionEditorPresenter  presenter = new RevisionEditorPresenterImpl(revision, session);
+        RevisionEditorPresenter  presenter = new RevisionEditorPresenterImpl(revision, session, parentView);
         view.observe(presenter);
         presenter.display(view, revision, dataset);
     }

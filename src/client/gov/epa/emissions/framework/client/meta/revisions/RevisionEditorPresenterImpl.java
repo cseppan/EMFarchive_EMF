@@ -11,11 +11,14 @@ public class RevisionEditorPresenterImpl implements RevisionEditorPresenter {
     private Revision revision;
 
     private EmfSession session;
+    
+    private RevisionsTabView parentView;
 
-    public RevisionEditorPresenterImpl(Revision revision, EmfSession session) {
+    public RevisionEditorPresenterImpl(Revision revision, EmfSession session, RevisionsTabView parentView) {
 
         this.session = session;
         this.revision = revision;
+        this.parentView = parentView;
     }
 
     public void display(RevisionEditorView view, Revision revision, EmfDataset dataset) throws EmfException {
@@ -40,6 +43,11 @@ public class RevisionEditorPresenterImpl implements RevisionEditorPresenter {
 
     public void doSave() throws EmfException {
         this.service().updateRevision(this.revision);
+    }
+    
+    public void doRefresh() {
+        this.parentView.refreshMSG(); 
+        //(this.revision);
     }
 
 }

@@ -9,4 +9,6 @@ public interface RevisionEditorPresenter {
     void display(RevisionEditorView view, Revision revision, EmfDataset dataset) throws EmfException;
 
     void doSave() throws EmfException;
+    
+    void doRefresh();
 }

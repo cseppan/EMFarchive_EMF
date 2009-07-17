@@ -215,6 +215,7 @@ public class RevisionEditorViewImpl extends Dialog implements RevisionEditorView
 
             try {
                 this.presenter.doSave();
+                presenter.doRefresh(); 
             } catch (EmfException e) {
                 e.printStackTrace();
             }
@@ -232,6 +233,7 @@ public class RevisionEditorViewImpl extends Dialog implements RevisionEditorView
         // e.printStackTrace();
         // }
     }
+    
 
     private void doClose() {
 

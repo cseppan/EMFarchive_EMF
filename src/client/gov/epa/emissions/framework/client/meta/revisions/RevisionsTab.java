@@ -119,7 +119,7 @@ public class RevisionsTab extends JPanel implements RevisionsTabView, RefreshObs
         else {
             for (Revision revision : selected) {
                 try {
-                    presenter.doEditRevision(revision, new RevisionEditorViewImpl(this.parentConsole));
+                    presenter.doEditRevision(revision, new RevisionEditorViewImpl(this.parentConsole), this);
                 } catch (EmfException e) {
                     e.printStackTrace();
                 }
@@ -141,5 +141,10 @@ public class RevisionsTab extends JPanel implements RevisionsTabView, RefreshObs
             setCursor(Cursor.getDefaultCursor());
         }
 
+    }
+    
+    public void refreshMSG(){
+        messagePanel.clear();
+        messagePanel.setMessage("Refresh to see the changes in dataset revisions.");
     }
 }
