@@ -246,8 +246,14 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
             if (hostChkBx.isSelected())
                 job.setHost((Host)hosts.getSelectedItem());
             
-            if (regionChkBx.isSelected())
-                job.setRegion((GeoRegion)regions.getSelectedItem());
+            if (regionChkBx.isSelected()){
+                GeoRegion selected = (GeoRegion)regions.getSelectedItem();
+                
+                if (selected.getName().trim().isEmpty())
+                    selected = null;
+                    
+                job.setRegion(selected);
+            }
             
             if (sectorChkBx.isSelected())
                 job.setSector((Sector)sectors.getSelectedItem());
