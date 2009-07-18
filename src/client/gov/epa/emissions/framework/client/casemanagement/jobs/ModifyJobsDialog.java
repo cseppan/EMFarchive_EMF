@@ -117,7 +117,7 @@ public class ModifyJobsDialog extends Dialog implements ManageChangeables {
         hosts.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("New Hostname:", hosts, right);
         
-        regions = new ComboBox("Select a sector", presenter.getGeoRegions());
+        regions = new ComboBox("Select a region", presenter.getGeoRegions());
         regions.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("New region:", regions, right);
         
