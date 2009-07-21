@@ -2518,7 +2518,8 @@ public class ManagedCaseService {
                 // If other parameters are in the queue options, translate them to their
                 // string values in the queue
                 try {
-                    queueOptions = dao.replaceEnvVarsCase(queueOptions, " ", jobCase, jobId, caseJob.getSector());
+                    // Queue options could be job specific, therefore pass job, sector, and region
+                    queueOptions = dao.replaceEnvVarsCase(queueOptions, " ", jobCase, jobId, caseJob.getSector(), caseJob.getRegion());
                 } catch (Exception e) {
                     System.out.println(e);
                     throw new EmfException("Job (" + cjt.getJobName() + "): " + e.getMessage());
@@ -2707,7 +2708,8 @@ public class ManagedCaseService {
                 
                 // Expand input director, ie. remove env variables
                 try {
-                    fullPath = dao.replaceEnvVarsCase(fullPath, delimeter, caseObj, job.getId(), job.getSector());
+                    // full path based on input dir, which is case general, therefore don't pass job, sector, or region
+                    fullPath = dao.replaceEnvVarsCase(fullPath, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
                 } catch (Exception e) {
                     throw new EmfException("Input folder: " + e.getMessage());
                 }
@@ -2850,7 +2852,7 @@ public class ManagedCaseService {
             EmfDataset ds = caseInput.getDataset();
             Version version = caseInput.getVersion();
             SubDir subdirObj = caseInput.getSubdirObj();
-
+            
             String subDir = "";
 
             if (subdirObj != null) {
@@ -2861,7 +2863,8 @@ public class ManagedCaseService {
 
             String delimeter = System.getProperty("file.separator");
             String exportDir = caseObj.getInputFileDir() + delimeter + subDir;
-            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, caseInput.getCaseJobID(),null);
+            // export Dir is case general, therefore don't pass job, sector, or region
+            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
             getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version },
                     exportDirExpanded, purpose, false);
 
@@ -2888,7 +2891,8 @@ public class ManagedCaseService {
 
             String delimeter = System.getProperty("file.separator");
             String exportDir = caseObj.getInputFileDir() + delimeter + subDir;
-            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, caseInput.getCaseJobID(), null);
+//          export Dir is case general, therefore don't pass job, sector, or region
+            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
 
             getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version },
                     exportDirExpanded, purpose, true);
@@ -3133,7 +3137,9 @@ public class ManagedCaseService {
 
         // Expand input director, ie. remove env variables
         try {
-            setenvLine = dao.replaceEnvVarsCase(setenvLine, delimeter, caseObj, job.getId(), job.getSector());
+            // input Dir is case general, therefore don't pass job, sector, or region
+            setenvLine = dao.replaceEnvVarsCase(setenvLine, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
+            
             return setenvLine;
         } catch (Exception e) {
             throw new EmfException("Input folder: " + e.getMessage());
@@ -3352,7 +3358,8 @@ public class ManagedCaseService {
         if (outputFileDir == null || (outputFileDir.length() == 0))
             throw new EmfException("The Output Job Scripts folder has not been specified");
         try {
-            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, job.getId(), job.getSector());
+            // output Dir is case general, therefore don't pass job, sector, or region
+            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
             sbuf.append(shellSetenv("EMF_SCRIPTDIR", outputDirExpanded));
         } catch (Exception e) {
             throw new EmfException("Output folder: " + e.getMessage());
@@ -3690,7 +3697,8 @@ public class ManagedCaseService {
         String delimeter = System.getProperty("file.separator");
         String outputFileDir = caseObj.getOutputFileDir();
         try {
-            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, job.getId(), job.getSector());
+            // output file Dir is case general, therefore don't pass job, sector, or region
+            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
 
             // Test output directory to place job script
             if ((outputDirExpanded == null) || (outputDirExpanded.equals(""))) {
