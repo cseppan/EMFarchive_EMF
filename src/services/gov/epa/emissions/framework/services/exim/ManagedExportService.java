@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.exim;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
@@ -22,6 +23,7 @@ import gov.epa.emissions.framework.services.casemanagement.SubDir;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
@@ -46,6 +48,13 @@ public class ManagedExportService {
     private static int svcCount = 0;
 
     private String svcLabel = null;
+
+    private final Sector ALL_SECTORS = null;
+    
+    private final GeoRegion ALL_REGIONS = null;
+
+    private final int ALL_JOB_ID = 0;
+
 
     public synchronized String myTag() {
         if (svcLabel == null) {
@@ -206,7 +215,8 @@ public class ManagedExportService {
 
         String inputDirExpanded;
         try {
-            inputDirExpanded = caseDao.replaceEnvVarsCase(inputDir, fileSeparator, caseObj, job.getId(), job.getSector());
+            // input Dir is case general, therefore don't pass job, sector, or region
+            inputDirExpanded = caseDao.replaceEnvVarsCase(inputDir, fileSeparator, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
         } catch (RuntimeException e1) {
             // NOTE Auto-generated catch block
             e1.printStackTrace();
