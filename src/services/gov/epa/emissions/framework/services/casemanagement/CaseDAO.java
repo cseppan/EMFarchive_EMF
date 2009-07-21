@@ -44,6 +44,13 @@ public class CaseDAO {
 
     private HibernateSessionFactory sessionFactory;
 
+    private final Sector ALL_SECTORS = null;
+    
+    private final GeoRegion ALL_REGIONS = null;
+
+    private final int ALL_JOB_ID = 0;
+
+
     public CaseDAO(HibernateSessionFactory sessionFactory) {
         super();
         this.sessionFactory = sessionFactory;
@@ -1582,7 +1589,7 @@ public class CaseDAO {
         return envVars.toArray(new String[0]);
     }
 
-    public String replaceEnvVars(String input, String delimiter, int caseId, int jobId, int model_to_run_id, Sector jobSector)
+    public String replaceEnvVars(String input, String delimiter, int caseId, int model_to_run_id, int jobId, Sector jobSector, GeoRegion jobRegion)
             throws EmfException {
         // replace any environemental variables with their values
         // use the delimiter to separate out environment variables
@@ -1596,7 +1603,7 @@ public class CaseDAO {
                         // loop over env variable names, get the parameter,
                         // and replace the env name in input string w/ that value
                         CaseParameter envVar = getUniqueCaseParametersFromEnvName(caseId, envName, jobId,
-                                model_to_run_id, jobSector);
+                                model_to_run_id, jobSector, jobRegion);
 
                         // Replace exact matches of environmental variable name
 
@@ -1639,10 +1646,12 @@ public class CaseDAO {
         }
     }
 
-    public String replaceEnvVarsCase(String input, String delimiter, Case caseObj, int jobId, Sector jobSector) throws EmfException {
+    public String replaceEnvVarsCase(String input, String delimiter, Case caseObj, int jobId, Sector jobSector, GeoRegion jobRegion) throws EmfException {
         // replace any environmental variables with their values
         // use the delimiter to separate out environment variables
         // If $CASE is found, replace it from the case summary abbreviation
+        
+
         try {
             String tempInput = "";
             if (!input.contains("$"))
@@ -1676,7 +1685,7 @@ public class CaseDAO {
             // replace any remaining environmental variables
             int caseId = caseObj.getId();
             int model_to_run_id = caseObj.getModel().getId();
-            tempInput = replaceEnvVars(tempInput, delimiter, caseId, jobId, model_to_run_id, jobSector);
+            tempInput = replaceEnvVars(tempInput, delimiter, caseId, model_to_run_id, jobId, jobSector, jobRegion);
             return tempInput;
 
         } catch (Exception e) {
@@ -1684,53 +1693,123 @@ public class CaseDAO {
         }
     }
 
+    private CaseParameter selectCaseParameterByHierarchy(int jobId, Sector sector, GeoRegion region, CaseParameter[] parameters){
+        // Select parameter based on jobID, sector, and region
+        CaseParameter matchingParam = null;
+
+        for (CaseParameter param: parameters){
+            boolean regionMatch = false;
+            boolean sectorMatch = false;
+            if (param.getSector() == null) {
+                if (sector == null) sectorMatch = true;
+            } else {
+                if (param.getSector().equals(sector)) sectorMatch = true;
+            }
+            if (param.getRegion() == null) {
+                if (region == null) regionMatch = true;
+            } else {
+                if (param.getRegion().equals(region)) regionMatch = true;
+            }
+            
+            // if both region and sector match, test jobId
+            if (regionMatch && sectorMatch){
+                if (param.getJobId() == jobId) {
+                    matchingParam = param;
+                }
+            }       
+        }
+        return matchingParam;
+    }
+    
     public CaseParameter getUniqueCaseParametersFromEnvName(int caseId, String envName, int jobId, int model_to_run_id,
-              Sector jobSector)
+              Sector jobSector, GeoRegion jobRegion)
             throws EmfException {
         // Get case parameters that match a specific environment variables name
-        // If more than 1 matches the environmental variable name, uses the job Id to find unique one
+        // If more than 1 matches the environmental variable name, uses the job Id, sector
+        // and region to find unique one
+        
+
         try {
             CaseParameter[] tempParams = getCaseParametersFromEnvName(caseId, envName, model_to_run_id);
             List<CaseParameter> params = new ArrayList<CaseParameter>();
-            if (tempParams.length == 1) {
-                params.add(tempParams[0]);
-            } else if (tempParams.length > 1) {
-                boolean found = false;
-                 
-                // loop over params and find any that match job
-                for (CaseParameter param : tempParams) {
-                     if (param.getJobId() == jobId) {
-                        params.clear(); // clear because we've found one more specific
-                        params.add(param);
-                        found = true;
-                        break;
-                                 }
+            CaseParameter matchingParam = null;
+            
+            /** Go through the parameter hierarchy and get the most exact match
+             * Present hierarchy from general to specific
+             *    AAA - all regions, all sectors, all jobs
+             *    RAA - specific region, all sectors, all jobs
+             *    ASA - all regions, specific sector, all jobs
+             *    RSA - specific region, specific sector, all jobs
+             *    AAJ - all regions, all sectors, specific job
+             *    RAJ - specific region, all sectors, specific job
+             *    ASJ - all regions, specific sector, specific job
+             *    RSJ - specific region, specific sector, specific job
+             */
+            
+            // AAA
+            matchingParam = selectCaseParameterByHierarchy(this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS, tempParams);
+            if (matchingParam != null) params.add(matchingParam);
+            
+            // If job, sector, and/or region are set, continue search
+            // otherwise, test params
+            if ((jobId != this.ALL_JOB_ID) || (jobSector != this.ALL_SECTORS) || (jobRegion != this.ALL_REGIONS)){
+                //RAA
+                matchingParam = selectCaseParameterByHierarchy(this.ALL_JOB_ID, this.ALL_SECTORS, jobRegion, tempParams);
+                if (matchingParam != null) {
+                    params.clear(); // clear because we've found one more specific
+                    params.add(matchingParam);
                 }
-                if (!found) // have not found job-specific param
-                {    
-                    for (CaseParameter param : tempParams) {
-                        // found matching sector for all jobs
-                        if ((param.getSector() != null) && (param.getSector().equals(jobSector)) && (param.getJobId() == 0)) {
-                           params.clear();   // if there was already one found, clear it since this is more specific
-                           params.add(param);
-                           found = true;
-                           break;
-                        }
-                    }
-                    if (!found){
-                        for (CaseParameter param : tempParams) {
+                
+                //ASA
+                matchingParam = selectCaseParameterByHierarchy(this.ALL_JOB_ID, jobSector, this.ALL_REGIONS, tempParams);
+                if (matchingParam != null) {
+                    params.clear(); // clear because we've found one more specific
+                    params.add(matchingParam);
+                }
+                
+                //RSA
+                matchingParam = selectCaseParameterByHierarchy(this.ALL_JOB_ID, jobSector, jobRegion, tempParams);
+                if (matchingParam != null) {
+                    params.clear(); // clear because we've found one more specific
+                    params.add(matchingParam);
+                }
+                
+                
+                //AAJ
+                matchingParam = selectCaseParameterByHierarchy(jobId, this.ALL_SECTORS, this.ALL_REGIONS, tempParams);
+                if (matchingParam != null) {
+                    params.clear(); // clear because we've found one more specific
+                    params.add(matchingParam);
+                }
+                
+                
+                //RAJ
+                matchingParam = selectCaseParameterByHierarchy(jobId, this.ALL_SECTORS, jobRegion, tempParams);
+                if (matchingParam != null) {
+                    params.clear(); // clear because we've found one more specific
+                    params.add(matchingParam);
+                }
+                
+                
+                //ASJ
+                matchingParam = selectCaseParameterByHierarchy(jobId, jobSector, this.ALL_REGIONS, tempParams);
+                if (matchingParam != null) {
+                    params.clear(); // clear because we've found one more specific
+                    params.add(matchingParam);
+                }
+                
+                
+                //RSJ
+                matchingParam = selectCaseParameterByHierarchy(jobId, jobSector, jobRegion, tempParams);
+                if (matchingParam != null) {
+                    params.clear(); // clear because we've found one more specific
+                    params.add(matchingParam);
+                }
+                
 
-                        // found all sectors for all jobs
-                            if ((param.getJobId() == 0) && ((param.getSector() == null) || 
-                                    (param.getSector().getName().equalsIgnoreCase("All sectors"))))
-                            {   
-                                params.add(param);
-                            }
-                        }
-                    }
-                    
-                }
             }
+            
+            
             
             if (params.size() > 1) {
                 throw new EmfException("Could not find a unique case parameter for " + envName + ", jobId" + jobId);
