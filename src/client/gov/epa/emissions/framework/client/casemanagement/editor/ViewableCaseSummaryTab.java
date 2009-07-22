@@ -206,7 +206,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
 
         layoutGenerator.addLabelWidgetPair("Model & Version:", modelToRun(), panel);
         layoutGenerator.addLabelWidgetPair("Modeling Region:", modRegions(), panel);
-        layoutGenerator.addLabelWidgetPair("<html>Grids:<br><br><br></html>", grids(), panel);
+        layoutGenerator.addLabelWidgetPair("<html>Regions:<br><br><br></html>", grids(), panel);
         layoutGenerator.addLabelWidgetPair("Met/Emis Layers:", metEmisLayers(), panel);
         layoutGenerator.addLabelWidgetPair("Start Date & Time: ", startDate(), panel);
 
