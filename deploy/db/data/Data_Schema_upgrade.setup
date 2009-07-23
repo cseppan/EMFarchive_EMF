@@ -935,6 +935,11 @@ CREATE TABLE emf.georegions
 ) 
 WITHOUT OIDS;
 
+insert into emf.region_type values (1, 'Name only', 'A region described only with a name');
+insert into emf.region_type values (2, 'I/O API Regular Grid', 'A grid as described by the I/O API with a lower left corner, number of cells in x and y, and cell size in x and y.');
+insert into emf.region_type values (3, 'List of Counties', 'The region refers to a dataset that provides a list of counties that describe the region');
+insert into emf.region_type values (4, 'Shapefile','The region is described by a dataset that represents a Shapefile');
+
 --6/4/09 added a new QA program
 insert into emf.dataset_types values(DEFAULT,'Smkmerge report state annual summary (CSV)','Smkmerge report state annual summary (CSV)','1', '1', false,'', 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter', '', null, 0);
 insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")

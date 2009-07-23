@@ -227,63 +227,9 @@ insert into emf.qa_programs values(DEFAULT,'Create monthly emissions by county f
 insert into emf.qa_programs values(DEFAULT,'Compare annual state summaries','gov.epa.emissions.framework.services.qa.SQLQACompareAnnualStateSummariesQueryRunner');
 insert into emf.qa_programs values(DEFAULT,'Annual state summaries crosstab','gov.epa.emissions.framework.services.qa.SQLQAAnnualStateSummariesCrosstabQueryRunner');
 
-
---
--- the dataset type id field depends on the order of dataset type table (ORL type being first)
--- emf.dataset_types_qa_step_templates
--- TODO: we need to set all line based dataset types to have a default sort order of LINE_NUMBER
--- TODO: we need to set all CSV based dataset types to set keywords EXPORT_INLINE_COMMENTS to false and
---       export_suffix to .csv - perhaps these things and the ones below are better done with a Java class
---       because if the dataset type numbers change, having them in this script won't work
-
-
-
--- reference.rsm_inv_sectors
-insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'nonpt', 'x19', 'x7');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'ptnonipm', 'x19', 'x7');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'ptimp', 'x19', 'x7');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'onroad', 'x19', 'x7');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'nonroad', 'x19', 'x7');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'alm', 'x19', 'x7');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'afdust', 'x19', 'x7');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'all', 'VOC', 'ag', 'x19', 'x7');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'egu', 'NOX', 'ptipm', 'x13', 'x1');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'egu', 'SO2', 'ptipm', 'x16', 'x4');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'egu_negu', 'PM2_5', 'ptipm', 'x22', 'x10');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'egu_negu', 'PM2_5', 'ptnonipm', 'x22', 'x10');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'negu_area', 'NOX', 'ptnonipm', 'x14', 'x2');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'negu_area', 'NOX', 'nonpt', 'x14', 'x2');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'negu_pt', 'SO2', 'ptnonipm', 'x17', 'x5');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NOX', 'onroad', 'x15', 'x3');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NOX', 'nonroad', 'x15', 'x3');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NOX', 'alm', 'x15', 'x3');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NH3', 'onroad', 'x21', 'x9');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NH3', 'nonroad', 'x21', 'x9');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'NH3', 'alm', 'x21', 'x9');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'PM2_5', 'onroad', 'x23', 'x11');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'PM2_5', 'nonroad', 'x23', 'x11');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'mobile', 'PM2_5', 'alm', 'x23', 'x11');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'SO2', 'nonpt', 'x18', 'x6');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'SO2', 'afdust', 'x18', 'x6');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'SO2', 'ag', 'x18', 'x6');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'NH3', 'nonpt', 'x20', 'x8');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'NH3', 'afdust', 'x20', 'x8');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'NH3', 'ag', 'x20', 'x8');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'PM2_5', 'nonpt', 'x24', 'x12');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'PM2_5', 'afdust', 'x24', 'x12');
-insert into reference.rsm_inv_sectors values(DEFAULT, 'area', 'PM2_5', 'ag', 'x24', 'x12');
-
-insert into emf.grids values (	default,	'EUS12_279X240','',		'36km, and BOTH 12km'	);
-insert into emf.grids values (	default,	'DETROIT12KM','',		'12km'	);
-insert into emf.grids values (	default,	'EUS12_216X240','',		'12km_test'	);
-insert into emf.grids values (	default,	'BALT4km','',		'4km'	);
-insert into emf.grids values (	default,	'US36KM_148X112,  U12KM_?','',		'36km, 12km-EUS'	);
-insert into emf.grids values (	default,	'US36KM_148X112','',		'36km'	);
-insert into emf.grids values (	default,	'2EUS12_148X112','',		'12km'	);
-insert into emf.grids values (	default,	'2EUS12_216X240','',		'12km'	);
-insert into emf.grids values (	default,	'12MW1_114x117','',		'12MW1'	);
-insert into emf.grids values (	default,	'12SE1','',		'12km'	);
-insert into emf.grids values (	default,	'12MIDATL1','',		'12km'	);
-insert into emf.grids values (	default,	'12MW2','',		'12km'	);
-insert into emf.grids values (	default,	'NG36_148X112','',		'36km'	);
+--7/23/2009 Region Types
+insert into emf.region_type values (1, 'Name only', 'A region described only with a name');
+insert into emf.region_type values (2, 'I/O API Regular Grid', 'A grid as described by the I/O API with a lower left corner, number of cells in x and y, and cell size in x and y.');
+insert into emf.region_type values (3, 'List of Counties', 'The region refers to a dataset that provides a list of counties that describe the region');
+insert into emf.region_type values (4, 'Shapefile','The region is described by a dataset that represents a Shapefile');
 
