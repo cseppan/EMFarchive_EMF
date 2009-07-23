@@ -4993,8 +4993,8 @@ public class ManagedCaseService {
 
     private CaseInput[] getValidCaseInputs4SensitivityCase(int caseId, int[] jobIds, CaseJob[] jobs, Session session) {
         String query = "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
-                + " AND ((obj.caseJobID = 0 AND obj.sector.id is null)"
-                + getAndOrClause(jobIds, "obj.caseJobID", getSectorIds(jobs), "obj.sector.id") + ")";
+                + " AND ((obj.caseJobID = 0 AND obj.sector.id is null AND obj.region.id is null) "
+                + getAndOrClause(jobIds, "obj.caseJobID", getSectorIds(jobs), "obj.sector.id", getRegionIds(jobs), "obj.region.id") + ")";
 
         if (DebugLevels.DEBUG_9)
             log.warn(query);
@@ -5013,8 +5013,8 @@ public class ManagedCaseService {
     private CaseParameter[] getValidCaseParameters4SensitivityCase(int caseId, int[] jobIds, CaseJob[] jobs,
             Session session) {
         String query = "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = "
-                + caseId + " AND ((obj.jobId = 0 AND obj.sector.id is null)"
-                + getAndOrClause(jobIds, "obj.jobId", getSectorIds(jobs), "obj.sector.id") + ")";
+                + caseId + " AND ((obj.jobId = 0 AND obj.sector.id is null AND obj.region.id is null) "
+                + getAndOrClause(jobIds, "obj.jobId", getSectorIds(jobs), "obj.sector.id", getRegionIds(jobs), "obj.region.id") + ")";
 
         if (DebugLevels.DEBUG_9)
             log.warn(query);
@@ -5043,27 +5043,72 @@ public class ManagedCaseService {
 
         return sectorIds;
     }
+    
+    private int[] getRegionIds(CaseJob[] jobs) {
+        int[] regionIds = new int[jobs.length];
 
-    private String getAndOrClause(int[] jobIds, String jobIdString, int[] sectorIds, String sectorIdString) {
-        StringBuffer sb = new StringBuffer();
-        int numIDs = jobIds.length;
+        for (int i = 0; i < jobs.length; i++) {
+            GeoRegion region = jobs[i].getRegion();
+
+            if (region == null)
+                regionIds[i] = -1;
+            else
+                regionIds[i] = region.getId();
+        }
+
+        return regionIds;
+    }
+
+    private String getAndOrClause(
+            int[] jIds, String jStr, 
+            int[] sIds, String sStr, 
+            int[] rIds, String rStr) {
+        int numIDs = jIds.length;
 
         if (numIDs < 1)
             return "";
 
         // NOTE: the following implementation reflects this logic:
-        // If you select job1 which is sector1, the logic for selecting the appropriate parameters from the template is:
-        // (All job AND All sectors) OR (all jobs AND sector = sector1) OR (job = job1 AND All sectors) OR (job=job1 AND
-        // sector = sector1)
-        // You have to also make sure this doesn't fail if the sector of the job is All sectors.
+        // If you select job1 which is region1 and sector1, the logic for selecting the appropriate parameters from the template is:
+        //      AAA - (all regions, all sectors AND all jobs) OR 
+        //      RAA - (region=region1, all sectors AND all jobs) OR
+        //      ASA - (all regions, sector=sector1 AND all jobs) OR
+        //      RSA - (region=region1, sector=sector1 AND all jobs) OR 
+        //      AAJ - (all regions, all sectors AND job=job1) OR
+        //      RAJ - (region=region1, all sectors AND job=job1) OR
+        //      ASJ - (all regions, sector=sector1 AND job=job1) OR
+        //      RSJ - (region=region1, sector=sector1 AND job=job1)
+        // You have to also make sure this doesn't fail if the region/sector of the job is All regions/sectors.
 
+        StringBuffer sb = new StringBuffer();
+        
         for (int i = 0; i < numIDs; i++) {
-            if (sectorIds[i] != -1)
-                sb.append(" OR (" + jobIdString + " = 0 AND " + sectorIdString + " = " + sectorIds[i] + ")" + " OR ("
-                        + jobIdString + " = " + jobIds[i] + " AND " + sectorIdString + " is null)" + " OR ("
-                        + jobIdString + " = " + jobIds[i] + " AND " + sectorIdString + " = " + sectorIds[i] + ")");
+            if (sIds[i] != -1 && rIds[i] != -1)
+                sb.append(" OR (" 
+                        + jStr + " = 0 AND " + sStr + " is null AND " + rStr + " = " + rIds[i] + ") OR ("
+                        + jStr + " = 0 AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null) OR ("
+                        + jStr + " = 0 AND " + sStr + " = " + sIds[i] + " AND " + rStr + " = " + rIds[i] + ") OR ("
+                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " is null) OR ("
+                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " = " + rIds[i] + ") OR ("
+                        + jStr + " = " + jIds[i] + " AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null) OR ("
+                        + jStr + " = " + jIds[i] + " AND " + sStr + " = " + sIds[i] + " AND " + rStr + " = " + rIds[i] 
+                        + ")");
+            else if (sIds[i] != -1 && rIds[i] == -1) {
+                sb.append(" OR (" 
+                        + jStr + " = 0 AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null) OR ("
+                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " is null) OR ("
+                        + jStr + " = " + jIds[i] + " AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null"
+                        + ")");
+            }
+            else if (sIds[i] == -1 && rIds[i] != -1) {
+                sb.append(" OR (" 
+                        + jStr + " = 0 AND " + sStr + " is null AND " + rStr + " = " + rIds[i] + ") OR ("
+                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " is null) OR ("
+                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " = " + rIds[i]
+                        + ")");
+            }
             else
-                sb.append(" OR (" + jobIdString + " = " + jobIds[i] + " AND " + sectorIdString + " is null)");
+                sb.append(" OR (" + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " is null)");
         }
 
         return sb.toString();
@@ -5076,10 +5121,10 @@ public class ManagedCaseService {
     // If you get multiple parameters from that query, then you match with same sector.
     //
     // example:
-    // template (name, env variable, sector, job) parent (name, env variable, sector, job)
-    // PARAM1, EV1,all sectors, all jobs PARAM1,EV1,all sectors,all jobs
-    // PARAM2,EV1,sector1, all jobs PARAM2,EV1,sector1, all jobs
-    // PARAM3,EV1,all sectors, job1 PARAM3, EV1, sector2,all jobs
+    // template (name, env variable, sector, job)   parent (name, env variable, sector, job)
+    // PARAM1,EV1,all sectors,all jobs              PARAM1,EV1,all sectors,all jobs
+    // PARAM2,EV1,sector1,all jobs                  PARAM2,EV1,sector1,all jobs
+    // PARAM3,EV1,all sectors,job1                  PARAM3,EV1,sector2,all jobs
     // PARAM4,EV1,sector2,all jobs
     // PARAM5,EV1,sector3,all jobs
     //
@@ -5090,15 +5135,42 @@ public class ManagedCaseService {
     // 3,1
     // 4,3
     // 5,1
+    // On 7/23/2009, since we introduced the GeoRegion in parameters (same as in inputs), the matching logic
+    // reasonably expand into this combinations:
+    // same env variable AND (
+    //    (all jobs and all sectors and all regions) OR
+    //    (all jobs and same sector and all regions) OR
+    //    (all jobs and all sectors and same region) OR
+    //    (all jobs and same sector and same region) )
+ 
 
     private CaseParameter getParentCaseParameters4SensitivityCase(int caseId, CaseParameter param, Session session) {
         ParameterEnvVar env = param.getEnvVar();
         Sector sector = param.getSector();
+        GeoRegion region = param.getRegion();
         CaseParameter theParameter = null;
 
         String query = "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = "
-                + caseId + " AND obj.envVar.id = " + env.getId() + " AND ((obj.jobId = 0 AND obj.sector.id is null)"
-                + " OR (obj.jobId = 0 AND obj.sector.id " + (sector == null ? "is null" : "= " + sector.getId()) + "))";
+                + caseId + " AND obj.envVar.id = " + env.getId();
+        
+        String suffix = " AND ((obj.jobId = 0 AND obj.sector.id is null AND obj.region.id is null) ";
+        
+        if (sector != null && region != null) {
+            suffix += "OR (obj.jobId = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id = " + region.getId() + ") "
+                    + "OR (obj.jobId = 0 AND obj.sector.id is null AND obj.region.id = " + region.getId() + ") "
+                    + "OR (obj.jobId = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id is null))";
+        }
+        else if (sector != null && region == null) {
+            suffix += "OR (obj.jobId = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id is null))";
+        }
+        else if (sector == null && region != null) {
+            suffix += "OR (obj.jobId = 0 AND obj.sector.id is null AND obj.region.id = " + region.getId() + "))";
+        }
+        else if (sector == null && region == null) {
+            suffix += ")";
+        }
+        
+        query += suffix;
 
         if (DebugLevels.DEBUG_9)
             log.warn(query);
@@ -5108,7 +5180,7 @@ public class ManagedCaseService {
         for (Iterator<?> iter = ids.iterator(); iter.hasNext();) {
             theParameter = dao.getCaseParameter((Integer) iter.next(), session);
 
-            if (sector != null && sector.equals(theParameter.getSector()))
+            if (sector != null && sector.equals(theParameter.getSector()) && region.equals(theParameter.getRegion()))
                 return theParameter;
         }
 
@@ -5117,6 +5189,7 @@ public class ManagedCaseService {
 
     private CaseInput getParentCaseInputs4SensitivityCase(int caseId, CaseInput input, Session session) {
         InputEnvtVar env = input.getEnvtVars();
+        GeoRegion region = input.getRegion();
 
         if (env == null)
             return null; // NOTE: this policy is to be determined.
@@ -5125,10 +5198,26 @@ public class ManagedCaseService {
         CaseInput theInput = null;
 
         String query = "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
-                + " AND obj.envtVars.id = " + env.getId() + " AND ((obj.caseJobID = 0 AND obj.sector.id is null)"
-                + " OR (obj.caseJobID = 0 AND obj.sector.id " + (sector == null ? "is null" : "= " + sector.getId())
-                + "))";
+                + " AND obj.envtVars.id = " + env.getId();
 
+        String suffix = " AND ((obj.caseJobID = 0 AND obj.sector.id is null AND obj.region.id is null) ";
+        
+        if (sector != null && region != null) {
+            suffix += "OR (obj.caseJobID = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id = " + region.getId() + ") "
+                    + "OR (obj.caseJobID = 0 AND obj.sector.id is null AND obj.region.id = " + region.getId() + ") "
+                    + "OR (obj.caseJobID = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id is null))";
+        }
+        else if (sector != null && region == null) {
+            suffix += "OR (obj.caseJobID = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id is null))";
+        }
+        else if (sector == null && region != null) {
+            suffix += "OR (obj.caseJobID = 0 AND obj.sector.id is null AND obj.region.id = " + region.getId() + "))";
+        }
+        else if (sector == null && region == null) {
+            suffix += ")";
+        }
+        
+        query += suffix;
         if (DebugLevels.DEBUG_9)
             log.warn(query);
 
