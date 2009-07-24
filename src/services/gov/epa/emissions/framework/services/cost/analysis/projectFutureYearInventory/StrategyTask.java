@@ -30,6 +30,10 @@ public class StrategyTask extends AbstractStrategyTask {
 
     public void run() throws EmfException {
 //        super.run(loader);
+        //make sure there are programs to run
+        if (controlStrategy.getControlPrograms() == null 
+                || controlStrategy.getControlPrograms().length == 0)
+            throw new EmfException("The strategy must have at least one control program specified for the run.");
         
         //get rid of strategy results
         deleteStrategyResults();

@@ -48,7 +48,7 @@ public class ControlStrategyProgramsTabPresenter implements EditControlStrategyT
         view.save(controlStrategy);
     }
     
-    public void doRun(ControlStrategy controlStrategy) {
+    public void doRun(ControlStrategy controlStrategy) throws EmfException {
         this.controlStrategy = controlStrategy;
         view.run(controlStrategy);
     }

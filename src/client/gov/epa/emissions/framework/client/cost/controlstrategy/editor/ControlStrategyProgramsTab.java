@@ -258,8 +258,10 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
         
     }
 
-    public void run(ControlStrategy controlStrategy) {
-        // NOTE Auto-generated method stub
-        
+    public void run(ControlStrategy controlStrategy) throws EmfException {
+        if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.projectFutureYearInventory)) {
+            if (tableData.rows().size() == 0) 
+                throw new EmfException("Control Programs Tab: The strategy must have at least one control program specified for the run.");
+        }
     }
 }
