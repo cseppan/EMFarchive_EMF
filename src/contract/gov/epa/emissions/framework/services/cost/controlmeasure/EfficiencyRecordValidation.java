@@ -23,7 +23,12 @@ public class EfficiencyRecordValidation {
         try {
             return CustomDateFormat.parse_MMddyyyy(date);
         } catch (Exception e) {
-            throw new EmfException("effective date format should be MM/dd/yyyy, value =" + date);
+            try {
+                //lets try a different format and see if that works...
+                return CustomDateFormat.format_yyyy_MM_dd_HHmmss(date);
+            } catch (Exception e1) {
+                throw new EmfException("effective date format should be MM/dd/yyyy or YYYY-MM-DD HH:MM:SS, value =" + date);
+            }
         }
     }
 
