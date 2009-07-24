@@ -201,7 +201,7 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
         + "max(input_emis) as starting_emissions, "
         + "sum(annual_cost) as annual_cost, "
         + "public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list, "
-        + "public.concatenate_with_ampersand(percent_reduction) as percent_reduction_list "
+        + "public.concatenate_with_ampersand(percent_reduction::varchar) as percent_reduction_list "
         + "FROM (select source_id, input_emis, final_emissions, annual_cost, cm_abbrev, percent_reduction "
         + "        FROM " + qualifiedTable(detailResultTableName, datasource)
         + "        WHERE ORIGINAL_DATASET_ID = " + invDataset.getId()
