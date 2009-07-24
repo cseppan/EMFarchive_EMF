@@ -1,4 +1,5 @@
 CREATE SCHEMA emf AUTHORIZATION emf;
 CREATE SCHEMA cases AUTHORIZATION emf;
 CREATE SCHEMA emissions AUTHORIZATION emf;
-CREATE SCHEMA reference AUTHORIZATION emf;
+--will be created via the refernece_schema_backup restore process
+--CREATE SCHEMA reference AUTHORIZATION emf;
