@@ -94,3 +94,14 @@ insert into cases.parameter_names values (DEFAULT, 'IOAPI grid name');
 insert into cases.parameter_names values (DEFAULT, 'Chemical mechanism abbreviation');
 insert into cases.parameter_names values (DEFAULT, 'Year being modeled');
 -- end of populating cases.parameter_names
+
+-- populate model to run table
+insert into cases.model_to_runs values (DEFAULT, 'SMOKE');
+insert into cases.model_to_runs values (DEFAULT, 'CMAQ');
+insert into cases.model_to_runs values (DEFAULT, 'Speciation Tool');
+insert into cases.model_to_runs values (DEFAULT, 'Postprocessing');
+insert into cases.model_to_runs values (DEFAULT, 'Controls');
+insert into cases.model_to_runs values (DEFAULT, 'Benefits');
+insert into cases.model_to_runs values (DEFAULT, 'RSM');
+insert into cases.model_to_runs values (DEFAULT, 'Surrogate Tool');
+-- end of populating cases.model_to_runs table
