@@ -171,6 +171,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
         JPanel rightPanel = new JPanel();
         mergeInventories = new JCheckBox("Merge Inventories", null, controlStrategy.getMergeInventories() != null ? controlStrategy.getMergeInventories() : true);
+        mergeInventories.setEnabled(false);
         rightPanel.add(mergeInventories);
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);
