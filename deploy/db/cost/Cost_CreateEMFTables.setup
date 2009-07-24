@@ -674,21 +674,6 @@ CREATE INDEX control_strategy_programs_control_strategy_id
 -- emf.control_strategy_programs
 
 
--- 9/12/2007 - DCD add user-defined functionm and aggreagte function to help build a comma-delimted list from a set
-create function public.join_with_ampersand(text,text)
-  returns text
-  immutable strict language 'sql'
-  as 'select $1||''&''||$2'
-;
-ALTER function public.join_with_ampersand(text,text) OWNER TO emf;
-
-create aggregate public.concatenate_with_ampersand (
-  sfunc = join_with_ampersand,
-  basetype = text,
-  stype = text
-);
-ALTER aggregate public.concatenate_with_ampersand(text) OWNER TO emf;
-
 CREATE TABLE emf.control_measure_months
 (
   id SERIAL PRIMARY KEY,
