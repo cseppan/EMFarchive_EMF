@@ -31,10 +31,10 @@ insert into emf.properties values(DEFAULT, 'MASS_STORAGE_ROOT', '/asm');
 --update version each time EMF gets updated!
 insert into emf.properties values(DEFAULT, 'EMF-version', 'v1.9 - 1/31/2008');
 insert into emf.properties values(DEFAULT, 'strategy-pool-size', '2');
-insert into emf.properties values(DEFAULT, 'postgres-bin-dir', 'D:\\Program\\PostgreSQL\\8.3\\bin\\');
 insert into emf.properties values(DEFAULT, 'postgres-db', 'EMF');
 insert into emf.properties values(DEFAULT, 'postgres-user', 'emf');
---NOTE THIS stores the postgres password, the name is different to hide its true purpose...
+insert into emf.properties values(DEFAULT, 'postgres-bin-dir', '/usr/local/PostgreSQL/8.3/bin');
+-NOTE THIS stores the postgres password, the name is different to hide its true purpose...
 insert into emf.properties values(DEFAULT, 'pgsql2shp-info', 'emf');
 INSERT into emf.properties values(DEFAULT, 'CANCEL_JOB_COMMAND_AMBER', 'qdel');
 INSERT into emf.properties values(DEFAULT, 'CANCEL_JOB_COMMAND_GARNET01', 'qdel');
@@ -225,7 +225,7 @@ insert into emf.qa_programs values(DEFAULT,'Compare Control Strategies','gov.epa
 insert into emf.qa_programs values(DEFAULT,'Compare VOC Speciation with HAP inventory','gov.epa.emissions.framework.services.qa.SQLQACompareVOCSpeciationWithHAPInventoryQueryRunner');
 insert into emf.qa_programs values(DEFAULT,'Create monthly emissions by county from annual emissions','gov.epa.emissions.framework.services.qa.SQLQACreateMoEmisByCtyFromAnnEmisQueryRunner');
 insert into emf.qa_programs values(DEFAULT,'Compare annual state summaries','gov.epa.emissions.framework.services.qa.SQLQACompareAnnualStateSummariesQueryRunner');
-insert into emf.qa_programs values(DEFAULT,'Annual state summaries crosstab','gov.epa.emissions.framework.services.qa.SQLQAAnnualStateSummariesCrosstabQueryRunner');
+insert into emf.qa_programs values(DEFAULT,'SMOKE output annual state summaries crosstab','gov.epa.emissions.framework.services.qa.SQLQAAnnualStateSummariesCrosstabQueryRunner');
 
 --7/23/2009 Region Types
 insert into emf.region_type values (1, 'Name only', 'A region described only with a name');

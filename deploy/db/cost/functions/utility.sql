@@ -29,28 +29,28 @@ ALTER FUNCTION public."add"(double precision, double precision) OWNER TO emf;
 
 -- USER DEFINED Aggregates
 
-DROP AGGREGATE public.concatenate_with_pipe("text");
+--DROP AGGREGATE public.concatenate_with_pipe("text");
 CREATE AGGREGATE public.concatenate_with_pipe("text") (
   SFUNC=join_with_pipe,
   STYPE=text
 );
 ALTER AGGREGATE public.concatenate_with_pipe("text") OWNER TO emf;
 
-DROP AGGREGATE public.concatenate_with_ampersand("text");
+--DROP AGGREGATE public.concatenate_with_ampersand("text");
 CREATE AGGREGATE public.concatenate_with_ampersand("text") (
   SFUNC=join_with_ampersand,
   STYPE=text
 );
 ALTER AGGREGATE public.concatenate_with_ampersand("text") OWNER TO emf;
 
-DROP AGGREGATE public.run_sum(double precision);
+--DROP AGGREGATE public.run_sum(double precision);
 CREATE AGGREGATE public.run_sum(double precision) (
   SFUNC=add,
   STYPE=float8
 );
 ALTER AGGREGATE public.run_sum(double precision) OWNER TO emf;
 
-DROP AGGREGATE public.times(double precision);
+--DROP AGGREGATE public.times(double precision);
 CREATE AGGREGATE public.times(double precision) (
   SFUNC=multiply,
   STYPE=float8
