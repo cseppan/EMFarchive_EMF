@@ -32,6 +32,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -128,7 +129,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
         JPanel panelTop = new JPanel(new SpringLayout());
-        JPanel panelBottom = new JPanel(new BorderLayout());
+        JPanel panelBottom = new JPanel(new GridLayout(1,2,5,5));
         // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -151,16 +152,15 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         middleRightLayoutGenerator.addLabelWidgetPair("Copied From:", new JLabel("   "), middleRightPanel);
         middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
-
+                30, 10);// xPad, yPad
 
 //        JPanel subPanel = new JPanel(new BorderLayout());
 //        subPanel.add(new JLabel("Project:"));
 //        subPanel.add(projects());
         
         layoutGenerator.addLabelWidgetPair("Project:", projects(), panelTop);
-        panelBottom.add(middleLeftPanel, BorderLayout.WEST);
-        panelBottom.add(middleRightPanel, BorderLayout.CENTER);
+        panelBottom.add(middleLeftPanel);
+        panelBottom.add(middleRightPanel);
 //        layoutGenerator.addWidgetPair(middleLeftPanel, middleRightPanel, panelBottom);
 //        layoutGenerator.addLabelWidgetPair("Creator:", creator(), panelTop);
 //        layoutGenerator.addLabelWidgetPair("Last Modified Date: ", lastModifiedDate(), panelTop);
