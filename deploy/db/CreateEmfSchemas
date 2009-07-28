@@ -1,5 +1,5 @@
 CREATE SCHEMA emf AUTHORIZATION emf;
 CREATE SCHEMA cases AUTHORIZATION emf;
 CREATE SCHEMA emissions AUTHORIZATION emf;
---will be created via the refernece_schema_backup restore process
+--Restore of this will create schema, see SetupEMFDatabase.setup file
 --CREATE SCHEMA reference AUTHORIZATION emf;

@@ -1,16 +1,29 @@
+-- populate model to run table
+-- needs to proceed many of the case tables
+insert into cases.model_to_runs values (DEFAULT, 'SMOKE');
+insert into cases.model_to_runs values (DEFAULT, 'CMAQ');
+insert into cases.model_to_runs values (DEFAULT, 'Speciation Tool');
+insert into cases.model_to_runs values (DEFAULT, 'Surrogate Tool');
+-- end of populating cases.model_to_runs table
+
+
 -- cases.inputnames
 insert into cases.inputnames values(DEFAULT,'Grid Description List');
 insert into cases.inputnames values(DEFAULT,'Country, State, County Information');
 insert into cases.inputnames values(DEFAULT,'Inventory Table');
+-- set all models to 1 (SMOKE)
+update cases.inputnames set model_to_run_id=1 where model_to_run_id is null;
 -- cases.inputnames
 
 -- cases.subdirs
---insert into cases.subdirs values(DEFAULT,'subdir/one');
---insert into cases.subdirs values(DEFAULT,'subdir/one/two');
---insert into cases.subdirs values(DEFAULT,'subdir/one/two/three');
+insert into cases.subdirs values(DEFAULT,'emf_jobheader');
+insert into cases.subdirs values(DEFAULT,'../ge_dat');
+-- set all models to 1 (SMOKE)
+update cases.subdirs set model_to_run_id=1 where model_to_run_id is null;
 -- cases.subdirs
 
 -- cases.programs
+insert into cases.programs values(DEFAULT,'Run Script');
 insert into cases.programs values(DEFAULT,'Cntlmat');
 insert into cases.programs values(DEFAULT,'Elevpoint');
 insert into cases.programs values(DEFAULT,'Emisfac');
@@ -27,12 +40,16 @@ insert into cases.programs values(DEFAULT,'Spcmat');
 insert into cases.programs values(DEFAULT,'Temporal');
 insert into cases.programs values(DEFAULT,'Tmpbeis3');
 insert into cases.programs values(DEFAULT,'Tmpbio');
+-- set all models to 1 (SMOKE)
+update cases.programs set model_to_run_id=1 where model_to_run_id is null;
 -- cases.programs
 
 -- cases.input_envt_vars
 insert into cases.input_envt_vars values(DEFAULT,'GRIDDESC');
 insert into cases.input_envt_vars values(DEFAULT,'COSTCY');
 insert into cases.input_envt_vars values(DEFAULT,'INVTABLE');
+-- set all models to 1 (SMOKE)
+update cases.input_envt_vars set model_to_run_id=1 where model_to_run_id is null;
 -- cases.input_envt_vars
 
 -- cases.case_jobrunstatus
@@ -75,6 +92,8 @@ insert into cases.parameter_env_vars values (DEFAULT, 'DAT_ROOT');
 insert into cases.parameter_env_vars values (DEFAULT, 'MET_ROOT');
 insert into cases.parameter_env_vars values (DEFAULT, 'IMD_ROOT');
 insert into cases.parameter_env_vars values (DEFAULT, 'OUT_ROOT');
+-- set all models to 1 (SMOKE)
+update cases.parameter_env_vars set model_to_run_id=1 where model_to_run_id is null;
 -- end of populate table cases.parameter_env_vars
 
 -- populate cases.cases.value_types
@@ -93,15 +112,7 @@ insert into cases.parameter_names values (DEFAULT, 'Grid abbreviation');
 insert into cases.parameter_names values (DEFAULT, 'IOAPI grid name');
 insert into cases.parameter_names values (DEFAULT, 'Chemical mechanism abbreviation');
 insert into cases.parameter_names values (DEFAULT, 'Year being modeled');
+-- set all models to 1 (SMOKE)
+update cases.parameter_names set model_to_run_id=1 where model_to_run_id is null;
 -- end of populating cases.parameter_names
 
--- populate model to run table
-insert into cases.model_to_runs values (DEFAULT, 'SMOKE');
-insert into cases.model_to_runs values (DEFAULT, 'CMAQ');
-insert into cases.model_to_runs values (DEFAULT, 'Speciation Tool');
-insert into cases.model_to_runs values (DEFAULT, 'Postprocessing');
-insert into cases.model_to_runs values (DEFAULT, 'Controls');
-insert into cases.model_to_runs values (DEFAULT, 'Benefits');
-insert into cases.model_to_runs values (DEFAULT, 'RSM');
-insert into cases.model_to_runs values (DEFAULT, 'Surrogate Tool');
--- end of populating cases.model_to_runs table
