@@ -74,7 +74,7 @@ CREATE TABLE cases.input_envt_vars
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL,
-  model_to_run_id int4 REFERENCES cases.model_to_runs(id),
+  model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id),
   UNIQUE (name, model_to_run_id)
 ) 
 WITHOUT OIDS;
@@ -263,7 +263,7 @@ CREATE TABLE cases.parameter_env_vars
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL,
-  model_to_run_id int4  REFERENCES cases.model_to_runs(id),
+  model_to_run_id int4 default 1 REFERENCES cases.model_to_runs(id),
   UNIQUE(name, model_to_run_id)
 )
 WITHOUT OIDS;
