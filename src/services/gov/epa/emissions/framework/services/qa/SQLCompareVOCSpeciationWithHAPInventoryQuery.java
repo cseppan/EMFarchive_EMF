@@ -260,7 +260,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
-                if (i > 0) sql += " union all \n";
+                if (i > 0) sql += " union \n";
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
@@ -274,7 +274,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 + "        limit 1) as benzene_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
-                if (i > 0) sql += " union all \n";
+                if (i > 0) sql += " union \n";
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
@@ -288,7 +288,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 + "        limit 1) as formaldehyde_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
-                if (i > 0) sql += " union all \n";
+                if (i > 0) sql += " union \n";
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
@@ -302,7 +302,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 + "        limit 1) as acetaldehyde_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
-                if (i > 0) sql += " union all \n";
+                if (i > 0) sql += " union \n";
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
@@ -492,7 +492,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
             
             sql += "    ,( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
-                if (i > 0) sql += " union all \n";
+                if (i > 0) sql += " union \n";
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
@@ -506,7 +506,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 + "        limit 1) as benzene_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
-                if (i > 0) sql += " union all \n";
+                if (i > 0) sql += " union \n";
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
@@ -520,7 +520,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 + "        limit 1) as formaldehyde_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
-                if (i > 0) sql += " union all \n";
+                if (i > 0) sql += " union \n";
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
@@ -534,7 +534,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
                 + "        limit 1) as acetaldehyde_percent, \n";
             sql += "    ( select percent from ( \n";
             for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
-                if (i > 0) sql += " union all \n";
+                if (i > 0) sql += " union \n";
                 dataset = getDataset(speciationProfileWeightDatasets[i]);
                 version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
                 table = qualifiedEmissionTableName(dataset);
@@ -620,7 +620,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "   -- get profilecode by SCC and pollutant \n"
         + "   inner join ( \n";
         for (int i = 0; i < speciationCrossReferenceDatasets.length; i++) {
-            if (i > 0) capSql += " union all \n";
+            if (i > 0) capSql += " union \n";
             dataset = getDataset(speciationCrossReferenceDatasets[i]);
             table = qualifiedEmissionTableName(dataset);
             version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
@@ -642,7 +642,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "    inner join ( \n";
         if (speciationProfileWeightDatasets!=null) {
         for (int i = 0; i < speciationProfileWeightDatasets.length; i++) {
-            if (i > 0) capSql += " union all \n";
+            if (i > 0) capSql += " union \n";
             dataset = getDataset(speciationProfileWeightDatasets[i]);
             version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
             table = qualifiedEmissionTableName(dataset);
@@ -733,7 +733,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "   -- get profilecode by SCC and pollutant \n"
         + "   left outer join ( \n";
         for (int i = 0; i < speciationCrossReferenceDatasets.length; i++) {
-            if (i > 0) hapSql += " union all \n";
+            if (i > 0) hapSql += " union \n";
             dataset = getDataset(speciationCrossReferenceDatasets[i]);
             table = qualifiedEmissionTableName(dataset);
             version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
@@ -818,7 +818,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "    -- get profilecode by SCC and pollutant \n"
         + "    left outer join ( \n";
         for (int i = 0; i < speciationCrossReferenceDatasets.length; i++) {
-            if (i > 0) capDatasourceSql += " union all \n";
+            if (i > 0) capDatasourceSql += " union \n";
             dataset = getDataset(speciationCrossReferenceDatasets[i]);
             table = qualifiedEmissionTableName(dataset);
             version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
@@ -909,7 +909,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         + "    -- get profilecode by SCC and pollutant \n"
         + "   left outer join ( \n";
         for (int i = 0; i < speciationCrossReferenceDatasets.length; i++) {
-            if (i > 0) hapDatasourceSql += " union all \n";
+            if (i > 0) hapDatasourceSql += " union \n";
             dataset = getDataset(speciationCrossReferenceDatasets[i]);
             table = qualifiedEmissionTableName(dataset);
             version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion())).query();
