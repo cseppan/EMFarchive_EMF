@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.region;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
@@ -49,7 +49,7 @@ public class RegionChooser extends JDialog {
         pack();
         setSize(300, 300);
         setLocation(ScreenUtils.getPointToCenter(this));
-        setModal(true);
+        //setModal(true);
         setVisible(true);
     }
 
@@ -61,7 +61,7 @@ public class RegionChooser extends JDialog {
 
     private JPanel buttonPanel() {
         Button newRegionButton = new Button("New", addNewRegionAction());
-        newRegionButton.setEnabled(false);
+        //newRegionButton.setEnabled(false);
         OKButton okButton = new OKButton(okAction());
         CancelButton cancelButton = new CancelButton(cancelAction());
         

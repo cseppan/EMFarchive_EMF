@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.region;
 
 import gov.epa.emissions.commons.data.Region;
 

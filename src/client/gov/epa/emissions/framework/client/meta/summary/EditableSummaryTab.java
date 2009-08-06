@@ -19,7 +19,7 @@ import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.data.IntendedUses;
 import gov.epa.emissions.framework.client.data.Projects;
-import gov.epa.emissions.framework.client.data.Regions;
+import gov.epa.emissions.framework.client.data.region.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.EmfDataset;

@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.region.RegionChooser;
 import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.ListWidget;
 
