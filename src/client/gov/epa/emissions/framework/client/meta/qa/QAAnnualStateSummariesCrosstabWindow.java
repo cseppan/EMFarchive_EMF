@@ -159,13 +159,13 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
         leftPollListWidget.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane leftPane = new JScrollPane(leftPollListWidget);
         leftPane.setPreferredSize(new Dimension(100, 75));
-        leftPollListWidget.setToolTipText("The fixed left column pollutants of the report.  Press select Add button to add to list.");
+        leftPollListWidget.setToolTipText("The column pollutants/species of the report.  Press select Add button to add to list.  Press Remove button to remove from the list.  To move the order of the columns, select the appropriate item and then press the Up or Down button to move the item.");
         if (pollList != null && pollList.length > 0) {
             for (String poll : pollList) {
                 leftPollListWidget.addElement(poll);
             }
         }
-        leftPollListPanel.add(new JLabel("<html>Fixed Left<br/>Columns:</html>"));
+        leftPollListPanel.add(new JLabel("<html>Report<br/>Pollutants/Species:</html>"));
         leftPollListPanel.add(leftPane);
         Button removeLeftPollButton = new RemoveButton("Remove", removeLeftPollAction());
         removeLeftPollButton.setMargin(new Insets(1, 2, 1, 2));
@@ -177,14 +177,14 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
         masterPollListWidget.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane pane = new JScrollPane(masterPollListWidget);
         pane.setPreferredSize(new Dimension(100, 75));
-        masterPollListWidget.setToolTipText("The alphabetical right column pollutants of the report.");
+        masterPollListWidget.setToolTipText("The column pollutants/species available to be added to the report.");
 //this should be populated with a distinct (unioned) list of pollutants from all the smk rpts
 //        if (specieList != null && specieList.length > 0) {
 //            for (String poll : specieList) {
 //                masterPollListWidget.addElement(poll);
 //            }
 //        }
-        masterPollListPanel.add(new JLabel("<html>Alphabetical Right<br/>Columns:</html>"));
+        masterPollListPanel.add(new JLabel("<html>Available<br/>Pollutants/Species:</html>"));
         masterPollListPanel.add(pane);
         JLabel fakeLabel = new JLabel("");
         fakeLabel.setPreferredSize(new Dimension(0, 25));
@@ -197,7 +197,7 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
         exclPollListWidget.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane excludePane = new JScrollPane(exclPollListWidget);
         excludePane.setPreferredSize(new Dimension(100, 75));
-        exclPollListWidget.setToolTipText("The pollutants/species to exclude from the report.  Press select Exclude button to add to list.");
+        exclPollListWidget.setToolTipText("The pollutants/species to exclude from the report.  Press select Exclude button to remove from the list.");
         if (exclPollList != null && exclPollList.length > 0) {
             for (String poll : exclPollList) {
                 exclPollListWidget.addElement(poll);
@@ -220,13 +220,22 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
         mergePollList();
         populateMasterPollListWidget();
 
+        JPanel leftListButtonPanel = new JPanel();
+        leftListButtonPanel.setLayout(new BoxLayout(leftListButtonPanel, BoxLayout.Y_AXIS));
         Button addPollButton = new AddButton("<<Add", addPollAction());
         addPollButton.setMargin(new Insets(1, 2, 1, 2));
+        Button upPollButton = new AddButton("Up", upPollAction());
+        upPollButton.setMargin(new Insets(1, 2, 1, 2));
+        Button downPollButton = new AddButton("Down", downPollAction());
+        downPollButton.setMargin(new Insets(1, 2, 1, 2));
         Button excludePollButton = new AddButton("Exclude>>", addExcludedPollAction());
         excludePollButton.setMargin(new Insets(1, 2, 1, 2));
-
+        leftListButtonPanel.add(upPollButton);
+        leftListButtonPanel.add(downPollButton);
+        
         JPanel container = new JPanel(new FlowLayout());
 
+        container.add(leftListButtonPanel);
         container.add(leftPollListPanel);
         container.add(addPollButton);
         container.add(masterPollListPanel);
@@ -294,6 +303,33 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 addToPollListWidget(masterPollListWidget.getSelectedValues());
+            }
+        };
+    }
+    
+    private Action upPollAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                for (int position : leftPollListWidget.getSelectedIndices()) {
+                    if (position > 0) 
+                        leftPollListWidget.swap(position, position - 1);
+                    leftPollListWidget.setSelectedIndex(position - 1);
+                    leftPollListWidget.ensureIndexIsVisible(position - 1);
+                }
+            }
+        };
+    }
+    
+    private Action downPollAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                for (int position : leftPollListWidget.getSelectedIndices()) {
+                    if (position < leftPollListWidget.getModel().getSize() - 1) { 
+                        leftPollListWidget.swap(position, position + 1);
+                        leftPollListWidget.setSelectedIndex(position + 1);
+                        leftPollListWidget.ensureIndexIsVisible(position + 1);
+                    }
+                }
             }
         };
     }
@@ -432,6 +468,8 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
             }
             masterPollListWidget.removeElements(new Object[] {poll});
         }
+        leftPollListWidget.setSelectedIndex(leftPollListWidget.getModel().getSize() - 1);
+        leftPollListWidget.ensureIndexIsVisible(leftPollListWidget.getModel().getSize() - 1);
     }
 
     private void addToExcludePollListWidget(Object[] polls) {
@@ -441,6 +479,8 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
             }
             masterPollListWidget.removeElements(new Object[] {poll});
         }
+        exclPollListWidget.setSelectedIndex(exclPollListWidget.getModel().getSize() - 1);
+        exclPollListWidget.ensureIndexIsVisible(exclPollListWidget.getModel().getSize() - 1);
     }
 
     protected Object getCoStCyDataset() {
