@@ -93,6 +93,11 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void doSave(ControlStrategy controlStrategy) throws EmfException {
+        //make sure we don't overwrite the runstatus
+        String currentRunStatus = service().getStrategyRunStatus(controlStrategy.getId());
+        if (currentRunStatus == null) currentRunStatus = "Not Started";
+        controlStrategy.setRunStatus(currentRunStatus);
+
         saveTabs(controlStrategy);
         validateName(controlStrategy);
         controlStrategy.setCreator(session.user());
