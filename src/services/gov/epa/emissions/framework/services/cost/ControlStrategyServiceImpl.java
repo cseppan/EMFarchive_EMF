@@ -566,4 +566,16 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             session.close();
         }
     }
+
+    public synchronized String getStrategyRunStatus(int id) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getStrategyRunStatus(session, id);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve strategy run status.", e);
+            throw new EmfException("Could not retrieve strategy run status.");
+        } finally {
+            session.close();
+        }
+    }
 }

@@ -462,4 +462,9 @@ public class ControlStrategyDAO {
         return dir;
     }
 
+    public String getStrategyRunStatus(Session session, int id) {
+        return (String)session.createQuery("select cS.runStatus " +
+                "from ControlStrategy cS where cS.id = " + id).uniqueResult();
+    }
+
 }

@@ -293,4 +293,15 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
         return (StrategyResultType[]) call.requestResponse(new Object[] { });
     }
+
+    public synchronized String getStrategyRunStatus(int id) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getStrategyRunStatus");
+        call.addIntegerParam("id");
+        call.setReturnType(mappings.string());
+
+        return (String) call.requestResponse(new Object[] { new Integer(id) });
+    }
+
 }
