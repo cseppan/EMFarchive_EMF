@@ -298,7 +298,8 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     protected void setResultTotalCostTotalReductionAndCount(ControlStrategyResult controlStrategyResult) throws EmfException {
-        String query = "SELECT count(1) as record_count, sum(Annual_Cost) as total_cost, sum(case when poll = '" + controlStrategy.getTargetPollutant().getName() 
+        String query = "SELECT count(1) as record_count, sum(case when poll = '" + controlStrategy.getTargetPollutant().getName() 
+            + "' then Annual_Cost else null::double precision end) as total_cost, sum(case when poll = '" + controlStrategy.getTargetPollutant().getName() 
             + "' then Emis_Reduction else null end) as total_reduction "
             + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
         ResultSet rs = null;
