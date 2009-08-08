@@ -72,4 +72,10 @@ public class EditQAEmissionsPresenter {
                 tolerance,
                 coStCy);
     }
+
+    public void updateECControlScenarioDatasets(Object inventory, Object detailedResult, 
+            Object[] gsrefDatasets, Object[] gsproDatasets) {
+        editQAStepView.updateECControlScenarioArguments(inventory, detailedResult, 
+                gsrefDatasets, gsproDatasets);
+    }
 }
