@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.DateUtil;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -235,8 +236,58 @@ public class SQLCompareAnnualStateSummariesQuery {
                 + "abs(inv.ann_emis - smk.ann_emis) / inv.ann_emis * 100.0 as abs_pct_diff,\n"
                 + "case when tolerance.tolerance_in_pct is not null and (inv.ann_emis - smk.ann_emis) / inv.ann_emis * 100.0 < tolerance.tolerance_in_pct then true when tolerance.tolerance_in_pct is not null and (inv.ann_emis - smk.ann_emis) / inv.ann_emis * 100.0 > tolerance.tolerance_in_pct then false else null::boolean end as within_tolerance \n";
 
+        sql += "from \n"
+            + "("
+            + "select \n"
+            + "sector, \n"
+            + "fipsst, \n"
+            + "state_name, \n"
+            + "smoke_name, \n"
+            + "sum(ann_emis) as ann_emis \n"
+            + "from ( \n";
+
+        int i = 0;
+        for (EmfDataset dataset : inventories) {
+            version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion()), "inv").query();
+            table = qualifiedEmissionTableName(dataset);
+            
+            int month = dataset.applicableMonth();
+            int noOfDaysInMonth = 31;
+            if (month != -1) {
+                noOfDaysInMonth = getDaysInMonth(dataset.getYear(), month);
+            }
+
+            if (i > 0) sql += " union all \n";
+            sql += "select '" + getDatasetSector(dataset) + "'::character varying(32) as sector, \n"
+                + "substring(inv.fips, case when length(inv.fips) = 5 then 1 when length(inv.fips) = 6 then 2 end, 2) as fipsst, \n"
+                + "costcy.statename as state_name, \n"
+                + "coalesce(invtable.name, 'AN UNSPECIFIED DESCRIPTION') as smoke_name, \n"
+                + "sum(coalesce(invtable.factor::double precision, 1.0) * coalesce(case when inv.avd_emis != -9.0 then inv.avd_emis else null end * " + noOfDaysInMonth + ", inv.ann_emis)) as ann_emis \n"
+                + "from " + table + " inv \n"
+                + "inner join " + coStCyTableName + " costcy \n"
+                + "on costcy.statecode = substring(inv.fips, case when length(inv.fips) = 5 then 1 when length(inv.fips) = 6 then 2 end, 2)::integer \n"
+                + "and coalesce(costcy.countrycode,0) = coalesce(" + getInventoryCountryCode(dataset, coStCyVersion) + ",0) \n"
+                + "inner join " + invTableTableName + " invtable \n"
+                + "on invtable.cas = inv.poll \n"
+                + "where " + version + " \n"
+                + "and " + invTableVersion + " \n"
+                + "and " + coStCyVersion + " \n"
+                + "and invtable.keep = 'Y' \n"
+                + "group by substring(inv.fips, case when length(inv.fips) = 5 then 1 when length(inv.fips) = 6 then 2 end, 2), costcy.statename, coalesce(invtable.name, 'AN UNSPECIFIED DESCRIPTION')";
+            ++i;
+        }
+        
+        sql += ") tbl\n" 
+            + "group by \n"
+            + "sector, \n"
+            + "fipsst, \n"
+            + "state_name, \n"
+            + "smoke_name \n"
+            + ") inv\n";
+
         //union together all smkmerge reports and aggregate to the sector, fipsst, state_name, smoke_name level
-        sql += "from (select \n"
+        sql += "inner join \n"
+            + "(select \n"
             + "sector, \n"
             + "trim(TO_CHAR(fipsst,'00')) as fipsst, \n"
             + "state_name, \n"
@@ -244,7 +295,7 @@ public class SQLCompareAnnualStateSummariesQuery {
             + "sum(ann_emis) as ann_emis \n"
             + "from ( \n";
 
-        int i = 0;
+        i = 0;
         for (EmfDataset dataset : smkRpts) {
             version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion()), "smk").query();
             table = qualifiedEmissionTableName(dataset);
@@ -275,54 +326,11 @@ public class SQLCompareAnnualStateSummariesQuery {
                 + ") smk\n";
 
         //union together all inventories and aggregate to the sector, fipsst, state_name, smoke_name level
-        sql += "full join ("
-            + "select \n"
-            + "sector, \n"
-            + "fipsst, \n"
-            + "state_name, \n"
-            + "smoke_name, \n"
-            + "sum(ann_emis) as ann_emis \n"
-            + "from ( \n";
 
-        i = 0;
-        for (EmfDataset dataset : inventories) {
-            version = new VersionedQuery(version(dataset.getId(), dataset.getDefaultVersion()), "inv").query();
-            table = qualifiedEmissionTableName(dataset);
-            
-            if (i > 0) sql += " union all \n";
-            sql += "select '" + getDatasetSector(dataset) + "'::character varying(32) as sector, \n"
-                + "substring(inv.fips, case when length(inv.fips) = 5 then 1 when length(inv.fips) = 6 then 2 end, 2) as fipsst, \n"
-                + "costcy.statename as state_name, \n"
-                + "coalesce(invtable.name, 'AN UNSPECIFIED DESCRIPTION') as smoke_name, \n"
-                + "sum(coalesce(invtable.factor::double precision, 1.0) * inv.ann_emis) as ann_emis \n"
-                + "from " + table + " inv \n"
-                + "inner join " + coStCyTableName + " costcy \n"
-                + "on costcy.statecode = substring(inv.fips, case when length(inv.fips) = 5 then 1 when length(inv.fips) = 6 then 2 end, 2)::integer \n"
-                + "and coalesce(costcy.countrycode,0) = coalesce(" + getInventoryCountryCode(dataset, coStCyVersion) + ",0) \n"
-                + "inner join " + invTableTableName + " invtable \n"
-                + "on invtable.cas = inv.poll \n"
-                + "where " + version + " \n"
-                + "and " + invTableVersion + " \n"
-                + "and " + coStCyVersion + " \n"
-                + "and invtable.keep = 'Y' \n"
-                + "group by substring(inv.fips, case when length(inv.fips) = 5 then 1 when length(inv.fips) = 6 then 2 end, 2), costcy.statename, coalesce(invtable.name, 'AN UNSPECIFIED DESCRIPTION')";
-            ++i;
-        }
-        
-        sql += ") tbl\n" 
-            + "group by \n"
-            + "sector, \n"
-            + "fipsst, \n"
-            + "state_name, \n"
-            + "smoke_name \n";
-
-
-        
-        sql += ") inv\n"
-                + "on inv.sector = smk.sector\n"
-                + "and inv.fipsst = smk.fipsst\n"
-                + "and inv.state_name = smk.state_name\n"
-                + "and inv.smoke_name = smk.smoke_name\n";
+        sql += "on inv.sector = smk.sector\n"
+            + "and inv.fipsst = smk.fipsst\n"
+            + "and inv.state_name = smk.state_name\n"
+            + "and inv.smoke_name = smk.smoke_name\n";
 
         sql += "left outer join " + toleranceTableName + " tolerance\n"
             + "on (coalesce(trim(tolerance.state_name),'') = '' or tolerance.state_name = coalesce(inv.state_name, smk.state_name))\n"
@@ -348,6 +356,10 @@ public class SQLCompareAnnualStateSummariesQuery {
         System.out.println(sql);
         
         return sql;
+    }
+
+    protected int getDaysInMonth(int year, int month) {
+        return month != - 1 ? DateUtil.daysInMonth(year, month) : 31;
     }
 
     protected String query(String partialQuery, boolean createClause) throws EmfException {
