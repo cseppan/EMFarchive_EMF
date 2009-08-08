@@ -126,4 +126,11 @@ public class ListWidget extends JList implements Changeable {
         return obj;
     }
 
+    //Swap two elements in the list.
+    public void swap(int a, int b) {
+        Object aObject = model.getElementAt(a);
+        Object bObject = model.getElementAt(b);
+        model.set(a, bObject);
+        model.set(b, aObject);
+    }
 }
