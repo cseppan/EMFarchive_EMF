@@ -80,14 +80,14 @@ public class SQLAnnualStateSummariesCrosstabQuery {
         int smkRptIndex = programArguments.indexOf(smkRptTag);
         int coStCyIndex = programArguments.indexOf(coStCyTag);
         int pollListIndex = programArguments.indexOf(pollListTag);
-        int specieListIndex = programArguments.indexOf(specieListTag);
+//        int specieListIndex = programArguments.indexOf(specieListTag);
 //        int exclPollIndex = programArguments.indexOf(exclPollTag);
 //        int sortPollIndex = programArguments.indexOf(sortPollTag);
 
         String[] smkRptNames = null; 
         String coStCyName = null;
         String[] polls = {};
-        String[] species = {};
+//        String[] species = {};
 //        String[] exclPolls = {};
 //        String[] sortPolls = {};
 
@@ -113,14 +113,14 @@ public class SQLAnnualStateSummariesCrosstabQuery {
             }
 
         }
-        if (specieListIndex != -1) {
-            arguments = parseSwitchArguments(programArguments, specieListIndex, programArguments.indexOf("\n-", specieListIndex) != -1 ? programArguments.indexOf("\n-", specieListIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) {
-                species = arguments;
-                for (String specie : species)
-                    sortedColumnMap.put(specie, specie);
-            }
-        }
+//        if (specieListIndex != -1) {
+//            arguments = parseSwitchArguments(programArguments, specieListIndex, programArguments.indexOf("\n-", specieListIndex) != -1 ? programArguments.indexOf("\n-", specieListIndex) : programArguments.length());
+//            if (arguments != null && arguments.length > 0) {
+//                species = arguments;
+//                for (String specie : species)
+//                    sortedColumnMap.put(specie, specie);
+//            }
+//        }
 //        if (exclPollIndex != -1) {
 //            arguments = parseSwitchArguments(programArguments, exclPollIndex, programArguments.indexOf("\n-", exclPollIndex) != -1 ? programArguments.indexOf("\n-", exclPollIndex) : programArguments.length());
 //            if (arguments != null && arguments.length > 0) exclPolls = arguments;
@@ -140,7 +140,7 @@ public class SQLAnnualStateSummariesCrosstabQuery {
             errors += "Missing " + DatasetType.countryStateCountyNamesAndDataCOSTCY + " dataset. ";
         }
         if ((polls == null || polls.length == 0)
-             && (species == null || species.length == 0)) {
+             /*&& (species == null || species.length == 0)*/) {
             errors += "Missing pollutants and species to include in report. ";
         }
 
@@ -153,14 +153,14 @@ public class SQLAnnualStateSummariesCrosstabQuery {
                 map.put(poll, poll);
             }
         }
-        if (species != null && species.length > 0) {
-            Map<String, String> map = new TreeMap<String, String>();
-            for (String specie : species) {
-                if (map.containsKey(specie))
-                    errors += "Species list already has, " + specie + ". No duplicates are allowed in the species list. ";
-                map.put(specie, specie);
-            }
-        }
+//        if (species != null && species.length > 0) {
+//            Map<String, String> map = new TreeMap<String, String>();
+//            for (String specie : species) {
+//                if (map.containsKey(specie))
+//                    errors += "Species list already has, " + specie + ". No duplicates are allowed in the species list. ";
+//                map.put(specie, specie);
+//            }
+//        }
 
 
         //make sure the all the datasets actually exist
@@ -197,9 +197,9 @@ public class SQLAnnualStateSummariesCrosstabQuery {
         for (String poll : polls) {
             sql += ",\"" + poll + "\" \n";
         }
-        for (String specie : species) {
-            sql += ",\"" + specie + "\" \n";
-        }
+//        for (String specie : species) {
+//            sql += ",\"" + specie + "\" \n";
+//        }
 
         //union together all smkmerge reports and aggregate to the sector, fipsst, state_name, smoke_name level
         sql += "from crosstab(' \n";
