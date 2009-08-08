@@ -162,6 +162,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     
     private static final String smokeOutputAnnStateSummaryCrosstabProgram = "SMOKE output annual state summaries crosstab";
     
+    private static final String ecControlScenarioProgram = "EC Control Scenario";
+    
     private static final String sqlProgram = "SQL";
     
     public static final String smkRptTag = "-smkrpt";
@@ -175,6 +177,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     public static final String exclPollTag = "-exclpoll";
 
     public static final String sortPollTag = "-sortpoll";
+
+    public static final String gsrefTag = "-gsref";
+
+    public static final String gsproTag = "-gspro";
+
+    public static final String detailedResultTag = "-detailed_result";
 
     private String lineFeeder = System.getProperty("line.separator");
 
@@ -888,6 +896,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     showCompareAnnualStateSummariesWindow();
                 } else if (smokeOutputAnnStateSummaryCrosstabProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showAnnualStateSummariesCrosstabWindow();
+                } else if (ecControlScenarioProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+                    showECControlScenarioWindow();
                 }else{
                     doSetWindow();
                 }
@@ -1372,6 +1382,50 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         }
     }
 
+    private void showECControlScenarioWindow() {
+        String programVal = program.getSelectedItem().toString();
+        String programSwitches = programArguments.getText();        
+        try {
+            int invIndex = programSwitches.indexOf(invTag);
+            int detailedResultIndex = programSwitches.indexOf(detailedResultTag);
+            int gsproIndex = programSwitches.indexOf(gsproTag);
+            int gsrefIndex = programSwitches.indexOf(gsrefTag);
+            EmfDataset detailedResultDataset = null; 
+            EmfDataset invDataset = null; 
+            EmfDataset[] gsproDatasets = null; 
+            EmfDataset[] gsrefDatasets = null; 
+            EmfDataset[] datasets;
+
+            if (invIndex != -1) {
+                datasets = getDatasets(programSwitches, invIndex, programSwitches.indexOf("\n-", invIndex) != -1 ? programSwitches.indexOf("\n-", invIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) invDataset = datasets[0];
+            }
+            if (detailedResultIndex != -1) {
+                datasets = getDatasets(programSwitches, detailedResultIndex, programSwitches.indexOf("\n-", detailedResultIndex) != -1 ? programSwitches.indexOf("\n-", detailedResultIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) detailedResultDataset = datasets[0];
+            }
+            if (gsproIndex != -1) {
+                datasets = getDatasets(programSwitches, gsproIndex, programSwitches.indexOf("\n-", gsproIndex) != -1 ? programSwitches.indexOf("\n-", gsproIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) gsproDatasets = datasets;
+            }
+            if (gsrefIndex != -1) {
+                datasets = getDatasets(programSwitches, gsrefIndex, programSwitches.indexOf("\n-", gsrefIndex) != -1 ? programSwitches.indexOf("\n-", gsrefIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                if (datasets != null && datasets.length > 0) gsrefDatasets = datasets;
+            }
+            QAECControlScenarioWindow view = new QAECControlScenarioWindow(desktopManager, 
+                programVal, 
+                session, 
+                invDataset,
+                detailedResultDataset,
+                gsrefDatasets,
+                gsproDatasets);
+            EditQAECControlScenarioPresenter presenter = new EditQAECControlScenarioPresenter(view, this, session);
+            presenter.display(origDataset, step);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
     private void showAnnualStateSummariesCrosstabWindow() {
 
         String programVal = program.getSelectedItem().toString();
@@ -1739,6 +1793,18 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         if (species != null) arguments += getTagString(specieListTag, species);
         if (exclPollutants != null) arguments += getTagString(exclPollTag, exclPollutants) + lineFeeder;
 //        if (pollutantsSort != null) arguments += getInvString(sortPollTag, pollutantsSort) + lineFeeder;
+
+        updateArgumentsTextArea(arguments);
+    }
+
+    public void updateECControlScenarioArguments(Object inventory, Object detailedResult, 
+            Object[] gsrefs, Object[] gspros) {
+        clear();
+        String arguments = "";
+        if (inventory != null) arguments += getInvString(invTag, new Object[] {inventory});
+        if (detailedResult != null) arguments += getInvString(detailedResultTag, new Object[] {detailedResult});
+        if (gsrefs != null) arguments += getTagString(gsrefTag, gsrefs);
+        if (gspros != null) arguments += getTagString(gsproTag, gspros);
 
         updateArgumentsTextArea(arguments);
     }
