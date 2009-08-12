@@ -53,6 +53,8 @@ public class RemoteCommand {
                     message = reader.readLine();
                 }
                 
+                LOG.warn("QID extracted: " + qId);
+                
                 if (qId == null && !localHost)
                     throw new EmfException("please check your queue options " + (lstNonNullMsg == null ? "" : "(" + lstNonNullMsg + ")"));
             } catch (Exception e) {
