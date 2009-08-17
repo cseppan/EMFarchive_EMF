@@ -27,6 +27,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParame
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 public class CaseServiceTransport implements CaseService {
 
@@ -1022,7 +1023,7 @@ public class CaseServiceTransport implements CaseService {
     }
 
     public synchronized Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds,
-            String jobGroup, Case sensitivityCase) throws EmfException {
+            String jobGroup, Case sensitivityCase, GeoRegion region) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("addSensitivity2Case");
@@ -1032,10 +1033,11 @@ public class CaseServiceTransport implements CaseService {
         call.addIntArrayParam();
         call.addStringParam("jobGroup");
         call.addParam("sensitivityCase", caseMappings.caseObject());
+        call.addParam("region", dataMappings.geoRegion());
         call.setReturnType(caseMappings.caseObject());
 
         return (Case) call.requestResponse(new Object[] { user, new Integer(parentCaseId), new Integer(templateCaseId),
-                jobIds, jobGroup, sensitivityCase });
+                jobIds, jobGroup, sensitivityCase, region });
     }
 
     public synchronized Case[] getSensitivityCases(int parentCaseId) throws EmfException {

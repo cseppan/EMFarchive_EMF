@@ -207,7 +207,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         });
         layoutGenerator.addLabelWidgetPair("Information: ", builtTemplateDesc(), panel);
         layoutGenerator.addLabelWidgetPair("Job Group:", jobGroup, panel);
-        layoutGenerator.addLabelWidgetPair("Grid Filter: ", buildGridsPanel(), panel);
+        layoutGenerator.addLabelWidgetPair("Region: ", buildGridsPanel(), panel);
         layoutGenerator.addLabelWidgetPair("Sector Filter: ", buildSectorsPanel(), panel);
         // layoutGenerator.addLabelWidgetPair("Sensitivity Jobs: ", buildjobsPanel(), panel);
         // Lay out the panel.
@@ -263,21 +263,8 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
     }
 
     private JScrollPane buildGridsPanel() {
-        String[] gridnames = new String[] { "Grid 1", "Grid 2", "Grid 3" };
-        String[] namevalues = new String[] { "Grid 1 (Not available)", "Grid 2 (Not available)", "Grid 3 (Not available)" };
-
-        try {
-            if (parentCase.getModel() != null)
-                namevalues = presenter.getGridNameValues(gridnames, parentCase.getId(), parentCase.getModel().getId());
-        } catch (EmfException e) {
-            e.printStackTrace();
-            messagePanel.setError(e.getMessage());
-        }
-
         grids = new JList();
-        grids.setListData(new GeoRegion[] { new GeoRegion("Select All"), new GeoRegion(namevalues[0]), new GeoRegion(namevalues[1]),
-                new GeoRegion(namevalues[2]) });
-        grids.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        grids.setListData(parentCase.getRegions());
         JScrollPane scrollPane = new JScrollPane(grids, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setPreferredSize(new Dimension(300, 100));
@@ -368,7 +355,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
             else
                 sensitivityCase = presenter.addSensitivities(parentCase.getId(), ((Case) senTypeCombox
                         .getSelectedItem()).getId(), jobIds(selectedJobs), getJobGroup(), (Case) senName
-                        .getSelectedItem());
+                        .getSelectedItem(), (GeoRegion)grids.getSelectedValue());
 
             if (sensitivityCase == null) {
                 messagePanel.setError("Failed processing sensitivity case.");
@@ -447,8 +434,13 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         Case sensitivityCase = new Case();
         sensitivityCase.setName(senName.getSelectedItem().toString());
         sensitivityCase.setAbbreviation(new Abbreviation(senCaseAbrev.getText()));
-
         sensitivityCase.setCaseCategory((CaseCategory) categoryCombox.getSelectedItem());
+        
+        GeoRegion rg = (GeoRegion)grids.getSelectedValue();
+        
+        if (rg != null)
+            sensitivityCase.setRegions(new GeoRegion[]{rg});
+        
         return sensitivityCase;
     }
 
@@ -460,6 +452,15 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
 
         if (senTypeCombox.getSelectedItem() == null)
             throw new EmfException("Please specify sensitivity type. ");
+        
+        if (grids.getModel() == null || grids.getModel().getSize() == 0)
+            throw new EmfException("Please exit and set regions in the parent case.");
+        
+        if (grids.getSelectedValue() == null)
+            throw new EmfException("Please select a specific region for the sensitivity case.");
+        
+        if (grids.getSelectedValues().length > 1)
+            throw new EmfException("Please select only one region for the sensitivity case.");
     }
 
     private void validateJobGroup(String group) throws EmfException {
@@ -506,10 +507,9 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                 messagePanel.clear();
                 try {
                     validateFields();
-                    CaseJob[] filteredJobs = presenter.getCaseJobs(selectedTem, getSelectedGrids(),
-                            getSelectedSectors());
+                    CaseJob[] filteredJobs = presenter.getCaseJobs(selectedTem, getSelectedSectors());
                     if (filteredJobs == null || filteredJobs.length == 0) {
-                        messagePanel.setMessage("There is no jobs for the selected grids and sectors");
+                        messagePanel.setMessage("There is no jobs for the selected region and sectors");
                         return;
                     }
                     JobsChooserDialog dialog = new JobsChooserDialog(view, parentConsole);
@@ -544,7 +544,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                 existingParas = Arrays.asList(presenter.getCaseParameters(((Case) senName.getSelectedItem()).getId(),
                         new Sector("All", "All"), false));
                 sensCase = presenter.addSensitivities(parentCase.getId(), temCaseId, jobIds(selectedJobs),
-                        getJobGroup(), (Case) senName.getSelectedItem());
+                        getJobGroup(), (Case) senName.getSelectedItem(), (GeoRegion)grids.getSelectedValue());
             }
             if (sensCase == null) {
                 messagePanel.setError("Failed processing sensitivity case.");
@@ -574,17 +574,6 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         presenter.doDisplaySetCaseWindow(newCase, title, parentConsole, desktopManager, parentPresenter,
                 existingInputs, existingParas);
         presenter.doClose();
-    }
-
-    private GeoRegion[] getSelectedGrids() {
-
-        List<GeoRegion> list = new ArrayList<GeoRegion>(grids.getSelectedValues().length);
-        for (int i = 0; i < grids.getSelectedValues().length; i++) {
-            GeoRegion grid = (GeoRegion) grids.getSelectedValues()[i];
-            if (!grid.getName().equalsIgnoreCase("Select All"))
-                list.add((GeoRegion) grids.getSelectedValues()[i]);
-        }
-        return list.toArray(new GeoRegion[0]);
     }
 
     private Sector[] getSelectedSectors() {

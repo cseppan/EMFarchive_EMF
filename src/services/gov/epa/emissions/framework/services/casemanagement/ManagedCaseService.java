@@ -4431,7 +4431,7 @@ public class ManagedCaseService {
     }
 
     public synchronized Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds,
-            String jobGroup, Case sensitivityCase) throws EmfException {
+            String jobGroup, Case sensitivityCase, GeoRegion region) throws EmfException {
         Session session = sessionFactory.getSession();
         Case lockedSC = null;
         Case lockedPC = null;
@@ -4467,11 +4467,11 @@ public class ManagedCaseService {
 
             checkJobsDuplication(existingJobs, jobs2copy, jobPrefix);
 
-            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy, user);
+            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy, region, user);
             CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), getValidCaseInputs4SensitivityCase(
-                    template.getId(), jobIds, jobs2copy, session), session);
+                    template.getId(), jobIds, jobs2copy, session), region, session);
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(),
-                    getValidCaseParameters4SensitivityCase(template.getId(), jobIds, jobs2copy, session), session);
+                    getValidCaseParameters4SensitivityCase(template.getId(), jobIds, jobs2copy, session), region, session);
 
             addCaseJobs4Sensitivity(user, targetId, jobs);
             addCaseInputs(user, targetId, removeRedundantInputs(inputs, existingInputs, jobPrefix), jobPrefix);
@@ -4649,6 +4649,7 @@ public class ManagedCaseService {
             Case loaded = (Case) dao.load(Case.class, sensitivityCase.getName(), session);
             lockedSC = dao.obtainLocked(user, loaded, session);
             int targetId = loaded.getId();
+            GeoRegion senRegion = (loaded.getRegions() == null ? null : loaded.getRegions()[0]);
 
             Case parent = dao.getCase(parentCaseId, session);
             lockedPC = dao.obtainLocked(user, parent, session);
@@ -4668,11 +4669,11 @@ public class ManagedCaseService {
                         + " has the lock for case '" + template.getName() + "'");
 
             CaseJob[] jobs2copy = getJobs2Copy(jobIds);
-            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy, user);
+            CaseJob[] jobs = cloneCaseJobs(lockedSC.getId(), lockedTC.getId(), jobGroup, jobPrefix, jobs2copy, senRegion, user);
             CaseInput[] inputs = cloneCaseInputs(parentCaseId, lockedSC.getId(), getValidCaseInputs4SensitivityCase(
-                    template.getId(), jobIds, jobs2copy, session), session);
+                    template.getId(), jobIds, jobs2copy, session), senRegion, session);
             CaseParameter[] params = cloneCaseParameters(parentCaseId, lockedSC.getId(),
-                    getValidCaseParameters4SensitivityCase(template.getId(), jobIds, jobs2copy, session), session);
+                    getValidCaseParameters4SensitivityCase(template.getId(), jobIds, jobs2copy, session), senRegion, session);
 
             addCaseJobs4Sensitivity(user, targetId, jobs);
             addCaseInputs(user, targetId, inputs, jobPrefix);
@@ -4776,30 +4777,38 @@ public class ManagedCaseService {
     }
 
     private CaseJob[] cloneCaseJobs(int targetCaseId, int parentCaseId, String jobGroup, String jobPrefix,
-            CaseJob[] objects, User user) throws Exception {
+            CaseJob[] jobs, GeoRegion senRegion, User user) throws Exception {
         List<CaseJob> copied = new ArrayList<CaseJob>();
 
-        for (int i = 0; i < objects.length; i++) {
-            CaseJob job = (CaseJob) DeepCopy.copy(objects[i]);
+        for (int i = 0; i < jobs.length; i++) {
+            CaseJob job = (CaseJob) DeepCopy.copy(jobs[i]);
             job.setName(jobPrefix + job.getName());
             job.setCaseId(targetCaseId);
             job.setParentCaseId(parentCaseId);
             job.setJobGroup(jobGroup);
             job.setUser(user);
             job.setRunJobUser(null);
+            
+            if (job.getRegion() != null)
+                job.setRegion(senRegion);
+            
             copied.add(job);
         }
 
         return copied.toArray(new CaseJob[0]);
     }
 
-    private CaseInput[] cloneCaseInputs(int parentCaseId, int targetCaseId, CaseInput[] inputs, Session session)
+    private CaseInput[] cloneCaseInputs(int parentCaseId, int targetCaseId, CaseInput[] inputs, GeoRegion region, Session session)
             throws Exception {
         List<CaseInput> inputList2Target = new ArrayList<CaseInput>();
 
         for (int i = 0; i < inputs.length; i++) {
             CaseInput tempInput = (CaseInput) DeepCopy.copy(inputs[i]);
-            CaseInput inputFromParent = getParentCaseInputs4SensitivityCase(parentCaseId, inputs[i], session);
+            
+            if (tempInput.getRegion() != null)
+                tempInput.setRegion(region);
+            
+            CaseInput inputFromParent = getParentCaseInputs4SensitivityCase(parentCaseId, tempInput, session);
             boolean modifiedFromParent = false;
 
             if (inputFromParent != null) {
@@ -4845,12 +4854,16 @@ public class ManagedCaseService {
     }
 
     private CaseParameter[] cloneCaseParameters(int parentCaseId, int targetCaseId, CaseParameter[] params,
-            Session session) throws Exception {
+            GeoRegion senRegion, Session session) throws Exception {
         List<CaseParameter> params2Target = new ArrayList<CaseParameter>();
 
         for (int i = 0; i < params.length; i++) {
             CaseParameter tempParam = (CaseParameter) DeepCopy.copy(params[i]);
-            CaseParameter parentParameter = getParentCaseParameters4SensitivityCase(parentCaseId, params[i], session);
+            
+            if (tempParam.getRegion() != null)
+                tempParam.setRegion(senRegion);
+            
+            CaseParameter parentParameter = getParentCaseParameters4SensitivityCase(parentCaseId, tempParam, session);
             boolean modifiedFromParent = false;
 
             if (parentParameter != null) {

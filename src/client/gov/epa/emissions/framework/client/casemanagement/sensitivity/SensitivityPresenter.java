@@ -29,9 +29,9 @@ public class SensitivityPresenter {
     private EmfSession session;
 
     private CaseManagerPresenter managerPresenter;
-    
+
     private int defaultPageSize = 20;
-    
+
     public SensitivityPresenter(EmfSession session, SensitivityView view, CaseManagerPresenter managerPresenter) {
         this.session = session;
         this.view = view;
@@ -50,24 +50,27 @@ public class SensitivityPresenter {
     private void closeView() {
         view.disposeView();
     }
-    
-    public Case addSensitivities(int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case setSensitivityCase) throws EmfException {
+
+    public Case addSensitivities(int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup,
+            Case setSensitivityCase, GeoRegion geoRegion) throws EmfException {
         setSensitivityCase.setLastModifiedBy(session.user());
         setSensitivityCase.setLastModifiedDate(new Date());
-        
-        return service().addSensitivity2Case(session.user(), parentCaseId, templateCaseId, jobIds, jobGroup, setSensitivityCase);
+
+        return service().addSensitivity2Case(session.user(), parentCaseId, templateCaseId, jobIds, jobGroup,
+                setSensitivityCase, geoRegion);
     }
 
-    public Case doSave(int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case newCase) throws EmfException {
+    public Case doSave(int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case newCase)
+            throws EmfException {
         if (isDuplicate(newCase))
             throw new EmfException("A Case named '" + newCase.getName() + "' already exists.");
 
         newCase.setCreator(session.user());
         newCase.setLastModifiedBy(session.user());
         newCase.setLastModifiedDate(new Date());
-        
+
         Case loaded = service().mergeCases(session.user(), parentCaseId, templateCaseId, jobIds, jobGroup, newCase);
-        //closeView();
+        // closeView();
         managerPresenter.addNewCaseToTableData(loaded);
         return loaded;
     }
@@ -87,78 +90,66 @@ public class SensitivityPresenter {
     }
 
     public Case copyCase(int caseId) throws EmfException {
-        return service().copyCaseObject(new int[] {caseId}, session.user())[0];
+        return service().copyCaseObject(new int[] { caseId }, session.user())[0];
     }
-    
+
     public Case updateCase(Case caseObj) throws EmfException {
         Case locked = service().obtainLocked(session.user(), caseObj);
         return service().updateCase(locked);
     }
-    
+
     public void editCase(CaseEditorView caseView, Case caseObj) throws EmfException {
         CaseEditorPresenter presenter = new CaseEditorPresenterImpl(caseObj, session, caseView, managerPresenter);
         presenter.doDisplay();
     }
-    
+
     public Case[] getCases(CaseCategory category) throws EmfException {
         if (category == null)
             return new Case[0];
-        
+
         if (category.getName().equals("All"))
             return service().getCases();
-        
+
         return service().getCases(category);
     }
-    
+
     public CaseJob[] getCaseJobs(Case caseObj) throws EmfException {
         return service().getCaseJobs(caseObj.getId());
     }
-    
-    public CaseJob[] getCaseJobs(Case caseObj, GeoRegion[] grids, Sector[] sectors) throws EmfException{
+
+    public CaseJob[] getCaseJobs(Case caseObj, Sector[] sectors) throws EmfException {
         CaseJob[] jobs = getCaseJobs(caseObj);
         List<CaseJob> filteredJobs1 = new ArrayList<CaseJob>();
-        //Find jobs contain selected grids
-        if ( sectors != null && grids.length > 0 ){
-            for (GeoRegion grid : grids){
-                int parenth = grid.getName().indexOf("("); //strip off the grid value part plus a space
-                int end =  parenth < 0 ? grid.getName().length() : parenth - 1;
-                String gridName = grid.getName().substring(0, end).replace("_", " ");
-                for (CaseJob job : jobs){
-                    if ((job.getName().toLowerCase().replace("_", " ")).contains(gridName.toLowerCase()))
-                        filteredJobs1.add(job);
-                }
-            }
-            
-        }else
-            filteredJobs1.addAll(new ArrayList(Arrays.asList(jobs)));
-        
-        
-        //Find jobs contain selected sectors
+        filteredJobs1.addAll(new ArrayList<CaseJob>(Arrays.asList(jobs)));
+
+        // Find jobs contain selected sectors
         List<CaseJob> filteredJobs2 = new ArrayList<CaseJob>();
-        if ( filteredJobs1.size()>0 && sectors != null && sectors.length > 0){
-            for (Sector sector: sectors){
-                for (CaseJob job : filteredJobs1){
-                    if (job.getSector().equals(sector))
+        if (filteredJobs1.size() > 0 && sectors != null && sectors.length > 0) {
+            for (Sector sector : sectors) {
+                for (CaseJob job : filteredJobs1) {
+                    if (job.getSector() != null && job.getSector().equals(sector))
                         filteredJobs2.add(job);
                 }
             }
-            return filteredJobs2.toArray(new CaseJob[0]); 
+            
+            return filteredJobs2.toArray(new CaseJob[0]);
         }
-        return filteredJobs1.toArray(new CaseJob[0]); 
+
+        return filteredJobs1.toArray(new CaseJob[0]);
     }
-    
+
     public EmfSession getSession() {
         return this.session;
     }
-    
-    public void doDisplaySetCaseWindow(Case newCase, String title, EmfConsole parentConsole, 
-            DesktopManager desktopManager, CaseManagerPresenter parentPresenter,
-            List<CaseInput> existingInputs, List<CaseParameter> existingParas) throws EmfException {
+
+    public void doDisplaySetCaseWindow(Case newCase, String title, EmfConsole parentConsole,
+            DesktopManager desktopManager, CaseManagerPresenter parentPresenter, List<CaseInput> existingInputs,
+            List<CaseParameter> existingParas) throws EmfException {
         SetCaseView view = new SetCaseWindow(title, parentConsole, desktopManager, existingInputs, existingParas);
-        SetCasePresenter presenter= new SetCasePresenterImpl(newCase, view, session, parentPresenter);
+        SetCasePresenter presenter = new SetCasePresenterImpl(newCase, view, session, parentPresenter);
         presenter.display();
     }
-    
+
     public Case[] getSensitivityCases(int parentCaseId) throws EmfException {
         return service().getSensitivityCases(parentCaseId);
     }
@@ -166,39 +157,40 @@ public class SensitivityPresenter {
     public Object[] getJobGroups(Case selectedCase) throws EmfException {
         return service().getJobGroups(selectedCase.getId());
     }
-    
+
     public CaseInput[] getCaseInput(int caseId, Sector sector, boolean showAll) throws EmfException {
         return service().getCaseInputs(defaultPageSize, caseId, sector, "", showAll);
     }
-    
+
     public CaseParameter[] getCaseParameters(int caseId, Sector sector, boolean showAll) throws EmfException {
-        //return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
+        // return service().getCaseParameters(defaultPageSize, caseId, sector, showAll);
         if (sector == null)
             return new CaseParameter[0];
 
         if (sector.compareTo(new Sector("All", "All")) == 0)
             sector = null; // to trigger select all on the server side
 
-        //return service().getcasgetCaseParameters(caseId, sector, showAll);
+        // return service().getcasgetCaseParameters(caseId, sector, showAll);
         return service().getCaseParameters(defaultPageSize, caseId, sector, "", showAll);
     }
-    
+
     public String[] getGridNameValues(String[] names, int caseId, int modelId) throws EmfException {
         if (modelId <= 0)
             throw new EmfException("Please specify parent case run model.");
-        
+
         String[] namevalues = new String[names.length];
-        
+
         for (int i = 0; i < names.length; i++) {
             ParameterEnvVar var = new ParameterEnvVar(names[i].toUpperCase().replace(' ', '_'));
             var.setModelToRunId(modelId);
             CaseParameter param = service().getCaseParameter(caseId, var);
-            String value = (param == null || param.getValue() == null || param.getValue().trim().isEmpty()? "Not available" : param.getValue());
+            String value = (param == null || param.getValue() == null || param.getValue().trim().isEmpty() ? "Not available"
+                    : param.getValue());
             namevalues[i] = names[i] + " (" + value + ")";
         }
-        
+
         return namevalues;
-        
+
     }
 
 }

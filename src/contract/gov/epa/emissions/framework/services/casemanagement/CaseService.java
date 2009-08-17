@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParame
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 public interface CaseService {
 
@@ -192,7 +193,7 @@ public interface CaseService {
     
     Case mergeCases(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case sensitivityCase) throws EmfException;
     
-    Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case sensitivityCase) throws EmfException;
+    Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case sensitivityCase, GeoRegion geoRegion) throws EmfException;
     
     String checkParentCase(Case caseObj) throws EmfException;
 

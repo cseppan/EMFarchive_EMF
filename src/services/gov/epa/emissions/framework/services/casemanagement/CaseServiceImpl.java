@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParame
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
@@ -652,8 +653,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().mergeCases(user, parentCaseId, templateCaseId, jobIds, jobGroup, sensitivityCase);
     }
     
-    public Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case sensitivityCase) throws EmfException {
-        return getCaseService().addSensitivity2Case(user, parentCaseId, templateCaseId, jobIds, jobGroup, sensitivityCase);
+    public Case addSensitivity2Case(User user, int parentCaseId, int templateCaseId, int[] jobIds, String jobGroup, Case sensitivityCase, GeoRegion region) throws EmfException {
+        return getCaseService().addSensitivity2Case(user, parentCaseId, templateCaseId, jobIds, jobGroup, sensitivityCase, region);
     }
     
     public String checkParentCase(Case caseObj) throws EmfException {

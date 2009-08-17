@@ -778,8 +778,9 @@ public class CaseDAO {
     public CaseJob getCaseJob(int caseId, CaseJob job, Session session) {
         Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("name", job.getName());
+        Criterion crit3 = Restrictions.eq("region", job.getRegion());
 
-        return (CaseJob) hibernateFacade.load(CaseJob.class, new Criterion[] { crit1, crit2 }, session);
+        return (CaseJob) hibernateFacade.load(CaseJob.class, new Criterion[] { crit1, crit2, crit3 }, session);
     }
 
     public CaseJob getCaseJob(int caseId, String jobName, Session session) {
