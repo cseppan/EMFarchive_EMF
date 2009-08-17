@@ -228,7 +228,7 @@ CREATE TABLE cases.cases_casejobs
   q_id varchar(255) ,
   local bool DEFAULT true,
   job_group varchar(255),
-  UNIQUE (case_id, name, region_id)
+  UNIQUE (case_id, name)
 )
 WITHOUT OIDS;
 -- cases.cases_casejobs
