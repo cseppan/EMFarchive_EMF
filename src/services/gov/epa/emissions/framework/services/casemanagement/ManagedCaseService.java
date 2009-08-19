@@ -5167,7 +5167,9 @@ public class ManagedCaseService {
     @SuppressWarnings("unchecked")
     private CaseParameter getParentCaseParameters4SensitivityCase(int caseId, CaseParameter param, Session session) {
 
-        System.out.println("Trying to find match for " + param.getName());
+        if (DebugLevels.DEBUG_9) {
+            System.out.println("Trying to find match for " + param.getName());
+        }
         
         ParameterEnvVar env = param.getEnvVar();
         Sector sector = param.getSector();
@@ -5198,8 +5200,10 @@ public class ManagedCaseService {
 
         List<Integer> ids = session.createQuery(query).list();
 
-        System.out.println("#IDs returned by query: " + ids == null ? 0 : ids.size());
-        
+        if (DebugLevels.DEBUG_9) {
+            System.out.println("#IDs returned by query: " + ids == null ? 0 : ids.size());
+        }        
+
         /*
          * convert ids to parameters
          */
@@ -5210,23 +5214,28 @@ public class ManagedCaseService {
         
         CaseParameter matchedParameter = null;
 
-        System.out.println("Attempting to match: " + Utils.stringify(param));
-
+        if (DebugLevels.DEBUG_9) {
+            System.out.println("Attempting to match: " + Utils.stringify(param));
+        }
+        
         /*
          * make sure list is not empty
          */
         if (!parameters.isEmpty()) {
-            
+
             /*
              * sort parameters and get the first one
              */
             Utils.sortParameters(parameters);
             matchedParameter = parameters.get(0);
 
-            System.out.println("Matched with: " + Utils.stringify(matchedParameter));
-        }
-        else {
-            System.out.println("No match found: list empty");
+            if (DebugLevels.DEBUG_9) {
+                System.out.println("Matched with: " + Utils.stringify(matchedParameter));
+            }
+        } else {
+            if (DebugLevels.DEBUG_9) {
+                System.out.println("No match found: list empty");
+            }
         }
         
         return matchedParameter;
@@ -5235,8 +5244,10 @@ public class ManagedCaseService {
     @SuppressWarnings("unchecked")
     private CaseInput getParentCaseInputs4SensitivityCase(int caseId, CaseInput input, Session session) {
 
-        System.out.println("Trying to find match for " + input.getName());
-
+        if (DebugLevels.DEBUG_9) {
+            System.out.println("Trying to find match for " + input.getName());
+        }
+        
         InputEnvtVar env = input.getEnvtVars();
         GeoRegion region = input.getRegion();
 
@@ -5269,8 +5280,10 @@ public class ManagedCaseService {
 
         List<Integer> ids = session.createQuery(query).list();
 
-        System.out.println("#IDs returned by query: " + ids == null ? 0 : ids.size());
-
+        if (DebugLevels.DEBUG_9) {
+            System.out.println("#IDs returned by query: " + ids == null ? 0 : ids.size());
+        }
+        
         /*
          * convert ids to inputs
          */
@@ -5281,23 +5294,28 @@ public class ManagedCaseService {
         
         CaseInput matchedInput = null;
 
-        System.out.println("Attempting to match: " + Utils.stringify(input));
-
+        if (DebugLevels.DEBUG_9) {
+            System.out.println("Attempting to match: " + Utils.stringify(input));
+        }
+        
         /*
          * make sure list is not empty
          */
         if (!inputs.isEmpty()) {
-            
+
             /*
              * sort parameters and get the first one
              */
             Utils.sortInputs(inputs);
             matchedInput = inputs.get(0);
 
-            System.out.println("Matched with: " + Utils.stringify(matchedInput));
-        }
-        else {
-            System.out.println("No match found: list empty");
+            if (DebugLevels.DEBUG_9) {
+                System.out.println("Matched with: " + Utils.stringify(matchedInput));
+            }
+        } else {
+            if (DebugLevels.DEBUG_9) {
+                System.out.println("No match found: list empty");
+            }
         }
         
         return matchedInput;

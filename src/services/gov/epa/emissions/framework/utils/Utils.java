@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 import gov.epa.emissions.framework.services.data.GeoRegion;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,25 +24,6 @@ public class Utils {
 
     public static void sortParameters(List<CaseParameter> parameters) {
         Collections.sort(parameters, G_TO_L_PARAMETER_COMPARATOR);
-    }
-
-    public static CaseInput match(CaseInput inputToMatch, List<CaseInput> inputs) {
-
-        CaseInput matchedInput = null;
-
-        // sortInputs(inputs);
-        //
-        // for (CaseInput caseInput : inputs) {
-        //
-        // int jobID = caseInput.getCaseJobID();
-        // int jobIDtoMatch = inputToMatch.getCaseJobID();
-        // GeoRegion region = caseInput.getRegion();
-        // GeoRegion regionToMatch = inputToMatch.getRegion();
-        // Sector sector = caseInput.getSector();
-        // Sector sectorToMatch = inputToMatch.getSector();
-        // }
-
-        return matchedInput;
     }
 
     public static boolean areEqualOrBothNull(Object o1, Object o2) {
@@ -90,11 +72,14 @@ public class Utils {
 
             int retval = 0;
 
-            System.out.println("Comparing:");
-            String o1String = "o1=" + stringify(o1);
-            System.out.println("  " + o1String);
-            String o2String = "o2=" + stringify(o2);
-            System.out.println("  " + o2String);
+            if (DebugLevels.DEBUG_9) {
+                
+                System.out.println("Comparing:");
+                String o1String = "o1=" + stringify(o1);
+                System.out.println("  " + o1String);
+                String o2String = "o2=" + stringify(o2);
+                System.out.println("  " + o2String);
+            }
 
             int factor = order.getFactor();
 
@@ -124,12 +109,15 @@ public class Utils {
                 }
             }
 
-            if (retval == 1) {
-                System.out.println("o1>o2");
-            } else if (retval == -1) {
-                System.out.println("o2>o1");
-            } else {
-                System.out.println("o1==o2");
+            if (DebugLevels.DEBUG_9) {
+                
+                if (retval == 1) {
+                    System.out.println("o1>o2");
+                } else if (retval == -1) {
+                    System.out.println("o2>o1");
+                } else {
+                    System.out.println("o1==o2");
+                }
             }
 
             return retval;
@@ -181,11 +169,14 @@ public class Utils {
 
             int retval = 0;
 
-            System.out.println("Comparing:");
-            String o1String = "o1=" + stringify(o1);
-            System.out.println("  " + o1String);
-            String o2String = "o2=" + stringify(o2);
-            System.out.println("  " + o2String);
+            if (DebugLevels.DEBUG_9) {
+                
+                System.out.println("Comparing:");
+                String o1String = "o1=" + stringify(o1);
+                System.out.println("  " + o1String);
+                String o2String = "o2=" + stringify(o2);
+                System.out.println("  " + o2String);
+            }
 
             int factor = order.getFactor();
 
@@ -215,12 +206,15 @@ public class Utils {
                 }
             }
 
-            if (retval == 1) {
-                System.out.println("o1>o2");
-            } else if (retval == -1) {
-                System.out.println("o2>o1");
-            } else {
-                System.out.println("o1==o2");
+            if (DebugLevels.DEBUG_9) {
+                
+                if (retval == 1) {
+                    System.out.println("o1>o2");
+                } else if (retval == -1) {
+                    System.out.println("o2>o1");
+                } else {
+                    System.out.println("o1==o2");
+                }
             }
 
             return retval;
@@ -238,105 +232,6 @@ public class Utils {
             return o.getSector();
         }
     }
-
-    // static abstract class AbstractComparator<T> implements Comparator<T> {
-    //
-    // private Order order;
-    //
-    // abstract int getJobID(T o);
-    //
-    // abstract Sector getSector(T o);
-    //
-    // abstract GeoRegion getRegion(T o);
-    //
-    // enum Order {
-    // GREATEST_TO_LEAST(-1), LEAST_TO_GREATEST(1);
-    //
-    // private int factor = 1;
-    //
-    // Order(int factor) {
-    // this.factor = factor;
-    // }
-    //
-    // public int getFactor() {
-    // return factor;
-    // }
-    // }
-    //
-    // public AbstractComparator() {
-    // this(Order.GREATEST_TO_LEAST);
-    // }
-    //
-    // public AbstractComparator(Order order) {
-    // this.order = order;
-    // }
-    //
-    // /**
-    // * null and null --> equal !null and !null --> equal
-    // */
-    // public int compare(T o1, T o2) {
-    //
-    // int retval = 0;
-    //
-    // System.out.println("Comparing:");
-    // String o1String = "o1=" + stringify(o1);
-    // System.out.println("  " + o1String);
-    // String o2String = "o2=" + stringify(o2);
-    // System.out.println("  " + o2String);
-    //
-    // int factor = order.getFactor();
-    //
-    // int id1 = this.getJobID(o1);
-    // int id2 = this.getJobID(o2);
-    // if (id1 != 0 && id2 == 0) {
-    // retval = 1 * factor;
-    // } else if (id1 == 0 && id2 != 0) {
-    // retval = -1 * factor;
-    // } else {
-    //
-    // Sector sector1 = this.getSector(o1);
-    // Sector sector2 = this.getSector(o2);
-    // if (sector1 != null && sector2 == null) {
-    // retval = 1 * factor;
-    // } else if (sector1 == null && sector2 != null) {
-    // retval = -1 * factor;
-    // } else {
-    //
-    // GeoRegion region1 = this.getRegion(o1);
-    // GeoRegion region2 = this.getRegion(o2);
-    // if (region1 != null && region2 == null) {
-    // retval = 1 * factor;
-    // } else if (region1 == null && region2 != null) {
-    // retval = -1 * factor;
-    // }
-    // }
-    // }
-    //
-    // if (retval == 1) {
-    // System.out.println("o1>o2");
-    // } else if (retval == -1) {
-    // System.out.println("o2>o1");
-    // } else {
-    // System.out.println("o1==o2");
-    // }
-    //
-    // return retval;
-    // }
-    // }
-    //
-    // private static String stringify(Object o) {
-    //
-    // String retval = "";
-    // if (o instanceof CaseInput) {
-    // retval = stringify((CaseInput) o);
-    // } else if (o instanceof CaseParameter) {
-    // retval = stringify((CaseParameter) o);
-    // } else {
-    // retval = o.toString();
-    // }
-    //
-    // return retval;
-    // }
 
     public static String stringify(CaseInput input) {
 
