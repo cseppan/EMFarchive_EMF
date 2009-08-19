@@ -178,7 +178,9 @@ public class GeoRegion implements Serializable, Comparable<GeoRegion> {
     }
 
     public String toString() {
-        return getName();
+        String abbr = (abbreviation == null || abbreviation.trim().isEmpty()) ? "" : " (" + abbreviation.trim() + ")";
+        
+        return getName() + abbr;
     }
 
     public int compareTo(GeoRegion other) {
