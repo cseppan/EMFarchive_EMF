@@ -44,6 +44,7 @@ import gov.epa.emissions.framework.tasks.CaseJobSubmitter;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 import gov.epa.emissions.framework.tasks.TaskManagerFactory;
 import gov.epa.emissions.framework.tasks.TaskSubmitter;
+import gov.epa.emissions.framework.utils.Utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -118,23 +119,23 @@ public class ManagedCaseService {
 
     // all sectors and all jobs id in the case inputs tb
     private final Sector ALL_SECTORS = null;
-    
+
     private final GeoRegion ALL_REGIONS = null;
-    
+
     private final String AAA = "all regions, all sectors, all jobs";
-    
+
     private final String AAJ = "all regions, all sectors, specific job";
-    
+
     private final String ASA = "all regions, specific sector, all jobs";
-    
+
     private final String ASJ = "all regions, specific sector, specific job";
-    
+
     private final String RAA = "specific region, all sectors, all jobs";
-    
+
     private final String RSA = "specific region, specific sector, all jobs";
-    
+
     private final String RAJ = "specific region, all sectors, specific job";
-    
+
     private final String RSJ = "specific region, specific sector, specific job";
 
     private final int ALL_JOB_ID = 0;
@@ -1192,8 +1193,8 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, String envNameContains, boolean showAll)
-            throws EmfException {
+    public synchronized CaseInput[] getCaseInputs(int pageSize, int caseId, Sector sector, String envNameContains,
+            boolean showAll) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
@@ -1235,7 +1236,8 @@ public class ManagedCaseService {
     /**
      * Gets all the inputs for this job, selects based on: case ID, job ID, and sector
      */
-    private List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector, GeoRegion region, Session session) throws EmfException {
+    private List<CaseInput> getJobInputs(int caseId, int jobId, Sector sector, GeoRegion region, Session session)
+            throws EmfException {
         List<CaseInput> outInputs = new ArrayList<CaseInput>();
         EmfDataset cipDataset = null;
         String badCipName = null;
@@ -1286,65 +1288,65 @@ public class ManagedCaseService {
         List<CaseInput> inputsRSA = map.get(RSA);
         List<CaseInput> inputsRAJ = map.get(RAJ);
         List<CaseInput> inputsRSJ = map.get(RSJ);
-        
+
         // append all the job inputs to the inputsAll list
         if ((inputsAAA != null) && (inputsAAA.size() > 0)) {
             if (DebugLevels.DEBUG_0)
                 System.out.println("Number of AAA inputs = " + inputsAAA.size());
             inputsAll.addAll(inputsAAA);
         }
-        
+
         if ((inputsASA != null) && (inputsASA.size() > 0)) {
             if (DebugLevels.DEBUG_0)
                 System.out.println("Number of ASA inputs = " + inputsASA.size());
             inputsAll.addAll(inputsASA);
         }
-        
+
         if ((inputsAAJ != null) && (inputsAAJ.size() > 0)) {
             if (DebugLevels.DEBUG_0)
                 System.out.println("Number of AAJ inputs = " + inputsAAJ.size());
             inputsAll.addAll(inputsAAJ);
         }
-        
+
         if ((inputsASJ != null) && (inputsASJ.size() > 0)) {
             if (DebugLevels.DEBUG_0)
                 System.out.println("Number of ASJ inputs = " + inputsASJ.size());
             inputsAll.addAll(inputsASJ);
         }
-        
+
         if ((inputsRSA != null) && (inputsRSA.size() > 0)) {
             if (DebugLevels.DEBUG_0)
                 System.out.println("Number of RSA inputs = " + inputsRSA.size());
             inputsAll.addAll(inputsRSA);
         }
-        
+
         if ((inputsRAJ != null) && (inputsRAJ.size() > 0)) {
             if (DebugLevels.DEBUG_0)
                 System.out.println("Number of RAJ inputs = " + inputsRAJ.size());
             inputsAll.addAll(inputsRAJ);
         }
-        
+
         if ((inputsRAA != null) && (inputsRAA.size() > 0)) {
             if (DebugLevels.DEBUG_0)
                 System.out.println("Number of RAA inputs = " + inputsRAA.size());
             inputsAll.addAll(inputsRAA);
         }
-        
+
         if ((inputsRSJ != null) && (inputsRSJ.size() > 0)) {
             if (DebugLevels.DEBUG_0)
                 System.out.println("Number of RSJ inputs = " + inputsRSJ.size());
             inputsAll.addAll(inputsRSJ);
         }
-        
+
         if (DebugLevels.DEBUG_0)
             System.out.println("Total number of inputs = " + inputsAll.size());
 
         return (inputsAll);
     }
-    
+
     private Map<String, List<CaseInput>> getInputHierarchy(CaseJob job, Session session) throws EmfException {
         Map<String, List<CaseInput>> map = new HashMap<String, List<CaseInput>>();
-        
+
         /**
          * Gets all the inputs for a specific job
          */
@@ -1362,11 +1364,11 @@ public class ManagedCaseService {
         List<CaseInput> inputsRSA = null; // inputs for specific region, specific sector and all jobs
         List<CaseInput> inputsRAJ = null; // inputs for specific region, all sectors specific jobs
         List<CaseInput> inputsRSJ = null; // inputs for specific region, specific sectors specific jobs
-        
+
         try {
             Sector sector = job.getSector();
             GeoRegion region = job.getRegion();
-            
+
             // Get case inputs (the datasets associated w/ the case)
             // All regions, all sectors, all jobs
             inputsAAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS, session);
@@ -1383,7 +1385,7 @@ public class ManagedCaseService {
             if (sector != this.ALL_SECTORS) {
                 inputsASJ = this.getJobInputs(caseId, jobId, sector, this.ALL_REGIONS, session);
             }
-            
+
             // Specific region, all sectors, all jobs
             if (region != this.ALL_REGIONS)
                 inputsRAA = this.getJobInputs(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, region, session);
@@ -1803,12 +1805,13 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector, String envNameContains, boolean showAll)
-            throws EmfException {
+    public synchronized CaseParameter[] getCaseParameters(int pageSize, int caseId, Sector sector,
+            String envNameContains, boolean showAll) throws EmfException {
         Session session = sessionFactory.getSession();
 
         try {
-            List<CaseParameter> params = dao.getCaseParameters(pageSize, caseId, sector, envNameContains, showAll, session);
+            List<CaseParameter> params = dao.getCaseParameters(pageSize, caseId, sector, envNameContains, showAll,
+                    session);
 
             Collections.sort(params, new Comparator<CaseParameter>() {
                 public int compare(CaseParameter o1, CaseParameter o2) {
@@ -2459,7 +2462,7 @@ public class ManagedCaseService {
 
                 // reset job run log
                 caseJob.setRunLog("");
-                
+
                 // clear previous job queue id
                 caseJob.setIdInQueue(null);
 
@@ -2519,7 +2522,8 @@ public class ManagedCaseService {
                 // string values in the queue
                 try {
                     // Queue options could be job specific, therefore pass job, sector, and region
-                    queueOptions = dao.replaceEnvVarsCase(queueOptions, " ", jobCase, jobId, caseJob.getSector(), caseJob.getRegion());
+                    queueOptions = dao.replaceEnvVarsCase(queueOptions, " ", jobCase, jobId, caseJob.getSector(),
+                            caseJob.getRegion());
                 } catch (Exception e) {
                     System.out.println(e);
                     throw new EmfException("Job (" + cjt.getJobName() + "): " + e.getMessage());
@@ -2573,7 +2577,6 @@ public class ManagedCaseService {
                 // test inputs for which need to be exported
                 List<CaseInput> inputs2Export = getInputs2Export(expSvc, inputs, caseJob, jobCase, user, purpose);
 
-                
                 // if no inputs need to be exported, set job tasks exports to success and set status to waiting
                 String runStatusValue = "Exporting";
                 if (inputs2Export == null || inputs2Export.size() == 0) {
@@ -2625,7 +2628,7 @@ public class ManagedCaseService {
 
             // Process the case job task manager wait queue
             // if a job has no new exports, this signals the task queue to
-            // process it           
+            // process it
             TaskManagerFactory.getCaseJobTaskManager(sessionFactory).processTaskQueue();
 
             if (DebugLevels.DEBUG_0)
@@ -2645,22 +2648,23 @@ public class ManagedCaseService {
         }
     }
 
-    private List<CaseInput> getInputs2Export(ManagedExportService exptSrv, List<CaseInput> inputs, CaseJob job, Case caseObj, User user, String purpose) throws EmfException {
+    private List<CaseInput> getInputs2Export(ManagedExportService exptSrv, List<CaseInput> inputs, CaseJob job,
+            Case caseObj, User user, String purpose) throws EmfException {
         // Determining which inputs already have been exported
         // return a list of those inputs which still need to be exported
         if (inputs == null || inputs.size() == 0)
             return inputs;
-        
+
         List<CaseInput> toExport = new ArrayList<CaseInput>();
         String delimeter = System.getProperty("file.separator");
         LoggingServiceImpl logSvr = exptSrv.services().getLoggingService();
-        
+
         Session session = this.sessionFactory.getSession();
         DatasetDAO dsdao = new DatasetDAO();
-        
+
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
-            boolean needExport = false; 
+            boolean needExport = false;
             EmfDataset dataset = input.getDataset();
             SubDir subdir = input.getSubdirObj();
             String fullPath = null;
@@ -2679,17 +2683,17 @@ public class ManagedCaseService {
                 } catch (Exception e) {
                     log.error("Could not get external sources for dataset " + dataset.getName(), e);
                     throw new EmfException("Could not get external sources for dataset " + dataset.getName() + ".");
-                } 
+                }
 
                 // test that all the external files in the dataset exist
                 if (extSrcs == null || extSrcs.length == 0) {
                     throw new EmfException("Input (" + input.getName() + ") must have at least 1 external dataset");
                 }
-                
-                //loop of external ds, if all there add to toExport list
+
+                // loop of external ds, if all there add to toExport list
                 for (int i = 0; i < extSrcs.length; i++) {
                     fullPath = extSrcs[i].getDatasource();
-                    
+
                     if (!new File(fullPath).exists()) {
                         needExport = true;
                         break;
@@ -2699,32 +2703,33 @@ public class ManagedCaseService {
                 // internal dataset
                 // Create a full path to the input file
                 fullPath = exptSrv.getCleanDatasetName(input.getDataset(), input.getVersion());
-                
+
                 if ((subdir != null) && !(subdir.toString()).equals("")) {
                     fullPath = caseObj.getInputFileDir() + delimeter + input.getSubdirObj() + delimeter + fullPath;
                 } else {
                     fullPath = caseObj.getInputFileDir() + delimeter + fullPath;
                 }
-                
+
                 // Expand input director, ie. remove env variables
                 try {
                     // full path based on input dir, which is case general, therefore don't pass job, sector, or region
-                    fullPath = dao.replaceEnvVarsCase(fullPath, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
+                    fullPath = dao.replaceEnvVarsCase(fullPath, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS,
+                            this.ALL_REGIONS);
                 } catch (Exception e) {
                     throw new EmfException("Input folder: " + e.getMessage());
                 }
-                
+
                 if (!new File(fullPath).exists())
                     needExport = true;
             }
-            
+
             if (needExport)
                 toExport.add(input);
-            
+
             if (!needExport)
                 exptSrv.logExportedTask(logSvr, user, purpose, fullPath, input);
         }
-        
+
         return toExport;
     }
 
@@ -2852,7 +2857,7 @@ public class ManagedCaseService {
             EmfDataset ds = caseInput.getDataset();
             Version version = caseInput.getVersion();
             SubDir subdirObj = caseInput.getSubdirObj();
-            
+
             String subDir = "";
 
             if (subdirObj != null) {
@@ -2864,7 +2869,8 @@ public class ManagedCaseService {
             String delimeter = System.getProperty("file.separator");
             String exportDir = caseObj.getInputFileDir() + delimeter + subDir;
             // export Dir is case general, therefore don't pass job, sector, or region
-            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
+            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, this.ALL_JOB_ID,
+                    this.ALL_SECTORS, this.ALL_REGIONS);
             getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version },
                     exportDirExpanded, purpose, false);
 
@@ -2891,8 +2897,9 @@ public class ManagedCaseService {
 
             String delimeter = System.getProperty("file.separator");
             String exportDir = caseObj.getInputFileDir() + delimeter + subDir;
-//          export Dir is case general, therefore don't pass job, sector, or region
-            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
+            // export Dir is case general, therefore don't pass job, sector, or region
+            String exportDirExpanded = dao.replaceEnvVarsCase(exportDir, delimeter, caseObj, this.ALL_JOB_ID,
+                    this.ALL_SECTORS, this.ALL_REGIONS);
 
             getExportService().exportForClient(user, new EmfDataset[] { ds }, new Version[] { version },
                     exportDirExpanded, purpose, true);
@@ -2938,7 +2945,7 @@ public class ManagedCaseService {
 
     private Map<String, List<CaseParameter>> getParameterHierarchy(CaseJob job, Session session) throws EmfException {
         Map<String, List<CaseParameter>> map = new HashMap<String, List<CaseParameter>>();
-        
+
         /**
          * Gets all the inputs for a specific job
          */
@@ -2956,11 +2963,11 @@ public class ManagedCaseService {
         List<CaseParameter> paramsRSA = null; // parameters for specific region, specific sector and all jobs
         List<CaseParameter> paramsRAJ = null; // parameters for specific region, all sectors specific jobs
         List<CaseParameter> paramsRSJ = null; // parameters for specific region, specific sectors specific jobs
-        
+
         try {
             Sector sector = job.getSector();
             GeoRegion region = job.getRegion();
-            
+
             // Get case inputs (the datasets associated w/ the case)
             // All regions, all sectors, all jobs
             paramsAAA = this.getJobParameters(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS, session);
@@ -2977,7 +2984,7 @@ public class ManagedCaseService {
             if (sector != this.ALL_SECTORS) {
                 paramsASJ = this.getJobParameters(caseId, jobId, sector, this.ALL_REGIONS, session);
             }
-            
+
             // Specific region, all sectors, all jobs
             if (region != this.ALL_REGIONS)
                 paramsRAA = this.getJobParameters(caseId, this.ALL_JOB_ID, this.ALL_SECTORS, region, session);
@@ -3013,8 +3020,9 @@ public class ManagedCaseService {
 
         return map;
     }
-    
-    private List<CaseParameter> getJobParameters(int caseId, int jobId, Sector sector, GeoRegion region, Session session) throws EmfException {
+
+    private List<CaseParameter> getJobParameters(int caseId, int jobId, Sector sector, GeoRegion region, Session session)
+            throws EmfException {
         /**
          * Gets all the parameters for this job, selects based on: case ID, job ID, and sector
          */
@@ -3042,7 +3050,7 @@ public class ManagedCaseService {
          */
         List<CaseInput> exclInputs = new ArrayList<CaseInput>();
         String inputEnvName = "";
-        
+
         if (inputs == null || inputs.size() == 0)
             return exclInputs;
 
@@ -3138,8 +3146,9 @@ public class ManagedCaseService {
         // Expand input director, ie. remove env variables
         try {
             // input Dir is case general, therefore don't pass job, sector, or region
-            setenvLine = dao.replaceEnvVarsCase(setenvLine, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
-            
+            setenvLine = dao.replaceEnvVarsCase(setenvLine, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS,
+                    this.ALL_REGIONS);
+
             return setenvLine;
         } catch (Exception e) {
             throw new EmfException("Input folder: " + e.getMessage());
@@ -3203,7 +3212,6 @@ public class ManagedCaseService {
          * Output: String - the job content
          */
 
-        
         // String jobContent="";
         String jobFileHeader = "";
 
@@ -3221,15 +3229,10 @@ public class ManagedCaseService {
         /*
          * Get the inputs in the based on hierarchy between region, sector, and job.
          * 
-         * Present hierarchy from general to specific
-         *    AAA - all regions, all sectors, all jobs
-         *    RAA - specific region, all sectors, all jobs
-         *    ASA - all regions, specific sector, all jobs
-         *    RSA - specific region, specific sector, all jobs
-         *    AAJ - all regions, all sectors, specific job
-         *    RAJ - specific region, all sectors, specific job
-         *    ASJ - all regions, specific sector, specific job
-         *    RSJ - specific region, specific sector, specific job
+         * Present hierarchy from general to specific AAA - all regions, all sectors, all jobs RAA - specific region,
+         * all sectors, all jobs ASA - all regions, specific sector, all jobs RSA - specific region, specific sector,
+         * all jobs AAJ - all regions, all sectors, specific job RAJ - specific region, all sectors, specific job ASJ -
+         * all regions, specific sector, specific job RSJ - specific region, specific sector, specific job
          */
 
         // inputs based on all (A), specific region (R), specific sector (S), and/or specific job (J)
@@ -3242,7 +3245,7 @@ public class ManagedCaseService {
         List<CaseInput> inputsRSA = map.get(RSA);
         List<CaseInput> inputsRAJ = map.get(RAJ);
         List<CaseInput> inputsRSJ = map.get(RSJ);
-        
+
         // parameters based on all (A), specific region (R), specific sector (S), and/or specific job (J)
         Map<String, List<CaseParameter>> paramsmap = getParameterHierarchy(job, session);
         List<CaseParameter> paramsAAA = paramsmap.get(AAA);
@@ -3253,62 +3256,62 @@ public class ManagedCaseService {
         List<CaseParameter> paramsRSA = paramsmap.get(RSA);
         List<CaseParameter> paramsRAJ = paramsmap.get(RAJ);
         List<CaseParameter> paramsRSJ = paramsmap.get(RSJ);
-        
+
         // Create an export service to get names of the datasets as inputs to Smoke script
         // ExportService exports = new ExportService(dbServerlocal, this.threadPool, this.sessionFactory);
         // Get case inputs (the datasets associated w/ the case)
 
         // Exclude any inputs w/ environmental variable EMF_JOBHEADER and see if the EMF_JOBHEADER exists at each level
-        /// AAA 
+        // / AAA
         List<CaseInput> exclInputs = this.excludeInputsEnv(inputsAAA, "EMF_JOBHEADER");
 
         if (exclInputs.size() != 0) {
             headerInput = exclInputs.get(0); // get the first element as header
         }
 
-        /// RAA 
+        // / RAA
         exclInputs = this.excludeInputsEnv(inputsRAA, "EMF_JOBHEADER");
 
         if (exclInputs.size() != 0) {
             headerInput = exclInputs.get(0); // get the first element as header
         }
 
-        /// ASA 
+        // / ASA
         exclInputs = this.excludeInputsEnv(inputsASA, "EMF_JOBHEADER");
 
         if (exclInputs.size() != 0) {
             headerInput = exclInputs.get(0); // get the first element as header
         }
-        
-        /// RSA 
+
+        // / RSA
         exclInputs = this.excludeInputsEnv(inputsRSA, "EMF_JOBHEADER");
 
         if (exclInputs.size() != 0) {
             headerInput = exclInputs.get(0); // get the first element as header
         }
-        
-        /// AAJ 
+
+        // / AAJ
         exclInputs = this.excludeInputsEnv(inputsAAJ, "EMF_JOBHEADER");
 
         if (exclInputs.size() != 0) {
             headerInput = exclInputs.get(0); // get the first element as header
         }
-        
-        /// RAJ 
+
+        // / RAJ
         exclInputs = this.excludeInputsEnv(inputsRAJ, "EMF_JOBHEADER");
 
         if (exclInputs.size() != 0) {
             headerInput = exclInputs.get(0); // get the first element as header
         }
-        
-        /// ASJ 
+
+        // / ASJ
         exclInputs = this.excludeInputsEnv(inputsASJ, "EMF_JOBHEADER");
 
         if (exclInputs.size() != 0) {
             headerInput = exclInputs.get(0); // get the first element as header
         }
-        
-        /// RSJ
+
+        // / RSJ
         exclInputs = this.excludeInputsEnv(inputsRSJ, "EMF_JOBHEADER");
 
         if (exclInputs.size() != 0) {
@@ -3359,7 +3362,8 @@ public class ManagedCaseService {
             throw new EmfException("The Output Job Scripts folder has not been specified");
         try {
             // output Dir is case general, therefore don't pass job, sector, or region
-            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
+            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, this.ALL_JOB_ID,
+                    this.ALL_SECTORS, this.ALL_REGIONS);
             sbuf.append(shellSetenv("EMF_SCRIPTDIR", outputDirExpanded));
         } catch (Exception e) {
             throw new EmfException("Output folder: " + e.getMessage());
@@ -3376,11 +3380,10 @@ public class ManagedCaseService {
         // Print the inputs to the file
 
         /*
-         * loop over inputs and write Env variables and input (full name and path) to job run file, print comments
-         * order of inputs based on above hierarchy
-         * 
+         * loop over inputs and write Env variables and input (full name and path) to job run file, print comments order
+         * of inputs based on above hierarchy
          */
-        
+
         // AAA
         sbuf.append(eolString);
         sbuf.append(this.runComment + " Inputs -- for all regions, all sectors and all jobs" + eolString);
@@ -3393,7 +3396,9 @@ public class ManagedCaseService {
         // RAA
         sbuf.append(eolString);
         if (inputsRAA != null) {
-            sbuf.append(this.runComment + " Inputs -- region (" + region + ") and all sectors and all jobs" + eolString);
+            sbuf
+                    .append(this.runComment + " Inputs -- region (" + region + ") and all sectors and all jobs"
+                            + eolString);
             for (CaseInput input : inputsRAA) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
@@ -3402,69 +3407,69 @@ public class ManagedCaseService {
         // ASA
         sbuf.append(eolString);
         if (inputsASA != null) {
-            sbuf.append(this.runComment + " Inputs -- all regions and  sector (" + sector + ") and all jobs" + eolString);
+            sbuf.append(this.runComment + " Inputs -- all regions and  sector (" + sector + ") and all jobs"
+                    + eolString);
             for (CaseInput input : inputsASA) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
         }
-        
+
         // RSA
         sbuf.append(eolString);
         if (inputsRSA != null) {
-            sbuf.append(this.runComment + " Inputs -- region (" + region + ") and  sector (" + sector + ") and all jobs" + eolString);
+            sbuf.append(this.runComment + " Inputs -- region (" + region + ") and  sector (" + sector
+                    + ") and all jobs" + eolString);
             for (CaseInput input : inputsRSA) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
         }
-        
+
         // AAJ
         sbuf.append(eolString);
         if (inputsAAJ != null) {
-            sbuf.append(this.runComment + " Inputs -- all regions and  all sector and job ("  + job + ")" + eolString);
+            sbuf.append(this.runComment + " Inputs -- all regions and  all sector and job (" + job + ")" + eolString);
             for (CaseInput input : inputsAAJ) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
         }
-        
+
         // RAJ
         sbuf.append(eolString);
         if (inputsRAJ != null) {
-            sbuf.append(this.runComment + " Inputs -- region (" + region + ") and  all sectors and job (" + job + ")" + eolString);
+            sbuf.append(this.runComment + " Inputs -- region (" + region + ") and  all sectors and job (" + job + ")"
+                    + eolString);
             for (CaseInput input : inputsRAJ) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
         }
-        
+
         // ASJ
         sbuf.append(eolString);
         if (inputsASJ != null) {
-            sbuf.append(this.runComment + " Inputs -- all regions and  sector (" + sector + ") and job (" + job + ")" + eolString);
+            sbuf.append(this.runComment + " Inputs -- all regions and  sector (" + sector + ") and job (" + job + ")"
+                    + eolString);
             for (CaseInput input : inputsASJ) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
         }
-        
+
         // RSJ
         sbuf.append(eolString);
         if (inputsRSJ != null) {
-            sbuf.append(this.runComment + " Inputs -- region (" + region + ") and  sector (" + sector + ") and job ("  + job + ")" + eolString);
+            sbuf.append(this.runComment + " Inputs -- region (" + region + ") and  sector (" + sector + ") and job ("
+                    + job + ")" + eolString);
             for (CaseInput input : inputsRSJ) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
         }
 
         /*
-         * Get the parameters for this job in following order: from summary tab, from job tab, 
-         * then in the same order as the inputs, ie.:
-         * Present hierarchy from general to specific
-         *    AAA - all regions, all sectors, all jobs
-         *    RAA - specific region, all sectors, all jobs
-         *    ASA - all regions, specific sector, all jobs
-         *    RSA - specific region, specific sector, all jobs
-         *    AAJ - all regions, all sectors, specific job
-         *    RAJ - specific region, all sectors, specific job
-         *    ASJ - all regions, specific sector, specific job
-         *    RSJ - specific region, specific sector, specific job
+         * Get the parameters for this job in following order: from summary tab, from job tab, then in the same order as
+         * the inputs, ie.: Present hierarchy from general to specific AAA - all regions, all sectors, all jobs RAA -
+         * specific region, all sectors, all jobs ASA - all regions, specific sector, all jobs RSA - specific region,
+         * specific sector, all jobs AAJ - all regions, all sectors, specific job RAJ - specific region, all sectors,
+         * specific job ASJ - all regions, specific sector, specific job RSJ - specific region, specific sector,
+         * specific job
          */
 
         // Parameters from the summary tab
@@ -3525,16 +3530,16 @@ public class ManagedCaseService {
         if (job.getJobGroup() != null && !job.getJobGroup().isEmpty()) {
             sbuf.append(shellSetenv("JOB_GROUP", job.getJobGroup()));
         }
-        if (region != null){
+        if (region != null) {
             sbuf.append(shellSetenv("REGION", region.getName()));
-            if (region.getAbbreviation() != null && !region.getAbbreviation().isEmpty()){
+            if (region.getAbbreviation() != null && !region.getAbbreviation().isEmpty()) {
                 sbuf.append(shellSetenv("REGION_ABBREV", region.getAbbreviation()));
             }
-            if (region.getIoapiName() != null && !region.getIoapiName().isEmpty()){
+            if (region.getIoapiName() != null && !region.getIoapiName().isEmpty()) {
                 sbuf.append(shellSetenv("REGION_IOAPI_GRIDNAME", region.getIoapiName()));
             }
         }
-        
+
         // AAA
         sbuf.append(eolString);
         if (paramsAAA != null) {
@@ -3543,7 +3548,7 @@ public class ManagedCaseService {
                 sbuf.append(setenvParameter(param));
             }
         }
-        
+
         // RAA
         sbuf.append(eolString);
         if (paramsRAA != null) {
@@ -3552,7 +3557,7 @@ public class ManagedCaseService {
                 sbuf.append(setenvParameter(param));
             }
         }
-        
+
         // ASA
         sbuf.append(eolString);
         if (paramsASA != null) {
@@ -3561,16 +3566,17 @@ public class ManagedCaseService {
                 sbuf.append(setenvParameter(param));
             }
         }
-        
+
         // RSA
         sbuf.append(eolString);
         if (paramsRSA != null) {
-            sbuf.append(this.runComment + " Parameters -- region (" + region + "), sector (" + sector + "), all jobs " + eolString);
+            sbuf.append(this.runComment + " Parameters -- region (" + region + "), sector (" + sector + "), all jobs "
+                    + eolString);
             for (CaseParameter param : paramsRSA) {
                 sbuf.append(setenvParameter(param));
             }
         }
-        
+
         // AAJ
         sbuf.append(eolString);
         if (paramsAAJ != null) {
@@ -3579,34 +3585,37 @@ public class ManagedCaseService {
                 sbuf.append(setenvParameter(param));
             }
         }
-        
+
         // RAJ
         sbuf.append(eolString);
         if (paramsRAJ != null) {
-            sbuf.append(this.runComment + " Parameters -- region (" + region + "), all sectors, job (" + job + ")" + eolString);
+            sbuf.append(this.runComment + " Parameters -- region (" + region + "), all sectors, job (" + job + ")"
+                    + eolString);
             for (CaseParameter param : paramsRAJ) {
                 sbuf.append(setenvParameter(param));
             }
         }
-        
+
         // ASJ
         sbuf.append(eolString);
         if (paramsASJ != null) {
-            sbuf.append(this.runComment + " Parameters -- all regions, sector (" + sector + "), all job (" + job + ")" + eolString);
+            sbuf.append(this.runComment + " Parameters -- all regions, sector (" + sector + "), all job (" + job + ")"
+                    + eolString);
             for (CaseParameter param : paramsASJ) {
                 sbuf.append(setenvParameter(param));
             }
         }
-        
+
         // RSJ
         sbuf.append(eolString);
         if (paramsRSJ != null) {
-            sbuf.append(this.runComment + " Parameters -- region (" + region + "), sector (" + sector + "), job (" + job + ")" + eolString);
+            sbuf.append(this.runComment + " Parameters -- region (" + region + "), sector (" + sector + "), job ("
+                    + job + ")" + eolString);
             for (CaseParameter param : paramsRSJ) {
                 sbuf.append(setenvParameter(param));
             }
         }
-        
+
         // Getting the executable object from the job
         Executable execVal = job.getExecutable();
 
@@ -3698,7 +3707,8 @@ public class ManagedCaseService {
         String outputFileDir = caseObj.getOutputFileDir();
         try {
             // output file Dir is case general, therefore don't pass job, sector, or region
-            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, this.ALL_JOB_ID, this.ALL_SECTORS, this.ALL_REGIONS);
+            String outputDirExpanded = dao.replaceEnvVarsCase(outputFileDir, delimeter, caseObj, this.ALL_JOB_ID,
+                    this.ALL_SECTORS, this.ALL_REGIONS);
 
             // Test output directory to place job script
             if ((outputDirExpanded == null) || (outputDirExpanded.equals(""))) {
@@ -4741,9 +4751,9 @@ public class ManagedCaseService {
         sensitivityCase.setDescription("Sensitivity on " + parent.getName() + ": " + parent.getDescription());
         sensitivityCase.setEmissionsYear(parent.getEmissionsYear());
         sensitivityCase.setFutureYear(parent.getFutureYear());
-//        sensitivityCase.setGrid(parent.getGrid());
+        // sensitivityCase.setGrid(parent.getGrid());
         sensitivityCase.setGridDescription(parent.getGridDescription());
-//        sensitivityCase.setGridResolution(parent.getGridResolution());
+        // sensitivityCase.setGridResolution(parent.getGridResolution());
         sensitivityCase.setMeteorlogicalYear(parent.getMeteorlogicalYear());
         sensitivityCase.setModel(parent.getModel());
         sensitivityCase.setModelVersion(parent.getModelVersion());
@@ -5005,9 +5015,13 @@ public class ManagedCaseService {
     }
 
     private CaseInput[] getValidCaseInputs4SensitivityCase(int caseId, int[] jobIds, CaseJob[] jobs, Session session) {
-        String query = "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
+        String query = "SELECT obj.id from "
+                + CaseInput.class.getSimpleName()
+                + " as obj WHERE obj.caseID = "
+                + caseId
                 + " AND ((obj.caseJobID = 0 AND obj.sector.id is null AND obj.region.id is null) "
-                + getAndOrClause(jobIds, "obj.caseJobID", getSectorIds(jobs), "obj.sector.id", getRegionIds(jobs), "obj.region.id") + ")";
+                + getAndOrClause(jobIds, "obj.caseJobID", getSectorIds(jobs), "obj.sector.id", getRegionIds(jobs),
+                        "obj.region.id") + ")";
 
         if (DebugLevels.DEBUG_9)
             log.warn(query);
@@ -5025,9 +5039,13 @@ public class ManagedCaseService {
 
     private CaseParameter[] getValidCaseParameters4SensitivityCase(int caseId, int[] jobIds, CaseJob[] jobs,
             Session session) {
-        String query = "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = "
-                + caseId + " AND ((obj.jobId = 0 AND obj.sector.id is null AND obj.region.id is null) "
-                + getAndOrClause(jobIds, "obj.jobId", getSectorIds(jobs), "obj.sector.id", getRegionIds(jobs), "obj.region.id") + ")";
+        String query = "SELECT obj.id from "
+                + CaseParameter.class.getSimpleName()
+                + " as obj WHERE obj.caseID = "
+                + caseId
+                + " AND ((obj.jobId = 0 AND obj.sector.id is null AND obj.region.id is null) "
+                + getAndOrClause(jobIds, "obj.jobId", getSectorIds(jobs), "obj.sector.id", getRegionIds(jobs),
+                        "obj.region.id") + ")";
 
         if (DebugLevels.DEBUG_9)
             log.warn(query);
@@ -5056,7 +5074,7 @@ public class ManagedCaseService {
 
         return sectorIds;
     }
-    
+
     private int[] getRegionIds(CaseJob[] jobs) {
         int[] regionIds = new int[jobs.length];
 
@@ -5072,55 +5090,45 @@ public class ManagedCaseService {
         return regionIds;
     }
 
-    private String getAndOrClause(
-            int[] jIds, String jStr, 
-            int[] sIds, String sStr, 
-            int[] rIds, String rStr) {
+    private String getAndOrClause(int[] jIds, String jStr, int[] sIds, String sStr, int[] rIds, String rStr) {
         int numIDs = jIds.length;
 
         if (numIDs < 1)
             return "";
 
         // NOTE: the following implementation reflects this logic:
-        // If you select job1 which is region1 and sector1, the logic for selecting the appropriate parameters from the template is:
-        //      AAA - (all regions, all sectors AND all jobs) OR 
-        //      RAA - (region=region1, all sectors AND all jobs) OR
-        //      ASA - (all regions, sector=sector1 AND all jobs) OR
-        //      RSA - (region=region1, sector=sector1 AND all jobs) OR 
-        //      AAJ - (all regions, all sectors AND job=job1) OR
-        //      RAJ - (region=region1, all sectors AND job=job1) OR
-        //      ASJ - (all regions, sector=sector1 AND job=job1) OR
-        //      RSJ - (region=region1, sector=sector1 AND job=job1)
+        // If you select job1 which is region1 and sector1, the logic for selecting the appropriate parameters from the
+        // template is:
+        // AAA - (all regions, all sectors AND all jobs) OR
+        // RAA - (region=region1, all sectors AND all jobs) OR
+        // ASA - (all regions, sector=sector1 AND all jobs) OR
+        // RSA - (region=region1, sector=sector1 AND all jobs) OR
+        // AAJ - (all regions, all sectors AND job=job1) OR
+        // RAJ - (region=region1, all sectors AND job=job1) OR
+        // ASJ - (all regions, sector=sector1 AND job=job1) OR
+        // RSJ - (region=region1, sector=sector1 AND job=job1)
         // You have to also make sure this doesn't fail if the region/sector of the job is All regions/sectors.
 
         StringBuffer sb = new StringBuffer();
-        
+
         for (int i = 0; i < numIDs; i++) {
             if (sIds[i] != -1 && rIds[i] != -1)
-                sb.append(" OR (" 
-                        + jStr + " = 0 AND " + sStr + " is null AND " + rStr + " = " + rIds[i] + ") OR ("
-                        + jStr + " = 0 AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null) OR ("
-                        + jStr + " = 0 AND " + sStr + " = " + sIds[i] + " AND " + rStr + " = " + rIds[i] + ") OR ("
-                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " is null) OR ("
-                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " = " + rIds[i] + ") OR ("
-                        + jStr + " = " + jIds[i] + " AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null) OR ("
-                        + jStr + " = " + jIds[i] + " AND " + sStr + " = " + sIds[i] + " AND " + rStr + " = " + rIds[i] 
-                        + ")");
+                sb.append(" OR (" + jStr + " = 0 AND " + sStr + " is null AND " + rStr + " = " + rIds[i] + ") OR ("
+                        + jStr + " = 0 AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null) OR (" + jStr
+                        + " = 0 AND " + sStr + " = " + sIds[i] + " AND " + rStr + " = " + rIds[i] + ") OR (" + jStr
+                        + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " is null) OR (" + jStr + " = "
+                        + jIds[i] + " AND " + sStr + " is null AND " + rStr + " = " + rIds[i] + ") OR (" + jStr + " = "
+                        + jIds[i] + " AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null) OR (" + jStr + " = "
+                        + jIds[i] + " AND " + sStr + " = " + sIds[i] + " AND " + rStr + " = " + rIds[i] + ")");
             else if (sIds[i] != -1 && rIds[i] == -1) {
-                sb.append(" OR (" 
-                        + jStr + " = 0 AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null) OR ("
-                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " is null) OR ("
-                        + jStr + " = " + jIds[i] + " AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null"
-                        + ")");
-            }
-            else if (sIds[i] == -1 && rIds[i] != -1) {
-                sb.append(" OR (" 
-                        + jStr + " = 0 AND " + sStr + " is null AND " + rStr + " = " + rIds[i] + ") OR ("
-                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " is null) OR ("
-                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " = " + rIds[i]
-                        + ")");
-            }
-            else
+                sb.append(" OR (" + jStr + " = 0 AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null) OR ("
+                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " is null) OR (" + jStr
+                        + " = " + jIds[i] + " AND " + sStr + " = " + sIds[i] + " AND " + rStr + " is null" + ")");
+            } else if (sIds[i] == -1 && rIds[i] != -1) {
+                sb.append(" OR (" + jStr + " = 0 AND " + sStr + " is null AND " + rStr + " = " + rIds[i] + ") OR ("
+                        + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " is null) OR (" + jStr
+                        + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " = " + rIds[i] + ")");
+            } else
                 sb.append(" OR (" + jStr + " = " + jIds[i] + " AND " + sStr + " is null AND " + rStr + " is null)");
         }
 
@@ -5134,10 +5142,10 @@ public class ManagedCaseService {
     // If you get multiple parameters from that query, then you match with same sector.
     //
     // example:
-    // template (name, env variable, sector, job)   parent (name, env variable, sector, job)
-    // PARAM1,EV1,all sectors,all jobs              PARAM1,EV1,all sectors,all jobs
-    // PARAM2,EV1,sector1,all jobs                  PARAM2,EV1,sector1,all jobs
-    // PARAM3,EV1,all sectors,job1                  PARAM3,EV1,sector2,all jobs
+    // template (name, env variable, sector, job) parent (name, env variable, sector, job)
+    // PARAM1,EV1,all sectors,all jobs PARAM1,EV1,all sectors,all jobs
+    // PARAM2,EV1,sector1,all jobs PARAM2,EV1,sector1,all jobs
+    // PARAM3,EV1,all sectors,job1 PARAM3,EV1,sector2,all jobs
     // PARAM4,EV1,sector2,all jobs
     // PARAM5,EV1,sector3,all jobs
     //
@@ -5151,56 +5159,84 @@ public class ManagedCaseService {
     // On 7/23/2009, since we introduced the GeoRegion in parameters (same as in inputs), the matching logic
     // reasonably expand into this combinations:
     // same env variable AND (
-    //    (all jobs and all sectors and all regions) OR
-    //    (all jobs and same sector and all regions) OR
-    //    (all jobs and all sectors and same region) OR
-    //    (all jobs and same sector and same region) )
- 
+    // (all jobs and all sectors and all regions) OR
+    // (all jobs and same sector and all regions) OR
+    // (all jobs and all sectors and same region) OR
+    // (all jobs and same sector and same region) )
 
+    @SuppressWarnings("unchecked")
     private CaseParameter getParentCaseParameters4SensitivityCase(int caseId, CaseParameter param, Session session) {
+
+        System.out.println("Trying to find match for " + param.getName());
+        
         ParameterEnvVar env = param.getEnvVar();
         Sector sector = param.getSector();
         GeoRegion region = param.getRegion();
-        CaseParameter theParameter = null;
 
         String query = "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = "
                 + caseId + " AND obj.envVar.id = " + env.getId();
-        
+
         String suffix = " AND ((obj.jobId = 0 AND obj.sector.id is null AND obj.region.id is null) ";
-        
+
         if (sector != null && region != null) {
-            suffix += "OR (obj.jobId = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id = " + region.getId() + ") "
-                    + "OR (obj.jobId = 0 AND obj.sector.id is null AND obj.region.id = " + region.getId() + ") "
-                    + "OR (obj.jobId = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id is null))";
-        }
-        else if (sector != null && region == null) {
+            suffix += "OR (obj.jobId = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id = "
+                    + region.getId() + ") " + "OR (obj.jobId = 0 AND obj.sector.id is null AND obj.region.id = "
+                    + region.getId() + ") " + "OR (obj.jobId = 0 AND obj.sector.id = " + sector.getId()
+                    + " AND obj.region.id is null))";
+        } else if (sector != null && region == null) {
             suffix += "OR (obj.jobId = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id is null))";
-        }
-        else if (sector == null && region != null) {
+        } else if (sector == null && region != null) {
             suffix += "OR (obj.jobId = 0 AND obj.sector.id is null AND obj.region.id = " + region.getId() + "))";
-        }
-        else if (sector == null && region == null) {
+        } else if (sector == null && region == null) {
             suffix += ")";
         }
-        
+
         query += suffix;
 
         if (DebugLevels.DEBUG_9)
             log.warn(query);
 
-        List<?> ids = session.createQuery(query).list();
+        List<Integer> ids = session.createQuery(query).list();
 
-        for (Iterator<?> iter = ids.iterator(); iter.hasNext();) {
-            theParameter = dao.getCaseParameter((Integer) iter.next(), session);
-
-            if (sector != null && sector.equals(theParameter.getSector()) && region.equals(theParameter.getRegion()))
-                return theParameter;
+        System.out.println("#IDs returned by query: " + ids == null ? 0 : ids.size());
+        
+        /*
+         * convert ids to parameters
+         */
+        List<CaseParameter> parameters = new ArrayList<CaseParameter>();
+        for (Integer id : ids) {
+            parameters.add(dao.getCaseParameter(id, session));
         }
+        
+        CaseParameter matchedParameter = null;
 
-        return theParameter;
+        System.out.println("Attempting to match: " + Utils.stringify(param));
+
+        /*
+         * make sure list is not empty
+         */
+        if (!parameters.isEmpty()) {
+            
+            /*
+             * sort parameters and get the first one
+             */
+            Utils.sortParameters(parameters);
+            matchedParameter = parameters.get(0);
+
+            System.out.println("Matched with: " + Utils.stringify(matchedParameter));
+        }
+        else {
+            System.out.println("No match found: list empty");
+        }
+        
+        return matchedParameter;
     }
 
+    @SuppressWarnings("unchecked")
     private CaseInput getParentCaseInputs4SensitivityCase(int caseId, CaseInput input, Session session) {
+
+        System.out.println("Trying to find match for " + input.getName());
+
         InputEnvtVar env = input.getEnvtVars();
         GeoRegion region = input.getRegion();
 
@@ -5208,45 +5244,65 @@ public class ManagedCaseService {
             return null; // NOTE: this policy is to be determined.
 
         Sector sector = input.getSector();
-        CaseInput theInput = null;
 
         String query = "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
                 + " AND obj.envtVars.id = " + env.getId();
 
         String suffix = " AND ((obj.caseJobID = 0 AND obj.sector.id is null AND obj.region.id is null) ";
-        
+
         if (sector != null && region != null) {
-            suffix += "OR (obj.caseJobID = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id = " + region.getId() + ") "
-                    + "OR (obj.caseJobID = 0 AND obj.sector.id is null AND obj.region.id = " + region.getId() + ") "
-                    + "OR (obj.caseJobID = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id is null))";
-        }
-        else if (sector != null && region == null) {
+            suffix += "OR (obj.caseJobID = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id = "
+                    + region.getId() + ") " + "OR (obj.caseJobID = 0 AND obj.sector.id is null AND obj.region.id = "
+                    + region.getId() + ") " + "OR (obj.caseJobID = 0 AND obj.sector.id = " + sector.getId()
+                    + " AND obj.region.id is null))";
+        } else if (sector != null && region == null) {
             suffix += "OR (obj.caseJobID = 0 AND obj.sector.id = " + sector.getId() + " AND obj.region.id is null))";
-        }
-        else if (sector == null && region != null) {
+        } else if (sector == null && region != null) {
             suffix += "OR (obj.caseJobID = 0 AND obj.sector.id is null AND obj.region.id = " + region.getId() + "))";
-        }
-        else if (sector == null && region == null) {
+        } else if (sector == null && region == null) {
             suffix += ")";
         }
-        
+
         query += suffix;
         if (DebugLevels.DEBUG_9)
             log.warn(query);
 
-        List<?> ids = session.createQuery(query).list();
+        List<Integer> ids = session.createQuery(query).list();
 
-        for (Iterator<?> iter = ids.iterator(); iter.hasNext();) {
-            Integer id = (Integer) iter.next();
-            theInput = dao.getCaseInput(id, session);
+        System.out.println("#IDs returned by query: " + ids == null ? 0 : ids.size());
 
-            if (sector != null && sector.equals(theInput.getSector()))
-                return theInput;
+        /*
+         * convert ids to inputs
+         */
+        List<CaseInput> inputs = new ArrayList<CaseInput>();
+        for (Integer id : ids) {
+            inputs.add(dao.getCaseInput(id, session));
         }
+        
+        CaseInput matchedInput = null;
 
-        return theInput;
+        System.out.println("Attempting to match: " + Utils.stringify(input));
+
+        /*
+         * make sure list is not empty
+         */
+        if (!inputs.isEmpty()) {
+            
+            /*
+             * sort parameters and get the first one
+             */
+            Utils.sortInputs(inputs);
+            matchedInput = inputs.get(0);
+
+            System.out.println("Matched with: " + Utils.stringify(matchedInput));
+        }
+        else {
+            System.out.println("No match found: list empty");
+        }
+        
+        return matchedInput;
     }
-
+    
     public synchronized void printCase(String folder, int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
         Case currentCase = null;
@@ -5357,9 +5413,9 @@ public class ManagedCaseService {
         String ls = System.getProperty("line.separator");
         String model = (currentCase.getModel() == null) ? "" : currentCase.getModel().getName();
         String modelRegion = (currentCase.getModelingRegion() == null) ? "" : currentCase.getModelingRegion().getName();
-//        String gridName = (currentCase.getGrid() == null) ? "" : currentCase.getGrid().getName();
-//        String gridResolution = (currentCase.getGridResolution() == null) ? "" : currentCase.getGridResolution()
-//                .getName();
+        // String gridName = (currentCase.getGrid() == null) ? "" : currentCase.getGrid().getName();
+        // String gridResolution = (currentCase.getGridResolution() == null) ? "" : currentCase.getGridResolution()
+        // .getName();
         String dstrModel = (currentCase.getAirQualityModel() == null) ? "" : currentCase.getAirQualityModel().getName();
         String speciation = (currentCase.getSpeciation() == null) ? "" : currentCase.getSpeciation().getName();
         String metYear = (currentCase.getMeteorlogicalYear() == null) ? "" : currentCase.getMeteorlogicalYear()
@@ -5368,7 +5424,7 @@ public class ManagedCaseService {
                 .format_MM_DD_YYYY_HH_mm(currentCase.getStartDate());
         String endDate = (currentCase.getEndDate() == null) ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(currentCase
                 .getEndDate());
-        
+
         String summary = "\"#EMF_CASE_NAME="
                 + clean(currentCase.getName())
                 + "\""
@@ -5427,8 +5483,8 @@ public class ManagedCaseService {
                 + clean(currentCase.getModelVersion()) + "\",String,TRUE,TRUE,,," + ls
                 + "Summary,Modeling Region,0,,,All sectors,All jobs for sector,All programs,\"" + clean(modelRegion)
                 + "\",String,TRUE,TRUE,,," + ls
-                + "Summary,Met Layers,0,,,All sectors,All jobs for sector,All programs," + currentCase.getNumMetLayers()
-                + ",Integer,TRUE,TRUE,,," + ls
+                + "Summary,Met Layers,0,,,All sectors,All jobs for sector,All programs,"
+                + currentCase.getNumMetLayers() + ",Integer,TRUE,TRUE,,," + ls
                 + "Summary,Emission Layers,0,,,All sectors,All jobs for sector,All programs,"
                 + currentCase.getNumEmissionsLayers() + ",Integer,TRUE,TRUE,,," + ls
                 + "Summary,Downstream Model,0,EMF_AQM,,All sectors,All jobs for sector,All programs,\""
@@ -5467,23 +5523,24 @@ public class ManagedCaseService {
             String purpose = param.getPurpose() == null ? "" : param.getPurpose();
 
             sb.append("Parameters,\"" + clean(name) + "\"," + order + ",\"" + clean(envVar) + "\",\"" + clean(region)
-                    + "\",\"" + clean(sector)
-                    + "\",\"" + clean(job) + "\",\"" + clean(prog) + "\",\"" + clean(value) + "\"," + clean(type) + ","
-                    + reqrd + "," + local + "," + lstMod + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\"" + ls);
+                    + "\",\"" + clean(sector) + "\",\"" + clean(job) + "\",\"" + clean(prog) + "\",\"" + clean(value)
+                    + "\"," + clean(type) + "," + reqrd + "," + local + "," + lstMod + ",\"" + clean(notes) + "\",\""
+                    + clean(purpose) + "\"" + ls);
         }
 
         return sb.toString();
     }
-    
+
     private String getRegions(GeoRegion[] regions, String ls) {
         StringBuffer sb = new StringBuffer();
 
         for (GeoRegion region : regions)
-            sb.append("\"#EMF_REGION=" + region.getName() + "&" + region.getAbbreviation() + "&" + region.getIoapiName() + "\"" + ls);
+            sb.append("\"#EMF_REGION=" + region.getName() + "&" + region.getAbbreviation() + "&"
+                    + region.getIoapiName() + "\"" + ls);
 
         return sb.toString();
     }
-    
+
     private String getSectors(Sector[] sectors) {
         StringBuffer sb = new StringBuffer();
 
@@ -5550,10 +5607,9 @@ public class ManagedCaseService {
             String parentName = parent != null ? parent.getName() : "";
 
             sb.append("Inputs,\"" + clean(name) + "\",\"" + clean(envVar) + "\",\"" + clean(region) + "\",\""
-                    + clean(sector) + "\",\""
-                    + clean(job) + "\",\"" + clean(prog) + "\",\"" + clean(dsName) + "\"," + dsVersion + ","
-                    + clean(qaStatus) + ",\"" + clean(dsType) + "\"," + reqrd + "," + local + "," + clean(subdir) + ","
-                    + lstMod + ",\"" + clean(parentName) + "\"" + ls);
+                    + clean(sector) + "\",\"" + clean(job) + "\",\"" + clean(prog) + "\",\"" + clean(dsName) + "\","
+                    + dsVersion + "," + clean(qaStatus) + ",\"" + clean(dsType) + "\"," + reqrd + "," + local + ","
+                    + clean(subdir) + "," + lstMod + ",\"" + clean(parentName) + "\"" + ls);
         }
         return sb.toString();
         // PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(new File(folder, inputsFile))));
@@ -5592,12 +5648,11 @@ public class ManagedCaseService {
             String purpose = job.getPurpose() == null ? "" : job.getPurpose();
             String dependsOn = getDependsOnJobsString(job.getDependentJobs(), session);
 
-            sb.append("Jobs,\"" + clean(name) + "\"," + order + ",\"" + clean(region) + "\","
-                    + clean(sector) + "\"," + clean(status) + ","
-                    + start + "," + end + "," + clean(exec) + ",\"" + clean(args) + "\"," + clean(path) + ",\""
-                    + clean(qOptns) + "\",\"" + clean(jobGrp) + "\"," + local + ",\"" + clean(qId) + "\",\""
-                    + clean(user) + "\", " + clean(host) + ",\"" + clean(notes) + "\",\"" + clean(purpose) + "\",\""
-                    + clean(dependsOn) + "\"" + ls);
+            sb.append("Jobs,\"" + clean(name) + "\"," + order + ",\"" + clean(region) + "\"," + clean(sector) + "\","
+                    + clean(status) + "," + start + "," + end + "," + clean(exec) + ",\"" + clean(args) + "\","
+                    + clean(path) + ",\"" + clean(qOptns) + "\",\"" + clean(jobGrp) + "\"," + local + ",\""
+                    + clean(qId) + "\",\"" + clean(user) + "\", " + clean(host) + ",\"" + clean(notes) + "\",\""
+                    + clean(purpose) + "\",\"" + clean(dependsOn) + "\"" + ls);
         }
         return sb.toString();
     }
@@ -5614,25 +5669,25 @@ public class ManagedCaseService {
     public synchronized int cancelJobs(int[] jobIds, User user) throws EmfException {
         if (jobIds == null || jobIds.length == 0)
             return 0;
-        
+
         int jobCanceled = 0;
-        
+
         for (int id : jobIds) {
             CaseJob job = dao.getCaseJob(id);
-            
+
             if (job == null)
                 continue;
-            
+
             User runUser = job.getRunJobUser();
-            
+
             if (!user.equals(runUser) && !user.isAdmin())
-                throw new EmfException("only the user who is running the job '" +
-                        job.getName() + "' or an administrator can cancel the job");
-            
+                throw new EmfException("only the user who is running the job '" + job.getName()
+                        + "' or an administrator can cancel the job");
+
             TaskManagerFactory.getCaseJobTaskManager(sessionFactory).cancelJob(id, user);
             jobCanceled++;
         }
-        
+
         return jobCanceled;
     }
 
