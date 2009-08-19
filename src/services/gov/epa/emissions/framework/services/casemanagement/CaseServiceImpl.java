@@ -23,6 +23,7 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
 
 public class CaseServiceImpl implements CaseService {
     private static Log log = LogFactory.getLog(CaseServiceImpl.class);
@@ -601,10 +602,15 @@ public class CaseServiceImpl implements CaseService {
             return caseWithLock;
             // return dao.getById(csWithLock.getId(), session);
         } catch (Exception e) {
+            if (e instanceof ConstraintViolationException) {
+                throw new EmfException("Please check case abbreviation (duplicate?): " + e.getLocalizedMessage() + ".");
+            }
+            
             log.error("Could not update Case: " + caseObj, e);
             throw new EmfException("Could not update Case: " + e.getMessage() + ".");
-        } finally {
-            session.close();
+        }  finally {
+            if (session != null && session.isConnected())
+                session.close();
         }
 
     }
