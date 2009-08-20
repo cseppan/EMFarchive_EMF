@@ -216,11 +216,11 @@ public class ManagedCaseService {
 
             return (Case[]) cases.toArray(new Case[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Cases", e);
             throw new EmfException("Could not get all Cases");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -230,11 +230,11 @@ public class ManagedCaseService {
             Case caseObj = dao.getCase(caseId, session);
             return caseObj;
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Cases", e);
             throw new EmfException("Could not get all Cases");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -244,11 +244,11 @@ public class ManagedCaseService {
             Case caseObj = dao.getCaseFromName(name, session);
             return caseObj;
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get case", e);
             throw new EmfException("Could not get case");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -279,11 +279,11 @@ public class ManagedCaseService {
 
             return vers;
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get versions for dataset: " + dataset.getName() + ".\n" + e.getMessage());
+            log.error("Could not get versions for dataset: " + dataset.getName() + ".\n" , e);
             throw new EmfException("Could not get versions for dataset: " + dataset.getName() + ".\n");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -293,11 +293,11 @@ public class ManagedCaseService {
         try {
             return dao.getCaseJob(jobId, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get job for job id " + jobId + ".\n" + e.getMessage());
+            log.error("Could not get job for job id " + jobId + ".\n", e);
             throw new EmfException("Could not get job for job id " + jobId + ".\n");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -305,9 +305,11 @@ public class ManagedCaseService {
         try {
             return dao.getCaseJob(jobId, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get job for job id " + jobId + ".\n" + e.getMessage());
+            log.error("Could not get job for job id " + jobId + ".\n", e);
             throw new EmfException("Could not get job for job id " + jobId + ".\n");
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -317,9 +319,11 @@ public class ManagedCaseService {
             List<Sector> sectors = dao.getSectorsUsedbyJobs(caseId, session);
             return sectors.toArray(new Sector[0]);
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("Could not get sectors for case id " + caseId + ".\n" + e.getMessage());
             throw new EmfException("Could not get sectors for case id " + caseId + ".\n");
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -330,11 +334,11 @@ public class ManagedCaseService {
 
             return (Abbreviation[]) abbreviations.toArray(new Abbreviation[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Abbreviations", e);
             throw new EmfException("Could not get all Abbreviations");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -345,11 +349,11 @@ public class ManagedCaseService {
             dao.add(abbr, session);
             return (Abbreviation) dao.load(Abbreviation.class, abbr.getName(), session);
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("Cannot add case abbreviation " + abbr.getName(), e);
             throw new EmfException("Cannot add case abbreviation " + abbr.getName() + e.getMessage());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -359,11 +363,11 @@ public class ManagedCaseService {
             List airQualityModels = dao.getAirQualityModels(session);
             return (AirQualityModel[]) airQualityModels.toArray(new AirQualityModel[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Air Quality Models", e);
             throw new EmfException("Could not get all Air Quality Models");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -373,11 +377,11 @@ public class ManagedCaseService {
             List results = dao.getCaseCategories(session);
             return (CaseCategory[]) results.toArray(new CaseCategory[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Case Categories", e);
             throw new EmfException("Could not get all Case Categories");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -387,11 +391,11 @@ public class ManagedCaseService {
             dao.add(element, session);
             return (CaseCategory) dao.load(CaseCategory.class, element.getName(), session);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not add CaseCategory: " + element, e);
             throw new EmfException("Could not add CaseCategory: " + element);
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -401,11 +405,11 @@ public class ManagedCaseService {
             List results = dao.getEmissionsYears(session);
             return (EmissionsYear[]) results.toArray(new EmissionsYear[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Emissions Years", e);
             throw new EmfException("Could not get all Emissions Years");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -415,11 +419,11 @@ public class ManagedCaseService {
             List results = dao.getMeteorlogicalYears(session);
             return (MeteorlogicalYear[]) results.toArray(new MeteorlogicalYear[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Meteorological Years", e);
             throw new EmfException("Could not get all Meteorological Years");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -429,11 +433,11 @@ public class ManagedCaseService {
             List results = dao.getSpeciations(session);
             return (Speciation[]) results.toArray(new Speciation[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Speciations", e);
             throw new EmfException("Could not get all Speciations");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -446,11 +450,11 @@ public class ManagedCaseService {
             locked.setAbbreviation(new Abbreviation(loaded.getId() + ""));
             return dao.update(locked, session);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not add Case: " + element, e);
             throw new EmfException("Could not add Case: " + element);
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -498,11 +502,11 @@ public class ManagedCaseService {
 
             return "";
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Checking case " + caseObj.getName() + ": " + e.getMessage());
+            log.error("Checking case " + caseObj.getName() + ".\n", e);
             throw new EmfException(e.getMessage());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -631,11 +635,11 @@ public class ManagedCaseService {
             if (DebugLevels.DEBUG_18)
                 log.warn("Removing case: finished removing case abbreviation: " + new Date());
         } catch (Exception e) {
-            e.printStackTrace();
             log.error("Could not remove Case: " + caseObj, e);
             throw new EmfException(e.getMessage());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -735,11 +739,11 @@ public class ManagedCaseService {
             Case locked = dao.obtainLocked(owner, element, session);
             return locked;
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not obtain lock for Case: " + element + " by owner: " + owner.getUsername(), e);
             throw new EmfException("Could not obtain lock for Case: " + element + " by owner: " + owner.getUsername());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -749,11 +753,11 @@ public class ManagedCaseService {
             Case released = dao.releaseLocked(owner, locked, session);
             return released;
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not release lock by " + locked.getLockOwner(), e);
             throw new EmfException("Could not release lock by " + locked.getLockOwner() + " for Case: " + locked);
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -764,11 +768,11 @@ public class ManagedCaseService {
             Case released = dao.update(element, session);
             return released;
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not update Case", e);
             throw new EmfException("Could not update Case: " + element + "; " + e.getMessage());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -780,11 +784,11 @@ public class ManagedCaseService {
             CaseInput input = dao.getCaseInput(inputId, session);
             return input;
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Input Names", e);
             throw new EmfException("Could not get all Input Names");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
 
     }
@@ -795,11 +799,11 @@ public class ManagedCaseService {
             List results = dao.getInputNames(session);
             return (InputName[]) results.toArray(new InputName[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Input Names", e);
             throw new EmfException("Could not get all Input Names");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -809,11 +813,11 @@ public class ManagedCaseService {
             List results = dao.getInputEnvtVars(session);
             return (InputEnvtVar[]) results.toArray(new InputEnvtVar[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Input Environment Variables", e);
             throw new EmfException("Could not get all Input Environment Variables");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -823,11 +827,11 @@ public class ManagedCaseService {
             List results = dao.getPrograms(session);
             return (CaseProgram[]) results.toArray(new CaseProgram[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Programs", e);
             throw new EmfException("Could not get all Programs");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -837,11 +841,11 @@ public class ManagedCaseService {
             List results = dao.getModelToRuns(session);
             return (ModelToRun[]) results.toArray(new ModelToRun[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all Models To Run", e);
             throw new EmfException("Could not get all Models To Run");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -892,11 +896,11 @@ public class ManagedCaseService {
 
             return (InputName) dao.load(InputName.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new case input name '" + name.getName() + "'\n" + e.getMessage());
+            log.error("Could not add new case input name '" + name.getName() + "'\n", e);
             throw new EmfException("Could not add new case input name '" + name.getName() + "'");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -909,11 +913,11 @@ public class ManagedCaseService {
 
             return (CaseProgram) dao.load(CaseProgram.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new program '" + program.getName() + "'\n" + e.getMessage());
+            log.error("Could not add new program '" + program.getName() + "'\n", e);
             throw new EmfException("Could not add new program '" + program.getName() + "'");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -925,12 +929,11 @@ public class ManagedCaseService {
             Criterion crit2 = Restrictions.eq("modelToRunId", new Integer(inputEnvtVar.getModelToRunId()));
             return (InputEnvtVar) dao.load(InputEnvtVar.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new input environment variable '" + inputEnvtVar.getName() + "'\n"
-                    + e.getMessage());
+            log.error("Could not add new input environment variable '" + inputEnvtVar.getName() + "'\n", e);
             throw new EmfException("Could not add new input environment variable '" + inputEnvtVar.getName() + "'");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -946,11 +949,11 @@ public class ManagedCaseService {
 
             return (ModelToRun) dao.load(ModelToRun.class, model.getName(), session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new model to run '" + model.getName() + "'\n" + e.getMessage());
+            log.error("Could not add new model to run '" + model.getName() + "'\n", e);
             throw new EmfException("Could not add new model to run '" + model.getName() + "'");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -960,11 +963,11 @@ public class ManagedCaseService {
             List results = dao.getSubDirs(session);
             return (SubDir[]) results.toArray(new SubDir[0]);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not get all subdirectories", e);
             throw new EmfException("Could not get all subdirectories");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -982,11 +985,11 @@ public class ManagedCaseService {
 
             return (SubDir) dao.load(SubDir.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new subdirectory '" + subdir.getName() + "'\n" + e.getMessage());
+            log.error("Could not add new subdirectory '" + subdir.getName() + "'\n", e);
             throw new EmfException("Could not add new subdirectory '" + subdir.getName() + "'");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1029,7 +1032,8 @@ public class ManagedCaseService {
             } catch (Exception e) {
                 throw new EmfException(e.getMessage() + " " + inputs.length + " inputs copied.");
             } finally {
-                session.close();
+                if (session != null && session.isConnected())
+                    session.close();
             }
         }
     }
@@ -1061,11 +1065,11 @@ public class ManagedCaseService {
                 dao.add(input, session);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new case input '" + inputs[0].getName() + "' etc.\n" + e.getMessage());
+            log.error("Could not add new case input '" + inputs[0].getName() + "' etc.\n", e);
             throw new EmfException(e.getMessage());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1087,11 +1091,11 @@ public class ManagedCaseService {
             dao.add(input, session);
             return (CaseInput) dao.loadCaseInput(input, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new case input '" + input.getName() + "'\n" + e.getMessage());
+            log.error("Could not add new case input '" + input.getName() + "'\n", e);
             throw new EmfException(e.getMessage() == null ? "Could not add new case input." : e.getMessage());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1117,11 +1121,11 @@ public class ManagedCaseService {
             dao.updateCaseInput(input, localSession);
             // setStatus(user, "Saved input " + input.getName() + " to database.", "Save Input");
         } catch (RuntimeException e) {
-            e.printStackTrace();
-            log.error("Could not update case input: " + input.getName() + ".\n" + e);
+            log.error("Could not update case input: " + input.getName() + ".\n", e);
             throw new EmfException("Could not update case input: " + input.getName() + ".");
         } finally {
-            localSession.close();
+            if (localSession != null && localSession.isConnected())
+                localSession.close();
         }
     }
 
@@ -1149,7 +1153,8 @@ public class ManagedCaseService {
         } catch (Exception e) {
             throw new EmfException("Error retrieving case inputs: " + e.getMessage());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1185,11 +1190,11 @@ public class ManagedCaseService {
 
             return inputs.toArray(new CaseInput[0]);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get all inputs for case (id=" + caseId + ").\n" + e.getMessage());
+            log.error("Could not get all inputs for case (id=" + caseId + ").\n", e);
             throw new EmfException("Could not get all inputs for case (id=" + caseId + ").\n");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1225,11 +1230,11 @@ public class ManagedCaseService {
             });
             return inputs.toArray(new CaseInput[0]);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get all inputs for case (id=" + caseId + ").\n" + e.getMessage());
+            log.error("Could not get all inputs for case (id=" + caseId + ").\n", e);
             throw new EmfException("Could not get all inputs for case (id=" + caseId + ").\n");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1404,9 +1409,7 @@ public class ManagedCaseService {
                 inputsRSJ = this.getJobInputs(caseId, jobId, sector, region, session);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n"
-                    + e.getMessage());
+            log.error("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId + ").\n", e);
             // throw new EmfException("Could not get all inputs for case (id=" + caseId + "), job (id=" + jobId +
             // ").\n");
             throw new EmfException(e.getMessage());
@@ -1432,7 +1435,6 @@ public class ManagedCaseService {
             try {
                 copiedList.add(copySingleCaseObj(caseToCopy, user));
             } catch (Exception e) {
-                e.printStackTrace();
                 log.error("Could not copy case " + caseToCopy.getName() + ".", e);
                 throw new EmfException("Could not copy case " + caseToCopy.getName() + ". " + e.getMessage());
             }
@@ -1481,11 +1483,11 @@ public class ManagedCaseService {
             locked.setAbbreviation(new Abbreviation(loaded.getId() + ""));
             return dao.update(locked, session);
         } catch (RuntimeException e) {
-            e.printStackTrace();
             log.error("Could not add case " + element, e);
             throw new EmfException("Could not add case " + element);
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1570,11 +1572,11 @@ public class ManagedCaseService {
 
             return type.toArray(new ParameterName[0]);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get all parameter names.\n" + e.getMessage());
+            log.error("Could not get all parameter names.\n", e);
             throw new EmfException("Could not get all parameter names.\n");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1619,7 +1621,8 @@ public class ManagedCaseService {
             } catch (Exception e) {
                 throw new EmfException(e.getMessage() + " " + params.length + " parameters copied.");
             } finally {
-                session.close();
+                if (session != null && session.isConnected())
+                    session.close();
             }
         }
     }
@@ -1685,11 +1688,11 @@ public class ManagedCaseService {
             for (CaseParameter param : params)
                 dao.addParameter(param, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new case parameter '" + params[0].getName() + "' etc.\n" + e.getMessage());
+            log.error("Could not add new case parameter '" + params[0].getName() + "' etc.\n", e);
             throw new EmfException(e.getMessage());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1712,11 +1715,11 @@ public class ManagedCaseService {
             dao.addParameter(param, session);
             return dao.loadCaseParameter(param, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new case parameter '" + param.getName() + "'\n" + e.getMessage());
+            log.error("Could not add new case parameter '" + param.getName() + "'\n", e);
             throw new EmfException(e.getMessage() == null ? "Could not add new case parameter." : e.getMessage());
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1726,11 +1729,11 @@ public class ManagedCaseService {
         try {
             dao.removeCaseParameters(params, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not remove case parameter " + params[0].getName() + " etc.\n" + e.getMessage());
+            log.error("Could not remove case parameter " + params[0].getName() + " etc.\n", e);
             throw new EmfException("Could not remove case parameter " + params[0].getName() + " etc.");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1745,7 +1748,8 @@ public class ManagedCaseService {
             throw new EmfException("Could not get parameter for case (id=" + caseId + ") and environment variable: "
                     + var.getName() + ".\n");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1781,11 +1785,11 @@ public class ManagedCaseService {
 
             return params.toArray(new CaseParameter[0]);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get all parameters for case (id=" + caseId + ").\n" + e.getMessage());
+            log.error("Could not get all parameters for case (id=" + caseId + ").\n", e);
             throw new EmfException("Could not get all parameters for case (id=" + caseId + ").\n");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1797,11 +1801,11 @@ public class ManagedCaseService {
 
             return params.toArray(new CaseParameter[0]);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get all parameters for case (id=" + caseId + ").\n" + e.getMessage());
+            log.error("Could not get all parameters for case (id=" + caseId + ").\n", e);
             throw new EmfException("Could not get all parameters for case (id=" + caseId + ").\n");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1839,11 +1843,11 @@ public class ManagedCaseService {
 
             return params.toArray(new CaseParameter[0]);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get all parameters for case (id=" + caseId + ").\n" + e.getMessage());
+            log.error("Could not get all parameters for case (id=" + caseId + ").\n", e);
             throw new EmfException("Could not get all parameters for case (id=" + caseId + ").\n");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1855,11 +1859,11 @@ public class ManagedCaseService {
 
             return (Executable) dao.load(Executable.class, exe.getName(), session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new executable '" + exe.getName() + "'\n" + e.getMessage());
+            log.error("Could not add new executable '" + exe.getName() + "'\n", e);
             throw new EmfException("Could not add new executable '" + exe.getName() + "'");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1871,11 +1875,11 @@ public class ManagedCaseService {
             Criterion crit2 = Restrictions.eq("modelToRunId", new Integer(name.getModelToRunId()));
             return (ParameterName) dao.load(ParameterName.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new parameter name '" + name.getName() + "'\n" + e.getMessage());
+            log.error("Could not add new parameter name '" + name.getName() + "'\n", e);
             throw new EmfException("Could not add new parameter name '" + name.getName() + "'");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1887,11 +1891,11 @@ public class ManagedCaseService {
 
             return type.toArray(new ValueType[0]);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get all value types.\n" + e.getMessage());
+            log.error("Could not get all value types.\n", e);
             throw new EmfException("Could not get all value types.\n");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1901,11 +1905,11 @@ public class ManagedCaseService {
             dao.addValueType(type, session);
             return (ValueType) dao.load(ValueType.class, type.getName(), session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new value type '" + type.getName() + "'\n" + e.getMessage());
+            log.error("Could not add new value type '" + type.getName() + "'\n", e);
             throw new EmfException("Could not add new value type '" + type.getName() + "'");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1917,11 +1921,11 @@ public class ManagedCaseService {
 
             return envvar.toArray(new ParameterEnvVar[0]);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not get all parameter env variables.\n" + e.getMessage());
+            log.error("Could not get all parameter env variables.\n", e);
             throw new EmfException("Could not get all parameter env variables.\n");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1933,11 +1937,11 @@ public class ManagedCaseService {
             Criterion crit2 = Restrictions.eq("modelToRunId", new Integer(envVar.getModelToRunId()));
             return (ParameterEnvVar) dao.load(ParameterEnvVar.class, new Criterion[] { crit1, crit2 }, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new parameter env variable '" + envVar.getName() + "'\n" + e.getMessage());
+            log.error("Could not add new parameter env variable '" + envVar.getName() + "'\n", e);
             throw new EmfException("Could not add new parameter env variable '" + envVar.getName() + "'");
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1962,7 +1966,8 @@ public class ManagedCaseService {
                 copied.setJobId(copiedJob.getId());
             }
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
         }
 
         return addCaseParameter(user, copied, true);
