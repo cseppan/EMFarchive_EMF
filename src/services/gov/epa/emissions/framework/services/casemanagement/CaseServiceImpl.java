@@ -603,7 +603,7 @@ public class CaseServiceImpl implements CaseService {
             // return dao.getById(csWithLock.getId(), session);
         } catch (Exception e) {
             if (e instanceof ConstraintViolationException) {
-                throw new EmfException("Please check case abbreviation (duplicate?): " + e.getLocalizedMessage() + ".");
+                throw new EmfException("Please check duplication: " + e.getLocalizedMessage() + ".");
             }
             
             log.error("Could not update Case: " + caseObj, e);

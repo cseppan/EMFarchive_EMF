@@ -22,6 +22,8 @@
 	<property name="nthik"  column="nthik"  type="integer" not-null="false"/>
 	<property name="abbreviation" column="abbr" type="java.lang.String" not-null="false"/>
 	<property name="datasetId" column="ds_id" type="integer" not-null="false"/>
+	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
+    <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
 	
 	<many-to-one
 	  name="type"

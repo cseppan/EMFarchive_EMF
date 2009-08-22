@@ -4,8 +4,12 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.editor.EditCaseSummaryTabPresenter;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.region.RegionChooser;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.ListWidget;
 
@@ -16,15 +20,19 @@ import java.util.Arrays;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 public class AddRemoveRegionsWidget extends JPanel {
     private ListWidget regionsList;
     private GeoRegion[] allRegions;
+    private EmfSession session;
     private EmfConsole parentConsole;
+    private DesktopManager desktopManager;
     private Button addButton;
     private Button removeButton;
+    private Object parentPresenter;
 
     public AddRemoveRegionsWidget(GeoRegion[] allGrids, ManageChangeables changeables, EmfConsole parentConsole) {
         this.allRegions = allGrids;
@@ -33,7 +41,7 @@ public class AddRemoveRegionsWidget extends JPanel {
 
     }
 
-    public AddRemoveRegionsWidget(GeoRegion[] allSectors) {
+    public AddRemoveRegionsWidget(GeoRegion[] allRegions) {
         setupLayout();
 
     }
@@ -94,14 +102,22 @@ public class AddRemoveRegionsWidget extends JPanel {
     private Action addAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                addGrids();
+                try {
+                    addRegions();
+                } catch (EmfException e1) {
+                    JOptionPane.showMessageDialog(parentConsole, e1.getMessage());
+                }
             }
         };
     }
 
-    private void addGrids() {
-        RegionChooser gridSelector = new RegionChooser(allRegions, regionsList, parentConsole);
-        gridSelector.display();
+    private void addRegions() throws EmfException {
+        allRegions = ((EditCaseSummaryTabPresenter)parentPresenter).getAllGeoRegions();
+        RegionChooser regionSelector = new RegionChooser(allRegions, regionsList, parentConsole);
+        regionSelector.setDesktopManager(desktopManager);
+        regionSelector.setEmfSession(session);
+        regionSelector.observeParentPresenter(parentPresenter);
+        regionSelector.display();
     }
 
     private void removeGrids() {
@@ -134,6 +150,17 @@ public class AddRemoveRegionsWidget extends JPanel {
             regionsList.addElement(grids[i]);
         }
     }
-   
+    
+    public void setEmfSession(EmfSession session) {
+        this.session = session;
+    }
+    
+    public void setDesktopManager(DesktopManager dm) {
+        this.desktopManager = dm;
+    }
+    
+    public void observeParentPresenter(Object presenter) {
+        this.parentPresenter = presenter;
+    }
 
 }

@@ -432,7 +432,9 @@ CREATE TABLE emf.georegions
   nrows int4 DEFAULT 0,
   nthik int4 DEFAULT 0,
   ds_id int4 DEFAULT 0,
-  version_id int4 REFERENCES emissions.versions(id)
+  version_id int4 REFERENCES emissions.versions(id),
+  lock_owner varchar(255),
+  lock_date timestamp
 ) 
 WITHOUT OIDS;
 -- emf.georegions

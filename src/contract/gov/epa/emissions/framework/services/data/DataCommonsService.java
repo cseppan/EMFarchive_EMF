@@ -116,4 +116,11 @@ public interface DataCommonsService {
     GeoRegion[] getGeoRegions() throws EmfException;
 
     GeoRegion addGeoRegion(GeoRegion grid) throws EmfException;
+    
+    GeoRegion updateGeoRegion(GeoRegion region, User user) throws EmfException;
+    
+    RegionType[] getRegionTypes() throws EmfException;
+
+    GeoRegion obtainLockedRegion(User user, GeoRegion region) throws EmfException;
+
 }

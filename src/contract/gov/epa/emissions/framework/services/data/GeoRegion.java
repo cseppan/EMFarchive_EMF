@@ -1,10 +1,14 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.data.Lockable;
+import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 
 import java.io.Serializable;
+import java.util.Date;
 
-public class GeoRegion implements Serializable, Comparable<GeoRegion> {
+public class GeoRegion implements Serializable, Lockable, Comparable<GeoRegion> {
 
     private int id;
 
@@ -29,6 +33,8 @@ public class GeoRegion implements Serializable, Comparable<GeoRegion> {
     private int datasetId;
     
     private Version version;
+    
+    private Mutex lock;
     
     public int getDatasetId() {
         return datasetId;
@@ -138,10 +144,11 @@ public class GeoRegion implements Serializable, Comparable<GeoRegion> {
      * Default constructor needed for hibernate and axis serialization
      */
     public GeoRegion() {
-        super();
+        this.lock = new Mutex();
     }
 
     public GeoRegion(String name) {
+        this();
         this.name = name;
     }
     
@@ -170,7 +177,7 @@ public class GeoRegion implements Serializable, Comparable<GeoRegion> {
         if (other == null || !(other instanceof GeoRegion))
             return false;
 
-        return ((GeoRegion) other).name.equals(this.name);
+        return this.id == ((GeoRegion) other).getId() || ((GeoRegion) other).name.equals(this.name);
     }
 
     public int hashCode() {
@@ -204,5 +211,33 @@ public class GeoRegion implements Serializable, Comparable<GeoRegion> {
 
     public void setAbbreviation(String abbreviation) {
         this.abbreviation = abbreviation;
+    }
+    
+    public Date getLockDate() {
+        return lock.getLockDate();
+    }
+
+    public void setLockDate(Date lockDate) {
+        lock.setLockDate(lockDate);
+    }
+
+    public String getLockOwner() {
+        return lock.getLockOwner();
+    }
+
+    public void setLockOwner(String owner) {
+        lock.setLockOwner(owner);
+    }
+
+    public boolean isLocked(String owner) {
+        return lock.isLocked(owner);
+    }
+
+    public boolean isLocked(User owner) {
+        return lock.isLocked(owner);
+    }
+
+    public boolean isLocked() {
+        return lock.isLocked();
     }
 }

@@ -387,7 +387,37 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             throw new EmfException("Could not add new GeoRegion" + (e.getMessage() == null ? "." : ": " 
                 + e.getMessage().substring(1,50)));
         } finally {
-            session.close();
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
+    
+    public synchronized GeoRegion obtainLockedRegion(User owner, GeoRegion region) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            return dao.obtainLockedRegion(owner, region, session);
+        } catch (Exception e) {
+            LOG.error("Could not obtain lock for region: " + region.getName() + " by owner: " + owner.getUsername(), e);
+            throw new EmfException("Could not obtain lock for region: " + region.getName() + " by owner: "
+                    + owner.getUsername());
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
+    
+    public GeoRegion updateGeoRegion(GeoRegion region, User user) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            return dao.updateGeoregion(region, user, session);
+        } catch (Exception e) {
+            LOG.error("ERROR: updating GeoRegion (" + region.getName() + ").", e);
+            throw new EmfException("Cannot update region object. " + e.getMessage() + ".");
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
     
@@ -649,6 +679,21 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             throw new EmfException("Could not get all Grids");
         } finally {
             session.close();
+        }
+    }
+    
+    public synchronized RegionType[] getRegionTypes() throws EmfException {
+        Session session = sessionFactory.getSession();
+       
+        try {
+            List<RegionType> results = dao.getRegionTypes(session);
+            return results.toArray(new RegionType[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all RegionTypes", e);
+            throw new EmfException("Could not get all RegionTypes");
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
     

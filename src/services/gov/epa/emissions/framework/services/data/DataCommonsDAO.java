@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
+import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.Iterator;
 import java.util.List;
@@ -40,10 +41,12 @@ public class DataCommonsDAO {
 
     private DatasetDAO datasetDAO;
     
+    private LockingScheme lockingScheme;
+    
     public DataCommonsDAO() {
-        
         sectorsDao = new SectorsDAO();
         hibernateFacade = new HibernateFacade();
+        lockingScheme = new LockingScheme();
         keywordsDAO = new KeywordsDAO();
         datasetTypesDAO = new DatasetTypesDAO();
         pollutantsDAO = new PollutantsDAO();
@@ -109,6 +112,18 @@ public class DataCommonsDAO {
 
     public Sector updateSector(Sector sector, Session session) throws EmfException {
         return sectorsDao.update(sector, session);
+    }
+    
+    public GeoRegion obtainLockedRegion(User user, GeoRegion region, Session session) {
+        return (GeoRegion)lockingScheme.getLocked(user, current(region, session), session);
+    }
+    
+    public GeoRegion updateGeoregion(GeoRegion region, User user, Session session) throws EmfException {
+        return (GeoRegion) lockingScheme.releaseLockOnUpdate(region, current(region, session), session);
+    }
+    
+    private GeoRegion current(GeoRegion region, Session session) {
+        return (GeoRegion)current(region.getId(), GeoRegion.class, session);
     }
 
     public Revision obtainLockedRevision(User user, Revision revision, Session session) {
@@ -264,6 +279,10 @@ public class DataCommonsDAO {
 
     public List<GeoRegion> getGeoRegions(Session session) {
         return hibernateFacade.getAll(GeoRegion.class, Order.asc("name"), session);
+    }
+    
+    public List<RegionType> getRegionTypes(Session session) {
+        return hibernateFacade.getAll(RegionType.class, Order.asc("name"), session);
     }
     
     public List getRevisions(int datasetId, Session session) {

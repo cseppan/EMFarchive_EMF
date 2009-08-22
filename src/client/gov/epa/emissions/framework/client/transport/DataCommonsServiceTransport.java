@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
+import gov.epa.emissions.framework.services.data.RegionType;
 import gov.epa.emissions.framework.services.editor.Revision;
 
 public class DataCommonsServiceTransport implements DataCommonsService {
@@ -520,6 +521,17 @@ public class DataCommonsServiceTransport implements DataCommonsService {
 
         return (GeoRegion) call.requestResponse(new Object[] { region });
     }
+    
+    public GeoRegion updateGeoRegion(GeoRegion region, User user) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("updateGeoRegion");
+        call.addParam("region", mappings.geoRegion());
+        call.addParam("user", mappings.user());
+        call.setReturnType(mappings.geoRegion());
+
+        return (GeoRegion) call.requestResponse(new Object[] { region, user });
+    }
 
     public GeoRegion[] getGeoRegions() throws EmfException {
         EmfCall call = call();
@@ -527,6 +539,28 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.setOperation("getGeoRegions");
         call.setReturnType(mappings.geoRegions());
 
-        return (GeoRegion[]) call.requestResponse(new Object[] {});    }
+        return (GeoRegion[]) call.requestResponse(new Object[] {});    
+    }
+
+    public RegionType[] getRegionTypes() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getRegionTypes");
+        call.setReturnType(mappings.regionTypes());
+
+        return (RegionType[]) call.requestResponse(new Object[] {});  
+    }
+
+    public GeoRegion obtainLockedRegion(User user, GeoRegion region) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("obtainLockedRegion");
+        call.addParam("user", mappings.user());
+        call.addParam("region", mappings.geoRegion());
+        call.setReturnType(mappings.geoRegion());
+        
+        return (GeoRegion) call.requestResponse(new Object[]{user, region});
+    }
+
 
 }

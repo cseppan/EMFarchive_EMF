@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.AddRemoveRegionsWidget;
 import gov.epa.emissions.framework.services.EmfException;
@@ -105,8 +106,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private Dimension defaultDimension = new Dimension(255, 22);
 
     private EditCaseSummaryTabPresenter presenter;
-
+    
     private EmfConsole parentConsole;
+    
+    private DesktopManager desktopManager;
 
     private MessagePanel messagePanel;
 
@@ -409,6 +412,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         regionsWidget = new AddRemoveRegionsWidget(presenter.getAllGeoRegions(), changeablesList, parentConsole);
         regionsWidget.setRegions(caseObj.getRegions());
         regionsWidget.setPreferredSize(new Dimension(255, 80));
+        regionsWidget.setDesktopManager(desktopManager);
+        regionsWidget.setEmfSession(session);
+        regionsWidget.observeParentPresenter(presenter);
         return regionsWidget;
     }
 
@@ -687,6 +693,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
                     
             messagePanel.setMessage(msg + " Grid \"" + grid.getName() + "\" added to the summary tab.");
         }
+    }
+    
+    public void setDesktopManager(DesktopManager dm) {
+        this.desktopManager = dm;
     }
 
 }

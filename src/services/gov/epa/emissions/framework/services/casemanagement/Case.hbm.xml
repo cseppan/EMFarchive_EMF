@@ -93,7 +93,7 @@
     		<many-to-many class="gov.epa.emissions.commons.data.Sector" column="sector_id"/>
   	</array>
   	
-  	<array name="regions" table="case_regions" schema="cases" cascade="save-update">
+  	<array name="regions" table="case_regions" schema="cases">
     		<key column="case_id" not-null="true"/>
     		<list-index column="list_index"/>
     		<many-to-many class="gov.epa.emissions.framework.services.data.GeoRegion" column="region_id"/>
