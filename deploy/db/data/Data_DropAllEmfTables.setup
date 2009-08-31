@@ -67,4 +67,4 @@ DROP TABLE emf.qa_programs CASCADE;
 -- emf emf datasets_notes
 DROP TABLE emf.datasets_notes CASCADE;
 
-DROP TABLE emf.grids CASCADE;
+DROP TABLE emf.georegions CASCADE;
