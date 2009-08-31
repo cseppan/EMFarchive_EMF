@@ -94,6 +94,8 @@ public class ControlMeasuresImporter implements Importer {
             runSCC(controlMeasures);
             //import equation file
             runEquation(controlMeasures);
+            //import property file
+            runProperty(controlMeasures);
             measures = controlMeasures();
             setDetailStatus("Saving measure and SCC information to the database\n");
             saveMeasureAndSCCs(measures, user);
@@ -191,6 +193,16 @@ public class ControlMeasuresImporter implements Importer {
             setStatus("Finished reading equation file");
         } else
             setStatus("Warning, no equation file was specified");
+    }
+
+    private void runProperty(Map controlMeasures) throws ImporterException {
+        CMPropertyImporter propertyImporter = cmImporters.propertyImporter();
+        if (propertyImporter != null) {
+            setStatus("Started reading property file");
+            propertyImporter.run(controlMeasures);
+            setStatus("Finished reading property file");
+        } else
+            setStatus("Warning, no property file was specified");
     }
 
     private OptimizedTableModifier dataModifier(String table, Datasource datasource) throws EmfException {

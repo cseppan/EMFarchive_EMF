@@ -19,10 +19,11 @@ public class CMImportTask implements Runnable {
     private HibernateSessionFactory sessionFactory;
 
     private DbServerFactory dbServerFactory;
-    
+
     private StatusDAO statusDao;
 
-    public CMImportTask(File folder, String[] files, User user, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
+    public CMImportTask(File folder, String[] files, User user, HibernateSessionFactory sessionFactory,
+            DbServerFactory dbServerFactory) {
         this.folder = folder;
         this.files = files;
         this.user = user;
@@ -40,7 +41,8 @@ public class CMImportTask implements Runnable {
                 setDetailStatus(e.getMessage());
                 setStatus(e.getMessage());
             }
-            if (importer != null) importer.run();
+            if (importer != null)
+                importer.run();
         } catch (Exception e) {
             //
         } finally {

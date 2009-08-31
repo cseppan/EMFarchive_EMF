@@ -68,11 +68,30 @@ public class CMCSVFileReader implements Reader {
             while (line != null) {
                 lineNumber++;
                 this.line = line;
-                if (isData(line))
+                if (isData(line)) {
+                    //next lets see if the line continues on to the next line, could have new line in the column text
+//look for what is in between the last comma in the line and hte end of the line.
+                    //  should be:
+                    //  ,
+                    //  ,""
+                    //if quote count is one or more than two
+                    int count = line.replaceAll("[^\"]","").length();
+                    if (count != 0 && count % 2 != 0) {
+                        String nextLine = fileReader.readLine();
+                        while (nextLine != null) {
+                            line += "\n" + nextLine;
+                            count = nextLine.replaceAll("[^\"]","").length();
+                            if (count == 0 && count % 2 == 0) {
+                                nextLine = fileReader.readLine();
+                            } else
+                                nextLine = null;
+                        }
+                    }
                     return doRead(line);
+                }
                 if (isComment(line))
                     comments.add(CustomStringTools.escapeBackSlash(line));
-
+    
                 line = fileReader.readLine();
             }
 
@@ -90,8 +109,11 @@ public class CMCSVFileReader implements Reader {
     private Record doRead(String line) throws ImporterException {
         Record record = new Record();
         String[] tokens = tokenizer.tokens(line);
+        for (int i = 0; i < tokens.length - 1; i++) {
+            tokens[i] = tokens[i].replace("\"\"", "\"");
+        }
         record.add(Arrays.asList(tokens));
-
+        record.token(1);
         return record;
     }
 
