@@ -498,6 +498,8 @@ public class EmfDataset implements Dataset, Lockable {
         return true;
     }
 
+    //returns:  -1 indicates no month, most likely a annual dataset not monthly
+    //          if not -1 will return Calendar.month values
     public int applicableMonth() {
 
         //code was copied from SQLQAAnnualQuery.java class
