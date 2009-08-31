@@ -188,6 +188,14 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
               strategyMessagesDatasetDescription());
     }
   
+    protected EmfDataset createStrategyMessagesDataset(String namePrefix, EmfDataset inventory) throws Exception {
+        return creator.addDataset("DS", 
+                DatasetCreator.createDatasetName(namePrefix + "_" + inventory.getName() + "_strategy_msgs"), 
+                getDatasetType("Strategy Messages (CSV)"), 
+                new VersionedTableFormat(new StrategyMessagesFileFormat(dbServer.getSqlDataTypes()), dbServer.getSqlDataTypes()), 
+                strategyMessagesDatasetDescription());
+      }
+    
     private String strategyMessagesDatasetDescription() {
         return "#Strategy Messages\n" + 
             "#Implements control strategy: " + controlStrategy.getName() + "\n#";
@@ -298,8 +306,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     protected void setResultTotalCostTotalReductionAndCount(ControlStrategyResult controlStrategyResult) throws EmfException {
-        String query = "SELECT count(1) as record_count, sum(case when poll = '" + controlStrategy.getTargetPollutant().getName() 
-            + "' then Annual_Cost else null::double precision end) as total_cost, sum(case when poll = '" + controlStrategy.getTargetPollutant().getName() 
+        String query = "SELECT count(1) as record_count, sum(Annual_Cost) as total_cost, sum(case when poll = '" + controlStrategy.getTargetPollutant().getName() 
             + "' then Emis_Reduction else null end) as total_reduction "
             + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
         ResultSet rs = null;
@@ -536,6 +543,24 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return result;
     }
     
+    protected ControlStrategyResult createStrategyMessagesResult(String namePrefix, EmfDataset inventory, int inventoryVersion) throws Exception 
+    {
+        ControlStrategyResult result = new ControlStrategyResult();
+        result.setControlStrategyId(controlStrategy.getId());
+        result.setInputDataset(inventory);
+        result.setInputDatasetVersion(inventoryVersion);
+        result.setDetailedResultDataset(createStrategyMessagesDataset(namePrefix, inventory));
+
+        result.setStrategyResultType(getStrategyMessagesResultType());
+        result.setStartTime(new Date());
+        result.setRunStatus("Start processing strategy messages result");
+
+        //persist result
+        saveControlStrategyResult(result);
+
+        return result;
+    }
+    
     protected void deleteStrategyMessageResult(ControlStrategyResult strategyMessagesResult) throws EmfException {
         //get rid of strategy results...
         Session session = sessionFactory.getSession();
@@ -554,4 +579,17 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         }
     }
 
+    protected void populateStrategyMessagesDataset(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult strategyMessagesResult, ControlStrategyResult detailedResult) throws EmfException {
+        String query = "";
+        query = "SELECT public.populate_max_emis_red_strategy_messages("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + strategyMessagesResult.getId() + ", " + detailedResult.getId() + ");";
+        System.out.println(System.currentTimeMillis() + " " + query);
+        try {
+            datasource.query().execute(query);
+        } catch (SQLException e) {
+            System.out.println("SQLException runStrategyUsingSQLApproach");
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            //
+        }
+    }
 }
