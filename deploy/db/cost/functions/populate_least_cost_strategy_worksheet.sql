@@ -138,6 +138,7 @@ BEGIN
 	where id = target_pollutant_id
 	into target_pollutant;
 
+
 	-- see if there are point specific columns in the inventory
 	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
 
@@ -283,7 +284,7 @@ BEGIN
 			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
 	END IF;
 	-- build version info into where clause filter
-	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version) || ')' || coalesce(' and ' || inv_filter, '');
+	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
 
 	--do this only for the Least Cost strategy type...
 	IF strategy_type = 'Least Cost' THEN
@@ -342,6 +343,8 @@ BEGIN
 
 --	uncontrolled_emis_sql := case when dataset_month != 0 then 'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' else 'inv.ann_emis' end;
 --	annualized_emis_sql := case when dataset_month != 0 then 'coalesce(inv.avd_emis * 365, inv.ann_emis)' else 'inv.ann_emis' end;
+
+
 	uncontrolled_emis_sql := 
 			case 
 				when dataset_month != 0 then 
@@ -364,7 +367,7 @@ BEGIN
 					'case when (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
 			end;
 	percent_reduction_sql := 'er.efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' / 100 / 100';
-	get_strategt_cost_sql := '(public.get_strategy_costs(' || case when use_cost_equations then 'true' else 'false' end || '::boolean, m.control_measures_id, 
+	get_strategt_cost_sql := '(public.get_strategy_costs(' || case when use_cost_equations then 'true' else 'false' end || '::boolean, m.id, 
 			abbreviation, ' || discount_rate|| ', 
 			m.equipment_life, er.cap_ann_ratio, 
 			er.cap_rec_factor, er.ref_yr_cost_per_ton, 
@@ -470,37 +473,11 @@ BEGIN
 			inv.scc,
 			inv.fips,
 			' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
-			' || chained_gdp_adjustment_factor || ' * 
-			case 
-				when eq.equation_type_id is null then
-					(' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton - ' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio * er.cap_rec_factor)
-				else
-					' || get_strategt_cost_inner_sql || '.operation_maintenance_cost
-			end as annual_oper_maint_cost,
-			' || chained_gdp_adjustment_factor || ' * case 
-				when eq.equation_type_id is null then
-					' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio * er.cap_rec_factor
-				else
-					' || get_strategt_cost_inner_sql || '.annualized_capital_cost
-			end as annualized_capital_cost,
-			' || chained_gdp_adjustment_factor || ' * case 
-				when eq.equation_type_id is null then
-					' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio
-				else
-					' || get_strategt_cost_inner_sql || '.capital_cost
-			end as total_capital_cost,
-			' || chained_gdp_adjustment_factor || ' * case 
-				when eq.equation_type_id is null then
-					' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton
-				else
-					' || get_strategt_cost_inner_sql || '.annual_cost
-			end as annual_cost,
-			' || chained_gdp_adjustment_factor || ' * case 
-				when eq.equation_type_id is null then
-					er.ref_yr_cost_per_ton
-				else
-					' || get_strategt_cost_inner_sql || '.computed_cost_per_ton
-			end as computed_cost_per_ton,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.operation_maintenance_cost as operation_maintenance_cost,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annualized_capital_cost as annualized_capital_cost,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.capital_cost as capital_cost,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annual_cost as annual_cost,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.computed_cost_per_ton as computed_cost_per_ton,
 			efficiency,
 			' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' as rule_pen,
 			' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
@@ -669,6 +646,9 @@ BEGIN
 
 				where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 					and ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton is not null 
+					-- dont include sources that have no emissions...
+					and ' || uncontrolled_emis_sql || ' <> 0.0
+
 --						group by scc.control_measures_id, er.id, inv.fips, inv.scc, inv.poll
 --							' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || '
 
@@ -690,13 +670,15 @@ BEGIN
 		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 			and p.id = ' || target_pollutant_id || '::integer
 
+			-- dont include sources that have no emissions...
+			and ' || uncontrolled_emis_sql || ' <> 0.0
+
 			-- dont include sources that have been fully controlled...
 			and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0) <> 100.0
 
 			-- make sure the new control is worthy, compare existing emis with new resulting emis, see if you get required percent decrease in emissions ((orig emis - new resulting emis) / orig emis * 100 ...
 			and (inv.ceff is null or ((' ||  emis_sql || ' - ' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100)) / ' ||  emis_sql || ' * 100 >= ' || replacement_control_min_eff_diff_constraint || '))
 
-			and ' || uncontrolled_emis_sql || ' <> 0.0
 			-- measure region filter
 			' || case when measure_with_region_count > 0 then '
 			and 
@@ -786,37 +768,11 @@ BEGIN
 		inv.scc,
 		inv.fips,
 		' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
-		' || chained_gdp_adjustment_factor || ' * 
-		case 
-			when eq.equation_type_id is null then
-				(' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton - ' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio * er.cap_rec_factor)
-			else
-				' || get_strategt_cost_inner_sql || '.operation_maintenance_cost
-		end as annual_oper_maint_cost,
-		' || chained_gdp_adjustment_factor || ' * case 
-			when eq.equation_type_id is null then
-				' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio * er.cap_rec_factor
-			else
-				' || get_strategt_cost_inner_sql || '.annualized_capital_cost
-		end as annualized_capital_cost,
-		' || chained_gdp_adjustment_factor || ' * case 
-			when eq.equation_type_id is null then
-				' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton * er.cap_ann_ratio
-			else
-				' || get_strategt_cost_inner_sql || '.capital_cost
-		end as total_capital_cost,
-		' || chained_gdp_adjustment_factor || ' * case 
-			when eq.equation_type_id is null then
-				' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100 * er.ref_yr_cost_per_ton
-			else
-				' || get_strategt_cost_inner_sql || '.annual_cost
-		end as annual_cost,
-		' || chained_gdp_adjustment_factor || ' * case 
-			when eq.equation_type_id is null then
-				er.ref_yr_cost_per_ton
-			else
-				' || get_strategt_cost_inner_sql || '.computed_cost_per_ton
-		end as computed_cost_per_ton,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.operation_maintenance_cost as operation_maintenance_cost,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annualized_capital_cost as annualized_capital_cost,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.capital_cost as capital_cost,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annual_cost as ann_cost,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.computed_cost_per_ton as computed_cost_per_ton,
 		efficiency,
 		' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' as rule_pen,
 		' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
@@ -923,7 +879,7 @@ BEGIN
 	raise notice '%', 'All Controls - emissions.' || worksheet_table_name || ' count = ' || gimme_count || ' - ' || clock_timestamp();
 
 	execute 'update emissions.' || worksheet_table_name || ' as detailed_result
-		set annual_cost = dr.annual_cost,
+		set source_annual_cost = dr.annual_cost,
 			marginal = case when coalesce(emis_reduction, 0) != 0 then coalesce(dr.annual_cost / emis_reduction, 0.0) else 0.0 end
 		from (
 			select dr.source, dr.cm_id, sum(annual_cost) as annual_cost

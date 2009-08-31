@@ -262,9 +262,9 @@ BEGIN
 		SELECT record_id, 
 			run_sum(cnt::numeric, ''apply_order' || counter || '''::text) as apply_order, 
 			run_sum(emis_reduction::numeric, ''emis_reduction' || counter || '''::text) as cum_emis_reduction, 
-			run_sum(annual_cost::numeric, ''annual_cost' || counter || '''::text) as cum_annual_cost
+			run_sum(source_annual_cost::numeric, ''annual_cost' || counter || '''::text) as cum_annual_cost
 		from (
-			SELECT marginal, emis_reduction, record_id, annual_cost, 1::integer as cnt --sum(emis_reduction)
+			SELECT marginal, emis_reduction, record_id, source_annual_cost, 1::integer as cnt --sum(emis_reduction)
 			from emissions.' || worksheet_table_name || '
 			where status is null 
 				and poll = ' || quote_literal(target_pollutant) || '
@@ -392,19 +392,19 @@ BEGIN
 				Uncontrolled_Emis
 				) 
 			select ' || costcurve_dataset_id || ',
-				poll, 
-				sum(annual_cost), 
-				sum(annual_cost) / sum(emis_reduction), 
-				sum(annual_oper_maint_cost), 
-				sum(annualized_capital_cost), 
-				sum(total_capital_cost), 
-				case when poll = ' || quote_literal(target_pollutant) || ' then ' || domain_wide_emis_reduction || ' / ' || uncontrolled_emis || ' * 100 else null::double precision end, 
-				case when poll = ' || quote_literal(target_pollutant) || ' then sum(emis_reduction) / ' || uncontrolled_emis || ' * 100 else null::double precision end, 
-				sum(emis_reduction), 
-				case when poll = ' || quote_literal(target_pollutant) || ' then ' || uncontrolled_emis || ' else null::double precision end
-			from emissions.'|| detailed_result_table_name || '
-			where poll = ' || quote_literal(target_pollutant) || '
-			group by poll';
+				dr.poll, 
+				sum(dr.annual_cost), 
+				sum(dr.annual_cost) / sum(dr.emis_reduction), 
+				sum(dr.annual_oper_maint_cost), 
+				sum(dr.annualized_capital_cost), 
+				sum(dr.total_capital_cost), 
+				case when dr.poll = ' || quote_literal(target_pollutant) || ' then ' || domain_wide_emis_reduction || ' / ' || uncontrolled_emis || ' * 100 else null::double precision end, 
+				case when dr.poll = ' || quote_literal(target_pollutant) || ' then sum(dr.emis_reduction) / ' || uncontrolled_emis || ' * 100 else null::double precision end, 
+				sum(dr.emis_reduction), 
+				case when dr.poll = ' || quote_literal(target_pollutant) || ' then ' || uncontrolled_emis || ' else null::double precision end
+			from emissions.'|| detailed_result_table_name || ' dr
+			where dr.poll = ' || quote_literal(target_pollutant) || '
+			group by dr.poll';
 	--			group by ' || costcurve_dataset_id || ', poll, ' || domain_wide_emis_reduction || ' / ' || uncontrolled_emis
 
 		raise notice '%', 'populate the cost curve with the relevant results - ' || clock_timestamp();
