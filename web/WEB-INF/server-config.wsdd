@@ -324,6 +324,24 @@
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasureNEIDevice"
 		qname="ns1:ControlMeasureNEIDevice" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasurePropertyCategory"
+		qname="ns1:ControlMeasurePropertyCategory" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasureProperty"
+		qname="ns1:ControlMeasureProperty" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<arrayMapping qname="ns1:ControlMeasureProperties" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasureProperty[]"
+		innerType="ns1:ControlMeasureProperty"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<arrayMapping qname="ns1:ControlMeasurePropertyCategories" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasurePropertyCategory[]"
+		innerType="ns1:ControlMeasurePropertyCategory"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
 	<arrayMapping qname="ns1:ControlMeasureEquations" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasureEquation[]"
 		innerType="ns1:ControlMeasureEquation"
