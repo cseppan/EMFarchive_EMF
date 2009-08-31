@@ -964,6 +964,9 @@ where name in ('State Comparison Tolerance (CSV)');
 
 insert into emf.qa_programs values(DEFAULT,'SMOKE output annual state summaries crosstab','gov.epa.emissions.framework.services.qa.SQLQAAnnualStateSummariesCrosstabQueryRunner');
 
+-- 8/1/2009 DCD added new QA Program
+insert into emf.qa_programs values(DEFAULT,'EC Control Scenario','gov.epa.emissions.framework.services.qa.SQLECControlScenarioQueryRunner');
+
 --added (7/16) to allow locking of revisions for edit
 ALTER TABLE emf.revisions ADD COLUMN lock_owner varchar(255);
 ALTER TABLE emf.revisions ADD COLUMN lock_date timestamp;
