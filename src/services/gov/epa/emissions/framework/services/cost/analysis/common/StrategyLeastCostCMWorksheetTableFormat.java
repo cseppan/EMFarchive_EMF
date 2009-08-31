@@ -111,6 +111,7 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
         cols.add(new Column("marginal", types.realType(), new RealFormatter()));
         cols.add(new Column("cum_annual_cost", types.realType(), new RealFormatter()));
         cols.add(new Column("cum_emis_reduction", types.realType(), new RealFormatter()));
+        cols.add(new Column("source_annual_cost", types.realType(), new RealFormatter()));
         cols.add(new Column("remove", types.booleanType()));
         cols.add(new Column("status", types.smallInt()));
         cols.add(new Column("ORIGINAL_DATASET_ID", types.intType(), new IntegerFormatter()));
