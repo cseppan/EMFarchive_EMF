@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 
 public class StrategyLoader extends AbstractStrategyLoader {
 
@@ -41,6 +42,21 @@ public class StrategyLoader extends AbstractStrategyLoader {
         createDetailedResultTableIndexes(controlStrategyInputDataset, detailedResult);
         runStrategyFinalize(controlStrategyInputDataset, detailedResult);
         
+        //create strategy messages result
+        strategyMessagesResult = createStrategyMessagesResult(inputDataset, controlStrategyInputDataset.getVersion());
+        populateStrategyMessagesDataset(controlStrategyInputDataset, strategyMessagesResult, detailedResult);
+        setResultCount(strategyMessagesResult);
+        
+        //if the messages dataset is empty (no records) then remove the dataset and strategy result, there
+        //is no point and keeping it around.
+        if (strategyMessagesResult.getRecordCount() == 0) {
+            deleteStrategyMessageResult(strategyMessagesResult);
+        } else {
+            strategyMessagesResult.setCompletionTime(new Date());
+            strategyMessagesResult.setRunStatus("Completed.");
+            saveControlStrategyResult(strategyMessagesResult);
+        }
+
         //still need to calculate the total cost and reduction...
         setResultTotalCostTotalReductionAndCount(detailedResult);
 
