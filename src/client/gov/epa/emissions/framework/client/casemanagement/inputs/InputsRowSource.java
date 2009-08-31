@@ -31,7 +31,7 @@ public class InputsRowSource implements RowSource {
     }
     
     private String getRegionName(CaseInput input) {
-        return (input.getRegion() == null) ? "" : input.getRegion().getName();
+        return (input.getRegion() == null) ? "" : input.getRegion().toString();
     }
     
     private String getSectorName(CaseInput input) {

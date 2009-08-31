@@ -40,7 +40,7 @@ public class ParametersRowSource implements RowSource {
     }
 
     private String getRegionName(CaseParameter parameter) {
-        return (parameter.getRegion() == null) ? "" : parameter.getRegion().getName();
+        return (parameter.getRegion() == null) ? "" : parameter.getRegion().toString();
     }
     
     private String getSectorName(CaseParameter param) {

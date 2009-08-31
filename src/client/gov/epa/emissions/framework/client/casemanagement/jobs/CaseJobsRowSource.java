@@ -32,7 +32,7 @@ public class CaseJobsRowSource implements RowSource {
     }
     
     private String getRegionName(CaseJob job) {
-        return (job.getRegion() == null) ? "" : job.getRegion().getName();
+        return (job.getRegion() == null) ? "" : job.getRegion().toString();
     }
     
     private String getSectorName(CaseJob job) {
