@@ -195,7 +195,7 @@ public class SQLAnnualStateSummariesCrosstabQuery {
                 + "fipscost,\n"
                 + "state_name \n";
         for (String poll : polls) {
-            sql += ",\"" + poll + "\" \n";
+            sql += ",coalesce(\"" + poll + "\",0.0::double precision) as \"" + poll + "\" \n";
         }
 //        for (String specie : species) {
 //            sql += ",\"" + specie + "\" \n";
