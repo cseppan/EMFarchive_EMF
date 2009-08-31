@@ -74,6 +74,22 @@ public class StrategyLoader extends LeastCostAbstractStrategyLoader {
             result.setCompletionTime(new Date());
             result.setRunStatus("Completed.");
             saveControlStrategyResult(result);
+
+            //create strategy messages result
+            strategyMessagesResult = createStrategyMessagesResult("pct_" + pctRed, inputDataset, controlStrategyInputDataset.getVersion());
+            populateStrategyMessagesDataset(controlStrategyInputDataset, strategyMessagesResult, result);
+            setResultCount(strategyMessagesResult);
+            
+            //if the messages dataset is empty (no records) then remove the dataset and strategy result, there
+            //is no point and keeping it around.
+            if (strategyMessagesResult.getRecordCount() == 0) {
+                deleteStrategyMessageResult(strategyMessagesResult);
+            } else {
+                strategyMessagesResult.setCompletionTime(new Date());
+                strategyMessagesResult.setRunStatus("Completed.");
+                saveControlStrategyResult(strategyMessagesResult);
+            }
+
         }
         
         return null;

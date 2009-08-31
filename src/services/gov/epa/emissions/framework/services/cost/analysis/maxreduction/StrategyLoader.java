@@ -80,18 +80,4 @@ public class StrategyLoader extends AbstractStrategyLoader {
     protected void doBatchInsert(ResultSet resultSet) throws Exception {
         //
     }
-
-    private void populateStrategyMessagesDataset(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult strategyMessagesResult, ControlStrategyResult detailedResult) throws EmfException {
-        String query = "";
-        query = "SELECT public.populate_max_emis_red_strategy_messages("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + strategyMessagesResult.getId() + ", " + detailedResult.getId() + ");";
-        System.out.println(System.currentTimeMillis() + " " + query);
-        try {
-            datasource.query().execute(query);
-        } catch (SQLException e) {
-            System.out.println("SQLException runStrategyUsingSQLApproach");
-            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
-        } finally {
-            //
-        }
-    }
 }

@@ -1,8 +1,5 @@
 package gov.epa.emissions.framework.services.cost.analysis.leastcost;
 
-import java.sql.SQLException;
-import java.util.Date;
-
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -11,6 +8,8 @@ import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+
+import java.util.Date;
 
 import org.hibernate.Session;
 
@@ -87,20 +86,6 @@ public class StrategyLoader extends LeastCostAbstractStrategyLoader {
             throw new EmfException("Could not get strategy target emission reduction");
         } finally {
             session.close();
-        }
-    }
-
-    private void populateStrategyMessagesDataset(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult strategyMessagesResult, ControlStrategyResult detailedResult) throws EmfException {
-        String query = "";
-        query = "SELECT public.populate_max_emis_red_strategy_messages("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + strategyMessagesResult.getId() + ", " + detailedResult.getId() + ");";
-        System.out.println(System.currentTimeMillis() + " " + query);
-        try {
-            datasource.query().execute(query);
-        } catch (SQLException e) {
-            System.out.println("SQLException runStrategyUsingSQLApproach");
-            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
-        } finally {
-            //
         }
     }
 }
