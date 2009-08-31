@@ -38,11 +38,11 @@ public class EditableCaseSummaryTabPresenterImpl implements EditableCaseSummaryT
         view.addSector(sector);
     }
     
-    public void addGrid(GeoRegion grid) {
-        if (grid == null)
+    public void addRegion(GeoRegion region) {
+        if (region == null)
             return;
         
-        view.addGrid(grid);
+        view.addRegion(region);
     }
 
 }

@@ -131,9 +131,9 @@ public class AddRemoveRegionsWidget extends JPanel {
         removeButton.setVisible(false);  
     }
     
-    public void addGrid(GeoRegion grid){
-        if (!regionsList.contains(grid))
-            regionsList.addElement(grid);
+    public void addRegion(GeoRegion region){
+        if (!regionsList.contains(region))
+            regionsList.addElement(region);
         sort(); 
     }
     

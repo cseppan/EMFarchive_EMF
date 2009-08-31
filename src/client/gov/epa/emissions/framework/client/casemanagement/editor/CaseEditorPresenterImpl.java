@@ -214,7 +214,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     
     public void addGridBacktoCase(GeoRegion grid) {
         if (summaryPresenter != null && grid != null)
-            summaryPresenter.addGrid(grid);
+            summaryPresenter.addRegion(grid);
     }
     
     public Case getCaseFromName(String caseName) throws EmfException{

@@ -670,28 +670,28 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         }
     }
     
-    public void addGrid(GeoRegion grid) {
-        if (grid == null)
+    public void addRegion(GeoRegion region) {
+        if (region == null)
             return;
 
-        List<GeoRegion> grids = new ArrayList<GeoRegion>();
-        grids.addAll(Arrays.asList(regionsWidget.getRegions()));
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
+        regions.addAll(Arrays.asList(regionsWidget.getRegions()));
         boolean found = false;
 
-        for (Iterator<GeoRegion> iter = grids.iterator(); iter.hasNext();) {
+        for (Iterator<GeoRegion> iter = regions.iterator(); iter.hasNext();) {
             GeoRegion item = iter.next();
-            if (grid != null && grid.equals(item))
+            if (region != null && region.equals(item))
                 found = true;
         }
 
         if (!found) {
-            regionsWidget.addGrid(grid);
+            regionsWidget.addRegion(region);
             String msg = messagePanel.getMessage();
             
             if (msg == null || (msg != null && msg.toUpperCase().contains("SAVED")))
                 msg = "";
                     
-            messagePanel.setMessage(msg + " Grid \"" + grid.getName() + "\" added to the summary tab.");
+            messagePanel.setMessage(msg + " Region \"" + region.getName() + "\" added to the summary tab.");
         }
     }
     
