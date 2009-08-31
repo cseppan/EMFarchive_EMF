@@ -1580,3 +1580,37 @@ and dataset_type_id in
 (select id 
 from emf.dataset_types dt
 where name in ('ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)'));
+
+-- Template for QA Program "SMOKE output annual state summaries crosstab" - 'Control Strategy Detailed Result','ORL Nonpoint Inventory (ARINV)','ORL Nonroad Inventory (ARINV)','ORL Onroad Inventory (MBINV)'
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 'SMOKE output annual state summaries crosstab', (select id from emf.qa_programs where name = 'SMOKE output annual state summaries crosstab'), 
+'-polllist
+CO
+NOX
+VOC
+SO2
+NH3
+PM10
+PM2_5
+CHLORINE
+HCL', false, 1, ''
+from emf.dataset_types dt
+where name in ('Smkmerge report state annual summary (CSV)')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'SMOKE output annual state summaries crosstab');
+
+update emf.dataset_types_qa_step_templates 
+set program_arguments = '-polllist
+CO
+NOX
+VOC
+SO2
+NH3
+PM10
+PM2_5
+CHLORINE
+HCL'
+where name = 'SMOKE output annual state summaries crosstab'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('Smkmerge report state annual summary (CSV)'));
