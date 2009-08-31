@@ -89,6 +89,18 @@
 	    	</composite-element>
   		</array>
   		
+		<array name="properties" table="control_measure_properties">
+	    	<key column="control_measure_id" not-null="true"/>
+	    	<list-index column="list_index"/>
+	    	<composite-element class="gov.epa.emissions.framework.services.cost.ControlMeasureProperty">
+		        <property name="name" column="name" type="java.lang.String" not-null="true"/>
+		        <many-to-one name="category" class="gov.epa.emissions.framework.services.cost.ControlMeasurePropertyCategory" column="control_measure_property_category_id" not-null="true"/>
+		        <property name="units" column="units" type="java.lang.String" not-null="true"/>
+		        <property name="dataType" column="data_type" type="java.lang.String" not-null="true"/>
+		        <property name="dbFieldName" column="db_field_name" type="java.lang.String" not-null="true"/>
+		        <property name="value" column="value" type="java.lang.String" not-null="true"/>
+	    	</composite-element>
+		</array>
 
     </class>
 </hibernate-mapping>

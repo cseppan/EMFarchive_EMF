@@ -73,4 +73,8 @@ public interface ControlMeasureService extends EMFService {
     
     EquationType[] getEquationTypes() throws EmfException;
     
+    ControlMeasurePropertyCategory[] getPropertyCategories() throws EmfException;
+
+    ControlMeasurePropertyCategory getPropertyCategory(String categoryName) throws EmfException;
+    
 }

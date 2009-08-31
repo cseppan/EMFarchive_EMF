@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.controlmeasure.io.ControlMeasurePropertyCategories;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -433,5 +434,22 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         } finally {
             session.close();
         }
+    }
+
+    public ControlMeasurePropertyCategory[] getPropertyCategories() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List<ControlMeasurePropertyCategory> all = dao.getPropertyCategories(session);
+            return all.toArray(new ControlMeasurePropertyCategory[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve control measure property categories.", e);
+            throw new EmfException("Could not retrieve control measures property categories.");
+        } finally {
+            session.close();
+        }
+    }
+
+    public ControlMeasurePropertyCategory getPropertyCategory(String categoryName) throws EmfException {
+        return new ControlMeasurePropertyCategories(sessionFactory).getCategory(categoryName);
     }
 }

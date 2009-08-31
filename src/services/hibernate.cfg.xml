@@ -104,6 +104,7 @@
 		<mapping resource="gov/epa/emissions/framework/services/cost/ControlTechnology.hbm.xml"/>
 	    <mapping resource="gov/epa/emissions/framework/services/cost/ControlStrategyResult.hbm.xml"/>
 	    <mapping resource="gov/epa/emissions/framework/services/cost/ControlMeasureClass.hbm.xml"/>
+	    <mapping resource="gov/epa/emissions/framework/services/cost/ControlMeasurePropertyCategory.hbm.xml"/>
 	    <mapping resource="gov/epa/emissions/framework/services/cost/ControlStrategyConstraint.hbm.xml"/>
     </session-factory>
     

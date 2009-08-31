@@ -79,6 +79,8 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private ControlMeasureNEIDevice[] neiDevices = new ControlMeasureNEIDevice[] {};
     
+    private ControlMeasureProperty[] properties = new ControlMeasureProperty[] {};
+    
     public ControlMeasure() {
         this.lock = new Mutex();
 //        this.sccs = new ArrayList();
@@ -417,4 +419,22 @@ public class ControlMeasure implements Lockable, Serializable {
     public void setNeiDevices(ControlMeasureNEIDevice[] neiDevices) {
         this.neiDevices = neiDevices;
     }
+
+
+    public void setProperties(ControlMeasureProperty[] properties) {
+        this.properties = properties;
+    }
+
+
+    public ControlMeasureProperty[] getProperties() {
+        return properties;
+    }
+
+    public void addProperty(ControlMeasureProperty property) {
+        List<ControlMeasureProperty> propertyList = new ArrayList<ControlMeasureProperty>();
+        propertyList.addAll(Arrays.asList(properties));
+        propertyList.add(property);
+        this.properties = propertyList.toArray(new ControlMeasureProperty[0]);
+    }
+
 }

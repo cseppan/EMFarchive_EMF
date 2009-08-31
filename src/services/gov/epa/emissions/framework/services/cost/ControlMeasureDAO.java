@@ -567,4 +567,10 @@ public class ControlMeasureDAO {
         query.setCacheable(true);
         return query.list();//hibernateFacade.getAll(EquationType.class, Order.asc("name"), session);
     }
+
+    public List<ControlMeasurePropertyCategory> getPropertyCategories(Session session) {
+        Query query = session.createQuery("from ControlMeasurePropertyCategory as e order by e.name");
+        query.setCacheable(true);
+        return query.list();
+    }
 }

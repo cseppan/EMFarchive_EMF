@@ -86,7 +86,7 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
         // parent.doRefresh();
     }
 
-    public void set(ControlMeasureTabView summary) {
+    public void set(ControlMeasureSummaryTab summary) {
         this.summaryTabView = summary;
         ControlMeasureTabPresenterImpl tabPresenter = new ControlMeasureTabPresenterImpl(summary);
         presenters.add(tabPresenter);
@@ -106,6 +106,11 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
     public void set(ControlMeasureEquationTab equationTabView) {
         ControlMeasureTabPresenterImpl equationPresenter = new ControlMeasureTabPresenterImpl(equationTabView);
         presenters.add(equationPresenter);
+    }
+
+    public void set(ControlMeasurePropertyTab propertyTabView) {
+        ControlMeasureTabPresenterImpl propertyPresenter = new ControlMeasureTabPresenterImpl(propertyTabView);
+        presenters.add(propertyPresenter);
     }
 
     public void doRefresh(ControlMeasure controlMeasure) {

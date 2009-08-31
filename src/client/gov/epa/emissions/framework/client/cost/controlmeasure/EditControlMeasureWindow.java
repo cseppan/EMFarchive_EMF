@@ -49,6 +49,8 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     
     protected ControlMeasureEquationTab controlMeasureEquationTabView; 
     
+    protected ControlMeasurePropertyTab controlMeasurePropertyTabView; 
+    
     public EditControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager, CostYearTable costYearTable) {
         super("Control Measure Editor", new Dimension(770, 500), desktopManager);
         this.desktopManager = desktopManager;
@@ -89,6 +91,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         tabbedPane.addTab("Efficiencies", createEfficiencyTab(measure, messagePanel));
         tabbedPane.addTab("SCCs", createSCCTab(measure, messagePanel));
         tabbedPane.addTab("Equations", createEquationTab(measure, messagePanel));
+        tabbedPane.addTab("Properties", createPropertyTab(measure, messagePanel));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -100,9 +103,15 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     }
 
     private JPanel createEquationTab(ControlMeasure measure, MessagePanel messagePanel) throws EmfException{
-        controlMeasureEquationTabView=new ControlMeasureEquationTab(measure, session, this, messagePanel, parent, presenter); 
+        controlMeasureEquationTabView= new ControlMeasureEquationTab(measure, session, this, messagePanel, parent, presenter); 
         presenter.set(controlMeasureEquationTabView);
         return controlMeasureEquationTabView;
+    }
+
+    private JPanel createPropertyTab(ControlMeasure measure, MessagePanel messagePanel){
+        controlMeasurePropertyTabView= new ControlMeasurePropertyTab(measure, session, this, messagePanel, parent, presenter, desktopManager); 
+        presenter.set(controlMeasurePropertyTabView);
+        return controlMeasurePropertyTabView;
     }
 
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {

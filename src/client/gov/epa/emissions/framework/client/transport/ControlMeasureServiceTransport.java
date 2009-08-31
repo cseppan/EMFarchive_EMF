@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
+import gov.epa.emissions.framework.services.cost.ControlMeasurePropertyCategory;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.EquationType;
 import gov.epa.emissions.framework.services.cost.LightControlMeasure;
@@ -307,5 +308,23 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.setOperation("getEquationTypes");
         call.setReturnType(mappings.equationTypes());
         return (EquationType[]) call.requestResponse(new Object[] { });
+    }
+
+    public synchronized ControlMeasurePropertyCategory[] getPropertyCategories() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getPropertyCategories");
+        call.setReturnType(mappings.controlMeasurePropertyCategories());
+        return (ControlMeasurePropertyCategory[]) call.requestResponse(new Object[] { });
+    }
+
+    public ControlMeasurePropertyCategory getPropertyCategory(String categoryName)
+            throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getPropertyCategory");
+        call.addStringParam("categoryName");
+        call.setReturnType(mappings.controlMeasurePropertyCategory());
+        return (ControlMeasurePropertyCategory) call.requestResponse(new Object[] { categoryName });
     }
 }

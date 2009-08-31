@@ -28,13 +28,14 @@ public class ViewControlMeasureWindow extends EditControlMeasureWindow {
         super.setName("viewControlMeasure" + measure.getId());
     }
 
+    //disable gui items via this method for "View" only purposes
     private void viewOnly() {
-        // NOTE Auto-generated method stub
         saveButton.setVisible(false);
         controlMeasureSccTabView.viewOnly();
         controlMeasureEfficiencyTabView.viewOnly();
         editableCMSummaryTabView.viewOnly();
         controlMeasureEquationTabView.viewOnly();
+        controlMeasurePropertyTabView.viewOnly();
     }
     
     public void close() {

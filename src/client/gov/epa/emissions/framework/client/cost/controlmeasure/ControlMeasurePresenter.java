@@ -16,13 +16,15 @@ public interface ControlMeasurePresenter {
 
     void doRefresh(ControlMeasure controlMeasure);
 
-    void set(ControlMeasureTabView effTabView);
+    void set(ControlMeasureSummaryTab sumaryTabView);
 
     void set(ControlMeasureSccTabView effTabView);
 
     void set(ControlMeasureEfficiencyTabView effTabView);
     
     void set(ControlMeasureEquationTab equationTabView);
+
+    void set(ControlMeasurePropertyTab propertyTabView);
 
     void fireTracking();
 
