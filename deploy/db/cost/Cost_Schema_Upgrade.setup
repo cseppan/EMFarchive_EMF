@@ -833,3 +833,49 @@ drop FUNCTION public.get_strategy_costs(
 
 ALTER TABLE emf.control_strategy_constraints
    ADD COLUMN control_program_measure_min_pct_red_diff double precision;
+
+   
+-- 8/31/2009 - DCD -- Added new control measure property functionality 
+-- emf.control_measure_property_categories
+CREATE TABLE emf.control_measure_property_categories
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) UNIQUE NOT NULL
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_measure_property_categories OWNER TO emf;
+CREATE INDEX control_measure_property_categories_id
+  ON emf.control_measure_property_categories
+  USING btree
+  (id);
+ALTER TABLE emf.control_measure_property_categories CLUSTER ON control_measure_property_categories_id;
+-- emf.control_measure_property_categories
+
+-- emf.control_measure_property_categories
+CREATE TABLE emf.control_measure_properties
+(
+  id serial NOT NULL PRIMARY KEY,
+  list_index integer,
+  control_measure_id integer NOT NULL REFERENCES emf.control_measures(id),
+  name varchar(255) NOT NULL,
+  control_measure_property_category_id integer NOT NULL REFERENCES emf.control_measure_property_categories(id),
+  units character varying(75) NOT NULL,
+  data_type character varying(64) NOT NULL,
+  db_field_name character varying(64),
+  "value" text NOT NULL
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.control_measure_properties OWNER TO emf;
+CREATE INDEX control_measure_properties_id
+  ON emf.control_measure_properties
+  USING btree
+  (id);
+CREATE INDEX control_measure_properties_measure_id
+  ON emf.control_measure_properties
+  USING btree
+  (control_measure_id);
+CREATE INDEX control_measure_properties_control_category_id
+  ON emf.control_measure_properties
+  USING btree
+  (control_measure_property_category_id);
+-- emf.control_measure_property_categories
