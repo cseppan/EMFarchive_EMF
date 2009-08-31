@@ -1,6 +1,6 @@
 
 
-CREATE OR REPLACE FUNCTION public.populate_max_emis_red_strategy_messages(
+CREATE OR REPLACE FUNCTION public.populate_post_strategy_messages(
 	control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer, 
@@ -247,8 +247,7 @@ BEGIN
 		null::character varying(255) as control_program,
 		''Emission reduction is negative, '' || emis_reduction || ''.'' as "comment"
 	from emissions.' || strategy_detailed_result_table_name || ' dr
-	where dr.emis_reduction < 0.0 
-		and dr.control_eff > 0.0';
+	where 	emis_reduction < 0.0';
 
 	-- if PM target pollutant run, then see if any of the CEFF are missing from the PM 10 vs 2.5 pollutant sources
 	execute 'insert into emissions.' || strategy_messages_table_name || ' 
