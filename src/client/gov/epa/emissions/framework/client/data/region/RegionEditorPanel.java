@@ -233,7 +233,7 @@ public class RegionEditorPanel extends JPanel {
         region.setResolution(resolution.getText() == null ? null : resolution.getText().trim());
         
         if (ioapiName.isEnabled())
-            region.setIoapiName(ioapiName.getText() == null ? null : ioapiName.getName().trim());
+            region.setIoapiName(ioapiName.getText() == null ? null : ioapiName.getText().trim());
         
         if (mapProjection.isEnabled())
             region.setMapProjection(mapProjection.getText() == null ? null : mapProjection.getText().trim());
