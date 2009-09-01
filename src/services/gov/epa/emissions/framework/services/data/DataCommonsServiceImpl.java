@@ -384,8 +384,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             return (GeoRegion)dao.load(GeoRegion.class, newRegion.getName(), session);
         } catch (Exception e) {
             LOG.error("Could not add new GeoRegion", e);
-            throw new EmfException("Could not add new GeoRegion" + (e.getMessage() == null ? "." : ": " 
-                + e.getMessage().substring(1,50)));
+            String err = e.getMessage() == null ? "." : ": " + e.getMessage();
+            err = err.length() > 50 ? err.substring(0, 49) : err;
+            throw new EmfException("Could not add new GeoRegion" + err);
         } finally {
             if (session != null && session.isConnected())
                 session.close();
