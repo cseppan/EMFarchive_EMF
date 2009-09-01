@@ -307,10 +307,7 @@ public class ManagedCaseService {
         } catch (Exception e) {
             log.error("Could not get job for job id " + jobId + ".\n", e);
             throw new EmfException("Could not get job for job id " + jobId + ".\n");
-        } finally {
-            if (session != null && session.isConnected())
-                session.close();
-        }
+        } 
     }
 
     public synchronized Sector[] getSectorsUsedbyJobs(int caseId) throws EmfException {
