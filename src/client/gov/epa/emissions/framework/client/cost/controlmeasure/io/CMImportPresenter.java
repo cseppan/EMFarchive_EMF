@@ -64,7 +64,8 @@ public class CMImportPresenter {
 
     private String getDefaultBaseFolder() {
         String folder = session.preferences().inputFolder();
-        if (!new File(folder).isDirectory())
+        if (folder == null) folder = "";
+        else if (!new File(folder).isDirectory())
             folder = "";// default, if unspecified
 
         return folder;
