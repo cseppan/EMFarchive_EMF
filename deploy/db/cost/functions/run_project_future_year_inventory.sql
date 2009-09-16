@@ -829,7 +829,7 @@ BEGIN
 			and dr.input_ds_id = inv.dataset_id
 			and dr.apply_order = 1
 
-			inner join emf.pollutants p
+			left outer join emf.pollutants p
 			on p.name = inv.poll
 			
 			' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
@@ -1126,7 +1126,7 @@ BEGIN
 			and pdr.input_ds_id = inv.dataset_id
 			and pdr.apply_order = 1
 
-			inner join emf.pollutants p
+			left outer join emf.pollutants p
 			on p.name = inv.poll
 			
 			' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
