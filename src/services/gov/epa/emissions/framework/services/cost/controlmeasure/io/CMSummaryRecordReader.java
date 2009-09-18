@@ -217,14 +217,14 @@ public class CMSummaryRecordReader {
 
     private Sector[] getSectors(String name) throws CMImporterException {
         if (name.indexOf("|") < 0)
-            return new Sector[] { sectors.getSector(name) };
+            return new Sector[] { sectors.getSector(name.trim().toLowerCase()) };
         
         StringTokenizer st = new StringTokenizer(name, "|");
         String[] names = new String[st.countTokens()];
         Sector[] sarray = new Sector[names.length];
         
         for (int i = 0; i < names.length; i++)
-            names[i] = st.nextToken().trim();
+            names[i] = st.nextToken().trim().toLowerCase();
         
         for (int i = 0; i < names.length; i++) {
             sarray[i] = sectors.getSector(names[i].trim().toLowerCase());
