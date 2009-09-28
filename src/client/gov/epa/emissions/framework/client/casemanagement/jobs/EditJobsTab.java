@@ -338,7 +338,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             public void actionPerformed(ActionEvent e) {
                 try {
                     clearMessage();
-                    editJobs();
+                    editJobs(getSelectedJobs());
                 } catch (EmfException ex) {
                     messagePanel.setError(ex.getMessage());
                 }
@@ -420,9 +420,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         refresh();
     }
 
-    private void editJobs() throws EmfException {
-        List<CaseJob> jobs = getSelectedJobs();
-
+    private void editJobs(List<CaseJob> jobs) throws EmfException {
         if (jobs.size() == 0) {
             messagePanel.setMessage("Please select job(s) to edit.");
             return;
@@ -453,9 +451,18 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
                 + " job(s) to case: ", "Copy Case Jobs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected,
                 selected[getDefultIndex(selected)]);
 
-        if ((selectedCase != null) && (selectedCase.length() > 0)) {
-            presenter.copyJobs(getCaseId(selectedCase), jobs);
+        if ((selectedCase != null) && (selectedCase.length() > 0)) 
+            processCopyjobs(getCaseId(selectedCase), jobs);
+    }
+
+    private void processCopyjobs(int caseId, List<CaseJob> jobs) throws Exception {
+        if (caseId == this.caseObj.getId()) {
+            List<CaseJob> copied = presenter.copyJobs2CurrentCase(caseId, jobs);
+            editJobs(copied);
+            return;
         }
+        
+        presenter.copyJobs(caseId, jobs);
     }
 
     private void modifyJobs() throws Exception {

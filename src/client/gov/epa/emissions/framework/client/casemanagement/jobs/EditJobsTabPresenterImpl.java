@@ -62,7 +62,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     public void doSave(CaseJob[] jobs) throws EmfException {
         for (CaseJob job : jobs)
             service().updateCaseJobStatus(job);
-        
+
         view.refresh();
     }
 
@@ -123,7 +123,18 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         presenter.display(job);
     }
 
-    public void copyJob2CurrentCase(int caseId, CaseJob job, EditCaseJobView jobEditor) throws Exception {
+    public List<CaseJob> copyJobs2CurrentCase(int caseId, List<CaseJob> jobs) throws Exception {
+        List<CaseJob> added = new ArrayList<CaseJob>();
+
+        if (caseId == this.caseObj.getId()) {
+            for (CaseJob job : jobs)
+                added.add(addNewJob(setJobValuesB4Copy(caseId, job)));
+        }
+
+        return added;
+    }
+
+    public CaseJob setJobValuesB4Copy(int caseId, CaseJob job) throws Exception {
         CaseJob newJob = (CaseJob) DeepCopy.copy(job);
         newJob.setCaseId(caseId);
         newJob.setName(getUniqueNewName("Copy of " + job.getName()));
@@ -133,26 +144,20 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         newJob.setRunStartDate(null);
         newJob.setRunCompletionDate(null);
         newJob.setRunJobUser(null); // not running at this moment
-
-        addNewJob(newJob);
+        return newJob;
     }
 
     public void copyJobs(int caseId, List<CaseJob> jobs) throws Exception {
-        if (caseId == this.caseObj.getId()) {
-            for (CaseJob job : jobs)
-                copyJob2CurrentCase(caseId, job, null);
-        } else {
-            CaseJob[] jobsArray = jobs.toArray(new CaseJob[0]);
-            User user = session.user();
+        CaseJob[] jobsArray = jobs.toArray(new CaseJob[0]);
+        User user = session.user();
 
-            for (int i = 0; i < jobs.size(); i++) {
-                jobsArray[i].setParentCaseId(this.caseObj.getId());
-                jobsArray[i].setRunJobUser(null); // not running at this moment
-                jobsArray[i].setUser(user); // job owner changes
-            }
-
-            service().addCaseJobs(user, caseId, jobsArray);
+        for (int i = 0; i < jobs.size(); i++) {
+            jobsArray[i].setParentCaseId(this.caseObj.getId());
+            jobsArray[i].setRunJobUser(null); // not running at this moment
+            jobsArray[i].setUser(user); // job owner changes
         }
+
+        service().addCaseJobs(user, caseId, jobsArray);
     }
 
     public CaseJob[] getCaseJobs() throws EmfException {
@@ -185,22 +190,22 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         service().runJobs(jobIds, caseObj.getId(), session.user());
         System.out.println("Finished running jobs");
     }
-    
+
     public Host[] getJobHosts() throws EmfException {
         caseObjectManager.refresh();
         return this.caseObjectManager.getJobHosts();
     }
-    
+
     public Sector[] getJobSectors() throws EmfException {
         caseObjectManager.refresh();
         return this.caseObjectManager.getSectors();
     }
-    
+
     public GeoRegion[] getGeoRegions() throws EmfException {
         List<GeoRegion> all = new ArrayList<GeoRegion>();
         all.add(new GeoRegion(""));
         all.addAll(Arrays.asList(caseObjectManager.getGeoRegions()));
-        
+
         return all.toArray(new GeoRegion[0]);
     }
 
@@ -217,7 +222,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
             if (status == null || status.trim().isEmpty())
                 ok.add(status);
-            
+
             if (status != null && status.equalsIgnoreCase("Not Started"))
                 ok.add(status);
 
@@ -327,7 +332,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
         view.addSector(sector);
     }
-    
+
     public void addNewRegionToSummary(CaseJob job) {
         GeoRegion region = job.getRegion();
 
@@ -356,20 +361,20 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
                 int count = service().cancelJobs(getJobIds(jobs2Cancel), session.user());
                 return count + " jobs have been successfully canceled.";
             }
-            
+
             return "No job has been canceled.";
         } catch (EmfException e) {
             String msg = e.getMessage();
-            
+
             if (msg == null || msg.trim().isEmpty())
                 msg = "error cancelling jobs.";
-            
+
             if (msg.length() > 80)
                 msg = msg.substring(0, 78) + "...";
-            
+
             if (!msg.endsWith("."))
                 msg += ".";
-                
+
             return "Warning: " + msg;
         }
     }
