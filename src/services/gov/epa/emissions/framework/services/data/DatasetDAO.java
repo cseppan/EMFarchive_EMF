@@ -1222,7 +1222,7 @@ public class DatasetDAO {
         String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE '%%" + desc.trim() + "%%'");
         String query = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
         		+ " DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
-        		+ " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse LEFT JOIN DS.project LEFT JOIN DS.region RIGHT JOIN DS.keyVals keyVal"
+        		+ " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse LEFT JOIN DS.project LEFT JOIN DS.region"
         		+ dsKeyStr
         		+ " WHERE DS.status <> 'Deleted'"
         		+ dsTypeStr
@@ -1240,7 +1240,7 @@ public class DatasetDAO {
         if (keyVals.length == 0)
             return "";
         
-        StringBuilder withStr = new StringBuilder(" WITH ");
+        StringBuilder withStr = new StringBuilder(" INNER JOIN DS.keyVals keyVal WITH ");
         
         for (KeyVal kv : keyVals) {
             String name = kv.getName();
