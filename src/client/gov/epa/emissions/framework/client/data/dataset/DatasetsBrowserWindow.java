@@ -96,7 +96,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private void createDSTypesComboBox() {
         dsTypesBox = new ComboBox("Select one", allDSTypes);
-        dsTypesBox.setPreferredSize(new Dimension(420, 25));
+        dsTypesBox.setPreferredSize(new Dimension(360, 25));
         dsTypesBox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 DatasetType type = getSelectedDSType();
@@ -110,13 +110,17 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         });
     }
 
-    private DatasetType getSelectedDSType() {
+    public DatasetType getSelectedDSType() {
         Object selected = dsTypesBox.getSelectedItem();
 
         if (selected == null)
             return new DatasetType("Select one");
 
         return (DatasetType) selected;
+    }
+    
+    public void setDSTypeSelection(DatasetType type) {
+        dsTypesBox.setSelectedItem(type);
     }
     
 //    private void loadDataset(){
@@ -169,8 +173,24 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 }
             }
         });
+        
+        Button advButton = new Button("Advanced", new AbstractAction(){
+            public void actionPerformed(ActionEvent arg0) {
+                advancedSearch();
+            }
+        });
+        advButton.setToolTipText("Advanced search");
+        
+        JPanel advPanel = new JPanel(new BorderLayout(5, 2));
+        JLabel jlabel = new JLabel("Name Contains:");
+        jlabel.setHorizontalAlignment(JLabel.RIGHT);
+        advPanel.add(jlabel, BorderLayout.WEST);
+        advPanel.add(textFilter, BorderLayout.CENTER);
+        advPanel.add(advButton, BorderLayout.EAST);
+        advPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 5));
+        
         topPanel.add(getDSTypePanel("Show Datasets of Type:", dsTypesBox), BorderLayout.LINE_START);
-        topPanel.add(nameContains("Name Contains: ", textFilter), BorderLayout.EAST);
+        topPanel.add(advPanel, BorderLayout.EAST);
 
         JPanel panel = new JPanel(new GridLayout(2, 1));
         panel.add(msgRefreshPanel);
@@ -180,6 +200,12 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
     
  
+
+    private void advancedSearch() {
+        DatasetSearchWindow view = new DatasetSearchWindow("Search Datasets Table", parentConsole, desktopManager);
+        view.observe(presenter);
+        view.display();
+    }
 
     private JPanel getDSTypePanel(String label, JComboBox box) {
         JPanel panel = new JPanel(new BorderLayout(5, 2));
@@ -192,16 +218,16 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         return panel;
     }
     
-    private JPanel nameContains(String label, TextField textFilter) {
-        JPanel panel = new JPanel(new BorderLayout(5, 2));
-        JLabel jlabel = new JLabel(label);
-        jlabel.setHorizontalAlignment(JLabel.RIGHT);
-        panel.add(jlabel, BorderLayout.WEST);
-        panel.add(textFilter, BorderLayout.CENTER);
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-
-        return panel;
-    }
+//    private JPanel nameContains(String label, TextField textFilter) {
+//        JPanel panel = new JPanel(new BorderLayout(5, 2));
+//        JLabel jlabel = new JLabel(label);
+//        jlabel.setHorizontalAlignment(JLabel.RIGHT);
+//        panel.add(jlabel, BorderLayout.WEST);
+//        panel.add(textFilter, BorderLayout.CENTER);
+//        panel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+//
+//        return panel;
+//    }
 
     private JPanel createControlPanel() {
         JPanel controlPanel = new JPanel();
@@ -540,4 +566,5 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         return textFilter.getText();
         
     }
+
 }

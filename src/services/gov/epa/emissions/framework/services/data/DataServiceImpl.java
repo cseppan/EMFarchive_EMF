@@ -1442,4 +1442,17 @@ public class DataServiceImpl implements DataService {
             closeDB(dbServer);
         }
     }
+
+    public EmfDataset[] findDatasets(EmfDataset dataset) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            return dao.findSimilarDatasets(dataset, session).toArray(new EmfDataset[0]);
+        } catch (Exception e) {
+            LOG.error("Could not find similar datasets.", e);
+            throw new EmfException("Could not find similar datasets.");
+        } finally {
+            session.close();
+        }
+    }
 }

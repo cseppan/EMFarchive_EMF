@@ -73,6 +73,7 @@
       <list-index column="list_index"/>
       <composite-element class="gov.epa.emissions.commons.data.KeyVal">
 	    <property name="value" column="value" not-null="true"/>	
+	    <property name="kwname" column="kwname" not-null="true"/>	
 	    <many-to-one  name="keyword" column="keyword_id" 
 	     class="gov.epa.emissions.commons.data.Keyword" cascade="save-update"/>
       </composite-element>

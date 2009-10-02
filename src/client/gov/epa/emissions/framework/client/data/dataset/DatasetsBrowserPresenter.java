@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
@@ -58,6 +59,23 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         view.clearMessage();
     }
     
+    public void refreshView(EmfDataset[] datasets) {
+        DatasetType dsType = getDstype(datasets);
+        view.setDSTypeSelection(dsType);
+        view.refresh(datasets);
+        view.clearMessage();
+    }
+    
+    private DatasetType getDstype(EmfDataset[] datasets) {
+        DatasetType type = datasets[0].getDatasetType();
+        
+        for (EmfDataset ds : datasets)
+            if (ds.getDatasetType() != type)
+                return new DatasetType("All");
+            
+        return type;
+    }
+
     public DatasetType[] getDSTypes() throws EmfException {
         return session.dataCommonsService().getDatasetTypes();
     }
@@ -175,6 +193,16 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         
         return dataService().getDatasetsWithFilter(type.getId(), nameContains);
     }
+    
+    public EmfDataset[] advSearch4Datasets(DatasetType type, EmfDataset ds) throws EmfException {
+        if (type.getName().equalsIgnoreCase("Select one"))
+            return new EmfDataset[0];
+        
+        if (type.getName().equalsIgnoreCase("All"))
+            ds.setDatasetType(null);
+        
+        return dataService().findDatasets(ds);
+    }
 
     public void purgeDeletedDatasets() throws EmfException {
         dataService().purgeDeletedDatasets(getUser());
@@ -206,6 +234,14 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     
     public EmfDataset[] getSelected() {
         return view.getSelected();
+    }
+
+    public Keyword[] getKeywords() throws EmfException {
+        return session.dataCommonsService().getKeywords();
+    }
+
+    public DatasetType getDSType() {
+        return view.getSelectedDSType();
     }
     
 }

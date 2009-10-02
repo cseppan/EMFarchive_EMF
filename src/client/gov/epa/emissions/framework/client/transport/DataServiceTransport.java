@@ -411,4 +411,14 @@ public class DataServiceTransport implements DataService {
         
     }
 
+    public EmfDataset[] findDatasets(EmfDataset dataset) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("findDatasets");
+        call.addParam("dataset", mappings.dataset());
+        call.setReturnType(mappings.datasets());
+        
+        return (EmfDataset[]) call.requestResponse(new Object[]{ dataset });
+    }
+
 }

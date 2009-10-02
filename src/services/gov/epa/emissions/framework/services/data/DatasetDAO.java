@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.db.DataQuery;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
@@ -144,7 +145,7 @@ public class DatasetDAO {
         return session
                 .createQuery(
                         "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
-                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
+                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region"
                                 + " where DS.status <> 'Deleted' order by DS.name").list();
     }
     
@@ -152,7 +153,7 @@ public class DatasetDAO {
         return session
                 .createQuery(
                         "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
-                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
+                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region"
                                 + " where lower(DS.name) like "
                                 + "'%%"
                                 + nameContains.toLowerCase().trim() + "%%' and DS.status <> 'Deleted' order by DS.name").list();
@@ -331,7 +332,7 @@ public class DatasetDAO {
         return session
                 .createQuery(
                         "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime,DS.stopDateTime, DS.temporalResolution) "
-                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
+                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region"
                                 + " where DS.datasetType.id = "
                                 + datasetTypeId
                                 + " and DS.status <> 'Deleted' order by DS.name").list();
@@ -341,7 +342,7 @@ public class DatasetDAO {
         return session
                 .createQuery(
                         "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
-                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region "
+                                + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region"
                                 + " where DS.datasetType.id = "
                                 + datasetTypeId
                                 + " and lower(DS.name) like "
@@ -1209,5 +1210,45 @@ public class DatasetDAO {
     public void importRemoteDataset() {
         //
         
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<EmfDataset> findSimilarDatasets(EmfDataset ds, Session session) {
+        String dsTypeStr = (ds.getDatasetType() == null ? "" : " AND DS.datasetType.id = " + ds.getDatasetType().getId());
+        String name = ds.getName();
+        String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE '%%" + name.trim() + "%%'");
+        String dsKeyStr = getKeyStr(ds.getKeyVals());
+        String desc = ds.getDescription();
+        String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE '%%" + desc.trim() + "%%'");
+        String query = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
+        		+ " DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
+        		+ " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse LEFT JOIN DS.project LEFT JOIN DS.region RIGHT JOIN DS.keyVals keyVal"
+        		+ dsKeyStr
+        		+ " WHERE DS.status <> 'Deleted'"
+        		+ dsTypeStr
+        		+ dsNameStr
+        		+ descStr
+        		+ " ORDER BY DS.name";
+        System.out.println("findSimilarDatasets(): " + query);
+        List<?> list = session.createQuery(query).list();
+        System.out.println(list.size() + " datasets selected.");
+        
+        return session.createQuery(query).list();
+    }
+
+    private String getKeyStr(KeyVal[] keyVals) {
+        if (keyVals.length == 0)
+            return "";
+        
+        StringBuilder withStr = new StringBuilder(" WITH ");
+        
+        for (KeyVal kv : keyVals) {
+            String name = kv.getName();
+            String value = kv.getValue();
+            value = (value == null || value.trim().isEmpty()) ? "" : " AND keyVal.value = '" + value.trim() + "'";
+            withStr.append("(keyVal.kwname = '" + name + "'" + value + ") OR ");
+        }
+        
+        return withStr.toString().substring(0, withStr.length()-3);
     }
 }

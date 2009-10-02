@@ -970,3 +970,7 @@ ALTER TABLE emf.revisions ADD COLUMN lock_date timestamp;
 ALTER TABLE emf.georegions ADD COLUMN lock_owner varchar(255);
 ALTER TABLE emf.georegions ADD COLUMN lock_date timestamp;
 
+--added (10/1/09) to allow search datasets on KeyVal
+ALTER TABLE emf.datasets_keywords ADD COLUMN kwname varchar(255) NOT NULL DEFAULT '';
+UPDATE emf.datasets_keywords AS kw SET kwname = (SELECT name FROM emf.keywords WHERE id = kw.keyword_id);
+
