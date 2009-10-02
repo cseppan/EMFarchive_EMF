@@ -100,7 +100,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
             public void actionPerformed(ActionEvent event) {
                 try {
                     messagePanel.clear();
-                    EmfDataset[] datasets = search(presenter.getDSType(), getDataset());
+                    DatasetType sType = presenter.getDSType();
+                    EmfDataset[] datasets = search(sType, getDataset());
 
                     if (datasets.length > 100) {
                         String msg = "Number of datasets > 100. Would you like to continue?";
@@ -110,7 +111,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                             return;
                     }
 
-                    presenter.refreshView(datasets);
+                    presenter.refreshView(datasets, sType);
                 } catch (EmfException e) {
                     if (e.getMessage().length() > 100)
                         messagePanel.setError(e.getMessage().substring(0, 100) + "...");

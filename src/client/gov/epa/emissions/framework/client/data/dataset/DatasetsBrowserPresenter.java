@@ -59,21 +59,24 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         view.clearMessage();
     }
     
-    public void refreshView(EmfDataset[] datasets) {
-        DatasetType dsType = getDstype(datasets);
+    public void refreshView(EmfDataset[] datasets, DatasetType type) {
+        DatasetType dsType = getDstype(datasets, type);
         view.setDSTypeSelection(dsType);
         view.refresh(datasets);
         view.clearMessage();
     }
     
-    private DatasetType getDstype(EmfDataset[] datasets) {
-        DatasetType type = datasets[0].getDatasetType();
+    private DatasetType getDstype(EmfDataset[] datasets, DatasetType type) {
+        if (datasets.length == 0)
+            return type;
+        
+        DatasetType temp = datasets[0].getDatasetType();
         
         for (EmfDataset ds : datasets)
-            if (ds.getDatasetType() != type)
+            if (!ds.getDatasetType().equals(temp))
                 return new DatasetType("All");
             
-        return type;
+        return temp;
     }
 
     public DatasetType[] getDSTypes() throws EmfException {
