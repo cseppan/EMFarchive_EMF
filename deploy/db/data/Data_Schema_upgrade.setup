@@ -975,4 +975,4 @@ ALTER TABLE emf.datasets_keywords ADD COLUMN kwname varchar(255) NOT NULL DEFAUL
 UPDATE emf.datasets_keywords AS kw SET kwname = (SELECT name FROM emf.keywords WHERE id = kw.keyword_id);
 
 --added (10/7/09) to add descriptions to dataset versions
-ALTER TABLE emissions.versions ADD COLUMN description varchar(255) NOT NULL DEFAULT '';
+ALTER TABLE emissions.versions ADD COLUMN description text NOT NULL DEFAULT '';
