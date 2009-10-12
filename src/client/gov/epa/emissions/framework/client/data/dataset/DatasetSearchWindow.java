@@ -21,6 +21,9 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -41,11 +44,13 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     private TextField desc;
 
     private ComboBox keyword;
+    
+    private ComboBox dsTypesBox;
 
     private TextField value;
-
+    
     public DatasetSearchWindow(String title, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super(title, new Dimension(400, 260), desktopManager);
+        super(title, new Dimension(500, 280), desktopManager);
         parent = parentConsole;
     }
 
@@ -73,18 +78,23 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGen = new SpringLayoutGenerator();
 
-        name = new TextField("namefilter", 18);
-        desc = new TextField("descfilter", 18);
+        dsTypesBox = new ComboBox("Select one", getAllDSTypes());
+        Dimension dim = dsTypesBox.getPreferredSize();
         keyword = new ComboBox("Select one", presenter.getKeywords());
-        value = new TextField("keyvalue", 18);
+        keyword.setPreferredSize(dim);
+        
+        name = new TextField("namefilter", 32);
+        desc = new TextField("descfilter", 32);
+        value = new TextField("keyvalue", 32);
 
         layoutGen.addLabelWidgetPair("Name contains:", name, panel);
         layoutGen.addLabelWidgetPair("Description contains:", desc, panel);
+        layoutGen.addLabelWidgetPair("Datast type:", dsTypesBox, panel);
         layoutGen.addLabelWidgetPair("Keyword:", keyword, panel);
         layoutGen.addLabelWidgetPair("Keyword value:", value, panel);
 
         // Lay out the panel.
-        layoutGen.makeCompactGrid(panel, 4, 2, // rows, cols
+        layoutGen.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 10);// xPad, yPad
 
@@ -100,8 +110,11 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
             public void actionPerformed(ActionEvent event) {
                 try {
                     messagePanel.clear();
-                    DatasetType sType = presenter.getDSType();
-                    EmfDataset[] datasets = search(sType, getDataset());
+                    
+                    if (!checkFields())
+                        return;
+                    
+                    EmfDataset[] datasets = search(getDataset());
 
                     if (datasets.length > 100) {
                         String msg = "Number of datasets > 100. Would you like to continue?";
@@ -111,7 +124,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                             return;
                     }
 
-                    presenter.refreshView(datasets, sType);
+                    DatasetType type = (DatasetType)dsTypesBox.getSelectedItem();
+                    presenter.refreshView(datasets, getDstype(datasets, type));
                 } catch (EmfException e) {
                     if (e.getMessage().length() > 100)
                         messagePanel.setError(e.getMessage().substring(0, 100) + "...");
@@ -137,11 +151,21 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         return controlPanel;
     }
 
+    protected boolean checkFields() {
+        if ((name.getText() == null || name.getText().trim().isEmpty())
+                && (desc.getText() == null || desc.getText().trim().isEmpty())
+                && dsTypesBox.getSelectedItem() == null
+                && keyword.getSelectedItem() == null)
+            return false;
+        
+        return true;
+    }
+
     protected EmfDataset getDataset() {
         EmfDataset ds = new EmfDataset();
-        ds.setDatasetType(presenter.getDSType());
         ds.setName(name.getText());
         ds.setDescription(desc.getText());
+        ds.setDatasetType(getSelectedDSType());
         Keyword kw = (Keyword) keyword.getSelectedItem();
 
         if (kw != null) {
@@ -151,9 +175,38 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
         return ds;
     }
+    
+    private DatasetType[] getAllDSTypes() throws EmfException {
+        List<DatasetType> dbDSTypes = new ArrayList<DatasetType>();
+        dbDSTypes.add(new DatasetType("All"));
+        dbDSTypes.addAll(Arrays.asList(presenter.getDSTypes()));
+        return dbDSTypes.toArray(new DatasetType[0]);
+    }
+    
+    private DatasetType getDstype(EmfDataset[] datasets, DatasetType type) {
+        if (datasets.length == 0)
+            return type;
+        
+        DatasetType temp = datasets[0].getDatasetType();
+        
+        for (EmfDataset ds : datasets)
+            if (!ds.getDatasetType().equals(temp))
+                return new DatasetType("All");
+            
+        return temp;
+    }
+    
+    public DatasetType getSelectedDSType() {
+        DatasetType selected = (DatasetType)dsTypesBox.getSelectedItem();
+        
+        if (selected != null && selected.getName().equals("All"))
+            return null;
 
-    public EmfDataset[] search(DatasetType type, EmfDataset dataset) throws EmfException {
-        return presenter.advSearch4Datasets(type, dataset);
+        return selected;
+    }
+
+    public EmfDataset[] search(EmfDataset dataset) throws EmfException {
+        return presenter.advSearch4Datasets(dataset);
     }
 
     public void observe(DatasetsBrowserPresenter presenter) {

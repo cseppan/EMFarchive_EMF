@@ -197,13 +197,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         return dataService().getDatasetsWithFilter(type.getId(), nameContains);
     }
     
-    public EmfDataset[] advSearch4Datasets(DatasetType type, EmfDataset ds) throws EmfException {
-        if (type.getName().equalsIgnoreCase("Select one"))
-            return new EmfDataset[0];
-        
-        if (type.getName().equalsIgnoreCase("All"))
-            ds.setDatasetType(null);
-        
+    public EmfDataset[] advSearch4Datasets(EmfDataset ds) throws EmfException {
         return dataService().findDatasets(ds);
     }
 
