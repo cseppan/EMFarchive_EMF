@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
@@ -22,21 +23,28 @@ import javax.swing.SpringLayout;
 public class EditVersionDialog extends Dialog {
 
     private TextField name;
-    
-    protected boolean shouldChange=false;
+
+    private TextArea descriptionTextArea;
+
+    protected boolean shouldChange = false;
 
     private Version version;
 
     private VersionsSet versionsSet;
+
+    private String originalName;
     
     public EditVersionDialog(EmfDataset dataset, Version selectedVersion, Version[] versions, EmfConsole parent) {
+
         super("Edit Version " + selectedVersion.getVersion() + " of " + dataset.getName(), parent);
-       // this.dataset = dataset;
-        super.setSize(new Dimension(400, 130));
-        this.version=selectedVersion;
+        // this.dataset = dataset;
+        super.setSize(new Dimension(400, 250));
+        this.version = selectedVersion;
         versionsSet = new VersionsSet(versions);
         super.getContentPane().add(createLayout());
         super.center();
+    
+        this.originalName = selectedVersion.getName();
     }
 
     private JPanel createLayout() {
@@ -57,14 +65,18 @@ public class EditVersionDialog extends Dialog {
         name.setText(version.getName());
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
+        this.descriptionTextArea = new TextArea("", version.getDescription(), 25, 6);
+        this.descriptionTextArea.setBorder(this.name.getBorder());
+        this.descriptionTextArea.setText(version.getDescription());
+        layoutGenerator.addLabelWidgetPair("Description", this.descriptionTextArea, panel);
+
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 15, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
     }
-
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
@@ -73,6 +85,7 @@ public class EditVersionDialog extends Dialog {
                 if (verifyInput()) {
                     shouldChange = true;
                     version.setName(name.getText().trim());
+                    version.setDescription(descriptionTextArea.getText());
                     close();
                 }
             }
@@ -94,23 +107,27 @@ public class EditVersionDialog extends Dialog {
     protected boolean verifyInput() {
         String newName = name().trim();
         if (newName.length() == 0) {
-            JOptionPane.showMessageDialog(super.getParent(), 
-                    "Please enter a name", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(super.getParent(), "Please enter a name", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
-        if (newName.contains("(") || newName.contains(")"))
-        {
-            JOptionPane.showMessageDialog(super.getParent(), 
-                   "Please enter a name that does not contain parentheses", 
-                  "Error", JOptionPane.ERROR_MESSAGE);
+        if (newName.contains("(") || newName.contains(")")) {
+            JOptionPane.showMessageDialog(super.getParent(), "Please enter a name that does not contain parentheses",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
-        if (isDuplicate(newName)) {
-            JOptionPane.showMessageDialog(super.getParent(), 
-                    "Please enter a unique 'name'", "Error",JOptionPane.ERROR_MESSAGE);
-            return false;
+        /*
+         * we don't need to check if the new name and the original name are equal. This was added
+         * when "description" was added to allow editing of only the description.
+         */
+        if (!this.originalName.equals(newName)) {
+            
+            if (isDuplicate(newName)) {
+                JOptionPane.showMessageDialog(super.getParent(), "Please enter a unique 'name'", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
         }
 
         return true;
@@ -123,7 +140,7 @@ public class EditVersionDialog extends Dialog {
     protected void close() {
         super.dispose();
     }
-    
+
     public boolean shouldChange() {
         return shouldChange;
     }
@@ -132,12 +149,15 @@ public class EditVersionDialog extends Dialog {
         super.display();
     }
 
-    public Version getVersion(){
+    public Version getVersion() {
         return version;
     }
-    
+
     public String name() {
         return name.getText();
     }
-    
+
+    public String getDescription() {
+        return this.descriptionTextArea.getText();
+    }
 }

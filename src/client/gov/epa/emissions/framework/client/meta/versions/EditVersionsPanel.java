@@ -144,7 +144,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             newButton.setEnabled(false);
         }
 
-        Button renameButton = new Button("Rename", new AbstractAction() {
+        Button renameButton = new Button("Edit", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     doEdit();

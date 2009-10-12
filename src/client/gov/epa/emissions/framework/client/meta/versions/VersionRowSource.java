@@ -18,7 +18,7 @@ public class VersionRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { selected, source.getName(), new Integer(source.getVersion()), new Long(source.getBase()),
+        return new Object[] { selected, source.getName(), source.getDescription(), new Integer(source.getVersion()), new Long(source.getBase()),
                 source.getCreator().getUsername(), Boolean.valueOf(source.isFinalVersion()), source.getNumberRecords(),
                 format(source.getLastModifiedDate()) };
     }
