@@ -154,7 +154,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
                 }
             }
         });
-        renameButton.setToolTipText("Change version name");
+        renameButton.setToolTipText("Edit version information");
         renameButton.setMargin(new Insets(2, 2, 2, 2));
         panel.add(renameButton);
         if (dataset.getInternalSources().length == 0) {
