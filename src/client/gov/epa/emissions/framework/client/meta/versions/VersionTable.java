@@ -47,7 +47,7 @@ public class VersionTable extends JTable {
 
             if (this.descriptionComponent != null) {
 
-                this.descriptionComponent.setToolTipText("");
+                this.descriptionComponent.setToolTipText(null);
                 this.descriptionComponent = null;
             }
         }
