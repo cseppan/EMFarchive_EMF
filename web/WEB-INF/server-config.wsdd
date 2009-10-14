@@ -257,7 +257,7 @@
 	<beanMapping languageSpecificType="java:gov.epa.emissions.commons.data.Project"
 		qname="ns1:Project" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
-	<beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.data.IntendedUse"
+	<beanMapping languageSpecificType="java:gov.epa.emissions.commons.db.intendeduse.IntendedUse"
 		qname="ns1:IntendedUse" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping languageSpecificType="java:gov.epa.emissions.commons.data.Dataset"
@@ -766,7 +766,7 @@
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<arrayMapping qname="ns1:IntendedUses" xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.data.IntendedUse[]"
+		languageSpecificType="java:gov.epa.emissions.commons.db.intendeduse.IntendedUse[]"
 		innerType="ns1:IntendedUse"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 

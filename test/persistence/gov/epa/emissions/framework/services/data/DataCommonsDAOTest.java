@@ -4,16 +4,11 @@ import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
+import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.UserDAO;
-import gov.epa.emissions.framework.services.data.DataCommonsDAO;
-import gov.epa.emissions.framework.services.data.DatasetDAO;
-import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.IntendedUse;
-import gov.epa.emissions.framework.services.data.Note;
-import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.editor.Revision;
 
 import java.util.Date;

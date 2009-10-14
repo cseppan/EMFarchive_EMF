@@ -19,7 +19,7 @@
 
   <many-to-one cascade="save-update"
             name="intendedUse" 
-            class="gov.epa.emissions.framework.services.data.IntendedUse"
+            class="gov.epa.emissions.commons.db.intendeduse.IntendedUse"
             column="intended_use"/> 
 
   <many-to-one cascade="save-update"

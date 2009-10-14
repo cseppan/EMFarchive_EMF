@@ -31,6 +31,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.border.CompoundBorder;
 
 public class EditVersionsPanel extends JPanel implements EditVersionsView {
@@ -90,10 +91,10 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
 
         refreshLayout();
     }
-    
-//    public void doRefresh(){
-//        tableModel.refresh();
-//    }
+
+    // public void doRefresh(){
+    // tableModel.refresh();
+    // }
 
     public void add(Version version) {
         tableData.add(version);
@@ -113,13 +114,18 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         tableData = new VersionsTableData(versions);
         tableModel = new EmfTableModel(tableData);
 
-        ScrollableTable table = new ScrollableTable(tableModel, null);
-        //"Select", "Name", "Version", "Base", "Creator", "Is Final?", "#Records", "Date" 
+        JTable table = new VersionTable(tableModel);
+
+        ScrollableTable scrollableTable = new ScrollableTable(table, null);
+
+        // "Select", "Name", "Version", "Base", "Creator", "Is Final?", "#Records", "Date"
         // set maximum column width
         String[] columns = { "Select", "Version", "Base", "Is Final?" }; // table.setColWidthsBasedOnColNames();
-        table.setMaxColWidth(columns);
-        table.disableScrolling();
-        return table;
+        scrollableTable.setMaxColWidth(columns);
+        scrollableTable.setColumnWidth("Name", 100);
+        scrollableTable.setColumnWidth("Description", 200);
+        scrollableTable.setColumnWidth("Date", 120);
+        return scrollableTable;
     }
 
     private JPanel bottomPanel() {
@@ -262,8 +268,8 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             messagePanel.setMessage("Please select version(s) to mark as final.");
 
         if (versions.length == 1 && !versions[0].isFinalVersion()) {
-            String msg = "Would you like to make version " + versions[0].getVersion() + 
-                " the default version for the dataset?";
+            String msg = "Would you like to make version " + versions[0].getVersion()
+                    + " the default version for the dataset?";
             int makeDefault = JOptionPane.showConfirmDialog(parentConsole, msg, "Make Default Version",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null);
 
@@ -305,7 +311,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             edit.setEnabled(false);
         }
         panel.add(edit);
-        
+
         Button copy = copyButton(tableCombo);
         if (dataset.getInternalSources().length == 0) {
             edit.setEnabled(false);
@@ -336,7 +342,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         edit.setToolTipText("Edit the specified table for the selected versions");
         return edit;
     }
-    
+
     private Button copyButton(final JComboBox tableCombo) {
         Button copy = new CopyButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -373,34 +379,34 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             displayError(e.getMessage());
         }
     }
-    
+
     private void copyDataSet(Object table) {
         Version[] versions = tableData.selected();
-        
+
         if (versions.length < 1) {
             displayError("Please select a final version to copy");
             return;
         }
-        
+
         if (versions.length > 1) {
             displayError("Please select only one final version to copy");
             return;
         }
-        
+
         try {
-            if ( getYesNoSelection() == JOptionPane.YES_OPTION)
+            if (getYesNoSelection() == JOptionPane.YES_OPTION)
                 presenter.copyDataset(versions[0]);
             else
-                return; 
+                return;
         } catch (EmfException e) {
             displayError(e.getMessage());
             return;
         }
-        
+
         messagePanel.setMessage("Please go to the dataset manager window and Refresh to see the copied dataset.");
     }
-    
-    private int getYesNoSelection(){
+
+    private int getYesNoSelection() {
         String message = " Would you like to copy a version to new dataset? ";
         int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
@@ -441,8 +447,8 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             displayError(e.getMessage());
         }
     }
-    
-    public void refresh(){
+
+    public void refresh() {
         try {
             presenter.reload();
         } catch (EmfException e) {

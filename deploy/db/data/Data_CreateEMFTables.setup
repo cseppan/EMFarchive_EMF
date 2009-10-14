@@ -26,6 +26,7 @@ CREATE TABLE emissions.versions
   name varchar(255) NOT NULL,
   description text NOT NULL DEFAULT '',
   final_version bool NOT NULL DEFAULT false,
+  intended_use int4 REFERENCES emf.intended_uses (id),
   date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   creator int4 NOT NULL  DEFAULT 2::integer REFERENCES emf.users(id),
   number_records int8 DEFAULT 0::int8, 

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 
 import java.util.List;
