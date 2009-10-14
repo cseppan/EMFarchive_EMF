@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -20,6 +21,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -239,7 +241,15 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             return;
         }
 
-        Version lockedVersion = presenter.getLockedVersion(selectedVersions[0]);
+        Version selectedVersion = selectedVersions[0];
+        User creator = selectedVersion.getCreator();
+        if (!creator.equals(this.parentConsole.getSession().user())) {
+            this.messagePanel.setMessage("Error: Only the owner of the version, " + creator.getName()
+                    + ", can edit the version metadata.", Color.RED);
+            return;
+        }
+
+        Version lockedVersion = presenter.getLockedVersion(selectedVersion);
         if (lockedVersion == null)
             return;
 
