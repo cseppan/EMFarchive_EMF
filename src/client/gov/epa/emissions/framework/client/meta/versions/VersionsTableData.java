@@ -22,7 +22,7 @@ public class VersionsTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Select", "Name", "Description", "Version", "Base", "Creator", "Is Final?", "# of Records", "Date" };
+        return new String[] { "Select", "Name", "Description", "Version", "Base", "Creator", "Is Final?","Intended Use", "# of Records", "Date" };
     }
 
     public Class getColumnClass(int col) {
