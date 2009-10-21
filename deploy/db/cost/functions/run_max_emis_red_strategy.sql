@@ -49,10 +49,10 @@ DECLARE
 	inventory_sectors character varying := '';
 	include_unspecified_costs boolean := true; 
 	has_pm_target_pollutant boolean := false; 
+	has_cpri_column boolean := false; 
+	has_primary_device_type_code_column boolean := false; 
+	is_add_on_control_sql character varying;
 BEGIN
---	SET work_mem TO '256MB';
---	SET enable_seqscan TO 'off';
-
 
 	-- get the input dataset info
 	select lower(i.table_name)
@@ -141,8 +141,14 @@ BEGIN
 	-- see if there is lat & long columns in the inventory
 	has_latlong_columns := public.check_table_for_columns(inv_table_name, 'xloc,yloc', ',');
 
-	-- see if there is lat & long columns in the inventory
+	-- see if there is plant column in the inventory
 	has_plant_column := public.check_table_for_columns(inv_table_name, 'plant', ',');
+
+	-- see if there is plant column in the inventory
+	has_cpri_column := public.check_table_for_columns(inv_table_name, 'cpri', ',');
+
+	-- see if there is primary_device_type_code column in the inventory
+	has_primary_device_type_code_column := public.check_table_for_columns(inv_table_name, 'primary_device_type_code', ',');
 
 	-- get strategy constraints
 	SELECT csc.max_emis_reduction,
@@ -323,9 +329,17 @@ BEGIN
 			null, null'
 			end
 			|| '))';
+
+	--select strpos('abc,def,ght','ght')
 	get_strategt_cost_inner_sql := replace(get_strategt_cost_sql,'m.control_measures_id','m.id');
-
-
+	is_add_on_control_sql := 
+		' case when strpos('','' || inv.control_measures || '','', '','' || er.existing_measure_abbr || '','') > 0 '
+		|| case when has_cpri_column then ' or er.existing_dev_code = inv.cpri '
+			when has_primary_device_type_code_column then ' or er.existing_dev_code = inv.primary_device_type_code::integer '
+			else '' end || '
+		then true
+		else false end ';
+			
 	-- add both target and cobenefit pollutants, first get best target pollutant measure, then use that to apply to other pollutants.
 	execute
 --	raise notice '%', 
@@ -467,7 +481,13 @@ BEGIN
 					' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment,' end || '
 					er.control_measures_id,
 					' || percent_reduction_sql || ' as percent_reduction,
-					(select sum(' || replace(replace(replace(replace(replace(replace(get_strategt_cost_inner_sql,'inv.','inv2.'),'er.','er2.'),'et.','et2.'),'eq.','eq2.'),'gdplev.','gdplev2.'),'invpm25or10.','invpm25or10_2.') || '.annual_cost) as annual_cost
+
+					-- calculate the sources cost
+					-- target pollutant cost
+					coalesce(' || get_strategt_cost_inner_sql || '.annual_cost,0.0)
+					
+					-- cobenefit costs
+					+ coalesce((select sum(' || replace(replace(replace(replace(replace(replace(get_strategt_cost_inner_sql,'inv.','inv2.'),'er.','er2.'),'et.','et2.'),'eq.','eq2.'),'gdplev.','gdplev2.'),'invpm25or10.','invpm25or10_2.') || '.annual_cost) as annual_cost
 
 					FROM emissions.' || inv_table_name || ' inv2
 
@@ -539,13 +559,15 @@ BEGIN
 						and inv2.segment = inv.segment
 						' end || '
 
+						and inv2.poll <> ' || quote_literal(target_pollutant) || '
+
 						-- dont include sources that have no emissions...
 						and ' || replace(replace(uncontrolled_emis_sql,'inv.','inv2.'),'invpm25or10.','invpm25or10_2.') || ' <> 0.0
 
 						-- dont include sources that have been fully controlled...
 						and coalesce(100 * ' || case when not has_pm_target_pollutant then 'inv2.ceff' else 'coalesce(inv2.ceff, invpm25or10_2.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv2.reff' else 'coalesce(inv2.reff, invpm25or10_2.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv2.rpen' else 'coalesce(inv2.rpen, invpm25or10_2.rpen)' end || ' / 100, 1.0)' else '' end || ', 0) <> 100.0
 
-	) as source_annual_cost,
+					),0.0) as source_annual_cost,
 					m.equipment_life
 --,cstp.precedence
 
@@ -625,6 +647,33 @@ BEGIN
 					and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
 					-- effecive date filter
 					and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)		
+
+	-- handle add on controls
+	and (
+		(
+		length(coalesce(er.existing_measure_abbr,'''')) > 0 
+		and 
+		strpos('','' || inv.control_measures || '','', '','' || er.existing_measure_abbr || '','') > 0 
+		)
+		' || case when has_cpri_column or has_primary_device_type_code_column then '
+		or 
+		(coalesce(er.existing_dev_code,0) <> 0
+		and 
+		' || case when has_cpri_column then '
+		er.existing_dev_code = inv.cpri '
+			when has_primary_device_type_code_column then 
+		'er.existing_dev_code = inv.primary_device_type_code::integer '
+			else '' end || '
+		)
+		' else '' end || '
+		or 
+		(
+		length(coalesce(er.existing_measure_abbr,'''')) = 0
+		and
+		coalesce(er.existing_dev_code,0) = 0
+		)
+	)
+
 
 					' || case when measures_count = 0 and measure_classes_count > 0 then '
 					inner join emf.control_strategy_classes csc

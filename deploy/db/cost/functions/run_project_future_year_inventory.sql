@@ -446,6 +446,7 @@ BEGIN
 				where 1 = 0
 
 				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.proj_factor,',control_program_dataset_filter_sql || ' and ' || inv_filter || coalesce(county_dataset_filter_sql, '')) || '
+				order by record_id, ranking
 			) tbl';
 
 /*
@@ -642,15 +643,19 @@ BEGIN
 				where 1 = 0
 
 				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.ceff,proj.rpen,proj.reff,proj.pri_cm_abbrev,proj.replacement,',control_program_dataset_filter_sql || ' and proj.application_control = ''Y'' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone') || '
-			) tbl';
+
+				order by record_id, replacement, ranking	
+			 ) tbl';
 		END IF;
 
 	END LOOP;
 --		raise notice '%', sql;
 
+
+
 	IF length(sql) > 0 THEN
 		raise notice '%', 'next lets do controls ' || clock_timestamp();
-		sql := sql || ' order by record_id, replacement desc, ranking';
+		sql := sql || ' order by record_id, replacement, ranking';
 
 		inv_percent_reduction_sql := '(coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end, 0.0) * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end, 100) / 100 ' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end, 100.0) / 100.0 ' else '' end || ')';
 		cont_packet_percent_reduction_sql := '(cont.ceff * coalesce(cont.reff, 100) / 100 * coalesce(cont.rpen, 100) / 100)';
@@ -896,6 +901,8 @@ BEGIN
 			)
 
 		order by inv.record_id, 
+			--makes sure replacements trump add on controls
+			replacement, 
 			--makes sure we get the highest ranking control packet record
 			cont.ranking,
 			case when length(er.locale) = 5 then 0 when length(er.locale) = 2 then 1 else 2 end, 	
@@ -991,6 +998,7 @@ BEGIN
 				where 1 = 0
 
 				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.cap,proj.replacement,case when replacement is not null then ''R'' when cap is not null then ''C'' end as allowable_type,',control_program_dataset_filter_sql || ' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone') || '
+				order by record_id, allowable_type, ranking
 			) tbl';
 		END IF;
 

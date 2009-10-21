@@ -1,4 +1,4 @@
--- Utility Functions
+	-- Utility Functions
 --select public.convert_design_capacity_to_mw(150, 'MMBtu', 'hr');
 
 CREATE OR REPLACE FUNCTION public.convert_design_capacity_to_mw(design_capacity double precision, design_capacity_unit_numerator character varying, 
@@ -280,13 +280,13 @@ BEGIN
 				(1028000/ stack_flow_rate) ^ 0.6 * capital_cost_factor * gas_flow_rate_factor * retrofit_factor * stack_flow_rate
 			else
 				capital_cost_factor * gas_flow_rate_factor * retrofit_factor * stack_flow_rate
-		end;
+		end * 0.9383;
 
 	-- calculate annualized capital cost
 	annualized_capital_cost := capital_cost * cap_recovery_factor;
 
 	-- calculate operation maintenance cost
-	operation_maintenance_cost := (3.35 + (0.00729 * 8736)) * stack_flow_rate * 0.9383;
+	operation_maintenance_cost := (3.35 + (0.000729 * 8736)) * stack_flow_rate * 0.9383;
 
 	-- calculate annual cost
 	annual_cost := annualized_capital_cost + operation_maintenance_cost;
@@ -547,6 +547,172 @@ BEGIN
 		end;
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
+
+
+-- Type 9 - EGU PM Control Equations
+CREATE OR REPLACE FUNCTION public.get_type9_equation_costs(
+	control_measure_id integer, 
+	discount_rate double precision, 
+	equipment_life double precision, 
+	capital_recovery_factor double precision, 
+	emis_reduction double precision, 
+	stack_flow_rate double precision, -- in cfm
+	total_equipment_cost_factor double precision,
+	total_equipment_cost_constant double precision,
+	equipment_to_capital_cost_multiplier double precision,
+	electricity_factor double precision,
+	electricity_constant double precision,
+	dust_disposal_factor double precision,
+	dust_disposal_constant double precision,
+	bag_replacement_factor double precision,
+	bag_replacement_constant double precision,
+	OUT annual_cost double precision, 
+	OUT capital_cost double precision,
+	OUT operation_maintenance_cost double precision, 
+	OUT annualized_capital_cost double precision,
+	OUT computed_cost_per_ton double precision)  AS $$
+DECLARE
+	cap_recovery_factor double precision := capital_recovery_factor;
+BEGIN
+	-- * Comments *
+
+
+
+
+	-- * Comments *
+
+	-- get capital recovery factor, caculate if it wasn't passed in...
+        IF coalesce(cap_recovery_factor, 0) = 0 and coalesce(discount_rate, 0) != 0 and coalesce(equipment_life, 0) != 0 THEN 
+             cap_recovery_factor := public.calculate_capital_recovery_factor(discount_rate, equipment_life);
+        END IF;
+
+	-- calculate capital cost
+	capital_cost := ((total_equipment_cost_factor * stack_flow_rate) + total_equipment_cost_constant) * equipment_to_capital_cost_multiplier;
+
+	-- calculate operation maintenance cost
+	operation_maintenance_cost := 
+		((electricity_factor * stack_flow_rate) + electricity_constant) + ((dust_disposal_factor * stack_flow_rate) + dust_disposal_constant) + ((bag_replacement_factor * stack_flow_rate) + bag_replacement_constant);
+
+	-- calculate annualized capital cost
+	annualized_capital_cost := capital_cost * cap_recovery_factor;
+
+	-- calculate annual cost
+	annual_cost :=  annualized_capital_cost + operation_maintenance_cost;
+
+	-- calculate computed cost per ton
+	computed_cost_per_ton := 
+		case 
+			when coalesce(emis_reduction, 0) <> 0 then annual_cost / emis_reduction
+			else null
+		end;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+
+-- Type 10
+CREATE OR REPLACE FUNCTION public.get_type10_equation_costs(
+	discount_rate double precision, 
+	equipment_life double precision, 
+	capital_recovery_factor double precision, 
+	emis_reduction double precision, 
+	design_capacity double precision, 
+	annual_avg_hours_per_year double precision, 
+	capital_cost_multiplier double precision,
+	capital_cost_exponent double precision, 
+	variable_operation_maintenance_cost_multiplier double precision,
+	fixed_operation_maintenance_cost_multiplier double precision,
+	fixed_operation_maintenance_cost_exponent double precision, 
+	OUT annual_cost double precision, 
+	OUT capital_cost double precision, 
+	OUT variable_operation_maintenance_cost double precision, 
+	OUT fixed_operation_maintenance_cost double precision, 
+	OUT operation_maintenance_cost double precision, 
+	OUT annualized_capital_cost double precision, 
+	OUT computed_cost_per_ton double precision)  AS $$
+DECLARE
+	cap_recovery_factor double precision := capital_recovery_factor;
+BEGIN
+	-- get capital recovery factor, caculate if it wasn't passed in...
+        IF coalesce(cap_recovery_factor, 0) = 0 and coalesce(discount_rate, 0) != 0 and coalesce(equipment_life, 0) != 0 THEN 
+             cap_recovery_factor := public.calculate_capital_recovery_factor(discount_rate, equipment_life);
+        END IF;
+
+	-- calculate capital cost
+	capital_cost := design_capacity * capital_cost_multiplier * 1000 * (250.0 / design_capacity) ^ capital_cost_exponent;
+
+	-- calculate annualized capital cost
+	annualized_capital_cost := capital_cost * cap_recovery_factor;
+
+
+	-- calculate variable_operation_maintenance_cost 
+	variable_operation_maintenance_cost := variable_operation_maintenance_cost_multiplier * design_capacity * 0.85 * annual_avg_hours_per_year;
+	
+	-- calculate fixed_operation_maintenance_cost
+	fixed_operation_maintenance_cost := design_capacity * 1000 * fixed_operation_maintenance_cost_multiplier * (250 / design_capacity) ^ fixed_operation_maintenance_cost_exponent;
+
+--O2 *1000*0.24*(250/O2)^0.3
+
+	-- calculate operation maintenance cost
+	operation_maintenance_cost := variable_operation_maintenance_cost + fixed_operation_maintenance_cost;
+
+	-- calculate annual cost
+	annual_cost := annualized_capital_cost + operation_maintenance_cost;
+
+	-- calculate computed cost per ton
+	computed_cost_per_ton := 
+		case 
+			when coalesce(emis_reduction, 0) <> 0 then annual_cost / emis_reduction
+			else null
+		end;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+-- Type 11 - SO2 Non EGU Control Equations
+CREATE OR REPLACE FUNCTION public.get_type11_equation_costs(
+	discount_rate double precision, 
+	equipment_life double precision, 
+	capital_recovery_factor double precision, 
+	capital_annualized_ratio double precision, 
+	emis_reduction double precision, 
+	design_capacity double precision, 	-- needs to be in units of mmBTU/hr
+	low_default_cost_per_ton double precision,
+	low_boiler_capacity_range double precision, 
+	medium_default_cost_per_ton double precision,
+	medium_boiler_capacity_range double precision,
+	high_default_cost_per_ton double precision, 
+	OUT annual_cost double precision, 
+	OUT capital_cost double precision, 
+	OUT operation_maintenance_cost double precision, 
+	OUT annualized_capital_cost double precision, 
+	OUT computed_cost_per_ton double precision)  AS $$
+DECLARE
+	cap_recovery_factor double precision := capital_recovery_factor;
+BEGIN
+	-- get capital recovery factor, caculate if it wasn't passed in...
+        IF coalesce(cap_recovery_factor, 0) = 0 and coalesce(discount_rate, 0) != 0 and coalesce(equipment_life, 0) != 0 THEN 
+             cap_recovery_factor := public.calculate_capital_recovery_factor(discount_rate, equipment_life);
+        END IF;
+
+	-- figure out cost per ton
+	computed_cost_per_ton := 
+		case 
+			when design_capacity <= low_boiler_capacity_range then low_default_cost_per_ton
+			when design_capacity > low_boiler_capacity_range and design_capacity < medium_boiler_capacity_range then medium_default_cost_per_ton
+			when design_capacity >= medium_boiler_capacity_range then high_default_cost_per_ton
+		end;
+
+	-- calculate annual cost
+	annual_cost := emis_reduction * computed_cost_per_ton;
+	-- calculate capital cost
+	capital_cost := annual_cost  * capital_annualized_ratio;
+	-- calculate annualized capital cost
+	annualized_capital_cost := capital_cost * cap_recovery_factor;
+	-- calculate operation maintenance cost
+	operation_maintenance_cost := annual_cost - annualized_capital_cost;
+
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
 
 -- Cost Equation Factory Method
 CREATE OR REPLACE FUNCTION public.get_strategy_costs(
@@ -924,6 +1090,101 @@ BEGIN
 				valid_cost := false;
 				actual_equation_type := '-Type 8';
 			END IF;
+
+			-- Type 9
+			IF equation_type = 'Type 9' THEN
+				IF coalesce(stack_flow_rate, 0) <> 0 THEN
+					select costs.annual_cost,
+						costs.capital_cost,
+						costs.operation_maintenance_cost,
+						costs.annualized_capital_cost,
+						costs.computed_cost_per_ton
+					from public.get_type8_equation_costs(control_measure_id, 
+						discount_rate, 
+						equipment_life, 
+						capital_recovery_factor, 
+						emis_reduction, 
+						stack_flow_rate,
+						variable_coefficient1, 
+						variable_coefficient2, 
+						variable_coefficient3, 
+						variable_coefficient4, 
+						variable_coefficient5, 
+						variable_coefficient6, 
+						variable_coefficient7, 
+						variable_coefficient8, 
+						variable_coefficient9) as costs
+					into annual_cost,
+						capital_cost,
+						operation_maintenance_cost,
+						annualized_capital_cost,
+						computed_cost_per_ton;
+					IF annual_cost is not null THEN
+						valid_cost := true;
+						actual_equation_type := 'Type 9';
+					ELSE
+						valid_cost := false;
+						actual_equation_type := '-Type 9';
+					END IF;
+					-- adjust costs to the reference cost year
+					annual_cost := ref_yr_chained_gdp_adjustment_factor * annual_cost;
+					capital_cost := ref_yr_chained_gdp_adjustment_factor * capital_cost;
+					operation_maintenance_cost := ref_yr_chained_gdp_adjustment_factor * operation_maintenance_cost;
+					annualized_capital_cost := ref_yr_chained_gdp_adjustment_factor * annualized_capital_cost;
+					computed_cost_per_ton := ref_yr_chained_gdp_adjustment_factor * computed_cost_per_ton;
+					return;
+				END IF;
+				valid_cost := false;
+				actual_equation_type := '-Type 9';
+			END IF;
+
+			-- Type 11
+			IF equation_type = 'Type 11' THEN
+
+				-- convert design capacity to mmBTU/hr
+				converted_design_capacity := 3.412 * public.convert_design_capacity_to_mw(design_capacity, design_capacity_unit_numerator, design_capacity_unit_denominator);
+
+				IF coalesce(converted_design_capacity, 0) <> 0 THEN
+					select costs.annual_cost,
+						costs.capital_cost,
+						costs.operation_maintenance_cost,
+						costs.annualized_capital_cost,
+						costs.computed_cost_per_ton
+					from public.get_type11_equation_costs(discount_rate, 
+						equipment_life, 
+						capital_recovery_factor, 
+						capital_annualized_ratio, 
+						emis_reduction, 
+						converted_design_capacity, 
+						variable_coefficient1, 
+						variable_coefficient2, 
+						variable_coefficient3, 
+						variable_coefficient4, 
+						variable_coefficient5) as costs
+					into annual_cost,
+						capital_cost,
+						operation_maintenance_cost,
+						annualized_capital_cost,
+						computed_cost_per_ton;
+					IF annual_cost is not null THEN
+						valid_cost := true;
+						actual_equation_type := 'Type 11';
+					ELSE
+						valid_cost := false;
+						actual_equation_type := '-Type 11';
+					END IF;
+					-- adjust costs to the reference cost year
+					annual_cost := ref_yr_chained_gdp_adjustment_factor * annual_cost;
+					capital_cost := ref_yr_chained_gdp_adjustment_factor * capital_cost;
+					operation_maintenance_cost := ref_yr_chained_gdp_adjustment_factor * operation_maintenance_cost;
+					annualized_capital_cost := ref_yr_chained_gdp_adjustment_factor * annualized_capital_cost;
+					computed_cost_per_ton := ref_yr_chained_gdp_adjustment_factor * computed_cost_per_ton;
+					return;
+				END IF;
+				valid_cost := false;
+				actual_equation_type := '-Type 11';
+			END IF;
+
 		END IF;
 	END IF;
 
@@ -954,6 +1215,198 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
+
+
+-- Cost Equation Factory Method
+CREATE OR REPLACE FUNCTION public.get_strategy_costs(
+	use_cost_equations boolean, 
+	control_measure_id integer, 
+	measure_abbreviation character varying(10), 
+	discount_rate double precision, 
+	equipment_life double precision, 
+	capital_annualized_ratio double precision, 
+	capital_recovery_factor double precision, 
+	ref_yr_cost_per_ton double precision,  
+	emis_reduction double precision, 
+	ref_yr_chained_gdp_adjustment_factor double precision,
+	equation_type character varying(255), 
+	variable_coefficient1 double precision, 
+	variable_coefficient2 double precision, 
+	variable_coefficient3 double precision, 
+	variable_coefficient4 double precision, 
+	variable_coefficient5 double precision, 
+	variable_coefficient6 double precision, 
+	variable_coefficient7 double precision, 
+	variable_coefficient8 double precision, 
+	variable_coefficient9 double precision, 
+	variable_coefficient10 double precision, 
+	stack_flow_rate double precision, 
+	design_capacity double precision, 
+	design_capacity_unit_numerator character varying, 
+	design_capacity_unit_denominator character varying, 
+	annual_avg_hours_per_year double precision, 
+	OUT annual_cost double precision, 
+	OUT capital_cost double precision, 
+	OUT variable_operation_maintenance_cost double precision, 
+	OUT fixed_operation_maintenance_cost double precision, 
+	OUT operation_maintenance_cost double precision, 
+	OUT annualized_capital_cost double precision, 
+	OUT computed_cost_per_ton double precision, 
+	OUT actual_equation_type character varying(255)
+--	,OUT valid_cost boolean
+	)  AS $$
+DECLARE
+	converted_design_capacity double precision;
+	valid_cost boolean;
+BEGIN
+	-- at first, we can only assume that everything is right...
+	valid_cost := true;
+
+	-- Each Cost Equation Function will return costs in the cost year that is specified in the emf.control_measure_equations table, 
+	-- after the costs are calculated we can adjust the costs to the reference cost year.
+
+	-- try cost equations first, then maybe use default approach, if needed
+	IF use_cost_equations THEN
+		IF equation_type is not null THEN
+			-- Type 10
+			IF equation_type = 'Type 10' THEN
+				--default units numerator to MW
+--				design_capacity_unit_numerator := case when len(coalesce(design_capacity_unit_numerator, '')) = 0 then 'MW' else design_capacity_unit_numerator end;
+				converted_design_capacity := 
+					public.convert_design_capacity_to_mw(design_capacity, 
+					case 
+						when length(coalesce(design_capacity_unit_numerator, '')) = 0 then 
+							'MW'::character varying
+						else
+							design_capacity_unit_numerator
+					end
+					, design_capacity_unit_denominator);
+--					case 
+--						when len(coalesce(design_capacity_unit_numerator, '')) = 0 then 
+--							public.convert_design_capacity_to_mw(design_capacity, 'MW'::character varying, design_capacity_unit_denominator)
+--						else
+--							public.convert_design_capacity_to_mw(design_capacity, design_capacity_unit_numerator, design_capacity_unit_denominator)
+--					end;
+
+
+				IF coalesce(design_capacity, 0) <> 0 THEN
+					select costs.annual_cost,
+						costs.capital_cost,
+						costs.variable_operation_maintenance_cost,
+						costs.fixed_operation_maintenance_cost,
+						costs.operation_maintenance_cost,
+						costs.annualized_capital_cost,
+						costs.computed_cost_per_ton
+					from public.get_type10_equation_costs(
+						discount_rate, 
+						equipment_life,
+						capital_recovery_factor, 
+						emis_reduction, 
+						converted_design_capacity,
+						annual_avg_hours_per_year,
+						variable_coefficient1, 
+						variable_coefficient2, 
+						variable_coefficient3, 
+						variable_coefficient4, 
+						variable_coefficient5) as costs
+					into annual_cost,
+						capital_cost,
+						variable_operation_maintenance_cost,
+						fixed_operation_maintenance_cost,
+						operation_maintenance_cost,
+						annualized_capital_cost,
+						computed_cost_per_ton;
+					IF annual_cost is not null THEN
+						valid_cost := true;
+						actual_equation_type := 'Type 10';
+					ELSE
+						valid_cost := false;
+						actual_equation_type := '-Type 10';
+					END IF;
+					-- adjust costs to the reference cost year
+					annual_cost := ref_yr_chained_gdp_adjustment_factor * annual_cost;
+					capital_cost := ref_yr_chained_gdp_adjustment_factor * capital_cost;
+					variable_operation_maintenance_cost := ref_yr_chained_gdp_adjustment_factor * variable_operation_maintenance_cost;
+					fixed_operation_maintenance_cost := ref_yr_chained_gdp_adjustment_factor * fixed_operation_maintenance_cost;
+					operation_maintenance_cost := ref_yr_chained_gdp_adjustment_factor * operation_maintenance_cost;
+					annualized_capital_cost := ref_yr_chained_gdp_adjustment_factor * annualized_capital_cost;
+					computed_cost_per_ton := ref_yr_chained_gdp_adjustment_factor * computed_cost_per_ton;
+					return;
+				END IF;
+				valid_cost := false;
+				actual_equation_type := '-Type 10';
+			ELSE
+				--call first version of this function
+
+				select costs.annual_cost,
+					costs.capital_cost,
+					costs.operation_maintenance_cost,
+					costs.annualized_capital_cost,
+					costs.computed_cost_per_ton,
+					costs.actual_equation_type
+				from public.get_strategy_costs(
+					use_cost_equations, 
+					control_measure_id, 
+					measure_abbreviation, 
+					discount_rate, 
+					equipment_life, 
+					capital_annualized_ratio, 
+					capital_recovery_factor, 
+					ref_yr_cost_per_ton,  
+					emis_reduction, 
+					ref_yr_chained_gdp_adjustment_factor,
+					equation_type, 
+					variable_coefficient1, 
+					variable_coefficient2, 
+					variable_coefficient3, 
+					variable_coefficient4, 
+					variable_coefficient5, 
+					variable_coefficient6, 
+					variable_coefficient7, 
+					variable_coefficient8, 
+					variable_coefficient9, 
+					variable_coefficient10, 
+					stack_flow_rate, 
+					design_capacity, 
+					design_capacity_unit_numerator, 
+					design_capacity_unit_denominator) as costs
+				into annual_cost,
+					capital_cost,
+					operation_maintenance_cost,
+					annualized_capital_cost,
+					computed_cost_per_ton,
+					actual_equation_type;
+				return;
+			END IF;
+		END IF;
+	END IF;
+
+	-- Use Default Approach for calculating the costs
+	-- don't adjust costs, they are already in reference cost year dollars
+	select costs.annual_cost,
+		costs.capital_cost,
+		costs.operation_maintenance_cost,
+		costs.annualized_capital_cost,
+		costs.computed_cost_per_ton
+	from public.get_default_costs(discount_rate, 
+		equipment_life, 
+		capital_annualized_ratio, 
+		capital_recovery_factor, 
+		ref_yr_cost_per_ton, 
+		emis_reduction) as costs
+	into annual_cost,
+		capital_cost,
+		operation_maintenance_cost,
+		annualized_capital_cost,
+		computed_cost_per_ton;
+	-- if no annual cost is specified then assume the cost is unspecified
+	IF annual_cost is not null THEN
+		valid_cost := true;
+	ELSE
+		valid_cost := false;
+	END IF;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
 
 /*
 select public.get_type2_equation_costs(14036, 0.07, 
