@@ -33,8 +33,6 @@ import javax.swing.SpringLayout;
 
 public class DatasetSearchWindow extends ReusableInteralFrame {
 
-    private EmfConsole parent;
-
     private DatasetsBrowserPresenter presenter;
 
     private MessagePanel messagePanel;
@@ -48,6 +46,10 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     private ComboBox dsTypesBox;
 
     private TextField value;
+    
+    private String preText;
+    
+    private EmfConsole parent;
     
     public DatasetSearchWindow(String title, EmfConsole parentConsole, DesktopManager desktopManager) {
         super(title, new Dimension(500, 280), desktopManager);
@@ -78,14 +80,18 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGen = new SpringLayoutGenerator();
 
+        Dimension dim = new Dimension(350, 60);
         dsTypesBox = new ComboBox("Select one", getAllDSTypes());
-        Dimension dim = dsTypesBox.getPreferredSize();
+        dsTypesBox.setPreferredSize(dim);
         keyword = new ComboBox("Select one", presenter.getKeywords());
         keyword.setPreferredSize(dim);
         
-        name = new TextField("namefilter", 32);
-        desc = new TextField("descfilter", 32);
-        value = new TextField("keyvalue", 32);
+        name = new TextField("namefilter", 30);
+        desc = new TextField("descfilter", 30);
+        value = new TextField("keyvalue", 30);
+        
+        if (preText != null)
+            name.setText(preText);
 
         layoutGen.addLabelWidgetPair("Name contains:", name, panel);
         layoutGen.addLabelWidgetPair("Description contains:", desc, panel);
@@ -125,7 +131,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                     }
 
                     DatasetType type = (DatasetType)dsTypesBox.getSelectedItem();
-                    presenter.refreshView(datasets, getDstype(datasets, type));
+                    presenter.refreshViewOnSearch(datasets, getDstype(datasets, type));
                 } catch (EmfException e) {
                     if (e.getMessage().length() > 100)
                         messagePanel.setError(e.getMessage().substring(0, 100) + "...");
@@ -139,9 +145,18 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
         Button closeButton = new CloseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                dispose();
+                windowClosing();
             }
         });
+        
+        Button clearButoon = new Button("Clear", new AbstractAction(){
+            public void actionPerformed(ActionEvent event) {
+                clearFields();
+            }
+        });
+        
+        panel.add(clearButoon);
+        
         panel.add(closeButton, BorderLayout.LINE_END);
         getRootPane().setDefaultButton(okButton);
 
@@ -149,6 +164,18 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         controlPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 10, 5));
 
         return controlPanel;
+    }
+
+    private void clearFields() {
+        name.setText("");
+        desc.setText("");
+        value.setText("");
+        dsTypesBox.setSelectedIndex(0);
+        keyword.setSelectedIndex(0);
+    }
+    
+    public void setNameText(String name) {
+        preText = name;
     }
 
     protected boolean checkFields() {
@@ -211,6 +238,11 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
     public void observe(DatasetsBrowserPresenter presenter) {
         this.presenter = presenter;
+    }
+    
+    public void windowClosing() {
+        super.windowClosing();
+        presenter.notifyAdvancedSearchOff();
     }
 
 }

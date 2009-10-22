@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1217,10 +1218,10 @@ public class DatasetDAO {
         String dsTypeStr = (ds.getDatasetType() == null ? "" : " AND DS.datasetType.id = " + ds.getDatasetType().getId());
         String name = ds.getName();
         String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE '%%" + name.trim() + "%%'");
-        String dsKeyStr = getKeyStr(ds.getKeyVals());
+        String dsKeyStr = getDSKeyStr(ds.getKeyVals());
         String desc = ds.getDescription();
         String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE '%%" + desc.trim() + "%%'");
-        String query = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
+        String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
         		+ " DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
         		+ " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse LEFT JOIN DS.project LEFT JOIN DS.region"
         		+ dsKeyStr
@@ -1229,14 +1230,36 @@ public class DatasetDAO {
         		+ dsNameStr
         		+ descStr
         		+ " ORDER BY DS.name";
-        System.out.println("findSimilarDatasets(): " + query);
-        List<?> list = session.createQuery(query).list();
-        System.out.println(list.size() + " datasets selected.");
+        System.out.println("findSimilarDatasets(): " + dsquery);
         
-        return session.createQuery(query).list();
+        List<EmfDataset> ds1 = session.createQuery(dsquery).list();
+        
+        String dsTypeKeyStr = getDSTypeKeyStr(ds.getKeyVals());
+        String dstypequery = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
+                + " DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
+                + " FROM EmfDataset AS DS" 
+                + (dsTypeKeyStr.isEmpty() ? "" : ", DatasetType AS TYPE") 
+                + " LEFT JOIN DS.intendedUse LEFT JOIN DS.project LEFT JOIN DS.region"
+                + dsTypeKeyStr
+                + " WHERE DS.status <> 'Deleted'"
+                + dsTypeStr
+                + (dsTypeKeyStr.isEmpty() ? "" : " AND TYPE.id = DS.datasetType.id")
+                + dsNameStr
+                + descStr
+                + " ORDER BY DS.name";
+        System.out.println("findSimilarDatasets(): " + dstypequery);
+        
+        List<EmfDataset> ds2 = session.createQuery(dstypequery).list();
+        List<EmfDataset> all = new ArrayList<EmfDataset>();
+        all.addAll(ds1);
+        all.addAll(ds2);
+        
+        TreeSet<EmfDataset> set = new TreeSet<EmfDataset>(all);
+        
+        return new ArrayList<EmfDataset>(set);
     }
 
-    private String getKeyStr(KeyVal[] keyVals) {
+    private String getDSKeyStr(KeyVal[] keyVals) {
         if (keyVals.length == 0)
             return "";
         
@@ -1250,5 +1273,21 @@ public class DatasetDAO {
         }
         
         return withStr.toString().substring(0, withStr.length()-3);
+    }
+    
+    private String getDSTypeKeyStr(KeyVal[] keyVals) {
+        if (keyVals.length == 0)
+            return "";
+        
+        StringBuilder typeWithStr = new StringBuilder(" INNER JOIN TYPE.keyVals keyVal WITH ");
+        
+        for (KeyVal kv : keyVals) {
+            String name = kv.getName();
+            String value = kv.getValue();
+            value = (value == null || value.trim().isEmpty()) ? "" : " AND keyVal.value = '" + value.trim() + "'";
+            typeWithStr.append("(keyVal.kwname = '" + name + "'" + value + ") OR ");
+        }
+        
+        return typeWithStr.toString().substring(0, typeWithStr.length()-3);
     }
 }

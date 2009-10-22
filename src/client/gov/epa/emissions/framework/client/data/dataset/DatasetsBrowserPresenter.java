@@ -59,14 +59,14 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         view.clearMessage();
     }
     
-    public void refreshView(EmfDataset[] datasets, DatasetType type) {
-        DatasetType dsType = getDstype(datasets, type);
-        view.setDSTypeSelection(dsType);
+    public void refreshViewOnSearch(EmfDataset[] datasets, DatasetType type) {
+        //DatasetType dsType = getDstype(datasets, type);
+        view.setDSTypeSelection(0);
         view.refresh(datasets);
         view.clearMessage();
     }
     
-    private DatasetType getDstype(EmfDataset[] datasets, DatasetType type) {
+    public DatasetType getDstype(EmfDataset[] datasets, DatasetType type) {
         if (datasets.length == 0)
             return type;
         
@@ -239,6 +239,10 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
 
     public DatasetType getDSType() {
         return view.getSelectedDSType();
+    }
+    
+    public void notifyAdvancedSearchOff() {
+        view.notifyAdvancedSearchOff();
     }
     
 }

@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class EmfDataset implements Dataset, Lockable {
+public class EmfDataset implements Dataset, Lockable, Comparable<EmfDataset> {
 
     private int id;// unique id needed for hibernate persistence
 
@@ -638,6 +638,10 @@ public class EmfDataset implements Dataset, Lockable {
         //Add exceptions for case where month value not found
         
         return month;
+    }
+    
+    public int compareTo(EmfDataset other) {
+        return getName().compareToIgnoreCase(other.getName());
     }
 
 //    public Integer getApplicableYear() throws EmfException {

@@ -69,7 +69,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private DatasetType[] allDSTypes;
 
     private SelectableSortFilterWrapper table;
-
+    
     public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Manager", new Dimension(850, 450), desktopManager);
         super.setName("datasetsBrowser");
@@ -102,6 +102,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 DatasetType type = getSelectedDSType();
                 try {
                     // count the number of datasets and do refresh
+                    if (dsTypesBox.getSelectedIndex() > 0)
                         doRefresh();          
                 } catch (EmfException e1) {
                     messagePanel.setError("Could not retrieve all datasets for dataset type " + type.getName());
@@ -121,6 +122,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     
     public void setDSTypeSelection(DatasetType type) {
         dsTypesBox.setSelectedItem(type);
+    }
+    
+    public void setDSTypeSelection(int index) {
+        dsTypesBox.setSelectedIndex(index);
     }
     
 //    private void loadDataset(){
@@ -177,6 +182,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         Button advButton = new Button("Advanced", new AbstractAction(){
             public void actionPerformed(ActionEvent arg0) {
                 advancedSearch();
+                notifyAdvancedSearch();
             }
         });
         advButton.setToolTipText("Advanced search");
@@ -201,8 +207,25 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     
  
 
+    public void notifyAdvancedSearch() {
+        if (textFilter != null) {
+            textFilter.setText("");
+            textFilter.setEnabled(false);
+        }
+    }
+    
+    public void notifyAdvancedSearchOff() {
+        if (textFilter != null) {
+            textFilter.setEnabled(true);
+        }
+    }
+
     private void advancedSearch() {
         DatasetSearchWindow view = new DatasetSearchWindow("Search Datasets Table", parentConsole, desktopManager);
+        
+        if (textFilter != null && textFilter.getText() != null && !textFilter.getText().trim().isEmpty())
+            view.setNameText(textFilter.getText().trim());
+        
         view.observe(presenter);
         view.display();
     }

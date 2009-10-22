@@ -28,5 +28,9 @@ public interface DatasetsBrowserView extends ManagedView {
     DatasetType getSelectedDSType();
     
     void setDSTypeSelection(DatasetType type);
+    
+    void setDSTypeSelection(int index);
+
+    void notifyAdvancedSearchOff();
 
 }

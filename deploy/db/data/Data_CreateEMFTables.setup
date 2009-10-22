@@ -245,6 +245,7 @@ CREATE TABLE emf.dataset_types_keywords
   list_index int4,
   keyword_id int4 NOT NULL REFERENCES emf.keywords (id),
   value varchar(255) NULL,
+  kwname varchar(255) NOT NULL,
   UNIQUE (dataset_type_id, keyword_id)
 ) 
 WITHOUT OIDS;
