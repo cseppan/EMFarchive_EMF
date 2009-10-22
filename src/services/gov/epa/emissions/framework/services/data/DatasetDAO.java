@@ -1230,7 +1230,6 @@ public class DatasetDAO {
         		+ dsNameStr
         		+ descStr
         		+ " ORDER BY DS.name";
-        System.out.println("findSimilarDatasets(): " + dsquery);
         
         List<EmfDataset> ds1 = session.createQuery(dsquery).list();
         
@@ -1247,7 +1246,6 @@ public class DatasetDAO {
                 + dsNameStr
                 + descStr
                 + " ORDER BY DS.name";
-        System.out.println("findSimilarDatasets(): " + dstypequery);
         
         List<EmfDataset> ds2 = session.createQuery(dstypequery).list();
         List<EmfDataset> all = new ArrayList<EmfDataset>();
