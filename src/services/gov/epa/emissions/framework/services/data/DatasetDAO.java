@@ -1228,7 +1228,7 @@ public class DatasetDAO {
         		+ " WHERE DS.status <> 'Deleted'"
         		+ dsTypeStr
         		+ dsNameStr
-        		+ descStr
+        		+ checkBackSlash(descStr)
         		+ " ORDER BY DS.name";
         
         List<EmfDataset> ds1 = session.createQuery(dsquery).list();
@@ -1244,7 +1244,7 @@ public class DatasetDAO {
                 + dsTypeStr
                 + (dsTypeKeyStr.isEmpty() ? "" : " AND TYPE.id = DS.datasetType.id")
                 + dsNameStr
-                + descStr
+                + checkBackSlash(descStr)
                 + " ORDER BY DS.name";
         
         List<EmfDataset> ds2 = session.createQuery(dstypequery).list();
@@ -1265,7 +1265,7 @@ public class DatasetDAO {
         
         for (KeyVal kv : keyVals) {
             String name = kv.getName();
-            String value = kv.getValue();
+            String value = checkBackSlash(kv.getValue());
             value = (value == null || value.trim().isEmpty()) ? "" : " AND keyVal.value = '" + value.trim() + "'";
             withStr.append("(keyVal.kwname = '" + name + "'" + value + ") OR ");
         }
@@ -1281,11 +1281,16 @@ public class DatasetDAO {
         
         for (KeyVal kv : keyVals) {
             String name = kv.getName();
-            String value = kv.getValue();
+            String value = checkBackSlash(kv.getValue());
             value = (value == null || value.trim().isEmpty()) ? "" : " AND keyVal.value = '" + value.trim() + "'";
             typeWithStr.append("(keyVal.kwname = '" + name + "'" + value + ") OR ");
         }
         
         return typeWithStr.toString().substring(0, typeWithStr.length()-3);
     }
+    
+    private String checkBackSlash(String col) {
+        return col.replaceAll("\\\\", "\\\\\\\\");
+    }
+
 }

@@ -880,6 +880,7 @@ public class DataServiceImpl implements DataService {
             defaultVersion.setLastModifiedDate(time);
             defaultVersion.setNumberRecords(version.getNumberRecords());
             defaultVersion.setFinalVersion(true);
+            defaultVersion.setDescription("");
             dao.add(defaultVersion, session);
         } catch (Exception e) {
             String error = "Error copying dataset...";
