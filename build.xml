@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="EMF" default="nirvana" basedir=".">
+<project name="EMF" default="core" basedir=".">
 
     <!--  =================== Properties ====================================== -->
     <property file="build.properties" />
@@ -292,7 +292,7 @@
     />
 
     <!-- DEFAULT target-->
-    <target name="nirvana"
+    <target name="core"
             description="Runs ALL (except UAT AND Webservices) tests"
             depends="clean, init, all-dev-tests"
     />
@@ -449,11 +449,18 @@
             <fileset dir="${build.classes.dir}" includes="**/*" />
             <fileset dir="." includes="${scc.ref.dir}/scc.txt" />
         </jar>
+    	
+		<zip zipfile="${client.dist.dir}/${app.name}-client.zip">
+			<fileset dir="${build.classes.dir}" includes="**/*" />
+			<fileset dir="." includes="${scc.ref.dir}/scc.txt" />
+		</zip>
 
         <jar jarfile="${client.dist.dir}/emf-client-installer.jar">
             <fileset dir="${build.classes.dir}"
                      includes="gov/epa/emissions/framework/install/installer/*"
             />
+        	
+        	<fileset dir="${build.classes.dir}" includes="logo.JPG"/>
 
             <manifest>
                 <attribute name="Main-Class"
@@ -466,6 +473,8 @@
         <copy tofile="${client.dist.dir}/epa-commons.jar">
             <fileset dir="${commons.basedir}/build/sandbox" includes="*.jar" />
         </copy>
+    	
+    	<copy todir="${client.dist.dir}" file="./build/eclipse/gov/epa/emissions/framework/install/installer/runinstaller.bat" />
 
         <java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList"
               fork="true"
@@ -555,7 +564,7 @@
     <target name="tomcat-start">
         <echo message="Starting with: ${tomcat.start}" />
 		<!-- Note Linux executable -->
-        <exec executable="${jdk.home}/bin/java"
+        <exec executable="${jdk.home}/bin/java.exe"
               dir="${build.home}"
               output="${build.home}/tomcat-start.txt"
               error="${build.home}/tomcat-start-error.txt"
@@ -566,7 +575,7 @@
     </target>
 
     <target name="tomcat-stop">
-        <exec executable="${jdk.home}/bin/java"
+        <exec executable="${jdk.home}/bin/java.exe"
               dir="${build.home}"
               output="${build.home}/tomcat-stop.txt"
               error="${build.home}/tomcat-stop-error.txt"
@@ -804,6 +813,16 @@
             />
         </copy>
     </target>
+	
+	<target name="kml-generator-dist" >
+		<property name="kml.basedir" value="${basedir}/../KML" />
+	    <ant dir="${kml.basedir}"
+	             target="exec-dist"
+	             inheritall="false" />
+	    <copy todir="${lib.dir}">
+	            <fileset dir="${kml.basedir}/build/dist" includes="*.jar" />
+	    </copy>
+	</target>
 
     <!--  ===============END EMF-dependent modules ============================== -->
 
