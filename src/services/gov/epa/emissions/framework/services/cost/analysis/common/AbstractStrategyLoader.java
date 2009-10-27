@@ -141,6 +141,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     protected void saveControlStrategyResult(ControlStrategyResult strategyResult) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
+            System.out.println("Strategy Result Type: " + strategyResult.getStrategyResultType());
             controlStrategyDAO.updateControlStrategyResult(strategyResult, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not save control strategy results: " + e.getMessage());
@@ -398,7 +399,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     protected int getDaysInMonth(int month) {
-        return month != - 1 ? DateUtil.daysInMonth(controlStrategy.getInventoryYear(), month) : 31;
+        return month != - 1 ? DateUtil.daysInOneBasedMonth(controlStrategy.getInventoryYear(), month) : 31;
     }
     
     protected double getEmission(double annEmis, double avdEmis) {

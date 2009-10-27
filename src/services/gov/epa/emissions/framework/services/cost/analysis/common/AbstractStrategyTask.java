@@ -419,7 +419,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     }
 
     protected int getDaysInMonth(int month) {
-        return month != - 1 ? DateUtil.daysInMonth(controlStrategy.getInventoryYear(), month) : 31;
+        return month != - 1 ? DateUtil.daysInOneBasedMonth(controlStrategy.getInventoryYear(), month) : 31;
     }
 
     protected void populateSourcesTable() throws EmfException {

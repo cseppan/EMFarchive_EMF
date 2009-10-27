@@ -199,7 +199,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
     }
 
     protected int getDaysInMonth(int month) {
-        return month != - 1 ? DateUtil.daysInMonth(controlStrategy.getInventoryYear(), month) : 31;
+        return month != - 1 ? DateUtil.daysInOneBasedMonth(controlStrategy.getInventoryYear(), month) : 31;
     }
     
     protected String detailDatasetTable(ControlStrategyResult result) throws EmfException {
@@ -232,9 +232,12 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
             Dataset dataset, Datasource datasource, boolean missingColumns) {
         VersionedQuery versionedQuery = new VersionedQuery(version);
         int month = inputDataset.applicableMonth();
+        System.out.println("Input dataset name: " + inputDataset.getName());
+        System.out.println("Month from input dataset: " + month);
         int noOfDaysInMonth = 31;
         if (month != -1) {
             noOfDaysInMonth = getDaysInMonth(month);
+            System.out.println("Number of days in month: " + noOfDaysInMonth);
         }
         String sql = "select ";
         String columnList = "";
