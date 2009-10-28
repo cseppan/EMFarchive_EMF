@@ -141,7 +141,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private JPanel createDataTab(EmfConsole parentConsole) {
-        DataTab view = new DataTab(parentConsole, desktopManager, messagePanel);
+        DataTab view = new DataTab(parentConsole, desktopManager, messagePanel, true);
         presenter.set(view);
         return view;
     }
@@ -195,7 +195,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private JPanel createRevisionsTab(EmfConsole parentConsole) {
         messagePanel.clear();
         try {
-            RevisionsTab view = new RevisionsTab(parentConsole, desktopManager, messagePanel);
+            RevisionsTab view = new RevisionsTab(parentConsole, desktopManager, messagePanel, true);
             presenter.set(view);
             return view;
         } catch (EmfException e) {

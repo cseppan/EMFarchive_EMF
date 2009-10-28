@@ -98,9 +98,9 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
         Button removeButton = new RemoveButton(removeAction());
         removeButton.setMargin(new Insets(2, 5, 2, 5));
         panel.add(removeButton);
-        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction(), table, confirmDialog);
-        removeButton.setMargin(new Insets(2, 5, 2, 5));
-        panel.add(viewButton);
+        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction(), table, confirmDialog);
+        editButton.setMargin(new Insets(2, 5, 2, 5));
+        panel.add(editButton);
 
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);
@@ -134,7 +134,7 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
         };
     }
     
-    private Action viewAction() {
+    private Action editAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 editControlPrograms();

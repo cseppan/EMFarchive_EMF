@@ -33,12 +33,17 @@ public class RevisionsTab extends JPanel implements RevisionsTabView, RefreshObs
 
     private RevisionsTabPresenter presenter;
 
-    public RevisionsTab(EmfConsole parentConsole, DesktopManager desktopManager, MessagePanel messagePanel) {
+    private boolean editable;
+    
+    public RevisionsTab(EmfConsole parentConsole, DesktopManager desktopManager, MessagePanel messagePanel, boolean editable) {
+
         super.setName("revisionsTab");
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
         this.messagePanel =messagePanel;
-
+        
+        this.editable = editable;
+        
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     }
 
@@ -90,6 +95,8 @@ public class RevisionsTab extends JPanel implements RevisionsTabView, RefreshObs
         });
         
         editButton.setMargin(insets);
+        editButton.setEnabled(this.editable);
+        
         buttonPanel.add(editButton);
 
         panel.add(buttonPanel, BorderLayout.LINE_START);

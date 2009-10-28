@@ -58,11 +58,19 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     private JTabbedPane tabbedPane;
 
-    public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
+    private boolean editable;
+    
+    public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager, boolean editable) {
+
         super("Dataset Properties View", new Dimension(700, 500), desktopManager);
         this.parentConsole = parentConsole;
         this.session=session;
         this.desktopManager = desktopManager;
+        this.editable = editable;
+    }
+
+    public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
+        this(session, parentConsole, desktopManager, true);
     }
 
     public void display(EmfDataset dataset, Version version) {
@@ -127,7 +135,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     }
 
     private JPanel createDataTab(EmfConsole parentConsole) {
-        DataTab view = new DataTab(parentConsole, desktopManager, messagePanel);
+        DataTab view = new DataTab(parentConsole, desktopManager, messagePanel, this.editable);
         presenter.set(view);
         return view;
     }
@@ -157,7 +165,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     private JPanel createRevisionsTab(EmfConsole parentConsole) {
         try {
-            RevisionsTab view = new RevisionsTab(parentConsole, desktopManager, messagePanel);
+            RevisionsTab view = new RevisionsTab(parentConsole, desktopManager, messagePanel, editable);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
@@ -198,11 +206,16 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     }
 
     private JPanel createBottomPanel() {
+        
         JPanel left = new JPanel();
         Button property = new Button("Edit Properties", editPropertyAction());
         property.setMnemonic('E');
+        property.setEnabled(this.editable);
+        
         Button data = new Button("Edit Data", editDataAction());
         data.setMnemonic('a');
+        data.setEnabled(this.editable);
+
         left.add(property);
         left.add(data);
 

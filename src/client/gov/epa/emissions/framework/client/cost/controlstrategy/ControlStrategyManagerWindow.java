@@ -12,6 +12,8 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyView;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyWindow;
+import gov.epa.emissions.framework.client.cost.controlstrategy.viewer.ViewControlStrategyView;
+import gov.epa.emissions.framework.client.cost.controlstrategy.viewer.ViewControlStrategyWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -58,6 +60,8 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     private EmfSession session;
     
     private EditControlStrategyView[] editControlStrategyViews = {};
+
+    private ViewControlStrategyView[] viewControlStrategyViews = {};
 
     private volatile Thread populateThread;
 
@@ -217,6 +221,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         
         Button copyButton = new CopyButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                
                     try {
                         copySelectedStrategy();
                     } catch (EmfException excp) {
@@ -249,12 +254,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         };
 
         SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, table, confirmDialog);
-        viewButton.setEnabled(false);
         return viewButton;
-    }
-
-    private void viewControlStrategies() {
-        tempMessage();
     }
 
     private void editControlStrategies() {
@@ -275,6 +275,34 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
                 messagePanel.setError(e.getMessage());
             }
         }
+    }
+
+    private void viewControlStrategies() {
+        
+        this.messagePanel.clear();
+        
+        List controlStrategies = selected();
+        if (controlStrategies.isEmpty()) {
+            this.messagePanel.setMessage("Please select one or more Control Strategies");
+        }
+        else {
+
+            this.viewControlStrategyViews = new ViewControlStrategyView[controlStrategies.size()]; 
+            
+            for (int i = 0; i < controlStrategies.size(); i++) {
+                
+                ControlStrategy controlStrategy = (ControlStrategy) controlStrategies.get(i);
+                ViewControlStrategyView view = new ViewControlStrategyWindow(desktopManager, session, parentConsole);
+                this.viewControlStrategyViews[i] = view;
+                
+                try {
+                    presenter.doView(view, controlStrategy);
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        }
+        
     }
     
     protected void doRemove() throws EmfException {
@@ -349,10 +377,5 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 
     public EmfConsole getParentConsole() {
         return parentConsole;
-    }
-
-    private void tempMessage() {
-        messagePanel.clear();
-        messagePanel.setMessage("Under construction");
     }
 }

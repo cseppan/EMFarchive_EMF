@@ -26,11 +26,15 @@ public class DataTab extends JPanel implements DataTabView, RefreshObserver {
     
     private EmfDataset dataset; 
 
-    public DataTab(EmfConsole parentConsole, DesktopManager desktopManager, MessagePanel messagePanel) {
+    private boolean editable;
+    
+    public DataTab(EmfConsole parentConsole, DesktopManager desktopManager, MessagePanel messagePanel, boolean editable) {
+
         setName("dataTab");
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
         this.messagePanel = messagePanel;
+        this.editable = editable;
     }
 
     public void observe(DataTabPresenter presenter) {
@@ -55,7 +59,7 @@ public class DataTab extends JPanel implements DataTabView, RefreshObserver {
     }
 
     private VersionsPanel versionsPanel() {
-        VersionsPanel versionsPanel = new VersionsPanel(dataset, messagePanel, parentConsole, desktopManager);
+        VersionsPanel versionsPanel = new VersionsPanel(dataset, messagePanel, parentConsole, desktopManager, editable);
         try {
             presenter.displayVersions(versionsPanel);
         } catch (EmfException e) {

@@ -7,9 +7,9 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
-import gov.epa.emissions.framework.services.cost.data.SumEffRec;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
+import gov.epa.emissions.framework.services.cost.data.SumEffRec;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.Serializable;
@@ -54,6 +54,8 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private Mutex lock;
 
+//    private Reference[] references = new Reference[0];
+    
     private Scc[] sccs = new Scc[] {};
 
     private EfficiencyRecord[] efficiencyRecords = new EfficiencyRecord[] {};
@@ -291,6 +293,15 @@ public class ControlMeasure implements Lockable, Serializable {
     public void setSccs(Scc[] sccs) {
         this.sccs = sccs;
     }
+
+    // public Reference[] getReferences() {
+    // return references;
+    // }
+    //
+    //
+    // public void setReferences(Reference[] references) {
+    // this.references = references;
+    // }
 
     public Sector[] getSectors() {
         return sectors;//(Sector[]) sectors.toArray(new Sector[0]);

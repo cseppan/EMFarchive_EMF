@@ -47,8 +47,11 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private DesktopManager desktopManager;
 
+    private boolean editable;
+    
     public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole,
-            DesktopManager desktopManager) {
+            DesktopManager desktopManager, boolean editable) {
+
         super.setLayout(new BorderLayout());
         setBorder();
 
@@ -56,6 +59,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
         this.messagePanel = messagePanel;
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
+        this.editable = editable;
     }
 
     private void setBorder() {
@@ -199,7 +203,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
     }
 
     private void showView(String table, Version version) {
-        DataViewer view = new DataViewer(dataset, parentConsole, desktopManager);
+        DataViewer view = new DataViewer(dataset, parentConsole, desktopManager, editable);
         try {
             presenter.doView(version, table, view);
         } catch (EmfException e) {

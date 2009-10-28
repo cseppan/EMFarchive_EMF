@@ -34,24 +34,39 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
     private String filter=""; 
     private EmfConsole parent;
 
+    private boolean editable;
+
     public DataViewer(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
+        this(dataset, parent, desktopManager, true);
+    }
+
+    public DataViewer(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager, boolean editable) {
         super("Data Viewer [Dataset:" + dataset.getName(), desktopManager);
         setDimension();
         this.dataset = dataset;
         this.parent = parent;
 
+        this.editable = editable;
+        
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(), BorderLayout.PAGE_START);
 
         this.getContentPane().add(layout);
     }
-    
+
     public DataViewer(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager, String filter) {
+        this(dataset, parent, desktopManager, filter, true);
+    }
+    
+    public DataViewer(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager, String filter, boolean editable) {
         super("Data Viewer [Dataset:" + dataset.getName(), desktopManager);
         setDimension();
         this.dataset = dataset;
         this.parent = parent;
         this.filter = filter; 
+
+        this.editable = editable;
+
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(), BorderLayout.PAGE_START);
 
@@ -121,6 +136,8 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
                 doAddNote();
             }
         });
+        addNote.setEnabled(this.editable);
+        
         leftPanel.add(addNote);
         return leftPanel;
     }

@@ -5,6 +5,9 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyPresenter;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyPresenterImpl;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyView;
+import gov.epa.emissions.framework.client.cost.controlstrategy.viewer.ViewControlStrategyPresenter;
+import gov.epa.emissions.framework.client.cost.controlstrategy.viewer.ViewControlStrategyPresenterImpl;
+import gov.epa.emissions.framework.client.cost.controlstrategy.viewer.ViewControlStrategyView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
@@ -33,7 +36,7 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
     }
 
     public void doRefresh() throws EmfException {
-//        loadControlMeasures();
+        // loadControlMeasures();
         view.refresh(service().getControlStrategies());
     }
 
@@ -44,15 +47,27 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
     public void doNew(ControlStrategyView view) {
         ControlStrategyPresenter presenter = new ControlStrategyPresenterImpl(session, view, this);
         presenter.doDisplay();
-        
+
     }
 
     public void doEdit(EditControlStrategyView view, ControlStrategy controlStrategy) throws EmfException {
-        EditControlStrategyPresenter presenter = new EditControlStrategyPresenterImpl(controlStrategy, session, view, this);
+        EditControlStrategyPresenter presenter = new EditControlStrategyPresenterImpl(controlStrategy, session, view,
+                this);
         displayEditor(presenter);
     }
 
+    public void doView(ViewControlStrategyView view, ControlStrategy controlStrategy) throws EmfException {
+
+        ViewControlStrategyPresenter presenter = new ViewControlStrategyPresenterImpl(controlStrategy, session, view,
+                this);
+        displayViewer(presenter);
+    }
+
     void displayEditor(EditControlStrategyPresenter presenter) throws EmfException {
+        presenter.doDisplay();
+    }
+
+    void displayViewer(ViewControlStrategyPresenter presenter) throws EmfException {
         presenter.doDisplay();
     }
 
@@ -60,35 +75,35 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
         service().removeControlStrategies(ids, session.user());
     }
 
-//    public void doSaveCopiedStrategies(ControlStrategy coppied, String name) throws EmfException {
-//        if (isDuplicate(coppied))
-//            throw new EmfException("A control strategy named '" + coppied.getName() + "' already exists.");
-//
-//        coppied.setCreator(session.user());
-//        coppied.setLastModifiedDate(new Date());
-//        service().addControlStrategy(coppied);
-//    }
-    
+    // public void doSaveCopiedStrategies(ControlStrategy coppied, String name) throws EmfException {
+    // if (isDuplicate(coppied))
+    // throw new EmfException("A control strategy named '" + coppied.getName() + "' already exists.");
+    //
+    // coppied.setCreator(session.user());
+    // coppied.setLastModifiedDate(new Date());
+    // service().addControlStrategy(coppied);
+    // }
+
     public void doSaveCopiedStrategies(int id, User creator) throws EmfException {
         service().copyControlStrategy(id, session.user());
     }
-    
-//    private boolean isDuplicate(ControlStrategy newStrategy) throws EmfException {
-//        return (service().isDuplicateName(newStrategy.getName()) != 0);
-////        ControlStrategy[] strategies = service().getControlStrategies();
-////        for (int i = 0; i < strategies.length; i++) {
-////            if (strategies[i].getName().equals(newStrategy.getName()))
-////                return true;
-////        }
-////
-////        return false;
-//    }
+
+    // private boolean isDuplicate(ControlStrategy newStrategy) throws EmfException {
+    // return (service().isDuplicateName(newStrategy.getName()) != 0);
+    // // ControlStrategy[] strategies = service().getControlStrategies();
+    // // for (int i = 0; i < strategies.length; i++) {
+    // // if (strategies[i].getName().equals(newStrategy.getName()))
+    // // return true;
+    // // }
+    // //
+    // // return false;
+    // }
 
     public LightControlMeasure[] getControlMeasures() {
         return controlMeasures;
     }
 
-    public void loadControlMeasures() throws EmfException  {
+    public void loadControlMeasures() throws EmfException {
         controlMeasures = session.controlMeasureService().getLightControlMeasures();
     }
 }
