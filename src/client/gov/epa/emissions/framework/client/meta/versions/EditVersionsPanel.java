@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.buttons.EditButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -243,9 +244,10 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
 
         Version selectedVersion = selectedVersions[0];
         User creator = selectedVersion.getCreator();
-        if (!creator.equals(this.parentConsole.getSession().user())) {
-            this.messagePanel.setMessage("Error: Only the owner of the version, " + creator.getName()
-                    + ", can edit the version metadata.", Color.RED);
+        EmfSession session = this.parentConsole.getSession();
+        if (!creator.equals(session.user()) && !session.user().isAdmin()) {
+            this.messagePanel.setMessage("Error: Only an Administrator or the owner of the version, "
+                    + creator.getName() + ", can edit the version metadata.", Color.RED);
             return;
         }
 
