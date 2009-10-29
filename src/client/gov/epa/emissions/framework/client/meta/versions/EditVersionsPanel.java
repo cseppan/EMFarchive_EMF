@@ -246,7 +246,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         User creator = selectedVersion.getCreator();
         EmfSession session = this.parentConsole.getSession();
         if (!creator.equals(session.user()) && !session.user().isAdmin()) {
-            this.messagePanel.setMessage("Error: Only an Administrator or the owner of the version, "
+            this.messagePanel.setMessage("Error: Only an administrator or the owner of the version, "
                     + creator.getName() + ", can edit the version metadata.", Color.RED);
             return;
         }
