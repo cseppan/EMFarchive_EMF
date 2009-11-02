@@ -14,7 +14,6 @@ public class ViewControlMeasureWindow extends EditControlMeasureWindow {
     }
 
     public void display(ControlMeasure measure) {
-//        super.display(measure);
 
         setWindowTitle(measure);
         buildDisplay(measure);
@@ -24,18 +23,21 @@ public class ViewControlMeasureWindow extends EditControlMeasureWindow {
     }
 
     private void setWindowTitle(ControlMeasure measure) {
-        super.setTitle("View Control Measure: " + measure.getName());
-        super.setName("viewControlMeasure" + measure.getId());
+
+        this.setTitle("View Control Measure: " + measure.getName());
+        this.setName("viewControlMeasure" + measure.getId());
     }
 
     //disable gui items via this method for "View" only purposes
     private void viewOnly() {
+        
         saveButton.setVisible(false);
         controlMeasureSccTabView.viewOnly();
         controlMeasureEfficiencyTabView.viewOnly();
         editableCMSummaryTabView.viewOnly();
         controlMeasureEquationTabView.viewOnly();
         controlMeasurePropertyTabView.viewOnly();
+        controlMeasureReferencesTabView.viewOnly();
     }
     
     public void close() {

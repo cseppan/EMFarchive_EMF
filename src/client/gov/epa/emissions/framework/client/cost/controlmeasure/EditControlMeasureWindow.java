@@ -36,23 +36,26 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     private EmfSession session;
 
     private EmfConsole parent;
-    
+
     protected EditableCMSummaryTab editableCMSummaryTabView;
 
     private CostYearTable costYearTable;
 
     protected Button saveButton;
-    
+
     protected ControlMeasureSccTabView controlMeasureSccTabView;
-    
+
     protected ControlMeasureEfficiencyTab controlMeasureEfficiencyTabView;
-    
-    protected ControlMeasureEquationTab controlMeasureEquationTabView; 
-    
-    protected ControlMeasurePropertyTab controlMeasurePropertyTabView; 
-    
-    public EditControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager, CostYearTable costYearTable) {
-        super("Control Measure Editor", new Dimension(770, 500), desktopManager);
+
+    protected ControlMeasureEquationTab controlMeasureEquationTabView;
+
+    protected ControlMeasurePropertyTab controlMeasurePropertyTabView;
+
+    protected ControlMeasureReferencesTab controlMeasureReferencesTabView;
+
+    public EditControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager,
+            CostYearTable costYearTable) {
+        super("Control Measure Editor", new Dimension(770, 500), desktopManager);        
         this.desktopManager = desktopManager;
         this.session = session;
         this.parent = parent;
@@ -66,7 +69,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         super.resetChanges();
     }
 
-    protected void buildDisplay(ControlMeasure measure){
+    protected void buildDisplay(ControlMeasure measure) {
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 
@@ -83,8 +86,8 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
 
         contentPane.add(panel);
     }
-    
-    private JTabbedPane createTabbedPane(ControlMeasure measure, final MessagePanel messagePanel) throws EmfException{
+
+    private JTabbedPane createTabbedPane(ControlMeasure measure, final MessagePanel messagePanel) throws EmfException {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
         tabbedPane.addTab("Summary", createSummaryTab(measure, messagePanel));
@@ -92,6 +95,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         tabbedPane.addTab("SCCs", createSCCTab(measure, messagePanel));
         tabbedPane.addTab("Equations", createEquationTab(measure, messagePanel));
         tabbedPane.addTab("Properties", createPropertyTab(measure, messagePanel));
+        tabbedPane.addTab("References", this.createReferencesTab(measure, messagePanel));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -102,16 +106,26 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         return tabbedPane;
     }
 
-    private JPanel createEquationTab(ControlMeasure measure, MessagePanel messagePanel) throws EmfException{
-        controlMeasureEquationTabView= new ControlMeasureEquationTab(measure, session, this, messagePanel, parent, presenter); 
+    private JPanel createEquationTab(ControlMeasure measure, MessagePanel messagePanel) throws EmfException {
+        controlMeasureEquationTabView = new ControlMeasureEquationTab(measure, session, this, messagePanel, parent,
+                presenter);
         presenter.set(controlMeasureEquationTabView);
         return controlMeasureEquationTabView;
     }
 
-    private JPanel createPropertyTab(ControlMeasure measure, MessagePanel messagePanel){
-        controlMeasurePropertyTabView= new ControlMeasurePropertyTab(measure, session, this, messagePanel, parent, presenter, desktopManager); 
+    private JPanel createPropertyTab(ControlMeasure measure, MessagePanel messagePanel) {
+        controlMeasurePropertyTabView = new ControlMeasurePropertyTab(measure, session, this, messagePanel, parent,
+                presenter, desktopManager);
         presenter.set(controlMeasurePropertyTabView);
         return controlMeasurePropertyTabView;
+    }
+
+    private JPanel createReferencesTab(ControlMeasure measure, MessagePanel messagePanel) {
+
+        this.controlMeasureReferencesTabView = new ControlMeasureReferencesTab(measure, this, messagePanel, parent,
+                presenter, desktopManager);
+        presenter.set(controlMeasureReferencesTabView);
+        return controlMeasureReferencesTabView;
     }
 
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {
@@ -139,7 +153,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     public void notifyModified() {
         presenter.doModify();
     }
-    
+
     private void setWindowTitle(ControlMeasure measure) {
         super.setTitle("Edit Control Measure: " + measure.getName());
         super.setName("editControlMeasure" + measure.getId());
@@ -201,6 +215,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     }
 
     private void doSave() {
+
         try {
             presenter.doSave();
             resetChanges();
@@ -210,13 +225,12 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     }
 
     public void notifyLockFailure(ControlMeasure measure) {
-        String message = "Cannot edit ControlMeasure: " + measure.getName()
-                + System.getProperty("line.separator") + " as it was locked by User: " + measure.getLockOwner()
-                + "(at " + CustomDateFormat.format_YYYY_MM_DD_HH_MM(measure.getLockDate()) + ")";
+        String message = "Cannot edit ControlMeasure: " + measure.getName() + System.getProperty("line.separator")
+                + " as it was locked by User: " + measure.getLockOwner() + "(at "
+                + CustomDateFormat.format_YYYY_MM_DD_HH_MM(measure.getLockDate()) + ")";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }
-
 
     public void notifyEditFailure(ControlMeasure measure) {
         String message = "Cannot edit ControlMeasure: " + measure.getName()

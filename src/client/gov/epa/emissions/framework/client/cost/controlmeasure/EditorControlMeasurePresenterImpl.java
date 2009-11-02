@@ -113,6 +113,12 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
         presenters.add(propertyPresenter);
     }
 
+    public void set(ControlMeasureReferencesTab referencesTabView) {
+
+        ControlMeasureTabPresenterImpl propertyPresenter = new ControlMeasureTabPresenterImpl(referencesTabView);
+        presenters.add(propertyPresenter);
+    }
+
     public void doRefresh(ControlMeasure controlMeasure) {
         this.measure = controlMeasure;
     }

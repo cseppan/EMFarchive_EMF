@@ -95,6 +95,11 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         ControlMeasureTabPresenterImpl propertyPresenter = new ControlMeasureTabPresenterImpl(propertyTabView);
         presenters.add(propertyPresenter);
     }
+    
+    public void set(ControlMeasureReferencesTab referencesTabView) {
+        ControlMeasureTabPresenterImpl propertyPresenter = new ControlMeasureTabPresenterImpl(referencesTabView);
+        presenters.add(propertyPresenter);
+    }
 
     public void doRefresh(ControlMeasure controlMeasure) {
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.Reference;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
@@ -54,7 +55,7 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private Mutex lock;
 
-//    private Reference[] references = new Reference[0];
+    private Reference[] references = new Reference[0];
     
     private Scc[] sccs = new Scc[] {};
 
@@ -294,14 +295,13 @@ public class ControlMeasure implements Lockable, Serializable {
         this.sccs = sccs;
     }
 
-    // public Reference[] getReferences() {
-    // return references;
-    // }
-    //
-    //
-    // public void setReferences(Reference[] references) {
-    // this.references = references;
-    // }
+    public Reference[] getReferences() {
+        return references;
+    }
+
+    public void setReferences(Reference[] references) {
+        this.references = references;
+    }
 
     public Sector[] getSectors() {
         return sectors;//(Sector[]) sectors.toArray(new Sector[0]);

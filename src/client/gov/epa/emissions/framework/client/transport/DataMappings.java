@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.data.QAStepTemplate;
+import gov.epa.emissions.commons.data.Reference;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SectorCriteria;
@@ -139,6 +140,7 @@ public class DataMappings extends Mappings {
         bean(call, EfficiencyRecord.class, efficiencyRecord());
         bean(call, SumEffRec.class, sumEffRec());
         bean(call, Scc.class, scc());
+        bean(call, Reference.class, reference());
         bean(call, ControlStrategyResultsSummary.class, controlStrategyResultsSummary());
         bean(call, StrategyResultType.class, strategyResultType());
         bean(call, CostYearTable.class, costYearTable());
@@ -211,6 +213,7 @@ public class DataMappings extends Mappings {
         array(call, EfficiencyRecord[].class, efficiencyRecords());
         array(call, SumEffRec[].class, sumEffRecs());
         array(call, Scc[].class, sccs());
+        array(call, Reference[].class, references());
         array(call, StrategyResultType[].class, strategyResultTypes());
         array(call, ControlMeasureClass[].class, controlMeasureClasses());
         array(call, EquationType[].class, equationTypes());
@@ -560,9 +563,17 @@ public class DataMappings extends Mappings {
     public QName scc() {
         return qname("scc");
     }
-
+    
+    public QName reference() {
+        return qname("Reference");
+    }
+    
     public QName sccs() {
         return qname("sccs");
+    }
+
+    public QName references() {
+        return qname("references");
     }
 
     public QName controlStrategyResult() {

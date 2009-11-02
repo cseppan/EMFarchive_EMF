@@ -371,6 +371,10 @@
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.controlmeasure.Scc"
 		qname="ns1:Scc" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.commons.data.Reference"
+		qname="ns1:Reference" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 		
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlStrategy"
@@ -909,6 +913,12 @@
 		xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.controlmeasure.Scc[]"
 		innerType="ns1:Scc"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<arrayMapping qname="ns1:References"
+		xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.commons.data.Reference[]"
+		innerType="ns1:Reference"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 		
 	<arrayMapping qname="ns1:ControlStrategyResults"

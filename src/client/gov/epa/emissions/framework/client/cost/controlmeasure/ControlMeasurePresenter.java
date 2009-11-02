@@ -26,6 +26,8 @@ public interface ControlMeasurePresenter {
 
     void set(ControlMeasurePropertyTab propertyTabView);
 
+    void set(ControlMeasureReferencesTab referencesTabView);
+
     void fireTracking();
 
     Pollutant[] getPollutants() throws EmfException;
