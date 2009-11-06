@@ -109,8 +109,6 @@ public class VersionsPanel extends JPanel implements VersionsView {
         ScrollableTable table = new ScrollableTable(tableModel, null);
         String[] columns = {"Select", "Version", "Base", "Is Final?"}; 
         table.setMaxColWidth(columns);
-        //table.setColWidthsBasedOnColNames();
-        table.disableScrolling();
         table.resetTextFont(this.getFont());
         return table;
     }
