@@ -22,11 +22,11 @@ public class VersionsTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Select", "Name", "Description", "Version", "Base", "Creator", "Is Final?","Intended Use", "# of Records", "Date" };
+        return new String[] { "Select", "Name", "Version", "Base", "Creator", "Is Final?","Intended Use", "# of Records", "Date" , "Description"};
     }
 
     public Class getColumnClass(int col) {
-        if ((col == 0) || (col == 6))
+        if ((col == 0) || (col == 5))
             return Boolean.class;
         return String.class;
     }
