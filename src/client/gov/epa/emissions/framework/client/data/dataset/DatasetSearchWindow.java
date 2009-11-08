@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -120,14 +121,17 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                     if (!checkFields())
                         return;
                     
-                    EmfDataset[] datasets = search(getDataset());
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    EmfDataset[] datasets = search(getDataset(), false);
 
-                    if (datasets.length > 100) {
-                        String msg = "Number of datasets > 100. Would you like to continue?";
+                    if (datasets.length == 1 && datasets[0].getName().startsWith("Alert!!! More than 300 datasets selected.")) {
+                        String msg = "Number of datasets > 300. Would you like to continue?";
                         int option = JOptionPane.showConfirmDialog(parent, msg, "Warning", JOptionPane.YES_NO_OPTION,
                                 JOptionPane.QUESTION_MESSAGE);
                         if (option == JOptionPane.NO_OPTION)
                             return;
+                        
+                        datasets = search(getDataset(), true);
                     }
 
                     DatasetType type = (DatasetType)dsTypesBox.getSelectedItem();
@@ -137,6 +141,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                         messagePanel.setError(e.getMessage().substring(0, 100) + "...");
                     else
                         messagePanel.setError(e.getMessage());
+                } finally {
+                    setCursor(Cursor.getDefaultCursor());
                 }
             }
         });
@@ -232,8 +238,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         return selected;
     }
 
-    public EmfDataset[] search(EmfDataset dataset) throws EmfException {
-        return presenter.advSearch4Datasets(dataset);
+    public EmfDataset[] search(EmfDataset dataset, boolean unconditional) throws EmfException {
+        return presenter.advSearch4Datasets(dataset, unconditional);
     }
 
     public void observe(DatasetsBrowserPresenter presenter) {

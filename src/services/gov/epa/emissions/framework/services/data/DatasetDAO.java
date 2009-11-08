@@ -156,9 +156,7 @@ public class DatasetDAO {
                         "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region"
                                 + " where lower(DS.name) like "
-                                + "'%%"
-                                + nameContains.toLowerCase().trim() + "%%' and DS.status <> 'Deleted' order by DS.name").list();
-    
+                                + getPattern(nameContains.toLowerCase().trim()) + " and DS.status <> 'Deleted' order by DS.name").list();
     }
 
     public void add(EmfDataset dataset, Session session) {
@@ -347,8 +345,7 @@ public class DatasetDAO {
                                 + " where DS.datasetType.id = "
                                 + datasetTypeId
                                 + " and lower(DS.name) like "
-                                + "'%%"
-                                + nameContains.toLowerCase().trim() + "%%' and DS.status <> 'Deleted' order by DS.name").list();
+                                + getPattern(nameContains.toLowerCase().trim()) + " and DS.status <> 'Deleted' order by DS.name").list();
     }
 
     public List getDatasets(Session session, int datasetTypeId, String nameContains) {
@@ -357,8 +354,7 @@ public class DatasetDAO {
                         "select new EmfDataset( DS.id, DS.name, DS.defaultVersion, DS.datasetType.id, DS.datasetType.name) from EmfDataset as DS where DS.datasetType.id = "
                                 + datasetTypeId
                                 + " and lower(DS.name) like "
-                                + "'%%"
-                                + nameContains.toLowerCase().trim() + "%%' and DS.status <> 'Deleted' order by DS.name")
+                                + getPattern(nameContains.toLowerCase().trim()) + " and DS.status <> 'Deleted' order by DS.name")
                 .list();
     }
 
@@ -1214,13 +1210,13 @@ public class DatasetDAO {
     }
 
     @SuppressWarnings("unchecked")
-    public List<EmfDataset> findSimilarDatasets(EmfDataset ds, Session session) {
+    public List<EmfDataset> findSimilarDatasets(EmfDataset ds, boolean unconditional, Session session) {
         String dsTypeStr = (ds.getDatasetType() == null ? "" : " AND DS.datasetType.id = " + ds.getDatasetType().getId());
         String name = ds.getName();
-        String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE '%%" + name.trim() + "%%'");
+        String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE " + getPattern(name.toLowerCase().trim()));
         String dsKeyStr = getDSKeyStr(ds.getKeyVals());
         String desc = ds.getDescription();
-        String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE '%%" + desc.trim() + "%%'");
+        String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE " + getPattern(desc.toLowerCase().trim()));
         String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
         		+ " DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
         		+ " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse LEFT JOIN DS.project LEFT JOIN DS.region"
@@ -1253,8 +1249,24 @@ public class DatasetDAO {
         all.addAll(ds2);
         
         TreeSet<EmfDataset> set = new TreeSet<EmfDataset>(all);
+        List<EmfDataset> total = new ArrayList<EmfDataset>(set);
         
-        return new ArrayList<EmfDataset>(set);
+        if (total.size() > 300 && !unconditional) {
+            total.get(0).setName("Alert!!! More than 300 datasets selected.");
+            return total.subList(0, 1);
+        }
+        
+        return total;
+    }
+
+    private String getPattern(String name) {
+        name = "'%%" + name;
+        name = name.replaceAll("\\*", "%%") + "%%'";
+        
+        if (name.contains("_")) 
+            name = name.replaceAll("_", "!_") + " ESCAPE '!'";
+        
+        return name;
     }
 
     private String getDSKeyStr(KeyVal[] keyVals) {
@@ -1289,8 +1301,8 @@ public class DatasetDAO {
         return typeWithStr.toString().substring(0, typeWithStr.length()-3);
     }
     
-    private String checkBackSlash(String col) {
-        return col.replaceAll("\\\\", "\\\\\\\\");
+    private String checkBackSlash(String str) {
+        return str.replaceAll("\\\\", "\\\\\\\\");
     }
 
 }
