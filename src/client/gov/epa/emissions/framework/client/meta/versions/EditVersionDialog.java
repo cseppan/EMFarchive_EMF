@@ -23,6 +23,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 public class EditVersionDialog extends Dialog {
@@ -83,7 +84,11 @@ public class EditVersionDialog extends Dialog {
         this.descriptionTextArea = new TextArea("", version.getDescription(), 25, 6);
         this.descriptionTextArea.setBorder(this.name.getBorder());
         this.descriptionTextArea.setText(version.getDescription());
-        layoutGenerator.addLabelWidgetPair("Description", this.descriptionTextArea, panel);
+        
+        JScrollPane scrollPane = new JScrollPane(this.descriptionTextArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        
+        layoutGenerator.addLabelWidgetPair("Description", scrollPane, panel);
 
         setupIntendedUseCombo();
         layoutGenerator.addLabelWidgetPair("Intended Use: ", intendedUseCombo, panel);
