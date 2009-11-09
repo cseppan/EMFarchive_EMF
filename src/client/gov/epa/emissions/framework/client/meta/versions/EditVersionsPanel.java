@@ -23,6 +23,7 @@ import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -34,7 +35,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.border.CompoundBorder;
 
 public class EditVersionsPanel extends JPanel implements EditVersionsView {
@@ -114,20 +114,23 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     }
 
     private ScrollableTable createTable(Version[] versions) {
+
         tableData = new VersionsTableData(versions);
         tableModel = new EmfTableModel(tableData);
 
-        JTable table = new VersionTable(tableModel);
+        ScrollableTable scrollableTable = new ScrollableTable(tableModel, null);
 
-        ScrollableTable scrollableTable = new ScrollableTable(table, null);
-
-        // "Select", "Name", "Version", "Base", "Creator", "Is Final?", "#Records", "Date"
-        // set maximum column width
-        String[] columns = { "Select", "Version", "Base", "Is Final?" }; // table.setColWidthsBasedOnColNames();
-        scrollableTable.setMaxColWidth(columns);
-        scrollableTable.setColumnWidth("Name", 100);
+        String[] columns = {"Select", "Version", "Base", "Is Final?"}; 
+        Font font = this.getFont();
+        scrollableTable.setMaxColWidth(columns, font);
+        
+        scrollableTable.setColumnWidth("Name", 154);
+        scrollableTable.setColumnWidth("Creator", 84);
         scrollableTable.setColumnWidth("Description", 200);
-        scrollableTable.setColumnWidth("Date", 120);
+        scrollableTable.setColumnWidth("Date", 106);
+        
+        scrollableTable.resetTextFont(font);
+        
         return scrollableTable;
     }
 

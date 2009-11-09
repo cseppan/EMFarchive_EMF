@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,14 +104,24 @@ public class VersionsPanel extends JPanel implements VersionsView {
     }
 
     private ScrollableTable createTable(Version[] versions) {
+        
         tableData = new VersionsTableData(versions);
         tableModel = new EmfTableModel(tableData);
 
-        ScrollableTable table = new ScrollableTable(tableModel, null);
+        ScrollableTable scrollableTable = new ScrollableTable(tableModel, null);
+
         String[] columns = {"Select", "Version", "Base", "Is Final?"}; 
-        table.setMaxColWidth(columns);
-        table.resetTextFont(this.getFont());
-        return table;
+        Font font = this.getFont();
+        scrollableTable.setMaxColWidth(columns, font);
+        
+        scrollableTable.setColumnWidth("Name", 154);
+        scrollableTable.setColumnWidth("Creator", 84);
+        scrollableTable.setColumnWidth("Description", 200);
+        scrollableTable.setColumnWidth("Date", 106);
+        
+        scrollableTable.resetTextFont(font);
+        
+        return scrollableTable;
     }
 
     private JPanel topPanel(InternalSource[] sources) {

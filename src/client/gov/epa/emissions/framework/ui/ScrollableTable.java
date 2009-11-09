@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.ui;
 
 import java.awt.Font;
+import java.awt.FontMetrics;
 
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -91,18 +92,25 @@ public class ScrollableTable extends JScrollPane {
         table.repaint();
     }
 
-    public void setMaxColWidth(String[] columns) {
+    public void setMaxColWidth(String[] columns, Font font) {
         TableColumnModel model = table.getColumnModel();
 
+        FontMetrics fontMetrics = table.getFontMetrics(font);
         for (int i = 0; i < model.getColumnCount(); i++) {
             TableColumn col = model.getColumn(i);
             String headerValue = (String) col.getHeaderValue();
-            if (contains(columns, headerValue))
-                col.setMaxWidth(headerValue.length() * 10);
-            else
-                col.setMinWidth(headerValue.length() * 10);
+
+            int width = fontMetrics.stringWidth(headerValue) + 8;
+            if (contains(columns, headerValue)) {
+                col.setMaxWidth(width);
+            }
+            else {
+                col.setMinWidth(width);
+            }
+
             col.setResizable(true);
         }
+
         table.repaint();
     }
 
