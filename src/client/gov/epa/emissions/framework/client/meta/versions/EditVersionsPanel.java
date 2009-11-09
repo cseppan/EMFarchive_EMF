@@ -118,7 +118,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         tableData = new VersionsTableData(versions);
         tableModel = new EmfTableModel(tableData);
 
-        ScrollableTable scrollableTable = new ScrollableTable(tableModel, null);
+        ScrollableTable scrollableTable = new ScrollableTable(new VersionTable(tableModel), null);
 
         String[] columns = {"Select", "Version", "Base", "Is Final?"}; 
         Font font = this.getFont();

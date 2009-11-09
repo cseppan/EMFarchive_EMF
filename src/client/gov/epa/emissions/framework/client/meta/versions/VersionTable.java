@@ -36,12 +36,13 @@ public class VersionTable extends JTable {
 
         Component c = super.prepareRenderer(renderer, rowIndex, columnIndex);
         int descriptionIndex = this.getColumnIndex("Description");
+
         if (columnIndex == descriptionIndex) {
             if (c instanceof JComponent) {
 
                 this.descriptionComponent = (JComponent) c;
                 String valueAt = (String) getValueAt(rowIndex, columnIndex);
-                this.descriptionComponent.setToolTipText(valueAt);
+                this.descriptionComponent.setToolTipText(Utils.convertTextToHTML(Utils.addBreaks(valueAt, 80, '\n')));
             }
         } else {
 
