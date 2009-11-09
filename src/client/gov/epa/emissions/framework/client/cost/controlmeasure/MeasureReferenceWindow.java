@@ -20,7 +20,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 public class MeasureReferenceWindow extends DisposableInteralFrame {
@@ -43,7 +43,7 @@ public class MeasureReferenceWindow extends DisposableInteralFrame {
 
     private static int counter = 0;
 
-    private static final Dimension DIMENSION = new Dimension(380, 200);
+    private static final Dimension DIMENSION = new Dimension(400, 200);
 
     public MeasureReferenceWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session) {
@@ -129,8 +129,9 @@ public class MeasureReferenceWindow extends DisposableInteralFrame {
 
         this.descriptionField = new TextArea("", "", 25, 6);
         this.changeablesList.addChangeable(this.descriptionField);
-        this.descriptionField.setBorder(new JTextField().getBorder());
-        layoutGenerator.addLabelWidgetPair("Description", this.descriptionField, panel);
+        
+        JScrollPane scrollPane = new JScrollPane(this.descriptionField, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        layoutGenerator.addLabelWidgetPair("Description", scrollPane, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
