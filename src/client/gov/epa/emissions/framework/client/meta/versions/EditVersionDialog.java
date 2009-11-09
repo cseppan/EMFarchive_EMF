@@ -53,7 +53,7 @@ public class EditVersionDialog extends Dialog {
 
         this.service = parent.getSession().dataCommonsService();
 
-        this.setSize(new Dimension(400, 264));
+        this.setSize(new Dimension(420, 264));
         this.version = selectedVersion;
         versionsSet = new VersionsSet(versions);
         this.getContentPane().add(createLayout());
