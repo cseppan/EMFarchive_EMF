@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
 import gov.epa.emissions.framework.client.data.dataset.CopyQAStepToDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.CopyQAStepToDatasetSelectionPresenter;
 import gov.epa.emissions.framework.client.data.dataset.CopyQAStepToDatasetSelectionView;
@@ -29,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class EditableQATab extends JPanel implements EditableQATabView, RefreshObserver {
@@ -149,6 +152,17 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
             }
         });
         container.add(runStatus);
+        JButton viewResults = new BorderlessButton("View Results", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
+                try {
+                    viewResults();
+                } catch (EmfException exc) {
+                    messagePanel.setError(exc.getMessage());
+                }
+            }
+        });
+        container.add(viewResults);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
@@ -357,4 +371,58 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
         
     }
 
+    public void displayResultsTable(String qaStepName, String exportedFileName) {
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QA Step Results: " + qaStepName, new Dimension(500, 500), desktop, parentConsole);
+        app.display(new String[] { exportedFileName });
+    }
+    
+    private void viewResults() throws EmfException {
+        clearMessage();
+
+        List selected = table.selected();
+        if (selected == null || selected.size() == 0) {
+            messagePanel.setMessage("Please select a QA step.");
+            return;
+        }
+
+        for (Iterator iter = selected.iterator(); iter.hasNext();) {
+            QAStep step = (QAStep) iter.next();
+            QAStepResult stepResult = presenter.getStepResult(step);
+            if (stepResult == null)
+                throw new EmfException("Please run the QA step, " + step.getName() + ", before trying to view.");
+        }
+
+        Thread viewResultsThread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    List selected = table.selected();
+                    for (Iterator iter = selected.iterator(); iter.hasNext();) {
+                        QAStep step = (QAStep) iter.next();
+                        QAStepResult stepResult = presenter.getStepResult(step);
+                        clearMessage();
+                        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                        if (presenter.getTableRecordCount(stepResult) > 100000) {
+                            String title = "Warning";
+                            String message = "Are you sure you want to view the result, the table has over 100,000 records?  It could take several minutes to load the data.";
+                            int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE);
+                    
+                            if (selection == JOptionPane.NO_OPTION) {
+                                return;
+                            }
+                        }
+    
+                        presenter.viewResults(step);
+                    }
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                } finally {
+                    setCursor(Cursor.getDefaultCursor());
+                }
+            }
+        });
+
+        viewResultsThread.start();
+    }
+    
 }

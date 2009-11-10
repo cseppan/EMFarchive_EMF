@@ -24,4 +24,6 @@ public interface EditableQATabView {
     
     void refresh(QAStep step, QAStepResult result);
 
+    void displayResultsTable(String name, String absolutePath);
+
 }

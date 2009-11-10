@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -10,7 +11,12 @@ import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 import gov.epa.emissions.framework.services.qa.QAService;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 public class EditableQATabPresenterImpl implements EditableQATabPresenter {
 
@@ -108,4 +114,83 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
             throw new EmfException("Lock on current dataset object expired. User " + reloaded.getLockOwner()
                     + " has it now.");    
     }
+
+    public QAStepResult getStepResult(QAStep step) throws EmfException {
+        return session.qaService().getQAStepResult(step);
+    }
+
+    public long getTableRecordCount(QAStepResult stepResult) throws EmfException {
+        return session.dataService().getTableRecordCount("emissions." + stepResult.getTable());
+    }
+
+    public void viewResults(QAStep qaStep) throws EmfException {
+        QAStepResult qaResult = getStepResult(qaStep);
+        
+        if (qaResult == null || qaResult.getTable() == null || qaResult.getTable().isEmpty())
+            throw new EmfException("No QA Step result available to view.");
+        
+        File localFile = new File(tempQAStepFilePath(qaStep.getOutputFolder(), qaResult));
+        try {
+            if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
+                Writer output = new BufferedWriter(new FileWriter(localFile));
+                try {
+                    output.write(  writerHeader(qaStep, qaResult, dataset.getName())+ getTableAsString(qaResult) );
+                }
+                finally {
+                    output.close();
+                    localFile.setLastModified(qaResult.getTableCreationDate().getTime());
+                }
+            }
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+        
+        view.displayResultsTable(qaStep.getName(), localFile.getAbsolutePath());
+    }
+
+    private String tempQAStepFilePath(String exportDir, QAStepResult qaStepResult) throws EmfException {
+        String separator = exportDir != null && exportDir.length() > 0 ? (exportDir.charAt(0) == '/') ? "/" : "\\" : "\\";
+        String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR");
+
+        if (tempDir == null || tempDir.isEmpty())
+            tempDir = System.getProperty("java.io.tmpdir");
+
+        File tempDirFile = new File(tempDir);
+
+        if (!(tempDirFile.exists() && tempDirFile.isDirectory() && tempDirFile.canWrite() && tempDirFile.canRead()))
+            throw new EmfException("Import-export temporary folder does not exist or lacks write permissions: "
+                    + tempDir);
+
+
+        return tempDir + separator + qaStepResult.getTable() + ".csv"; // this is how exported file name was
+    }
+    
+    private String writerHeader(QAStep qaStep, QAStepResult stepResult, String dsName){
+        String lineFeeder = System.getProperty("line.separator");
+        String header="#DATASET_NAME=" + dsName + lineFeeder;
+        header +="#DATASET_VERSION_NUM= " + qaStep.getVersion() + lineFeeder;
+        header +="#CREATION_DATE=" + CustomDateFormat.format_YYYY_MM_DD_HH_MM(stepResult.getTableCreationDate())+ lineFeeder;
+        header +="#QA_STEP_NAME=" + qaStep.getName() + lineFeeder; 
+        header +="#QA_PROGRAM=" + qaStep.getProgram()+ lineFeeder;
+        String arguments= qaStep.getProgramArguments();
+        StringTokenizer argumentTokenizer = new StringTokenizer(arguments);
+        header += "#ARGUMENTS=" +argumentTokenizer.nextToken(); // get first token
+
+        while (argumentTokenizer.hasMoreTokens()){
+            String next = argumentTokenizer.nextToken().trim(); 
+            if (next.contains("-"))
+                header += lineFeeder+ "#" +next;
+            else 
+                header += "  " +next;
+        }
+        header +=lineFeeder;
+        //arguments.replaceAll(lineFeeder, "#");
+        //System.out.println("after replace  \n" + header);
+        return header;
+    }
+
+    public String getTableAsString(QAStepResult stepResult) throws EmfException {
+        return session.dataService().getTableAsString("emissions." + stepResult.getTable());
+    }
+
 }

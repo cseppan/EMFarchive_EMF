@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorTabPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 
 public interface EditableQATabPresenter extends PropertiesEditorTabPresenter {
     void display() throws EmfException;
@@ -23,4 +24,10 @@ public interface EditableQATabPresenter extends PropertiesEditorTabPresenter {
     void addFromTemplates(QAStep[] newSteps) throws EmfException;
 
     public void doCopyQASteps(QAStep[] steps, int[] datasetIds, boolean replace) throws EmfException;
+
+    QAStepResult getStepResult(QAStep step) throws EmfException;
+    
+    long getTableRecordCount(QAStepResult stepResult) throws EmfException;
+
+    void viewResults(QAStep qaStep) throws EmfException;
 }
