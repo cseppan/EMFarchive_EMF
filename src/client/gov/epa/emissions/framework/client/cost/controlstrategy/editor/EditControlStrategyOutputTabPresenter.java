@@ -173,10 +173,11 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         return folder;
     }
 
-    public void doInventory(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) throws EmfException {
+    public void doInventory(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults, 
+            String namePrefix) throws EmfException {
         view.clearMsgPanel();
         session.controlStrategyService().createInventories(session.user(), controlStrategy, 
-                controlStrategyResults);
+                controlStrategyResults, namePrefix);
     }
 
     public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {

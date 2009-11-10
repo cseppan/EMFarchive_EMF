@@ -159,11 +159,13 @@ public class ViewControlStrategyOutputTabPresenterImpl implements ViewControlStr
         return folder;
     }
 
-    public void doInventory(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults)
+    public void doInventory(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults,
+            String namePrefix)
             throws EmfException {
 
         view.clearMessage();
-        session.controlStrategyService().createInventories(session.user(), controlStrategy, controlStrategyResults);
+        session.controlStrategyService().createInventories(session.user(), controlStrategy, 
+                controlStrategyResults, namePrefix);
     }
 
     public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {

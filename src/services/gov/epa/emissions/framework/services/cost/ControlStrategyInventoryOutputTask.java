@@ -31,22 +31,26 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
     private DbServerFactory dbServerFactory;
     
     private ControlStrategyResult[] controlStrategyResults;
+
+    private String namePrefix;
     
     public ControlStrategyInventoryOutputTask(User user, ControlStrategy controlStrategy,
-            ControlStrategyResult[] controlStrategyResults, HibernateSessionFactory sessionFactory, 
-            DbServerFactory dbServerFactory) {
+            ControlStrategyResult[] controlStrategyResults, String namePrefix, 
+            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.user = user;
         this.controlStrategy = controlStrategy;
         this.controlStrategyResults = controlStrategyResults;
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
+        this.namePrefix = namePrefix;
     }
 
     public void run() {
         try {
             int count = 0;
             ControlStrategyInventoryOutputFactory factory = new ControlStrategyInventoryOutputFactory(user, controlStrategy,
-                    sessionFactory, dbServerFactory);
+                    namePrefix, sessionFactory, 
+                    dbServerFactory);
             for (int i = 0; i < controlStrategyResults.length; i++) {
                 if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)
                         || controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.annotatedInventory)) {

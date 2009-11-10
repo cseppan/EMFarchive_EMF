@@ -322,8 +322,8 @@ public class ViewControlStrategyOutputTab extends EmfPanel implements ViewContro
                     return;
                 }
             }
-
-            presenter.doInventory(controlStrategy, controlStrategyResults);
+            String namePrefix = null;
+            presenter.doInventory(controlStrategy, controlStrategyResults, namePrefix);
             // flag to make sure the user doesn't click the button twice...
             creatingControlledInventories = true;
 

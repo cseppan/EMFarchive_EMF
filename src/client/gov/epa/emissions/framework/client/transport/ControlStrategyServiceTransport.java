@@ -187,17 +187,18 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
     }
 
     public synchronized void createInventories(User user, ControlStrategy controlStrategy, 
-            ControlStrategyResult[] controlStrategyResults) throws EmfException {
+            ControlStrategyResult[] controlStrategyResults, String namePrefix) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("createInventories");
         call.addParam("user", mappings.user());
         call.addParam("controlStrategy", mappings.controlStrategy());
         call.addParam("controlStrategyResults", mappings.controlStrategyResults());
+        call.addStringParam("namePrefix");
         call.setVoidReturnType();
 
         call.request(new Object[] { user, controlStrategy, 
-                controlStrategyResults });
+                controlStrategyResults, namePrefix });
 
     }
 

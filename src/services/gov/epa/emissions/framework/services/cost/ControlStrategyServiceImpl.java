@@ -426,10 +426,11 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     }
 
     public synchronized void createInventories(User user, ControlStrategy controlStrategy,
-            ControlStrategyResult[] controlStrategyResults) throws EmfException {
+            ControlStrategyResult[] controlStrategyResults, String namePrefix) throws EmfException {
         try {
             ControlStrategyInventoryOutputTask task = new ControlStrategyInventoryOutputTask(user, controlStrategy,
-                    controlStrategyResults, sessionFactory, dbServerFactory);
+                    controlStrategyResults, namePrefix, 
+                    sessionFactory, dbServerFactory);
             if (task.shouldProceed())
                 threadPool.execute(new GCEnforcerTask("Create Inventories: " + controlStrategy.getName(), task));
         } catch (Exception e) {

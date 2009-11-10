@@ -20,8 +20,8 @@ public interface ViewControlStrategyOutputTabPresenter extends ViewControlStrate
 
     String folder();
 
-    void doInventory(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults)
-            throws EmfException;
+    void doInventory(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults,
+            String namePrefix) throws EmfException;
 
     void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException;
 
