@@ -82,7 +82,6 @@ public class EditVersionDialog extends Dialog {
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
         this.descriptionTextArea = new TextArea("", version.getDescription(), 25, 6);
-        this.descriptionTextArea.setBorder(this.name.getBorder());
         this.descriptionTextArea.setText(version.getDescription());
         
         JScrollPane scrollPane = new JScrollPane(this.descriptionTextArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
