@@ -42,7 +42,13 @@ public class VersionTable extends JTable {
 
                 this.descriptionComponent = (JComponent) c;
                 String valueAt = (String) getValueAt(rowIndex, columnIndex);
-                this.descriptionComponent.setToolTipText(Utils.convertTextToHTML(Utils.addBreaks(valueAt, 80, '\n')));
+
+                if (valueAt == null || valueAt.isEmpty()) {
+                    this.descriptionComponent.setToolTipText(null);
+                } else {
+                    this.descriptionComponent.setToolTipText(Utils
+                            .convertTextToHTML(Utils.addBreaks(valueAt, 80, '\n')));
+                }
             }
         } else {
 
