@@ -17,11 +17,11 @@ import java.sql.SQLException;
 public class AnnotatedControlStrategyInventoryOutput extends AbstractControlStrategyInventoryOutput {
 
     public AnnotatedControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
-            ControlStrategyResult controlStrategyResult, HibernateSessionFactory sessionFactory, 
-            DbServerFactory dbServerFactory) throws Exception {
+            ControlStrategyResult controlStrategyResult, String namePrefix, 
+            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
         super(user, controlStrategy,
-                controlStrategyResult, sessionFactory, 
-                dbServerFactory);
+                controlStrategyResult, namePrefix,
+                sessionFactory, dbServerFactory);
     }
 
     public void create() throws Exception {
@@ -31,7 +31,7 @@ public class AnnotatedControlStrategyInventoryOutput extends AbstractControlStra
     protected void doCreateInventory(EmfDataset inputDataset, String inputTable) throws EmfException, Exception, SQLException {
         startStatus(statusServices);
         try {
-            EmfDataset dataset = creator.addDataset(creator.createDatasetName(inputDataset + "_CntlInv"), 
+            EmfDataset dataset = creator.addDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), 
                     inputDataset, inputDataset.getDatasetType(), 
                     tableFormat, description(inputDataset));
             

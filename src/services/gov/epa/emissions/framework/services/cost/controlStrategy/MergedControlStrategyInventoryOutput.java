@@ -32,11 +32,11 @@ import org.hibernate.Session;
 public class MergedControlStrategyInventoryOutput extends AbstractControlStrategyInventoryOutput {
    
     public MergedControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
-            ControlStrategyResult controlStrategyResult, HibernateSessionFactory sessionFactory, 
-            DbServerFactory dbServerFactory) throws Exception {
+            ControlStrategyResult controlStrategyResult, String namePrefix, 
+            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
         super(user, controlStrategy,
-                controlStrategyResult, sessionFactory, 
-                dbServerFactory);
+                controlStrategyResult, namePrefix,
+                sessionFactory, dbServerFactory);
     }
 
     public void create() throws Exception {
@@ -55,7 +55,7 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
                 if (!inputDataset.getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
                     tableFormat = new FileFormatFactory(dbServer).tableFormat(inputDataset.getDatasetType());
                     //create controlled inventory dataset
-                    EmfDataset dataset = creator.addDataset(creator.createDatasetName(inputDataset + "_CntlInv"), 
+                    EmfDataset dataset = creator.addDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), 
                             inputDataset, inputDataset.getDatasetType(), 
                             tableFormat, description(inputDataset));
                     //get table name
@@ -111,8 +111,10 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
         VersionedQuery invVersionedQuery = new VersionedQuery(invVersion);
         int month = inputDataset.applicableMonth();
         int noOfDaysInMonth = 31;
+        boolean isMonthlyInventory = false;
         if (month != -1) {
             noOfDaysInMonth = getDaysInMonth(month);
+            isMonthlyInventory = true;
         }
         String sql = "select ";
         String columnList = "";
@@ -160,7 +162,10 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
                 sql += ", case when b.source_id is not null then b.final_emissions / " + (month != -1 ? noOfDaysInMonth : "365") + " else avd_emis end as avd_emis";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("ann_emis")) {
-                sql += ", case when b.source_id is not null then b.final_emissions else ann_emis end as ann_emis";
+                if (isMonthlyInventory)
+                    sql += ", -9.0::double precision as ann_emis";
+                else
+                    sql += ", case when b.source_id is not null then b.final_emissions else ann_emis end as ann_emis";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("reff")) {
                 sql += ", case when b.source_id is not null then 100 else reff end as reff";

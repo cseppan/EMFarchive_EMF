@@ -17,24 +17,25 @@ import java.util.Date;
 public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends AbstractControlStrategyInventoryOutput {
 
     public ProjectFutureYearInventoryControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
-            ControlStrategyResult controlStrategyResult, HibernateSessionFactory sessionFactory, 
-            DbServerFactory dbServerFactory) throws Exception {
-        super(user, controlStrategy,
-                controlStrategyResult, sessionFactory, 
-                dbServerFactory);
+            ControlStrategyResult controlStrategyResult, String namePrefix, 
+            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
+        super(user, controlStrategy, 
+                controlStrategyResult, namePrefix,
+                sessionFactory, dbServerFactory);
     }
 
     public void create() throws Exception {
         doCreateInventory(inputDataset, getDatasetTableName(inputDataset));
     }
 
-    protected void doCreateInventory(EmfDataset inputDataset, String inputTable) throws EmfException, Exception, SQLException {
+    protected void doCreateInventory(EmfDataset inputDataset, String inputTable) throws EmfException, Exception,
+            SQLException {
         startStatus(statusServices);
         try {
-            //we need to change the year on the start and stop datetime.
+            // we need to change the year on the start and stop datetime.
             Date startDate = inputDataset.getStartDateTime();
             Date stopDate = inputDataset.getStopDateTime();
-            
+
             if (startDate != null && stopDate != null) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(startDate);
@@ -44,13 +45,12 @@ public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends Ab
                 calendar.set(Calendar.YEAR, controlStrategy.getInventoryYear());
                 inputDataset.setStopDateTime(calendar.getTime());
             }
-            
-            EmfDataset dataset = creator.addDataset(creator.createDatasetName(inputDataset + "_CntlInv"), 
-                    inputDataset, inputDataset.getDatasetType(), 
-                    tableFormat, description(inputDataset));
-            
+
+            EmfDataset dataset = creator.addDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), inputDataset,
+                    inputDataset.getDatasetType(), tableFormat, description(inputDataset));
+
             String outputInventoryTableName = getDatasetTableName(dataset);
-            
+
             ControlStrategyResult result = getControlStrategyResult(controlStrategyResult.getId());
             createDetailedResultTableIndexes(result);
             createControlledInventory(dataset.getId(), inputTable, detailDatasetTable(result),
@@ -63,21 +63,23 @@ public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends Ab
             e.printStackTrace();
             throw e;
         } finally {
-//            setandRunQASteps();
+            // setandRunQASteps();
             dbServer.disconnect();
         }
-        
+
     }
 
-    private void createControlledInventory(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
-            Dataset dataset, Datasource datasource) throws EmfException {
-        String query = "SELECT public.create_projected_future_year_inventory("  + controlStrategy.getId() + ", " + inputDataset.getId() + ", " + version.getVersion() + ", " + controlStrategyResult.getId() + ", " + datasetId + ");";
+    private void createControlledInventory(int datasetId, String inputTable, String detailResultTable,
+            String outputTable, Version version, Dataset dataset, Datasource datasource) throws EmfException {
+        String query = "SELECT public.create_projected_future_year_inventory(" + controlStrategy.getId() + ", "
+                + inputDataset.getId() + ", " + version.getVersion() + ", " + controlStrategyResult.getId() + ", "
+                + datasetId + ");";
 
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
-            throw new EmfException("Error occured when copying data from " + inputTable + " to "
-                    + outputTable + "\n" + e.getMessage());
+            throw new EmfException("Error occured when copying data from " + inputTable + " to " + outputTable + "\n"
+                    + e.getMessage());
         }
     }
 }

@@ -18,7 +18,6 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
-import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -51,9 +50,11 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
     protected ControlStrategyResult controlStrategyResult;
 
     protected Datasource datasource;
+
+    protected String namePrefix;
     
     public AbstractControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
-            ControlStrategyResult controlStrategyResult, HibernateSessionFactory sessionFactory, 
+            ControlStrategyResult controlStrategyResult, String namePrefix, HibernateSessionFactory sessionFactory, 
             DbServerFactory dbServerFactory) throws Exception {
         this.controlStrategy = controlStrategy;
         this.controlStrategyResult = controlStrategyResult;
@@ -68,6 +69,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
                 sessionFactory, dbServerFactory,
                 dbServer.getEmissionsDatasource(), new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords()));
         this.statusServices = new StatusDAO(sessionFactory);
+        this.namePrefix = namePrefix;
     }
 
     public void create() throws Exception {
@@ -77,7 +79,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
     protected void doCreateInventory(EmfDataset inputDataset, String inputTable) throws EmfException, Exception, SQLException {
         startStatus(statusServices);
         try {
-            EmfDataset dataset = creator.addDataset(creator.createDatasetName(inputDataset + "_CntlInv"), 
+            EmfDataset dataset = creator.addDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), 
                     inputDataset, inputDataset.getDatasetType(), 
                     tableFormat, description(inputDataset));
             
@@ -122,13 +124,29 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
         String startingDesc = inputDataset.getDescription() + "";
         if ((startingDesc.indexOf("FIPS,SCC") > 0) || (startingDesc.indexOf("\"FIPS\",") > 0))
         {
-           return startingDesc;
+            //the columns desc is already included
+            return startingDesc + "\n" + creator.getKeyValsAsHeaderString();
         }
-        return inputDataset.getDescription() + "#" + "Implements control strategy: " + controlStrategy.getName() + "\n" +
-          "#DESC FIPS,SCC,SIC,MACT,SRCTYPE,POLL,ANN_EMIS,AVD_EMIS,CEFF,REFF,RPEN,PRI_DEV,SEC_DEV,DATA_SOURCE,YEAR,TRIBAL_CODE,"+
-          "MACT_FLAG,COMPLIANCE_STATUS,START_DATE,END_DATE,WINTER_PCT,SPRING_PCT,SUMMER_PCT,FALL_PCT,DAYS_PER_WEEK,WEEKS_PER_YEAR,HOURS_PER_DAY,"+
-          "HOURS_PER_YEAR,PERIOD_DAYS_PER_WEEK,PERIOD_WEEKS_PER_YEAR,PERIOD_HOURS_OF_DAY,PERIOD_HOURS_PER_PERIOD\n";
-          // TODO: need to make it so that exporters automatically output the column descs instead of putting it here
+        //the columns desc is not included
+        return inputDataset.getDescription() 
+        + "\nDESC " + columnListForHeader() 
+        + "\n" + creator.getKeyValsAsHeaderString();
+    }
+
+    //build comma-delimted list of column name
+    protected String columnListForHeader() {
+        String delimitedList = "";
+        Column[] columns = tableFormat.cols();
+        for (int i = 0; i < columns.length; i++) {
+            String columnName = columns[i].name().toLowerCase();
+            if (!columnName.equalsIgnoreCase("Record_Id")
+                    && !columnName.equalsIgnoreCase("Dataset_Id")
+                    && !columnName.equalsIgnoreCase("Version")
+                    && !columnName.equalsIgnoreCase("Delete_Versions")
+                    ) 
+            delimitedList += (delimitedList.length() > 0 ? "," + "\"" + columnName + "\"" : "\"" + columnName + "\"");
+        }
+        return delimitedList;
     }
 
     protected ControlStrategyResult getControlStrategyResult(int id) throws EmfException {
@@ -235,16 +253,18 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
         System.out.println("Input dataset name: " + inputDataset.getName());
         System.out.println("Month from input dataset: " + month);
         int noOfDaysInMonth = 31;
+        boolean isMonthlyInventory = false;
         if (month != -1) {
             noOfDaysInMonth = getDaysInMonth(month);
             System.out.println("Number of days in month: " + noOfDaysInMonth);
+            isMonthlyInventory = true;
         }
         String sql = "select ";
         String columnList = "";
         Column[] columns = tableFormat.cols();
         //flag indicating if we are doing replacement vs
         //add on controls., currently we only support replacement controls.
-        boolean isReplacementControl = !controlStrategy.getStrategyType().getName().equals(StrategyType.applyMeasuresInSeries);
+        boolean isReplacementControl = false;//TODO, still needs work
         //right before abbreviation, is an empty now...
         for (int i = 0; i < columns.length; i++) {
             String columnName = columns[i].name();
@@ -266,10 +286,13 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
                 sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then (1- b.final_emissions / b.starting_emissions) * 100 else null::double precision end else ceff end as ceff";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("avd_emis")) {
-                sql += ", case when b.source_id is not null then b.final_emissions / " + (month != -1 ? noOfDaysInMonth : "365") + " else avd_emis end as avd_emis";
+                    sql += ", case when b.source_id is not null then b.final_emissions / " + (month != -1 ? noOfDaysInMonth : "365") + " else avd_emis end as avd_emis";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("ann_emis")) {
-                sql += ", case when b.source_id is not null then b.final_emissions else ann_emis end as ann_emis";
+                if (isMonthlyInventory)
+                    sql += ", -9.0::double precision as ann_emis";
+                else
+                    sql += ", case when b.source_id is not null then b.final_emissions else ann_emis end as ann_emis";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("reff")) {
                 sql += ", case when b.source_id is not null then 100 else reff end as reff";

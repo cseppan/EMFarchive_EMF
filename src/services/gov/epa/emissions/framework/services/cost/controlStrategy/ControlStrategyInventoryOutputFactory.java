@@ -17,29 +17,33 @@ public class ControlStrategyInventoryOutputFactory {
 
     private DbServerFactory dbServerFactory;
 
+    private String namePrefix;
+
     public ControlStrategyInventoryOutputFactory(User user, ControlStrategy controlStrategy,
-            HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
+            String namePrefix, HibernateSessionFactory sessionFactory, 
+            DbServerFactory dbServerFactory) throws Exception {
         this.controlStrategy = controlStrategy;
         this.user = user;
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
+        this.namePrefix = namePrefix;
     }
 
     public ControlStrategyInventoryOutput get(ControlStrategyResult controlStrategyResult) throws Exception {
         if (controlStrategy.getStrategyType().getName().equals(StrategyType.projectFutureYearInventory)) 
             return new ProjectFutureYearInventoryControlStrategyInventoryOutput(user, controlStrategy, 
-                    controlStrategyResult, sessionFactory, 
-                    dbServerFactory);
+                    controlStrategyResult, namePrefix,
+                    sessionFactory, dbServerFactory);
         if (controlStrategy.getStrategyType().getName().equals(StrategyType.annotateInventory)) 
             return new AnnotatedControlStrategyInventoryOutput(user, controlStrategy, 
-                    controlStrategyResult, sessionFactory, 
-                    dbServerFactory);
+                    controlStrategyResult, namePrefix, 
+                    sessionFactory, dbServerFactory);
         if (controlStrategyResult.getInputDataset().getDatasetType().getName().equals(DatasetType.orlMergedInventory))
             return new MergedControlStrategyInventoryOutput(user, controlStrategy, 
-                    controlStrategyResult, sessionFactory, 
-                    dbServerFactory);
+                    controlStrategyResult, namePrefix,
+                    sessionFactory, dbServerFactory);
         return new AbstractControlStrategyInventoryOutput(user, controlStrategy, 
-                controlStrategyResult, sessionFactory, 
-                dbServerFactory);
+                controlStrategyResult, namePrefix,
+                sessionFactory, dbServerFactory);
     }
 }
