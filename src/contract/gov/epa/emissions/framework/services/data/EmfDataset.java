@@ -501,6 +501,7 @@ public class EmfDataset implements Dataset, Lockable, Comparable<EmfDataset> {
 
     //returns:  -1 indicates no month, most likely a annual dataset not monthly
     //          if not -1 will return Calendar.month values
+    //          values are based on 0 based (i.e., Jan = 0 ... Dec = 11)
     public int applicableMonth() {
 
         //code was copied from SQLQAAnnualQuery.java class
