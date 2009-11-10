@@ -138,7 +138,7 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractStrategyTask
         try {
             ORLMergedFileFormat fileFormat = new ORLMergedFileFormat(dbServer.getSqlDataTypes());
             
-            String columnDelimitedList = fileFormat.columnDelimitedList();
+            String columnDelimitedList = fileFormat.columnList();
             
             String sql = "INSERT INTO " + qualifiedEmissionTableName(mergedDataset) + " (dataset_id, " + columnDelimitedList + ") ";
             ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
