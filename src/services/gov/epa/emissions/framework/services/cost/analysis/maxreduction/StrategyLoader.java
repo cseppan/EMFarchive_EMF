@@ -26,9 +26,10 @@ public class StrategyLoader extends AbstractStrategyLoader {
         EmfDataset inputDataset = controlStrategyInputDataset.getInputDataset();
         //make sure inventory has indexes created...
         makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset);
-        //make sure inventory has the target pollutant, if not don't run
+        //make sure inventory has the target pollutant, if not show a warning message
         if (!inventoryHasTargetPollutant(controlStrategyInputDataset)) {
-            throw new EmfException("Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". Target pollutant, " + controlStrategy.getTargetPollutant().getName() + ", is not in the inventory.");
+            setStatus("Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". Target pollutant, " + controlStrategy.getTargetPollutant().getName() + ", is not in the inventory.");
+//            throw new EmfException("Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". Target pollutant, " + controlStrategy.getTargetPollutant().getName() + ", is not in the inventory.");
         }
         //reset counters
         recordCount = 0;
@@ -67,7 +68,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
     private void runStrategy(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "";
         query = "SELECT public.run_max_emis_red_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
-        System.out.println(System.currentTimeMillis() + " " + query);
+//        System.out.println(System.currentTimeMillis() + " " + query);
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
