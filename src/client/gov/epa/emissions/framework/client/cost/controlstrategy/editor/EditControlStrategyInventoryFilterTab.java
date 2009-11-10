@@ -453,8 +453,6 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     
     public void save(ControlStrategy controlStrategy) throws EmfException {
         String value = filter.getText().trim();
-        if (value.length() > 255)
-            throw new EmfException("Filter Tab: The length of the sql filter should not exceed 255 characters.");
 
         controlStrategy.setFilter(value);
 //        controlStrategy.setCountyFile(countyFileTextField.getText().trim());
