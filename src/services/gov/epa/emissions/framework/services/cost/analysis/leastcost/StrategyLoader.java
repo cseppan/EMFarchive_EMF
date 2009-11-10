@@ -24,10 +24,18 @@ public class StrategyLoader extends LeastCostAbstractStrategyLoader {
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
         EmfDataset inputDataset = controlStrategyInputDataset.getInputDataset();
 
-        //make sure inventory has the target pollutant, if not don't run
+        //make sure inventory has the target pollutant, if not show a warning message
         if (!inventoryHasTargetPollutant(controlStrategyInputDataset)) {
-            throw new EmfException("Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". Target pollutant, " + controlStrategy.getTargetPollutant().getName() + ", is not in the inventory.");
+            setStatus("Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". Target pollutant, " + controlStrategy.getTargetPollutant().getName() + ", is not in the inventory.");
+//            throw new EmfException("Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". Target pollutant, " + controlStrategy.getTargetPollutant().getName() + ", is not in the inventory.");
         }
+        
+//        //see if inventory is a monthly, if so warn user these inventories are currently not supported.
+//        if (!inventoryHasTargetPollutant(controlStrategyInputDataset)) {
+//            setStatus("Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". Target pollutant, " + controlStrategy.getTargetPollutant().getName() + ", is not in the inventory.");
+////            throw new EmfException("Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". Target pollutant, " + controlStrategy.getTargetPollutant().getName() + ", is not in the inventory.");
+//        }
+        
         //reset counters
         recordCount = 0;
         totalCost = 0.0;
