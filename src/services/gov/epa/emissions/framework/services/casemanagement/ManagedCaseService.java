@@ -5668,7 +5668,7 @@ public class ManagedCaseService {
             String purpose = job.getPurpose() == null ? "" : job.getPurpose();
             String dependsOn = getDependsOnJobsString(job.getDependentJobs(), session);
 
-            sb.append("Jobs,\"" + clean(name) + "\"," + order + ",\"" + clean(region) + "\"," + clean(sector) + "\","
+            sb.append("Jobs,\"" + clean(name) + "\"," + order + ",\"" + clean(region) + "\",\"" + clean(sector) + "\","
                     + clean(status) + "," + start + "," + end + "," + clean(exec) + ",\"" + clean(args) + "\","
                     + clean(path) + ",\"" + clean(qOptns) + "\",\"" + clean(jobGrp) + "\"," + local + ",\""
                     + clean(qId) + "\",\"" + clean(user) + "\", " + clean(host) + ",\"" + clean(notes) + "\",\""
