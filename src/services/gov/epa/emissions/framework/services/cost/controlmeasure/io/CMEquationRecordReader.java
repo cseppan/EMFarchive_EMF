@@ -95,7 +95,7 @@ public class CMEquationRecordReader {
                             equation.setValue10(value);
                         }
                     } catch (NumberFormatException e) {
-                        sb.append(format("variable value must be a number, column position = " + (equationTypeVariables[i].getFileColPosition() + 1) + ", value = " + tokens[equationTypeVariables[i].getFileColPosition() + 1]));
+                        sb.append(format("variable value must be a number, column position = " + (equationTypeVariables[i].getFileColPosition() + 3) + ", value = " + tokens[equationTypeVariables[i].getFileColPosition() + 3]));
                         break;
                     }
                 }
