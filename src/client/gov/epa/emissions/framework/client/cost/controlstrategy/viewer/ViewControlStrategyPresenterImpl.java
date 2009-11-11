@@ -52,16 +52,11 @@ public class ViewControlStrategyPresenterImpl implements ViewControlStrategyPres
     }
 
     public void doDisplay() throws EmfException {
-        
+
         view.observe(this);
-        
-        controlStrategy = service().obtainLocked(session.user(), controlStrategy.getId());
-        
-        if (!controlStrategy.isLocked(session.user())) {// view mode, locked by another user
-            view.notifyLockFailure(controlStrategy);
-            return;
-        }
-        
+
+        controlStrategy = service().getById(controlStrategy.getId());
+
         view.display(controlStrategy, getResult());
     }
 
@@ -73,9 +68,8 @@ public class ViewControlStrategyPresenterImpl implements ViewControlStrategyPres
         return service().getById(id);
     }
 
-    public void doClose() throws EmfException {
-        service().releaseLocked(session.user(), controlStrategy.getId());
-        closeView();
+    public void doClose() {
+       closeView();
     }
 
     private void closeView() {
@@ -170,7 +164,7 @@ public class ViewControlStrategyPresenterImpl implements ViewControlStrategyPres
     }
 
     public Version[] getVersions(EmfDataset dataset) throws EmfException {
-        
+
         if (dataset == null) {
             return new Version[0];
         }
@@ -208,7 +202,7 @@ public class ViewControlStrategyPresenterImpl implements ViewControlStrategyPres
                 return v;
             }
         }
-        
+
         return null;
     }
 
