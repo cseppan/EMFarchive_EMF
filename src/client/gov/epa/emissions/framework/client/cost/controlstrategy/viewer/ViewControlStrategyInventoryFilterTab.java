@@ -290,7 +290,7 @@ public class ViewControlStrategyInventoryFilterTab extends EmfPanel implements V
         // String width = EmptyStrings.create(80);
         // Dimension size=new Dimension(500, 13);
 
-        dataset = new ComboBox(datasets);
+        dataset = new ComboBox("Not selected", datasets);
         if (controlStrategy.getCountyDataset() != null) {
             dataset.setSelectedItem(controlStrategy.getCountyDataset());
         }
