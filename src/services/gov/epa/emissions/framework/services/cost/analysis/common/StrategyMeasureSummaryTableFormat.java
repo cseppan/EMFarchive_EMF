@@ -75,7 +75,7 @@ public class StrategyMeasureSummaryTableFormat implements TableFormat {
         cols.add(new Column("source_group", types.stringType(255), new StringFormatter(255)));
         cols.add(new Column("Annual_Cost", types.realType(), new RealFormatter()));
         cols.add(new Column("Avg_Ann_Cost_per_Ton", types.realType(), new RealFormatter()));
-        cols.add(new Column("Controlled_Emis", types.realType(), new RealFormatter()));
+        cols.add(new Column("input_emis", types.realType(), new RealFormatter()));
         cols.add(new Column("Emis_Reduction", types.realType(), new RealFormatter()));
         cols.add(new Column("Pct_Red", types.realType(), new RealFormatter()));
         cols.add(new Column("Comment", types.stringType(128), new StringFormatter(128)));

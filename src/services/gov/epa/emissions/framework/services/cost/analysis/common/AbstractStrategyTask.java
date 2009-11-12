@@ -278,18 +278,20 @@ public abstract class AbstractStrategyTask implements Strategy {
             //SET work_mem TO '512MB';
             
             //NOTE:  Still need to  support mobile monthly files
-            String sql = "INSERT INTO " + qualifiedEmissionTableName(summaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, scc, poll, Control_Measure_Abbreviation, Control_Measure, Control_Technology, source_group, avg_ann_cost_per_ton, Annual_Cost, Emis_Reduction) " 
+            String sql = "INSERT INTO " + qualifiedEmissionTableName(summaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, scc, poll, Control_Measure_Abbreviation, Control_Measure, Control_Technology, source_group, avg_ann_cost_per_ton, Annual_Cost, input_emis, Emis_Reduction, Pct_Red) " 
             + "select " + summaryResult.getDetailedResultDataset().getId() + ", 0, summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name as Control_Technology, sg.name, "
             + "case when sum(summary.Emis_Reduction) <> 0 then sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) else null::double precision end as avg_cost_per_ton, " 
             + "sum(summary.Annual_Cost) as Annual_Cost, "
-            + "sum(summary.Emis_Reduction) as Emis_Reduction " 
+            + "sum(summary.input_emis) as input_emis, " 
+            + "sum(summary.Emis_Reduction) as Emis_Reduction, " 
+            + "case when sum(summary.input_emis) <> 0 then (sum(summary.Emis_Reduction)) / sum(summary.input_emis) * 100.0 else null::double precision end as Pct_Red " 
             + "from (";
             int count = 0;
             for (int i = 0; i < results.length; i++) {
                 if (results[i].getDetailedResultDataset() != null) {
                     String tableName = qualifiedEmissionTableName(results[i].getDetailedResultDataset());
                     sql += (count > 0 ? " union all " : "") 
-                        + "select e.sector, e.fips, e.scc, e.poll, e.cm_id, sum(e.Annual_Cost) as Annual_Cost, sum(e.Emis_Reduction) as Emis_Reduction "
+                        + "select e.sector, e.fips, e.scc, e.poll, e.cm_id, sum(e.Annual_Cost) as Annual_Cost, sum(e.Emis_Reduction) as Emis_Reduction, sum(e.input_emis) as input_emis "
                         + "from " + tableName + " e "
                         + "group by e.sector, e.fips, e.scc, e.poll, e.cm_id ";
                     ++count;
@@ -320,7 +322,11 @@ public abstract class AbstractStrategyTask implements Strategy {
             //SET work_mem TO '512MB';
             //NOTE:  Still need to  support mobile monthly files
             String sql = "INSERT INTO " + qualifiedEmissionTableName(countySummaryResult.getDetailedResultDataset()) + " (dataset_id, version, sector, fips, poll, Uncontrolled_Emis, Emis_Reduction, Remaining_Emis, Pct_Red, Annual_Cost, Annual_Oper_Maint_Cost, Annualized_Capital_Cost, Total_Capital_Cost, Avg_Ann_Cost_per_Ton) " 
-            + "select " + countySummaryResult.getDetailedResultDataset().getId() + ", 0, sector, fips, poll, Uncontrolled_Emis, Emis_Reduction, Remaining_Emis, Pct_Red, Annual_Cost, Annual_Oper_Maint_Cost, Annualized_Capital_Cost, Total_Capital_Cost, Avg_Ann_Cost_per_Ton " 
+            + "select " + countySummaryResult.getDetailedResultDataset().getId() + ", 0, sector, fips, poll, sum(summary.Uncontrolled_Emis) as Uncontrolled_Emis, sum(summary.Emis_Reduction) as Emis_Reduction, sum(summary.Remaining_Emis) as Remaining_Emis, case when sum(summary.Uncontrolled_Emis) <> 0 then (sum(summary.Emis_Reduction)) / sum(summary.Uncontrolled_Emis) * 100.0 else null::double precision end as Pct_Red, sum(summary.Annual_Cost) as Annual_Cost, "
+                      + "sum(summary.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
+                      + "sum(summary.Annualized_Capital_Cost) as Annualized_Capital_Cost, "
+                      + "sum(summary.Total_Capital_Cost) as Total_Capital_Cost, "
+                      + "case when sum(summary.Emis_Reduction) <> 0 then sum(summary.Annual_Cost) / sum(summary.Emis_Reduction) else null::double precision end as Avg_Ann_Cost_per_Ton " 
             + "from (";
             int count = 0;
             
@@ -338,6 +344,7 @@ public abstract class AbstractStrategyTask implements Strategy {
 //                      EmfDataset inventory = inventories[i].getInputDataset();
                   ControlStrategyInputDataset inventory = inventories[i];
                   if (!inventory.getInputDataset().getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
+
                       for (int j = 0; j < results.length; j++) {
                           if (results[j].getDetailedResultDataset() != null 
                               && results[j].getInputDataset() != null) {
@@ -353,7 +360,14 @@ public abstract class AbstractStrategyTask implements Strategy {
                               }
                               String sqlAnnEmis = (month != -1 ? "coalesce(" + noOfDaysInMonth + " * i.avd_emis, i.ann_emis)" : "i.ann_emis");
                               sql += (count > 0 ? " union all " : "") 
-                                  + "select '" + sector.replace("'", "''") + "'::character varying(64) as sector, i.fips, i.poll, sum(" + sqlAnnEmis + ") as Uncontrolled_Emis, sum(" + sqlAnnEmis + ") - sum(e.final_emissions) as Emis_Reduction, coalesce(sum(e.final_emissions), sum(" + sqlAnnEmis + ")) as Remaining_Emis, case when sum(" + sqlAnnEmis + ") <> 0 then (sum(" + sqlAnnEmis + ") - sum(e.final_emissions)) / sum(" + sqlAnnEmis + ") * 100.0 else null::double precision end as Pct_Red, sum(e.Annual_Cost) as Annual_Cost, "
+                                  + "select '" + sector.replace("'", "''") + "'::character varying(64) as sector, "
+                                  + "i.fips, "
+                                  + "i.poll, "
+                                  + "sum(" + sqlAnnEmis + ") as Uncontrolled_Emis, "
+                                  + "sum(e.Emis_Reduction) as Emis_Reduction, "
+                                  + "/*coalesce(sum(e.final_emissions), sum(" + sqlAnnEmis + ")) - sum(e.Emis_Reduction) */ null::double precision as Remaining_Emis, "
+                                  + "/*case when sum(" + sqlAnnEmis + ") <> 0 then (sum(" + sqlAnnEmis + ") - sum(e.final_emissions)) / sum(" + sqlAnnEmis + ") * 100.0 else null::double precision end */ null::double precision as Pct_Red, "
+                                  + "sum(e.Annual_Cost) as Annual_Cost, "
                                   + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
                                   + "sum(e.Annualized_Capital_Cost) as Annualized_Capital_Cost, "
                                   + "sum(e.Total_Capital_Cost) as Total_Capital_Cost, "
@@ -386,11 +400,12 @@ public abstract class AbstractStrategyTask implements Strategy {
                         }
                         String sqlAnnEmis = (month != -1 ? "coalesce(" + noOfDaysInMonth + " * i.avd_emis, i.ann_emis)" : "i.ann_emis");
                         sql += (count > 0 ? " union all " : "") 
-                            + "select '" + sector.replace("'", "''") + "'::character varying(64) as sector, i.fips, i.poll, "
+                            + "select '" + sector.replace("'", "''") + "'::character varying(64) as sector, "
+                            + "i.fips, "
+                            + "i.poll, "
                             + "sum(" + sqlAnnEmis + ") as Uncontrolled_Emis, "
                             + "sum(" + sqlAnnEmis + ") - sum(e.final_emissions) as Emis_Reduction, "
-                            + "coalesce(sum(e.final_emissions), "
-                            + "sum(" + sqlAnnEmis + ")) as Remaining_Emis, "
+                            + "coalesce(sum(e.final_emissions), sum(" + sqlAnnEmis + ")) as Remaining_Emis, "
                             + "case when sum(" + sqlAnnEmis + ") <> 0 then (sum(" + sqlAnnEmis + ") - sum(e.final_emissions)) / sum(" + sqlAnnEmis + ") * 100.0 else null::double precision end as Pct_Red, "
                             + "sum(e.Annual_Cost) as Annual_Cost, "
                             + "sum(e.Annual_Oper_Maint_Cost) as Annual_Oper_Maint_Cost, "
@@ -406,8 +421,9 @@ public abstract class AbstractStrategyTask implements Strategy {
                     }
                 }
             }
-            sql += ") summary ";
-            sql += "order by fips, sector, poll ";
+            sql += ") summary "
+                + "group by sector, fips, poll ";
+            sql += "order by sector, fips, poll ";
             
             System.out.println(sql);
             try {
@@ -419,7 +435,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     }
 
     protected int getDaysInMonth(int month) {
-        return month != - 1 ? DateUtil.daysInOneBasedMonth(controlStrategy.getInventoryYear(), month) : 31;
+        return month != - 1 ? DateUtil.daysInZeroBasedMonth(controlStrategy.getInventoryYear(), month) : 31;
     }
 
     protected void populateSourcesTable() throws EmfException {
