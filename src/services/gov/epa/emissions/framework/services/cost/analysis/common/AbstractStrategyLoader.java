@@ -399,7 +399,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     protected int getDaysInMonth(int month) {
-        return month != - 1 ? DateUtil.daysInOneBasedMonth(controlStrategy.getInventoryYear(), month) : 31;
+        return month != - 1 ? DateUtil.daysInZeroBasedMonth(controlStrategy.getInventoryYear(), month) : 31;
     }
     
     protected double getEmission(double annEmis, double avdEmis) {

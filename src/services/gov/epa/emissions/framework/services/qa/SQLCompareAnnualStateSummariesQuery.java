@@ -359,7 +359,7 @@ public class SQLCompareAnnualStateSummariesQuery {
     }
 
     protected int getDaysInMonth(int year, int month) {
-        return month != -1 ? DateUtil.daysInOneBasedMonth(year, month) : 31;
+        return month != -1 ? DateUtil.daysInZeroBasedMonth(year, month) : 31;
     }
 
     protected String query(String partialQuery, boolean createClause) throws EmfException {

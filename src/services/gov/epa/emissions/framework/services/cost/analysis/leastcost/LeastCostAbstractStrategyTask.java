@@ -185,7 +185,7 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractStrategyTask
                     inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("SECTOR", "'" + getDatasetSector(inputDataset) +  "' as SECTOR");
                     inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("ORIGINAL_DATASET_ID", inputDataset.getId() +  "::integer as ORIGINAL_DATASET_ID");
                     inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("ORIGINAL_RECORD_ID", "RECORD_ID as ORIGINAL_RECORD_ID");
-                    inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("MONTH", inputDataset.applicableMonth() + "::smallint as \"month\"");
+                    inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("MONTH", (inputDataset.applicableMonth() + 1) + "::smallint as \"month\"");
                     VersionedQuery versionedQuery = new VersionedQuery(version(inputDataset, controlStrategyInputDatasets[i].getVersion()));
                     sql += (i > 0 ? " union all " : "") 
                         + "select " + mergedDataset.getId() + " as dataset_id, " + inventoryColumnDelimitedList + " "
