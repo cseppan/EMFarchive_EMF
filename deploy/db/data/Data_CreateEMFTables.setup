@@ -443,14 +443,15 @@ WITHOUT OIDS;
 -- emf.georegions
 
 -- emf.references
-CREATE TABLE "references"
+CREATE TABLE emf."references"
 (
   id serial NOT NULL,
   description text,
   lock_owner character varying(255),
   lock_date timestamp without time zone,
-  CONSTRAINT references_pkey PRIMARY KEY (id)
+  CONSTRAINT references_pkey PRIMARY KEY (id),
+  UNIQUE(description)
 )
 WITH (OIDS=FALSE);
-ALTER TABLE "references" OWNER TO emf;
+ALTER TABLE emf."references" OWNER TO emf;
 -- emf.references

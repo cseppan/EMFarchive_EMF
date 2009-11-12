@@ -917,3 +917,9 @@ CREATE INDEX control_measure_references_reference_id
    USING btree
    (reference_id);
 -- emf control_measure_references
+
+-- 11/10/09 - changed the filter to be text instead of varchar(255)
+ALTER TABLE emf.control_strategies ALTER filter TYPE text;
+
+-- 11/12/09 - added unique constraint to the reference description
+ALTER TABLE "references" ADD CONSTRAINT uq_reference_description UNIQUE (description);
