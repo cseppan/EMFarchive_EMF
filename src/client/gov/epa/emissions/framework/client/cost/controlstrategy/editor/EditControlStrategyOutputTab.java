@@ -296,7 +296,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 //                }
 //            }
             
-            String namePrefix = JOptionPane.showInputDialog(parentConsole, "Enter a name prefix for the control inventories", "");
+            String namePrefix = JOptionPane.showInputDialog(parentConsole, "Enter a name prefix for the controlled inventories", "");
             presenter.doInventory(controlStrategy, controlStrategyResults, namePrefix);
             //flag to make sure the user doesn't click the button twice...
             creatingControlledInventories = true;
