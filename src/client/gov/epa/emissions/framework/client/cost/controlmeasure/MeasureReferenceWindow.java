@@ -8,22 +8,24 @@ import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SpringLayout;
 
-public class MeasureReferenceWindow extends DisposableInteralFrame {
+public class MeasureReferenceWindow extends DisposableInteralFrame implements MeasureReferenceView {
 
     private MessagePanel messagePanel;
 
@@ -41,9 +43,11 @@ public class MeasureReferenceWindow extends DisposableInteralFrame {
 
     private ManageChangeables changeablesList;
 
+    private ControlMeasure controlMeasure;
+
     private static int counter = 0;
 
-    private static final Dimension DIMENSION = new Dimension(400, 200);
+    private static final Dimension DIMENSION = new Dimension(500, 200);
 
     public MeasureReferenceWindow(String title, ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session) {
@@ -56,18 +60,26 @@ public class MeasureReferenceWindow extends DisposableInteralFrame {
     public void save() {
 
         messagePanel.clear();
-        doSave();
 
-        if (!newReference) {
-            presenter.refresh();
+        if (this.presenter.checkIfExists(this.descriptionField.getText().trim(), this.controlMeasure)) {
+            this.messagePanel.setMessage("Control Measure already contains reference with the same description.");
         } else {
-            presenter.add(reference);
-        }
 
-        disposeView();
+            doSave();
+
+            if (!newReference) {
+                presenter.refresh();
+            } else {
+                presenter.add(reference);
+            }
+
+            disposeView();
+        }
     }
 
     public void display(ControlMeasure measure, Reference reference) {
+
+        this.controlMeasure = measure;
 
         String name = measure.getName();
         if (name == null) {
@@ -113,6 +125,7 @@ public class MeasureReferenceWindow extends DisposableInteralFrame {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
+        this.messagePanel.setOpaque(false);
         panel.add(messagePanel);
         panel.add(this.inputPanel());
 
@@ -124,19 +137,42 @@ public class MeasureReferenceWindow extends DisposableInteralFrame {
 
     private JPanel inputPanel() {
 
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        Insets labelInsets = new Insets(0, 24, 5, 5);
+        Insets inputInsets = new Insets(0, 5, 5, 10);
 
-        this.descriptionField = new TextArea("", "", 25, 6);
+        JPanel panel = new JPanel(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridheight = 1;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.insets = labelInsets;
+
+        JLabel descriptionLabel = new JLabel("Description");
+        panel.add(descriptionLabel, gbc);
+
+        this.descriptionField = new TextArea("", "");
         this.changeablesList.addChangeable(this.descriptionField);
-        
-        JScrollPane scrollPane = new JScrollPane(this.descriptionField, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        layoutGenerator.addLabelWidgetPair("Description", scrollPane, panel);
 
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                5, 15, // initialX, initialY
-                10, 10);// xPad, yPad
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.gridheight = 1;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.insets = inputInsets;
+
+        JScrollPane scrollPane = new JScrollPane(this.descriptionField, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setPreferredSize(new Dimension(645, 80));
+        panel.add(scrollPane, gbc);
 
         return panel;
     }
@@ -163,6 +199,7 @@ public class MeasureReferenceWindow extends DisposableInteralFrame {
 
     protected void doSave() {
         this.reference.setDescription(this.descriptionField.getText().trim());
+        this.reference.setUpdatedReference(true);
     }
 
     private void closeWindow() {

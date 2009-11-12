@@ -67,6 +67,10 @@ public class CMReferenceTableData extends AbstractEditableTableData {
         return sources;
     }
 
+    public boolean contains(Reference reference) {
+        return this.sourcesList().contains(reference);
+    }
+    
     public void add(Reference reference) {
         rows.add(row(reference));
     }

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.Reference;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
@@ -27,12 +28,16 @@ public class ControlMeasureDAO {
     private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
+
+    private ReferencesDAO referencesDAO;
     
 //    private DbServer dbServer;
     
     public ControlMeasureDAO() {
+
         lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
+        this.referencesDAO = new ReferencesDAO();
     }
 
 //    public ControlMeasureDAO(DbServer dbServer) {
@@ -200,24 +205,53 @@ public class ControlMeasureDAO {
     }
     
     public ControlMeasure update(ControlMeasure locked, Scc[] sccs, Session session) throws EmfException {
-        //Validate control measure
-        //make sure abbreviation is not 
+        // Validate control measure
+        // make sure abbreviation is not
         if (locked.getAbbreviation().trim().length() == 0) {
             throw new EmfException("Summary tab: An abbreviation must be specified");
         }
-        //make sure its not longer than 10 characters
+        // make sure its not longer than 10 characters
         if (locked.getAbbreviation().trim().length() > 10) {
             throw new EmfException("Summary tab: An abbreviation must not be longer than 10 characters");
         }
-        //make sure its does not contain a space
+        // make sure its does not contain a space
         if (locked.getAbbreviation().trim().indexOf(" ") > 0) {
             throw new EmfException("Summary tab: An abbreviation can not contain a space");
         }
+
         checkForConstraints(locked, session);
-        ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, current(locked.getId(),
-                session), session);
+        updateReferenceIds(locked, session);
+        ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, current(locked
+                .getId(), session), session);
         updateSccs(sccs, locked.getId(), session);
         return releaseLockOnUpdate;
+    }
+
+    /**
+     * Checks for references with the same description in the db. If one is found, the object reference is updated to
+     * the existing one.
+     */
+    private void updateReferenceIds(ControlMeasure controlMeasure, Session session) {
+
+        Reference[] newReferences = controlMeasure.getReferences();
+
+        List<Reference> existingReferences = this.referencesDAO.getReferences(session);
+
+        for (int i = 0; i < newReferences.length; i++) {
+
+            Reference newReference = newReferences[i];
+            if (newReference.isUpdatedReference()) {
+
+                for (Reference existingReference : existingReferences) {
+
+                    if (existingReference.getDescription().equalsIgnoreCase(newReference.getDescription())) {
+
+                        newReferences[i] = existingReference;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private void updateSccs(Scc[] sccs, int controlMeasureId, Session session) {

@@ -95,11 +95,11 @@ public class HibernateFacade {
         return crit.uniqueResult();
     }
 
-    public boolean nameUsed(String name, Class clazz, Session session) {
+    public boolean isUsed(String key, String value, Class clazz, Session session) {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));
+            Criteria crit = session.createCriteria(clazz).add(Restrictions.eq(key, value));
             boolean result = crit.uniqueResult() != null;
             tx.commit();
 
@@ -108,6 +108,10 @@ public class HibernateFacade {
             tx.rollback();
             throw e;
         }
+    }
+    
+    public boolean nameUsed(String name, Class clazz, Session session) {
+        return this.isUsed("name", name, clazz, session);
     }
 
     // save- new object, updates if the objects already exist

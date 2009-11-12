@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.Reference;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EMFService;
 import gov.epa.emissions.framework.services.EmfException;
@@ -42,7 +43,11 @@ public interface ControlMeasureService extends EMFService {
     Scc[] getSccs(int controlMeasureId) throws EmfException;
 
     ControlTechnology[] getControlTechnologies() throws EmfException;
-    
+
+    Reference[] getReferences(String textContains) throws EmfException;
+
+    int getReferenceCount(String textContains) throws EmfException;
+
     CostYearTable getCostYearTable(int targetYear) throws EmfException;
 
     ControlMeasure[] getMeasures(Pollutant pollutant) throws EmfException;

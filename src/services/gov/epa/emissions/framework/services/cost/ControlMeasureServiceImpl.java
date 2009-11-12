@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.Reference;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -30,6 +31,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     private ControlTechnologiesDAO controlTechnologiesDAO;
 
     private DbServerFactory dbServerFactory;
+
+    private ReferencesDAO referencesDAO;
     
     public ControlMeasureServiceImpl() throws Exception {
         this(HibernateSessionFactory.get(), DbServerFactory.get());
@@ -48,8 +51,10 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     private void init() {
+
         dao = new ControlMeasureDAO();
         controlTechnologiesDAO = new ControlTechnologiesDAO();
+        this.referencesDAO = new ReferencesDAO();
     }
 
 
@@ -226,6 +231,52 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control technologies.", e);
             throw new EmfException("Could not retrieve control technologies.");
+        } finally {
+            session.close();
+        }
+    }
+
+    public int getReferenceCount(String textContains) throws EmfException {
+
+        Session session = sessionFactory.getSession();
+        try {
+
+            int count = 0;
+            if (textContains == null || textContains.trim().length() == 0) {
+                count = this.referencesDAO.getReferenceCount(session);
+            } else {
+                count = this.referencesDAO.getReferenceCount(session, textContains);
+            }
+
+            return count;
+        } catch (RuntimeException e) {
+
+            String errorMessage = "Could not get all references";
+
+            LOG.error(errorMessage, e);
+            throw new EmfException(errorMessage);
+        } finally {
+            session.close();
+        }
+    }
+
+    public synchronized Reference[] getReferences(String textContains) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+
+            List<Reference> all = null;
+            if (textContains == null || textContains.trim().length() == 0) {
+                all = this.referencesDAO.getReferences(session);
+            } else {
+                all = this.referencesDAO.getReferences(session, textContains);
+            }
+
+            return all.toArray(new Reference[0]);
+        } catch (RuntimeException e) {
+
+            String errorMessage = "Could not retrieve references.";
+            LOG.error(errorMessage, e);
+            throw new EmfException(errorMessage);
         } finally {
             session.close();
         }

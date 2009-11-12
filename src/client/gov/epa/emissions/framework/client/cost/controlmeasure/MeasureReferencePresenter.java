@@ -7,9 +7,9 @@ public class MeasureReferencePresenter {
 
     protected ControlMeasureReferencesTab parentView;
 
-    protected MeasureReferenceWindow view;
+    protected MeasureReferenceView view;
 
-    public MeasureReferencePresenter(ControlMeasureReferencesTab parentView, MeasureReferenceWindow view) {
+    public MeasureReferencePresenter(ControlMeasureReferencesTab parentView, MeasureReferenceView view) {
 
         this.parentView = parentView;
         this.view = view;
@@ -39,5 +39,21 @@ public class MeasureReferencePresenter {
 
     public void doSave(ControlMeasure measure) {
         parentView.save(measure);
+    }
+
+    public boolean checkIfExists(String referenceDescription, ControlMeasure controlMeasure) {
+
+        boolean exists = false;
+        Reference[] references = controlMeasure.getReferences();
+        for (Reference reference : references) {
+            
+            if (reference.getDescription().equalsIgnoreCase(referenceDescription)) {
+
+                exists = true;
+                break;
+            }
+        }
+
+        return exists;
     }
 }

@@ -68,7 +68,6 @@ public class ControlMeasureReferencesTab extends EmfPanel implements ControlMeas
         doLayout(measure);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
     }
 
     private void doLayout(ControlMeasure measure) {
@@ -189,8 +188,8 @@ public class ControlMeasureReferencesTab extends EmfPanel implements ControlMeas
 
         this.clearMessage();
 
-        MeasureReferenceWindow view = new MeasureReferenceWindow("Add Reference", this.changeables, this
-                .getDesktopManager(), this.getSession());
+        MeasureReferenceView view = new MeasureReferenceAddWindow("Add Reference", this.getDesktopManager(), this
+                .getSession());
         MeasureReferencePresenter presenter = new MeasureReferencePresenter(this, view);
 
         presenter.display(measure);
@@ -200,7 +199,7 @@ public class ControlMeasureReferencesTab extends EmfPanel implements ControlMeas
 
         this.clearMessage();
 
-        MeasureReferenceWindow view = new MeasureReferenceWindow("Edit Reference", this.changeables, this
+        MeasureReferenceView view = new MeasureReferenceWindow("Edit Reference", this.changeables, this
                 .getDesktopManager(), this.getSession());
         MeasureReferencePresenter presenter = new MeasureReferencePresenter(this, view);
 
@@ -211,7 +210,7 @@ public class ControlMeasureReferencesTab extends EmfPanel implements ControlMeas
 
         this.clearMessage();
 
-        MeasureReferenceWindow view = new MeasureReferenceWindow("View Reference", this.changeables, this
+        MeasureReferenceView view = new MeasureReferenceWindow("View Reference", this.changeables, this
                 .getDesktopManager(), this.getSession());
         MeasureReferencePresenter presenter = new MeasureReferencePresenter(this, view);
 
@@ -287,9 +286,16 @@ public class ControlMeasureReferencesTab extends EmfPanel implements ControlMeas
     }
 
     public void add(Reference reference) {
-        tableData.add(reference);
-        refresh();
-        modify();
+        
+        if (tableData.contains(reference)) {
+            this.showMessage("Control Measure already contains added reference.");
+        }
+        else {
+
+            tableData.add(reference);
+            refresh();
+            modify();
+        }
     }
 
     public void save(ControlMeasure measure) {
