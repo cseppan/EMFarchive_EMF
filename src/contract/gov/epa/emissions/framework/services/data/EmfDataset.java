@@ -499,6 +499,18 @@ public class EmfDataset implements Dataset, Lockable, Comparable<EmfDataset> {
         return true;
     }
 
+    //for testing...
+    public static void main(String[] args) {
+        //
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("test");
+        Calendar cal = Calendar.getInstance();
+        dataset.setStartDateTime(cal.getTime());
+        dataset.setStopDateTime(cal.getTime());
+        System.out.println(dataset.applicableMonth());
+        
+    }
+    
     //returns:  -1 indicates no month, most likely a annual dataset not monthly
     //          if not -1 will return Calendar.month values
     //          values are based on 0 based (i.e., Jan = 0 ... Dec = 11)
@@ -526,13 +538,13 @@ public class EmfDataset implements Dataset, Lockable, Comparable<EmfDataset> {
         if (startDateTime != null) {
             cal.setTime(startDateTime);
             startYear = cal.get(cal.YEAR);
-            startMonth = cal.get(cal.MONTH) + 1;
+            startMonth = cal.get(cal.MONTH);
         }
 
         if (endDateTime != null) {
             cal.setTime(endDateTime);
             stopYear = cal.get(cal.YEAR);
-            stopMonth = cal.get(cal.MONTH) + 1;
+            stopMonth = cal.get(cal.MONTH);
         }
         
         // New String Tokenizer to parse the dataset names to find month values.
