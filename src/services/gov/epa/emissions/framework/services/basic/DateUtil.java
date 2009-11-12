@@ -14,4 +14,13 @@ public class DateUtil {
         return cal.getActualMaximum(Calendar.DAY_OF_MONTH); // 28
       }
     
+    public static int daysInZeroBasedMonth(int year, int month) {
+        
+        // Create a calendar object of the desired 1-based month
+        Calendar cal = new GregorianCalendar(year, month, 1);
+        
+        // Get the number of days in that month
+        return cal.getActualMaximum(Calendar.DAY_OF_MONTH); // 28
+      }
+    
 }
