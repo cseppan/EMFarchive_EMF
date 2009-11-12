@@ -46,8 +46,9 @@ public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends Ab
                 inputDataset.setStopDateTime(calendar.getTime());
             }
 
-            EmfDataset dataset = creator.addDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), inputDataset,
-                    inputDataset.getDatasetType(), tableFormat, description(inputDataset));
+            EmfDataset dataset = creator.addControlledInventoryDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), inputDataset,
+                    inputDataset.getDatasetType(), tableFormat, 
+                    description(inputDataset));
 
             String outputInventoryTableName = getDatasetTableName(dataset);
 

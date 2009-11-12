@@ -79,7 +79,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
     protected void doCreateInventory(EmfDataset inputDataset, String inputTable) throws EmfException, Exception, SQLException {
         startStatus(statusServices);
         try {
-            EmfDataset dataset = creator.addDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), 
+            EmfDataset dataset = creator.addControlledInventoryDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), 
                     inputDataset, inputDataset.getDatasetType(), 
                     tableFormat, description(inputDataset));
             
@@ -217,7 +217,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
     }
 
     protected int getDaysInMonth(int month) {
-        return month != - 1 ? DateUtil.daysInOneBasedMonth(controlStrategy.getInventoryYear(), month) : 31;
+        return month != - 1 ? DateUtil.daysInZeroBasedMonth(controlStrategy.getInventoryYear(), month) : 31;
     }
     
     protected String detailDatasetTable(ControlStrategyResult result) throws EmfException {

@@ -55,7 +55,7 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
                 if (!inputDataset.getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
                     tableFormat = new FileFormatFactory(dbServer).tableFormat(inputDataset.getDatasetType());
                     //create controlled inventory dataset
-                    EmfDataset dataset = creator.addDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), 
+                    EmfDataset dataset = creator.addControlledInventoryDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), 
                             inputDataset, inputDataset.getDatasetType(), 
                             tableFormat, description(inputDataset));
                     //get table name

@@ -15,6 +15,7 @@ import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.DateUtil;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
@@ -48,6 +49,9 @@ public class DatasetCreator {
     
     private Datasource datasource;
 
+    public DatasetCreator() {
+        //
+    }
     public DatasetCreator(ControlStrategy controlStrategy, User user, 
             HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory,
             Datasource datasource, Keywords keywordMasterList) {
@@ -129,6 +133,66 @@ public class DatasetCreator {
         
         //create dataset
         EmfDataset dataset = createDataset(outputDatasetName, description, type, inputDataset);
+        
+//        Iterator iterator = keywordValues.entrySet().iterator();
+//
+//        Map.Entry entry =  (Map.Entry)iterator.next();
+//        String keyword = (String) entry.getKey();
+//        String value = (String) entry.getValue();
+//
+//        while (iterator.hasNext()) {
+//            entry =  (Map.Entry)iterator.next();
+//            keyword = (String) entry.getKey();
+//            value = (String) entry.getValue();
+//            addKeyVal(dataset, keyword, value);
+//        }
+
+        setDatasetInternalSource(dataset, outputTableName, 
+                tableFormat, inputDataset.getName());
+
+        //persist dataset to db
+        add(dataset);
+        try {
+            addVersionZeroEntryToVersionsTable(dataset);
+        } catch (Exception e) {
+            throw new EmfException("Cannot add version zero entry to versions table for dataset: " + dataset.getName());
+        }
+
+        createTable(outputTableName, tableFormat);
+
+        return dataset;
+    }
+
+
+    public EmfDataset addControlledInventoryDataset(String datasetName, 
+            EmfDataset inputDataset, DatasetType type, 
+            TableFormat tableFormat, String description
+//            ,Map<String,String> keywordValues
+            ) throws EmfException {
+//        return addDataset(datasetName, "DS", 
+//                inputDataset, type, 
+//                tableFormat, description);
+        
+        String outputDatasetName = datasetName;
+        //check and see if this name is already being used, if so add a timestamp.
+        if (isDatasetNameUsed(datasetName)) 
+            outputDatasetName = createDatasetName(datasetName);
+
+        String outputTableName = createTableName(datasetName);
+        
+        //create dataset
+        EmfDataset dataset = createDataset(outputDatasetName, description, type, inputDataset);
+        
+        //update dataset start and stop date time to correct year
+        Calendar cal = Calendar.getInstance();
+        Date dateTime = inputDataset.getStartDateTime();
+        cal.setTime(dateTime);
+        cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+        dataset.setStartDateTime(cal.getTime());
+        dateTime = inputDataset.getStopDateTime();
+        cal.setTime(dateTime);
+        cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+        dataset.setStopDateTime(cal.getTime());
         
 //        Iterator iterator = keywordValues.entrySet().iterator();
 //
@@ -299,6 +363,20 @@ public class DatasetCreator {
                 + "_V" + inputDataset.getDefaultVersion());
     }
         
+    //for testing...
+    public static void main(String[] args) {
+        //
+        DatasetCreator dc = new DatasetCreator();
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("test");
+        Calendar cal = Calendar.getInstance();
+        dataset.setStartDateTime(cal.getTime());
+        dataset.setStopDateTime(cal.getTime());
+        System.out.println("zero based month = " + dataset.applicableMonth());
+        System.out.println("no days in month = " + DateUtil.daysInZeroBasedMonth(2020, dataset.applicableMonth()));
+        System.out.println(dc.createControlledInventoryDatasetName("asdad", dataset));
+    }
+    
     public String createControlledInventoryDatasetName(String datasetNamePrefix, EmfDataset inputDataset) {
         String datasetName = "";
         //if no prefix was passed then use the existing name as a starting point.
@@ -308,43 +386,56 @@ public class DatasetCreator {
             datasetName = datasetNamePrefix;
             //see if we need to tag with a monthly indicator
             int applicableMonth = inputDataset.applicableMonth();
-            if (applicableMonth >= 0)
-                if (applicableMonth == Calendar.JANUARY) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_jan_") != -1) 
+            if (applicableMonth >= 0) {
+                if (applicableMonth == Calendar.JANUARY) {
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_jan_") == -1) 
                         datasetName += "_jan";
-                else if (applicableMonth == Calendar.FEBRUARY) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_feb_") != -1) 
+                }
+                else if (applicableMonth == Calendar.FEBRUARY) {
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_feb_") == -1) 
                         datasetName += "_feb";
-                else if (applicableMonth == Calendar.MARCH) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_mar_") != -1) 
+                }
+                else if (applicableMonth == Calendar.MARCH) {
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_mar_") == -1) 
                         datasetName += "_mar";
-                else if (applicableMonth == Calendar.APRIL) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_apr_") != -1) 
+                }
+                else if (applicableMonth == Calendar.APRIL) {
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_apr_") == -1) 
                         datasetName += "_apr";
-                else if (applicableMonth == Calendar.MAY) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_may_") != -1) 
+                }
+                else if (applicableMonth == Calendar.MAY) {
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_may_") == -1) 
                         datasetName += "_may";
-                else if (applicableMonth == Calendar.JUNE) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_jun_") != -1) 
+                }
+                else if (applicableMonth == Calendar.JUNE) {
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_jun_") == -1) 
                         datasetName += "_jun";
-                else if (applicableMonth == Calendar.JULY) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_jul_") != -1) 
+                }
+                else if (applicableMonth == Calendar.JULY) {
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_jul_") == -1) 
                         datasetName += "_jul";
-                else if (applicableMonth == Calendar.AUGUST) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_aug_") != -1) 
+                }
+                else if (applicableMonth == Calendar.AUGUST) {  
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_aug_") == -1) 
                         datasetName += "_aug";
-                else if (applicableMonth == Calendar.SEPTEMBER) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_sep_") != -1) 
+                }
+                else if (applicableMonth == Calendar.SEPTEMBER) {
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_sep_") == -1) 
                         datasetName += "_sep";
-                else if (applicableMonth == Calendar.OCTOBER) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_oct_") != -1) 
+                }
+                else if (applicableMonth == Calendar.OCTOBER) {
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_oct_") == -1) 
                         datasetName += "_oct";
-                else if (applicableMonth == Calendar.NOVEMBER) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_nov_") != -1) 
+                }
+                else if (applicableMonth == Calendar.NOVEMBER) {
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_nov_") == -1) 
                         datasetName += "_nov";
-                else if (applicableMonth == Calendar.DECEMBER) 
-                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_dec_") != -1) 
+                }
+                else if (applicableMonth == Calendar.DECEMBER) {
+                    if (("_" + datasetName.toLowerCase() + "_").indexOf("_dec_") == -1) 
                         datasetName += "_dec";
+                }
+            }
         }
         return datasetName;
     }
@@ -425,6 +516,18 @@ public class DatasetCreator {
         }
     }
     
+//    public void update(EmfDataset dataset) throws EmfException {
+//        Session session = sessionFactory.getSession();
+//        try {
+//            DatasetDAO dao = new DatasetDAO(dbServerFactory);
+//            dao.updateWithoutLocking(dataset, session);
+//        } catch (Exception e) {
+//            throw new EmfException("Could not update dataset: " + dataset.getName());
+//        } finally {
+//            session.close();
+//        }
+//    }
+//    
     private void createTable(String tableName, TableFormat tableFormat) throws EmfException {
         TableCreator creator = new TableCreator(datasource);
         try {
