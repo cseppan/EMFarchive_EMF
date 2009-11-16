@@ -554,881 +554,881 @@ values('INCLUDE_UNSPECIFIED_COSTS');
 --
 
 -- emf.dataset_type_keywords
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Strategy Measure Summary') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Strategy Measure Summary')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Strategy Measure Summary') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Strategy Measure Summary')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Strategy Measure Summary') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Strategy Measure Summary')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool species info') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool species info')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool species info') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool species info')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool species info') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool species info')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool species info') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool species info')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Nonroad Inventory (ARINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Nonroad Inventory (ARINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '_orl.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '_orl.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Nonroad Inventory (ARINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Nonroad Inventory (ARINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_PREFIX') as keyword_id,
-  'arinv_' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'arinv_' as "value", 'EXPORT_PREFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Nonpoint Inventory (ARINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Nonpoint Inventory (ARINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '_orl.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '_orl.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Area-to-point Conversions (Line-based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Area-to-point Conversions (Line-based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'BEIS3 Emission Factors (Line-based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'BEIS3 Emission Factors (Line-based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'BEIS3 Emission Factors (Line-based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'BEIS3 Emission Factors (Line-based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Chemical Speciation Profiles (GSPRO)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Chemical Speciation Profiles (GSPRO)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Country, state, and county names and data (COSTCY)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Country, state, and county names and data (COSTCY)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Daily profiles for creating daily EGUs') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Daily profiles for creating daily EGUs')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Daily profiles for creating daily EGUs') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Daily profiles for creating daily EGUs')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Daily profiles for creating daily EGUs') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Daily profiles for creating daily EGUs')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Elevated source configuration (PELVCONFIG)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Elevated source configuration (PELVCONFIG)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Grid Descriptions (Line-based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Grid Descriptions (Line-based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Grid Descriptions (Line-based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Grid Descriptions (Line-based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Gridding Cross Reference (A/MGREF)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Gridding Cross Reference (A/MGREF)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Holiday Identifications (Line-based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Holiday Identifications (Line-based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'IDA Activity') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'IDA Activity')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '_ida.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '_ida.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'IDA Mobile') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'IDA Mobile')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '_ida.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '_ida.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Chemical Speciation Cross-Reference (GSREF)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Chemical Speciation Cross-Reference (GSREF)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Inventory Table Data (INVTABLE)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Inventory Table Data (INVTABLE)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'EMF Job Header') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'EMF Job Header')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'EMF Job Header') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'EMF Job Header')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool carbons') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool carbons')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool carbons') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool carbons')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool carbons') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool carbons')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool carbons') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool carbons')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool static profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool static profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool static profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool static profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool static profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool static profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool static profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool static profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool control file') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool control file')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool profile-process list') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool profile-process list')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool profile-process list') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool profile-process list')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool profile-process list') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool profile-process list')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool profile-process list') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool profile-process list')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'IDA Mobile') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'IDA Mobile')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_PREFIX') as keyword_id,
-  'mbinv_' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'mbinv_' as "value", 'EXPORT_PREFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'IDA Nonpoint/Nonroad') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'IDA Nonpoint/Nonroad')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '_ida.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '_ida.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'IDA Nonpoint/Nonroad') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'IDA Nonpoint/Nonroad')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_PREFIX') as keyword_id,
-  'arinv_' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'arinv_' as "value", 'EXPORT_PREFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'IDA Point') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'IDA Point')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '_ida.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '_ida.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'IDA Point') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'IDA Point')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_PREFIX') as keyword_id,
-  'ptinv_' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'ptinv_' as "value", 'EXPORT_PREFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'MACT description (MACTDESC)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'MACT description (MACTDESC)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'MACT description (MACTDESC)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'MACT description (MACTDESC)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Mobile codes (MCODES, Line-based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Mobile codes (MCODES, Line-based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Monthly profiles for creating daily EGUs') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Monthly profiles for creating daily EGUs')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Monthly profiles for creating daily EGUs') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Monthly profiles for creating daily EGUs')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Monthly profiles for creating daily EGUs') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Monthly profiles for creating daily EGUs')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Monthly profiles for creating daily EGUs') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Monthly profiles for creating daily EGUs')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'NAICS description file (NAICSDESC)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'NAICS description file (NAICSDESC)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'NAICS description file (NAICSDESC)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'NAICS description file (NAICSDESC)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'NHAPEXCLUDE (Line-based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'NHAPEXCLUDE (Line-based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORIS Description (ORISDESC)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORIS Description (ORISDESC)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Day-Specific Fire Data Inventory (PTDAY)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Day-Specific Fire Data Inventory (PTDAY)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_PREFIX') as keyword_id,
-  'ptday_' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'ptday_' as "value", 'EXPORT_PREFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Day-Specific Fire Data Inventory (PTDAY)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Day-Specific Fire Data Inventory (PTDAY)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '_orl.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '_orl.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Fire Inventory (PTINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Fire Inventory (PTINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_PREFIX') as keyword_id,
-  'ptinv_' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'ptinv_' as "value", 'EXPORT_PREFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Fire Inventory (PTINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Fire Inventory (PTINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '_orl.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '_orl.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Point-Source Stack Replacements (PSTK)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Point-Source Stack Replacements (PSTK)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Pollutant to Pollutant Conversion (GSCNV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Pollutant to Pollutant Conversion (GSCNV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Report Configurations (Line-based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Report Configurations (Line-based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Report Configurations (Line-based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Report Configurations (Line-based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'true' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'true' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'SIC Descriptions (Line-based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'SIC Descriptions (Line-based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool gas profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool gas profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool gas profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool gas profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool gas profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool gas profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool gas profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool gas profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool gas species map') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool gas species map')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool gas species map') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool gas species map')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool gas species map') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool gas species map')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool gas species map') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool gas species map')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool PM profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool PM profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool PM profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool PM profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool PM profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool PM profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool PM profiles') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool PM profiles')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool PM species map') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool PM species map')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool PM species map') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool PM species map')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool PM species map') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool PM species map')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool PM species map') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool PM species map')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool profile weights') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool profile weights')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool profile weights') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool profile weights')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool profile weights') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool profile weights')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool profile weights') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool profile weights')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Descriptions (SRGDESC)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Descriptions (SRGDESC)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Temporal Cross Reference (A/M/PTREF)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Temporal Cross Reference (A/M/PTREF)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Temporal Profile (A/M/PTPRO)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Temporal Profile (A/M/PTPRO)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Nonpoint Inventory (ARINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Nonpoint Inventory (ARINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_PREFIX') as keyword_id,
-  'arinv_' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'arinv_' as "value", 'EXPORT_PREFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Point Inventory (PTINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Point Inventory (PTINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '_orl.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '_orl.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Point Inventory (PTINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Point Inventory (PTINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_PREFIX') as keyword_id,
-  'ptinv_' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'ptinv_' as "value", 'EXPORT_PREFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Log summary') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Log summary')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Log summary') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Log summary')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Control Strategy Detailed Result') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Control Strategy Detailed Result')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Control Strategy Detailed Result') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Control Strategy Detailed Result')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Control Strategy Detailed Result') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Control Strategy Detailed Result')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Chemical Speciation Combo Profiles (GSPRO_COMBO)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Chemical Speciation Combo Profiles (GSPRO_COMBO)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'SMOKE Report') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'SMOKE Report')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Comma Separated Values (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Comma Separated Values (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Comma Separated Values (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Comma Separated Values (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Comma Separated Values (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Comma Separated Values (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'SCC Descriptions (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'SCC Descriptions (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'N' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'N' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'SCC Descriptions (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'SCC Descriptions (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'State Summary') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'State Summary')) as list_index,
   (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
-  'varchar(100)|varchar(2)|varchar(2)|varchar(16)|float8(17)' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'varchar(100)|varchar(2)|varchar(2)|varchar(16)|float8(17)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism description') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism description')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism description') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism description')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism description') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism description')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism description') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool mechanism description')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Smkreport state-SCC-srgcode') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Smkreport state-SCC-srgcode')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Smkreport state-SCC-spec_profile') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Smkreport state-SCC-spec_profile')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Smkreport state-SCC') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Smkreport state-SCC')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Smkreport state') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Smkreport state')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Smkreport county') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Smkreport county')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Sensitivity Adjustment Factors (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Sensitivity Adjustment Factors (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Sensitivity Adjustment Factors (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Sensitivity Adjustment Factors (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Sensitivity Adjustment Factors (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Sensitivity Adjustment Factors (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
-  'varchar(32)|varchar(64)|float8(17)' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'varchar(32)|varchar(64)|float8(17)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL AVGFIRE HAP (ARINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL AVGFIRE HAP (ARINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '_orl.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '_orl.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL AVGFIRE HAP (ARINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL AVGFIRE HAP (ARINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_PREFIX') as keyword_id,
-  'arinv_' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'arinv_' as "value", 'EXPORT_PREFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool toxic file') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool toxic file')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool toxic file') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool toxic file')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool toxic file') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool toxic file')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Speciation Tool toxic file') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Speciation Tool toxic file')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Species Tagging List (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Species Tagging List (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Species Tagging List (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Species Tagging List (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Species Tagging List (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Species Tagging List (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
-  'varchar(64)|varchar(32)|varchar(6)' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'varchar(64)|varchar(32)|varchar(6)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Onroad Temperature Adjustment Factors (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Onroad Temperature Adjustment Factors (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Onroad Temperature Adjustment Factors (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Onroad Temperature Adjustment Factors (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Onroad Temperature Adjustment Factors (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Onroad Temperature Adjustment Factors (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ASM Archive Report (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ASM Archive Report (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
-  'varchar(32)|varchar(32)|varchar(16)|varchar(32)|integer8(6)|integer8(6)' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'varchar(32)|varchar(32)|varchar(16)|varchar(32)|integer8(6)|integer8(6)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Species Tagging File (GSTAG)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Species Tagging File (GSTAG)')) as list_index,
   (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
-  'int|varchar(10)|varchar(16)|varchar(8)|varchar(6)|varchar(4)|varchar(15)' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'int|varchar(10)|varchar(16)|varchar(8)|varchar(6)|varchar(4)|varchar(15)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Species Tagging File (GSTAG)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Species Tagging File (GSTAG)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_PREFIX') as keyword_id,
-  'gstag_' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'gstag_' as "value", 'EXPORT_PREFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Species Tagging File (GSTAG)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Species Tagging File (GSTAG)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Species Tagging File (GSTAG)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Species Tagging File (GSTAG)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Species Tagging File (GSTAG)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Species Tagging File (GSTAG)')) as list_index,
   (select id from emf.keywords where "name" = 'HEADER_COMMENT_CHAR') as keyword_id,
-  '#' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '#' as "value", 'HEADER_COMMENT_CHAR' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Log summary level 1') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Log summary level 1')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Log summary level 1') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Log summary level 1')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Log summary level 1') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Log summary level 1')) as list_index,
   (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
-  'int(4)|varchar(6)|int(16)|varchar(256)|varchar(256)' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'int(4)|varchar(6)|int(16)|varchar(256)|varchar(256)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Log summary level 3') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Log summary level 3')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Log summary level 3') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Log summary level 3')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Log summary level 3') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Log summary level 3')) as list_index,
   (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
-  'int(4)|varchar(256)|int(10)|varchar(256)|varchar(256)' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'int(4)|varchar(256)|int(10)|varchar(256)|varchar(256)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Sector List (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Sector List (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Sector List (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Sector List (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Sector List (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Sector List (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
-  'varchar(32)|varchar(32)|varchar(4)|varchar(32)|varchar(32)|varchar(3)|varchar(20)|varchar(3)' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'varchar(32)|varchar(32)|varchar(4)|varchar(32)|varchar(32)|varchar(3)|varchar(20)|varchar(3)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Shapefile Catalog (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Shapefile Catalog (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Shapefile Catalog (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Shapefile Catalog (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Shapefile Catalog (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Shapefile Catalog (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Shapefile Catalog (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Shapefile Catalog (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'ALL_CAPS' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'ALL_CAPS' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Specifications (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Specifications (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Specifications (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Specifications (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Specifications (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Specifications (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Specifications (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Specifications (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'ALL_CAPS' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'ALL_CAPS' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'ALL_CAPS' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'ALL_CAPS' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Tool Control Variables (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Tool Control Variables (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Tool Control Variables (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Tool Control Variables (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Tool Control Variables (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Tool Control Variables (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'ALL_CAPS' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'ALL_CAPS' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Tool Control Variables (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Tool Control Variables (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Tool Generation Controls (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Tool Generation Controls (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Tool Generation Controls (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Tool Generation Controls (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '.csv' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '.csv' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Tool Generation Controls (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Tool Generation Controls (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'ALL_CAPS' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'ALL_CAPS' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Tool Generation Controls (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Tool Generation Controls (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (Line- based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (Line- based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_COLUMN_LABEL') as keyword_id,
-  'ALL_CAPS' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'ALL_CAPS' as "value", 'EXPORT_COLUMN_LABEL' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (Line- based)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Surrogate Code Mapping (Line- based)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_HEADER_COMMENTS') as keyword_id,
-  'false' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'false' as "value", 'EXPORT_HEADER_COMMENTS' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Onroad Inventory (MBINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Onroad Inventory (MBINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_SUFFIX') as keyword_id,
-  '_orl.txt' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  '_orl.txt' as "value", 'EXPORT_SUFFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'ORL Onroad Inventory (MBINV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'ORL Onroad Inventory (MBINV)')) as list_index,
   (select id from emf.keywords where "name" = 'EXPORT_PREFIX') as keyword_id,
-  'mbinv_' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'mbinv_' as "value", 'EXPORT_PREFIX' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'Smkmerge report state annual summary (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Smkmerge report state annual summary (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
-  'varchar(64)|varchar(32)|varchar(32)|float8(17)' as "value";
-insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value")
+  'varchar(64)|varchar(32)|varchar(32)|float8(17)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select (select id from emf.dataset_types where "name" = 'State Comparison Tolerance (CSV)') as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'State Comparison Tolerance (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
-  'varchar(100)|varchar(255)|float8(17)' as "value";
+  'varchar(100)|varchar(255)|float8(17)' as "value", 'COLUMN_TYPES' as kwname;
 -- emf.dataset_type_keywords
 
 -- emf.qa_programs
