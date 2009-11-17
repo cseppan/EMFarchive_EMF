@@ -24,6 +24,7 @@ CREATE TABLE emissions.versions
   dataset_id int4 NOT NULL,
   version int4 NOT NULL,
   name varchar(255) NOT NULL,
+  path text NULL DEFAULT ''::text,
   description text NOT NULL DEFAULT '',
   final_version bool NOT NULL DEFAULT false,
   intended_use int4 REFERENCES emf.intended_uses (id),
