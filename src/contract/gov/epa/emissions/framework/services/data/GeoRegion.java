@@ -153,6 +153,7 @@ public class GeoRegion implements Serializable, Lockable, Comparable<GeoRegion> 
     }
     
     public GeoRegion(String name, String desc) {
+        this();
         this.name = name;
         this.description = desc;
     }

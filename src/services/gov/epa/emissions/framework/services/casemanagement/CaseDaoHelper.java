@@ -391,8 +391,15 @@ public class CaseDaoHelper {
             return null;
 
         if (georegions == null || georegions.isEmpty())
-            georegions = getGeoRegions(); // make sure Sector have been retrieved
+            georegions = getGeoRegions(); // make sure regions have been retrieved
+        
+        for (GeoRegion rg : georegions) {
+            System.out.println("Region: " + rg.getName());
+            System.out.println("Region: " + region.getName() + " in the list? " + georegions.contains(region));
+        }
 
+        System.out.println("<<<<<<<<<>>>>>>>>>>>>");
+        
         if (georegions.contains(region))
             return georegions.get(georegions.indexOf(region));
 

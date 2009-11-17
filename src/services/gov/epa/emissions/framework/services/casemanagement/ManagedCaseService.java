@@ -5529,7 +5529,7 @@ public class ManagedCaseService {
             String name = param.getName();
             String order = param.getOrder() + "";
             String envVar = param.getEnvVar() == null ? "" : param.getEnvVar() + "";
-            String region = (param.getRegion() == null) ? "" : param.getRegion() + "";
+            String region = (param.getRegion() == null) ? "" : param.getRegion().getName();
             String sector = (param.getSector() == null) ? "All sectors" : param.getSector() + "";
             String job = getJobName(param.getJobId(), jobs);
             String prog = param.getProgram() == null ? "" : param.getProgram() + "";
@@ -5611,7 +5611,7 @@ public class ManagedCaseService {
             String name = input.getName();
             String envVar = input.getEnvtVars() == null ? "" : input.getEnvtVars() + "";
             String sector = (input.getSector() == null) ? "All sectors" : input.getSector() + "";
-            String region = (input.getRegion() == null) ? "" : input.getRegion() + "";
+            String region = (input.getRegion() == null) ? "" : input.getRegion().getName();
             String job = getJobName(input.getCaseJobID(), jobs);
             String prog = input.getProgram() == null ? "" : input.getProgram() + "";
             String dsName = input.getDataset() == null ? "" : input.getDataset().getName();
@@ -5648,7 +5648,7 @@ public class ManagedCaseService {
             CaseJob job = iter.next();
             String name = job.getName();
             String order = job.getJobNo() + "";
-            String region = (job.getRegion() == null) ? "" : job.getRegion() + "";
+            String region = (job.getRegion() == null) ? "" : job.getRegion().getName();
             String sector = (job.getSector() == null) ? "All sectors" : job.getSector() + "";
             String status = job.getRunstatus() == null ? "" : job.getRunstatus() + "";
             String start = job.getRunStartDate() == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(job
