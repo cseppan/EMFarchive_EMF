@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.casemanagement.CaseSelectionDialog;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -26,14 +27,11 @@ import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -369,19 +367,19 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             return;
         }
 
-        Object[] selected = presenter.getAllCaseNameIDs();
-        String selectedCase = (String) JOptionPane.showInputDialog(parentConsole, "Copy " + params.size()
-                + " case parameter(s) to case: ", "Copy Case Parameters", JOptionPane.PLAIN_MESSAGE, getCopyIcon(),
-                selected, selected[getDefultIndex(selected)]);
-
-        if ((selectedCase != null) && (selectedCase.length() > 0)) {
+        String[] caseIds = (String[]) presenter.getAllCaseNameIDs();      
+        CaseSelectionDialog view = new CaseSelectionDialog(parentConsole, caseIds);
+        String title = "Copy " + params.size()+" case parameter(s) to case: ";
+        
+        view.display(title, true);
+        
+        if (view.shouldCopy()){
+            String selectedCase=view.getCases()[0];
             int selectedCaseId = getCaseId(selectedCase);
-
             if (selectedCaseId != this.caseId) {
                 presenter.copyParameter(selectedCaseId, params);
                 return;
             }
-
             showEditor(presenter, params, selectedCase);
         }
     }
@@ -416,17 +414,6 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         return tableData.sources();
     }
 
-    private int getDefultIndex(Object[] selected) {
-        int currentCaseId = this.caseObj.getId();
-        int length = selected.length;
-
-        for (int i = 0; i < length; i++)
-            if (selected[i].toString().contains("(" + currentCaseId + ")"))
-                return i;
-
-        return 0;
-    }
-
     private int getCaseId(String selectedCase) {
         int index1 = selectedCase.indexOf("(") + 1;
         int index2 = selectedCase.indexOf(")");
@@ -434,15 +421,6 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         return Integer.parseInt(selectedCase.substring(index1, index2));
     }
 
-    private Icon getCopyIcon() {
-        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
-
-        if (imgURL != null) {
-            return new ImageIcon(imgURL);
-        }
-
-        return null;
-    }
 
     public void refresh() {
         // note that this will get called when the case is save

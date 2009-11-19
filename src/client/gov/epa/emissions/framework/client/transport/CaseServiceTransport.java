@@ -60,6 +60,16 @@ public class CaseServiceTransport implements CaseService {
 
         return (Case[]) call.requestResponse(new Object[] {});
     }
+    
+    public synchronized Case[] getCases(String nameContains) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCases");
+        call.addStringParam("nameContains");
+        call.setReturnType(caseMappings.cases());
+
+        return (Case[]) call.requestResponse(new Object[] {nameContains});
+    }
 
     public synchronized Case reloadCase(int caseId) throws EmfException {
         EmfCall call = call();
@@ -826,6 +836,16 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.cases());
 
         return (Case[]) call.requestResponse(new Object[] { category });
+    }
+    
+    public synchronized Case[] getCases(CaseCategory category, String nameContains) throws EmfException {
+        EmfCall call = call();
+        call.setOperation("getCases");
+        call.addParam("category", caseMappings.caseCategory());
+        call.addStringParam("nameContains");
+        call.setReturnType(caseMappings.cases());
+
+        return (Case[]) call.requestResponse(new Object[] { category, nameContains });
     }
 
     public String validateJobs(Integer[] jobIDs) throws EmfException {

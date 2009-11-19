@@ -64,6 +64,11 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         dialog.register(this);
         dialog.display(newInput.getCaseID(), newInput);
     }
+    
+//    public void displayCaseSelectionDialog(CaseSelectionView dialog) {
+//        dialog.register(this);
+//        dialog.display(newInput.getCaseID(), newInput);
+//    }
 
     public void addNewInput(CaseInput input) throws EmfException {
         CaseInput loaded = service().addCaseInput(session.user(), input);

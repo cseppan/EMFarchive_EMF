@@ -48,6 +48,8 @@ public interface CaseService {
     SubDir[] getSubDirs() throws EmfException;
 
     Case[] getCases() throws EmfException;
+    
+    Case[] getCases(String nameContains) throws EmfException;
 
     Case addCase(User owner, Case element) throws EmfException;
 
@@ -176,8 +178,10 @@ public interface CaseService {
     String restoreTaskManagers() throws EmfException;
 
     String printStatusCaseJobTaskManager() throws EmfException;
-
+    
     Case[] getCases(CaseCategory category) throws EmfException;
+
+    Case[] getCases(CaseCategory category, String nameContains) throws EmfException;
     
     String validateJobs(Integer[] jobIDs) throws EmfException;
     

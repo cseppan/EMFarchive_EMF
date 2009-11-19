@@ -4,20 +4,17 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorView;
-import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerView;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerPresenterImpl;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerView;
 import gov.epa.emissions.framework.client.casemanagement.sensitivity.SensitivityPresenter;
 import gov.epa.emissions.framework.client.casemanagement.sensitivity.SensitivityView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
-import gov.epa.emissions.framework.ui.RefreshObserver;
 
-import java.util.Date;
-
-public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPresenter {
+public class CaseManagerPresenterImpl implements CaseManagerPresenter {
 
     private CaseManagerView view;
 
@@ -44,12 +41,9 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
         service().removeCase(caseObj);
     }
 
-    public void doRefresh() throws EmfException {
-        view.refresh(service().getCases());
-    }
-
-    public void doRefresh(CaseCategory category) throws EmfException {
-        view.refresh(getCases(category));
+    public void doRefresh() throws EmfException{
+        //view.refresh(service().getCases());
+        view.refreshWithLastCategory();
     }
 
     public void doClose() {
@@ -70,27 +64,27 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
         view.addNewCaseToTableData(newCase);
     }
 
-    public void doSaveCopiedCase(Case newCase, String templateused) throws EmfException {
-        if (isDuplicate(newCase))
-            throw new EmfException("A Case named '" + newCase.getName() + "' already exists.");
-
-        newCase.setLastModifiedBy(session.user());
-        newCase.setLastModifiedDate(new Date());
-        newCase.setTemplateUsed(templateused);
-
-        service().addCase(session.user(), newCase);
-        doRefresh();
-    }
-    
-    private boolean isDuplicate(Case newCase) throws EmfException {
-        Case[] cases = service().getCases();
-        for (int i = 0; i < cases.length; i++) {
-            if (cases[i].getName().equals(newCase.getName()))
-                return true;
-        }
-
-        return false;
-    }
+//    public void doSaveCopiedCase(Case newCase, String templateused) throws EmfException {
+//        if (isDuplicate(newCase))
+//            throw new EmfException("A Case named '" + newCase.getName() + "' already exists.");
+//
+//        newCase.setLastModifiedBy(session.user());
+//        newCase.setLastModifiedDate(new Date());
+//        newCase.setTemplateUsed(templateused);
+//
+//        service().addCase(session.user(), newCase);
+//        //doRefresh();
+//    }
+//    
+//    private boolean isDuplicate(Case newCase) throws EmfException {
+//        Case[] cases = service().getCases();
+//        for (int i = 0; i < cases.length; i++) {
+//            if (cases[i].getName().equals(newCase.getName()))
+//                return true;
+//        }
+//
+//        return false;
+//    }
 
     public void doEdit(CaseEditorView caseView, Case caseObj) throws EmfException {
         CaseEditorPresenter presenter = new CaseEditorPresenterImpl(caseObj, session, caseView, this);
@@ -114,7 +108,7 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
         return service().getCaseCategories();
     }
 
-    public Case[] getCases(CaseCategory category) throws EmfException {
+    public Case[] getCases(CaseCategory category ) throws EmfException {
         this.caseObjectManager.refresh();
         this.caseObjectManager.refreshJobList();
         
@@ -125,6 +119,20 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
             return service().getCases();
         
         return service().getCases(category);
+    }
+    
+    public Case[] getCases(CaseCategory category, String nameContains) throws EmfException {
+        this.caseObjectManager.refresh();
+        this.caseObjectManager.refreshJobList();
+        
+        if (category == null)
+            return new Case[0];
+        
+        if (category.getName().equals("All"))
+            return service().getCases(nameContains);
+        
+        return service().getCases(category, nameContains);
+        //eturn cases==null?  new Case[0] :cases;
     }
 
     public void refreshWithLastCategory() throws EmfException {

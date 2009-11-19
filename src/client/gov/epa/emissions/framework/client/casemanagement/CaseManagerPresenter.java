@@ -17,15 +17,15 @@ public interface CaseManagerPresenter {
     
     void doEdit(CaseEditorView caseView, Case caseObj) throws EmfException; 
 
-    void doRefresh() throws EmfException;
+    //void doRefresh(String nameContains) throws EmfException;
     
-    void doRefresh(CaseCategory category) throws EmfException;
+    //void doRefresh() throws EmfException;
 
     void doClose();
 
     void doNew(NewCaseView view);
     
-    void doSaveCopiedCase(Case newCase, String templateused) throws EmfException;
+    //void doSaveCopiedCase(Case newCase, String templateused) throws EmfException;
     
     void addNewCaseToTableData(Case newCase);
 
@@ -42,5 +42,7 @@ public interface CaseManagerPresenter {
     CaseCategory getSelectedCategory();
     
     Case[] getCases(CaseCategory category) throws EmfException;
+    
+    Case[] getCases(CaseCategory category, String nameContains) throws EmfException;
 
 }

@@ -32,7 +32,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
 
     private EmfSession session;
 
-    private CaseManagerPresenter managerPresenter;
+    //private CaseManagerPresenter managerPresenter;
 
     private Case caseObj;
 
@@ -65,7 +65,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         this.caseObj = caseObj;
         this.session = session;
         this.view = view;
-        this.managerPresenter = managerPresenter;
+        //this.managerPresenter = managerPresenter;
         presenters = new ArrayList<CaseEditorTabPresenter>();
     }
 
@@ -162,7 +162,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
 
     public void doSaveWithoutClose() throws EmfException {
         updateCase();
-        managerPresenter.doRefresh();
+        //managerPresenter.doRefresh();
 
         caseObj = service().obtainLocked(session.user(), caseObj); // get lock after release it
         if (!caseObj.isLocked(session.user())) {// view mode, locked by another user

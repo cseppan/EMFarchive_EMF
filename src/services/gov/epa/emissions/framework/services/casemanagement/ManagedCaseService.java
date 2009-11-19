@@ -223,6 +223,20 @@ public class ManagedCaseService {
                 session.close();
         }
     }
+    
+    public synchronized Case[] getCases(String nameContains) throws EmfException {
+        
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getCases(session, nameContains);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not retrieve all case", e);
+            throw new EmfException("Could not retrieve all case " + e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
 
     public synchronized Case getCase(int caseId) throws EmfException {
         Session session = sessionFactory.getSession();
@@ -265,6 +279,21 @@ public class ManagedCaseService {
     public synchronized Case[] getCases(CaseCategory category) {
         return dao.getCases(category);
     }
+    
+    public synchronized Case[] getCases(CaseCategory category, String nameContains) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getCases(session, category,nameContains);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Could not retrieve all case", e);
+            throw new EmfException("Could not retrieve all case " + e.getMessage());
+        } finally {
+            session.close();
+        }
+
+    }
+
 
     public synchronized Version[] getLaterVersions(EmfDataset dataset, Version version) throws EmfException {
         Versions versions = new Versions();

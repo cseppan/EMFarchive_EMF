@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.ImportButton;
@@ -62,6 +63,8 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private EmfConsole parentConsole;
 
     private List cases;
+    
+    private TextField nameFilter;
 
     private List<CaseCategory> categories;
 
@@ -105,7 +108,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     }
 
     public void refreshWithLastCategory() throws EmfException {
-        doLayout(presenter.getCases(selectedCategory));
+        doLayout(presenter.getCases(selectedCategory, nameFilter.getText()));
         super.refreshLayout();
     }
 
@@ -150,22 +153,23 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
     private void createCategoriesComboBox() {
         categoriesBox = new ComboBox("Select one", categories.toArray(new CaseCategory[0]));
-
+        categoriesBox.setPreferredSize(new Dimension(360, 20));
+        
         if (selectedCategory != null)
             categoriesBox.setSelectedItem(selectedCategory);
 
         categoriesBox.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
                 CaseCategory category = getSelectedCategory();
                 try {
-                    if (category == null) {
-                        refresh(new Case[0]);
-                        return;
-                    }
-
-                    refresh(presenter.getCases(category));
+                    if (nameFilter.getText().trim().equals(""))
+                        refresh(presenter.getCases(category));
+                    else
+                        refresh(presenter.getCases(category, nameFilter.getText()));
                 } catch (EmfException e1) {
                     messagePanel.setError("Could not retrieve all cases with -- " + category.getName());
+                    e1.printStackTrace();
                 }
             }
         });
@@ -192,9 +196,37 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
                 messagePanel);
         msgRefreshPanel.add(button, BorderLayout.EAST);
 
+        JPanel topPanel = new JPanel(new BorderLayout());
+        nameFilter = new TextField("textfilter", 10);
+        nameFilter.setEditable(true);
+        nameFilter.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
+                CaseCategory category = getSelectedCategory();
+                try {
+                    if (nameFilter.getText().trim().equals(""))
+                        refresh(presenter.getCases(category));
+                    else
+                        refresh(presenter.getCases(category, nameFilter.getText()));
+                } catch (EmfException e1) {
+                    messagePanel.setError("Could not retrieve all cases with -- " + category.getName());
+                }
+            }
+        });
+        
+        JPanel advPanel = new JPanel(new BorderLayout(5, 2));
+        JLabel jlabel = new JLabel("Name Contains:");
+        jlabel.setHorizontalAlignment(JLabel.RIGHT);
+        advPanel.add(jlabel, BorderLayout.WEST);
+        advPanel.add(nameFilter, BorderLayout.CENTER);
+        advPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 30));
+        
+        topPanel.add(getCategoryPanel("Show Cases of Category:", categoriesBox), BorderLayout.LINE_START);
+        topPanel.add(advPanel, BorderLayout.EAST);
+        
         JPanel panel = new JPanel(new GridLayout(2, 1));
         panel.add(msgRefreshPanel);
-        panel.add(getCategoryPanel("Show Cases of Category:", categoriesBox));
+        panel.add(topPanel);
 
         return panel;
     }
@@ -205,7 +237,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         jlabel.setHorizontalAlignment(JLabel.RIGHT);
         panel.add(jlabel, BorderLayout.WEST);
         panel.add(box, BorderLayout.CENTER);
-        panel.setBorder(BorderFactory.createEmptyBorder(3, 150, 5, 150));
+        panel.setBorder(BorderFactory.createEmptyBorder(3, 50, 5, 5));
 
         return panel;
     }
@@ -465,8 +497,21 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         messagePanel.clear();
     }
 
-    public void doRefresh() throws EmfException {
-        refresh(presenter.getCases(getSelectedCategory()));
+    public void doRefresh(){
+        try {
+            messagePanel.clear();
+            if (nameFilter.getText().trim().equals(""))
+                refresh(presenter.getCases(getSelectedCategory()));
+            else{
+                Case[] cases=presenter.getCases(getSelectedCategory(), nameFilter.getText());
+                refresh(cases);
+                //refresh(presenter.getCases(getSelectedCategory(), nameFilter.getName()));
+                //messagePanel.setMessage(" Refresh case with name filter "+  getSelectedCategory().getName(), nameFilter.getName()presenter.getCases(getSelectedCategory(), nameFilter.getText()).length );
+            }
+            
+        } catch (Exception e) {
+            showError("Could not retrieve all cases with -- " + getSelectedCategory().getName());
+        } 
     }
 
     public void addNewCaseToTableData(Case newCase) {

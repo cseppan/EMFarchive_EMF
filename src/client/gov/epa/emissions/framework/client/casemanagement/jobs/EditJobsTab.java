@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.casemanagement.CaseSelectionDialog;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -33,14 +34,11 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -446,13 +444,18 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             return;
         }
 
-        Object[] selected = presenter.getAllCaseNameIDs();
-        String selectedCase = (String) JOptionPane.showInputDialog(parentConsole, "Copy " + jobs.size()
-                + " job(s) to case: ", "Copy Case Jobs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected,
-                selected[getDefultIndex(selected)]);
-
-        if ((selectedCase != null) && (selectedCase.length() > 0)) 
+        String[] caseIds = (String[]) presenter.getAllCaseNameIDs();
+        
+        CaseSelectionDialog view = new CaseSelectionDialog(parentConsole, caseIds);
+        String title = "Copy " + jobs.size()+" case job(s) to case: ";
+        
+        view.display(title, true);
+        
+        if (view.shouldCopy()){
+            String selectedCase=view.getCases()[0];
             processCopyjobs(getCaseId(selectedCase), jobs);
+        }
+
     }
 
     private void processCopyjobs(int caseId, List<CaseJob> jobs) throws Exception {
@@ -493,16 +496,16 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         presenter.modifyJobs(dialog);
     }
 
-    private int getDefultIndex(Object[] selected) {
-        int currentCaseId = this.caseObj.getId();
-        int length = selected.length;
-
-        for (int i = 0; i < length; i++)
-            if (selected[i].toString().contains("(" + currentCaseId + ")"))
-                return i;
-
-        return 0;
-    }
+//    private int getDefultIndex(Object[] selected) {
+//        int currentCaseId = this.caseObj.getId();
+//        int length = selected.length;
+//
+//        for (int i = 0; i < length; i++)
+//            if (selected[i].toString().contains("(" + currentCaseId + ")"))
+//                return i;
+//
+//        return 0;
+//    }
 
     private int getCaseId(String selectedCase) {
         int index1 = selectedCase.indexOf("(") + 1;
@@ -511,15 +514,15 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         return Integer.parseInt(selectedCase.substring(index1, index2));
     }
 
-    private Icon getCopyIcon() {
-        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
-
-        if (imgURL != null) {
-            return new ImageIcon(imgURL);
-        }
-
-        return null;
-    }
+//    private Icon getCopyIcon() {
+//        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
+//
+//        if (imgURL != null) {
+//            return new ImageIcon(imgURL);
+//        }
+//
+//        return null;
+//    }
 
     private void validateJobDatasets() throws EmfException {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);

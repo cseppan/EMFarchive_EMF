@@ -120,6 +120,10 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getCases();
     }
     
+    public Case[] getCases(String nameContains) throws EmfException {
+        return getCaseService().getCases(nameContains);
+    }
+    
     public Case reloadCase(int caseId) throws EmfException {
         return getCaseService().getCase(caseId);
     }
@@ -564,6 +568,13 @@ public class CaseServiceImpl implements CaseService {
 
     public Case[] getCases(CaseCategory category) {
         return getCaseService().getCases(category);
+    }
+    
+    public Case[] getCases(CaseCategory category, String nameContains) throws EmfException {
+        if (nameContains == null || nameContains.trim().length() == 0 || nameContains.trim().equals("*"))
+           return getCaseService().getCases(category);
+      
+        return getCaseService().getCases(category, nameContains);     
     }
 
     public String validateJobs(Integer[] jobIDs) throws EmfException {

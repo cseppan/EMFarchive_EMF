@@ -1388,9 +1388,35 @@ public class CaseDAO {
         } finally {
             session.close();
         }
+ 
+        return cases == null ? null : (Case[]) cases.toArray(new Case[0]);
+    }
+    
+    public Case[] getCases(Session session, String nameContains) {
+
+        String ns = getPattern(nameContains.toLowerCase().trim());
+
+        List<?> cases=session
+        .createQuery(
+                "FROM Case as CA WHERE lower(CA.name) like "  + ns
+                + " order by CA.name").list();
 
         return cases == null ? null : (Case[]) cases.toArray(new Case[0]);
     }
+
+    public Case[] getCases(Session session, CaseCategory category, String nameContains) {
+        
+        String ns = getPattern(nameContains.toLowerCase().trim());
+        List<?> cases = session
+        .createQuery(
+                "FROM Case as CA WHERE lower(CA.name) like "  + ns
+                + " and CA.caseCategory.id=" + category.getId() + " "
+                + " order by CA.name").list();
+
+        return cases == null ? null : (Case[]) cases.toArray(new Case[0]);
+
+    }
+
 
     public CaseOutput getCaseOutput(CaseOutput output, Session session) {
         Criterion crit1 = Restrictions.eq("caseId", new Integer(output.getCaseId()));
@@ -1948,5 +1974,14 @@ public class CaseDAO {
         }
 
         return dsIds;
+    }
+    
+    private String getPattern(String name) {
+        name = name.replaceAll("\\*", "%%");
+        name = name.replaceAll("!", "!!");
+        name = name.replaceAll("'", "''");
+        name = name.replaceAll("_", "!_");
+        
+        return "'%%" + name + "%%'" + (name.contains("!") ? " ESCAPE '!'" : "");
     }
 }

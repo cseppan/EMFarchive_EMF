@@ -15,6 +15,7 @@ import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.casemanagement.CaseSelectionDialog;
 import gov.epa.emissions.framework.client.casemanagement.editor.FindCaseWindow;
 import gov.epa.emissions.framework.client.casemanagement.editor.RelatedCaseView;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -38,15 +39,12 @@ import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -373,9 +371,11 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             public void actionPerformed(ActionEvent arg0) {
                 try {
                     clearMessage();
+                    checkModelToRun();
                     copyInputs(localPresenter);
                 } catch (Exception ex) {
                     messagePanel.setError(ex.getMessage());
+                    ex.printStackTrace();
                 }
             }
         };
@@ -453,7 +453,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
     }
 
     private void copyInputs(EditInputsTabPresenter presenter) throws Exception {
-        checkModelToRun();
         List<CaseInput> inputs = getSelectedInputs();
 
         if (inputs.size() == 0) {
@@ -461,19 +460,19 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             return;
         }
 
-        Object[] selected = presenter.getAllCaseNameIDs();
-        String selectedCase = (String) JOptionPane.showInputDialog(parentConsole, "Copy " + inputs.size()
-                + " case input(s) to case: ", "Copy Case Inputs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected,
-                selected[getDefultIndex(selected)]);
-
-        if ((selectedCase != null) && (selectedCase.length() > 0)) {
+        String[] caseIds = (String[]) presenter.getAllCaseNameIDs();      
+        CaseSelectionDialog view = new CaseSelectionDialog(parentConsole, caseIds);
+        String title = "Copy " + inputs.size()+" case input(s) to case: ";
+        
+        view.display(title, true);
+        
+        if (view.shouldCopy()){
+            String selectedCase=view.getCases()[0];
             int selectedCaseId = getCaseId(selectedCase);
-
             if (selectedCaseId != this.caseId) {
                 presenter.copyInput(selectedCaseId, inputs);
                 return;
             }
-
             showEditor(presenter, inputs, selectedCase);
         }
     }
@@ -623,16 +622,16 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         return inputDir.getText();
     }
 
-    private int getDefultIndex(Object[] selected) {
-        int currentCaseId = this.caseObj.getId();
-        int length = selected.length;
-
-        for (int i = 0; i < length; i++)
-            if (selected[i].toString().contains("(" + currentCaseId + ")"))
-                return i;
-
-        return 0;
-    }
+//    private int getDefultIndex(Object[] selected) {
+//        int currentCaseId = this.caseObj.getId();
+//        int length = selected.length;
+//
+//        for (int i = 0; i < length; i++)
+//            if (selected[i].toString().contains("(" + currentCaseId + ")"))
+//                return i;
+//
+//        return 0;
+//    }
 
     private int getCaseId(String selectedCase) {
         int index1 = selectedCase.indexOf("(") + 1;
@@ -641,15 +640,15 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         return Integer.parseInt(selectedCase.substring(index1, index2));
     }
 
-    private Icon getCopyIcon() {
-        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
-
-        if (imgURL != null) {
-            return new ImageIcon(imgURL);
-        }
-
-        return null;
-    }
+//    private Icon getCopyIcon() {
+//        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
+//
+//        if (imgURL != null) {
+//            return new ImageIcon(imgURL);
+//        }
+//
+//        return null;
+//    }
 
     private CaseInput[] listFreshInputs() throws EmfException {
         CaseInput[] freshList = presenter.getCaseInput(caseId, getSelectedSector(), nameContains(), showAll.isSelected());
