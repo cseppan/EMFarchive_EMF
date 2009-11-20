@@ -17,6 +17,15 @@ CREATE TABLE emf.users
 WITHOUT OIDS;
 -- emf.users
 --
+-- emf intended_uses
+CREATE TABLE emf.intended_uses
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf intended_uses
+--
 -- emissions.versions
 CREATE TABLE emissions.versions
 (
@@ -49,15 +58,6 @@ CREATE TABLE emf.note_types
 )
 WITHOUT OIDS;
 -- emf.note_types
---
--- emf intended_uses
-CREATE TABLE emf.intended_uses
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
-) 
-WITHOUT OIDS;
--- emf intended_uses
 --
 -- emf projects
 CREATE TABLE emf.projects
