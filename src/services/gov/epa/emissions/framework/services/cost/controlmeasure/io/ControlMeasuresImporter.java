@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.commons.data.Reference;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.OptimizedTableModifier;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +49,7 @@ public class ControlMeasuresImporter implements Importer {
     private User user;
 
     private ControlMeasureDAO controlMeasuresDao;
-
+    
     private TableFormat effRecTableFormat;
 
     private Datasource datasource;
@@ -82,12 +84,19 @@ public class ControlMeasuresImporter implements Importer {
     }
 
     public void run() throws ImporterException {
+        
         setStatus("Started importing control measures");
         setDetailStatus("Started importing control measures\n");
         ControlMeasure[] measures;
         EfficiencyRecord[] efficiencyRecords;
         int efficiencyRecordCount = 0;
         try {
+            
+            Map<Integer, Reference> referenceMap = new HashMap<Integer, Reference>();
+            Map<Integer, Integer> idMap = new HashMap<Integer, Integer>();
+
+            this.runReference(referenceMap, idMap);
+            
             //import summary file
             runSummary(controlMeasures);
             //import scc file
@@ -97,6 +106,9 @@ public class ControlMeasuresImporter implements Importer {
             //import property file
             runProperty(controlMeasures);
             measures = controlMeasures();
+            
+            this.updateControlMeasureReferences(measures, referenceMap, idMap);
+            
             setDetailStatus("Saving measure and SCC information to the database\n");
             saveMeasureAndSCCs(measures, user);
             //this is needed so we know what the Ids are for the saved measures
@@ -155,6 +167,61 @@ public class ControlMeasuresImporter implements Importer {
         return measures;
     }
 
+    private void updateControlMeasureReferences(ControlMeasure[] controlMeasures, Map<Integer, Reference> referenceMap, Map<Integer, Integer> idMap) {
+
+        for (ControlMeasure controlMeasure : controlMeasures) {
+            
+            String dataSource = controlMeasure.getDataSouce();
+            List<Integer> dataSourceIds = this.parseDataSource(dataSource);
+            
+            List<Reference> references = new ArrayList<Reference>();
+            for (Integer id: dataSourceIds) {
+                
+                Integer mappedId = idMap.get(id);
+
+                if (mappedId == null) {
+                    System.out.println("Control measure '" + controlMeasure.getName()
+                            + "' contains undefined reference '" + id + "'. Skipping reference.");
+                }
+                else {
+
+                    Reference reference = referenceMap.get(mappedId);
+                    if (reference == null) {
+                        System.out.println("Unable to find reference with id '" + id + "' and mapped id '" + mappedId
+                                + "'. Skipping reference.");
+                    } else {
+                        references.add(reference);
+                    }
+                }
+
+            }           
+            
+            controlMeasure.setReferences(references.toArray(new Reference[0]));
+        }
+        
+    }
+
+    private List<Integer> parseDataSource(String datasource) {
+        
+        List<Integer> sourceIds = new ArrayList<Integer>();
+
+        StringTokenizer tokenizer = new StringTokenizer(datasource, "|");
+        while (tokenizer.hasMoreElements()) {
+        
+            String source = (String) tokenizer.nextElement();
+            source = source.trim();
+            try {
+                
+                int id = Integer.valueOf(source);
+                sourceIds.add(id);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        
+        return sourceIds;
+    }
+    
     private void updateControlMeasuresMap(ControlMeasure[] measures) {
         controlMeasures = new HashMap();
         for (int i = 0; i < measures.length; i++) {
@@ -203,6 +270,17 @@ public class ControlMeasuresImporter implements Importer {
             setStatus("Finished reading property file");
         } else
             setStatus("Warning, no property file was specified");
+    }
+
+    private void runReference(Map<Integer, Reference> referenceMap, Map<Integer, Integer> idMap) throws ImporterException {
+
+        CMReferenceImporter referenceImporter = cmImporters.referenceImporter();
+        if (referenceImporter != null) {
+            setStatus("Started reading reference file: " + referenceImporter.getFileName());
+            referenceImporter.run(referenceMap, idMap);
+            setStatus("Finished reading reference file: " + referenceImporter.getFileName());
+        } else
+            setStatus("Warning, no reference file was specified");
     }
 
     private OptimizedTableModifier dataModifier(String table, Datasource datasource) throws EmfException {
@@ -372,4 +450,20 @@ public class ControlMeasuresImporter implements Importer {
         log.error(messge, e);
     }
 
+    public static void main(String[] args) {
+        
+        String test = "1|2|11|12";
+        StringTokenizer tokenizer = new StringTokenizer(test, "|");
+        while (tokenizer.hasMoreElements()) {
+        
+            String string = (String) tokenizer.nextElement();
+            System.out.println(string);
+        }
+
+        String[] split = test.split("|");
+        for (String string : split) {
+            System.out.println(string);
+        }
+        
+    }
 }

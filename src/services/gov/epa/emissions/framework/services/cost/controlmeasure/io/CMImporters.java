@@ -146,11 +146,12 @@ public class CMImporters {
     }
 
     private CMReferenceImporter createReferenceImporter() {
+        
         CMReferenceFileFormat fileFormat = new CMReferenceFileFormat();
         String[] cols = fileFormat.cols();
         for (int i = 0; i < records.length; i++) {
             if (matches(cols, records[i].getTokens())) {
-                return new CMReferenceImporter(files[i], fileFormat);
+                return new CMReferenceImporter(files[i], fileFormat, this.user, this.sessionFactory);
             }
         }
         return null;

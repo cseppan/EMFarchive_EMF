@@ -240,7 +240,7 @@ public class ControlMeasureDAO {
         for (int i = 0; i < newReferences.length; i++) {
 
             Reference newReference = newReferences[i];
-            if (newReference.isUpdatedReference()) {
+            if (newReference != null && newReference.isUpdated()) {
 
                 for (Reference existingReference : existingReferences) {
 

@@ -199,7 +199,7 @@ public class MeasureReferenceWindow extends DisposableInteralFrame implements Me
 
     protected void doSave() {
         this.reference.setDescription(this.descriptionField.getText().trim());
-        this.reference.setUpdatedReference(true);
+        this.reference.setUpdated(true);
     }
 
     private void closeWindow() {

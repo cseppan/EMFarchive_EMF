@@ -184,7 +184,7 @@ public class MeasureReferenceAddWindow extends DisposableInteralFrame implements
     public void display(ControlMeasure measure) {
 
         Reference newReference = new Reference();
-        newReference.setUpdatedReference(true);
+        newReference.setUpdated(true);
         display(measure, newReference);
         this.newReference = true;
     }

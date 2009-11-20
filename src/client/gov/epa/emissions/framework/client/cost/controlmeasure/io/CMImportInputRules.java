@@ -11,7 +11,7 @@ public class CMImportInputRules {
     }
 
     private void checkForMinAndMaxFiles(int size) throws EmfException {
-        if (size > 6 || size < 3)
+        if (size > 8 || size < 4)
             throw new EmfException("The control measure importer requires between 3 and 6 files");
     }
 

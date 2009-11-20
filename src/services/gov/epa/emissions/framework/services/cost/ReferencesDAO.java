@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Reference;
+import gov.epa.emissions.commons.db.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public class ReferencesDAO {
 
     private HibernateFacade hibernateFacade;
 
+    private Session session;
+
     public ReferencesDAO() {
         hibernateFacade = new HibernateFacade();
     }
@@ -26,11 +29,11 @@ public class ReferencesDAO {
         addObject(reference, session);
     }
 
-    public List getReferences(Session session) {
+    public List<Reference> getReferences(Session session) {
         return session.createCriteria(Reference.class).addOrder(Order.asc("description")).list();
     }
 
-    public List getReferences(Session session, String textContains) {
+    public List<Reference> getReferences(Session session, String textContains) {
         return session.createCriteria(Reference.class).add(
                 Restrictions.like("description", textContains.toLowerCase().trim(), MatchMode.ANYWHERE)).addOrder(
                 Order.asc("description")).list();
@@ -76,5 +79,14 @@ public class ReferencesDAO {
 
     private boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
+    }
+
+    public Session getSession() {
+
+        if (this.session == null) {
+            this.session = HibernateSessionFactory.get().getSession();
+        }
+
+        return this.session;
     }
 }
