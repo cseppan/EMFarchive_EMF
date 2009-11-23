@@ -109,7 +109,10 @@ public class CMCSVFileReader implements Reader {
     private Record doRead(String line) throws ImporterException {
         Record record = new Record();
         String[] tokens = tokenizer.tokens(line);
+//        List<String> stringList = new ArrayList<String>();
         for (int i = 0; i < tokens.length - 1; i++) {
+//            stringList.add(tokens[i]);
+            
             tokens[i] = tokens[i].replace("\"\"", "\"");
         }
         record.add(Arrays.asList(tokens));

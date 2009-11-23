@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -262,7 +263,7 @@ public class ControlMeasuresImporter implements Importer {
             setStatus("Warning, no equation file was specified");
     }
 
-    private void runProperty(Map controlMeasures) throws ImporterException {
+    private void runProperty(Map controlMeasures) throws ImporterException, FileNotFoundException {
         CMPropertyImporter propertyImporter = cmImporters.propertyImporter();
         if (propertyImporter != null) {
             setStatus("Started reading property file");

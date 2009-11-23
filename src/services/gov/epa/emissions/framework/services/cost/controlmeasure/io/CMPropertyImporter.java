@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.commons.io.csv.CSVReader;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -8,6 +9,8 @@ import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Date;
 import java.util.Map;
 
@@ -29,10 +32,10 @@ public class CMPropertyImporter{
         this.propertyReader = new CMPropertyRecordReader(fileFormat, user, sessionFactory);
     }
 
-    public void run(Map controlMeasures) throws ImporterException {
+    public void run(Map controlMeasures) throws ImporterException, FileNotFoundException {
         addStatus("Started reading properties file");
-        CMCSVFileReader reader = new CMCSVFileReader(file);
-        for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
+        CSVReader reader = new CSVReader(new FileReader( file));
+        for (Record record = reader.read(); reader.hasNext(); record = reader.read()) {
             propertyReader.parse(controlMeasures, record, 
                     reader.lineNumber());
         }

@@ -40,15 +40,15 @@ public class CMPropertyRecordReader {
 
         ControlMeasureProperty property = new ControlMeasureProperty();
         property.setName(tokens[1]);
-        property.setValue(tokens[2]);
         try {
-            property.setCategory(categories.getCategory(tokens[3]));
+            property.setCategory(categories.getCategory(tokens[2]));
         } catch (EmfException e) {
             sb.append(format(e.getMessage()));
         }
-        property.setUnits(tokens[4]);
-        property.setDataType(tokens[5]);
-        property.setDbFieldName(tokens[6]);
+        property.setUnits(tokens[3]);
+        property.setDataType(tokens[4]);
+        property.setDbFieldName(tokens[5]);
+        property.setValue(tokens[6]);
         cm.addProperty(property);
         if (sb.length() > 0) {
             errorCount++;
