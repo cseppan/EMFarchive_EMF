@@ -96,7 +96,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         //refresh Edit Control Strategy windows...
         for (int i = 0; i < editControlStrategyViews.length; i++) {
             EditControlStrategyView view = editControlStrategyViews[i];
-            view.endControlMeasuresRefresh();
+            if (view != null) view.endControlMeasuresRefresh();
         }
         this.populateThread = null;
     }
