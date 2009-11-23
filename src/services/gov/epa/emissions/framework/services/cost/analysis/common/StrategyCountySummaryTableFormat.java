@@ -69,7 +69,7 @@ public class StrategyCountySummaryTableFormat implements TableFormat {
         cols.add(new Column("SECTOR", types.stringType(64), 64, new StringFormatter(64)));
         cols.add(new Column("FIPS", types.stringType(6), new StringFormatter(6)));
         cols.add(new Column("Poll", types.stringType(20), new StringFormatter(20)));
-        cols.add(new Column("Uncontrolled_Emis", types.realType(), new RealFormatter()));
+        cols.add(new Column("Input_Emis", types.realType(), new RealFormatter()));
         cols.add(new Column("Emis_Reduction", types.realType(), new RealFormatter()));
         cols.add(new Column("Remaining_Emis", types.realType(), new RealFormatter()));
         cols.add(new Column("Pct_Red", types.realType(), new RealFormatter()));
