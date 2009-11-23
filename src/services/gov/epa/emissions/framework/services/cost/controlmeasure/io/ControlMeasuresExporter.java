@@ -85,6 +85,8 @@ public class ControlMeasuresExporter implements Exporter {
         writeEfficiencyFile();
         writeSccFile();
         writeEquationFile();
+        writeReferenceFile();
+        writePropertyFile();
     }
 
     private void writeEquationFile() throws ExporterException {
@@ -203,7 +205,12 @@ public class ControlMeasuresExporter implements Exporter {
             + "         group by cmnd.control_measure_id "
             + "     ) as NEIDeviceCode, "
             + "     date_part('year', m.date_reviewed) as DateReviewed, "
-            + "     m.data_souce as DataSource, "
+            + "     ( "
+            + "         select public.concatenate_with_pipe(cmr.reference_id || '')  "
+            + "         from emf.control_measure_references cmr "
+            + "         where cmr.control_measure_id = m.id "
+            + "         group by cmr.control_measure_id "
+            + "     ) as DataSource, "
             + "     ( "
             + "         select public.concatenate_with_pipe(cmm.\"month\" || '')  "
             + "         from emf.control_measure_months cmm "
@@ -416,6 +423,42 @@ public class ControlMeasuresExporter implements Exporter {
 //        }
 //        
 //        sccsWriter.close();
+    }
+
+    private void writeReferenceFile() throws ExporterException {
+        File file = new File(folder, prefix + "_Refs.csv");
+        String selectQuery = 
+            "   select r.id as \"DataSource\", "
+            + "     r.description as \"Description\" "
+            + " from  emf.\"references\" r "
+            + "     inner join emf.control_measure_references mr "
+            + "     on mr.reference_id = r.id "
+            + " where mr.control_measure_id in (" + idList + ")";
+        
+        postgresCOPYExport.export(selectQuery, file.getAbsolutePath());
+    }
+
+    private void writePropertyFile() throws ExporterException {
+        File file = new File(folder, prefix + "_Props.csv");
+//        "CMAbbreviation", "Name", 
+//        "Category", "Units", "Data_Type", 
+//        "DB_FieldName", "Value"
+        String selectQuery = 
+            "   select m.abbreviation as \"CMAbbreviation\", "
+            + "     mp.name as \"Name\", "
+            + "     coalesce(mpc.name,'') as \"Category\", "
+            + "     mp.units as \"Units\", "
+            + "     mp.data_type as \"Data_Type\", "
+            + "     mp.db_field_name as \"DB_FieldName\", "
+            + "     mp.\"value\" as \"Value\" "
+            + " from emf.control_measures m "
+            + "     inner join emf.control_measure_properties mp "
+            + "     on mp.control_measure_id = m.id "
+            + "     left outer join emf.control_measure_property_categories mpc "
+            + "     on mpc.id = mp.control_measure_property_category_id "
+            + " where m.id in (" + idList + ")";
+        
+        postgresCOPYExport.export(selectQuery, file.getAbsolutePath());
     }
 
     private void addStatus(String message) {
