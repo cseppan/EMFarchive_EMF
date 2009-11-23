@@ -12,7 +12,7 @@ $BODY$
 DECLARE
 	inv_table_name varchar(64) := '';
 	cont_inv_table_name varchar(64) := '';
-	inv_filter varchar := '';
+	inv_filter text := '';
 	inv_fips_filter text := '';
 	detailed_result_dataset_id integer := null;
 	detailed_result_table_name varchar(64) := '';
@@ -402,13 +402,18 @@ BEGIN
 			end as avd_emis';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'ann_emis' THEN
-			select_column_list_sql := select_column_list_sql || ', 
+			select_column_list_sql := select_column_list_sql || ', ' ||
 			case 
-				when cr.source_id is not null then cr.final_emissions 
-				when cont.source_id is not null then cont.final_emissions 
-				when proj.source_id is not null then proj.final_emissions 
-				else ann_emis 
-			end as ann_emis';
+				when dataset_month != 0 then 
+					'-9.0::double precision as ann_emis'
+				else 
+					'case 
+						when cr.source_id is not null then cr.final_emissions 
+						when cont.source_id is not null then cont.final_emissions 
+						when proj.source_id is not null then proj.final_emissions 
+						else ann_emis 
+					end as ann_emis'
+			end;
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'ceff' THEN
 			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source

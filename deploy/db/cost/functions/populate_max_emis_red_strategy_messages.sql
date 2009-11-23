@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION public.populate_max_emis_red_strategy_messages(
 $BODY$
 DECLARE
 	inv_table_name varchar(64) := '';
-	inv_filter varchar := '';
+	inv_filter text := '';
 	inv_fips_filter text := '';
 	strategy_messages_dataset_id integer := null;
 	strategy_messages_table_name varchar(64) := '';

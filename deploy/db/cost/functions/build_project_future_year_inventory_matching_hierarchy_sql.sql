@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION public.build_project_future_year_inventory_matching_h
 	control_program_table_name varchar(64), 
 	inv_table_name varchar(64), 
 	select_columns varchar, 
-	where_filter varchar
+	where_filter text
 	) RETURNS text AS
 $BODY$
 DECLARE
@@ -11,7 +11,7 @@ DECLARE
 	inv_has_naics_column boolean := false;
 	inv_has_mact_column boolean := false;
 	control_packet_has_mact_column boolean := false;
-	sql character varying := '';
+	sql text := '';
 BEGIN
 
 	-- see if there are point specific columns in the inventory

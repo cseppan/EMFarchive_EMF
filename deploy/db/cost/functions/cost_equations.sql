@@ -1067,6 +1067,7 @@ BEGIN
 						variable_coefficient3, 
 						variable_coefficient4, 
 						variable_coefficient5) as costs
+
 					into annual_cost,
 						capital_cost,
 						operation_maintenance_cost,
@@ -1099,7 +1100,7 @@ BEGIN
 						costs.operation_maintenance_cost,
 						costs.annualized_capital_cost,
 						costs.computed_cost_per_ton
-					from public.get_type8_equation_costs(control_measure_id, 
+					from public.get_type9_equation_costs(control_measure_id, 
 						discount_rate, 
 						equipment_life, 
 						capital_recovery_factor, 

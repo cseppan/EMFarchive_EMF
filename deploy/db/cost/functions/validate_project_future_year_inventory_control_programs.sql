@@ -12,7 +12,7 @@ DECLARE
 
 
 	inv_table_name varchar(64) := '';
-	inv_filter varchar := '';
+	inv_filter text := '';
 	inv_fips_filter text := '';
 	county_dataset_id integer := null;
 	county_dataset_version integer := null;

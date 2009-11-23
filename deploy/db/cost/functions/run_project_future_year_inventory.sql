@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION public.run_project_future_year_inventory(
 $BODY$
 DECLARE
 	inv_table_name varchar(64) := '';
-	inv_filter varchar := '';
+	inv_filter text := '';
 	inv_fips_filter text := '';
 	detailed_result_dataset_id integer := null;
 	detailed_result_table_name varchar(64) := '';

@@ -1,6 +1,10 @@
+drop FUNCTION public.populate_sources_table(
+	inv_table_name varchar(64),
+	inv_filter varchar);
+
 CREATE OR REPLACE FUNCTION public.populate_sources_table(
 	inv_table_name varchar(64),
-	inv_filter varchar
+	inv_filter text
 ) RETURNS void AS $$
 DECLARE
 	is_point_table boolean := false;
