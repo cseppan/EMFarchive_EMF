@@ -18,4 +18,6 @@ public interface CaseManagerView extends ManagedView {
     void addNewCaseToTableData(Case newCase);
     
     CaseCategory getSelectedCategory();
+    
+    void setSelectedCategory();
 }

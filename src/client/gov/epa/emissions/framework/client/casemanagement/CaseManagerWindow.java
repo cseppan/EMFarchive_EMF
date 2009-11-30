@@ -179,6 +179,10 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         this.selectedCategory = (CaseCategory) categoriesBox.getSelectedItem();
         return selectedCategory;
     }
+    
+    public void setSelectedCategory() {
+        categoriesBox.setSelectedIndex(1);
+    }
 
     private void createLayout(JPanel layout, JPanel table) {
         layout.removeAll();

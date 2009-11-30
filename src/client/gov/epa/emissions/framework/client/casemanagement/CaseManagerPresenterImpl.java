@@ -125,9 +125,10 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
         this.caseObjectManager.refresh();
         this.caseObjectManager.refreshJobList();
         
-        if (category == null)
-            return new Case[0];
-        
+        if (category == null){
+            view.setSelectedCategory();
+            return service().getCases(nameContains);
+        }
         if (category.getName().equals("All"))
             return service().getCases(nameContains);
         
