@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.data.dataset;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
@@ -235,6 +236,10 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
 
     public Keyword[] getKeywords() throws EmfException {
         return session.dataCommonsService().getKeywords();
+    }
+    
+    public synchronized Project[] getProjects() throws EmfException {
+        return session.dataCommonsService().getProjects();
     }
 
     public DatasetType getDSType() {

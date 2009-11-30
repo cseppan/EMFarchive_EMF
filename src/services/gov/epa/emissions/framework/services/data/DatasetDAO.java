@@ -1225,12 +1225,13 @@ public class DatasetDAO {
         String dsKeyStr = getDSKeyStr(ds.getKeyVals());
         String desc = ds.getDescription();
         String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE " + getPattern(desc.toLowerCase().trim()));
+        String dsProjStr = (ds.getProject() == null ? "" : " AND DS.project.id = " + ds.getProject().getId());
         String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
         		+ " DS.creator, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
         		+ " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse LEFT JOIN DS.project LEFT JOIN DS.region"
         		+ dsKeyStr
         		+ " WHERE DS.status <> 'Deleted'"
-                + dsTypeStr + dsNameStr + checkBackSlash(descStr) + " ORDER BY DS.name";
+                + dsTypeStr + dsNameStr + checkBackSlash(descStr) + dsProjStr + " ORDER BY DS.name";
         
         List<EmfDataset> ds1 = session.createQuery(dsquery).list();
         
@@ -1245,6 +1246,7 @@ public class DatasetDAO {
                 + dsTypeStr + (dsTypeKeyStr.isEmpty() ? "" : " AND TYPE.id = DS.datasetType.id")
                 + dsNameStr
                 + checkBackSlash(descStr)
+                + dsProjStr
                 + " ORDER BY DS.name";
         
         List<EmfDataset> ds2 = session.createQuery(dstypequery).list();

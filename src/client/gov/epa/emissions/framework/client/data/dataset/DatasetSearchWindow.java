@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.data.dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.TextField;
@@ -45,6 +46,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     private ComboBox keyword;
     
     private ComboBox dsTypesBox;
+    
+    private ComboBox projectsCombo;
 
     private TextField value;
     
@@ -53,7 +56,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     private EmfConsole parent;
     
     public DatasetSearchWindow(String title, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super(title, new Dimension(500, 280), desktopManager);
+        super(title, new Dimension(500, 320), desktopManager);
         parent = parentConsole;
     }
 
@@ -87,6 +90,9 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         keyword = new ComboBox("Select one", presenter.getKeywords());
         keyword.setPreferredSize(dim);
         
+        projectsCombo = new ComboBox("Select one", presenter.getProjects());
+        projectsCombo.setPreferredSize(dim);
+        
         name = new TextField("namefilter", 30);
         desc = new TextField("descfilter", 30);
         value = new TextField("keyvalue", 30);
@@ -100,9 +106,10 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         layoutGen.addLabelWidgetPair("Datast type:", dsTypesBox, panel);
         layoutGen.addLabelWidgetPair("Keyword:", keyword, panel);
         layoutGen.addLabelWidgetPair("Keyword value:", value, panel);
+        layoutGen.addLabelWidgetPair("Project:", projectsCombo, panel);
 
         // Lay out the panel.
-        layoutGen.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGen.makeCompactGrid(panel, 6, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 10);// xPad, yPad
 
@@ -179,6 +186,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         value.setText("");
         dsTypesBox.setSelectedIndex(0);
         keyword.setSelectedIndex(0);
+        projectsCombo.setSelectedIndex(0);
     }
     
     public void setNameText(String name) {
@@ -189,7 +197,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         if ((name.getText() == null || name.getText().trim().isEmpty())
                 && (desc.getText() == null || desc.getText().trim().isEmpty())
                 && dsTypesBox.getSelectedItem() == null
-                && keyword.getSelectedItem() == null)
+                && keyword.getSelectedItem() == null
+                && projectsCombo.getSelectedItem() == null)
             return false;
         
         return true;
@@ -206,7 +215,13 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
             KeyVal kv = new KeyVal(kw, value.getText());
             ds.setKeyVals(new KeyVal[] { kv });
         }
+        
+        Project project = (Project) projectsCombo.getSelectedItem();
 
+        if (project != null) {
+            ds.setProject(project);
+        }
+        
         return ds;
     }
     
