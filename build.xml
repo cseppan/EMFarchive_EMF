@@ -12,6 +12,7 @@
     <property name="src.client.dir" value="${src.dir}/client" />
     <property name="src.contract.dir" value="${src.dir}/contract" />
     <property name="src.services.dir" value="${src.dir}/services" />
+    <property name="src.common.dir" value="${src.dir}/common" />
     <property name="lib.dir" value="lib" />
     <property name="res.dir" value="res" />
 
@@ -124,9 +125,24 @@
             <param name="resources.root" value="${src.services.dir}" />
         </antcall>
     </target>
+	
+    <target name="build-version"
+            depends="clean, init"
+            description="Build EMF version" >
+
+        <antcall target="do-compile">
+            <param name="compile.src" value="${src.common.dir}" />
+        </antcall>
+
+    	<java classname="gov.epa.emissions.common.version.EMFVersionPropertiesBuilder"
+              fork="true"
+              failonerror="true"
+        	  classpathref="classpath" >
+        </java>
+    </target>
 
     <target name="compile-src"
-            depends="clean, init, compile-contract, compile-client, compile-services"
+            depends="clean, init, build-version, compile-contract, compile-client, compile-services"
     />
 
     <target name="do-compile">
