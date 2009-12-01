@@ -120,15 +120,8 @@ public class MeasureReferenceAddWindow extends DisposableInteralFrame implements
         this.referenceList.setModel(model);
     }
 
-    static boolean e = true;
     public void save() {
 
-        if (e) {
-
-            e = false;
-            throw new RuntimeException();
-        }
-        
         messagePanel.clear();
 
         String description = null;

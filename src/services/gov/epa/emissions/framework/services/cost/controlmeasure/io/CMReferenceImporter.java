@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.data.Reference;
+import gov.epa.emissions.commons.io.csv.CSVReader;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -10,6 +11,8 @@ import gov.epa.emissions.framework.services.cost.ReferencesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,14 +44,18 @@ public class CMReferenceImporter {
         this.referenceReader = new CMReferenceRecordReader(fileFormat, user, sessionFactory);
     }
 
-    public void run(Map<Integer, Reference> referenceMap, Map<Integer, Integer> idMap) throws ImporterException {
+    public void run(Map<Integer, Reference> referenceMap, Map<Integer, Integer> idMap) throws ImporterException, FileNotFoundException {
 
         addStatus("Reading reference file...");
 
         Map<Integer, Reference> initialReferenceMap = new HashMap<Integer, Reference>();
 
-        CMCSVFileReader reader = new CMCSVFileReader(file);
-        for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
+        CSVReader reader = new CSVReader(new FileReader( file));
+        //read the first header line...
+        reader.read();
+        for (Record record = reader.read(); reader.hasNext(); record = reader.read()) {
+//        CMCSVFileReader reader = new CMCSVFileReader(file);
+//        for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
             this.referenceReader.parse(initialReferenceMap, record, reader.lineNumber());
         }
 

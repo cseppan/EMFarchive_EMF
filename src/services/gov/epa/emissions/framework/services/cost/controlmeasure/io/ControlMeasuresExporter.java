@@ -428,12 +428,13 @@ public class ControlMeasuresExporter implements Exporter {
     private void writeReferenceFile() throws ExporterException {
         File file = new File(folder, prefix + "_Refs.csv");
         String selectQuery = 
-            "   select r.id as \"DataSource\", "
+            "   select distinct r.id as \"DataSource\", "
             + "     r.description as \"Description\" "
             + " from  emf.\"references\" r "
             + "     inner join emf.control_measure_references mr "
             + "     on mr.reference_id = r.id "
-            + " where mr.control_measure_id in (" + idList + ")";
+            + " where mr.control_measure_id in (" + idList + ") "
+            + " ";
         
         postgresCOPYExport.export(selectQuery, file.getAbsolutePath());
     }

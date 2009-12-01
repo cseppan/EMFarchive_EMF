@@ -273,7 +273,7 @@ public class ControlMeasuresImporter implements Importer {
             setStatus("Warning, no property file was specified");
     }
 
-    private void runReference(Map<Integer, Reference> referenceMap, Map<Integer, Integer> idMap) throws ImporterException {
+    private void runReference(Map<Integer, Reference> referenceMap, Map<Integer, Integer> idMap) throws ImporterException, FileNotFoundException {
 
         CMReferenceImporter referenceImporter = cmImporters.referenceImporter();
         if (referenceImporter != null) {

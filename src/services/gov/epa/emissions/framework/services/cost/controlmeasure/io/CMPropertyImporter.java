@@ -35,6 +35,8 @@ public class CMPropertyImporter{
     public void run(Map controlMeasures) throws ImporterException, FileNotFoundException {
         addStatus("Started reading properties file");
         CSVReader reader = new CSVReader(new FileReader( file));
+        //read the first header line...
+        reader.read();
         for (Record record = reader.read(); reader.hasNext(); record = reader.read()) {
             propertyReader.parse(controlMeasures, record, 
                     reader.lineNumber());
