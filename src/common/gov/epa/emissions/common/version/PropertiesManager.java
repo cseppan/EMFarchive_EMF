@@ -29,9 +29,9 @@ public class PropertiesManager {
 
         private String key;
 
-        private Class type;
+        private Class<?> type;
 
-        private PropertyKey(String key, Class type) {
+        private PropertyKey(String key, Class<?> type) {
 
             this.key = key;
             this.type = type;
@@ -46,9 +46,9 @@ public class PropertiesManager {
             return this.key;
         }
 
-        public static Class getType(String key) {
+        public static Class<?> getType(String key) {
 
-            Class type = null;
+            Class<?> type = null;
             PropertyKey[] values = PropertyKey.values();
             for (PropertyKey propertyKey : values) {
 
@@ -92,7 +92,6 @@ public class PropertiesManager {
     private PropertiesManager() {
 
         this.properties = new Properties();
-        // this.properties.setProperty(PropertyKey.DATA_MINIMUM.getKey(), "0");
 
         for (Object key : this.properties.keySet()) {
             System.out.println(key + "=" + this.properties.get(key));
@@ -124,7 +123,7 @@ public class PropertiesManager {
         this.properties.load(new FileInputStream(inputFile));
 
         for (Object key : this.properties.keySet()) {
-            System.out.println(key + " " + this.properties.get(key));
+            System.out.println(key + "=" + this.properties.get(key));
         }
 
         this.validateInput();
