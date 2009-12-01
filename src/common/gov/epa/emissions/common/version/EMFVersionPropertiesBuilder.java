@@ -36,8 +36,8 @@ public class EMFVersionPropertiesBuilder {
             fileWriter.write(key);
             fileWriter.write("=");
             
-            int version = propertiesManager.getValueAsInt(key);
-            fileWriter.write(Integer.toString(version));
+            Object value = propertiesManager.getValue(key);
+            fileWriter.write(value.toString());
             fileWriter.write("\n");
         }
 

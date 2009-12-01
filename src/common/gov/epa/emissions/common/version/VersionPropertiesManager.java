@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Set;
 
@@ -15,12 +16,18 @@ public class VersionPropertiesManager {
     public enum PropertyKey {
 
         BUILD_VERSION_TIMESTAMP("build.version.timestamp", Long.class), // 
-        SCHEMA_VERSION_CASE("schema.version.case", Integer.class), // 
-        SCHEMA_VERSION_EMF("schema.version.emf", Integer.class), // 
-        SCHEMA_VERSION_COST("schema.version.cost", Integer.class), // 
-        SCHEMA_VERSION_PUBLIC("schema.version.public", Integer.class), // 
-        SCHEMA_VERSION_REFERENCE("schema.version.reference", Integer.class), // 
-        CODEBASE_VERSION_JAVA("codebase.version.java", Integer.class); // 
+        SCHEMA_CASE_VERSION("schema.case.version", Integer.class), // 
+        SCHEMA_CASE_CHANGED("schema.case.changed", Boolean.class), // 
+        SCHEMA_EMF_VERSION("schema.emf.version", Integer.class), // 
+        SCHEMA_EMF_CHANGED("schema.emf.changed", Boolean.class), // 
+        SCHEMA_COST_VERSION("schema.cost.version", Integer.class), // 
+        SCHEMA_COST_CHANGED("schema.cost.changed", Boolean.class), // 
+        SCHEMA_PUBLIC_VERSION("schema.public.version", Integer.class), // 
+        SCHEMA_PUBLIC_CHANGED("schema.public.changed", Boolean.class), // 
+        SCHEMA_REFERENCE_VERSION("schema.reference.version", Integer.class), // 
+        SCHEMA_REFERENCE_CHANGED("schema.reference.changed", Boolean.class), // 
+        CODEBASE_JAVA_VERSION("codebase.java.version", Integer.class), // 
+        CODEBASE_JAVA_CHANGED("codebase.java.changed", Boolean.class); // 
 
         private String key;
 
@@ -156,6 +163,18 @@ public class VersionPropertiesManager {
 
     public int getValueAsInt(String key) {
         return Integer.parseInt(this.properties.getProperty(key));
+    }
+
+    public long getValueAsLong(String key) {
+        return Long.parseLong(this.properties.getProperty(key));
+    }
+
+    public boolean getValueAsBoolean(String key) {
+        return Boolean.parseBoolean(this.properties.getProperty(key));
+    }
+
+    public Date getValueAsDate(String key) {
+        return new Date(this.getValueAsLong(this.properties.getProperty(key)));
     }
 
     public void setValue(String key, String value) {
