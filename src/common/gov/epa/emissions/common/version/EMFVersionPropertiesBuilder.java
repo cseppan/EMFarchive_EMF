@@ -10,17 +10,31 @@ public class EMFVersionPropertiesBuilder {
 
     public static void main(String[] args) throws IOException {
 
+        String userDir = System.getProperty("user.dir");
+        String relativeFilePath = "/res/properties/version_generated.properties";
+        String absoluteFilePath = "";
+        if (args.length == 0) {
+
+            absoluteFilePath = userDir + relativeFilePath;
+            System.out.println("No argument given for the generated properties file path. Using default: " + absoluteFilePath);
+        } else {
+            
+            absoluteFilePath = userDir + args[0];
+            System.out.println("Generated properties file path found. Using: " + absoluteFilePath);
+        }
+
         Date date = new Date(System.currentTimeMillis());
-        File versionGeneratedFile = new File(System.getProperty("user.dir") + "/res/properties/version_generated.properties");
-        System.out.println("Building version file:" + versionGeneratedFile.getAbsolutePath() + " with date: " + date.toString()
-                + "...");
+        File versionGeneratedFile = new File(absoluteFilePath);
+        System.out.println("Building version file:" + versionGeneratedFile.getAbsolutePath() + " with date: "
+                + date.toString() + "...");
 
         PropertiesManager propertiesManager = PropertiesManager.getInstance();
-        propertiesManager.initProperties(System.getProperty("user.dir") + "/res/properties/version.properties");
-        
+        propertiesManager.initProperties(absoluteFilePath);
+
         FileWriter fileWriter = new FileWriter(versionGeneratedFile);
 
-        fileWriter.write("#WARNING: This is an automatically generated file. Any manual changes to it will be lost during build.");
+        fileWriter
+                .write("#WARNING: This is an automatically generated file. Any manual changes to it will be lost during build.");
         fileWriter.write("\n");
         fileWriter.write("\n");
         fileWriter.write("#build.version.timestamp in readable form: ");
@@ -32,10 +46,10 @@ public class EMFVersionPropertiesBuilder {
 
         Set<String> keys = propertiesManager.getKeys();
         for (String key : keys) {
-            
+
             fileWriter.write(key);
             fileWriter.write("=");
-            
+
             Object value = propertiesManager.getValue(key);
             fileWriter.write(value.toString());
             fileWriter.write("\n");

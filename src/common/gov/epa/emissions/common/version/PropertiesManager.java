@@ -90,15 +90,12 @@ public class PropertiesManager {
     }
 
     private PropertiesManager() {
-
         this.properties = new Properties();
-
-        for (Object key : this.properties.keySet()) {
-            System.out.println(key + "=" + this.properties.get(key));
-        }
     }
 
     public void initProperties(String[] parameters) throws FileNotFoundException, IOException {
+
+        System.out.println("Initializing properties:");
 
         this.properties.clear();
         this.properties.load(new FileInputStream(parameters[1]));
@@ -111,7 +108,7 @@ public class PropertiesManager {
         }
 
         for (Object key : this.properties.keySet()) {
-            System.out.println(key + "=" + this.properties.get(key));
+            System.out.println("  " + key + "=" + this.properties.get(key));
         }
 
         this.validateInput();
@@ -119,11 +116,13 @@ public class PropertiesManager {
 
     public void initProperties(String inputFile) throws FileNotFoundException, IOException {
 
+        System.out.println("Initializing properties from file " + inputFile + ":");
+
         this.properties.clear();
         this.properties.load(new FileInputStream(inputFile));
 
         for (Object key : this.properties.keySet()) {
-            System.out.println(key + "=" + this.properties.get(key));
+            System.out.println("  " + key + "=" + this.properties.get(key));
         }
 
         this.validateInput();
