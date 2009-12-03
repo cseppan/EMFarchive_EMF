@@ -138,7 +138,7 @@
               fork="true"
               failonerror="true"
         	  classpathref="classpath" >
-    		<arg value="/res/properties/version_generated.properties"/>
+    		<arg value="/res/properties/version_generated.properties" />
         </java>
     </target>
 
