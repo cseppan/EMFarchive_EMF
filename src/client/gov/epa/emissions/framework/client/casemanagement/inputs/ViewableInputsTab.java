@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.casemanagement.CaseSelectionDialog;
 import gov.epa.emissions.framework.client.casemanagement.editor.FindCaseWindow;
 import gov.epa.emissions.framework.client.casemanagement.editor.RelatedCaseView;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -30,15 +31,12 @@ import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -340,17 +338,17 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
             return;
         }
 
-        Object[] selected = presenter.getAllCaseNameIDs();
-        String selectedCase = (String) JOptionPane.showInputDialog(parentConsole, "Copy " + inputs.size()
-                + " case input(s) to case: ", "Copy Case Inputs", JOptionPane.PLAIN_MESSAGE, getCopyIcon(), selected,
-                selected[getDefultIndex(selected)]);
-
-        if ((selectedCase != null) && (selectedCase.length() > 0)) {
+        String[] caseIds = (String[]) presenter.getAllCaseNameIDs();      
+        CaseSelectionDialog view = new CaseSelectionDialog(parentConsole, caseIds);
+        String title = "Copy " + inputs.size()+" case input(s) to case: ";
+        
+        view.display(title, true);
+        
+        if (view.shouldCopy()){
+            String selectedCase=view.getCases()[0];
             int selectedCaseId = getCaseId(selectedCase);
-
             if (selectedCaseId != this.caseId) {
                 presenter.copyInput(selectedCaseId, inputs);
-                return;
             }
         }
     }
@@ -358,27 +356,6 @@ public class ViewableInputsTab extends JPanel implements RefreshObserver {
     private void checkModelToRun() throws EmfException {
         if (caseObj.getModel() == null || caseObj.getModel().getId() == 0)
             throw new EmfException("Please specify model to run on summary tab. ");
-    }
-    
-    private int getDefultIndex(Object[] selected) {
-        int currentCaseId = this.caseObj.getId();
-        int length = selected.length;
-
-        for (int i = 0; i < length; i++)
-            if (selected[i].toString().contains("(" + currentCaseId + ")"))
-                return i;
-
-        return 0;
-    }
-
-    private Icon getCopyIcon() {
-        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
-
-        if (imgURL != null) {
-            return new ImageIcon(imgURL);
-        }
-
-        return null;
     }
     
     private int getCaseId(String selectedCase) {
