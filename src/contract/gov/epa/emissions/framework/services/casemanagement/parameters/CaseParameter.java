@@ -137,8 +137,9 @@ public class CaseParameter implements Serializable, Comparable<CaseParameter> {
         boolean bool2 = isEqual(((CaseParameter) other).sector, this.sector);
         boolean bool3 = isEqual(((CaseParameter) other).program, this.program);
         boolean bool4 = ((CaseParameter) other).jobId == this.jobId;
+        boolean bool5 = isEqual(((CaseParameter) other).region, this.region);
         
-        return (bool1 && bool2 && bool3 && bool4) || (this.id == ((CaseParameter) other).getId());
+        return (bool1 && bool2 && bool3 && bool4 && bool5) || (this.id == ((CaseParameter) other).getId());
     }
     
     private boolean isEqual(Object obj, Object current) {
