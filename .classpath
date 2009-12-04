@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry including="**/*.java" kind="src" path="test/integration"/>
+	<classpathentry kind="src" path="src/common"/>
 	<classpathentry kind="src" path="test/webservices"/>
 	<classpathentry including="**/*.java" kind="src" path="test/persistence"/>
 	<classpathentry including="**/*.java" kind="src" path="test/commons"/>
@@ -55,7 +56,7 @@
 	<classpathentry kind="lib" path="lib/commons-collections-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/dev/dbunit-2.1.jar" sourcepath="lib/dev/dbunit-src.zip"/>
 	<classpathentry kind="lib" path="lib/dev/jmock/jmock-cglib-1.0.1.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/Java 6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/concurrent.jar"/>
 	<classpathentry kind="lib" path="lib/dev/jmock/jmock-SNAPSHOT-09262005.jar"/>
 	<classpathentry kind="lib" path="lib/jnlp.jar"/>
@@ -64,10 +65,11 @@
 	<classpathentry kind="lib" path="lib/saaj-api.jar"/>
 	<classpathentry kind="lib" path="lib/saaj-impl.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Commons"/>
-	<classpathentry kind="lib" path="lib/tomcat/postgresql-8.2-508.jdbc4.jar"/>
 	<classpathentry kind="lib" path="lib/analysis-engine.jar"/>
 	<classpathentry kind="lib" path="lib/c3p0-0.9.1.2.jar"/>
 	<classpathentry kind="lib" path="lib/xstream-1.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/epa-commons.jar"/>
+	<classpathentry kind="lib" path="lib/tomcat/postgresql-8.3-603.jdbc4.jar"/>
+	<classpathentry kind="lib" path="lib/kmlGenerator.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
