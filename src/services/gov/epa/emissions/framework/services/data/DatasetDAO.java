@@ -396,13 +396,19 @@ public class DatasetDAO {
         return count != null && count.size() > 0;
     }
 
+    @SuppressWarnings("unchecked")
     public EmfDataset getDataset(Session session, String name) {
         Criterion statusCrit = Restrictions.ne("status", "Deleted"); // FIXME: to be deleted after dataset removed
         // from db
         Criterion nameCrit = Restrictions.eq("name", name);
         Criterion criterion = Restrictions.and(statusCrit, nameCrit);
         Order order = Order.asc("name");
-        return (EmfDataset) hibernateFacade.get(EmfDataset.class, criterion, order, session).get(0);
+        List<EmfDataset> list = hibernateFacade.get(EmfDataset.class, criterion, order, session);
+        
+        if (list == null || list.size() == 0)
+            return null;
+        
+        return list.get(0);
     }
 
     public EmfDataset getDataset(Session session, int id) {
