@@ -103,7 +103,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
         layoutGen.addLabelWidgetPair("Name contains:", name, panel);
         layoutGen.addLabelWidgetPair("Description contains:", desc, panel);
-        layoutGen.addLabelWidgetPair("Datast type:", dsTypesBox, panel);
+        layoutGen.addLabelWidgetPair("Dataset type:", dsTypesBox, panel);
         layoutGen.addLabelWidgetPair("Keyword:", keyword, panel);
         layoutGen.addLabelWidgetPair("Keyword value:", value, panel);
         layoutGen.addLabelWidgetPair("Project:", projectsCombo, panel);
