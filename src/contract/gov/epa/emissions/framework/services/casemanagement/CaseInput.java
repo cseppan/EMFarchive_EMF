@@ -64,7 +64,8 @@ public class CaseInput implements Serializable, Comparable {
         boolean bool2 = evalToEqual(((CaseInput) other).sector, this.sector);
         boolean bool3 = evalToEqual(((CaseInput) other).program, this.program);
         boolean bool4 = evalToEqual(((CaseInput) other).caseJobID, this.caseJobID);
-        return (bool1 && bool2 && bool3 && bool4) || (this.id == ((CaseInput) other).getId());
+        boolean bool5 = evalToEqual(((CaseInput) other).region, this.region);
+        return (bool1 && bool2 && bool3 && bool4 && bool5) || (this.id == ((CaseInput) other).getId());
     }
     
     private boolean evalToEqual(Object obj, Object current) {
