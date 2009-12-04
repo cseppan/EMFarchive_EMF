@@ -393,12 +393,12 @@ public class CaseDaoHelper {
         if (georegions == null || georegions.isEmpty())
             georegions = getGeoRegions(); // make sure regions have been retrieved
         
-        for (GeoRegion rg : georegions) {
-            System.out.println("Region: " + rg.getName());
-            System.out.println("Region: " + region.getName() + " in the list? " + georegions.contains(region));
-        }
-
-        System.out.println("<<<<<<<<<>>>>>>>>>>>>");
+//        for (GeoRegion rg : georegions) {
+//            System.out.println("Region: " + rg.getName());
+//            System.out.println("Region: " + region.getName() + " in the list? " + georegions.contains(region));
+//        }
+//
+//        System.out.println("<<<<<<<<<>>>>>>>>>>>>");
         
         if (georegions.contains(region))
             return georegions.get(georegions.indexOf(region));
@@ -620,6 +620,9 @@ public class CaseDaoHelper {
 
         try {
             EmfDataset ds = dsDao.getDataset(session, name);
+            
+            if (ds == null)
+                return null;
             
             if (ds.getDatasetType().equals(type))
                 return dsDao.getDataset(session, name);
