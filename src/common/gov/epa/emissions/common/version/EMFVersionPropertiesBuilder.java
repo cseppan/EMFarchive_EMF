@@ -29,7 +29,7 @@ public class EMFVersionPropertiesBuilder {
                 + date.toString() + "...");
 
         PropertiesManager propertiesManager = PropertiesManager.getInstance();
-        propertiesManager.initProperties(absoluteFilePath);
+        propertiesManager.initProperties(System.getProperty("user.dir") + "/res/properties/version.properties");
 
         FileWriter fileWriter = new FileWriter(versionGeneratedFile);
 
