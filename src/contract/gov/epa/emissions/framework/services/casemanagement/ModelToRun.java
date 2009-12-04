@@ -38,7 +38,7 @@ public class ModelToRun implements Serializable, Comparable<ModelToRun> {
         if (other == null || !(other instanceof ModelToRun))
             return false;
 
-        return ((ModelToRun) other).name.equals(this.name) || ((ModelToRun)other).id == id;
+        return ((ModelToRun) other).name.equalsIgnoreCase(this.name) || ((ModelToRun)other).id == id;
     }
 
     public int hashCode() {

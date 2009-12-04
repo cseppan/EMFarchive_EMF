@@ -328,6 +328,9 @@ public class CaseAssistanceService {
         session.clear();
         session.flush();
         Object temp = caseDao.load(clazz, name, session);
+        
+        if (obj instanceof ModelToRun)
+            temp = caseDao.loadModelTorun(name, session);
 
         if (temp != null && temp instanceof Abbreviation) {
             String random = Math.random() + "";
@@ -340,7 +343,7 @@ public class CaseAssistanceService {
             session.flush();
             temp = caseDao.load(clazz, uniqueName, session);
         }
-
+        
         if (temp == null) {
             session.clear();
             session.flush();
@@ -1267,7 +1270,7 @@ public class CaseAssistanceService {
     public synchronized ModelToRun addModelToRun(ModelToRun model) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ModelToRun temp = (ModelToRun) caseDao.load(ModelToRun.class, model.getName(), session);
+            ModelToRun temp = caseDao.loadModelTorun(model.getName(), session);
 
             if (temp != null)
                 return temp;

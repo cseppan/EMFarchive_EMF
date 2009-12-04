@@ -366,6 +366,16 @@ public class CaseDAO {
         Criterion criterion = Restrictions.eq("name", name);
         return hibernateFacade.load(clazz, criterion, session);
     }
+    
+    public ModelToRun loadModelTorun(String name, Session session) {
+        String query = " FROM " + ModelToRun.class.getSimpleName() + " as obj WHERE lower(obj.name)='" + name.toLowerCase()+ "'";
+        List<?> mods = session.createQuery(query).list();
+        
+        if (mods == null || mods.size() == 0)
+            return null;
+        
+        return (ModelToRun) mods.get(0);
+    }
 
     public Object load(Class<?> clazz, Criterion[] criterions, Session session) {
         return hibernateFacade.load(clazz, criterions, session);

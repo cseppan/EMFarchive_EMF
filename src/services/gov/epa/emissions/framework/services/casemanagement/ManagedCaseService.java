@@ -966,7 +966,7 @@ public class ManagedCaseService {
     public synchronized ModelToRun addModelToRun(ModelToRun model) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            ModelToRun temp = (ModelToRun) dao.load(ModelToRun.class, model.getName(), session);
+            ModelToRun temp = dao.loadModelTorun(model.getName(), session);
 
             if (temp != null)
                 return temp;
