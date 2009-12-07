@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 public class ProjectsDAO {
@@ -18,18 +17,24 @@ public class ProjectsDAO {
         hibernateFacade = new HibernateFacade();
     }
 
-    public List getAll(Session session) {
-        return session.createCriteria(Project.class).addOrder(Order.asc("name")).list();
-    }
-    
     public Project getProject(String name, Session session) {
-        Criterion criterion = Restrictions.eq("name", name);
-        return (Project)hibernateFacade.load(Project.class, criterion, session);
+        String query = " FROM " + Project.class.getSimpleName() + " as obj WHERE lower(obj.name)='" + name.toLowerCase()+ "'";
+        List<?> projs = session.createQuery(query).list();
+        
+        if (projs == null || projs.size() == 0)
+            return null;
+        
+        return (Project) projs.get(0);
     }
     
     public Project addProject(Project project, Session session) {
         hibernateFacade.add(project, session);
-        return getProject(project.getName(), session);
+        return loadProject(project.getName(), session);
+    }
+    
+    private Project loadProject(String name, Session session) {
+        Criterion criterion = Restrictions.eq("name", name);
+        return (Project)hibernateFacade.load(Project.class, criterion, session);
     }
 
 }

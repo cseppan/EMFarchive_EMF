@@ -412,11 +412,11 @@ public class ManagedImportService {
         dataset.setTemporalResolution(headerReader.getTemporalResolution());
 
         return setDatasetProperties(folder, dataset, headerReader.getRegion(), headerReader.getProject(), headerReader
-                .getSector(), headerReader.getCountry());
+                .getSector(), headerReader.getCountry(), user);
     }
 
     private synchronized EmfDataset setDatasetProperties(String folder, EmfDataset dataset, String region,
-            String project, String sector, String country) {
+            String project, String sector, String country, User user) {
         SectorsDAO sectorsDao = new SectorsDAO();
         ProjectsDAO projectsDao = new ProjectsDAO();
         RegionsDAO regionsDao = new RegionsDAO();
@@ -429,8 +429,14 @@ public class ManagedImportService {
 
         try {
             Project projectObj = projectsDao.getProject(project, session);
-            dataset.setProject((projectObj == null && project != null) ? projectsDao.addProject(new Project(project),
-                    session) : projectObj);
+            
+            if (projectObj == null && user.isAdmin())
+                projectObj = projectsDao.addProject(new Project(project), session);
+            
+            if (projectObj == null)
+                log.warn("Project '" + project + "' cannot be added by user: " + user.getUsername());
+            
+            dataset.setProject(projectObj);
 
             Region regionObj = regionsDao.getRegion(region, session);
             dataset.setRegion((regionObj == null && region != null) ? regionsDao.addRegion(new Region(region), session)
