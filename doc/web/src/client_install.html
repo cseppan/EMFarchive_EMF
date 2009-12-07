@@ -1,0 +1,54 @@
+<!doctype HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title>The Emissions Modeling Framework (EMF) Installation</title>
+		<link rel="stylesheet" type="text/css" href="emf.css" />	
+	</head>
+
+	<body>
+		<h1>Client Installation</h1>
+		<p>Generally the EMF client is run from a Windows PC. Optionally, it can be installed and run on Linux, although there are some slight layout and behavioral differences.</p>
+
+		<ul id="links">
+			<li><a href="#windows">Windows Client Installation using Installer</a></li>
+			<li><a href="#linux">Manual Linux Installation</a></li>
+		</ul>
+
+		<h2 id="windows">Windows Client Installation using Installer</h2>
+		<div class="section">
+			<ol>
+				<li>The EMF client runs best under Java 6. Before running the installer or the client, please download and install the latest <a href="http://java.sun.com/javase/downloads/index.jsp" target="_blank">Java Runtime Environment 6</a> (e.g., JRE 6u14)</li>
+				<li>Download the <a href="http://www.ie.unc.edu/cempd/projects/emf/beta_testing/install/emfinst.exe">EMF Installer Executable (emfinst.exe)</a></li>
+				<li>Double click on emfinst.exe to run the installer.
+					<ul type=disc>
+						<li>First, the installer will expand the zipped compressed file onto your hard-disk. The default location is <em>C:\emf-install</em>. This is a very small installation of the installer software only, and does not require much disk space.</li>
+						<li>Once the expansion is complete, the installer program will start.</li>
+					</ul>
+				</li>
+				<li>In the EMF Client Installer window, fill in the fields. You may click "Browse" to help you choose any local directories.
+					<p>NOTE: the input and output file directories should be directories on the remote EMF server, not on your local client's machine. The installer will warn you if they don't exist on your client machine. You can ignore that warning and keep installing.</p>
+					<p>Examples of filled-in fields are the following:
+						<ul type=disc>
+							<li>EMF Download URL: http://www.ie.unc.edu/cempd/projects/emf/beta_testing/install</li>
+							<li>Java Home Directory: C:\Program Files\Java\jre1.6.0_07</li>
+							<li>Input File Directory: /orchid/share</li>
+							<li>Output File Directory: /orchid/share</li>
+							<li>Client Home Directory: C:\Program Files\EMFClient</li>
+							<li>Server Address: http://emf.ie.unc.edu:8080/emf/services</li>
+						</ul>
+					</p>
+				</li>
+				<li>Click "Install".</li>
+				<li>If you already have the client installed, you will be prompted about whether you wish to "Update" or "Reinstall". "Update" will download only changed files, and "Reinstall" will download all files. In most cases, you can "Update", but if things do not seem to be working properly you can try to "Reinstall".</li>
+				<li>The installer will provide feedback on the files it is downloading. The latest list of installation files is available from <a href="http//www.ie.unc.edu/cempd/projects/emf/beta_testing/install/files.txt">files.txt</a></li>
+				<li>When the installation is finished, click "Done".</li>
+			</ol>
+			<p>Note: A file containing the preferences (i.e. stored settings) for the installer called EMFUserInstallPrefs.ini is stored in your user home directory (usually <em>C:\Documents and Settings\&lt;your_user_name&gt;</em>), and a file containing the EMF preferences called <em>EMFPrefs.txt</em> is in the same directory.</p>
+		</div>
+
+		<h2 id="linux">Manual Linux Installation</h2>
+		<div class="section">
+			<em>&lt;Discuss the untarring and placement of the client files. For example, placing the client jars and scripts in /usr/local/EMFClient, while the startup scripts go in /usr/local/bin.&gt;
+		</div>
+	</body>
+</html>
