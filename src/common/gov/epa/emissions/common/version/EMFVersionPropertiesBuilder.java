@@ -1,8 +1,8 @@
 /*
- * $Id: EMFVersionPropertiesBuilder.java,v 1.6 2009/12/08 19:03:12 rross67 Exp $
- * $Author: rross67 $
- * $Date: 2009/12/08 19:03:12 $
  * $Log: EMFVersionPropertiesBuilder.java,v $
+ * Revision 1.7  2009/12/08 19:04:28  rross67
+ * Yet another test
+ *
  * Revision 1.6  2009/12/08 19:03:12  rross67
  * Another keyword test
  *
