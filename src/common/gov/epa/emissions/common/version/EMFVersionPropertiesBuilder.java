@@ -1,15 +1,8 @@
 /*
- * 
- * $Log: EMFVersionPropertiesBuilder.java,v $
- * Revision 1.8  2009/12/08 19:06:57  rross67
- * And yet another
- *
- * Revision 1.7  2009/12/08 19:04:28  rross67
- * Yet another test
- *
- * Revision 1.6  2009/12/08 19:03:12  rross67
- * Another keyword test
- *
+ * $Source: /home/catherine/Projects/emf_cvs/cvs_repo/EMF/src/common/gov/epa/emissions/common/version/EMFVersionPropertiesBuilder.java,v $
+ * $Revision: 1.9 $
+ * $Author: rross67 $
+ * $Date: 2009/12/08 19:09:58 $
  */
 package gov.epa.emissions.common.version;
 
