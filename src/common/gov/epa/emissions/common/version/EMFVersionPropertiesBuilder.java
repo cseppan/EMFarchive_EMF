@@ -1,3 +1,12 @@
+/*
+ * Id: $Id: EMFVersionPropertiesBuilder.java,v 1.5 2009/12/08 19:01:21 rross67 Exp $
+ * Author: $Author: rross67 $
+ * Date: $Date: 2009/12/08 19:01:21 $
+ * Log: $Log: EMFVersionPropertiesBuilder.java,v $
+ * Log: Revision 1.5  2009/12/08 19:01:21  rross67
+ * Log: CVS keyword substitution test
+ * Log:
+ */
 package gov.epa.emissions.common.version;
 
 import java.io.File;
