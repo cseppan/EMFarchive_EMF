@@ -922,4 +922,4 @@ CREATE INDEX control_measure_references_reference_id
 ALTER TABLE emf.control_strategies ALTER filter TYPE text;
 
 -- 11/12/09 - added unique constraint to the reference description
-ALTER TABLE "references" ADD CONSTRAINT uq_reference_description UNIQUE (description);
+ALTER TABLE emf."references" ADD CONSTRAINT uq_reference_description UNIQUE (description);
