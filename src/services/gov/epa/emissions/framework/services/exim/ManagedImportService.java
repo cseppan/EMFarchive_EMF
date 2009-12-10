@@ -170,6 +170,7 @@ public class ManagedImportService {
             addTasks(folderPath, path, filenames, datasetName, user, datasetType, services);
             addTasksToSubmitter(importClientSubmitter, importTasks);
         } catch (Exception e) {
+            e.printStackTrace();
             setErrorMsgs(folderPath, e);
             throw new EmfException(e.getMessage());
         }
@@ -428,13 +429,20 @@ public class ManagedImportService {
         String massStorageRoot = System.getProperty("MASS_STORAGE_ROOT");
 
         try {
-            Project projectObj = projectsDao.getProject(project, session);
             
-            if (projectObj == null && user.isAdmin())
-                projectObj = projectsDao.addProject(new Project(project), session);
+            Project projectObj = null;
+                
+            if (project != null && !project.trim().isEmpty()) {
+                projectObj = projectsDao.getProject(project, session);
             
-            if (projectObj == null)
-                log.warn("Project '" + project + "' cannot be added by user: " + user.getUsername());
+            
+                if (projectObj == null && user.isAdmin())
+                    projectObj = projectsDao.addProject(new Project(project), session);
+            
+            
+                if (projectObj == null)
+                    log.warn("Project '" + project + "' cannot be added by user: " + user.getUsername());
+            }
             
             dataset.setProject(projectObj);
 

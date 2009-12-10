@@ -18,6 +18,9 @@ public class ProjectsDAO {
     }
 
     public Project getProject(String name, Session session) {
+        if (name == null || name.trim().isEmpty())
+            return null;
+        
         String query = " FROM " + Project.class.getSimpleName() + " as obj WHERE lower(obj.name)='" + name.toLowerCase()+ "'";
         List<?> projs = session.createQuery(query).list();
         
