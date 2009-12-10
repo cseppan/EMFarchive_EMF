@@ -114,17 +114,6 @@ public class ControlMeasurePropertyTab extends JPanel implements ControlMeasureT
     private Action addAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                //if this is a new measure, make sure we save it before we proceed.
-                //the efficiency editor needs to have a measure in the db first!
-                if (measure.getId() == 0) {
-                    try {
-                        controlMeasurePresenter.doSave();
-                    } catch (EmfException e1) {
-                        messagePanel.setError("Cannot save control measure: " + e1.getMessage());
-                        return;
-                    }
-                }
-
                 doAdd();
             }
         };

@@ -80,9 +80,27 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
             e.printStackTrace();
         }
         
+        tabbedPane.addTab("Properties", this.createPropertyTab(measure, messagePanel));
+        tabbedPane.addTab("References", this.createReferencesTab(measure, messagePanel));
+
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         return tabbedPane;
+    }
+
+    private JPanel createPropertyTab(ControlMeasure measure, MessagePanel messagePanel) {
+        ControlMeasurePropertyTab controlMeasurePropertyTabView = new ControlMeasurePropertyTab(measure, session, this, messagePanel, parent,
+                presenter, desktopManager);
+        presenter.set(controlMeasurePropertyTabView);
+        return controlMeasurePropertyTabView;
+    }
+
+    private JPanel createReferencesTab(ControlMeasure measure, MessagePanel messagePanel) {
+
+        ControlMeasureReferencesTab controlMeasureReferencesTabView = new ControlMeasureReferencesTab(measure, this, messagePanel, parent,
+                presenter, desktopManager);
+        presenter.set(controlMeasureReferencesTabView);
+        return controlMeasureReferencesTabView;
     }
 
     private JPanel createEquationTab(ControlMeasure measure, MessagePanel messagePanel) throws EmfException{

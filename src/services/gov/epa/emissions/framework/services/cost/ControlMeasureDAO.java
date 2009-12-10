@@ -111,9 +111,8 @@ public class ControlMeasureDAO {
             throw new EmfException("Summary tab: An abbreviation can not contain a space");
         }
 
-        
-        
         checkForConstraints(measure, session);
+        updateReferenceIds(measure, session);
         hibernateFacade.add(measure, session);
         int cmId = controlMeasureIds(measure, sccs, session);
         hibernateFacade.add(sccs, session);
