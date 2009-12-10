@@ -39,6 +39,8 @@ public class CaseFileParser {
     private File inputs_file;
 
     private File jobs_file;
+    
+    private String sysNewLine = System.getProperty("line.separator");
 
     private String[] paramColNames = new String[0];
 
@@ -226,7 +228,7 @@ public class CaseFileParser {
         }
 
         if (line.startsWith("#EMF_CASE_DESCRIPTION")) {
-            caseObj.setDescription(line.substring(index));
+            caseObj.setDescription(recoverNewLines(line.substring(index)));
             return;
         }
 
@@ -294,6 +296,13 @@ public class CaseFileParser {
             rList.add(region);
             caseObj.setRegions(rList.toArray(new GeoRegion[0]));
         }
+    }
+
+    private String recoverNewLines(String text) {
+        if (text == null || text.trim().isEmpty())
+            return "";
+        
+        return text.replaceAll(ManagedCaseService.locNewLine, sysNewLine);
     }
 
     private void populateCase(String[] values) throws ParseException {
@@ -388,8 +397,8 @@ public class CaseFileParser {
         newParam.setRequired(fields[10].equalsIgnoreCase("TRUE"));
         newParam.setLocal(fields[11].equalsIgnoreCase("TRUE"));
         newParam.setLastModifiedDate(CustomDateFormat.parse_MM_DD_YYYY_HH_mm(fields[12]));
-        newParam.setNotes(fields[13]);
-        newParam.setPurpose(fields[14]);
+        newParam.setNotes(recoverNewLines(fields[13]));
+        newParam.setPurpose(recoverNewLines(fields[14]));
 
         this.params.add(newParam);
     }
@@ -455,8 +464,8 @@ public class CaseFileParser {
         job.setIdInQueue(data[14]);
         job.setUser(new User(data[15]));
         job.setHost(new Host(data[16]));
-        job.setRunNotes(data[17]);
-        job.setPurpose(data[18]);
+        job.setRunNotes(recoverNewLines(data[17]));
+        job.setPurpose(recoverNewLines(data[18]));
 
         this.jobs.add(job);
     }

@@ -77,6 +77,8 @@ public class ManagedCaseService {
     private static Log log = LogFactory.getLog(ManagedCaseService.class);
 
     private static int svcCount = 0;
+    
+    public static String locNewLine = "   /   ";
 
     private String svcLabel = null;
 
@@ -5483,7 +5485,7 @@ public class ManagedCaseService {
                 + "\""
                 + ls
                 + "\"#EMF_CASE_DESCRIPTION="
-                + clean(currentCase.getDescription() == null ? "" : currentCase.getDescription())
+                + clean(currentCase.getDescription() == null ? "" : processNewLines(currentCase.getDescription()))
                 + "\""
                 + ls
                 + "\"#EMF_CASE_CATEGORY="
@@ -5568,8 +5570,8 @@ public class ManagedCaseService {
             String local = param.isLocal() + "";
             String lstMod = param.getLastModifiedDate() == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(param
                     .getLastModifiedDate());
-            String notes = param.getNotes() == null ? "" : param.getNotes();
-            String purpose = param.getPurpose() == null ? "" : param.getPurpose();
+            String notes = param.getNotes() == null ? "" : processNewLines(param.getNotes());
+            String purpose = param.getPurpose() == null ? "" : processNewLines(param.getPurpose());
 
             sb.append("Parameters,\"" + clean(name) + "\"," + order + ",\"" + clean(envVar) + "\",\"" + clean(region)
                     + "\",\"" + clean(sector) + "\",\"" + clean(job) + "\",\"" + clean(prog) + "\",\"" + clean(value)
@@ -5578,6 +5580,26 @@ public class ManagedCaseService {
         }
 
         return sb.toString();
+    }
+
+    private String processNewLines(String text) {
+        int i = 0;
+        
+        while (i < text.length()) {
+            if (text.charAt(i) == '\n') {
+                text = text.substring(0, i) + locNewLine + text.substring(i+1);
+                i += locNewLine.length() - 1;
+            } else if (text.charAt(i) == '\r' && text.charAt(i+1) == '\n') {
+                text = text.substring(0, i) + locNewLine + text.substring(i+2);
+                i += locNewLine.length();
+            } else if (text.charAt(i) == '\r') {
+                text = text.substring(0, i) + locNewLine + text.substring(i+1);
+                i += locNewLine.length() - 1;
+            } else
+                i++;
+        }
+
+        return text;
     }
 
     private String getRegions(GeoRegion[] regions, String ls) {
@@ -5693,8 +5715,8 @@ public class ManagedCaseService {
             String qId = job.getIdInQueue() == null ? "" : job.getIdInQueue();
             String user = job.getUser() == null ? "" : job.getUser().getName();
             String host = job.getHost() == null ? "" : job.getHost() + "";
-            String notes = job.getRunNotes() == null ? "" : job.getRunNotes();
-            String purpose = job.getPurpose() == null ? "" : job.getPurpose();
+            String notes = job.getRunNotes() == null ? "" : processNewLines(job.getRunNotes());
+            String purpose = job.getPurpose() == null ? "" : processNewLines(job.getPurpose());
             String dependsOn = getDependsOnJobsString(job.getDependentJobs(), session);
 
             sb.append("Jobs,\"" + clean(name) + "\"," + order + ",\"" + clean(region) + "\",\"" + clean(sector) + "\","
