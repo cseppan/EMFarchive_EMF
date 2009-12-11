@@ -32,6 +32,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 
 public class MeasureReferenceAddWindow extends DisposableInteralFrame implements MeasureReferenceView {
 
@@ -236,7 +237,7 @@ public class MeasureReferenceAddWindow extends DisposableInteralFrame implements
         gbc.weighty = 0;
         gbc.insets = rbInsets;
 
-        this.existingReferenceRB = new JRadioButton("Use existing reference(s)");
+        this.existingReferenceRB = new JRadioButton("Use existing reference");
         this.existingReferenceRB.setSelected(true);
         bg.add(this.existingReferenceRB);
         panel.add(this.existingReferenceRB, gbc);
@@ -312,6 +313,7 @@ public class MeasureReferenceAddWindow extends DisposableInteralFrame implements
         gbc.insets = inputInsets;
 
         this.referenceList = new ListWidget(null);
+        this.referenceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.referenceList.setVisibleRowCount(4);
 
         JScrollPane scrollPane = new JScrollPane(this.referenceList, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
