@@ -312,6 +312,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     
     private EditableComboBox projects() throws EmfException {
         projectsCombo = new EditableComboBox(getProjects());
+
+        if (!(this.session != null && this.session.user() != null && this.session.user().isAdmin())) {
+            projectsCombo.setEditable(false);
+        }
+
         projectsCombo.setSelectedItem(controlStrategy.getProject());
         projectsCombo.setPreferredSize(comboSize);
         changeablesList.addChangeable(projectsCombo);
