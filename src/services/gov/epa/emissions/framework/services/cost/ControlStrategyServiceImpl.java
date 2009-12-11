@@ -481,19 +481,20 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
                 throw new EmfException("A control strategy named '" + name + "' already exists.");
 
             // do a deep copy
-            ControlStrategy coppied = (ControlStrategy) DeepCopy.copy(cs);
+            ControlStrategy copied = (ControlStrategy) DeepCopy.copy(cs);
             // change to applicable values
-            coppied.setName(name);
-            coppied.setCreator(creator);
-            coppied.setLastModifiedDate(new Date());
-            coppied.setRunStatus("Not started");
-            if (coppied.isLocked()) {
-                coppied.setLockDate(null);
-                coppied.setLockOwner(null);
+            copied.setName(name);
+            copied.setCreator(creator);
+            copied.setLastModifiedDate(new Date());
+            copied.setRunStatus("Not started");
+            copied.setCopiedFrom(cs.getName());
+            if (copied.isLocked()) {
+                copied.setLockDate(null);
+                copied.setLockOwner(null);
             }
 
-            dao.add(coppied, session);
-            int csId = coppied.getId();
+            dao.add(copied, session);
+            int csId = copied.getId();
             // FIXME: something is not right with the hibernate mapping, constraint should be added automatically.
             if (constraint != null) {
                 constraint.setControlStrategyId(csId);

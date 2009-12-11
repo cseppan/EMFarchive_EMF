@@ -289,7 +289,8 @@ CREATE TABLE emf.control_strategies
   export_directory character varying,
   delete_results boolean DEFAULT true,
   merge_inventories boolean DEFAULT false,
-  include_unspecified_costs boolean DEFAULT true
+  include_unspecified_costs boolean DEFAULT true,
+  copied_from varchar(255)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_strategies OWNER TO emf;

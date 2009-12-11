@@ -27,6 +27,7 @@
 
     <property name="countyDatasetVersion" column="county_dataset_version" type="integer"/>
 	<property name="exportDirectory" column="export_directory" type="java.lang.String" not-null="false"/>
+	<property name="copiedFrom" column="copied_from" type="java.lang.String" not-null="false"/>
 	<property name="deleteResults" column="delete_results" type="boolean" not-null="false"/>
 	<property name="mergeInventories" column="merge_inventories" type="boolean" not-null="false"/>
 	<property name="includeUnspecifiedCosts" column="include_unspecified_costs" type="boolean" not-null="false"/>

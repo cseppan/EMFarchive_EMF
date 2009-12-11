@@ -81,6 +81,8 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private Boolean includeUnspecifiedCosts;
     
+    private String copiedFrom;
+    
     public ControlStrategy() {
         this.lock = new Mutex();
 //        this.controlStrategyInputDatasets = new ArrayList();
@@ -426,5 +428,13 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public ControlProgram[] getControlPrograms() {
         return controlPrograms;
+    }
+
+    public String getCopiedFrom() {
+        return copiedFrom;
+    }
+
+    public void setCopiedFrom(String copiedFrom) {
+        this.copiedFrom = copiedFrom;
     }
 }

@@ -149,7 +149,15 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator middleRightLayoutGenerator = new SpringLayoutGenerator();
         middleRightLayoutGenerator.addLabelWidgetPair("Last Modified Date: ", lastModifiedDate(), middleRightPanel);
-        middleRightLayoutGenerator.addLabelWidgetPair("Copied From:", new JLabel("   "), middleRightPanel);
+        
+        String copiedFrom = this.controlStrategy.getCopiedFrom();
+        if (copiedFrom == null) {
+            copiedFrom = "";
+        }
+
+        middleRightLayoutGenerator.addLabelWidgetPair("Copied From:", this.createLeftAlignedLabel(copiedFrom),
+                middleRightPanel);
+
         middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 30, 10);// xPad, yPad
