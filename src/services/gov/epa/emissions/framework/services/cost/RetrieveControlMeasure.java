@@ -35,21 +35,21 @@ public class RetrieveControlMeasure {
         return controlMeasures;
     }
 
-//    public ControlMeasure[] getControlMeasures(int majorPollutantId) throws SQLException {
-//        ControlMeasure[] controlMeasures = {};
-//        try {
-//            String sql = query(majorPollutantId);
-////            log.error("exec query");
-//            ResultSet set = dbServer.getEmfDatasource().query().executeQuery(sql);
-////            log.error("populate measures from query");
-//            controlMeasures = values(set);
-////            log.error("done populate measures from query");
-//        } catch (SQLException e) {
-//            throw e;
-//        }
-//
-//        return controlMeasures;
-//    }
+    public List<ControlMeasure> getLightControlMeasures(String whereFilter) throws SQLException {
+
+        List<ControlMeasure> controlMeasures = null;
+        try {
+            String sql = this.lightQuery(whereFilter);
+            ResultSet set = this.dbServer.getEmfDatasource().query().executeQuery(sql);
+            controlMeasures = this.lightValues(set);
+        } catch (SQLException e) {
+
+            controlMeasures = new ArrayList<ControlMeasure>();
+            throw e;
+        }
+
+        return controlMeasures;
+    }
 
     public ControlMeasure[] getControlMeasures(int majorPollutantId, String whereFilter) throws SQLException {
         ControlMeasure[] controlMeasures = {};
@@ -58,6 +58,22 @@ public class RetrieveControlMeasure {
             ResultSet set = dbServer.getEmfDatasource().query().executeQuery(sql);
             controlMeasures = values(set);
         } catch (SQLException e) {
+            throw e;
+        }
+
+        return controlMeasures;
+    }
+
+    public List<ControlMeasure> getLightControlMeasures(int majorPollutantId, String whereFilter) throws SQLException {
+
+        List<ControlMeasure> controlMeasures = null;
+        try {
+            String sql = this.lightQuery(majorPollutantId, whereFilter);
+            ResultSet set = this.dbServer.getEmfDatasource().query().executeQuery(sql);
+            controlMeasures = this.lightValues(set);
+        } catch (SQLException e) {
+
+            controlMeasures = new ArrayList<ControlMeasure>();
             throw e;
         }
 
@@ -123,6 +139,56 @@ public class RetrieveControlMeasure {
             rs.close();
         }
         return (ControlMeasure[]) cms.toArray(new ControlMeasure[0]);
+    }
+
+    private List<ControlMeasure> lightValues(ResultSet rs) throws SQLException {
+
+        List<ControlMeasure> cms = new ArrayList<ControlMeasure>();
+        int cmId = Integer.MIN_VALUE;
+        String sector = "";
+        ControlMeasure cm = null;
+        try {
+            boolean next = rs.next();
+            boolean hasRecords = next;
+            while (next) {
+
+                if (cmId != rs.getInt(1)) {
+                
+                    if (cmId != Integer.MIN_VALUE && cmId != rs.getInt(1)) {
+                        //add measure
+                        cms.add(cm);
+                    }
+
+                    cmId = rs.getInt(1);
+                    
+                    //reset
+                    sector = "";
+                    cm = new ControlMeasure();
+                    cm.setId(cmId);
+                    cm.setName(rs.getString(2));
+                    cm.setAbbreviation(rs.getString(3));
+                    cm.setDescription(rs.getString(4));
+                    cm.setMajorPollutant(new Pollutant(rs.getInt(5), rs.getString(6)));
+                }
+
+                String sectorString = rs.getString(7);
+                if (sectorString != null && !sector.trim().equalsIgnoreCase(sectorString.trim())) {
+                  cm.addSector(new Sector("", sectorString));
+                }
+
+                sector = sectorString != null ? sectorString : "";
+                next = rs.next();
+            }
+
+            if (hasRecords) {
+                cms.add(cm);
+            }
+
+        } finally {
+            rs.close();
+        }
+
+        return cms;
     }
 
     private String query(String whereFilter) {
@@ -249,6 +315,49 @@ public class RetrieveControlMeasure {
         (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + 
          " order by cm.name, cm.id, s.name, p.name";
 //        log.error(query);
+
+        return query;
+    }
+
+    private String lightQuery(String whereFilter) {
+
+        //Keep the sort order, this dictates how the list is built for the measure mgr!!!
+        String query = "select cm.id, cm.name, " +
+			"cm.abbreviation, cm.description, cm.major_pollutant, mp.name, " +
+            "s.name " +
+            "from emf.control_measures cm " +
+            "left outer join emf.control_measure_sectors cms " +
+            "on cms.control_measure_id = cm.id " +
+            "left outer join emf.sectors s " +
+            "on s.id = cms.sector_id " +
+            "left outer join emf.pollutants mp " +
+            "on mp.id = cm.major_pollutant " +
+            (whereFilter.length() > 0 ? " where " + whereFilter : "") + 
+            " order by cm.name, cm.id, s.name";
+
+        return query;
+    }
+
+    private String lightQuery(int majorPollutantId, String whereFilter) {
+
+        //Keep the sort order, this dictates how the list is built for the measure mgr!!!
+        String query = "select cm.id, cm.name, " +
+        	"cm.abbreviation, cm.description, cm.major_pollutant, mp.name, " +
+        	"s.name " +
+        	"from emf.control_measures cm " +
+        	"left outer join emf.control_measure_sectors cms " +
+        	"on cms.control_measure_id = cm.id " +
+        	"left outer join emf.sectors s " +
+        	"on s.id = cms.sector_id " +
+        	"left outer join emf.pollutants mp " +
+        	"on mp.id = cm.major_pollutant " +
+	        "where (cm.major_pollutant = " + majorPollutantId + " " +
+    	    " or cm.id in (select distinct control_measures_id from emf.aggregrated_efficiencyrecords mpers " +
+        	"where mpers.pollutant_id = " + majorPollutantId + " )) " +
+
+            //don't include filter if no sccs
+        	(whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + 
+        	" order by cm.name, cm.id, s.name, mp.name";
 
         return query;
     }

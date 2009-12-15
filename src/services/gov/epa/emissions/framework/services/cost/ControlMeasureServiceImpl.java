@@ -430,9 +430,10 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public synchronized ControlMeasure[] getControlMeasures(String whereFilter) throws EmfException {
-        Session session = sessionFactory.getSession();
+
+        DbServer dbServer = dbServerFactory.getDbServer();        
         try {
-            return (ControlMeasure[])dao.getControlMeasures(session, whereFilter).toArray(new ControlMeasure[0]);
+            return dao.getLightControlMeasures(whereFilter, dbServer).toArray(new ControlMeasure[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measure efficiency records.", e);
             throw new EmfException("Could not retrieve control measures efficiency records.");
@@ -440,7 +441,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             LOG.error("Could not retrieve control measure efficiency records.", e);
             throw new EmfException(e.getMessage());
         } finally {
-            session.close();
+            close(dbServer);
         }
     }
 
@@ -460,9 +461,10 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     }
 
     public synchronized ControlMeasure[] getControlMeasures(int majorPollutantId, String whereFilter) throws EmfException {
-        Session session = sessionFactory.getSession();
+
+        DbServer dbServer = dbServerFactory.getDbServer();        
         try {
-            return (ControlMeasure[])dao.getControlMeasures(majorPollutantId, session, whereFilter).toArray((new ControlMeasure[0]));
+            return dao.getLightControlMeasures(majorPollutantId, whereFilter, dbServer).toArray((new ControlMeasure[0]));
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measures.", e);
             throw new EmfException("Could not retrieve control measures.");
@@ -470,7 +472,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             LOG.error("Could not retrieve control measures.", e);
             throw new EmfException(e.getMessage());
         } finally {
-            session.close();
+            close(dbServer);
         }
     }
 

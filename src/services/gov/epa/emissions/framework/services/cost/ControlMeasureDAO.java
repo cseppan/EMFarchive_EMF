@@ -553,12 +553,6 @@ public class ControlMeasureDAO {
         }
     }
 
-    public List getControlMeasures(Session session, String whereFilter) {
-        return session.createQuery("select new ControlMeasure(cM.id, cM.name, " +
-                "cM.abbreviation, cM.majorPollutant.name) " +
-                "from ControlMeasure cM " + (whereFilter.length() > 0 ? " where " + whereFilter: "") + " order by cM.name").list();
-    }
-
     public ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, DbServer dbServer, String whereFilter) throws EmfException {
         try {
             RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(dbServer);
@@ -568,11 +562,24 @@ public class ControlMeasureDAO {
         }
     }
 
-    public List getControlMeasures(int majorPollutantId, Session session, String whereFilter) {
-        return session.createQuery("select new ControlMeasure(cM.id, cM.name, " +
-                "cM.abbreviation, cM.majorPollutant.name) " +
-                "from ControlMeasure cM where (cM.majorPollutant.id = " + majorPollutantId + " or cM.id in (select distinct controlMeasureId from EfficiencyRecord where pollutant.id = " + majorPollutantId + "))" + (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + " order by cM.name").list();
-                //"from ControlMeasure cM where cM.majorPollutant.id=" + majorPollutantId + (whereFilter.length() > 0 ? " and (" + whereFilter + ")": "") + " order by cM.name").list();
+    public List<ControlMeasure> getLightControlMeasures(String whereFilter, DbServer dbServer) throws EmfException {
+
+        try {
+            RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(dbServer);
+            return retrieveControlMeasure.getLightControlMeasures(whereFilter);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+
+    public List<ControlMeasure> getLightControlMeasures(int majorPollutantId, String whereFilter, DbServer dbServer) throws EmfException {
+
+        try {
+            RetrieveControlMeasure retrieveControlMeasure = new RetrieveControlMeasure(dbServer);
+            return retrieveControlMeasure.getLightControlMeasures(majorPollutantId, whereFilter);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
     }
 
     private void updateAggregateEfficiencyRecords(int controlMeasureId, DbServer dbServer) throws EmfException {

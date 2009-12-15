@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.ui.Row;
@@ -17,7 +18,7 @@ public class LightControlMeasureTableData extends ControlMeasureTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Abbreviation", "Pollutant" };
+        return new String[] { "Name", "Abbreviation", "Pollutant", "Sector" };
     }
 
     public Class getColumnClass(int col) {
@@ -38,7 +39,8 @@ public class LightControlMeasureTableData extends ControlMeasureTableData {
         targetYear = year;
         for (int i = 0; i < measures.length; i++) {
             ControlMeasure measure = measures[i];
-            Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(measure) };
+
+            Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(measure), this.getSectorsString(measure) };
             Row row = new ViewableRow(measure, values);
             rows.add(row);
         }
@@ -51,6 +53,23 @@ public class LightControlMeasureTableData extends ControlMeasureTableData {
         if (measure.getMajorPollutant() == null)
             return "";
         return measure.getMajorPollutant().getName();
+    }
+
+    private String getSectorsString(ControlMeasure measure) {
+        
+        StringBuilder sb = new StringBuilder();
+        Sector[] sectors = measure.getSectors();
+        if (sectors != null) {
+            for (Sector sector : sectors) {
+                sb.append(sector.getName()).append("|");
+            }
+        }
+
+        if (sb.length() > 0) {
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        
+        return sb.toString();
     }
 
     public boolean isEditable(int col) {

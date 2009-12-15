@@ -99,14 +99,6 @@ public class ControlMeasure implements Lockable, Serializable {
         this.name = name;
     }
 
-    public ControlMeasure(int id, String name, String abbreviation, String majorPollutant) {
-        this();
-        this.id = id;
-        this.name = name;
-        this.abbreviation = abbreviation;
-        if (majorPollutant != null) this.majorPollutant = new Pollutant(majorPollutant);
-    }
-
     public float getAnnualizedCost() {
         return annualizedCost;
     }
