@@ -18,6 +18,7 @@ import javax.swing.JMenuItem;
 public class FileMenu extends JMenu {
 
     private DesktopManager desktopManager;
+    private ImportPresenter importPresenter;
 
     // FIXME: where's the associated Presenter ?
     public FileMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, DesktopManager desktopManager) {
@@ -88,9 +89,14 @@ public class FileMenu extends JMenu {
     }
 
     protected void displayImport(EmfSession session, EmfConsole parent) throws EmfException, Exception {
+
         ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktopManager, parent, null);
-        ImportPresenter presenter = new ImportPresenter(session, session.user(), session.eximService());
-        presenter.display(importView);
+        if (this.importPresenter == null) {
+            this.importPresenter = new ImportPresenter(session, session.user(), session
+                    .eximService());
+        } 
+        
+        importPresenter.display(importView);
     }
 
 }

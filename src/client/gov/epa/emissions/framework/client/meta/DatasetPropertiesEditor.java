@@ -66,6 +66,8 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private int previousTab = 0; // NOTE: assuming the default tab shown is Summary tab.
 
+    private ExportPresenter exportPresenter;
+
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
         this.session = session;
@@ -357,7 +359,10 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager, parentConsole, session);
         getDesktopPane().add(exportView);
 
-        ExportPresenter exportPresenter = new ExportPresenterImpl(session);
+        if (this.exportPresenter == null) {
+            this.exportPresenter = new ExportPresenterImpl(this.session);
+        }
+
         presenter.doExport(exportView, exportPresenter);
     }
 
