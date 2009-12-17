@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
+import java.awt.Dimension;
 import javax.swing.JPanel;
 
 public class DefaultVersionPanel extends JPanel {
@@ -42,6 +43,7 @@ public class DefaultVersionPanel extends JPanel {
         }    
         
         versionCombo = new ComboBox(finalVersions);
+        versionCombo.setPreferredSize(new Dimension(175,20));
         versionCombo.setSelectedIndex(getIndexOfDefaultVersion(defaultVersionNum, finalVersions));
         
         versionCombo.setName("defaultVersions");
