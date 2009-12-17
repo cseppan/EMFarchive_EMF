@@ -97,7 +97,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         desc = new TextField("descfilter", 30);
         value = new TextField("keyvalue", 30);
         value.setToolTipText("Please select a Keyword for this field to be valid.");
-        
+                
         if (preText != null)
             name.setText(preText);
 
