@@ -317,6 +317,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
                 sensitivityCase();
             }
         });
+        sensitivityButton.setMnemonic('S');
         crudPanel.add(sensitivityButton);
         
         return crudPanel;
