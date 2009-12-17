@@ -14,6 +14,12 @@ public class InputDatasetSelectionPresenter {
     private InputDatasetSelectionView view;
     
     private DatasetType[] datasetTypesToInclude;
+    
+    private static DatasetType lastDatasetType = null;
+    
+    private static String lastNameContains = null;
+    
+    private static EmfDataset[] lastDatasets = null;
 
     public InputDatasetSelectionPresenter(InputDatasetSelectionView view, EmfSession session,
             DatasetType[] datasetTypesToInclude) {
@@ -40,7 +46,20 @@ public class InputDatasetSelectionPresenter {
     }
     
     public void refreshDatasets(DatasetType datasetType, String nameContaining) throws EmfException {
-        view.refreshDatasets(session.dataService().getDatasets(datasetType.getId(), nameContaining));
+        if ((lastDatasets!=null) && (lastDatasetType!=null) && datasetType.getName().equals(lastDatasetType.getName()) && (nameContaining.equals(lastNameContains)))
+        {
+            // nothing has changed since last time, so just refresh with the previously retrieved list
+            System.out.println("Using previously retrieved datasets: name="+nameContaining+", dstype="+datasetType.getName());
+            view.refreshDatasets(lastDatasets);
+        }    
+        else 
+        {
+            System.out.println("Getting new datasets");
+            lastDatasets = session.dataService().getDatasets(datasetType.getId(), nameContaining);
+            view.refreshDatasets(lastDatasets);      
+        }
+        lastDatasetType = datasetType;
+        lastNameContains = nameContaining;
     }
     
     public EmfDataset[] getDatasets() throws EmfException {
