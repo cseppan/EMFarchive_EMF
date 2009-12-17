@@ -225,7 +225,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     private void advancedSearch() {
-        DatasetSearchWindow view = new DatasetSearchWindow("Search Datasets Table", parentConsole, desktopManager);
+        DatasetSearchWindow view = new DatasetSearchWindow("Advanced Dataset Search", parentConsole, desktopManager);
         
         if (textFilter != null && textFilter.getText() != null && !textFilter.getText().trim().isEmpty())
             view.setNameText(textFilter.getText().trim());
