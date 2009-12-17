@@ -230,7 +230,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             public void actionPerformed(ActionEvent e) {
                 try {
                     clearMsgPanel();
-                    doAddWindow();
+                    selectInputDataset();
                 } catch (Exception e1) {
                     messagePanel.setError(e1.getMessage());
                 }
@@ -238,7 +238,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         };
     }
 
-    private void doAddWindow() throws Exception {
+    private void selectInputDataset() throws Exception {
         DatasetType type = (DatasetType) dsType.getSelectedItem();
 
         if (type == null)
