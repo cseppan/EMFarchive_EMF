@@ -46,7 +46,11 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private EmfDataset[] datasets = new EmfDataset[] {};
     
     private boolean shouldCreate = false;  
-
+    
+    private static String lastNameContains = null;
+    
+    private static DatasetType lastDatasetType = null;
+    
     public InputDatasetSelectionDialog(EmfConsole parent) {
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
@@ -59,6 +63,19 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     }
     
     public void display(DatasetType[] datasetTypes, DatasetType defaultType, boolean selectSingle) {
+        if ((defaultType != null) && (lastDatasetType != null))
+               System.out.println("defaultType.getName()="+defaultType.getName()+","+
+                       defaultType.getName().equals(lastDatasetType.getName()));
+        else
+        {
+            System.out.println("one or both is null");
+        }
+        if ((defaultType != null) && (lastDatasetType != null) && 
+           !defaultType.getName().equals(lastDatasetType.getName()))
+        {
+            lastNameContains = null;
+            lastDatasetType = null;
+        }
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout(5, 5));
         JPanel panel = new JPanel(new BorderLayout(10, 10));
@@ -101,8 +118,10 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
         datasetTypeCombo = new ComboBox("Choose a dataset type", datasetTypes);
         if (defaultType != null )
             datasetTypeCombo.setSelectedItem(defaultType); //setSelectedIndex(getIndex(defaultType, datasetTypes));
+
         datasetTypeCombo.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                lastDatasetType = (DatasetType)datasetTypeCombo.getSelectedItem();
                 refresh();
             }
         });
@@ -115,10 +134,12 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     private JPanel buildNameContains(){
         JPanel panel = new JPanel(new SpringLayout()); 
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        name= new  TextField ("Dataset name contains", "", 25);
+        String defaultName = ((lastNameContains == null) ? "" : lastNameContains);
+        name= new TextField("Dataset name contains", defaultName, 25);
         name.setEditable(true);
         name.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                lastNameContains = name.getText();
                 refresh();
             }
         });
@@ -190,6 +211,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
                     shouldCreate = true; 
                     setVisible(false);
                     dispose();
+                    lastDatasetType = (DatasetType)datasetTypeCombo.getSelectedItem();
                 }
             }
         };
