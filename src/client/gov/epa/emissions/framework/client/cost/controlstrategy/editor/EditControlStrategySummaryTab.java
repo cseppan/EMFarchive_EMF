@@ -326,7 +326,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         }
 
         projectsCombo.setSelectedItem(controlStrategy.getProject());
-        projectsCombo.setPreferredSize(comboSize);
+        projectsCombo.setPreferredSize(name.getPreferredSize());
         changeablesList.addChangeable(projectsCombo);
 
         return projectsCombo;

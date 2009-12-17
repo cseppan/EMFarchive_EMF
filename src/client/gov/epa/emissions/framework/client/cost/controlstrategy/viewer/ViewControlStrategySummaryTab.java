@@ -340,7 +340,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
 
         this.projectsCombo = new ComboBox(getProjects());
         this.projectsCombo.setSelectedItem(controlStrategy.getProject());
-        this.projectsCombo.setPreferredSize(comboSize);
+        this.projectsCombo.setPreferredSize(name.getPreferredSize());
 
         return this.projectsCombo;
     }
