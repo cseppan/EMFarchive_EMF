@@ -182,6 +182,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
         // temporal resolution
         temporalResolutionsCombo = temporalResolutionCombo();
+        temporalResolutionsCombo.setPreferredSize(new Dimension(175, 20));
         layoutGenerator.addLabelWidgetPair("Temporal Resolution:", temporalResolutionsCombo, panel);
 
         sectorsCombo = new ComboBox("Choose a sector", service.getSectors());
@@ -199,7 +200,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         regionsCombo = new EditableComboBox(allRegions);
         regionsCombo.setSelectedItem(dataset.getRegion());
         regionsCombo.setName("regionsComboModel");
-        regionsCombo.setPreferredSize(new Dimension(125, 20));
+        regionsCombo.setPreferredSize(new Dimension(175, 20));
         changeablesList.addChangeable(regionsCombo);
         layoutGenerator.addLabelWidgetPair("Region:", regionsCombo, panel);
         Region region = dataset.getRegion();
@@ -227,9 +228,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     private ComboBox temporalResolutionCombo() {
         ComboBox combo = new ComboBox("Choose a resolution", TemporalResolution.NAMES.toArray());
         combo.setName("temporalResolutions");
-        combo.setPreferredSize(new Dimension(170, 20));
-
-        String resolution = dataset.getTemporalResolution();
+         String resolution = dataset.getTemporalResolution();
 
         if (resolution != null) 
             combo.setSelectedIndex(getIndexOfTempResolution(resolution) + 1);
