@@ -133,6 +133,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         overwrite = new JCheckBox("Overwrite files if they exist?", false);
         overwrite.setEnabled(true);
         overwrite.setName("overwrite");
+        overwrite.setEnabled(false);
         overwritePanel.add(overwrite, BorderLayout.LINE_START);
 
         panel.add(new JPanel());// filler
