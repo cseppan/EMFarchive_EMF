@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.ui;
 
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.util.ArrayList;
@@ -8,8 +10,10 @@ import java.util.List;
 public class EmfDatasetTableData extends AbstractTableData {
 
     private List rows;
+    private EmfSession session;
 
-    public EmfDatasetTableData(EmfDataset[] datasets) {
+    public EmfDatasetTableData(EmfDataset[] datasets, EmfSession session) {
+        this.session = session;
         this.rows = createRows(datasets);
     }
 
@@ -28,7 +32,7 @@ public class EmfDatasetTableData extends AbstractTableData {
         for (int i = 0; i < datasets.length; i++) {
             EmfDataset dataset = datasets[i];
             Object[] values = { dataset.getName(), format(dataset.getModifiedDateTime()), dataset.getDatasetTypeName(),
-                    dataset.getStatus(), dataset.getCreator(), dataset.getIntendedUse(), dataset.getProject(),
+                    dataset.getStatus(), getCreatorFullName(dataset), dataset.getIntendedUse(), dataset.getProject(),
                     dataset.getRegion(), format(dataset.getStartDateTime()), format(dataset.getStopDateTime()), dataset.getTemporalResolution() };
 
             Row row = new ViewableRow(dataset, values);
@@ -47,6 +51,18 @@ public class EmfDatasetTableData extends AbstractTableData {
             throw new IllegalArgumentException("Allowed values are between 0 and 8, but the value is " + col);
         }
         return String.class;
+    }
+    
+    String getCreatorFullName(EmfDataset dataset){
+        String fullName = "";
+        try {
+            fullName = session.getUserFullName(dataset.getCreator());
+            if (fullName ==null)
+                fullName = dataset.getCreator();
+        } catch (EmfException e) {
+            e.printStackTrace();
+        }
+        return fullName;
     }
 
 }

@@ -282,7 +282,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         layoutGenerator.addLabelWidgetPair("Project:", projectsCombo, panel);
 
         // creator
-        JLabel creator = createLeftAlignedLabel(dataset.getCreator());
+        JLabel creator = createLeftAlignedLabel(getCreatorFullName());
         layoutGenerator.addLabelWidgetPair("Creator:", creator, panel);
 
         // dataset type
@@ -295,6 +295,21 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
                 10, 10);// xPad, yPad
 
         return panel;
+    }
+    
+    String getCreatorFullName(){
+        String fullName = "";
+        try {
+            fullName = session.getUserFullName(dataset.getCreator());
+            if (fullName ==null)
+                fullName = dataset.getCreator();
+            else
+                fullName= fullName+ " ("+dataset.getCreator()+")";
+        } catch (EmfException e) {
+            messagePanel.setMessage(e.getMessage());
+            e.printStackTrace();
+        }
+        return fullName;
     }
 
     private JLabel createLeftAlignedLabel(String name) {
