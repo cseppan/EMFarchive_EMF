@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 public class EmfDatasetTableDataTest extends TestCase {
 
     public void testShouldAppropriateColumnClassDefinedForAllColumns() {
-        EmfDatasetTableData data = new EmfDatasetTableData(new EmfDataset[0], null);
+        EmfDatasetTableData data = new EmfDatasetTableData(new EmfDataset[0]);
 
         assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
@@ -36,7 +36,7 @@ public class EmfDatasetTableDataTest extends TestCase {
         dataset.setModifiedDateTime(modifiedDate);
 
         EmfDataset[] datasets = { dataset };
-        EmfDatasetTableData data = new EmfDatasetTableData(datasets, null);
+        EmfDatasetTableData data = new EmfDatasetTableData(datasets);
 
         List rows = data.rows();
         assertEquals(1, rows.size());
@@ -54,7 +54,7 @@ public class EmfDatasetTableDataTest extends TestCase {
         dataset.setModifiedDateTime(new Date());
         
         EmfDataset[] datasets = { dataset };
-        EmfDatasetTableData data = new EmfDatasetTableData(datasets, null);
+        EmfDatasetTableData data = new EmfDatasetTableData(datasets);
 
         List rows = data.rows();
         assertEquals(1, rows.size());

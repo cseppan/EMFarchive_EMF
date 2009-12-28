@@ -10,6 +10,7 @@
   </id>
   <property name="name"					column="name"					type="java.lang.String"		not-null="true"/>
   <property name="creator"				column="creator"				type="java.lang.String"		not-null="true"/>
+  <property name="creatorFullName"  	column="creator_full_name"		type="java.lang.String"		not-null="true"/>
   <property name="status"				column="status"					type="java.lang.String"		not-null="false"/>
 
   <many-to-one

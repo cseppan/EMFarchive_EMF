@@ -855,6 +855,7 @@ public class DataServiceImpl implements DataService {
             copied.setDescription("Copied from version " + version.getVersion() + " of dataset " + dataset.getName()
                     + " on " + time + System.getProperty("line.separator") + dataset.getDescription());
             copied.setCreator(user.getUsername());
+            copied.setCreatorFullName(user.getName());
             copied.setDefaultVersion(0);
             copied.setInternalSources(null);
 

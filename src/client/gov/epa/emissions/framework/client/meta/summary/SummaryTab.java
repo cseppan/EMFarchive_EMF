@@ -9,12 +9,10 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.util.CustomDateFormat;
-import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.awt.BorderLayout;
@@ -31,17 +29,12 @@ public class SummaryTab extends JPanel implements SummaryTabView, RefreshObserve
 
     private EmfDataset dataset;
     private Version version; 
-    private EmfSession session;
-    private MessagePanel messagePanel;
     private SummaryTabPresenter presenter; 
 
-    public SummaryTab(EmfDataset dataset, Version version, 
-            EmfSession session, MessagePanel messagePanel) {
+    public SummaryTab(EmfDataset dataset, Version version) {
         super.setName("summary");
         this.dataset = dataset;
         this.version = version; 
-        this.session = session; 
-        this.messagePanel = messagePanel;
 
         setLayout();
     }
@@ -158,7 +151,7 @@ public class SummaryTab extends JPanel implements SummaryTabView, RefreshObserve
         Project project = dataset.getProject();
         String projectName = (project != null) ? project.getName() : "";
         layoutGenerator.addLabelWidgetPair("Project:", new JLabel(projectName), panel);
-        layoutGenerator.addLabelWidgetPair("Creator:", new JLabel(getCreatorFullName()), panel);
+        layoutGenerator.addLabelWidgetPair("Creator:", new JLabel(getFullName()), panel);
         layoutGenerator.addLabelWidgetPair("Dataset Type:", new JLabel(dataset.getDatasetTypeName()), panel);
 
         // Lay out the panel.
@@ -178,23 +171,16 @@ public class SummaryTab extends JPanel implements SummaryTabView, RefreshObserve
     }
 
     public void observe(SummaryTabPresenter presenter) {
-        this.presenter = presenter; 
-        
+        this.presenter = presenter;   
     }
     
-    String getCreatorFullName(){
-        String fullName = "";
-        try {
-            fullName = session.getUserFullName(dataset.getCreator());
-            if (fullName ==null)
-                fullName = dataset.getCreator();
-            else
-                fullName= fullName+ " ("+dataset.getCreator()+")";
-        } catch (EmfException e) {
-            messagePanel.setMessage(e.getMessage());
-            e.printStackTrace();
-        }
+    String getFullName(){
+        String fullName = dataset.getCreatorFullName();
+        if (fullName ==null)
+            fullName = dataset.getCreator();
+        else
+            fullName= fullName+ " ("+dataset.getCreator()+")";
         return fullName;
-    }
+    }   
 
 }

@@ -129,7 +129,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     }
 
     private JPanel createSummaryTab() {
-        SummaryTab view = new SummaryTab(dataset, version, session, messagePanel);
+        SummaryTab view = new SummaryTab(dataset, version);
         presenter.set(view);
         return view;
     }

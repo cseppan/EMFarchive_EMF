@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.client;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
@@ -25,8 +24,6 @@ public interface EmfSession {
 
     User user();
 
-    String getUserFullName(String shortName) throws EmfException;
-    
     ExImService eximService();
 
     DataService dataService();

@@ -158,6 +158,7 @@ CREATE TABLE emf.datasets
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
   creator varchar(255) NOT NULL REFERENCES emf.users (username),
+  creator_full_name varchar(255) NOT NULL REFERENCES emf.users (name),
   status varchar(255),
   dataset_type int4 REFERENCES emf.dataset_types (id),
   units varchar(255),

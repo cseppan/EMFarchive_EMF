@@ -372,6 +372,7 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         User user = userService.getUser("emf");
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
+        dataset.setCreatorFullName(user.getName());
         add(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 

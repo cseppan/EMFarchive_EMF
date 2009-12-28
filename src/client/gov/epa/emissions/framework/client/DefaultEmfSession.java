@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client;
 
-import java.util.Hashtable;
-
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
 import gov.epa.emissions.framework.client.preference.UserPreference;
@@ -33,8 +31,6 @@ public class DefaultEmfSession implements EmfSession {
     private UserPreference preferences;
     
     private CaseService caseService;
-    
-    private Hashtable<String, User> users;
 
     public DefaultEmfSession(User user, ServiceLocator locator) throws EmfException {
         serviceLocator = locator;
@@ -119,21 +115,5 @@ public class DefaultEmfSession implements EmfSession {
 
     public ControlProgramService controlProgramService() {
         return serviceLocator.controlProgramService();
-    }
-    
-    public String getUserFullName(String shortName) throws EmfException{
-
-        if (users == null) {
-            
-            users = new Hashtable<String, User>();
-            User[] allUsers;
-
-            allUsers = serviceLocator.userService().getUsers();
-
-            for (User usr : allUsers)
-                users.put(usr.getUsername(), usr);
-        }
-        return users.get(shortName).getName();
-
     }
 }

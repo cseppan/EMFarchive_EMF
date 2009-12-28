@@ -54,7 +54,7 @@ public class EmfTableModelTest extends MockObjectTestCase {
 
         datasetList.add(dataset2);
 
-        tableData = new EmfDatasetTableData(new EmfDataset[] { dataset1, dataset2 }, null);
+        tableData = new EmfDatasetTableData(new EmfDataset[] { dataset1, dataset2 });
 
         model = new EmfTableModel(tableData);
     }

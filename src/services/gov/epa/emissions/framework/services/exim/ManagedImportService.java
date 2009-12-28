@@ -404,6 +404,7 @@ public class ManagedImportService {
 
         dataset.setName(name);
         dataset.setCreator(user.getUsername());
+        dataset.setCreatorFullName(user.getName());
         dataset.setDatasetType(datasetType);
         dataset.setCreatedDateTime(new Date());
         dataset.setModifiedDateTime(file.exists() ? new Date(file.lastModified()) : new Date());

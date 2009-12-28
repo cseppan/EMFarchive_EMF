@@ -144,7 +144,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     private JPanel createBrowserPanel(EmfDataset[] datasets) {
-        EmfDatasetTableData tableData = new EmfDatasetTableData(datasets, session);
+        EmfDatasetTableData tableData = new EmfDatasetTableData(datasets);
         table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
 
         JPanel browserPanel = new JPanel(new BorderLayout());
@@ -544,7 +544,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     public void refresh(EmfDataset[] datasets) {
         clearMessage();
-        table.refresh(new EmfDatasetTableData(datasets, session));
+        table.refresh(new EmfDatasetTableData(datasets));
         super.refreshLayout();
     }
 

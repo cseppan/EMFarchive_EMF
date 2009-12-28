@@ -44,6 +44,8 @@ public class EmfDataset implements Dataset, Lockable, Comparable<EmfDataset> {
     private String units;
 
     private String creator;
+    
+    private String creatorFullName;
 
     private String temporalResolution;
 
@@ -90,7 +92,7 @@ public class EmfDataset implements Dataset, Lockable, Comparable<EmfDataset> {
     public EmfDataset(int id, String name, 
             Date modifiedDateTime, int datasetTypeId, 
             String datasetTypeName, String status,
-            String creator, String intendedUse, 
+            String creator, String creatorFullName, String intendedUse, 
             String project, String region, 
             Date startDateTime, Date stopDateTime,
             String temporalResolution) {
@@ -101,6 +103,7 @@ public class EmfDataset implements Dataset, Lockable, Comparable<EmfDataset> {
         this.datasetType = new DatasetType(datasetTypeId, datasetTypeName);
         this.status = status;
         this.creator = creator;
+        this.creatorFullName = creatorFullName;
         if (intendedUse != null) this.intendedUse = new IntendedUse(intendedUse);
         if (project != null) this.project = new Project(project);
         if (region != null) this.region = new Region(region);
@@ -219,6 +222,14 @@ public class EmfDataset implements Dataset, Lockable, Comparable<EmfDataset> {
 
     public String getCreator() {
         return creator;
+    }
+    
+    public void setCreatorFullName(String creatorFullName) {
+        this.creatorFullName = creatorFullName;
+    }
+
+    public String getCreatorFullName() {
+        return creatorFullName;
     }
 
     public String getTemporalResolution() {

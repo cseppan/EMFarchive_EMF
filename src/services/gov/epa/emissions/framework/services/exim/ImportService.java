@@ -127,6 +127,7 @@ public class ImportService {
 
         dataset.setName(datasetName);
         dataset.setCreator(user.getUsername());
+        dataset.setCreatorFullName(user.getName());
         dataset.setDatasetType(datasetType);
         dataset.setCreatedDateTime(new Date());
         // dataset.setModifiedDateTime(new Date());
