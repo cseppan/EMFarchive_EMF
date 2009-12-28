@@ -69,10 +69,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private DatasetType[] allDSTypes;
 
     private SelectableSortFilterWrapper table;
-
-    private ExportPresenter exportPresenter;
-
-    private ImportPresenter importPresenter;
     
     public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Manager", new Dimension(850, 450), desktopManager);
@@ -332,10 +328,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktopManager, parentConsole,
                 getSelectedDSType());
 
-        if (this.importPresenter == null) {
-            this.importPresenter = new DatasetsBrowserAwareImportPresenter(session, session.user(), session
+        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session, session.user(), session
                     .eximService(), session.dataService(), this);
-        }
 
         presenter.doImport(importView, importPresenter);
     }
@@ -399,9 +393,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager, parentConsole, session);
         getDesktopPane().add(exportView);
 
-        if (this.exportPresenter == null) {
-            this.exportPresenter = new ExportPresenterImpl(this.session);
-        }
+        ExportPresenter exportPresenter = new ExportPresenterImpl(this.session);
         
         presenter.doExport(exportView, exportPresenter, emfDatasets);
     }

@@ -60,8 +60,6 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     private boolean editable;
 
-    private ExportPresenter exportPresenter;
-    
     public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager, boolean editable) {
 
         super("Dataset Properties View", new Dimension(750, 500), desktopManager);
@@ -273,9 +271,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager, parentConsole, session);
         getDesktopPane().add(exportView);
 
-        if (this.exportPresenter == null) {
-            this.exportPresenter = new ExportPresenterImpl(this.session);
-        }
+        ExportPresenter exportPresenter = new ExportPresenterImpl(this.session);
 
         presenter.doExport(exportView, exportPresenter);
     }
