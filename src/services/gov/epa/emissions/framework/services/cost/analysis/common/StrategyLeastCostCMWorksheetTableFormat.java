@@ -79,6 +79,8 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
         cols.add(new Column("Annual_Cost", types.realType(), new RealFormatter()));
         cols.add(new Column("Ann_Cost_per_Ton", types.realType(), new RealFormatter()));
         cols.add(new Column("Annual_Oper_Maint_Cost", types.realType(), new RealFormatter()));
+        cols.add(new Column("Annual_Variable_Oper_Maint_Cost", types.realType(), new RealFormatter()));
+        cols.add(new Column("Annual_Fixed_Oper_Maint_Cost", types.realType(), new RealFormatter()));
         cols.add(new Column("Annualized_Capital_Cost", types.realType(), new RealFormatter()));
         cols.add(new Column("Total_Capital_Cost", types.realType(), new RealFormatter()));
 
@@ -121,6 +123,9 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
         cols.add(new Column("XLOC", types.realType(), new RealFormatter()));
         cols.add(new Column("YLOC", types.realType(), new RealFormatter()));
         cols.add(new Column("PLANT", types.stringType(255), 255, new StringFormatter(255)));
+        cols.add(new Column("REPLACEMENT_ADDON", types.stringType(1), 1, new StringFormatter(1)));
+        cols.add(new Column("EXISTING_MEASURE_ABBREVIATION", types.stringType(10), 10, new StringFormatter(10)));
+        cols.add(new Column("EXISTING_PRIMARY_DEVICE_TYPE_CODE", types.stringType(4), 4, new StringFormatter(4)));
         cols.add(new Column("Comment", types.stringType(128), new StringFormatter(128)));
 
         return cols.toArray(new Column[0]);

@@ -156,11 +156,17 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractStrategyTask
                     boolean hasDesignCapacityColumns = false;
                     boolean hasSICColumn = false;
                     boolean hasNAICSColumn = false;
+                    boolean hasCpriColumn = false;
+                    boolean hasPrimaryDeviceTypeCodeColumn = false;
                     for (int j = 1; j <= md.getColumnCount(); j++) {
                         if (md.getColumnName(j).equalsIgnoreCase("naics")) {
                             hasNAICSColumn = true;
                         } else if (md.getColumnName(j).equalsIgnoreCase("sic")) {
                             hasSICColumn = true;
+                        } else if (md.getColumnName(j).equalsIgnoreCase("cpri")) {
+                            hasCpriColumn = true;
+                        } else if (md.getColumnName(j).equalsIgnoreCase("PRIMARY_DEVICE_TYPE_CODE")) {
+                            hasPrimaryDeviceTypeCodeColumn = true;
                         } else if (md.getColumnName(j).equalsIgnoreCase("design_capacity")) {
                             ++designCapacityColumnCount;
                         } else if (md.getColumnName(j).equalsIgnoreCase("design_capacity_unit_numerator")) {
@@ -173,15 +179,16 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractStrategyTask
                         if (designCapacityColumnCount == 3) hasDesignCapacityColumns = true;
                         inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("RPEN", "100::double precision as RPEN");
                         if (!hasDesignCapacityColumns) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("DESIGN_CAPACITY, DESIGN_CAPACITY_UNIT_NUMERATOR, DESIGN_CAPACITY_UNIT_DENOMINATOR", "null::double precision as DESIGN_CAPACITY, null::text as DESIGN_CAPACITY_UNIT_NUMERATOR, null::text as DESIGN_CAPACITY_UNIT_DENOMINATOR");
-                        if (!hasNAICSColumn) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("NAICS", "null::text as NAICS");
-                        if (!hasSICColumn) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("SIC", "null::text as SIC");
                     } else {
                         inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("PLANTID, POINTID, STACKID, SEGMENT, PLANT", "''::text as PLANTID, ''::text as POINTID, ''::text as STACKID, ''::text as SEGMENT, ''::text as PLANT");
                         inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("DESIGN_CAPACITY, DESIGN_CAPACITY_UNIT_NUMERATOR, DESIGN_CAPACITY_UNIT_DENOMINATOR", "null::double precision as DESIGN_CAPACITY, null::text as DESIGN_CAPACITY_UNIT_NUMERATOR, null::text as DESIGN_CAPACITY_UNIT_DENOMINATOR");
                         inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("STKFLOW", "null::double precision as STKFLOW");
-                        if (!hasNAICSColumn) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("NAICS", "null::text as NAICS");
-                        if (!hasSICColumn) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("SIC", "null::text as SIC");
+                        inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("ANNUAL_AVG_HOURS_PER_YEAR", "null::double precision as ANNUAL_AVG_HOURS_PER_YEAR");
                     }
+                    if (!hasNAICSColumn) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("NAICS", "null::text as NAICS");
+                    if (!hasSICColumn) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("SIC", "null::text as SIC");
+                    if (!hasCpriColumn) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("CPRI", "null::integer as CPRI");
+                    if (!hasPrimaryDeviceTypeCodeColumn) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("PRIMARY_DEVICE_TYPE_CODE", "null::varchar(4) as PRIMARY_DEVICE_TYPE_CODE");
                     inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("SECTOR", "'" + getDatasetSector(inputDataset) +  "' as SECTOR");
                     inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("ORIGINAL_DATASET_ID", inputDataset.getId() +  "::integer as ORIGINAL_DATASET_ID");
                     inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("ORIGINAL_RECORD_ID", "RECORD_ID as ORIGINAL_RECORD_ID");

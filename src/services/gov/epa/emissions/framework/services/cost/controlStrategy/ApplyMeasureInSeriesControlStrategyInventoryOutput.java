@@ -27,7 +27,7 @@ import java.util.Date;
 
 import org.hibernate.Session;
 
-public class AbstractControlStrategyInventoryOutput implements ControlStrategyInventoryOutput {
+public class ApplyMeasureInSeriesControlStrategyInventoryOutput implements ControlStrategyInventoryOutput {
 
     protected ControlStrategy controlStrategy;
 
@@ -53,7 +53,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
 
     protected String namePrefix;
     
-    public AbstractControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
+    public ApplyMeasureInSeriesControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy,
             ControlStrategyResult controlStrategyResult, String namePrefix, HibernateSessionFactory sessionFactory, 
             DbServerFactory dbServerFactory) throws Exception {
         this.controlStrategy = controlStrategy;
@@ -262,6 +262,10 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
         String sql = "select ";
         String columnList = "";
         Column[] columns = tableFormat.cols();
+        //flag indicating if we are doing replacement vs
+        //add on controls., currently we only support replacement controls.
+        boolean isReplacementControl = false;//TODO, still needs work
+        //right before abbreviation, is an empty now...
         for (int i = 0; i < columns.length; i++) {
             String columnName = columns[i].name();
             if (columnName.equalsIgnoreCase("record_id")) {
@@ -297,16 +301,25 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
                 sql += ", case when b.source_id is not null then 100 else rpen end as rpen";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("CONTROL_MEASURES")) {
-                sql += ", case when REPLACEMENT_ADDON = 'R' then cm_abbrev_list else case when " + (!missingColumns ? "control_measures" : "null") + " is null or length(" + (!missingColumns ? "control_measures" : "null") + ") = 0 then cm_abbrev_list else " + (!missingColumns ? "control_measures" : "null") + " || '&' || cm_abbrev_list end end as CONTROL_MEASURES";
+                if (isReplacementControl)
+                    sql += ", cm_abbrev_list as CONTROL_MEASURES";
+                else
+                    sql += ", case when " + (!missingColumns ? "control_measures" : "null") + " is null or length(" + (!missingColumns ? "control_measures" : "null") + ") = 0 then cm_abbrev_list else " + (!missingColumns ? "control_measures" : "null") + " || '&' || cm_abbrev_list end as CONTROL_MEASURES";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("PCT_REDUCTION")) {
-                sql += ", case when REPLACEMENT_ADDON = 'R' then percent_reduction_list else case when " + (!missingColumns ? "pct_reduction" : "null") + " is null or length(" + (!missingColumns ? "pct_reduction" : "null") + ") = 0 then percent_reduction_list else " + (!missingColumns ? "pct_reduction" : "null") + " || '&' || percent_reduction_list end end as PCT_REDUCTION";
+                if (isReplacementControl)
+                    sql += ", percent_reduction_list as PCT_REDUCTION";
+                else
+                    sql += ", case when " + (!missingColumns ? "pct_reduction" : "null") + " is null or length(" + (!missingColumns ? "pct_reduction" : "null") + ") = 0 then percent_reduction_list else " + (!missingColumns ? "pct_reduction" : "null") + " || '&' || percent_reduction_list end as PCT_REDUCTION";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("CURRENT_COST")) {
                 sql += ", annual_cost as CURRENT_COST";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("CUMULATIVE_COST")) {
-                sql += ", case when b.source_id is not null then " + (!missingColumns ? "case when cumulative_cost is null then annual_cost when cumulative_cost is not null then case when REPLACEMENT_ADDON = 'R' then coalesce(annual_cost, 0.0) else cumulative_cost + coalesce(annual_cost, 0.0) end end" : "annual_cost") + " else " + (!missingColumns ? "cumulative_cost" : "null::double precision") + " end as CUMULATIVE_COST";
+                if (isReplacementControl)
+                    sql += ", case when b.source_id is not null then " + (!missingColumns ? "case when cumulative_cost is null then annual_cost when cumulative_cost is not null then coalesce(annual_cost, 0.0) end" : "annual_cost") + " else " + (!missingColumns ? "cumulative_cost" : "null::double precision") + " end as CUMULATIVE_COST";
+                else
+                    sql += ", case when b.source_id is not null then " + (!missingColumns ? "case when cumulative_cost is null then annual_cost when cumulative_cost is not null then cumulative_cost + coalesce(annual_cost, 0.0) end" : "annual_cost") + " else " + (!missingColumns ? "cumulative_cost" : "null::double precision") + " end as CUMULATIVE_COST";
 //                sql += ", case when " + (!missingColumns ? "cumulative_cost" : "null") + " is null and annual_cost is null then null::double precision else coalesce(" + (!missingColumns ? "cumulative_cost" : "null::double precision") + ", 0.0) + coalesce(annual_cost, 0) end as CUMULATIVE_COST";
                 columnList += "," + columnName;
             } else {
@@ -316,15 +329,17 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
         }
         sql += " FROM " + qualifiedTable(inputTable, datasource) + " as inv ";
         sql += " left outer join ( "
-        + "SELECT distinct on (source_id) source_id, "
-        + "final_emissions, "
-        + "case when REPLACEMENT_ADDON = 'R' then input_emis else input_emis / (1 - coalesce(inv_ctrl_eff, 100.0) / 100.0 * coalesce(inv_rule_pen, 100.0) / 100.0 * coalesce(inv_rule_eff, 100.0) / 100.0) end as starting_emissions, "
-        + "annual_cost, "
-        + "cm_abbrev as cm_abbrev_list, "
-        + "percent_reduction::varchar as percent_reduction_list, "
-        + "REPLACEMENT_ADDON "
-        + " FROM " + qualifiedTable(detailResultTable, datasource)
-        + ") as b "
+        + "SELECT source_id, "
+        + "min(final_emissions) as final_emissions, "
+        + "max(input_emis) as starting_emissions, "
+        + "sum(annual_cost) as annual_cost, "
+        + "public.concatenate_with_ampersand(cm_abbrev) as cm_abbrev_list, "
+        + "public.concatenate_with_ampersand(percent_reduction::varchar) as percent_reduction_list "
+        + "FROM (select source_id, input_emis, final_emissions, annual_cost, cm_abbrev, percent_reduction "
+        + "        FROM " + qualifiedTable(detailResultTable, datasource)
+        + "        order by source_id, apply_order "
+        + "        ) tbl "
+        + "    group by source_id ) as b "
         + "on inv.record_id = b.source_id"
         + " WHERE " + versionedQuery.query();
         sql = "INSERT INTO " + qualifiedTable(outputTable, datasource) + " (" + columnList + ") " + sql;

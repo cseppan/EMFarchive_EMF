@@ -30,6 +30,10 @@ public class ControlStrategyInventoryOutputFactory {
     }
 
     public ControlStrategyInventoryOutput get(ControlStrategyResult controlStrategyResult) throws Exception {
+        if (controlStrategy.getStrategyType().getName().equals(StrategyType.applyMeasuresInSeries)) 
+            return new ApplyMeasureInSeriesControlStrategyInventoryOutput(user, controlStrategy, 
+                    controlStrategyResult, namePrefix,
+                    sessionFactory, dbServerFactory);
         if (controlStrategy.getStrategyType().getName().equals(StrategyType.projectFutureYearInventory)) 
             return new ProjectFutureYearInventoryControlStrategyInventoryOutput(user, controlStrategy, 
                     controlStrategyResult, namePrefix,
