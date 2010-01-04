@@ -287,6 +287,8 @@ BEGIN
 		fips,
 		' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
 		annual_oper_maint_cost,
+		annual_variable_oper_maint_cost,
+		annual_fixed_oper_maint_cost,
 		annualized_capital_cost,
 		total_capital_cost,
 		annual_cost,
@@ -302,6 +304,8 @@ BEGIN
 		emis_reduction,
 		inv_emissions,
 		apply_order,
+		input_emis,
+		output_emis,
 		fipsst,
 		fipscty,
 		sic,
@@ -315,7 +319,10 @@ BEGIN
 		sector,
 		xloc,
 		yloc,
-		plant
+		plant,
+		REPLACEMENT_ADDON,
+		EXISTING_MEASURE_ABBREVIATION,
+		EXISTING_PRIMARY_DEVICE_TYPE_CODE
 		) 
 	select 	
 		' || detailed_result_dataset_id || '::integer,
@@ -325,6 +332,8 @@ BEGIN
 		fips,
 		' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
 		annual_oper_maint_cost as operation_maintenance_cost,
+		annual_variable_oper_maint_cost,
+		annual_fixed_oper_maint_cost,
 		annualized_capital_cost as annualized_capital_cost,
 		total_capital_cost as capital_cost,
 		annual_cost as ann_cost,
@@ -340,6 +349,8 @@ BEGIN
 		emis_reduction,
 		inv_emissions,
 		apply_order,
+		input_emis,
+		output_emis,
 		substr(fips, 1, 2),
 		substr(fips, 3, 3),
 		' || case when has_sic_column = false then 'null::character varying' else 'sic' end || ',
@@ -353,7 +364,10 @@ BEGIN
 		sector,
 		xloc,
 		yloc,
-		plant
+		plant,
+		REPLACEMENT_ADDON,
+		EXISTING_MEASURE_ABBREVIATION,
+		EXISTING_PRIMARY_DEVICE_TYPE_CODE
 	from (
 
 

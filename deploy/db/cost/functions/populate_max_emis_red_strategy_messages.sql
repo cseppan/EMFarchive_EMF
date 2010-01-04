@@ -56,6 +56,7 @@ DECLARE
 	has_control_measures_col boolean := false;
 	has_pct_reduction_col boolean := false;
 	sql character varying := '';
+	has_control_measures_column boolean := false; 
 BEGIN
 
 	-- get the input dataset info
@@ -146,6 +147,9 @@ BEGIN
 
 	-- see if there is plant column in the inventory
 	has_plant_column := public.check_table_for_columns(inv_table_name, 'plant', ',');
+
+	-- see if there is control_measures column in the inventory
+	has_control_measures_column := public.check_table_for_columns(inv_table_name, 'control_measures', ',');
 
 	-- get strategy constraints
 	SELECT max_emis_reduction,
@@ -319,6 +323,83 @@ BEGIN
 		' else '' end || ' 
 		a.poll';
 
+	-- check to see if any of the sources that have an existing control (cpri/primary_device_type_code or control_measures columns are populated)
+	-- are missing the ceff value
+	execute 'insert into emissions.' || strategy_messages_table_name || ' 
+		(
+		dataset_id, 
+		fips, 
+		scc, 
+		' || case when is_point_table then '
+		plantid, 
+		pointid, 
+		stackid, 
+		segment, 
+		' else '' end || ' 
+		poll, 
+		status,
+		control_program,
+		message
+		)
+	select 
+		' || strategy_messages_dataset_id || '::integer,
+		a.fips,
+		a.scc,
+		' || case when is_point_table then '
+		a.plantid, 
+		a.pointid, 
+		a.stackid, 
+		a.segment, 
+		' else '' end || ' 
+		a.poll,
+		''Warning''::character varying(11) as status,
+		null::character varying(255) as control_program,
+		''Source has existing control but is missing ceff.'' as "comment"
+	FROM emissions.' || inv_table_name || ' a
+
+	where record_id in (
+			select null::integer as record_id 
+			where 1 = 0
+			
+			' || case when has_control_measures_column then '
+			union all
+			select record_id 
+			FROM emissions.' || inv_table_name || ' a
+			where ' || inv_filter || ' 
+				and length(coalesce(control_measures,'''')) > 0 
+				and coalesce(ceff,0.0) = 0.0 '
+			else ''
+			end || '
+			' || case when has_primary_device_type_code_column then '
+			union all
+			select record_id 
+			FROM emissions.' || inv_table_name || ' a
+			where ' || inv_filter || ' 
+				and length(coalesce(primary_device_type_code,'''')) > 0
+				and coalesce(ceff,0.0) = 0.0 '
+			else ''
+			end || '
+			' || case when has_cpri_column then '
+			union all
+			select record_id 
+			FROM emissions.' || inv_table_name || ' a
+			where ' || inv_filter || ' 
+				and coalesce(cpri,0) <> 0
+				and coalesce(ceff,0.0) = 0.0 '
+			else ''
+			end || '
+		)
+	order by a.fips,
+		a.scc, 
+		' || case when is_point_table then '
+		a.plantid, 
+		a.pointid, 
+		a.stackid, 
+		a.segment, 
+		' else '' end || ' 
+		a.poll';
+
 END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE;
+

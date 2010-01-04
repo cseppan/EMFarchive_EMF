@@ -46,12 +46,12 @@ DECLARE
 	uncontrolled_emis_sql character varying;
 	emis_sql character varying;
 	percent_reduction_sql character varying;
+	remaining_emis_sql character varying;
 	inventory_sectors character varying := '';
 	include_unspecified_costs boolean := true; 
 	has_pm_target_pollutant boolean := false; 
 	has_cpri_column boolean := false; 
 	has_primary_device_type_code_column boolean := false; 
-	is_add_on_control_sql character varying;
 BEGIN
 
 	-- get the input dataset info
@@ -279,13 +279,13 @@ BEGIN
 
 --	uncontrolled_emis_sql := case when dataset_month != 0 then 'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' else 'inv.ann_emis' end;
 --	annualized_uncontrolled_emis_sql := case when dataset_month != 0 then 'coalesce(inv.avd_emis * 365, inv.ann_emis)' else 'inv.ann_emis' end;
-	uncontrolled_emis_sql := 
+	uncontrolled_emis_sql := '(' ||
 			case 
 				when dataset_month != 0 then 
 					'case when (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.rpen' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) / (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.rpen' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
 				else 
 					'case when (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.rpen' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.rpen' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
-			end;
+			end || ')';
 	emis_sql := 
 			case 
 				when dataset_month != 0 then 
@@ -293,6 +293,7 @@ BEGIN
 				else 
 					'inv.ann_emis' 
 			end;
+	
 	annualized_uncontrolled_emis_sql := 
 			case 
 				when dataset_month != 0 then 
@@ -304,11 +305,36 @@ BEGIN
 
 
 	percent_reduction_sql := 'er.efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' / 100 / 100';
-	get_strategt_cost_sql := '(public.get_strategy_costs(' || case when use_cost_equations then 'true' else 'false' end || '::boolean, m.control_measures_id, 
+	-- relative emission reduction from inventory emission (i.e., ann emis in inv 100 tons (add on control gives addtl 50% red --> 50 tons
+	-- whereas a 95% ceff replacement control on a source with an existing control of 90% reduction needs to back out source to an 
+	-- uncontrolled emission 100 / (1 - 0.9) = 1000 tons giving a and then applying new control gives 950 tons reduced giving a 95% control
+	remaining_emis_sql := 
+		'( case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then -- add on control
+			' || emis_sql || ' * ' || percent_reduction_sql || ' / 100.0 
+		else -- replacement control
+			(' || uncontrolled_emis_sql || ' * (1.0 - ' || percent_reduction_sql || ' / 100.0))
+		end )';
+/*
+	remaining_emis_sql := 
+		'(' || emis_sql || '
+		- ( case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then -- add on control
+			' || emis_sql || ' * ' || percent_reduction_sql || ' / 100.0 
+		else -- replacement control
+			(' || uncontrolled_emis_sql || ' * (1.0 - ' || percent_reduction_sql || ' / 100.0))
+		end ))';
+
+
+case when (1 - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv.rpen' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || ' / 100, 1.0)' else '' end || ', 0)) != 0 then -- has existing control
+	' || emis_sql || ' - (' || uncontrolled_emis_sql || ' * (1.0 - ' || percent_reduction_sql || ' / 100.0))
+else -- has NO existing control
+	' || emis_sql || ' * (1.0 - ' || percent_reduction_sql || ' / 100.0)
+end
+*/
+	get_strategt_cost_sql := '(public.get_strategy_costs(' || case when use_cost_equations then 'true' else 'false' end || '::boolean, tpm.control_measures_id, 
 			abbreviation, ' || discount_rate|| ', 
-			m.equipment_life, er.cap_ann_ratio, 
+			tpm.equipment_life, er.cap_ann_ratio, 
 			er.cap_rec_factor, er.ref_yr_cost_per_ton, 
-			' || uncontrolled_emis_sql || ' * ' || percent_reduction_sql || ' / 100, ' || ref_cost_year_chained_gdp || ' / cast(gdplev.chained_gdp as double precision), 
+			case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * ' || percent_reduction_sql || ' / 100, ' || ref_cost_year_chained_gdp || ' / cast(gdplev.chained_gdp as double precision), 
 			' || case when use_cost_equations then 
 			'et.name, 
 			eq.value1, eq.value2, 
@@ -317,7 +343,7 @@ BEGIN
 			eq.value7, eq.value8, 
 			eq.value9, eq.value10, 
 			' || case when not is_point_table then 'null' else 'inv.stkflow * 60.0' end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity' end end || ', 
-			' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_numerator' end end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_denominator' end end 
+			' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_numerator' end end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_denominator' end end || ', ' || case when not is_point_table then 'null' else 'inv.annual_avg_hours_per_year' end 
 			else
 			'null, 
 			null, null, 
@@ -326,19 +352,13 @@ BEGIN
 			null, null, 
 			null, null, 
 			null, null, 
-			null, null'
+			null, null, 
+			null'
 			end
 			|| '))';
 
 	--select strpos('abc,def,ght','ght')
-	get_strategt_cost_inner_sql := replace(get_strategt_cost_sql,'m.control_measures_id','m.id');
-	is_add_on_control_sql := 
-		' case when strpos('','' || inv.control_measures || '','', '','' || er.existing_measure_abbr || '','') > 0 '
-		|| case when has_cpri_column then ' or er.existing_dev_code = inv.cpri '
-			when has_primary_device_type_code_column then ' or er.existing_dev_code = inv.primary_device_type_code::integer '
-			else '' end || '
-		then true
-		else false end ';
+	get_strategt_cost_inner_sql := replace(replace(get_strategt_cost_sql,'tpm.control_measures_id','m.id'),'tpm.equipment_life','m.equipment_life');
 			
 	-- add both target and cobenefit pollutants, first get best target pollutant measure, then use that to apply to other pollutants.
 	execute
@@ -352,6 +372,8 @@ BEGIN
 		fips,
 		' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
 		annual_oper_maint_cost,
+		annual_variable_oper_maint_cost,
+		annual_fixed_oper_maint_cost,
 		annualized_capital_cost,
 		total_capital_cost,
 		annual_cost,
@@ -382,7 +404,10 @@ BEGIN
 		xloc,
 		yloc,
 		plant,
-		"comment"
+		"comment",
+		REPLACEMENT_ADDON,
+		EXISTING_MEASURE_ABBREVIATION,
+		EXISTING_PRIMARY_DEVICE_TYPE_CODE
 		)
 	select DISTINCT ON (inv.fips, inv.scc, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id) 
 		' || detailed_result_dataset_id || '::integer,
@@ -392,6 +417,8 @@ BEGIN
 		inv.fips,
 		' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
 		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.operation_maintenance_cost as operation_maintenance_cost,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.variable_operation_maintenance_cost as annual_variable_oper_maint_cost,
+		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.fixed_operation_maintenance_cost as annual_fixed_oper_maint_cost,
 		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annualized_capital_cost as annualized_capital_cost,
 		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.capital_cost as capital_cost,
 		' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annual_cost as ann_cost,
@@ -403,11 +430,11 @@ BEGIN
 		' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ',
 		' || case when is_point_table = false then '' || case when not has_pm_target_pollutant then 'inv.rpen' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || '' else '100' end || ',
 		' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ',
-		' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
-		' || emis_sql || ' - ' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as emis_reduction,
+		case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
+		' || emis_sql || ' - case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - ' || percent_reduction_sql || ' / 100) as emis_reduction,
 		' || emis_sql || ' as inv_emissions,
-		' || uncontrolled_emis_sql || ' as input_emis,
-		' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100) as output_emis,
+		case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end as input_emis,
+		case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - ' || percent_reduction_sql || ' / 100) as output_emis,
 		1,
 		substr(inv.fips, 1, 2),
 		substr(inv.fips, 3, 3),
@@ -421,7 +448,10 @@ BEGIN
 		' || quote_literal(inventory_sectors) || ' as sector,
 		' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
 		' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
-		''''
+		'''',
+		REPLACEMENT_ADDON,
+		tpm.existing_measure_abbr,
+		tpm.existing_dev_code
 	FROM emissions.' || inv_table_name || ' inv
 
 		inner join emf.pollutants p
@@ -471,7 +501,11 @@ BEGIN
 				fips,
 				' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
 				control_measures_id,
-				equipment_life
+				equipment_life,
+				REPLACEMENT_ADDON,
+				existing_measure_abbr,
+				existing_dev_code
+
 			from (
 				-- get best measures for sources target pollutants, there could be a tie for a paticular source.
 				select DISTINCT ON (inv.fips, inv.scc' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || ', er.control_measures_id) 
@@ -480,6 +514,7 @@ BEGIN
 					inv.fips,
 					' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment,' end || '
 					er.control_measures_id,
+					' || remaining_emis_sql || ' as remaining_emis,
 					' || percent_reduction_sql || ' as percent_reduction,
 					(select sum(' || replace(replace(replace(replace(replace(replace(get_strategt_cost_inner_sql,'inv.','inv2.'),'er.','er2.'),'et.','et2.'),'eq.','eq2.'),'gdplev.','gdplev2.'),'invpm25or10.','invpm25or10_2.') || '.annual_cost) as annual_cost
 
@@ -522,7 +557,7 @@ BEGIN
 
 						left outer join emf.control_measure_equations eq2
 						on eq2.control_measure_id = m.id
-						and eq2.pollutant_id = p.id
+						and eq2.pollutant_id = p2.id
 
 						left outer join emf.equation_types et2
 						on et2.id = eq2.equation_type_id
@@ -541,6 +576,30 @@ BEGIN
 						-- effecive date filter
 						and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er2.effective_date), ' || inventory_year || '::integer)		
 
+						-- Replacement vs Add On Logic...
+						and (
+
+							-- Measure is Add On Only!
+							(
+								(coalesce(er2.existing_measure_abbr, '''') <> '''' or er2.existing_dev_code <> 0)
+								and 
+								(
+									(length(inv2.control_measures) > 0 and strpos(''&'' || coalesce(inv2.control_measures, '''') || ''&'', ''&'' || er2.existing_measure_abbr || ''&'') > 0) '
+									|| case when has_cpri_column then ' or (inv2.cpri <> 0 and er2.existing_dev_code = inv2.cpri) '
+									when has_primary_device_type_code_column then ' or (length(inv2.primary_device_type_code) > 0 and er2.existing_dev_code || '''' = inv2.primary_device_type_code) '
+									else '' end || '
+								)
+							)
+
+							-- Measure is Replacement Only!
+							or 
+							(
+								coalesce(er2.existing_measure_abbr, '''') = '''' and coalesce(er2.existing_dev_code, 0) = 0
+							)
+
+
+						)
+		
 					where 	' || replace(inv_filter,'inv.','inv2.') || coalesce(replace(county_dataset_filter_sql,'inv.','inv2.'), '') || '
 
 						-- limit to specific source
@@ -559,9 +618,12 @@ BEGIN
 						-- dont include sources that have been fully controlled...
 						and coalesce(100 * ' || case when not has_pm_target_pollutant then 'inv2.ceff' else 'coalesce(inv2.ceff, invpm25or10_2.ceff)' end || ' / 100 * coalesce(' || case when not has_pm_target_pollutant then 'inv2.reff' else 'coalesce(inv2.reff, invpm25or10_2.reff)' end || ' / 100, 1.0)' || case when has_rpen_column then ' * coalesce(' || case when not has_pm_target_pollutant then 'inv2.rpen' else 'coalesce(inv2.rpen, invpm25or10_2.rpen)' end || ' / 100, 1.0)' else '' end || ', 0) <> 100.0
 
-	) as source_annual_cost,
-					m.equipment_life
---,cstp.precedence
+					) as source_annual_cost,
+					m.equipment_life,
+					case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ''A''
+					else ''R'' end as REPLACEMENT_ADDON,
+					er.existing_measure_abbr,
+					er.existing_dev_code
 
 				FROM emissions.' || inv_table_name || ' inv
 
@@ -639,6 +701,29 @@ BEGIN
 					and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
 					-- effecive date filter
 					and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)		
+					-- Replacement vs Add On Logic...
+					and (
+
+						-- Measure is Add On Only!
+						(
+							(coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0)
+							and 
+							(
+								(length(inv.control_measures) > 0 and strpos(''&'' || coalesce(inv.control_measures, '''') || ''&'', ''&'' || er.existing_measure_abbr || ''&'') > 0) '
+								|| case when has_cpri_column then ' or (inv.cpri <> 0 and er.existing_dev_code = inv.cpri) '
+								when has_primary_device_type_code_column then ' or (length(inv.primary_device_type_code) > 0 and er.existing_dev_code || '''' = inv.primary_device_type_code) '
+								else '' end || '
+							)
+						)
+
+						-- Measure is Replacement Only!
+						or 
+						(
+							coalesce(er.existing_measure_abbr, '''') = '''' and coalesce(er.existing_dev_code, 0) = 0
+						)
+
+
+					)
 
 					' || case when measures_count = 0 and measure_classes_count > 0 then '
 					inner join emf.control_strategy_classes csc
@@ -651,119 +736,6 @@ BEGIN
 --					on cstp.pollutant_id = p.id
 --					and cstp.control_strategy_id = ' || control_strategy_id || '
 
-/*					' || case when include_unspecified_costs = true then '' else '
-					-- include only measures that have specified costs, if no specified costs then don;t include the measure
-					inner join (
-
-						select distinct on (scc.control_measures_id, er.id, inv.fips, inv.scc
-							' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || ')
-							scc.control_measures_id, er.id as eff_rec_id, inv.fips, inv.scc
-							' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || '
-							--,true as valid_costs
-						FROM emissions.' || inv_table_name || ' inv
-
-							inner join emf.pollutants p
-							on p.name = inv.poll
-							
-							' || 
-									case 
-										when target_pollutant = 'PM10' or target_pollutant = 'PM2_5' then '
-
-							left outer join emissions.' || inv_table_name || ' invpm25or10
-							on invpm25or10.fips = inv.fips
-							and invpm25or10.scc = inv.scc
-
-									' || case when is_point_table then 
-							'and invpm25or10.plantid = inv.plantid
-							and invpm25or10.pointid = inv.pointid
-							and invpm25or10.stackid = inv.stackid
-							and invpm25or10.segment = inv.segment' 
-									else 
-										''
-									end || '
-							and (
-								(invpm25or10.poll = ''PM2_5''
-								and inv.poll = ''PM10''
-								and inv.ceff is null) 
-							or 
-								(invpm25or10.poll = ''PM10''
-								and inv.poll = ''PM2_5''
-								and inv.ceff is null)
-							)
-							and (' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'invpm25or10') || ')' 
-								else 
-							'' 
-							end || '
-
-							inner join emf.control_measure_sccs scc
-							on scc.name = inv.scc
-
-							' || case when measures_count > 0 then '
-							inner join emf.control_strategy_measures csm
-							on csm.control_measure_id = scc.control_measures_id
-							and csm.control_strategy_id = ' || control_strategy_id || '
-							' else '' end || '
-
-							--this part will get applicable measure based on the target pollutant, use this measure for target and cobenefit pollutants...
-							inner join emf.control_measures m
-							on m.id = scc.control_measures_id
-
-							inner join emf.control_measure_months ms
-							on ms.control_measure_id = m.id
-							and ms.month in (0' || case when dataset_month != 0 then ',' || dataset_month else '' end || ')
-
-							left outer join emf.control_measure_equations eq
-							on eq.control_measure_id = m.id
-							and eq.pollutant_id = p.id
-
-							left outer join emf.equation_types et
-							on et.id = eq.equation_type_id
-
-							left outer join reference.gdplev
-							on gdplev.annual = eq.cost_year
-
-							inner join emf.control_measure_efficiencyrecords er
-							on er.control_measures_id = scc.control_measures_id
-							-- pollutant filter
-							and er.pollutant_id = p.id
-							-- min and max emission filter
-							and ' || annualized_uncontrolled_emis_sql || ' between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
-							-- locale filter
-							and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
-							-- effecive date filter
-							and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)		
-
-							' || case when measures_count = 0 and measure_classes_count > 0 then '
-							inner join emf.control_strategy_classes csc
-							on csc.control_measure_class_id = m.cm_class_id
-							and csc.control_strategy_id = ' || control_strategy_id || '
-							' else '' end || '
-
-
-						where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-							and ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton is not null 
-							-- dont include sources that have no emissions...
-							and ' || uncontrolled_emis_sql || ' <> 0.0
-
---						group by scc.control_measures_id, er.id, inv.fips, inv.scc, inv.poll
---							' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || '
-
-					) tblCosts
-					on tblCosts.fips = inv.fips
-					and tblCosts.scc = inv.scc
---					and tblCosts.poll = inv.poll
-					' || case when is_point_table = false then '' else '
-					and tblCosts.plantid = inv.plantid
-					and tblCosts.pointid = inv.pointid
-					and tblCosts.stackid = inv.stackid
-					and tblCosts.segment = inv.segment
-					' end || '
-					and tblCosts.control_measures_id = m.id
-					and tblCosts.eff_rec_id = er.id
---					and tblCosts.valid_costs = true
-					' end || '
-*/					
-
 				where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 					and p.id = ' ||  target_pollutant_id || '
 
@@ -775,7 +747,15 @@ BEGIN
 
 					-- make sure the new control is worthy, compare existing emis with new resulting emis, see if you get required percent decrease in emissions ((orig emis - new resulting emis) / orig emis * 100 ...
 --					and (' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' is null or er.efficiency - coalesce(' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ', 0) >= ' || replacement_control_min_eff_diff_constraint || ')
-					and (' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' is null or ((' ||  emis_sql || ' - ' || uncontrolled_emis_sql || ' * (1 - ' || percent_reduction_sql || ' / 100)) / ' ||  emis_sql || ' * 100 >= ' || replacement_control_min_eff_diff_constraint || '))
+--					and (' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' is null or ((' ||  emis_sql || ' - case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end  * (1 - ' || percent_reduction_sql || ' / 100)) / ' ||  emis_sql || ' * 100 >= ' || replacement_control_min_eff_diff_constraint || '))
+
+
+					and (
+						((' ||  emis_sql || ') - (' || remaining_emis_sql || ')) / (' ||  emis_sql || ') * 100 >= ' || replacement_control_min_eff_diff_constraint || '
+					)
+
+					-- dont include measures already on the source...
+					and strpos(''&'' || coalesce(inv.control_measures, '''') || ''&'', ''&'' || m.abbreviation || ''&'') = 0
 
 					-- measure region filter
 					' || case when measure_with_region_count > 0 then '
@@ -806,7 +786,7 @@ BEGIN
 					' || case when has_constraints then '
 					and (
 							' || percent_reduction_sql || ' >= ' || coalesce(min_control_efficiency_constraint, -100.0) || '
-							' || coalesce(' and ' || percent_reduction_sql || ' / 100 * ' || annualized_uncontrolled_emis_sql || ' >= ' || min_emis_reduction_constraint, '')  || '
+							' || coalesce(' and (' ||  emis_sql || ') - (' || remaining_emis_sql || ') >= ' || min_emis_reduction_constraint, '')  || '
 							' || coalesce(' and coalesce(' || chained_gdp_adjustment_factor || '
 								* ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton, -1E+308) <= ' || max_cost_per_ton_constraint, '')  || '
 							' || coalesce(' and coalesce(' || percent_reduction_sql || ' / 100 * ' || annualized_uncontrolled_emis_sql || ' * ' || chained_gdp_adjustment_factor || '
@@ -855,7 +835,7 @@ BEGIN
 
 						left outer join emf.control_measure_equations eq2
 						on eq2.control_measure_id = m.id
-						and eq2.pollutant_id = p.id
+						and eq2.pollutant_id = p2.id
 
 						left outer join emf.equation_types et2
 						on et2.id = eq2.equation_type_id
@@ -873,6 +853,28 @@ BEGIN
 						and (er2.locale = inv2.fips or er2.locale = substr(inv2.fips, 1, 2) or er2.locale = '''')
 						-- effecive date filter
 						and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er2.effective_date), ' || inventory_year || '::integer)		
+						-- Replacement vs Add On Logic...
+						and (
+
+							-- Measure is Add On Only!
+							(
+								(coalesce(er2.existing_measure_abbr, '''') <> '''' or er2.existing_dev_code <> 0)
+								and 
+								(
+									(length(inv2.control_measures) > 0 and strpos(''&'' || coalesce(inv2.control_measures, '''') || ''&'', ''&'' || er2.existing_measure_abbr || ''&'') > 0) '
+									|| case when has_cpri_column then ' or (inv2.cpri <> 0 and er2.existing_dev_code = inv2.cpri) '
+								when has_primary_device_type_code_column then ' or (length(inv2.primary_device_type_code) > 0 and er2.existing_dev_code || '''' = inv2.primary_device_type_code) '
+								else '' end || '
+								)
+							)
+
+							-- Measure is Replacement Only!
+							or 
+							(
+								coalesce(er2.existing_measure_abbr, '''') = '''' and coalesce(er2.existing_dev_code, 0) = 0
+							)
+
+						)
 
 					where 	' || replace(inv_filter,'inv.','inv2.') || coalesce(replace(county_dataset_filter_sql,'inv.','inv2.'), '') || '
 
@@ -899,30 +901,29 @@ BEGIN
 					inv.scc, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
 					er.control_measures_id, 
 					case when length(er.locale) = 5 then 0 when length(er.locale) = 2 then 1 else 2 end, 
-					' || percent_reduction_sql || ' desc
+					' || remaining_emis_sql || '
 			) sm
 			order by fips, 
 				scc,' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
---				precedence,
-				percent_reduction desc, 
-				source_annual_cost
-		) m
-		on m.scc = inv.scc
-		and m.fips = inv.fips
+				remaining_emis,
+				coalesce(source_annual_cost,0.0)
+		) tpm
+		on tpm.scc = inv.scc
+		and tpm.fips = inv.fips
 		' || case when is_point_table = false then '' else '
-		and m.plantid = inv.plantid
-		and m.pointid = inv.pointid
-		and m.stackid = inv.stackid
-		and m.segment = inv.segment' end || '
+		and tpm.plantid = inv.plantid
+		and tpm.pointid = inv.pointid
+		and tpm.stackid = inv.stackid
+		and tpm.segment = inv.segment' end || '
 
 		' || case when measures_count > 0 then '
 		inner join emf.control_strategy_measures csm
-		on csm.control_measure_id = m.control_measures_id
+		on csm.control_measure_id = tpm.control_measures_id
 		and csm.control_strategy_id = ' || control_strategy_id || '
 		' else '' end || '
 
 		left outer join emf.control_measure_equations eq
-		on eq.control_measure_id = m.control_measures_id
+		on eq.control_measure_id = tpm.control_measures_id
 		and eq.pollutant_id = p.id
 
 		left outer join emf.equation_types et
@@ -933,7 +934,7 @@ BEGIN
 
 		--this part will get best eff rec...
 		inner join emf.control_measure_efficiencyrecords er
-		on er.control_measures_id = m.control_measures_id
+		on er.control_measures_id = tpm.control_measures_id
 		-- pollutant filter
 		and er.pollutant_id = p.id
 		-- min and max emission filter
@@ -942,6 +943,25 @@ BEGIN
 		and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
 		-- effecive date filter
 		and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)
+
+		-- Replacement vs Add On Logic...
+		and (
+
+			-- Measure is Add On Only!
+			(
+				tpm.REPLACEMENT_ADDON = ''A''
+				and 
+				(tpm.existing_measure_abbr = er.existing_measure_abbr
+				or tpm.existing_dev_code = er.existing_dev_code)
+			)
+
+			-- Measure is Replacement Only!
+			or 
+			(
+				tpm.REPLACEMENT_ADDON = ''R''
+			)
+
+		)
 
 	where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 		-- dont include sources that have no emissions...
@@ -952,9 +972,14 @@ BEGIN
 		' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
 		er.pollutant_id, 
 		case when length(er.locale) = 5 then 0 when length(er.locale) = 2 then 1 else 2 end, 
-		' || percent_reduction_sql || ' desc, 
+		' || remaining_emis_sql || ', 
+--		tpm.source_annual_cost
 		' || get_strategt_cost_sql || '.computed_cost_per_ton';
 
 	return;
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+--new
