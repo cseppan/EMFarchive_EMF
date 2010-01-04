@@ -101,6 +101,7 @@ public class CMEfficiencyRecordReader {
             locale(efficiencyRecord, tokens[2], sb);
             effectiveDate(efficiencyRecord, tokens[3], sb);
             existingMeasureAbbrev(efficiencyRecord, tokens[4]);
+            existingDevCode(efficiencyRecord, tokens[5], sb);
             //original file format
             if (this.colCount == 15) {
                 controlEfficiency(efficiencyRecord, tokens[6], sb);
@@ -229,6 +230,14 @@ public class CMEfficiencyRecordReader {
 
     private void existingMeasureAbbrev(EfficiencyRecord efficiencyRecord, String existMeasureAbbrev) {
         efficiencyRecord.setExistingMeasureAbbr(existMeasureAbbrev);
+    }
+
+    private void existingDevCode(EfficiencyRecord efficiencyRecord, String existDevCode, StringBuffer sb) {
+        try {
+            efficiencyRecord.setExistingDevCode(validation.existingDevCode(existDevCode));
+        } catch (EmfException e) {
+            sb.append(format(e.getMessage()));
+        }
     }
 
     private void controlEfficiency(EfficiencyRecord efficiencyRecord, String ce, StringBuffer sb) throws EmfException {

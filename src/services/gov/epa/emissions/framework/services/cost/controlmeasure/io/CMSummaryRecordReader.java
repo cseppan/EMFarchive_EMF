@@ -267,6 +267,7 @@ public class CMSummaryRecordReader {
                     int neiDeviceCode = Integer.parseInt(stringTokenizer.nextToken());
                     ControlMeasureNEIDevice neiDevice = new ControlMeasureNEIDevice();
                     neiDevice.setNeiDeviceCode(neiDeviceCode);
+                    neiDeviceList.add(neiDevice);
                   } catch (NumberFormatException e) {
                       sb.append(format("device code(s) must be integer values: " + neiDeviceCodeList));
                   }
