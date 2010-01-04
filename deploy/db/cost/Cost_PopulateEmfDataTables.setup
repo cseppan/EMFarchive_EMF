@@ -102,8 +102,11 @@ select 'Type 7', 'Type 7';
 insert into emf.equation_types (name, description)
 select 'Type 8', 'Non-EGU PM';
 insert into emf.equation_types (name, description)
+select 'Type 9', 'EGU PM Control Equations';
+insert into emf.equation_types (name, description)
 select 'Type 10', 'ESP Upgrade';
-
+insert into emf.equation_types (name, description)
+select 'Type 11', 'SO2 Non EGU Control Equations';
 
 -- Add Eqaution Variables
 
@@ -211,3 +214,63 @@ select e.id, 'Fixed O&M Cost Exponent', (select COALESCE(max(file_col_position) 
 from emf.equation_types as e 
 where name = 'Type 10';
 
+-- 12/29/2009 -- forgot to add equation type variable definition...
+-- Type 11
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Low Default Cost Per Ton', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 11';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Low Boiler Capacity Range', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 11';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Medium Default Cost Per Ton', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 11';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Medium Boiler Capacity Range', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 11';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'High Default Cost Per Ton', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 11';
+
+-- Type 9
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Total Equipment Cost Factor', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 9';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Total Equipment Cost Constant', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 9';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Equipment To Capital Cost Multiplier', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 9';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Electricity Factor', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 9';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Electricity Constant', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 9';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Dust Disposal Factor', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 9';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Dust Disposal Constant', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 9';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Bag Replacement Factor', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 9';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Bag Replacement Constant', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 9';

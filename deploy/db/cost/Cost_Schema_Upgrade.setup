@@ -926,3 +926,10 @@ ALTER TABLE emf."references" ADD CONSTRAINT uq_reference_description UNIQUE (des
 
 -- 12/11/09 - added copied_from column to control_strategies table
 ALTER TABLE emf.control_strategies ADD copied_from varchar(255);
+
+-- 12/27/09 - added new equation types for add on control logic.
+select 'Type 9', 'EGU PM Control Equations';
+insert into emf.equation_types (name, description)
+select 'Type 10', 'ESP Upgrade';
+insert into emf.equation_types (name, description)
+select 'Type 11', 'SO2 Non EGU Control Equations';
