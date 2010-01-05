@@ -258,6 +258,7 @@ public class DatasetCreator {
 
         dataset.setName(name);
         dataset.setCreator(user.getUsername());
+        dataset.setCreatorFullName(user.getName());
         dataset.setDatasetType(type);
         dataset.setDescription(description);
         dataset.setCreatedDateTime(start);
