@@ -68,6 +68,8 @@ public class ExportTask extends Task {
 
     private int sleepAfterExport = 0;
 
+    private DatasetDAO datasetDao;
+
     protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
             DbServerFactory dbFactory, HibernateSessionFactory sessionFactory, Version version) {
         super();
@@ -84,6 +86,7 @@ public class ExportTask extends Task {
         this.accesslog = accesslog;
         this.sessionFactory = sessionFactory;
         this.version = version;
+        this.datasetDao = new DatasetDAO();
     }
 
     public void run() {
@@ -100,10 +103,12 @@ public class ExportTask extends Task {
         if (DebugLevels.DEBUG_1)
             if (DebugLevels.DEBUG_1)
                 System.out.println("Task# " + taskId + " running");
+        
+        Date start = new Date();
 
         try {
             setStartStatus();
-            accesslog.setTimestamp(new Date());
+            accesslog.setTimestamp(start);
             long exportedLineCount = 0;
             accesslog.setFolderPath(file.getAbsolutePath());
 
@@ -163,6 +168,11 @@ public class ExportTask extends Task {
             setErrorStatus(e, "");
         } finally {
             try {
+                //We want to record the dataset access time anyways
+                dataset.setAccessedDateTime(start);
+                session.clear();
+                updateDataset(dataset, session);
+                
                 // check for isConnected before disconnecting
                 if ((dbServer != null) && (dbServer.isConnected()))
                     dbServer.disconnect();
@@ -195,8 +205,10 @@ public class ExportTask extends Task {
             if (DebugLevels.DEBUG_1)
                 System.out.println("Task# " + taskId + " running");
 
+        Date start = new Date();
+        
         try {
-            accesslog.setTimestamp(new Date());
+            accesslog.setTimestamp(start);
             long exportedLineCount = 0;
             accesslog.setFolderPath("");
 
@@ -243,6 +255,11 @@ public class ExportTask extends Task {
             return sts;
         } finally {
             try {
+              //We want to record the dataset access time anyways
+                dataset.setAccessedDateTime(start);
+                session.clear();
+                updateDataset(dataset, session);
+                
                 // check for isConnected before disconnecting
                 if ((dbServer != null) && (dbServer.isConnected()))
                     dbServer.disconnect();
@@ -262,11 +279,13 @@ public class ExportTask extends Task {
     public boolean isExternal() {
         return type.isExternal();
     }
+    
+    private void updateDataset(EmfDataset ds, Session session) throws Exception {
+        datasetDao.updateDSPropNoLocking(ds, session);
+    }
 
     private ExternalSource[] getExternalSrcs(Session session) {
-        DatasetDAO dao = new DatasetDAO();
-
-        return dao.getExternalSrcs(dataset.getId(), -1, null, session);
+        return datasetDao.getExternalSrcs(dataset.getId(), -1, null, session);
     }
 
     private void printLogInfo(AccessLog log) {
@@ -288,7 +307,6 @@ public class ExportTask extends Task {
                 || importerclass.equals("gov.epa.emissions.commons.io.other.CountryStateCountyDataImporter"))
             return true;
 
-        DatasetDAO datasetDao = new DatasetDAO();
         long records = 0;
 
         try {

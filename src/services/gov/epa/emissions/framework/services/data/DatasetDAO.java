@@ -170,6 +170,12 @@ public class DatasetDAO {
     public void add(Version version, Session session) {
         hibernateFacade.add(version, session);
     }
+    
+    //NOTE: make sure dataset has no changes in name, emission table name(s)
+    //when call this update method. Not for updating status to be 'Deleted'.
+    public void updateDSPropNoLocking(EmfDataset dataset, Session session) throws Exception {
+        hibernateFacade.updateOnly(dataset, session);
+    }
 
     public void updateWithoutLocking(EmfDataset dataset, Session session) throws Exception {
         try {
