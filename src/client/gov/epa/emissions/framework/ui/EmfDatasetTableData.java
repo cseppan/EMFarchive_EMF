@@ -28,7 +28,7 @@ public class EmfDatasetTableData extends AbstractTableData {
         for (int i = 0; i < datasets.length; i++) {
             EmfDataset dataset = datasets[i];
             Object[] values = { dataset.getName(), format(dataset.getModifiedDateTime()), dataset.getDatasetTypeName(),
-                    dataset.getStatus(), dataset.getCreatorFullName(), dataset.getIntendedUse(), dataset.getProject(),
+                    dataset.getStatus(), getFullName(dataset), dataset.getIntendedUse(), dataset.getProject(),
                     dataset.getRegion(), format(dataset.getStartDateTime()), format(dataset.getStopDateTime()), dataset.getTemporalResolution() };
 
             Row row = new ViewableRow(dataset, values);
@@ -49,4 +49,10 @@ public class EmfDatasetTableData extends AbstractTableData {
         return String.class;
     }
 
+    String getFullName(EmfDataset dataset){
+        String fullName = dataset.getCreatorFullName();
+        if ((fullName == null) || (fullName.trim().equalsIgnoreCase("")))
+            fullName = dataset.getCreator();
+        return fullName;
+    }   
 }

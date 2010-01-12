@@ -399,7 +399,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     String getFullName(){
         String fullName = dataset.getCreatorFullName();
-        if (fullName ==null)
+        if ((fullName ==null) || (fullName.trim().equalsIgnoreCase("")))
             fullName = dataset.getCreator();
         else
             fullName= fullName+ " ("+dataset.getCreator()+")";

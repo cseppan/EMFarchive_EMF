@@ -176,7 +176,7 @@ public class SummaryTab extends JPanel implements SummaryTabView, RefreshObserve
     
     String getFullName(){
         String fullName = dataset.getCreatorFullName();
-        if (fullName ==null)
+        if ((fullName == null) || (fullName.trim().equalsIgnoreCase("")))
             fullName = dataset.getCreator();
         else
             fullName= fullName+ " ("+dataset.getCreator()+")";
