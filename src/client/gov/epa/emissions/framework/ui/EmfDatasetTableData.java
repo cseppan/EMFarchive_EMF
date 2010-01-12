@@ -49,7 +49,7 @@ public class EmfDatasetTableData extends AbstractTableData {
         return String.class;
     }
 
-    String getFullName(EmfDataset dataset){
+    private String getFullName(EmfDataset dataset){
         String fullName = dataset.getCreatorFullName();
         if ((fullName == null) || (fullName.trim().equalsIgnoreCase("")))
             fullName = dataset.getCreator();
