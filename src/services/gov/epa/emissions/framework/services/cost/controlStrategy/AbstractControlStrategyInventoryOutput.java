@@ -125,12 +125,13 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
         if ((startingDesc.indexOf("FIPS,SCC") > 0) || (startingDesc.indexOf("\"FIPS\",") > 0))
         {
             //the columns desc is already included
-            return startingDesc + "\n" + creator.getKeyValsAsHeaderString();
+            return startingDesc 
+                + "\n" + creator.getKeyValsAsHeaderString();
         }
         //the columns desc is not included
-        return inputDataset.getDescription() 
-        + "\n#DESC " + columnListForHeader() 
-        + "\n" + creator.getKeyValsAsHeaderString();
+        return startingDesc
+            + "\n#DESC " + columnListForHeader() 
+            + "\n" + creator.getKeyValsAsHeaderString();
     }
 
     //build comma-delimted list of column name
