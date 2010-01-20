@@ -283,6 +283,9 @@ public class ControlProgramSummaryTab extends JPanel implements ControlProgramTa
         if (controlProgram.getDataset() == null)
             throw new EmfException("The control program dataset is missing.");
 
+        if (controlProgram.getControlProgramType() == null)
+            throw new EmfException("The control program type is missing.");
+
         controlProgram.setName(name.getText());
         controlProgram.setDescription(description.getText());
         Version v = (Version)version.getSelectedItem();
