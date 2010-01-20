@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 public class CMEfficiencyRecordReader {
@@ -35,6 +36,8 @@ public class CMEfficiencyRecordReader {
     private int errorLimit = 100;
 
     private boolean warning = false;
+
+    private Map<String, String> compositeKeyMap;
     
     public CMEfficiencyRecordReader(CMFileFormat fileFormat, User user, 
             HibernateSessionFactory sessionFactory, CostYearTable costYearTable) {
@@ -45,6 +48,7 @@ public class CMEfficiencyRecordReader {
         this.pollutants = new Pollutants(sessionFactory);
         this.validation = new EfficiencyRecordValidation();
         this.costYearTable = costYearTable;
+        this.compositeKeyMap = new HashMap<String,String>();
     }
 
 //    public void parse(Map controlMeasures, Record record, int lineNo) {
@@ -86,13 +90,14 @@ public class CMEfficiencyRecordReader {
         EfficiencyRecord efficiencyRecord = null;
         warning = false;
         
-        ControlMeasure cm = controlMeasure(tokens[0], controlMeasures, sb, lineNo);
-        if (tokens == null || cm == null || !checkForConstraints(tokens, sb, lineNo)) {
-            errorCount++;
-            return null;
-        }
-
+//        control_measures_id, pollutant_id, locale, existing_measure_abbr, effective_date, min_emis, max_emis
+        //tokens[0] + "_" + pollutants.getPollutant(tokens[1]) + "_" + tokens[2] + "_" + tokens[4] + "_" + validation.existingDevCode(tokens[5]) + "_" + validation.effectiveDate(tokens[3]) + "_" + validation.minEmis(tokens[6]) + "_" + validation.minEmis(tokens[7])  
         try {
+            ControlMeasure cm = controlMeasure(tokens[0], controlMeasures, sb, lineNo);
+            if (tokens == null || cm == null || !checkForConstraints(tokens, sb, lineNo)) {
+                errorCount++;
+                return null;
+            }
             efficiencyRecord = new EfficiencyRecord();
             efficiencyRecord.setControlMeasureId(cm.getId());
             efficiencyRecord.setLastModifiedTime(new Date());
@@ -155,6 +160,9 @@ public class CMEfficiencyRecordReader {
                 details(efficiencyRecord, tokens[18]);  
             }
 
+        } catch (CMImporterException e) {
+            // don't add the efficiency record if the validation fails
+            efficiencyRecord = null;
         } catch (EmfException e) {
             // don't add the efficiency record if the validation fails
             efficiencyRecord = null;
@@ -193,7 +201,16 @@ public class CMEfficiencyRecordReader {
         return cm;
     }
 
-    private boolean checkForConstraints(String[] tokens, StringBuffer sb, int lineNo) {
+    private boolean checkForConstraints(String[] tokens, StringBuffer sb, int lineNo) throws EmfException, CMImporterException {
+        String uniqueCompositeKey = tokens[0] + "_" + pollutants.getPollutant(tokens[1]).getName() + "_" + tokens[2] + "_" + tokens[4] + "_" + validation.existingDevCode(tokens[5]) + "_" + validation.effectiveDate(tokens[3]) + "_" + (this.colCount != 15 ? validation.minEmis(tokens[6]) + "_" + validation.minEmis(tokens[7]) : "_");
+        if (this.compositeKeyMap.containsKey(uniqueCompositeKey)) {
+            sb.append("Efficiency record is a duplicate, remove the duplicate.");
+            status.addStatus(lineNo, sb);
+            return false;
+        }
+        //add new composite key
+        this.compositeKeyMap.put(uniqueCompositeKey, "");
+//control_measures_id, pollutant_id, locale, existing_measure_abbr, effective_date, min_emis, max_emis
         if (tokens[0].length() == 0) {
             sb.append("pollutant should not be empty.");
             status.addStatus(lineNo, sb);
