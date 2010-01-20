@@ -952,7 +952,7 @@ set program_arguments = 'select cm.name as CMName,
 	aer.max_cost_per_ton as max_cpt, 
 	aer.avg_rule_effectiveness as mean_re, 
 	aer.avg_rule_penetration as mean_rp,
-	(select count(1) from emf.control_measure_efficiencyrecords where control_measures_id = cm.id) as effrec_count
+	(select count(1) from emf.control_measure_efficiencyrecords where control_measures_id = cm.id and pollutant_id = p.id) as effrec_count
 from emf.control_measures cm 
 	left outer join emf.control_measure_sectors cms 
 	on cms.control_measure_id = cm.id 
@@ -973,3 +973,9 @@ and dataset_type_id in
 from emf.dataset_types dt
 where name in ('Control Strategy Detailed Result'));
 
+-- 1/9/10 - incorrect unique constraint on eff rec table, existing dev code was missing
+ALTER TABLE emf.control_measure_efficiencyrecords
+  drop CONSTRAINT control_measure_efficiencyrecords_control_measures_id_key;
+
+ALTER TABLE emf.control_measure_efficiencyrecords
+  ADD CONSTRAINT control_measure_efficiencyrecords_control_measures_id_key UNIQUE(control_measures_id, pollutant_id, locale, existing_measure_abbr, existing_dev_code, effective_date, min_emis, max_emis);
