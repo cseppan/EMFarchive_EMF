@@ -171,7 +171,7 @@ CREATE TABLE emf.control_measure_efficiencyrecords
   max_emis double precision,
   Cap_Ann_Ratio double precision,
   Incremental_Cost_Per_Ton double precision,
-  UNIQUE (control_measures_id,pollutant_id,locale,existing_measure_abbr,effective_date, min_emis, max_emis)
+  UNIQUE (control_measures_id, pollutant_id, locale, existing_measure_abbr, existing_dev_code, effective_date, min_emis, max_emis)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.control_measure_efficiencyrecords OWNER TO emf;
