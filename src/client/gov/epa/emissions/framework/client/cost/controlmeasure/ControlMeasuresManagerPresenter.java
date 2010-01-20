@@ -100,19 +100,35 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         return service().getSccs(controlMeasureId);
     }
 
-    public ControlMeasure[] getControlMeasures(Pollutant pollutant, boolean getDetails) throws EmfException {
-        if (pollutant.getName().equalsIgnoreCase("Select one"))
-            return new ControlMeasure[0];
+    public ControlMeasure[] getControlMeasures(Pollutant pollutant, boolean getDetails, String nameContains) throws EmfException {
+        
+        ControlMeasure[] controlMeasures = new ControlMeasure[0];
 
-        if (pollutant.getName().equals("ALL"))
-            return (getDetails ? service().getSummaryControlMeasures("") : service().getControlMeasures(""));
+        if (!pollutant.getName().equalsIgnoreCase("Select one")) {
 
-        return (getDetails ? service().getSummaryControlMeasures(pollutant.getId(), "") : service().getControlMeasures(pollutant.getId(), ""));
+            StringBuilder whereFilteSB = new StringBuilder();
+            if (nameContains != null && nameContains.length() > 0) {
+
+                nameContains = nameContains.replaceAll("'", "''");
+                whereFilteSB.append(" cm.name like '%").append(nameContains).append("%' ");
+            }
+
+            String whereFilterString = whereFilteSB.toString();
+            if (pollutant.getName().equals("ALL")) {
+                controlMeasures = (getDetails ? service().getSummaryControlMeasures(whereFilterString) : service()
+                        .getControlMeasures(whereFilterString));
+            } else {
+                controlMeasures = (getDetails ? service().getSummaryControlMeasures(pollutant.getId(),
+                        whereFilterString) : service().getControlMeasures(pollutant.getId(), whereFilterString));
+            }
+        }
+
+        return controlMeasures;
     }
     
-    public ControlMeasure[] getControlMeasures(Pollutant pollutant, Scc[] sccs, boolean getDetails) throws EmfException {
+    public ControlMeasure[] getControlMeasures(Pollutant pollutant, Scc[] sccs, boolean getDetails, String nameContains) throws EmfException {
         if (sccs.length==0 )
-            return getControlMeasures(pollutant, getDetails);
+            return getControlMeasures(pollutant, getDetails, nameContains);
         
         String scc="";
         for (int i=0; i<sccs.length-1; i++)
@@ -120,7 +136,13 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         scc +="'"+sccs[sccs.length-1].getCode()+"'";
 //        System.out.println(scc);
         
-        String whereFilter = "cM.id in (select " + (!getDetails ? "controlMeasureId" : "control_measures_id") + " from " + (!getDetails ? "Scc" : "emf.control_measure_sccs") + " where " + (!getDetails ? "code" : "name") + " in (" + scc +")) " ;
+        String whereFilter = "cM.id in (select " + (!getDetails ? "controlMeasureId" : "control_measures_id")
+                + " from " + (!getDetails ? "Scc" : "emf.control_measure_sccs") + " where "
+                + (!getDetails ? "code" : "name") + " in (" + scc + ")) ";
+        if (nameContains != null && nameContains.length() > 0) {
+            whereFilter += " and cM.name like '%" + nameContains + "%' ";
+        }
+
         if (pollutant.getName().equals("ALL") || pollutant.getName().equalsIgnoreCase("Select one"))
             return (getDetails ? service().getSummaryControlMeasures(whereFilter) : service().getControlMeasures(whereFilter));
         return (getDetails ? service().getSummaryControlMeasures(pollutant.getId(), whereFilter) : service().getControlMeasures(pollutant.getId(), whereFilter));

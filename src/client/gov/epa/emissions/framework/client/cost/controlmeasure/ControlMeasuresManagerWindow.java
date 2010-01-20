@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ImportButton;
@@ -34,6 +35,9 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -44,16 +48,15 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 public class ControlMeasuresManagerWindow extends ReusableInteralFrame implements ControlMeasuresManagerView,
         RefreshObserver, Runnable {
 
-//    private SortFilterSelectModel selectModel;
+    // private SortFilterSelectModel selectModel;
 
     private MessagePanel messagePanel;
 
@@ -63,7 +66,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private EmfSession session;
 
-//    private EmfTableModel model;
+    // private EmfTableModel model;
 
     private ControlMeasureTableData tableData;
 
@@ -80,8 +83,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private JPanel tablePanel;
 
     private Pollutant[] pollsFromDB;
-    
-    private Scc[] sccs=new Scc[] {}; 
+
+    private Scc[] sccs = new Scc[] {};
 
     private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006" };
 
@@ -92,27 +95,30 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private volatile Thread populateThread;
 
     private String threadAction;
-    
+
     private SelectAwareButton copyButton;
-    
+
     private Button refreshButton;
 
     private JCheckBox showDetailsCheckBox = new JCheckBox("Show Details?", false);
 
     private SelectableSortFilterWrapper table;
-    
+
     private boolean threadRunning;
-    
+
+    private TextField textFilter;
+
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Control Measure Manager", new Dimension(900, 350), desktopManager);
+        super("Control Measure Manager", new Dimension(900, 400), desktopManager);
         super.setName("controlMeasures");
-        super.setMinimumSize(new Dimension(860, 250));
+        super.setMinimumSize(new Dimension(860, 300));
         this.session = session;
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
     }
 
     public void run() {
+        
         if (!threadRunning) {
             if (this.threadAction == "refresh") {
                 threadRunning = true;
@@ -120,12 +126,13 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                     setButton(false);
                     messagePanel.setMessage("Please wait while retrieving control measures...");
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-//                    refresh(new ControlMeasure[0]);
-                    refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs, showDetailsCheckBox.isSelected()));
+                    // refresh(new ControlMeasure[0]);
+                    refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs, showDetailsCheckBox
+                            .isSelected(), this.textFilter.getText()));
                     messagePanel.clear();
                 } catch (Exception e) {
                     messagePanel.setError("Cannot retrieve control measures.  " + e.getMessage());
-                } finally  {
+                } finally {
                     setButton(true);
                     setCursor(Cursor.getDefaultCursor());
                     threadRunning = false;
@@ -138,11 +145,12 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                     messagePanel.setMessage("Please wait while copying control measures...");
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     copySelectedControlMeasures();
-                    refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs, showDetailsCheckBox.isSelected()));
+                    refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs, showDetailsCheckBox
+                            .isSelected(), this.textFilter.getText()));
                     messagePanel.clear();
                 } catch (Exception e) {
                     messagePanel.setError("Cannot copy control measures.  " + e.getMessage());
-                } finally  {
+                } finally {
                     setButton(true);
                     setCursor(Cursor.getDefaultCursor());
                     threadRunning = false;
@@ -155,14 +163,15 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                     messagePanel.setMessage("Please wait while retrieving control measures...");
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     refresh(new ControlMeasure[0]);
-                    refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs, showDetailsCheckBox.isSelected()));
-                    String sccMsg = sccs.length>0 ? "Retrieved measures for SCC: " + getScc(): ""; 
+                    refresh(presenter.getControlMeasures(getSelectedMajorPollutant(), sccs, showDetailsCheckBox
+                            .isSelected(), this.textFilter.getText()));
+                    String sccMsg = sccs.length > 0 ? "Retrieved measures for SCC: " + getScc() : "";
                     this.sccs = new Scc[] {};
                     messagePanel.clear();
                     messagePanel.setMessage(sccMsg);
                 } catch (Exception e) {
                     messagePanel.setError("Cannot retrieve control measures.  " + e.getMessage());
-                } finally  {
+                } finally {
                     setButton(true);
                     setCursor(Cursor.getDefaultCursor());
                     threadRunning = false;
@@ -172,19 +181,20 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         } else
             this.populateThread = null;
     }
-    
-    private String getScc(){
-        String sccMsg="";
-        if (sccs.length<5){
-            for (int i=0; i<sccs.length; i++)
+
+    private String getScc() {
+        String sccMsg = "";
+        if (sccs.length < 5) {
+            for (int i = 0; i < sccs.length; i++)
                 sccMsg += sccs[i].getCode() + "  ";
-        }else{
-            for (int i=0; i<5; i++)
+        } else {
+            for (int i = 0; i < 5; i++)
                 sccMsg += sccs[i].getCode() + "  ";
             sccMsg += "...";
         }
         return sccMsg;
     }
+
     private void setButton(boolean b) {
         copyButton.setEnabled(b);
         refreshButton.setEnabled(b);
@@ -222,9 +232,9 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         this.tablePanel = new JPanel();
         tablePanel.setLayout(new BorderLayout());
 
-//        JScrollPane sortFilterPane = sortFilterPane(parentConsole);
+        // JScrollPane sortFilterPane = sortFilterPane(parentConsole);
         table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
-        
+
         tablePanel.add(table);
 
         return tablePanel;
@@ -234,9 +244,10 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         if (showDetailsCheckBox.isSelected())
             tableData = new ControlMeasureTableData(measures, costYearTable, selectedPollutant(), selectedCostYear());
         else
-            tableData = new LightControlMeasureTableData(measures, costYearTable, selectedPollutant(), selectedCostYear());
-//        model = new EmfTableModel(tableData);
-//        selectModel = new SortFilterSelectModel(model);
+            tableData = new LightControlMeasureTableData(measures, costYearTable, selectedPollutant(),
+                    selectedCostYear());
+        // model = new EmfTableModel(tableData);
+        // selectModel = new SortFilterSelectModel(model);
     }
 
     private void getAllPollutants(EmfSession session) throws EmfException {
@@ -257,14 +268,14 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         return session.dataCommonsService().getPollutants();
     }
 
-//    private JScrollPane sortFilterPane(EmfConsole parentConsole) {
-//        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
-//        panel.sort(sortCriteria());
-//        panel.getTable().setName("controlMeasuresTable");
-//        panel.setPreferredSize(new Dimension(550, 120));
-//
-//        return new JScrollPane(panel);
-//    }
+    // private JScrollPane sortFilterPane(EmfConsole parentConsole) {
+    // SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
+    // panel.sort(sortCriteria());
+    // panel.getTable().setName("controlMeasuresTable");
+    // panel.setPreferredSize(new Dimension(550, 120));
+    //
+    // return new JScrollPane(panel);
+    // }
 
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Name" };
@@ -272,35 +283,62 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     private JPanel createTopPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JPanel innerPanel = new JPanel(new BorderLayout());
 
-        innerPanel.add(getItem("Pollutant Filter:", majorPollutant), BorderLayout.WEST);
-        innerPanel.setBorder(BorderFactory.createEmptyBorder(4,5,4,4));
-        majorPollutant.setPreferredSize(new Dimension(100, 30));
-//        showDetailsCheckBox = new JCheckBox("Show Details?", false);
-        //showDetailsCheckBox.add
+        JPanel topPanel = new JPanel(new GridBagLayout());
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 3;
+        constraints.weightx = 1;
+        constraints.anchor = GridBagConstraints.CENTER;
+        constraints.insets = new Insets(0, 0, 0, 0);
+
+        this.messagePanel = new SingleLineMessagePanel();
+        this.messagePanel.setOpaque(false);
+        topPanel.add(this.messagePanel, constraints);
+
+        constraints.gridx = 4;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0;
+        constraints.anchor = GridBagConstraints.EAST;
+        constraints.insets = new Insets(0, 0, 0, 0);
+
+        this.refreshButton = new RefreshButton(this, "Refresh Datasets", this.messagePanel);
+        topPanel.add(this.refreshButton, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(0, 5, 0, 0);
+
+        topPanel.add(getItem("Pollutant Filter:", majorPollutant, 120, 25), constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.weightx = 0;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = new Insets(0, 0, 0, 0);
+
         showDetailsCheckBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED || e.getStateChange() == ItemEvent.DESELECTED) {
-                    //lets rebuild the table first, the table structure changes...
-//                    try {
-//                        setupTableModel(new ControlMeasure[] {});
-//                    } catch (EmfException e1) {
-//                        // NOTE Auto-generated catch block
-//                        e1.printStackTrace();
-//                    }
-//                    table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
 
                     try {
                         if (showDetailsCheckBox.isSelected())
-                            tableData = new ControlMeasureTableData(new ControlMeasure[0], costYearTable, selectedPollutant(), selectedCostYear());
+                            tableData = new ControlMeasureTableData(new ControlMeasure[0], costYearTable,
+                                    selectedPollutant(), selectedCostYear());
                         else
-                            tableData = new LightControlMeasureTableData(new ControlMeasure[0], costYearTable, selectedPollutant(), selectedCostYear());
+                            tableData = new LightControlMeasureTableData(new ControlMeasure[0], costYearTable,
+                                    selectedPollutant(), selectedCostYear());
                     } catch (EmfException e1) {
-                        // NOTE Auto-generated catch block
                         e1.printStackTrace();
                     }
+
                     table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
                     tablePanel.removeAll();
                     tablePanel.add(table);
@@ -308,16 +346,27 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                 }
             }
         });
-        innerPanel.add(showDetailsCheckBox, BorderLayout.EAST);
-        panel.add(innerPanel, BorderLayout.WEST);
-        
-        messagePanel = new SingleLineMessagePanel();
-        panel.add(messagePanel, BorderLayout.CENTER);
 
-        refreshButton = new RefreshButton(this, "Refresh Control Measures", messagePanel);
-        panel.add(refreshButton, BorderLayout.EAST);
+        topPanel.add(this.showDetailsCheckBox, constraints);
 
-        return panel;
+        constraints.gridx = 3;
+        constraints.gridy = 1;
+        constraints.gridwidth = 2;
+        constraints.weightx = 0;
+        constraints.anchor = GridBagConstraints.EAST;
+        constraints.insets = new Insets(4, 0, 0, 0);
+
+        textFilter = new TextField("textfilter", 10);
+        textFilter.setEditable(true);
+        textFilter.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doRefresh();
+            }
+        });
+
+        topPanel.add(getItem("Name contains:", textFilter, 150, 25), constraints);
+
+        return topPanel;
     }
 
     private void createPollutantComboBox() {
@@ -338,10 +387,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         return (Pollutant) selected;
     }
 
-    protected void disPlayControlMeasures(Pollutant pollutant) throws EmfException {
-        refresh(presenter.getControlMeasures(pollutant, showDetailsCheckBox.isSelected()));
-    }
-
     private JPanel createControlPanel() {
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new BorderLayout());
@@ -354,9 +399,9 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     // Create View, Edit, copy, new buttons to panel
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
-        
+
         Button view = new Button("View", viewAction());
-//        Button view = new ViewButton(viewAction());
+        // Button view = new ViewButton(viewAction());
         panel.add(view);
 
         Button edit = new Button("Edit", editAction());
@@ -375,7 +420,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
         Button newControlMeasure = new NewButton(newControlMeasureAction());
         panel.add(newControlMeasure);
-        
+
         Button find = new Button("Find", findAction());
         find.setToolTipText("Find measures that apply to specific SCCs");
         panel.add(find);
@@ -385,8 +430,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private Component createRightControlPanel() {
         JPanel panel = new JPanel();
-        panel.add(getItem("Pollutant:", pollutant));
-        panel.add(getItem("Cost Year:", costYear));
+        panel.add(getItem("Pollutant:", pollutant, 80, 25));
+        panel.add(getItem("Cost Year:", costYear, 80, 25));
         pollutant.setPreferredSize(new Dimension(100, 30));
 
         Button importButton = new ImportButton(importAction());
@@ -464,15 +509,16 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             return;
         }
 
-        presenter.doExport((ControlMeasure[]) cmList.toArray(new ControlMeasure[0]), desktopManager, table.getSelectedCount(), parentConsole);
+        presenter.doExport((ControlMeasure[]) cmList.toArray(new ControlMeasure[0]), desktopManager, table
+                .getSelectedCount(), parentConsole);
     }
 
-    private Component getItem(String label, JComboBox box) {
+    private Component getItem(String label, JComponent comp, int width, int height) {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        box.setPreferredSize(new Dimension(80, 25));
-        layoutGenerator.addLabelWidgetPair(label, box, panel);
+        comp.setPreferredSize(new Dimension(width, height));
+        layoutGenerator.addLabelWidgetPair(label, comp, panel);
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 1, 1, // initialX, initialY
                 5, 5);// xPad, yPad
@@ -502,7 +548,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         };
         return action;
     }
-    
 
     private Action editAction() {
         Action action = new AbstractAction() {
@@ -535,8 +580,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         };
         return action;
     }
-    
-    private void findView(){
+
+    private void findView() {
         SCCSelectionView view = new SCCFindDialog(parentConsole);
         SCCFindPresenter presenter = new SCCFindPresenter(this, view);
         try {
@@ -545,7 +590,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             messagePanel.setError(exp.getMessage());
         }
     }
-    
+
     protected void copySelectedControlMeasures() throws EmfException {
         messagePanel.clear();
         List cmList = getSelectedMeasures();
@@ -558,8 +603,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             ControlMeasure element = (ControlMeasure) iter.next();
 
             try {
-//                ControlMeasure coppied = (ControlMeasure) DeepCopy.copy(element);
-//                coppied.setName("Copy of " + element.getName());
+                // ControlMeasure coppied = (ControlMeasure) DeepCopy.copy(element);
+                // coppied.setName("Copy of " + element.getName());
                 presenter.doSaveCopiedControlMeasure(element.getId());
             } catch (EmfException e) {
                 throw e;
@@ -618,9 +663,9 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         this.populateThread = new Thread(this);
         this.populateThread.start();
     }
-    
+
     public void doFind(Scc[] sccs) {
-        this.sccs=sccs; 
+        this.sccs = sccs;
         this.threadAction = "find";
         this.populateThread = new Thread(this);
         this.populateThread.start();
@@ -633,11 +678,11 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     public void refresh(ControlMeasure[] measures) {
-//        clearMessage();
+        // clearMessage();
         try {
             setupTableModel(measures);
             table.refresh(tableData);
-//            panelRefresh();
+            // panelRefresh();
         } catch (EmfException e) {
             messagePanel.setError("Error refreshing table: " + e.getMessage());
         }
@@ -648,30 +693,29 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         try {
             tableData.refresh(selectedPollutant(), selectedCostYear());
             table.refresh(tableData); // AME: added to fix refresh issue
-//            panelRefresh();
+            // panelRefresh();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
     }
 
-//    private void panelRefresh() {
-//        tablePanel.removeAll();
-//        tablePanel.add(table);
-//        super.refreshLayout();
-//    }
-    
+    // private void panelRefresh() {
+    // tablePanel.removeAll();
+    // tablePanel.add(table);
+    // super.refreshLayout();
+    // }
+
     private String selectedCostYear() throws EmfException {
-//        if (costYear == null) return null;
+        // if (costYear == null) return null;
         String year = ((String) costYear.getSelectedItem()).trim();
 
         yearValidation.value(year, costYearTable.getStartYear(), costYearTable.getEndYear());
-        return (String)costYear.getSelectedItem();
+        return (String) costYear.getSelectedItem();
     }
 
     private Pollutant selectedPollutant() {
-//        if (pollutant == null) return null;
+        // if (pollutant == null) return null;
         return (Pollutant) pollutant.getSelectedItem();
     }
-
 
 }
