@@ -5,8 +5,8 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.EditableComboBox;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
-import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.ImportButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
@@ -93,7 +93,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private String threadAction;
     
-    private Button copyButton;
+    private SelectAwareButton copyButton;
     
     private Button refreshButton;
 
@@ -362,12 +362,16 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         Button edit = new Button("Edit", editAction());
         panel.add(edit);
 
-        copyButton = new CopyButton(new AbstractAction() {
+        AbstractAction copyAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doCopy();
             }
-        });
-        panel.add(copyButton);
+        };
+
+        String message = "You have chosen to copy a Control Measure(s). Do you wish to proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        this.copyButton = new SelectAwareButton("Copy", copyAction, table, 0, confirmDialog);
+        panel.add(this.copyButton);
 
         Button newControlMeasure = new NewButton(newControlMeasureAction());
         panel.add(newControlMeasure);
