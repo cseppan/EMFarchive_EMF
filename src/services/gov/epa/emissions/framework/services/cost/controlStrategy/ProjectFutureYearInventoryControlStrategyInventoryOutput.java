@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends AbstractControlStrategyInventoryOutput {
 
@@ -45,10 +46,22 @@ public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends Ab
                 calendar.set(Calendar.YEAR, controlStrategy.getInventoryYear());
                 inputDataset.setStopDateTime(calendar.getTime());
             }
-
+            //update the #YEAR header to the projection year (really inventory year)
+            String desc = description(inputDataset);
+            StringTokenizer tokenizer = new StringTokenizer(desc, "\n");
+            String yearHeader = "";
+            while (tokenizer.hasMoreTokens()) {
+                String header = tokenizer.nextToken().trim();
+                if (!header.isEmpty() && header.contains("#YEAR")) {
+                    yearHeader = header;
+                    break;
+                }
+            }
+            desc = desc.replace(yearHeader, "#YEAR     " + controlStrategy.getInventoryYear());
+            //create controlled inventory dataset
             EmfDataset dataset = creator.addControlledInventoryDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), inputDataset,
                     inputDataset.getDatasetType(), tableFormat, 
-                    description(inputDataset));
+                    desc);
 
             String outputInventoryTableName = getDatasetTableName(dataset);
 
