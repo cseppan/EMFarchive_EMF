@@ -109,8 +109,8 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
             StringBuilder whereFilteSB = new StringBuilder();
             if (nameContains != null && nameContains.length() > 0) {
 
-                nameContains = nameContains.replaceAll("'", "''");
-                whereFilteSB.append(" cm.name like '%").append(nameContains).append("%' ");
+                String escapedNameContains = getPattern(nameContains.toLowerCase().trim());
+                whereFilteSB.append(" lower(cm.name) like ").append(escapedNameContains).append(" ");
             }
 
             String whereFilterString = whereFilteSB.toString();
@@ -127,6 +127,7 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     }
     
     public ControlMeasure[] getControlMeasures(Pollutant pollutant, Scc[] sccs, boolean getDetails, String nameContains) throws EmfException {
+
         if (sccs.length==0 )
             return getControlMeasures(pollutant, getDetails, nameContains);
         
@@ -139,14 +140,25 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         String whereFilter = "cM.id in (select " + (!getDetails ? "controlMeasureId" : "control_measures_id")
                 + " from " + (!getDetails ? "Scc" : "emf.control_measure_sccs") + " where "
                 + (!getDetails ? "code" : "name") + " in (" + scc + ")) ";
-        if (nameContains != null && nameContains.length() > 0) {
-            whereFilter += " and cM.name like '%" + nameContains + "%' ";
+        if (nameContains != null && nameContains.trim().length() > 0) {
+
+            String escapedNameContains = getPattern(nameContains.toLowerCase().trim());
+            whereFilter += " and lower(cM.name) like " + escapedNameContains + " ";
         }
 
         if (pollutant.getName().equals("ALL") || pollutant.getName().equalsIgnoreCase("Select one"))
             return (getDetails ? service().getSummaryControlMeasures(whereFilter) : service().getControlMeasures(whereFilter));
         return (getDetails ? service().getSummaryControlMeasures(pollutant.getId(), whereFilter) : service().getControlMeasures(pollutant.getId(), whereFilter));
         
+    }
+
+    private String getPattern(String name) {
+        name = name.replaceAll("\\*", "%%");
+        name = name.replaceAll("!", "!!");
+        name = name.replaceAll("'", "''");
+        name = name.replaceAll("_", "!_");
+        
+        return "'%%" + name + "%%'" + (name.contains("!") ? " ESCAPE '!'" : "");
     }
 
     public CostYearTable getCostYearTable() {

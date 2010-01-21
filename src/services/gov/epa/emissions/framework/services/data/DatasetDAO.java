@@ -1277,6 +1277,9 @@ public class DatasetDAO {
         return total;
     }
 
+    /**
+     * This should be moved to a utility class so that any class can use it.
+     */
     private String getPattern(String name) {
         name = name.replaceAll("\\*", "%%");
         name = name.replaceAll("!", "!!");
