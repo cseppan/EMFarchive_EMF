@@ -6,6 +6,8 @@ import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,12 +19,28 @@ public class SCCTableData extends AbstractTableData {
         rows = createRows(sccs);
     }
 
-    private List createRows(Scc[] sccs) {
-        List rows = new ArrayList();
+    private List<Row> createRows(Scc[] sccs) {
+
+        List<Row> rows = new ArrayList();
         for (int i = 0; i < sccs.length; i++) {
             Row row = row(sccs[i]);
             rows.add(row);
         }
+
+        /*
+         * Sort by scc
+         */
+        Collections.sort(rows, new Comparator<Row>() {
+
+            public int compare(Row r1, Row r2) {
+
+                String sccCode1 = (String) r1.getValueAt(0);
+                String sccCode2 = (String) r2.getValueAt(0);
+
+                return sccCode1.compareTo(sccCode2);
+            }
+        });
+
         return rows;
     }
 
