@@ -6,7 +6,7 @@ import gov.epa.emissions.commons.gui.PasswordField;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
-import gov.epa.emissions.commons.gui.buttons.OKButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.Border;
@@ -51,18 +51,18 @@ public class EditableUserProfilePanel extends JPanel {
     private User user;
 
     // FIXME: one to many params ?
-    public EditableUserProfilePanel(User user, Widget usernameWidget, Action okAction, Action cancelAction,
+    public EditableUserProfilePanel(User user, Widget usernameWidget, Action saveAction, Action cancelAction,
             AdminOption adminOption, PopulateUserStrategy populateUserStrategy, ManageChangeables changeableList) {
         this.user = user;
         this.adminOption = adminOption;
         this.populateUserStrategy = populateUserStrategy;
         this.changeablesList = changeableList;
 
-        createLayout(user, usernameWidget, okAction, cancelAction, adminOption);
+        createLayout(user, usernameWidget, saveAction, cancelAction, adminOption);
         this.setSize(new Dimension(375, 425));
     }
 
-    private void createLayout(User user, Widget usernameWidget, Action okAction, Action cancelAction,
+    private void createLayout(User user, Widget usernameWidget, Action saveAction, Action cancelAction,
             AdminOption adminOption) {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -71,10 +71,10 @@ public class EditableUserProfilePanel extends JPanel {
         this.add(createProfilePanel(user, adminOption));
 
         this.add(createLoginPanel(usernameWidget));
-        this.add(createButtonsPanel(okAction, cancelAction));
+        this.add(createButtonsPanel(saveAction, cancelAction));
     }
 
-    private JPanel createButtonsPanel(Action okAction, Action cancelAction) {
+    private JPanel createButtonsPanel(Action saveButton, Action cancelAction) {
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
@@ -83,7 +83,7 @@ public class EditableUserProfilePanel extends JPanel {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button okButton = new OKButton(okAction);
+        Button okButton = new SaveButton(saveButton);
         container.add(okButton);
         CloseButton closeButton = new CloseButton(cancelAction);
         container.add(closeButton);
