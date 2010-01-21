@@ -121,7 +121,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         if (dirOnly)
             setPreferredSize(new Dimension(424, 300));
         else
-            setPreferredSize(new Dimension(652, 400));
+            setPreferredSize(new Dimension(800, 440));
 
         setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
     }
@@ -268,7 +268,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(new JLabel("Subfolders:"), BorderLayout.NORTH);
         panel.add(subdirListWidgit(dirs));
-        panel.setPreferredSize(new Dimension(100, 250));
+        panel.setPreferredSize(new Dimension(150, 250));
 
         return panel;
     }
