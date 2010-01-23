@@ -146,7 +146,6 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
             whereFilter += " and lower(cm.name) like " + escapedNameContains + " ";
         }
 
-      System.out.println(whereFilter);
         if (pollutant.getName().equals("ALL") || pollutant.getName().equalsIgnoreCase("Select one"))
             return (getDetails ? service().getSummaryControlMeasures(whereFilter) : service().getControlMeasures(whereFilter));
         return (getDetails ? service().getSummaryControlMeasures(pollutant.getId(), whereFilter) : service().getControlMeasures(pollutant.getId(), whereFilter));
