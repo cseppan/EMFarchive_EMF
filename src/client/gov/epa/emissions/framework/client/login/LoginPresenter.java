@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.login;
 
+import java.util.Date;
+
 import gov.epa.emissions.commons.CommonsException;
 import gov.epa.emissions.commons.security.PasswordGenerator;
 import gov.epa.emissions.commons.security.User;
@@ -39,6 +41,7 @@ public class LoginPresenter {
                 throw new EmfException("Unable to fetch lock on user: " + username + ".");
             
             user.setLoggedIn(true);
+            user.setLastLoginDate(new Date());
             userAdmin.updateUser(user);
         }
         

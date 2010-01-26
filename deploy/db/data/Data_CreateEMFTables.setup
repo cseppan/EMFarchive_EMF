@@ -11,8 +11,10 @@ CREATE TABLE emf.users
   is_admin bool NOT NULL DEFAULT false,
   is_login bool NOT NULL DEFAULT false,
   is_account_disabled bool NOT NULL DEFAULT false,
+  is_want_emails NOT NULL DEFAULT true,
   lock_owner varchar(255),  
-  lock_date timestamp
+  lock_date timestamp,
+  last_login_date timestamp
 ) 
 WITHOUT OIDS;
 -- emf.users

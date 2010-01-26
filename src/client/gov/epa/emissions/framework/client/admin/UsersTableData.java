@@ -20,11 +20,11 @@ public class UsersTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Username", "Name", "Logged in", "Phone", "Email", "Is Admin ?" };
+        return new String[] { "Username", "Name", "Logged in", "Phone", "Email", "Is Admin ?", "Want Emails?", "Last Logged in" };
     }
 
     public Class getColumnClass(int col) {
-        if (col ==2 || col == 5)
+        if (col ==2 || col == 5 || col == 6)
             return Boolean.class;
         return String.class;
     }

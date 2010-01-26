@@ -21,6 +21,7 @@ import java.awt.GridLayout;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -43,6 +44,8 @@ public class EditableUserProfilePanel extends JPanel {
     private MessagePanel messagePanel;
 
     private AdminOption adminOption;
+    
+    private JCheckBox wantEmails;
 
     private PopulateUserStrategy populateUserStrategy;
 
@@ -139,6 +142,12 @@ public class EditableUserProfilePanel extends JPanel {
         JPanel optionsPanel = new JPanel();
         adminOption.add(optionsPanel);
         adminOption.setAdmin(user);
+        
+        //wantEmails = new JCheckBox(" Want Emails? ", null,user.isWantEmails());
+        wantEmails = new JCheckBox(" Want Emails? ");
+        wantEmails.setSelected(user.isWantEmails());
+        optionsPanel.add(wantEmails);
+        //changeablesList.addChangeable(wantEmails);
         panel.add(optionsPanel);
 
         return panel;
@@ -191,7 +200,7 @@ public class EditableUserProfilePanel extends JPanel {
 
     protected void populateUser() throws EmfException {
         populateUserStrategy.populate(name.getText(), affiliation.getText(), phone.getText(), email.getText(), username
-                .value(), password.getPassword(), confirmPassword.getPassword());
+                .value(), password.getPassword(), confirmPassword.getPassword(), wantEmails.isSelected());
         adminOption.isAdmin(user);
     }
 

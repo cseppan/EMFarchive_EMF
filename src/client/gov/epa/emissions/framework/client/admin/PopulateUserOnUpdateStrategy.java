@@ -13,7 +13,7 @@ public class PopulateUserOnUpdateStrategy implements PopulateUserStrategy {
     }
 
     public void populate(String name, String affiliation, String phone, String email, String username, char[] password,
-            char[] confirmPassword) throws EmfException {
+            char[] confirmPassword, Boolean wantEmails) throws EmfException {
         try {
             user.setName(name);
             user.setAffiliation(affiliation);
@@ -23,6 +23,7 @@ public class PopulateUserOnUpdateStrategy implements PopulateUserStrategy {
                 user.setPassword(new String(password));
                 user.confirmPassword(new String(confirmPassword));
             }
+            user.setWantEmails(wantEmails);
         } catch (UserException e) {
             throw new EmfException(e.getMessage());
         }
