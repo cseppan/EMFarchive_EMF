@@ -34,7 +34,7 @@ public class LoginPresenter {
         
         User user = userAdmin.getUser(username);
         
-        if (!user.isLoggedIn()){
+        //if (!user.isLoggedIn()){
             user = userAdmin.obtainLocked(userAdmin.getUser(username), userAdmin.getUser(username));
             
             if ( user == null )        
@@ -43,7 +43,7 @@ public class LoginPresenter {
             user.setLoggedIn(true);
             user.setLastLoginDate(new Date());
             userAdmin.updateUser(user);
-        }
+        //}
         
         return user;
     }
