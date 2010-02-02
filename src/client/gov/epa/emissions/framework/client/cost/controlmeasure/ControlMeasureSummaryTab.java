@@ -379,9 +379,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         measure.setName(name.getText());
         measure.setDescription(description.getText());
         measure.setCreator(session.user());
-//TODO
-//        if (deviceCode.getText().length() > 0)
-//            measure.setDeviceCode(deviceId);
+        //leave untouched for now, these are not editable for now...
+        measure.setNeiDevices(measure.getNeiDevices());
         if (equipmentLife.getText().length() > 0)
             measure.setEquipmentLife(life);
         updatePollutant();
@@ -507,8 +506,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         if (cmClass.getSelectedItem() == null)
             throw new EmfException("Summary tab: Please select a class");
 
-        if (deviceCode.getText().trim().length() > 0)
-            deviceId = verifier.parseInteger(deviceCode);
+//        if (deviceCode.getText().trim().length() > 0)
+//            deviceId = verifier.parseInteger(deviceCode);
 
         if (equipmentLife.getText().trim().length() > 0)
             life = verifier.parseFloat(equipmentLife);
