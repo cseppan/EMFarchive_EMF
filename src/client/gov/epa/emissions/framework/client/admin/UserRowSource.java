@@ -16,7 +16,7 @@ public class UserRowSource implements RowSource {
 
     public Object[] values() {
         return new Object[] { source.getUsername(), source.getName(), source.isLoggedIn(), source.getPhone(), source.getEmail(), 
-                new Boolean(source.isAdmin()), source.isWantEmails(), format(source.getLastLoginDate()) };
+                new Boolean(source.isAdmin()), source.getWantEmails(), format(source.getLastLoginDate()) };
     }
 
     public Object source() {

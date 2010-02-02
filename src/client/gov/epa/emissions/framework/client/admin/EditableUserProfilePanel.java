@@ -145,7 +145,7 @@ public class EditableUserProfilePanel extends JPanel {
         
         //wantEmails = new JCheckBox(" Want Emails? ", null,user.isWantEmails());
         wantEmails = new JCheckBox(" Want Emails? ");
-        wantEmails.setSelected(user.isWantEmails());
+        wantEmails.setSelected(user.getWantEmails());
         optionsPanel.add(wantEmails);
         //changeablesList.addChangeable(wantEmails);
         panel.add(optionsPanel);
