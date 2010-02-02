@@ -500,15 +500,17 @@ public class ControlMeasureDAO {
         Criterion locale = Restrictions.eq("locale", record.getLocale());
         Criterion pollutant = Restrictions.eq("pollutant", record.getPollutant());
         Criterion existingMeasureAbbr = record.getExistingMeasureAbbr() == null ? Restrictions.isNull("existingMeasureAbbr") : Restrictions.eq("existingMeasureAbbr", record.getExistingMeasureAbbr());
+        Criterion existingDevCode = Restrictions.eq("existingDevCode", record.getExistingDevCode());
         Criterion effectiveDate = record.getEffectiveDate() == null ? Restrictions.isNull("effectiveDate") : Restrictions.eq("effectiveDate", record.getEffectiveDate());
 
         Criterion minEmis = record.getMinEmis() == null ? Restrictions.isNull("minEmis") : Restrictions.eq("minEmis", record.getMinEmis());
         Criterion maxEmis = record.getMaxEmis() == null ? Restrictions.isNull("maxEmis") : Restrictions.eq("maxEmis", record.getMaxEmis());
 
-        if (exists(EfficiencyRecord.class, new Criterion[] {id, measureId, locale, pollutant, existingMeasureAbbr, effectiveDate, minEmis, maxEmis}, session)) {
-            throw new EmfException("Duplicate Record: The combination of 'Pollutant', 'Locale', 'Effective Date', 'Existing Measure', 'Minimum Emission' and 'Maximum Emission' should be unique - Locale = " + record.getLocale()
+        if (exists(EfficiencyRecord.class, new Criterion[] {id, measureId, locale, pollutant, existingMeasureAbbr, existingDevCode, effectiveDate, minEmis, maxEmis}, session)) {
+            throw new EmfException("Duplicate Record: The combination of 'Pollutant', 'Locale', 'Effective Date', 'Existing Measure', 'Existing Dev Code', 'Minimum Emission' and 'Maximum Emission' should be unique - Locale = " + record.getLocale()
                 + " Pollutant = " + record.getPollutant().getName()
                 + " ExistingMeasureAbbr = " + record.getExistingMeasureAbbr()
+                + " ExistingDevCode = " + record.getExistingDevCode()
                 + " EffectiveDate = " + (record.getEffectiveDate() == null ? "" : record.getEffectiveDate())
                 + " MinEmis = " + (record.getMinEmis() == null ? "" : record.getMinEmis())
                 + " MaxEmis = " + (record.getMaxEmis() == null ? "" : record.getMaxEmis()));

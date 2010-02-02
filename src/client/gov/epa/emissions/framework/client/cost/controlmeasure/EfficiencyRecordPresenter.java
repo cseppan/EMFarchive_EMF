@@ -25,13 +25,14 @@ public class EfficiencyRecordPresenter {
     }
 
     private String duplicateRecordMsg() {
-        return "The combination of 'Pollutant', 'Locale', 'Effective Date', 'Existing Measure', 'Min Emission' and 'Max Emission' should be unique";
+        return "The combination of 'Pollutant', 'Locale', 'Effective Date', 'Existing Measure', 'Existing Dev Code', 'Min Emission' and 'Max Emission' should be unique";
     }
 
     private boolean same(EfficiencyRecord record1, EfficiencyRecord record2) {
         return record1.getPollutant().equals(record2.getPollutant()) && record1.getLocale().equals(record2.getLocale())
                 && sameEffectiveDate(record1, record2)
                 && record1.getExistingMeasureAbbr().equals(record2.getExistingMeasureAbbr())
+                && record1.getExistingDevCode() == record2.getExistingDevCode()
                 && sameMinMaxEmission(record1, record2);
     
     }
