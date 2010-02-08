@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.io.importer.CommaDelimitedTokenizer;
 import gov.epa.emissions.commons.io.importer.DelimitedFileReader;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
+import gov.epa.emissions.commons.util.StringTools;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -218,32 +219,32 @@ public class CaseFileParser {
         int index = line.indexOf('=') + 1;
 
         if (line.startsWith("#EMF_CASE_NAME")) {
-            caseObj.setName(line.substring(index));
+            caseObj.setName(restoreChars(line.substring(index)));
             return;
         }
 
         if (line.startsWith("#EMF_CASE_ABBREVIATION")) {
-            caseObj.setAbbreviation(new Abbreviation(line.substring(index)));
+            caseObj.setAbbreviation(new Abbreviation(restoreChars(line.substring(index))));
             return;
         }
 
         if (line.startsWith("#EMF_CASE_DESCRIPTION")) {
-            caseObj.setDescription(recoverNewLines(line.substring(index)));
+            caseObj.setDescription(recoverNewLines(restoreChars(line.substring(index))));
             return;
         }
 
         if (line.startsWith("#EMF_CASE_CATEGORY")) {
-            caseObj.setCaseCategory(new CaseCategory(line.substring(index)));
+            caseObj.setCaseCategory(new CaseCategory(restoreChars(line.substring(index))));
             return;
         }
 
         if (line.startsWith("#EMF_PROJECT")) {
-            caseObj.setProject(new Project(line.substring(index)));
+            caseObj.setProject(new Project(restoreChars(line.substring(index))));
             return;
         }
 
         if (line.startsWith("#EMF_CASE_COPIED_FROM")) {
-            caseObj.setTemplateUsed(line.substring(index));
+            caseObj.setTemplateUsed(restoreChars(line.substring(index)));
             return;
         }
 
@@ -258,12 +259,12 @@ public class CaseFileParser {
         }
         
         if (line.startsWith("#EMF_OUTPUT_JOB_SCRIPTS_FOLDER")) {
-            caseObj.setOutputFileDir(line.substring(index));
+            caseObj.setOutputFileDir(restoreChars(line.substring(index)));
             return;
         }
         
         if (line.startsWith("#EMF_INPUT_FOLDER")) {
-            caseObj.setInputFileDir(line.substring(index));
+            caseObj.setInputFileDir(restoreChars(line.substring(index)));
             return;
         }
         
@@ -272,7 +273,7 @@ public class CaseFileParser {
             Sector[] sList = new Sector[sectors.length];
             
             for(int i = 0; i < sList.length; i++)
-                sList[i] = new Sector(sectors[i], sectors[i]);
+                sList[i] = new Sector(restoreChars(sectors[i]), restoreChars(sectors[i]));
             
             caseObj.setSectors(sList);
             return;
@@ -289,9 +290,9 @@ public class CaseFileParser {
             
             GeoRegion region = new GeoRegion();
             String[] rFields = line.substring(index).split("&");
-            region.setName(rFields[0]);
-            region.setAbbreviation(rFields[1]);
-            region.setIoapiName(rFields[2]);
+            region.setName(restoreChars(rFields[0]));
+            region.setAbbreviation(restoreChars(rFields[1]));
+            region.setIoapiName(restoreChars(rFields[2]));
             
             rList.add(region);
             caseObj.setRegions(rList.toArray(new GeoRegion[0]));
@@ -302,14 +303,14 @@ public class CaseFileParser {
         if (text == null || text.trim().isEmpty())
             return "";
         
-        return text.replaceAll(ManagedCaseService.locNewLine, sysNewLine);
+        return text.replaceAll(StringTools.EMF_NEW_LINE, sysNewLine);
     }
 
     private void populateCase(String[] values) throws ParseException {
         // NOTE: the order of fields:
         // Tab,Parameter,Order,Envt. Var.,Region,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose
         // pEnvVars.add(new ParameterEnvVar(values[3]));
-        String value = values[8];
+        String value = restoreChars(values[8]);
         
         if (values[1].equalsIgnoreCase("Model to Run")) {
             caseObj.setModel(new ModelToRun(value));
@@ -383,22 +384,22 @@ public class CaseFileParser {
         // NOTE: the order of fields:
         // Tab,Parameter,Order,Envt. Var.,Region,Sector,Job,Program,Value,Type,Reqd?,Local?,Last Modified,Notes,Purpose
 
-        newParam.setParameterName(new ParameterName(fields[1]));
+        newParam.setParameterName(new ParameterName(restoreChars(fields[1])));
         newParam.setOrder(Float.valueOf(fields[2]));
-        ParameterEnvVar envar = new ParameterEnvVar(fields[3]);
+        ParameterEnvVar envar = new ParameterEnvVar(restoreChars(fields[3]));
         pEnvVars.add(envar);
         newParam.setEnvVar(envar);
-        newParam.setRegion(new GeoRegion(fields[4], fields[4]));
-        newParam.setSector(new Sector(fields[5], fields[5]));
-        newParam.setJobName(fields[6]);
-        newParam.setProgram(new CaseProgram(fields[7]));
-        newParam.setValue(fields[8]);
+        newParam.setRegion(new GeoRegion(restoreChars(fields[4]), restoreChars(fields[4])));
+        newParam.setSector(new Sector(restoreChars(fields[5]), restoreChars(fields[5])));
+        newParam.setJobName(restoreChars(fields[6]));
+        newParam.setProgram(new CaseProgram(restoreChars(fields[7])));
+        newParam.setValue(restoreChars(fields[8]));
         newParam.setType(new ValueType(fields[9]));
         newParam.setRequired(fields[10].equalsIgnoreCase("TRUE"));
         newParam.setLocal(fields[11].equalsIgnoreCase("TRUE"));
         newParam.setLastModifiedDate(CustomDateFormat.parse_MM_DD_YYYY_HH_mm(fields[12]));
-        newParam.setNotes(recoverNewLines(fields[13]));
-        newParam.setPurpose(recoverNewLines(fields[14]));
+        newParam.setNotes(recoverNewLines(restoreChars(fields[13])));
+        newParam.setPurpose(recoverNewLines(restoreChars(fields[14])));
 
         this.params.add(newParam);
     }
@@ -415,24 +416,24 @@ public class CaseFileParser {
         // Tab,Inputname,Envt Variable,Sector,Job,Program,Dataset,Version,QA status,DS Type,Reqd?,Local?,Subdir,Last
         // Modified,Parentcase
 
-        input.setInputName(new InputName(data[1]));
-        InputEnvtVar envVar = new InputEnvtVar(data[2]);
+        input.setInputName(new InputName(restoreChars(data[1])));
+        InputEnvtVar envVar = new InputEnvtVar(restoreChars(data[2]));
         this.inEnvVars.add(envVar);
         input.setEnvtVars(envVar);
-        input.setRegion(new GeoRegion(data[3], data[3]));
-        input.setSector(new Sector(data[4], data[4].equalsIgnoreCase("All sectors") ? "" : data[4]));
-        input.setJobName(data[5].equalsIgnoreCase("All jobs for sector") ? "" : data[5]);
-        input.setProgram(new CaseProgram(data[6]));
-        input.setDataset(new EmfDataset(0, data[7], 0, 0, data[10]));
+        input.setRegion(new GeoRegion(restoreChars(data[3]), restoreChars(data[3])));
+        input.setSector(new Sector(restoreChars(data[4]), data[4].equalsIgnoreCase("All sectors") ? "" : restoreChars(data[4])));
+        input.setJobName(data[5].equalsIgnoreCase("All jobs for sector") ? "" : restoreChars(data[5]));
+        input.setProgram(new CaseProgram(restoreChars(data[6])));
+        input.setDataset(new EmfDataset(0, restoreChars(data[7]), 0, 0, restoreChars(data[10])));
         Version version = (data[8] == null || data[8].equalsIgnoreCase("null") || data[8].trim().isEmpty()) ? null
                 : new Version(Integer.parseInt(data[8]));
         input.setVersion(version);
-        input.setDatasetType(new DatasetType(data[10]));
+        input.setDatasetType(new DatasetType(restoreChars(data[10])));
         input.setRequired(data[11].equalsIgnoreCase("TRUE"));
         input.setLocal(data[12].equalsIgnoreCase("TRUE"));
-        input.setSubdirObj(new SubDir(data[13]));
+        input.setSubdirObj(new SubDir(restoreChars(data[13])));
         input.setLastModifiedDate(data[14].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[14]));
-        input.setParentCase(data[15]);
+        input.setParentCase(restoreChars(data[15]));
 
         this.inputs.add(input);
     }
@@ -448,26 +449,30 @@ public class CaseFileParser {
         // NOTE: the order of fields:
         // Tab,JobName,Order,Sector,RunStatus,StartDate,CompletionDate,Executable,Arguments,Path,QueueOptions,JobGroup,Local,QueueID,User,Host,Notes,Purpose,DependsOn
 
-        job.setName(data[1]);
+        job.setName(restoreChars(data[1]));
         job.setJobNo(Float.parseFloat(data[2]));
-        job.setRegion(new GeoRegion(data[3], data[3]));
-        job.setSector(new Sector(data[4], data[4].equalsIgnoreCase("All sectors") ? "" : data[4]));
-        job.setRunstatus(new JobRunStatus(data[5]));
+        job.setRegion(new GeoRegion(restoreChars(data[3]), restoreChars(data[3])));
+        job.setSector(new Sector(restoreChars(data[4]), data[4].equalsIgnoreCase("All sectors") ? "" : restoreChars(data[4])));
+        job.setRunstatus(new JobRunStatus(restoreChars(data[5])));
         job.setRunStartDate(data[6].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[6]));
         job.setRunCompletionDate(data[7].trim().isEmpty() ? null : CustomDateFormat.parse_MM_DD_YYYY_HH_mm(data[7]));
-        job.setExecutable(new Executable(data[8]));
-        job.setArgs(data[9]);
-        job.setPath(data[10]);
-        job.setQueOptions(data[11]);
-        job.setJobGroup(data[12]);
+        job.setExecutable(new Executable(restoreChars(data[8])));
+        job.setArgs(restoreChars(data[9]));
+        job.setPath(restoreChars(data[10]));
+        job.setQueOptions(restoreChars(data[11]));
+        job.setJobGroup(restoreChars(data[12]));
         job.setLocal(data[13].equalsIgnoreCase("TRUE"));
         job.setIdInQueue(data[14]);
-        job.setUser(new User(data[15]));
-        job.setHost(new Host(data[16]));
-        job.setRunNotes(recoverNewLines(data[17]));
-        job.setPurpose(recoverNewLines(data[18]));
+        job.setUser(new User(restoreChars(data[15])));
+        job.setHost(new Host(restoreChars(data[16])));
+        job.setRunNotes(recoverNewLines(restoreChars(data[17])));
+        job.setPurpose(recoverNewLines(restoreChars(data[18])));
 
         this.jobs.add(job);
+    }
+    
+    private String restoreChars(String parsed) {
+        return parsed.replaceAll(StringTools.EMF_DOUBLE_QUOTE, "\"");
     }
 
 }

@@ -11,7 +11,7 @@ import gov.epa.emissions.commons.io.generic.GenericExporterToString;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
-import gov.epa.emissions.commons.util.CustomStringTools;
+import gov.epa.emissions.commons.util.StringTools;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
@@ -78,9 +78,9 @@ public class ManagedCaseService {
 
     private static int svcCount = 0;
     
-    public static String locNewLine = "   /   ";
-
     private String svcLabel = null;
+    
+    private String locNewLine = StringTools.EMF_NEW_LINE;
 
     public synchronized String myTag() {
         if (svcLabel == null) {
@@ -5372,7 +5372,7 @@ public class ManagedCaseService {
             List<CaseParameter> parameters = dao.getCaseParameters(caseId, session);
 
             String prefix = currentCase.getName() + "_" + currentCase.getAbbreviation().getName() + "_";
-            prefix = CustomStringTools.replaceNoneLetterDigit(prefix, '_');
+            prefix = StringTools.replaceNoneLetterDigit(prefix, '_');
             String sumParamFile = prefix + "Summary_Parameters.csv";
             String inputsFile = prefix + "Inputs.csv";
             String jobsFile = prefix + "Jobs.csv";
@@ -5732,7 +5732,7 @@ public class ManagedCaseService {
         if (toClean == null || toClean.trim().isEmpty())
             return "";
 
-        String temp = toClean.replace('"', '\'');
+        String temp = toClean.replace("\"", StringTools.EMF_DOUBLE_QUOTE);
 
         return temp.replaceAll("\\\\", "/");
     }

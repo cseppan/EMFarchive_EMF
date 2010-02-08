@@ -7,7 +7,7 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.Reader;
 import gov.epa.emissions.commons.io.importer.TerminatorRecord;
 import gov.epa.emissions.commons.io.importer.Tokenizer;
-import gov.epa.emissions.commons.util.CustomStringTools;
+import gov.epa.emissions.commons.util.StringTools;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -90,7 +90,7 @@ public class CMCSVFileReader implements Reader {
                     return doRead(line);
                 }
                 if (isComment(line))
-                    comments.add(CustomStringTools.escapeBackSlash(line));
+                    comments.add(StringTools.escapeBackSlash(line));
     
                 line = fileReader.readLine();
             }

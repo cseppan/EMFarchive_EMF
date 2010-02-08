@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
-import gov.epa.emissions.commons.util.CustomStringTools;
+import gov.epa.emissions.commons.util.StringTools;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -47,7 +47,7 @@ public class PrintCasePresenter {
         }
         try {
             String prefix = currentCase.getName() + "_" + currentCase.getAbbreviation().getName() + "_";
-            prefix = CustomStringTools.replaceNoneLetterDigit(prefix, '_');
+            prefix = StringTools.replaceNoneLetterDigit(prefix, '_');
             String sumParamFile = prefix + "Summary_Parameters.csv";
             String inputsFile = prefix + "Inputs.csv";
             String jobsFile = prefix + "Jobs.csv";
