@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.login;
 
-import java.util.Date;
-
 import gov.epa.emissions.commons.CommonsException;
 import gov.epa.emissions.commons.security.PasswordGenerator;
 import gov.epa.emissions.commons.security.User;
@@ -9,6 +7,8 @@ import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.UserService;
+
+import java.util.Date;
 
 public class LoginPresenter {
 
@@ -32,6 +32,8 @@ public class LoginPresenter {
             throw new EmfException(e.getMessage());
         }
         
+        
+        
         User user = userAdmin.getUser(username);
         
         //if (!user.isLoggedIn()){
@@ -42,6 +44,8 @@ public class LoginPresenter {
             
             user.setLoggedIn(true);
             user.setLastLoginDate(new Date());
+            if ( user.getPasswordResetDate() == null )
+                user.setPasswordResetDate(new Date());
             userAdmin.updateUser(user);
         //}
         
@@ -63,6 +67,15 @@ public class LoginPresenter {
 
     public String getUpdatedEmfVersion() {
         return update;
+    }
+    
+    public Integer getEffectiveDays() throws EmfException {
+        try {
+            return Integer.valueOf(userAdmin.getEmfPasswordEffDays());
+        } catch (EmfException e) {
+            e.printStackTrace();
+            throw new EmfException(e.getMessage());
+        }
     }
 
     public void doCancel() {

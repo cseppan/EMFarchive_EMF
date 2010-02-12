@@ -125,6 +125,15 @@ public class UserServiceTransport implements UserService {
         
         return (String) call.requestResponse(new Object[] { });
     }
+    
+    public synchronized String getEmfPasswordEffDays() throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getEmfPasswordEffDays");
+        call.setStringReturnType();
+        
+        return (String) call.requestResponse(new Object[] { });
+    }
 
     public void logExitMessage(User user) throws EmfException {
         EmfCall call = call();

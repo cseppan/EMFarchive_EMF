@@ -21,6 +21,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -149,6 +150,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
         try {
             User user = presenter.doLogin(username.getText(), new String(password.getPassword()));
             messagePanel.clear();
+            toExpire(user);
             super.refreshLayout();
             launchConsole(user);
             disposeView();
@@ -156,6 +158,27 @@ public class LoginWindow extends EmfFrame implements LoginView {
             messagePanel.setError(e.getMessage());
         }
     }
+    
+    private int toExpire(User user) throws EmfException {
+        int difInDays = (int) (((new Date()).getTime() - (user.getPasswordResetDate()).getTime())/(1000*60*60*24));
+        Integer expireDays=0;
+        try {
+            expireDays = difInDays - presenter.getEffectiveDays();
+        } catch (EmfException e) {
+            throw new EmfException(e.getMessage());
+        }
+        if ( expireDays > 0) {
+            throw new EmfException("Password has expired.  Reset Password.");
+        }
+//        else if ( Math.abs(expireDays)<5 ){   
+//            String message = " Password is to expire in " + 
+//            Math.abs(expireDays) + " days.\n"
+//            + "Please reset your password using profile manager. ";
+//            System.out.println("Showing confirm dialog");
+//            return JOptionPane.showConfirmDialog(this, message, "Warning", JOptionPane.CLOSED_OPTION);
+//        }
+        return 0; 
+    }  
 
     private void launchConsole(User user) throws EmfException {
         EmfConsole console = new EmfConsole(new DefaultEmfSession(user, serviceLocator));
@@ -194,9 +217,12 @@ public class LoginWindow extends EmfFrame implements LoginView {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        JButton forgotPassword = new JButton("Reset Password");
-        forgotPassword.setEnabled(false);
-        forgotPassword.setToolTipText("Not yet implemented");
+        JButton forgotPassword = new Button("Reset Password", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doResetPassword();
+            }
+        });
+        forgotPassword.setToolTipText("Reset password");
         JPanel forgotPasswordPanel = new JPanel(new BorderLayout());
         forgotPasswordPanel.add(forgotPassword);
 
@@ -225,10 +251,29 @@ public class LoginWindow extends EmfFrame implements LoginView {
         }
         disposeView();
     }
+    
+    private void doResetPassword() {
+        try {
+            User user = presenter.doLogin(username.getText(), new String(password.getPassword()));
+            launchResetUser(user);
+        } catch (Exception ex) {
+            messagePanel.setError(ex.getMessage());
+            return;
+        }
+        disposeView();
+    }
 
     private void launchRegisterUser() throws Exception {
         PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(serviceLocator);
         RegisterUserWindow view = new RegisterUserWindow(serviceLocator, strategy);
+
+        RegisterUserPresenter presenter = new RegisterUserPresenter(serviceLocator.userService());
+        presenter.display(view);
+    }
+    
+    private void launchResetUser(User user) throws Exception {
+        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(serviceLocator);
+        RegisterUserWindow view = new RegisterUserWindow(serviceLocator, strategy, user);
 
         RegisterUserPresenter presenter = new RegisterUserPresenter(serviceLocator.userService());
         presenter.display(view);

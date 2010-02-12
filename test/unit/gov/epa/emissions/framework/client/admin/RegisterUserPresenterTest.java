@@ -33,7 +33,7 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
         userServices.expects(once()).method("createUser").with(eq(user)).will(returnValue(user));
         userServices.expects(once()).method("authenticate").with(eq("joey"), eq(user.getEncryptedPassword()));
 
-        presenter.doRegister(user);
+        presenter.doRegister(user, true);
     }
 
     public void testShouldCloseViewOnCancelAction() {

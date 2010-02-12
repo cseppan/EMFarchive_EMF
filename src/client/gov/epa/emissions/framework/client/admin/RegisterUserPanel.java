@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.gui.LabelWidget;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextFieldWidget;
 import gov.epa.emissions.commons.gui.Widget;
@@ -30,20 +31,25 @@ public class RegisterUserPanel extends JPanel {
     private EditableUserProfilePanel panel;
 
     private User user;
+    
+    private Boolean isNewUser; 
 
     private ManageChangeables changeablesList;
-
+    
     public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
-            EmfView parent, ManageChangeables changeablesList) {
-        this(postRegisterStrategy, cancelStrategy, parent, new NoAdminOption(), changeablesList);
+            EmfView parent, ManageChangeables changeablesList, User user) {
+        //this.user = user; 
+        this(postRegisterStrategy, cancelStrategy, parent, new NoAdminOption(), 
+                changeablesList, user);
     }
 
     public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
-            EmfView parent, AdminOption adminOption, ManageChangeables changeablesList) {
+            EmfView parent, AdminOption adminOption, ManageChangeables changeablesList, User user) {
         this.postRegisterStrategy = postRegisterStrategy;
         this.cancelStrategy = cancelStrategy;
         this.container = parent;
         this.changeablesList = changeablesList;
+        this.user = user; 
         createLayout(adminOption);
 
         this.setSize(new Dimension(375, 425));
@@ -60,9 +66,16 @@ public class RegisterUserPanel extends JPanel {
                 closeWindow();
             }
         };
-
-        user = new User();
-        Widget username = new TextFieldWidget("username", user.getUsername(), 10);
+        Widget username;
+        if ( user == null ) {
+            user = new User();
+            isNewUser = true; 
+            username = new TextFieldWidget("username", user.getUsername(), 10);
+        }
+        else {
+            isNewUser = false; 
+            username = new LabelWidget("username", user.getUsername());
+        }
         panel = new EditableUserProfilePanel(user, username, okAction, cancelAction, adminOption,
                 new PopulateUserOnRegisterStrategy(user), changeablesList);
         this.add(panel);
@@ -74,7 +87,7 @@ public class RegisterUserPanel extends JPanel {
 
             // FIXME: monitor.resetChanges();
             //user.setLoggedIn(true);
-            user = presenter.doRegister(user);
+            user = presenter.doRegister(user, isNewUser);
             postRegisterStrategy.execute(user);
         } catch (EmfException e) {
             panel.setError(e.getMessage());

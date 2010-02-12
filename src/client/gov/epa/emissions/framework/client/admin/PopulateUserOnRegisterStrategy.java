@@ -28,6 +28,7 @@ public class PopulateUserOnRegisterStrategy implements PopulateUserStrategy {
             user.setLoggedIn(true);
             user.setWantEmails(wantEmails);
             user.setLastLoginDate(new Date());
+            user.setPasswordResetDate(new Date());
         } catch (UserException e) {
             throw new EmfException(e.getMessage());
         }

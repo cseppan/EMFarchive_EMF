@@ -15,9 +15,16 @@ public class RegisterUserPresenter {
     }
 
     // auto-login, upon registration
-    public User doRegister(User user) throws EmfException {
-        user = model.createUser(user);// create and update with saved object(so that id is updated on the client side)
-        model.authenticate(user.getUsername(), user.getEncryptedPassword());
+    public User doRegister(User user, Boolean isNewUser) throws EmfException {
+        if ( isNewUser ){
+            user = model.createUser(user);// create and update with saved object(so that id is updated on the client side)
+            model.authenticate(user.getUsername(), user.getEncryptedPassword());
+        }
+        else {
+            model.obtainLocked(user, user);
+            model.checkDuplicatesByEmail(user);
+            model.updateUser(user);
+        }
         return user;
     }
 

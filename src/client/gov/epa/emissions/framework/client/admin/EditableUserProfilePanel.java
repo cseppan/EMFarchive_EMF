@@ -144,10 +144,10 @@ public class EditableUserProfilePanel extends JPanel {
         adminOption.setAdmin(user);
         
         //wantEmails = new JCheckBox(" Want Emails? ", null,user.isWantEmails());
-        wantEmails = new JCheckBox(" Want Emails? ");
+        wantEmails = new JCheckBox("Receive update emails? ");
         wantEmails.setSelected(user.getWantEmails());
         optionsPanel.add(wantEmails);
-        //changeablesList.addChangeable(wantEmails);
+        
         panel.add(optionsPanel);
 
         return panel;

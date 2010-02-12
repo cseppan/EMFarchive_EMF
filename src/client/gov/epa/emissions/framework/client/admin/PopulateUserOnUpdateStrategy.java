@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
+import java.util.Date;
+
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.security.UserException;
 import gov.epa.emissions.framework.services.EmfException;
@@ -22,6 +24,7 @@ public class PopulateUserOnUpdateStrategy implements PopulateUserStrategy {
             if (password.length > 0) {
                 user.setPassword(new String(password));
                 user.confirmPassword(new String(confirmPassword));
+                user.setPasswordResetDate(new Date());
             }
             user.setWantEmails(wantEmails);
         } catch (UserException e) {

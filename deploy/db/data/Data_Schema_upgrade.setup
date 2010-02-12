@@ -995,3 +995,9 @@ UPDATE emf.datasets as ds SET creator_full_name = (SELECT name FROM	emf.users wh
 -- added (01/25/2010) to add creator full name to datasets
 ALTER TABLE emf.users ADD COLUMN want_emails boolean NOT NULL DEFAULT true;
 ALTER TABLE emf.users ADD COLUMN last_login_date timestamp;
+
+-- added (02/10/2010) to add creator full name to datasets
+ALTER TABLE emf.users ADD COLUMN password_reset_date timestamp;
+
+--02/10/2010 add another property of password effective days
+INSERT into emf.properties values(DEFAULT, 'PASSWORD_EFFECTIVE_DAYS', '90');

@@ -32,6 +32,8 @@ public interface UserService extends EMFService {
     
     String getEmfVersion() throws EmfException;
     
+    String getEmfPasswordEffDays() throws EmfException;
+    
     void logExitMessage(User user) throws EmfException;
 
 }

@@ -224,6 +224,20 @@ public class UserServiceImpl implements UserService {
             session.close();
         }
     }
+    
+    public synchronized String getEmfPasswordEffDays() throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty("PASSWORD_EFFECTIVE_DAYS", session);
+            return property == null ? null : property.getValue();
+        } catch (Exception e) {
+            LOG.error("Could not get EMF password effective days.", e);
+            throw new EmfException("Could not get EMF password effective days.");
+        } finally {
+            session.close();
+        }
+    }
 
     @Override
     protected synchronized void finalize() throws Throwable {
