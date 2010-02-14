@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
+import gov.epa.emissions.commons.util.StringTools;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
@@ -237,6 +238,9 @@ public class CaseAssistanceService {
 
         MeteorlogicalYear metYear = newCase.getMeteorlogicalYear();
         loadNSetObject(newCase, metYear, MeteorlogicalYear.class, metYear == null ? "" : metYear.getName(), session);
+        
+        EmissionsYear emisYear = newCase.getEmissionsYear();
+        loadNSetObject(newCase, emisYear, EmissionsYear.class, emisYear == null ? "" : emisYear.getName(), session);
 
         Sector[] sectors = newCase.getSectors();
         loadNSetSectors(newCase, sectors, session);
@@ -292,6 +296,11 @@ public class CaseAssistanceService {
 
         if (obj instanceof MeteorlogicalYear) {
             newCase.setMeteorlogicalYear((MeteorlogicalYear) temp);
+            return;
+        }
+        
+        if (obj instanceof EmissionsYear) {
+            newCase.setEmissionsYear((EmissionsYear) temp);
             return;
         }
     }
@@ -430,6 +439,11 @@ public class CaseAssistanceService {
 
     private void insertInputs(int caseId, int model2RunId, List<CaseInput> inputs, CaseDaoHelper helper,
             HashMap<String, Integer> jobIds) throws Exception {
+        int nameNoMatch = 0;
+        int verNoMatch = 0;
+        StringBuilder defltVerUsed = new StringBuilder();
+        StringBuilder noMatchNames = new StringBuilder();
+        
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
             CaseInput input = iter.next();
             input.setCaseID(caseId);
@@ -467,13 +481,29 @@ public class CaseAssistanceService {
             input.setSubdirObj(subDir);
 
             EmfDataset ds = helper.getDataset(input.getDataset().getName(), type);
-            Version version = input.getVersion();
-
-            int verNum = version == null ? 0 : version.getVersion();
+            Version ver = null;
+            Version tempVer = input.getVersion();
+            int verNum = (tempVer == null ? ds.getDefaultVersion() : tempVer.getVersion());
+            
+            if (ds != null) {
+                ver = helper.getDatasetVersion(ds.getId(), verNum);
+                ver = (ver == null ? helper.getDatasetVersion(ds.getId(), ds.getDefaultVersion()) : ver);
+            }
+            
+            if (ds == null) {
+                nameNoMatch++; 
+                noMatchNames.append("\"" + input.getName() + "\" ");
+            }
+            
+            if (ver != null && ver.getVersion() != verNum) {
+                verNoMatch++; 
+                defltVerUsed.append("Default dataset version used for input \"" + input.getName() + "\"" 
+                        + StringTools.SYS_NEW_LINE);
+            }
 
             input.setDataset(ds);
-            input.setVersion(ds == null ? null : helper.getDatasetVersion(ds.getId(), verNum));
-
+            input.setVersion(ver);
+            
             String jobName = input.getJobName();
 
             if (jobName != null && !jobName.trim().equalsIgnoreCase("All jobs for sector") && !jobName.trim().isEmpty())
@@ -481,6 +511,17 @@ public class CaseAssistanceService {
 
             helper.insertCaseInput(input);
         }
+        
+        StringBuilder sb = new StringBuilder();
+        
+        if (nameNoMatch > 0) {
+            sb.append(nameNoMatch + " input(s) have no matching datasets in the database:" +
+            		StringTools.SYS_NEW_LINE + noMatchNames.toString());
+        }
+        
+        if (verNoMatch > 0) sb.append(defltVerUsed);
+        
+        if (sb.length() > 0) throw new Exception(sb.toString());
     }
 
     public synchronized String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException {
@@ -1248,6 +1289,23 @@ public class CaseAssistanceService {
             session.close();
         }
     }
+    
+    public synchronized EmissionsYear addEmissionsYear(EmissionsYear emisyr) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            EmissionsYear temp = (EmissionsYear) caseDao.load(EmissionsYear.class, emisyr.getName(), session);
+
+            if (temp != null)
+                return temp;
+            caseDao.add(emisyr, session);
+            return (EmissionsYear) caseDao.load(EmissionsYear.class, emisyr.getName(), session);
+        } catch (Exception e) {
+            log.error("Could not add new EmissionsYear '" + emisyr.getName() + "'\n", e);
+            throw new EmfException("Could not add new EmissionsYear '" + emisyr.getName() + "'");
+        } finally {
+            session.close();
+        }
+    }
 
     public synchronized GeoRegion addGrid(GeoRegion grid) throws EmfException {
         Session session = sessionFactory.getSession();
@@ -1357,5 +1415,5 @@ public class CaseAssistanceService {
             localSession.close();
         }
     }
-
+    
 }

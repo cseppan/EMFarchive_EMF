@@ -5545,7 +5545,7 @@ public class ManagedCaseService {
                 + "Summary,Meteorological Year,0,,,All sectors,All jobs for sector,All programs," + metYear
                 + ",String,TRUE,TRUE,,," + ls
                 + "Summary,Base Year,0,BASE_YEAR,,All sectors,All jobs for sector,All programs,"
-                + currentCase.getBaseYear() + ",String,TRUE,TRUE,,," + ls
+                + currentCase.getEmissionsYear() + ",String,TRUE,TRUE,,," + ls
                 + "Summary,Future Year,0,FUTURE_YEAR,,All sectors,All jobs for sector,All programs,"
                 + currentCase.getFutureYear() + ",String,TRUE,TRUE,,," + ls
                 + "Summary,Start Date & Time,0,EPI_STDATE_TIME,,All sectors,All jobs for sector,All programs,"
