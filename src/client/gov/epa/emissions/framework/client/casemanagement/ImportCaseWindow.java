@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class ImportCaseWindow extends ReusableInteralFrame implements ImportCaseView {
@@ -30,22 +31,25 @@ public class ImportCaseWindow extends ReusableInteralFrame implements ImportCase
     private DataCommonsService service;
 
     private ImportCasePanel importInputPanel;
+    
+    private EmfConsole parentConsole;
 
     public ImportCaseWindow(DataCommonsService service, DesktopManager desktopManager, EmfConsole parent) {
         super("Import Cases", new Dimension(650, 300), desktopManager);
         super.setName("importCases");
 
         this.service = service;
+        this.parentConsole = parent;
 
-        this.getContentPane().add(createLayout(parent));
+        this.getContentPane().add(createLayout());
     }
 
-    private JPanel createLayout(EmfConsole parent) {
+    private JPanel createLayout() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
-        importInputPanel = new ImportCasePanel(service, messagePanel, parent);
+        importInputPanel = new ImportCasePanel(service, messagePanel, parentConsole);
         panel.add(messagePanel);
         panel.add(importInputPanel);
         panel.add(createButtonsPanel());
@@ -88,7 +92,7 @@ public class ImportCaseWindow extends ReusableInteralFrame implements ImportCase
             messagePanel.setMessage("Successfully imported the case.");
             importButton.setEnabled(false);
         } catch (Exception e) {
-            messagePanel.setError(e.getMessage());
+            JOptionPane.showMessageDialog(parentConsole, e.getMessage(), "Import Case", JOptionPane.WARNING_MESSAGE);
         }
     }
 
