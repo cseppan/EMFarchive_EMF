@@ -5475,6 +5475,8 @@ public class ManagedCaseService {
                 .format_MM_DD_YYYY_HH_mm(currentCase.getStartDate());
         String endDate = (currentCase.getEndDate() == null) ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm(currentCase
                 .getEndDate());
+        EmissionsYear emisyr = currentCase.getEmissionsYear();
+        String emisYear = (emisyr == null || emisyr.getName().trim().isEmpty() ? "" : emisyr.getName().trim());
 
         String summary = "\"#EMF_CASE_NAME="
                 + clean(currentCase.getName())
@@ -5545,7 +5547,7 @@ public class ManagedCaseService {
                 + "Summary,Meteorological Year,0,,,All sectors,All jobs for sector,All programs," + metYear
                 + ",String,TRUE,TRUE,,," + ls
                 + "Summary,Base Year,0,BASE_YEAR,,All sectors,All jobs for sector,All programs,"
-                + currentCase.getEmissionsYear() + ",String,TRUE,TRUE,,," + ls
+                + emisYear + ",String,TRUE,TRUE,,," + ls
                 + "Summary,Future Year,0,FUTURE_YEAR,,All sectors,All jobs for sector,All programs,"
                 + currentCase.getFutureYear() + ",String,TRUE,TRUE,,," + ls
                 + "Summary,Start Date & Time,0,EPI_STDATE_TIME,,All sectors,All jobs for sector,All programs,"

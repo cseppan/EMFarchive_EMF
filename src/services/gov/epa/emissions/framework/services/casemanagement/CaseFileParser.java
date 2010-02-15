@@ -353,8 +353,8 @@ public class CaseFileParser {
         }
 
         if (values[1].equalsIgnoreCase("Base Year")) {
-            if (value != null && !value.trim().isEmpty())
-                caseObj.setEmissionsYear(new EmissionsYear(value));
+            if (value != null && !value.trim().isEmpty() && !value.trim().toLowerCase().equals("null"))
+                caseObj.setEmissionsYear(new EmissionsYear(value.trim()));
 
             return;
         }
