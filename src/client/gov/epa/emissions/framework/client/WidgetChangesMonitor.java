@@ -32,4 +32,13 @@ public class WidgetChangesMonitor {
         return true;
     }
 
+    public boolean shouldProcessChanges(String title, String message) {
+
+        boolean retVal = false;
+        if (list.hasChanges()) {
+            retVal = new YesNoDialog(window, title, message).confirm();
+        }
+
+        return retVal;
+    }
 }

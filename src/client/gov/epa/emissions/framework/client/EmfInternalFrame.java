@@ -141,6 +141,10 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     public boolean shouldDiscardChanges() {
         return monitor.shouldDiscardChanges();
     }
+    
+    public boolean shouldProcessChanges(String title, String message) {
+        return monitor.shouldProcessChanges(title, message);
+    }
 
     protected void setDefaultButton(Button button) {
         getRootPane().setDefaultButton(button);

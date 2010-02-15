@@ -14,6 +14,8 @@ public interface ManagedView extends EmfView {
 
     boolean shouldDiscardChanges(); // FIXME: do we need this method
 
+    boolean shouldProcessChanges(String title, String message);
+
     /* Should release the locks if any and call disposeView() */
     void windowClosing();
 }
