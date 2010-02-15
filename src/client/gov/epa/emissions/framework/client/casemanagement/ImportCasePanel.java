@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -20,12 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SpringLayout;
 
 public class ImportCasePanel extends JPanel {
 
@@ -54,34 +56,42 @@ public class ImportCasePanel extends JPanel {
     }
 
     private void initialize() {
-        setLayout(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        int width = 40;
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
 
-        JPanel chooser = new JPanel(new BorderLayout(2, 0));
-        folder = new TextField("folder", 35);
-        chooser.add(folder, BorderLayout.LINE_START);
-        chooser.add(importFileButton(), BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("Folder", chooser, this);
+        JPanel chooser = new JPanel(new BorderLayout(10, 10));
+        folder = new TextField("folder", width);
+        chooser.add(new JLabel("Folder     "),BorderLayout.WEST);
+        chooser.add(folder);
+        chooser.add(browseFileButton(), BorderLayout.EAST);
 
-        JPanel apply = new JPanel(new BorderLayout(2, 0));
-        pattern = new TextField("pattern", 35);
-        apply.add(pattern, BorderLayout.LINE_START);
-        apply.add(applyPatternButton(), BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("Pattern", apply, this);
+        JPanel apply = new JPanel(new BorderLayout(10,10));
+        pattern = new TextField("pattern", width);
+        apply.add(new JLabel("Pattern   "),BorderLayout.WEST);
+        apply.add(pattern);
+        apply.add(applyPatternButton(), BorderLayout.EAST);
 
-        filenames = new TextArea("filenames", "", 35, 6);
-        JScrollPane fileTextArea = new JScrollPane(filenames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+        JPanel fileNamesPanel = new JPanel(new BorderLayout(4,10));
+        filenames = new TextArea("filenames", "", width, 6);
+        JScrollPane fileTextAreaPane = new JScrollPane(filenames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        layoutGenerator.addLabelWidgetPair("Filenames", fileTextArea, this);
+        fileNamesPanel.add(new JLabel("Filenames"),BorderLayout.WEST);
+        fileNamesPanel.add(fileTextAreaPane);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(this, 3, 2, // rows, cols
-                10, 10, // initialX, initialY
-                10, 10);// xPad, yPad
-
+        mainPanel.add(chooser);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(apply);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(fileNamesPanel);
+        mainPanel.add(Box.createVerticalStrut(10));
+        this.setBorder(BorderFactory.createEmptyBorder(10,10,10,20));
+        this.setLayout(new BorderLayout(10,10));
+        this.add(mainPanel,BorderLayout.NORTH);
     }
 
-    private JButton importFileButton() {
+    private JButton browseFileButton() {
         Button button = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clear();

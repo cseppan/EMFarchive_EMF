@@ -35,7 +35,7 @@ public class ImportCaseWindow extends ReusableInteralFrame implements ImportCase
     private EmfConsole parentConsole;
 
     public ImportCaseWindow(DataCommonsService service, DesktopManager desktopManager, EmfConsole parent) {
-        super("Import Cases", new Dimension(650, 300), desktopManager);
+        super("Import Cases", new Dimension(700, 320), desktopManager);
         super.setName("importCases");
 
         this.service = service;

@@ -32,7 +32,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private ImportInputPanel importInputPanel;
 
     public ImportWindow(DataCommonsService service, DesktopManager desktopManager, EmfConsole parent, DatasetType dsType) throws EmfException {
-        super("Import Datasets", new Dimension(650, 400), desktopManager);
+        super("Import Datasets", new Dimension(700, 420), desktopManager);
         super.setName("importDatasets");
 
         this.service = service;

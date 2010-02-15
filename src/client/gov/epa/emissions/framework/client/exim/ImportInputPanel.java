@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -22,15 +21,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SpringLayout;
 
 public class ImportInputPanel extends JPanel {
 
@@ -69,41 +71,62 @@ public class ImportInputPanel extends JPanel {
     }
 
     private void initialize() throws EmfException {
-        setLayout(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
+        int width = 40;
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
+        
         datasetTypesComboBox = typesComboBox();
-        layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesComboBox, this);
+        JPanel typesCombo = new JPanel(new BorderLayout(10, 10));
+        //layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesComboBox, this);
+        typesCombo.add(new JLabel("Dataset Type"),BorderLayout.WEST);
+        typesCombo.add(datasetTypesComboBox);
+        
+        JPanel chooser = new JPanel(new BorderLayout(10, 10));
+        folder = new TextField("folder", width);
+        chooser.add(new JLabel("Folder             "),BorderLayout.WEST);
+        chooser.add(folder);
+        chooser.add(browseFileButton(), BorderLayout.EAST);
+        
+        JPanel apply = new JPanel(new BorderLayout(10,10));
+        pattern = new TextField("pattern", width);
+        apply.add(new JLabel("Pattern           "),BorderLayout.WEST);
+        apply.add(pattern);
+        apply.add(applyPatternButton(), BorderLayout.EAST);
 
-        JPanel chooser = new JPanel(new BorderLayout(2, 0));
-        folder = new TextField("folder", 35);
-        chooser.add(folder, BorderLayout.LINE_START);
-        chooser.add(importFileButton(), BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("Folder", chooser, this);
-
-        JPanel apply = new JPanel(new BorderLayout(2, 0));
-        pattern = new TextField("pattern", 35);
-        apply.add(pattern, BorderLayout.LINE_START);
-        apply.add(applyPatternButton(), BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("Pattern", apply, this);
-
-        filenames = new TextArea("filenames", "", 35, 6);
-        JScrollPane fileTextArea = new JScrollPane(filenames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+        JPanel fileNamesPanel = new JPanel(new BorderLayout(4,10));
+        filenames = new TextArea("filenames", "", width, 6);
+        JScrollPane fileTextAreaPane = new JScrollPane(filenames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        layoutGenerator.addLabelWidgetPair("Filenames", fileTextArea, this);
+        fileNamesPanel.add(new JLabel("Filenames        "),BorderLayout.WEST);
+        fileNamesPanel.add(fileTextAreaPane);
 
-        name = new TextField("name", 35);
-        layoutGenerator.addLabelWidgetPair("Dataset Name", name, this);
+        name = new TextField("name", width);
+        JPanel nameField = new JPanel(new BorderLayout(10, 10));
+        nameField.add(new JLabel("Dataset Names"),BorderLayout.WEST);
+        nameField.add(name);
+        //layoutGenerator.addLabelWidgetPair("Dataset Name", name, this);
 
         isMultipleDatasets = new JCheckBox("Create Multiple Datasets");
         isMultipleDatasets.addActionListener(multipleDatasetsActionListener());
 
-        layoutGenerator.addLabelWidgetPair("", isMultipleDatasets, this);
+        //layoutGenerator.addLabelWidgetPair("", isMultipleDatasets, this);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(this, 6, 2, // rows, cols
-                10, 10, // initialX, initialY
-                10, 10);// xPad, yPad
+        
+        mainPanel.add(typesCombo);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(chooser);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(apply);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(fileNamesPanel);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(nameField);
+        mainPanel.add(Box.createVerticalStrut(10));
+        this.setBorder(BorderFactory.createEmptyBorder(10,10,10,20));
+        this.setLayout(new BorderLayout(10,10));
+        this.add(mainPanel,BorderLayout.NORTH);
+        this.add(isMultipleDatasets);
 
     }
 
@@ -149,7 +172,7 @@ public class ImportInputPanel extends JPanel {
         }
     }
 
-    private JButton importFileButton() {
+    private JButton browseFileButton() {
         Button button = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clear();
