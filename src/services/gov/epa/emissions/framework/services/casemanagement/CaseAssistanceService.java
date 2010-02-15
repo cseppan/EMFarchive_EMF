@@ -492,7 +492,7 @@ public class CaseAssistanceService {
             
             if (ds == null) {
                 nameNoMatch++; 
-                noMatchNames.append("\"" + input.getName() + "\" ");
+                noMatchNames.append("\t" + input.getName() + StringTools.SYS_NEW_LINE);
             }
             
             if (ver != null && ver.getVersion() != verNum) {
