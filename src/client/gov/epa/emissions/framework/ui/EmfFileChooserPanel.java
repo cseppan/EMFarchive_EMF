@@ -119,7 +119,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         });
 
         if (dirOnly)
-            setPreferredSize(new Dimension(424, 300));
+            setPreferredSize(new Dimension(600, 400));
         else
             setPreferredSize(new Dimension(800, 440));
 
@@ -166,9 +166,9 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
 
     private void createDirField() {
         if (dirOnly)
-            folder = new JTextField(currentDir.getAbsolutePath(), 27);
+            folder = new JTextField(currentDir.getAbsolutePath(), 40);
         else
-            folder = new JTextField(currentDir.getAbsolutePath(), 51);
+            folder = new JTextField(currentDir.getAbsolutePath(), 60);
 
         folder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -183,7 +183,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
     private JPanel createNewSubfolderField() {
         JPanel panel = new JPanel();
 
-        subfolder = new JTextField("", 19);
+        subfolder = new JTextField("", 32);
 
         subfolder.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {
