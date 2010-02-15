@@ -186,6 +186,6 @@ public class VersionPropertiesManager {
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
         VersionPropertiesManager propertiesManager = VersionPropertiesManager.getInstance();
-        propertiesManager.initProperties(System.getProperty("user.dir") + "/res/properties/version.properties");
+        propertiesManager.initProperties(System.getProperty("user.dir") + "/res/properties/version_generated.properties");
     }
 }
