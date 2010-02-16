@@ -3,29 +3,29 @@ package gov.epa.emissions.framework.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ViewableRow implements Row {
-    private Map columns;
+public class ViewableRow<T> implements Row<T> {
+    private Map<Integer, Column> columns;
 
-    private Object source;
+    private T source;
 
-    private RowSource rowSource;
+    private RowSource<T> rowSource;
 
-    public ViewableRow(Object source, Object[] values) {
+    public ViewableRow(T source, Object[] values) {
         this.source = source;
 
-        columns = new HashMap();
+        columns = new HashMap<Integer, Column>();
         for (int i = 0; i < values.length; i++) {
             columns.put(new Integer(i), new Column(values[i]));
         }
     }
 
-    public ViewableRow(RowSource rowSource) {
+    public ViewableRow(RowSource<T> rowSource) {
         this(rowSource.source(), rowSource.values());
         this.rowSource = rowSource;
     }
 
     public Object getValueAt(int column) {
-        Column columnHolder = (Column) columns.get(new Integer(column));
+        Column columnHolder = columns.get(new Integer(column));
         return columnHolder.value;
     }
 
@@ -39,18 +39,18 @@ public class ViewableRow implements Row {
 
     }
 
-    public Object source() {
+    public T source() {
         return source;
     }
 
-    public RowSource rowSource() {
+    public RowSource<T> rowSource() {
         return rowSource;
     }
 
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof ViewableRow))
             return false;
-        ViewableRow other = (ViewableRow) obj;
+        ViewableRow<T> other = (ViewableRow<T>) obj;
         return source.equals(other.source);
 
     }

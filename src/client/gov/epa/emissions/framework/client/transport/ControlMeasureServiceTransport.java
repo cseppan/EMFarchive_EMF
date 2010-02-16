@@ -129,6 +129,17 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (ControlMeasure) call.requestResponse(new Object[] { measure, sccs });
     }
 
+    public synchronized ControlMeasure updateMeasureAndHoldLock(ControlMeasure measure, Scc[] sccs) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("updateMeasureAndHoldLock");
+        call.addParam("measure", mappings.controlMeasure());
+        call.addParam("sccs", mappings.sccs());
+        call.setReturnType(mappings.controlMeasure());
+
+        return (ControlMeasure) call.requestResponse(new Object[] { measure, sccs });
+    }
+
     public synchronized Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException {
         EmfCall call = call();
 

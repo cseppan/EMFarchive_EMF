@@ -74,7 +74,7 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
         controlMeasureService.expects(once()).method("updateMeasure").with(eq(measure),eq(sccs));
         expects(view, "disposeView");
         presenter.save(measure, (ControlMeasureService) controlMeasureService.proxy(), presenters(), (ControlMeasureView) view
-                .proxy());
+                .proxy(), true);
     }
 
     private List presenters() {

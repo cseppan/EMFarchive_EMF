@@ -18,6 +18,8 @@ public interface ControlMeasureService extends EMFService {
 
     ControlMeasure updateMeasure(ControlMeasure measure, Scc[] sccs) throws EmfException;
 
+    ControlMeasure updateMeasureAndHoldLock(ControlMeasure measure, Scc[] sccs) throws EmfException;
+
 //    ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException;
 
     void releaseLockedControlMeasure(User user, int controlMeasureId) throws EmfException;

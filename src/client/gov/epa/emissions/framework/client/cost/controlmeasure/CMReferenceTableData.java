@@ -10,37 +10,40 @@ import java.util.List;
 
 public class CMReferenceTableData extends AbstractEditableTableData {
 
-    private List<ViewableRow> rows;
+    private List<ViewableRow<Reference>> rows;
 
     public CMReferenceTableData(Reference[] references) {
         rows = createRows(references);
     }
 
-    private List<ViewableRow> createRows(Reference[] references) {
+    private List<ViewableRow<Reference>> createRows(Reference[] references) {
         
-        rows = new ArrayList<ViewableRow>();
+        rows = new ArrayList<ViewableRow<Reference>>();
         for (Reference reference : references) {
-            rows.add(row(reference));
+            
+            if (reference!=null) {
+                rows.add(row(reference));
+            }
         }
         
         return rows;
     }
 
-    private ViewableRow row(Reference reference) {
+    private ViewableRow<Reference> row(Reference reference) {
 
         Object[] values = { reference.getId(), reference.getDescription() };
-        return new ViewableRow(reference, values);
+        return new ViewableRow<Reference>(reference, values);
     }
 
     public String[] columns() {
         return new String[] { "ID", "Description" };
     }
 
-    public Class getColumnClass(int col) {
+    public Class<?> getColumnClass(int col) {
         return String.class;
     }
 
-    public List rows() {
+    public List<ViewableRow<Reference>> rows() {
         return this.rows;
     }
 
@@ -58,10 +61,9 @@ public class CMReferenceTableData extends AbstractEditableTableData {
 
     private List<Reference> sourcesList() {
 
-        List<Reference> sources = new ArrayList<Reference>();
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            ViewableRow row = (ViewableRow) iter.next();
-            sources.add((Reference) row.source());
+        List<Reference> sources = new ArrayList<Reference>();        
+        for (ViewableRow<Reference> row : this.rows) {
+            sources.add(row.source());
         }
 
         return sources;
@@ -77,11 +79,9 @@ public class CMReferenceTableData extends AbstractEditableTableData {
 
     private void remove(Reference reference) {
 
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+        for (ViewableRow<Reference> row : this.rows) {
 
-            ViewableRow row = (ViewableRow) iter.next();
-            Reference source = (Reference) row.source();
-
+            Reference source = row.source();
             if (source.equals(reference)) {
 
                 rows.remove(row);

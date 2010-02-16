@@ -46,11 +46,12 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         view.disposeView();
     }
 
-    public void doSave() throws EmfException {
-        save(measure, session.controlMeasureService(), presenters, view);
+    
+    public void doSave(boolean shouldDispose) throws EmfException {
+        save(measure, session.controlMeasureService(), presenters, view, shouldDispose);
     }
 
-    void save(ControlMeasure measure, ControlMeasureService service, List presenters, ControlMeasureView view)
+    void save(ControlMeasure measure, ControlMeasureService service, List presenters, ControlMeasureView view, boolean shouldDispose)
             throws EmfException {
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {
             ControlMeasureTabPresenter element = (ControlMeasureTabPresenter) iter.next();
@@ -66,10 +67,20 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         }
         
         doRefresh(measure);
-//        view.disposeView();
+
+        if (shouldDispose) {
+            view.disposeView();
+        }
         //parent.doRefresh();
     }
 
+    public void doReport() throws EmfException {
+        createReport(measure, view);
+    }
+
+    private void createReport(ControlMeasure measure, ControlMeasureView view) throws EmfException {
+    }
+    
     public void set(ControlMeasureSummaryTab summary) {
         this.summaryTabView = summary;
         EditableCMSummaryTabPresenterImpl summaryPresenter = new EditableCMSummaryTabPresenterImpl(summary);

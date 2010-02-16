@@ -27,6 +27,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+@SuppressWarnings("serial")
 public class EditControlMeasureWindow extends DisposableInteralFrame implements ControlMeasureView {
 
     protected ControlMeasurePresenter presenter;
@@ -55,7 +56,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
 
     public EditControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager,
             CostYearTable costYearTable) {
-        super("Control Measure Editor", new Dimension(770, 500), desktopManager);        
+        super("Control Measure Editor", new Dimension(770, 500), desktopManager);
         this.desktopManager = desktopManager;
         this.session = session;
         this.parent = parent;
@@ -169,6 +170,16 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
+        Button reportButton = new Button("Report", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                doReport();
+            }
+        });
+
+        reportButton.setToolTipText("Generate \"At-a-glance\" report");
+
+        buttonsPanel.add(reportButton);
+
         saveButton = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
@@ -217,8 +228,28 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
     private void doSave() {
 
         try {
-            presenter.doSave();
+            presenter.doSave(true);
             resetChanges();
+        } catch (EmfException e) {
+            showError(e.getMessage());
+        }
+    }
+
+    private void doReport() {
+
+        try {
+
+            if (this.shouldProcessChanges("Save changes?", "Would you like to save current changes "
+                    + System.getProperty("line.separator") + " prior to generating the report?")) {
+
+                presenter.doSave(false);
+                resetChanges();
+            }
+            else {
+                
+            }
+            
+            presenter.doReport();
         } catch (EmfException e) {
             showError(e.getMessage());
         }

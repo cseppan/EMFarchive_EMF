@@ -129,7 +129,7 @@ public class ControlMeasureReferencesTab extends EmfPanel implements ControlMeas
                 if (measure.getId() == 0) {
 
                     try {
-                        controlMeasurePresenter.doSave();
+                        controlMeasurePresenter.doSave(true);
                     } catch (EmfException e1) {
                         showError("Cannot save control measure: " + e1.getMessage());
                         return;

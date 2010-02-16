@@ -204,6 +204,10 @@ public class ControlMeasureDAO {
     }
     
     public ControlMeasure update(ControlMeasure locked, Scc[] sccs, Session session) throws EmfException {
+        return update(locked, sccs, session, true);
+    }
+
+    public ControlMeasure update(ControlMeasure locked, Scc[] sccs, Session session, boolean releaseLock) throws EmfException {
         // Validate control measure
         // make sure abbreviation is not
         if (locked.getAbbreviation().trim().length() == 0) {
@@ -220,10 +224,18 @@ public class ControlMeasureDAO {
 
         checkForConstraints(locked, session);
         updateReferenceIds(locked, session);
-        ControlMeasure releaseLockOnUpdate = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, current(locked
-                .getId(), session), session);
+        
+        ControlMeasure updatedControlMeasure = null;
+        if (releaseLock) {
+            updatedControlMeasure = (ControlMeasure) lockingScheme.releaseLockOnUpdate(locked, current(locked.getId(),
+                    session), session);
+        } else {
+            updatedControlMeasure = (ControlMeasure) lockingScheme.renewLockOnUpdate(locked, current(locked.getId(),
+                    session), session);
+        }
+        
         updateSccs(sccs, locked.getId(), session);
-        return releaseLockOnUpdate;
+        return updatedControlMeasure;
     }
 
     /**

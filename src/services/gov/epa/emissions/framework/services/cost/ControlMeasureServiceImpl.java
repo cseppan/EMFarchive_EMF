@@ -196,6 +196,19 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
+    public synchronized ControlMeasure updateMeasureAndHoldLock(ControlMeasure measure, Scc[] sccs) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            ControlMeasure updated = dao.update(measure, sccs, session, false);
+            return updated;
+        } catch (RuntimeException e) {
+            LOG.error("Could not update for ControlMeasure: " + measure.getName(), e);
+            throw new EmfException("Could not update for ControlMeasure: " + measure.getName());
+        } finally {
+            session.close();
+        }
+    }
+
     public synchronized Scc[] getSccsWithDescriptions(int controlMeasureId) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {

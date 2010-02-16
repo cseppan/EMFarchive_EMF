@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.ui;
 
-public interface Row {
+public interface Row<T> {
 
     Object getValueAt(int column);
 
-    Object source();
+    T source();
 
     void setValueAt(Object value, int column);
 

@@ -231,7 +231,7 @@ public class ControlMeasureEfficiencyTab extends JPanel implements ControlMeasur
                 //the efficiency editor needs to have a measure in the db first!
                 if (measure.getId() == 0) {
                     try {
-                        controlMeasurePresenter.doSave();
+                        controlMeasurePresenter.doSave(true);
                     } catch (EmfException e1) {
                         messagePanel.setError("Cannot save control measure: " + e1.getMessage());
                         return;

@@ -10,7 +10,9 @@ public interface ControlMeasurePresenter {
 
     void doClose() throws EmfException;
 
-    void doSave() throws EmfException;
+    void doSave(boolean shouldDispose) throws EmfException;
+
+    void doReport() throws EmfException;
 
     void doModify();
 
