@@ -62,7 +62,7 @@ public class EditableUserProfilePanel extends JPanel {
         this.changeablesList = changeableList;
 
         createLayout(user, usernameWidget, saveAction, cancelAction, adminOption);
-        this.setSize(new Dimension(375, 425));
+        this.setSize(new Dimension(380, 470));
     }
 
     private void createLayout(User user, Widget usernameWidget, Action saveAction, Action cancelAction,
@@ -83,7 +83,7 @@ public class EditableUserProfilePanel extends JPanel {
         JPanel container = new JPanel();
         FlowLayout layout = new FlowLayout();
         layout.setHgap(20);
-        layout.setVgap(25);
+        layout.setVgap(15);
         container.setLayout(layout);
 
         Button okButton = new SaveButton(saveButton);
@@ -135,20 +135,25 @@ public class EditableUserProfilePanel extends JPanel {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new Border("Profile"));
-
+        
         JPanel mandatoryPanel = createManadatoryProfilePanel(user);
         panel.add(mandatoryPanel);
+        //panel.add(Box.createRigidArea(new Dimension(1, 15)));
 
-        JPanel optionsPanel = new JPanel();
-        adminOption.add(optionsPanel);
+        GridLayout labelsLayoutManager = new GridLayout(2, 1, 20, 5);
+        //labelsLayoutManager.setVgap(5);
+        JPanel checkPanel = new JPanel(labelsLayoutManager);
+        
+        wantEmails = new JCheckBox("Receives EMF update emails? ");
+        wantEmails.setSelected(user.getWantEmails());    
+        checkPanel.add(wantEmails);
+        
+        //JPanel optionsPanel = new JPanel();
+        adminOption.add(checkPanel);
         adminOption.setAdmin(user);
         
         //wantEmails = new JCheckBox(" Want Emails? ", null,user.isWantEmails());
-        wantEmails = new JCheckBox("Receive update emails? ");
-        wantEmails.setSelected(user.getWantEmails());
-        optionsPanel.add(wantEmails);
-        
-        panel.add(optionsPanel);
+        panel.add(checkPanel);
 
         return panel;
     }
