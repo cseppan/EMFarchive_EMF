@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.EmptyStrings;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
@@ -33,6 +32,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
@@ -41,7 +41,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.SpringLayout;
 
 public class EmfFileChooserPanel extends JPanel implements Runnable {
 
@@ -118,10 +117,14 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
             }
         });
 
-        if (dirOnly)
+        if (dirOnly){
             setPreferredSize(new Dimension(600, 400));
-        else
+            setMinimumSize(new Dimension(600, 400));
+        }
+        else{
             setPreferredSize(new Dimension(800, 440));
+            setMinimumSize(new Dimension(800, 440));
+        }
 
         setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
     }
@@ -143,24 +146,34 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
     }
 
     public JPanel upperPanel() {
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        JPanel panel = new JPanel();
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
 
         createDirField();
-        layoutGenerator.addLabelWidgetPair("Folder:             ", folder, panel);
-
+        JPanel chooser = new JPanel(new BorderLayout(10, 10));
+        chooser.add(new JLabel("Folder     "),BorderLayout.WEST);
+        chooser.add(folder);
+        mainPanel.add(chooser);
+        mainPanel.add(Box.createVerticalStrut(10));
+        
         if (!dirOnly) {
             createPatternBox();
-            layoutGenerator.addLabelWidgetPair("File Pattern: ", filePattern, panel);
+            JPanel apply = new JPanel(new BorderLayout(10,10));
+            apply.add(new JLabel("Pattern   "),BorderLayout.WEST);
+            apply.add(filePattern);
+            mainPanel.add(apply);
+            mainPanel.add(Box.createVerticalStrut(10));
         }
 
-        if (dirOnly)
-            layoutGenerator.addLabelWidgetPair("New Subfolder:", createNewSubfolderField(), panel);
+        if (dirOnly)  {
+            mainPanel.add(createNewSubfolderField());
+            //mainPanel.add(Box.createVerticalStrut(10));
+        }
 
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
-                0, 10, // initialX, initialY
-                0, 10);// xPad, yPad
-
+        panel.setBorder(BorderFactory.createEmptyBorder(5,10,5,20));
+        panel.setLayout(new BorderLayout(10,10));
+        panel.add(mainPanel,BorderLayout.NORTH);
         return panel;
     }
 
@@ -181,10 +194,10 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
     }
 
     private JPanel createNewSubfolderField() {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new BorderLayout(10,0));
 
-        subfolder = new JTextField("", 32);
-
+        subfolder = new JTextField("subfolder", 40);
+        panel.add(new JLabel("New Subfolder:"), BorderLayout.WEST);
         subfolder.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2)
@@ -215,7 +228,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         Button create = new Button("Create", createSubdir());
         create.setMnemonic('C');
         panel.add(subfolder);
-        panel.add(create);
+        panel.add(create, BorderLayout.EAST);
 
         return panel;
     }

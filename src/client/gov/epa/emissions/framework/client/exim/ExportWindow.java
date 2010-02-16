@@ -1,13 +1,12 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -20,18 +19,21 @@ import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.SpringLayout;
+import javax.swing.ScrollPaneConstants;
 
 public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
@@ -89,45 +91,41 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         panel.add(messagePanel);
         panel.add(createExportPanel());
         panel.add(createButtonsPanel());
-
         return panel;
     }
 
     private JPanel createExportPanel() {
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        JPanel panel = new JPanel();
+        int width = 40;
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
 
         // datasets
-        TextArea datasetNames = new TextArea("datasets", getDatasetsLabel(datasets));
+        JPanel datasetNamesPanel = new JPanel(new BorderLayout(4,10));
+        
+        TextArea datasetNames = new TextArea("datasets", getDatasetsLabel(datasets), width, 6);
         datasetNames.setEditable(false);
-        ScrollableComponent dsArea = new ScrollableComponent(datasetNames);
-        datasetNames.setWrapStyleWord(true);
-        datasetNames.setLineWrap(true);
-        dsArea.setMinimumSize(new Dimension(75, 75));
-        layoutGenerator.addLabelWidgetPair("Datasets", dsArea, panel);
+        JScrollPane dsArea = new JScrollPane(datasetNames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        datasetNamesPanel.add(new JLabel("Datasets  "),BorderLayout.WEST);
+        datasetNamesPanel.add(dsArea);
 
         // folder
-        folder = new JTextField(40);
-        folder.setName("folder");
-        Button button = new BrowseButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent arg0) {
-                selectFolder();
-            }
-        });
-        Icon icon = new ImageResources().open("Export a Dataset");
-        button.setIcon(icon);
-
-        JPanel folderPanel = new JPanel(new BorderLayout(2, 0));
-        folderPanel.add(folder, BorderLayout.LINE_START);
-        folderPanel.add(button, BorderLayout.LINE_END);
-        layoutGenerator.addLabelWidgetPair("Folder", folderPanel, panel);
-
+        JPanel chooser = new JPanel(new BorderLayout(10, 10));
+        folder = new TextField("folder", width);
+        chooser.add(new JLabel("Folder     "),BorderLayout.WEST);
+        chooser.add(folder);
+        chooser.add(browseFileButton(), BorderLayout.EAST);
+        
         // purpose
-        purpose = new TextArea("purpose", "");
-        purpose.setSize(2, 45);
-        purpose.setLineWrap(false);
-        layoutGenerator.addLabelWidgetPair("Purpose", new ScrollableComponent(purpose), panel);
-
+        JPanel purposePanel = new JPanel(new BorderLayout(4,10));
+        purpose = new TextArea("purpose", "", width, 6);
+        JScrollPane purposeArea = new JScrollPane(purpose, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        purposePanel.add(new JLabel("Purpose   "),BorderLayout.WEST);
+        purposePanel.add(purposeArea);
+ 
         // overwrite
         JPanel overwritePanel = new JPanel(new BorderLayout());
         overwrite = new JCheckBox("Overwrite files if they exist?", false);
@@ -135,18 +133,33 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         overwrite.setName("overwrite");
         //overwrite.setVisible(false);
         overwritePanel.add(overwrite, BorderLayout.LINE_START);
-
-        panel.add(new JPanel());// filler
-        panel.add(overwritePanel);
         overwritePanel.setVisible(false);
-
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
-                5, 5, // initialX, initialY
-                5, 5);// xPad, yPad
-
+        
+        mainPanel.add(datasetNamesPanel);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(chooser);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(purposePanel);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(overwritePanel);
+        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,20));
+        panel.setLayout(new BorderLayout(10,10));
+        panel.add(mainPanel,BorderLayout.NORTH);       
+ 
         return panel;
     }
+    
+    private JButton browseFileButton() {
+        Button button = new BrowseButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                selectFolder();
+            }
+        });   
+        Icon icon = new ImageResources().open("Export a Dataset");
+        button.setIcon(icon);
+        return button;
+    }
+    
 
     private String getDatasetsLabel(EmfDataset[] datasets) {
         StringBuffer buf = new StringBuffer();
