@@ -19,6 +19,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -61,17 +62,17 @@ public class EditableUserProfilePanel extends JPanel {
         this.populateUserStrategy = populateUserStrategy;
         this.changeablesList = changeableList;
 
-        createLayout(user, usernameWidget, saveAction, cancelAction, adminOption);
-        this.setSize(new Dimension(380, 470));
+        createLayout(usernameWidget, saveAction, cancelAction, adminOption);
+        this.setSize(new Dimension(380, 540));
     }
 
-    private void createLayout(User user, Widget usernameWidget, Action saveAction, Action cancelAction,
+    private void createLayout(Widget usernameWidget, Action saveAction, Action cancelAction,
             AdminOption adminOption) {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         this.add(messagePanel);
-        this.add(createProfilePanel(user, adminOption));
+        this.add(createProfilePanel(adminOption));
 
         this.add(createLoginPanel(usernameWidget));
         this.add(createButtonsPanel(saveAction, cancelAction));
@@ -82,7 +83,7 @@ public class EditableUserProfilePanel extends JPanel {
 
         JPanel container = new JPanel();
         FlowLayout layout = new FlowLayout();
-        layout.setHgap(20);
+        layout.setHgap(10);
         layout.setVgap(15);
         container.setLayout(layout);
 
@@ -91,7 +92,7 @@ public class EditableUserProfilePanel extends JPanel {
         CloseButton closeButton = new CloseButton(cancelAction);
         container.add(closeButton);
 
-        panel.add(container, BorderLayout.EAST);
+        panel.add(container, BorderLayout.CENTER);
 
         return panel;
     }
@@ -131,34 +132,35 @@ public class EditableUserProfilePanel extends JPanel {
         return panel;
     }
 
-    private JPanel createProfilePanel(User user, AdminOption adminOption) {
+    private JPanel createProfilePanel(AdminOption adminOption) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new Border("Profile"));
         
-        JPanel mandatoryPanel = createManadatoryProfilePanel(user);
+        JPanel mandatoryPanel = createManadatoryProfilePanel();
         panel.add(mandatoryPanel);
-        //panel.add(Box.createRigidArea(new Dimension(1, 15)));
-
-        GridLayout labelsLayoutManager = new GridLayout(2, 1, 20, 5);
+ 
+        //JPanel subPanel = new JPanel();
+        //subPanel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         //labelsLayoutManager.setVgap(5);
-        JPanel checkPanel = new JPanel(labelsLayoutManager);
-        
+        JPanel checkPanel = new JPanel(new BorderLayout(10,0));
         wantEmails = new JCheckBox("Receives EMF update emails? ");
         wantEmails.setSelected(user.getWantEmails());    
-        checkPanel.add(wantEmails);
+        checkPanel.add(wantEmails, BorderLayout.NORTH);
+        checkPanel.setBorder(BorderFactory.createEmptyBorder(2,30,2,20));
         
-        //JPanel optionsPanel = new JPanel();
+        JPanel optionsPanel = new JPanel(new BorderLayout(10,0));
         adminOption.add(checkPanel);
         adminOption.setAdmin(user);
+        optionsPanel.setBorder(BorderFactory.createEmptyBorder(2,30,2,20));
         
-        //wantEmails = new JCheckBox(" Want Emails? ", null,user.isWantEmails());
         panel.add(checkPanel);
-
+        panel.add(optionsPanel,BorderLayout.SOUTH);
+        panel.setMaximumSize(new Dimension(300, 280));
         return panel;
     }
 
-    private JPanel createManadatoryProfilePanel(User user) {
+    private JPanel createManadatoryProfilePanel() {
         JPanel panel = new JPanel();
 
         JPanel labelsPanel = new JPanel();
@@ -207,6 +209,10 @@ public class EditableUserProfilePanel extends JPanel {
         populateUserStrategy.populate(name.getText(), affiliation.getText(), phone.getText(), email.getText(), username
                 .value(), password.getPassword(), confirmPassword.getPassword(), wantEmails.isSelected());
         adminOption.isAdmin(user);
+    }
+    
+    protected void checkNewPwd() throws EmfException {
+        populateUserStrategy.checkNewPwd( password.getPassword());
     }
 
     void setError(String message) {

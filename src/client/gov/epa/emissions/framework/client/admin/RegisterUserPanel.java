@@ -83,6 +83,8 @@ public class RegisterUserPanel extends JPanel {
 
     private void registerUser() {
         try {
+            if (!isNewUser)
+                panel.checkNewPwd();
             panel.populateUser();
 
             // FIXME: monitor.resetChanges();

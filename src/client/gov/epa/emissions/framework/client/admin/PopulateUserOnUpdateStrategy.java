@@ -9,6 +9,8 @@ import gov.epa.emissions.framework.services.EmfException;
 public class PopulateUserOnUpdateStrategy implements PopulateUserStrategy {
 
     private User user;
+    
+    private String oldPassword =null;
 
     public PopulateUserOnUpdateStrategy(User user) {
         this.user = user;
@@ -22,13 +24,28 @@ public class PopulateUserOnUpdateStrategy implements PopulateUserStrategy {
             user.setPhone(phone);
             user.setEmail(email);
             if (password.length > 0) {
-                user.setPassword(new String(password));
+                checkNewPwd(password);
                 user.confirmPassword(new String(confirmPassword));
                 user.setPasswordResetDate(new Date());
             }
             user.setWantEmails(wantEmails);
         } catch (UserException e) {
             throw new EmfException(e.getMessage());
+        }
+    }
+    
+    public void checkNewPwd(char[] password) throws EmfException {
+        if ( oldPassword == null ){
+            oldPassword = user.getEncryptedPassword();
+        }
+        try {
+            user.setPassword(new String(password));
+        } catch (UserException e) {
+            throw new EmfException(e.getMessage());
+        }
+        
+        if (oldPassword.equals(user.getEncryptedPassword())) {
+            throw new EmfException("Please specify a new password. ");
         }
     }
 
