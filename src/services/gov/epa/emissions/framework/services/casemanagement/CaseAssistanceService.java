@@ -716,11 +716,18 @@ public class CaseAssistanceService {
             }
 
             if (envVar.toUpperCase().equals("BASE_YEAR")) {
-                int baseyr = caze.getBaseYear();
+                EmissionsYear baseyr = caze.getEmissionsYear();
 
-                sb.append("WARNING: base year -- value replaced (previous: " + baseyr + ")" + lineSep);
+                if (baseyr != null && baseyr.getName() != null && baseyr.getName().trim().equalsIgnoreCase(value))
+                    continue;
+                
+                if (baseyr != null && baseyr.getName() != null)
+                    sb.append("WARNING: base year -- value replaced (previous: " + baseyr + ")" + lineSep);
 
-                caze.setBaseYear(Integer.parseInt(value.trim()));
+                baseyr = new EmissionsYear(value.trim());
+                baseyr = this.addEmissionsYear(baseyr);
+                
+                caze.setEmissionsYear(baseyr);
             }
 
             if (envVar.toUpperCase().equals("FUTURE_YEAR")) {
