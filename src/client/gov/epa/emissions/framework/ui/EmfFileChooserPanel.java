@@ -196,7 +196,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
     private JPanel createNewSubfolderField() {
         JPanel panel = new JPanel(new BorderLayout(10,0));
 
-        subfolder = new JTextField("subfolder", 40);
+        subfolder = new JTextField("", 40);
         panel.add(new JLabel("New Subfolder:"), BorderLayout.WEST);
         subfolder.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {
@@ -229,6 +229,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         create.setMnemonic('C');
         panel.add(subfolder);
         panel.add(create, BorderLayout.EAST);
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0,0));
 
         return panel;
     }
