@@ -1,8 +1,8 @@
 /*
  * $Source: /home/catherine/Projects/emf_cvs/cvs_repo/EMF/src/client/gov/epa/emissions/framework/client/cost/controlmeasure/ControlMeasurePDFReportGenerator.java,v $
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  * $Author: rross67 $
- * $Date: 2010/02/16 21:11:05 $
+ * $Date: 2010/02/17 17:44:54 $
  */
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
@@ -26,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.util.ArrayList;
@@ -158,7 +157,7 @@ public class ControlMeasurePDFReportGenerator {
 
     private void createHeader(Document document) throws DocumentException, MalformedURLException, IOException {
 
-        Image image = new Jpeg(new URL("file:///C:/epa-logo.gif"));
+        Image image = new Jpeg(this.getClass().getResource("/epa-logo.gif"));
         image.scalePercent(25);
         image.setAlignment(Element.ALIGN_CENTER);
         document.add(image);
@@ -1091,7 +1090,7 @@ public class ControlMeasurePDFReportGenerator {
             java.util.List<PdfPCell> existingMeasureList = new ArrayList<PdfPCell>();
             java.util.List<PdfPCell> existingNEIDevList = new ArrayList<PdfPCell>();
 
-            BaseColor backgroundColor = BaseColor.WHITE;//new BaseColor(0xAAAAAA);
+            BaseColor backgroundColor = BaseColor.WHITE;// new BaseColor(0xAAAAAA);
 
             PdfPTable table = null;
             for (int i = 0; i < efficiencyRecords.length; i++) {
