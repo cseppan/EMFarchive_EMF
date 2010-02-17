@@ -4,8 +4,10 @@ import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.StringTools;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.ControlProgram;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -58,6 +60,8 @@ public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends Ab
                 }
             }
             desc = desc.replace(yearHeader, "#YEAR     " + controlStrategy.getInventoryYear());
+            desc = addControlProgramsInfo(desc);
+            
             //create controlled inventory dataset
             EmfDataset dataset = creator.addControlledInventoryDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), inputDataset,
                     inputDataset.getDatasetType(), tableFormat, 
@@ -81,6 +85,20 @@ public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends Ab
             dbServer.disconnect();
         }
 
+    }
+
+    private String addControlProgramsInfo(String desc) {
+        ControlProgram[] progs = controlStrategy.getControlPrograms();
+        StringBuilder sb = new StringBuilder(desc + StringTools.SYS_NEW_LINE);
+        
+        for (ControlProgram prog : progs) {
+            EmfDataset ds = prog.getDataset();
+            sb.append("#CONTROL_PROGRAM=\"" + prog.getName() + "; " 
+                    + prog.getControlProgramType() + "; " 
+                    + ds.getName() + "\"" + StringTools.SYS_NEW_LINE);
+        }
+        
+        return sb.toString();
     }
 
     private void createControlledInventory(int datasetId, String inputTable, String detailResultTable,
