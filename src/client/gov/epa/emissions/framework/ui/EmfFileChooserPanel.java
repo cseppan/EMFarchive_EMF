@@ -118,8 +118,8 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         });
 
         if (dirOnly){
-            setPreferredSize(new Dimension(600, 400));
-            setMinimumSize(new Dimension(600, 400));
+            setPreferredSize(new Dimension(600, 350));
+            setMinimumSize(new Dimension(600, 350));
         }
         else{
             setPreferredSize(new Dimension(800, 440));
@@ -168,7 +168,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
 
         if (dirOnly)  {
             mainPanel.add(createNewSubfolderField());
-            //mainPanel.add(Box.createVerticalStrut(10));
+            mainPanel.add(Box.createVerticalStrut(10));
         }
 
         panel.setBorder(BorderFactory.createEmptyBorder(5,10,5,20));
@@ -194,7 +194,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
     }
 
     private JPanel createNewSubfolderField() {
-        JPanel panel = new JPanel(new BorderLayout(10,0));
+        JPanel panel = new JPanel(new BorderLayout(10,10));
 
         subfolder = new JTextField("", 40);
         panel.add(new JLabel("New Subfolder:"), BorderLayout.WEST);
@@ -229,8 +229,7 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
         create.setMnemonic('C');
         panel.add(subfolder);
         panel.add(create, BorderLayout.EAST);
-        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0,0));
-
+        
         return panel;
     }
 
