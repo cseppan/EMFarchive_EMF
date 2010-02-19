@@ -43,7 +43,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
 
         ControlMeasure cm = new ControlMeasure();
         String name = "cm test one" + Math.random();
-        cm.setEquipmentLife(12);
+        cm.setEquipmentLife(new Float(12));
         cm.setName(name);
         cm.setAbbreviation("12345678");
         cm.setLastModifiedBy(userService.getUser("emf").getName());
@@ -66,7 +66,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         dataService.addPollutant(poll); 
         ControlMeasure cm = new ControlMeasure();
         String name = "cm test one" + Math.random();
-        cm.setEquipmentLife(12);
+        cm.setEquipmentLife(new Float(12));
         cm.setName(name);
         cm.setAbbreviation("12345678");
         cm.setLastModifiedBy(userService.getUser("emf").getName());
@@ -97,7 +97,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
 
         ControlMeasure cm = new ControlMeasure();
         String name = "cm test one" + Math.random();
-        cm.setEquipmentLife(12);
+        cm.setEquipmentLife(new Float(12));
         cm.setName(name);
         cm.setAbbreviation("12345679");
         cm.setLastModifiedBy(userService.getUser("emf").getName());
@@ -123,7 +123,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         ControlMeasureClass cmc = service.getMeasureClass("Known");
         cm.setCmClass(cmc);
         String name = "cm test one" + Math.random();
-        cm.setEquipmentLife(12);
+        cm.setEquipmentLife(new Float(12));
         cm.setName(name);
         cm.setAbbreviation("12345688");
         cm.setLastModifiedBy(owner.getName());
@@ -134,7 +134,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         service.addMeasure(cm, new Scc[] { scc1 });
 
         ControlMeasure cmModified = service.obtainLockedMeasure(owner, cm.getId());
-        cmModified.setEquipmentLife(120);
+        cmModified.setEquipmentLife(new Float(120));
         cmModified.setName("cm updated");
         ControlMeasure cm2 = service.updateMeasure(cmModified, new Scc[] {});
 
@@ -204,7 +204,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
         String name = "cm test one" + Math.random();
         ControlMeasureClass cmc = service.getMeasureClass("Emerging");
         cm.setCmClass(cmc);
-        cm.setEquipmentLife(12);
+        cm.setEquipmentLife(new Float(12));
         cm.setName(name);
         cm.setAbbreviation("12345678");
         cm.setLastModifiedBy(userService.getUser("emf").getName());
@@ -227,7 +227,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
 
         ControlMeasure cm = new ControlMeasure();
         String name = "cm test one" + Math.random();
-        cm.setEquipmentLife(12);
+        cm.setEquipmentLife(new Float(12));
         cm.setName(name);
         cm.setAbbreviation("12345679");
         cm.setLastModifiedBy(userService.getUser("emf").getName());
@@ -259,7 +259,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
 
         ControlMeasure cm = new ControlMeasure();
         String name = "cm test one" + Math.random();
-        cm.setEquipmentLife(12);
+        cm.setEquipmentLife(new Float(12));
         cm.setName(name);
         cm.setAbbreviation("12345679");
         cm.setLastModifiedBy(userService.getUser("emf").getName());
@@ -294,7 +294,7 @@ public class ControlMeasureServiceTest extends ServiceTestCase {
 
         ControlMeasure cm = new ControlMeasure();
         String name = "cm test one" + Math.random();
-        cm.setEquipmentLife(12);
+        cm.setEquipmentLife(new Float(12));
         cm.setName(name);
         cm.setAbbreviation("12345679");
         cm.setLastModifiedBy(userService.getUser("emf").getName());

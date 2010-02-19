@@ -31,7 +31,7 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private int costYear;
 
-    private float equipmentLife;
+    private Float equipmentLife;
 
     private Pollutant majorPollutant;
 
@@ -131,11 +131,11 @@ public class ControlMeasure implements Lockable, Serializable {
 //        this.deviceCode = deviceCode;
 //    }
 
-    public float getEquipmentLife() {
+    public Float getEquipmentLife() {
         return equipmentLife;
     }
 
-    public void setEquipmentLife(float equipmentLife) {
+    public void setEquipmentLife(Float equipmentLife) {
         this.equipmentLife = equipmentLife;
     }
 

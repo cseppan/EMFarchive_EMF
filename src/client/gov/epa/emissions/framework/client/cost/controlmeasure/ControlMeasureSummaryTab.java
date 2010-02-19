@@ -120,7 +120,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 //        cmClass.setSelectedItem(getText(measure.getCmClass()));
         // costYear.setText(measure.getCostYear() + "");
         deviceCode.setText(getNEIDevices());
-        equipmentLife.setText(measure.getEquipmentLife() + "");
+        equipmentLife.setText(measure.getEquipmentLife() == null ? "" : measure.getEquipmentLife()+"");
         if (modifiedTime != null)
             lastModifiedTime.setText(CustomDateFormat.format_YYYY_MM_DD_HH_MM(modifiedTime));
         lastModifiedBy.setText(measure.getLastModifiedBy() + "");
@@ -509,6 +509,9 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 //        if (deviceCode.getText().trim().length() > 0)
 //            deviceId = verifier.parseInteger(deviceCode);
 
+        if (equipmentLife.getText() != null && equipmentLife.getText().trim().equals("0"))
+            throw new EmfException("Summary tab: Please input a non-zero value for equipment life or leave the field blank.");
+        
         if (equipmentLife.getText().trim().length() > 0)
             life = verifier.parseFloat(equipmentLife);
 
