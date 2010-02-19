@@ -3,9 +3,12 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
+import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.Pollutants;
 import gov.epa.emissions.framework.services.EmfException;
@@ -18,6 +21,7 @@ import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -27,9 +31,12 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
 
 //import java.util.ArrayList;
 //import java.util.List;
@@ -53,6 +60,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
     private CMEquationsTableData tableData;
     private ManageChangeables changeables;
     private Pollutants pollutants;
+    private EquationType currentEqType;
     
     public ControlMeasureEquationTab(ControlMeasure measure, EmfSession session, ManageChangeables changeables,
             MessagePanel messagePanel, EmfConsole parent,
@@ -67,6 +75,9 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
         this.changeables = changeables;
         this.controlMeasurePresenter = controlMeasurePresenter;
         this.pollutants = new Pollutants(controlMeasurePresenter.getPollutants());
+        
+        if (measure.getEquations() != null && measure.getEquations().length > 0)
+            this.currentEqType = measure.getEquations()[0].getEquationType();
      
 //       mainPanel = new JPanel(new BorderLayout());
         doLayout(measure);
@@ -78,14 +89,40 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
  
 
     private void doLayout(ControlMeasure measure){
-        mainPanel.setBorder(BorderFactory.createTitledBorder("Equation"));
+        mainPanel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+        mainPanel.add(equationInfoPanel(), BorderLayout.NORTH);
         mainPanel.add(createTable(measure.getEquations()), BorderLayout.CENTER);
         this.add(mainPanel, BorderLayout.CENTER);
         this.add(buttonPanel(), BorderLayout.SOUTH);
     }
 
+    private JPanel equationInfoPanel() {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        layoutGenerator.addLabelWidgetPair("Equation Type:", new JLabel(), panel);
+        layoutGenerator.addLabelWidgetPair("Name:", new JLabel(currentEqType == null ? "" : currentEqType.getName()), panel);
+        layoutGenerator.addLabelWidgetPair("Description:", new JLabel(currentEqType == null ? "" : currentEqType.getDescription()), panel);
+        layoutGenerator.addLabelWidgetPair("Inventory Fields:", new JLabel(currentEqType == null ? "" : currentEqType.getInventory_fields()), panel);
+        layoutGenerator.addLabelWidgetPair("Equation:", getEquation(), panel);
+        layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 5, 10);
+
+        return panel;
+    }
+
+
+    private JComponent getEquation() {
+        TextArea equation = new TextArea("equation", currentEqType == null ? "" : currentEqType.getEquation());
+        equation.setEditable(false);
+        ScrollableComponent scrolpane = new ScrollableComponent(equation);
+        
+        return scrolpane;
+    }
+
+
     private void updateMainPanel(ControlMeasureEquation[] equations){
-        mainPanel.removeAll();  
+        mainPanel.removeAll(); 
+        mainPanel.add(equationInfoPanel(), BorderLayout.NORTH);
         mainPanel.add(createTable(equations), BorderLayout.CENTER);
         mainPanel.validate();
 
@@ -131,6 +168,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
                         presenter.display();
                         //get Equation Type...
                         EquationType equationType = presenter.getEquationType();
+                        currentEqType = equationType;
     
                         if (equationType!=null){
                             ControlMeasureEquation equation = new ControlMeasureEquation(equationType);
@@ -191,6 +229,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
 
         if (selection == JOptionPane.YES_OPTION) {
             if(tableData.rows().size()>0){
+                this.currentEqType = null;
                 ControlMeasureEquation[] cmEquations=new ControlMeasureEquation[]{};
                 refresh(measure);
                 updateMainPanel(cmEquations);

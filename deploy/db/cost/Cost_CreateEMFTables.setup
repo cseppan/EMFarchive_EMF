@@ -489,6 +489,8 @@ CREATE TABLE emf.equation_types
   id serial NOT NULL,
   name character varying(255) NOT NULL,
   description text NOT NULL DEFAULT ''::text,
+  inventory_fields varchar(512),
+  equation text,
   CONSTRAINT equation_types_pkey PRIMARY KEY (id),
   CONSTRAINT equation_types_name_key UNIQUE (name)
 ) 

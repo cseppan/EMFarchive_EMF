@@ -1001,3 +1001,6 @@ ALTER TABLE emf.users ADD COLUMN password_reset_date timestamp;
 
 --02/10/2010 add another property of password effective days
 INSERT into emf.properties values(DEFAULT, 'PASSWORD_EFFECTIVE_DAYS', '90');
+
+--02/15/2010 add uniqueness constraint on georegions
+ALTER TABLE emf.georegions ADD CONSTRAINT georegions_abbr_key UNIQUE (abbr);

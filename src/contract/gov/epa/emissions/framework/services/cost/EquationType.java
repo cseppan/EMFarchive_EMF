@@ -14,6 +14,10 @@ public class EquationType implements Serializable {
 
     private String description = "";
     
+    private String inventory_fields;
+    
+    private String equation;
+    
     private List equationTypeVariables;
 
     private Pollutant pollutant;
@@ -97,5 +101,21 @@ public class EquationType implements Serializable {
 
     public int getCostYear() {
         return costYear;
+    }
+
+    public String getInventory_fields() {
+        return inventory_fields;
+    }
+
+    public void setInventory_fields(String inventory_fields) {
+        this.inventory_fields = inventory_fields;
+    }
+
+    public String getEquation() {
+        return equation;
+    }
+
+    public void setEquation(String equation) {
+        this.equation = equation;
     }
 }

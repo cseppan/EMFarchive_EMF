@@ -1065,4 +1065,8 @@ insert into emf.equation_type_variables (equation_type_id, name, file_col_positi
 select e.id, 'Bag Replacement Constant', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
 from emf.equation_types as e 
 where name = 'Type 9';
+
+--Added 02/16/2020
+ALTER TABLE emf.equation_types ADD COLUMN inventory_fields varchar(512);
+ALTER TABLE emf.equation_types ADD COLUMN equation text;
   

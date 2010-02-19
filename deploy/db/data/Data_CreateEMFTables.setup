@@ -427,7 +427,7 @@ CREATE TABLE emf.georegions
   id SERIAL PRIMARY KEY,
   name varchar(128) NOT NULL UNIQUE,
   description text,
-  abbr varchar(128),
+  abbr varchar(128) NOT NULL UNIQUE,
   type_id int4 DEFAULT 1 REFERENCES emf.region_type(id),
   resltn varchar(255),
   ioapi_name varchar(255),
