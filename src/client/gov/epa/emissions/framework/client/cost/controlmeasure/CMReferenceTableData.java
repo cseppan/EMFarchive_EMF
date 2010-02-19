@@ -5,7 +5,6 @@ import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class CMReferenceTableData extends AbstractEditableTableData {
