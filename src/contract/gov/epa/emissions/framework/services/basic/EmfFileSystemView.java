@@ -119,7 +119,7 @@ public class EmfFileSystemView implements Serializable {
         try {
             return service.getSubdirs(file);
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             throw new EmfException(e.getMessage());
         }
     }

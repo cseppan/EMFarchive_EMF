@@ -13,7 +13,7 @@ public class ExportPresenterImpl implements ExportPresenter {
 
     private EmfSession session;
 
-    private static String lastFolder = null;
+    private static String lastFolder=null;
 
     public ExportPresenterImpl(EmfSession session) {
         this.session = session;
@@ -75,6 +75,10 @@ public class ExportPresenterImpl implements ExportPresenter {
         }
         
  
+    }
+    
+    public void setLastFolder( String lastfolder) {
+        lastFolder =lastfolder;
     }
 
     private String getDefaultFolder() {

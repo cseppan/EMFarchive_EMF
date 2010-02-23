@@ -13,4 +13,5 @@ public interface ExportPresenter {
 
     void doExport(EmfDataset[] datasets, String folder, String purpose) throws EmfException;
 
+    void setLastFolder( String lastfolder);
 }

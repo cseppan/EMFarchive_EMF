@@ -247,6 +247,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
         if (file.isDirectory()) {
             folder.setText(file.getAbsolutePath());
+            presenter.setLastFolder(file.getAbsolutePath());
         }
     }
     

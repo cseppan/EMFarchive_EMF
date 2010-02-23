@@ -68,9 +68,8 @@ public class EmfFileChooser extends JComponent {
 
     public EmfFileChooser(EmfFileInfo dir, EmfFileSystemView fsv) {
         this.fsv = fsv;
-        this.current = dir;
-        
-        if (LAST_SELECTED_DIR != null)
+        this.current = dir;     
+        if ((dir.getAbsolutePath().trim().equalsIgnoreCase("")) && (LAST_SELECTED_DIR != null))
             this.current = LAST_SELECTED_DIR;
     }
 
