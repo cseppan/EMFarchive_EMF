@@ -112,7 +112,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
 
 
     private JComponent getEquation() {
-        TextArea equation = new TextArea("equation", currentEqType == null ? "" : currentEqType.getEquation());
+        TextArea equation = new TextArea("equation", currentEqType == null ? "" : currentEqType.getEquation(), 56);
         equation.setEditable(false);
         ScrollableComponent scrolpane = new ScrollableComponent(equation);
         
