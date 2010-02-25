@@ -1119,3 +1119,9 @@ Notes:
 Cost equations are based on capacity in the range of > 0 to < 2000 mmBTU/hr. 
 If capacity is not within range, a cost per ton value is applied.  Capital cost equations are in the form of $ = capital multiplier (capacity) ^ capital exponent.  Annual costs are in the form of $ = annual multiplier (capacity) ^ annual exponent.  
 Multipliers and exponents are available for a no control baseline and a RACT baseline.  Control measure is not applied if boiler capacity is missing.', inventory_fields =  'design_capacity, design_capacity_unit_numerator, design_capacity_unit_denominator' where name = 'Type 1';
+
+
+-- 02/25/2010 update control measure equipment life to null if its zero
+update emf.control_measures
+set equipment_life = null
+where equipment_life = 0;
