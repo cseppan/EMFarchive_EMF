@@ -1004,3 +1004,6 @@ INSERT into emf.properties values(DEFAULT, 'PASSWORD_EFFECTIVE_DAYS', '90');
 
 --02/15/2010 add uniqueness constraint on georegions
 ALTER TABLE emf.georegions ADD CONSTRAINT georegions_abbr_key UNIQUE (abbr);
+
+--02/25/2010 change the width of phone column in emf.users
+ALTER TABLE emf.users ALTER phone TYPE varchar(36);

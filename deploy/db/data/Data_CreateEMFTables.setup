@@ -6,7 +6,7 @@ CREATE TABLE emf.users
   password varchar(255) NOT NULL,
   name varchar(255) NOT NULL,
   affiliation varchar(255) NOT NULL,
-  phone varchar(128) NOT NULL,
+  phone varchar(36) NOT NULL,
   email varchar(255) NOT NULL,
   is_admin bool NOT NULL DEFAULT false,
   is_login bool NOT NULL DEFAULT false,
