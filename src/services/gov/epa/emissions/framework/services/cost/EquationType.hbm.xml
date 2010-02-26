@@ -12,7 +12,7 @@
 
         <property name="name" column="name" type="java.lang.String" not-null="true"/>
         <property name="description" column="description" type="java.lang.String" not-null="true"/>
-		<property name="inventory_fields" column="inventory_fields" type="java.lang.String" not-null="false"/>
+		<property name="inventoryFields" column="inventory_fields" type="java.lang.String" not-null="false"/>
 		<property name="equation" column="equation" type="java.lang.String" not-null="false"/>
 		
 		<array name="equationTypeVariables" >

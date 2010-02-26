@@ -246,7 +246,7 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
                 resetChanges();
             }
             else {
-                
+                //
             }
             
             presenter.doReport();

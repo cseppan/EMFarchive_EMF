@@ -103,7 +103,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
         layoutGenerator.addLabelWidgetPair("Equation Type:", new JLabel(), panel);
         layoutGenerator.addLabelWidgetPair("Name:", new JLabel(currentEqType == null ? "" : currentEqType.getName()), panel);
         layoutGenerator.addLabelWidgetPair("Description:", new JLabel(currentEqType == null ? "" : currentEqType.getDescription()), panel);
-        layoutGenerator.addLabelWidgetPair("Inventory Fields:", new JLabel(currentEqType == null ? "" : currentEqType.getInventory_fields()), panel);
+        layoutGenerator.addLabelWidgetPair("Inventory Fields:", new JLabel(currentEqType == null ? "" : currentEqType.getInventoryFields()), panel);
         layoutGenerator.addLabelWidgetPair("Equation:", getEquation(), panel);
         layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 5, 10);
 
@@ -114,6 +114,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
     private JComponent getEquation() {
         TextArea equation = new TextArea("equation", currentEqType == null ? "" : currentEqType.getEquation(), 56);
         equation.setEditable(false);
+        equation.setOpaque(false);
         ScrollableComponent scrolpane = new ScrollableComponent(equation);
         
         return scrolpane;

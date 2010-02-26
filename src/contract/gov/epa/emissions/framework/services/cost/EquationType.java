@@ -14,7 +14,7 @@ public class EquationType implements Serializable {
 
     private String description = "";
     
-    private String inventory_fields;
+    private String inventoryFields;
     
     private String equation;
     
@@ -103,12 +103,12 @@ public class EquationType implements Serializable {
         return costYear;
     }
 
-    public String getInventory_fields() {
-        return inventory_fields;
+    public String getInventoryFields() {
+        return inventoryFields;
     }
 
-    public void setInventory_fields(String inventory_fields) {
-        this.inventory_fields = inventory_fields;
+    public void setInventoryFields(String inventoryFields) {
+        this.inventoryFields = inventoryFields;
     }
 
     public String getEquation() {

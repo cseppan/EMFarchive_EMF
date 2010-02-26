@@ -381,8 +381,10 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         measure.setCreator(session.user());
         //leave untouched for now, these are not editable for now...
         measure.setNeiDevices(measure.getNeiDevices());
-        if (equipmentLife.getText().length() > 0)
+        if (equipmentLife.getText().trim().length() > 0)
             measure.setEquipmentLife(life);
+        else 
+            measure.setEquipmentLife(null);
         updatePollutant();
         updateControlTechnology();
         updateSourceGroup();
