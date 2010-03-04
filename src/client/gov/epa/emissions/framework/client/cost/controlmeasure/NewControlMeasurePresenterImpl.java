@@ -78,7 +78,8 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         createReport(measure, view);
     }
 
-    private void createReport(ControlMeasure measure, ControlMeasureView view) throws EmfException {
+    private void createReport(ControlMeasure measure, ControlMeasureView view) {
+        //
     }
     
     public void set(ControlMeasureSummaryTab summary) {
