@@ -246,10 +246,12 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private void refreshCurrentTab() throws EmfException {
         RefreshObserver tab = (RefreshObserver) tabbedPane.getSelectedComponent();
-
+        RefreshObserver summaryTab = (RefreshObserver) tabbedPane.getComponentAt(0);
         try {
             messagePanel.clear();
             tab.doRefresh();
+            if (tabbedPane.getSelectedIndex()!= 0)
+                summaryTab.doRefresh();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }

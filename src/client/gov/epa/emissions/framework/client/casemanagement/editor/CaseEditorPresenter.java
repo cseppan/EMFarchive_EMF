@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
-import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTabView;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabView;
 import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTabView;
@@ -8,7 +7,6 @@ import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTabV
 import gov.epa.emissions.framework.client.casemanagement.parameters.EditCaseParametersTabView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
-import gov.epa.emissions.framework.services.data.GeoRegion;
 
 public interface CaseEditorPresenter {
 
@@ -36,9 +34,9 @@ public interface CaseEditorPresenter {
     
     void checkIfLockedByCurrentUser() throws EmfException;
     
-    void addSectorBacktoCase(Sector sector);
-    
-    void addGridBacktoCase(GeoRegion grid);
+//    void addSectorBacktoCase(Sector sector);
+//    
+//    void addGridBacktoCase(GeoRegion grid);
     
     Case getCaseFromName(String caseName) throws EmfException;
     

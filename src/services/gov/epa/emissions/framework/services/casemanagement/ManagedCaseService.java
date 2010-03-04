@@ -1024,6 +1024,7 @@ public class ManagedCaseService {
     public synchronized void addCaseInputs(User user, int caseId, CaseInput[] inputs) throws EmfException {
         Session session = sessionFactory.getSession();
         List<Sector> sectors = new ArrayList<Sector>();
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
 
         try {
             for (int i = 0; i < inputs.length; i++) {
@@ -1046,9 +1047,12 @@ public class ManagedCaseService {
             for (CaseInput input : inputs) {
                 dao.add(input, session);
                 Sector sector = input.getSector();
+                GeoRegion region = input.getRegion();
 
                 if (sector != null && !sectors.contains(sector))
-                    sectors.add(input.getSector());
+                    sectors.add(sector);
+                if (region != null && !regions.contains(region))
+                    regions.add(region);
             }
         } catch (Exception e) {
             log.error("Could not add new case input '" + inputs[0].getName() + "' etc.\n", e);
@@ -1056,7 +1060,7 @@ public class ManagedCaseService {
         } finally {
             // NOTE: if any inputs get copied, we need to update target case sector list
             try {
-                updateSectorsList(user, caseId, session, sectors);
+                updateCase(user, caseId, session, sectors, regions);
             } catch (Exception e) {
                 throw new EmfException(e.getMessage() + " " + inputs.length + " inputs copied.");
             } finally {
@@ -1069,7 +1073,7 @@ public class ManagedCaseService {
     private synchronized void addCaseInputs(User user, int caseId, CaseInput[] inputs, String jobPrefix)
             throws EmfException {
         Session session = sessionFactory.getSession();
-
+        
         try {
             for (int i = 0; i < inputs.length; i++) {
                 inputs[i].setCaseID(caseId);
@@ -1103,7 +1107,16 @@ public class ManagedCaseService {
 
     public synchronized CaseInput addCaseInput(User user, CaseInput input, boolean copyingCase) throws EmfException {
         Session session = sessionFactory.getSession();
+        List<Sector> sectors = new ArrayList<Sector>();
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
+        Sector sector = input.getSector();
+        GeoRegion region = input.getRegion();
 
+        if (sector != null && !sectors.contains(sector))
+            sectors.add(sector);
+        if (region != null && !regions.contains(region))
+            regions.add(region);
+        
         try {
             if (!copyingCase)
                 checkNExtendCaseLock(user, getCase(input.getCaseID(), session));
@@ -1117,18 +1130,35 @@ public class ManagedCaseService {
                         "The combination of 'Input Name', 'Region', 'Sector', 'Program', and 'Job' should be unique.");
 
             dao.add(input, session);
+            
             return (CaseInput) dao.loadCaseInput(input, session);
         } catch (Exception e) {
             log.error("Could not add new case input '" + input.getName() + "'\n", e);
             throw new EmfException(e.getMessage() == null ? "Could not add new case input." : e.getMessage());
         } finally {
-            if (session != null && session.isConnected())
-                session.close();
+            try {
+                updateCase(user, input.getCaseID(), session, sectors, regions);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage() + " " + "Case can not be updated. ");
+            } finally {
+                if (session != null && session.isConnected())
+                    session.close();
+            }
         }
+        
     }
 
     public synchronized void updateCaseInput(User user, CaseInput input) throws EmfException {
         Session localSession = sessionFactory.getSession();
+        List<Sector> sectors = new ArrayList<Sector>();
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
+        Sector sector = input.getSector();
+        GeoRegion region = input.getRegion();
+
+        if (sector != null && !sectors.contains(sector))
+            sectors.add(sector);
+        if (region != null && !regions.contains(region))
+            regions.add(region);
 
         try {
             checkNExtendCaseLock(user, getCase(input.getCaseID(), localSession));
@@ -1152,14 +1182,22 @@ public class ManagedCaseService {
             log.error("Could not update case input: " + input.getName() + ".\n", e);
             throw new EmfException("Could not update case input: " + input.getName() + ".");
         } finally {
-            if (localSession != null && localSession.isConnected())
-                localSession.close();
+            try {
+                updateCase(user, input.getCaseID(),localSession, sectors, regions);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage() + " " + "Case can not be updated. ");
+            } finally {
+                if (localSession != null && localSession.isConnected())
+                    localSession.close();
+            } 
         }
     }
 
-    public synchronized void removeCaseInputs(CaseInput[] inputs) throws EmfException {
-        Session session = sessionFactory.getSession();
-
+    public synchronized void removeCaseInputs(User user, CaseInput[] inputs) throws EmfException {
+        Session session = sessionFactory.getSession();       
+        int caseId = inputs[0].getCaseID();        
+        List<Sector> sectors = new ArrayList<Sector>();
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
         try {
             dao.removeCaseInputs(inputs, session);
         } catch (Exception e) {
@@ -1167,7 +1205,14 @@ public class ManagedCaseService {
             log.error("Could not remove case input " + inputs[0].getName() + " etc.\n" + e.getMessage());
             throw new EmfException("Could not remove case input " + inputs[0].getName() + " etc.");
         } finally {
-            session.close();
+            try {
+                updateCase(user, caseId, session, sectors, regions);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage() + " " + "Case can not be updated. ");
+            } finally {
+                if (session != null && session.isConnected())
+                    session.close();
+            }
         }
     }
 
@@ -1611,7 +1656,7 @@ public class ManagedCaseService {
     public synchronized void addCaseParameters(User user, int caseId, CaseParameter[] params) throws EmfException {
         Session session = sessionFactory.getSession();
         List<Sector> sectors = new ArrayList<Sector>();
-
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
         try {
             for (int i = 0; i < params.length; i++) {
                 params[i].setCaseID(caseId);
@@ -1634,9 +1679,12 @@ public class ManagedCaseService {
             for (CaseParameter param : params) {
                 dao.addParameter(param, session);
                 Sector sector = param.getSector();
-
+                GeoRegion region = param.getRegion();
+                
                 if (sector != null && !sectors.contains(sector))
-                    sectors.add(param.getSector());
+                    sectors.add(sector);
+                if (region != null && !regions.contains(region))
+                    regions.add(region);
             }
         } catch (Exception e) {
             log.error("Could not add new case parameter '" + params[0].getName() + "' etc.\n", e);
@@ -1645,7 +1693,7 @@ public class ManagedCaseService {
             // NOTE: if there is any parameter get copied, need to add new sectors to the copied case
             // sectors list
             try {
-                updateSectorsList(user, caseId, session, sectors);
+                updateCase(user, caseId, session, sectors, regions);
             } catch (Exception e) {
                 throw new EmfException(e.getMessage() + " " + params.length + " parameters copied.");
             } finally {
@@ -1655,21 +1703,21 @@ public class ManagedCaseService {
         }
     }
 
-    private void updateSectorsList(User user, int caseId, Session session, List<Sector> sectors) throws EmfException {
+    private void updateCase(User user, int caseId, Session session, List<Sector> sectors, List<GeoRegion> regions) throws EmfException {
+        
+        boolean lockObtained = false;
+        Case target = dao.getCase(caseId, session);
+
+        if (target.isLocked() && !target.isLocked(user))
+            throw new EmfException("Cannot obtain lock on target case to update sectors list.");
+
+        Case locked = target;
+
+        if (!target.isLocked()) {
+            locked = dao.obtainLocked(user, target, session);
+            lockObtained = true;
+        }
         if (sectors.size() > 0) {
-            boolean lockObtained = false;
-            Case target = dao.getCase(caseId, session);
-
-            if (target.isLocked() && !target.isLocked(user))
-                throw new EmfException("Cannot obtain lock on target case to update sectors list.");
-
-            Case locked = target;
-
-            if (!target.isLocked()) {
-                locked = dao.obtainLocked(user, target, session);
-                lockObtained = true;
-            }
-
             Sector[] sectrs = locked.getSectors();
             List<Sector> existed = new ArrayList<Sector>();
             existed.addAll(Arrays.asList(sectrs));
@@ -1679,15 +1727,29 @@ public class ManagedCaseService {
                     existed.add(sectors.get(i));
 
             locked.setSectors(existed.toArray(new Sector[0]));
-
-            if (lockObtained) {
-                dao.update(locked, session);
-                return;
-            }
-
-            dao.updateWithLock(locked, session);
         }
-    }
+        
+        if (regions.size() > 0) {
+            GeoRegion[] regs = locked.getRegions();
+            List<GeoRegion> existed = new ArrayList<GeoRegion>();
+            existed.addAll(Arrays.asList(regs));
+
+            for (int i = 0; i < regions.size(); i++)
+                if (!existed.contains(regions.get(i)))
+                    existed.add(regions.get(i));
+
+            locked.setRegions(existed.toArray(new GeoRegion[0]));
+        }
+        
+        locked.setLastModifiedBy(user);
+        locked.setLastModifiedDate(new Date());
+
+        if (lockObtained) {
+            dao.update(locked, session);
+            return;
+        }
+        dao.updateWithLock(locked, session);
+    } 
 
     private synchronized void addCaseParameters(User user, int caseId, CaseParameter[] params, String jobPrefix)
             throws EmfException {
@@ -1727,7 +1789,8 @@ public class ManagedCaseService {
     public synchronized CaseParameter addCaseParameter(User user, CaseParameter param, boolean copyingCase)
             throws EmfException {
         Session session = sessionFactory.getSession();
-
+        List<Sector> sectors = new ArrayList<Sector>();
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
         try {
             if (!copyingCase)
                 checkNExtendCaseLock(user, getCase(param.getCaseID(), session));
@@ -1741,28 +1804,52 @@ public class ManagedCaseService {
                         "The combination of 'Parameter Name', 'Region', 'Sector', 'Program', and 'Job' should be unique.");
 
             dao.addParameter(param, session);
+            
+            Sector sector = param.getSector();
+            GeoRegion region = param.getRegion();
+
+            if (sector != null && !sectors.contains(sector))
+                sectors.add(sector);
+            if (region != null && !regions.contains(region))
+                regions.add(region);
+            
             return dao.loadCaseParameter(param, session);
         } catch (Exception e) {
             log.error("Could not add new case parameter '" + param.getName() + "'\n", e);
             throw new EmfException(e.getMessage() == null ? "Could not add new case parameter." : e.getMessage());
         } finally {
-            if (session != null && session.isConnected())
-                session.close();
+            try {
+                updateCase(user, param.getCaseID(), session, sectors, regions);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage() + " " + "Case can not be updated. ");
+            } finally {      
+                if (session != null && session.isConnected())
+                    session.close();
+            }
         }
     }
 
-    public synchronized void removeCaseParameters(CaseParameter[] params) throws EmfException {
+    public synchronized void removeCaseParameters(User user, CaseParameter[] params) throws EmfException {
         Session session = sessionFactory.getSession();
-
+        List<Sector> sectors = new ArrayList<Sector>();
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
         try {
             dao.removeCaseParameters(params, session);
         } catch (Exception e) {
             log.error("Could not remove case parameter " + params[0].getName() + " etc.\n", e);
             throw new EmfException("Could not remove case parameter " + params[0].getName() + " etc.");
         } finally {
-            if (session != null && session.isConnected())
-                session.close();
+            try {
+                updateCase(user, params[0].getCaseID(),session, sectors, regions);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage() + " " + "Case can not be updated. ");
+            } finally {      
+                if (session != null && session.isConnected())
+                    session.close();
+            }
         }
+        
+        
     }
 
     public CaseParameter getCaseParameter(int caseId, ParameterEnvVar var) throws EmfException {
@@ -2004,7 +2091,8 @@ public class ManagedCaseService {
     public synchronized void addCaseJobs(User user, int caseId, CaseJob[] jobs) throws EmfException {
         Session session = sessionFactory.getSession();
         List<Sector> sectors = new ArrayList<Sector>();
-
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
+        
         try {
             for (CaseJob job : jobs)
                 if (dao.getCaseJob(caseId, job, session) != null)
@@ -2020,9 +2108,12 @@ public class ManagedCaseService {
                 job.setRunstatus(dao.getJobRunStatuse("Not Started"));
                 dao.add(job, session);
                 Sector sector = job.getSector();
-
+                GeoRegion region = job.getRegion();
+                
                 if (sector != null && !sectors.contains(sector))
                     sectors.add(job.getSector());
+                if (region != null && !regions.contains(region))
+                    regions.add(region);
             }
         } catch (EmfException e) {
             log.error("Could not add new case jobs '" + jobs[0].getName() + "' etc.\n" + e.getMessage());
@@ -2030,7 +2121,7 @@ public class ManagedCaseService {
         } finally {
             // NOTE: if any jobs get copied, we need to update target case sector list
             try {
-                updateSectorsList(user, caseId, session, sectors);
+                updateCase(user, caseId, session, sectors, regions);
             } catch (Exception e) {
                 throw new EmfException(e.getMessage() + " " + jobs.length + " jobs copied.");
             } finally {
@@ -2066,7 +2157,8 @@ public class ManagedCaseService {
 
     public synchronized CaseJob addCaseJob(User user, CaseJob job, boolean copyingCase) throws EmfException {
         Session session = sessionFactory.getSession();
-
+        List<Sector> sectors = new ArrayList<Sector>();
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
         try {
             if (!copyingCase) // if not copying case, automatically extend the lock on case object
                 checkNExtendCaseLock(user, getCase(job.getCaseId(), session));
@@ -2080,13 +2172,29 @@ public class ManagedCaseService {
 
             job.setIdInQueue(null);
             dao.add(job, session);
+            
+            Sector sector = job.getSector();
+            GeoRegion region = job.getRegion();
+
+            if (sector != null && !sectors.contains(sector))
+                sectors.add(sector);
+            if (region != null && !regions.contains(region))
+                regions.add(region);
+            
             return dao.loadCaseJobByName(job);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not add new case job '" + job.getName() + "'\n" + e.getMessage());
             throw new EmfException("Could not add new case job '" + job.getName() + "'");
         } finally {
-            session.close();
+            try {
+                updateCase(user, job.getCaseId(), session, sectors, regions);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage() + " " + "Case can not be updated. ");
+            } finally {      
+                if (session != null && session.isConnected())
+                    session.close();
+            }
         }
     }
 
@@ -2178,9 +2286,11 @@ public class ManagedCaseService {
 
     }
 
-    public synchronized void removeCaseJobs(CaseJob[] jobs) throws EmfException {
+    public synchronized void removeCaseJobs(User user, CaseJob[] jobs) throws EmfException {
         Session session = sessionFactory.getSession();
-
+        List<Sector> sectors = new ArrayList<Sector>();
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
+        
         checkJobsStatuses(Arrays.asList(jobs), dao.getCase(jobs[0].getCaseId(), session));
         checkTaskPersistItems(jobs, session);
         checkJobOutputItems(jobs, session);
@@ -2202,8 +2312,16 @@ public class ManagedCaseService {
             log.error("Could not remove case job " + jobs[0].getName() + " etc.\n" + e.getMessage());
             throw new EmfException("Could not remove selected job(s): " + e.getLocalizedMessage());
         } finally {
-            session.close();
+            try {
+                updateCase(user, jobs[0].getCaseId(),session, sectors, regions);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage() + " " + "Case can not be updated. ");
+            } finally {    
+                if (session != null && session.isConnected());
+                session.close();
+            }
         }
+        
     }
 
     private void checkJobOutputItems(CaseJob[] jobs, Session session) throws EmfException {
@@ -2401,7 +2519,9 @@ public class ManagedCaseService {
 
     public synchronized void updateCaseParameter(User user, CaseParameter parameter) throws EmfException {
         Session localSession = sessionFactory.getSession();
-
+        List<Sector> sectors = new ArrayList<Sector>();
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
+        
         try {
             checkNExtendCaseLock(user, getCase(parameter.getCaseID(), localSession));
         } catch (EmfException e) {
@@ -2418,13 +2538,30 @@ public class ManagedCaseService {
             // FIXME: why session.clear()?
             localSession.clear();
             dao.updateCaseParameter(parameter, localSession);
+            
+            Sector sector = parameter.getSector();
+            GeoRegion region = parameter.getRegion();
+
+            if (sector != null && !sectors.contains(sector))
+                sectors.add(sector);
+            if (region != null && !regions.contains(region))
+                regions.add(region);
+
             // setStatus(user, "Saved parameter " + parameter.getName() + " to database.", "Save Parameter");
         } catch (RuntimeException e) {
             e.printStackTrace();
             log.error("Could not update case parameter: " + parameter.getName() + ".\n" + e);
             throw new EmfException("Could not update case parameter: " + parameter.getName() + ".");
         } finally {
-            localSession.close();
+            try {
+                updateCase(user, parameter.getCaseID(), localSession, sectors, regions);
+            } catch (Exception e) {
+                throw new EmfException(e.getMessage() + " " + "Case can not be updated. ");
+            } finally {      
+                if (localSession != null && localSession.isConnected())
+                    localSession.close();
+            }
+         
         }
     }
 
@@ -2824,7 +2961,23 @@ public class ManagedCaseService {
 
     public synchronized void saveCaseJobFromClient(User user, CaseJob job) throws EmfException {
         Session localSession = sessionFactory.getSession();
+        List<Sector> sectors = new ArrayList<Sector>();
+        List<GeoRegion> regions = new ArrayList<GeoRegion>();
+             
+        Sector sector = job.getSector();
+        GeoRegion region = job.getRegion();
 
+        if (sector != null && !sectors.contains(sector))
+            sectors.add(sector);
+        if (region != null && !regions.contains(region))
+            regions.add(region);
+
+        try {
+            updateCase(user, job.getCaseId(), localSession, sectors, regions );
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage() + " " + "Case can not be updated. ");        
+        }
+        
         try {
             checkNExtendCaseLock(user, getCase(job.getCaseId(), localSession));
         } catch (EmfException e) {

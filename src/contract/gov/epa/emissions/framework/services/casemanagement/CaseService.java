@@ -85,7 +85,7 @@ public interface CaseService {
     
     void updateCaseInput(User user, CaseInput input) throws EmfException;
     
-    void removeCaseInputs(CaseInput[] inputs) throws EmfException;
+    void removeCaseInputs(User user, CaseInput[] inputs) throws EmfException;
     
     void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset) throws EmfException;
     
@@ -117,7 +117,7 @@ public interface CaseService {
 
     JobRunStatus[] getJobRunStatuses() throws EmfException;
     
-    void removeCaseJobs(CaseJob[] jobs) throws EmfException;
+    void removeCaseJobs(User user, CaseJob[] jobs) throws EmfException;
 
     void updateCaseJob(User user, CaseJob job) throws EmfException;
     
@@ -143,7 +143,7 @@ public interface CaseService {
     
     CaseParameter addCaseParameter(User user, CaseParameter param) throws EmfException;
     
-    void removeCaseParameters(CaseParameter[] params) throws EmfException;
+    void removeCaseParameters(User user, CaseParameter[] params) throws EmfException;
     
     CaseParameter[] getCaseParameters(int caseId) throws EmfException;
     

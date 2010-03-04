@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.casemanagement.jobs;
 
-import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -23,7 +22,6 @@ import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
-import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
@@ -416,6 +414,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
         tableData.remove(jobs);
         refresh();
+        messagePanel.setMessage("Click Refresh to see case updates. " );
     }
 
     private void editJobs(List<CaseJob> jobs) throws EmfException {
@@ -709,18 +708,5 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
     }
 
-    public void addSector(Sector sector) {
-        if (sector == null)
-            return;
-
-        parentPresenter.addSectorBacktoCase(sector);
-    }
-    
-    public void addGrid(GeoRegion grid) {
-        if (grid == null)
-            return;
-
-        parentPresenter.addGridBacktoCase(grid);
-    }
 
 }

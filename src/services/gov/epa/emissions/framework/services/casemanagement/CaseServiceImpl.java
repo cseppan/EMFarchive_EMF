@@ -229,8 +229,8 @@ public class CaseServiceImpl implements CaseService {
         getCaseService().updateCaseInput(user, input);
     }
 
-    public void removeCaseInputs(CaseInput[] inputs) throws EmfException {
-        getCaseService().removeCaseInputs(inputs);
+    public void removeCaseInputs(User user, CaseInput[] inputs) throws EmfException {
+        getCaseService().removeCaseInputs(user, inputs);
     }
 
     public void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset) throws EmfException {
@@ -281,8 +281,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getExecutables(casejobId);
     }
 
-    public void removeCaseJobs(CaseJob[] jobs) throws EmfException {
-        getCaseService().removeCaseJobs(jobs);
+    public void removeCaseJobs(User user, CaseJob[] jobs) throws EmfException {
+        getCaseService().removeCaseJobs(user, jobs);
     }
 
     public void updateCaseJob(User user, CaseJob job) throws EmfException {
@@ -395,8 +395,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getCaseParameters(pageSize, caseId, sector, envNameContains, showAll);
     }
 
-    public void removeCaseParameters(CaseParameter[] params) throws EmfException {
-        getCaseService().removeCaseParameters(params);
+    public void removeCaseParameters(User user, CaseParameter[] params) throws EmfException {
+        getCaseService().removeCaseParameters(user, params);
     }
 
     public void exportCaseInputs(User user, Integer[] caseInputIds, String purpose) throws EmfException {

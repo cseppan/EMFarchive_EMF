@@ -1,10 +1,8 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
-import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
-import gov.epa.emissions.framework.services.data.GeoRegion;
 
 public interface EditInputsTabView {
 
@@ -22,10 +20,10 @@ public interface EditInputsTabView {
 
     void clearMessage();
 
-    void addSectorBacktoCase(Sector updatedSector);
-    
-    void addGridBacktoCase(GeoRegion updatedRegion );
-    
+//    void addSectorBacktoCase(Sector updatedSector);
+//    
+//    void addGridBacktoCase(GeoRegion updatedRegion );
+//    
     void setMessage(String message);
     
 //    void notifychanges();

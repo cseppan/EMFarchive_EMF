@@ -15,7 +15,6 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,8 +74,6 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
         if (input.getCaseID() == caseObj.getId()) {
             view.addInput(loaded);
-            addSectorBacktoCase(loaded.getSector());
-            addGridBacktoCase(loaded.getRegion());
         }
     }
 
@@ -89,7 +86,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     }
 
     public void removeInputs(CaseInput[] inputs) throws EmfException {
-        service().removeCaseInputs(inputs);
+        service().removeCaseInputs(session.user(), inputs);
     }
 
     public void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException {
@@ -211,14 +208,6 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     public void doViewRelated(RelatedCaseView view, Case[] casesByInputDataset, Case[] casesByOutputDataset) {
         RelatedCasePresenter presenter = new RelatedCasePresenter(view, session);
         presenter.doDisplay(casesByInputDataset, casesByOutputDataset);
-    }
-
-    public void addSectorBacktoCase(Sector updatedSector) {
-        parentPresenter.addSectorBacktoCase(updatedSector);
-    }
-    
-    public void addGridBacktoCase(GeoRegion updatedGrid) {
-        parentPresenter.addGridBacktoCase(updatedGrid);
     }
 
 }

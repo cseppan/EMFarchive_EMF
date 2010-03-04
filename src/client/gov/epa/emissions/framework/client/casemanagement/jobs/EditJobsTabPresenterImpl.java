@@ -77,7 +77,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
         if (newJob.getCaseId() == caseObj.getId()) {
             view.addJob(newJob);
-            addNewSectorToSummary(job);
+            //addNewSectorToSummary(job);
         }
 
         return newJob;
@@ -109,12 +109,12 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
     public void removeJobs(CaseJob[] jobs) throws EmfException {
         if (inputsBySelectedJobs != null && inputsBySelectedJobs.length > 0)
-            service().removeCaseInputs(inputsBySelectedJobs);
+            service().removeCaseInputs(session.user(), inputsBySelectedJobs);
 
         if (parametersBySelectedJobs != null && parametersBySelectedJobs.length > 0)
-            service().removeCaseParameters(parametersBySelectedJobs);
+            service().removeCaseParameters(session.user(), parametersBySelectedJobs);
 
-        service().removeCaseJobs(jobs);
+        service().removeCaseJobs(session.user(), jobs);
         this.caseObjectManager.refreshJobList();
     }
 
@@ -324,23 +324,23 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
                     + " has it now.");
     }
 
-    public void addNewSectorToSummary(CaseJob job) {
-        Sector sector = job.getSector();
+//    public void addNewSectorToSummary(CaseJob job) {
+//        Sector sector = job.getSector();
+//
+//        if (sector == null)
+//            return;
+//
+//        view.addSector(sector);
+//    }
 
-        if (sector == null)
-            return;
-
-        view.addSector(sector);
-    }
-
-    public void addNewRegionToSummary(CaseJob job) {
-        GeoRegion region = job.getRegion();
-
-        if (region == null)
-            return;
-
-        view.addGrid(region);
-    }
+//    public void addNewRegionToSummary(CaseJob job) {
+//        GeoRegion region = job.getRegion();
+//
+//        if (region == null)
+//            return;
+//
+//        view.addGrid(region);
+//    }
 
     public void refreshJobList() throws EmfException {
         this.caseObjectManager.refreshJobList();

@@ -361,14 +361,15 @@ public class CaseServiceTransport implements CaseService {
         call.request(new Object[] { user, input });
     }
 
-    public synchronized void removeCaseInputs(CaseInput[] inputs) throws EmfException {
+    public synchronized void removeCaseInputs(User user, CaseInput[] inputs) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("removeCaseInputs");
+        call.addParam("user", dataMappings.user());
         call.addParam("inputs", caseMappings.caseinputs());
         call.setVoidReturnType();
 
-        call.request(new Object[] { inputs });
+        call.request(new Object[] { user, inputs });
     }
 
     public synchronized void removeCaseOutputs(User user, CaseOutput[] outputs, boolean deleteDataset)
@@ -493,14 +494,15 @@ public class CaseServiceTransport implements CaseService {
         return (Executable[]) call.requestResponse(new Object[] {});
     }
 
-    public synchronized void removeCaseJobs(CaseJob[] jobs) throws EmfException {
+    public synchronized void removeCaseJobs(User user, CaseJob[] jobs) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("removeCaseJobs");
+        call.addParam("user", dataMappings.user());
         call.addParam("jobs", caseMappings.casejobs());
         call.setVoidReturnType();
 
-        call.request(new Object[] { jobs });
+        call.request(new Object[] { user, jobs });
     }
 
     public synchronized void updateCaseJob(User user, CaseJob job) throws EmfException {
@@ -681,14 +683,15 @@ public class CaseServiceTransport implements CaseService {
                 sector, envNameContains, showAll });
     }
 
-    public synchronized void removeCaseParameters(CaseParameter[] params) throws EmfException {
+    public synchronized void removeCaseParameters(User user, CaseParameter[] params) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("removeCaseParameters");
+        call.addParam("user", dataMappings.user());
         call.addParam("params", caseMappings.caseParameters());
         call.setVoidReturnType();
 
-        call.request(new Object[] { params });
+        call.request(new Object[] { user, params });
     }
 
     public synchronized void updateCaseParameter(User user, CaseParameter parameter) throws EmfException {

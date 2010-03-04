@@ -10,7 +10,6 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
-import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,9 +61,9 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
 
         if (param.getCaseID() == caseObj.getId()) {
             view.addParameter(loaded);
-            //refreshView();
-            addSectorBacktoCase(loaded.getSector());
-            addRegionBacktoCase(loaded.getRegion());
+//            refreshView();
+//            addSectorBacktoCase(loaded.getSector());
+//            addRegionBacktoCase(loaded.getRegion());
         }
     }
 
@@ -109,7 +108,7 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     }
 
     public void removeParameters(CaseParameter[] params) throws EmfException {
-        service().removeCaseParameters(params);
+        service().removeCaseParameters(session.user(), params);
     }
 
     public Sector[] getAllSetcors() {
@@ -150,12 +149,12 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
         return this.defaultPageSize;
     }
     
-    public void addSectorBacktoCase(Sector updatedSector) {
-        parentPresenter.addSectorBacktoCase(updatedSector);
-    }
-    
-    public void addRegionBacktoCase(GeoRegion updatedGrid) {
-        parentPresenter.addGridBacktoCase(updatedGrid);
-    }
+//    public void addSectorBacktoCase(Sector updatedSector) {
+//        parentPresenter.addSectorBacktoCase(updatedSector);
+//    }
+//    
+//    public void addRegionBacktoCase(GeoRegion updatedGrid) {
+//        parentPresenter.addGridBacktoCase(updatedGrid);
+//    }
 
 }

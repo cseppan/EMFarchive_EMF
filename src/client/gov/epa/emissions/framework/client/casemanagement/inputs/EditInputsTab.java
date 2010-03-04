@@ -27,7 +27,6 @@ import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
@@ -375,7 +374,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
                     copyInputs(localPresenter);
                 } catch (Exception ex) {
                     messagePanel.setError(ex.getMessage());
-                    ex.printStackTrace();
+                    //ex.printStackTrace();
                 }
             }
         };
@@ -425,7 +424,13 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         if (selection == JOptionPane.YES_OPTION) {
             tableData.remove(inputs);
             refresh();
-            presenter.removeInputs(inputs);
+            try {
+                presenter.removeInputs(inputs);
+                setMessage(" Click Refresh to see case updates.");
+            }catch (EmfException e){
+                //e.printStackTrace();
+                throw new EmfException(e.getMessage());
+            }
         }
     }
 
@@ -501,7 +506,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
                 presenter.doDisplayPropertiesView(view, dataset);
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }
@@ -724,11 +729,11 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
 
     }
 
-    public void addSectorBacktoCase(Sector updatedSector) {
-        presenter.addSectorBacktoCase(updatedSector);
-    }
-
-    public void addGridBacktoCase(GeoRegion updatedGrid) {
-        presenter.addGridBacktoCase(updatedGrid);
-    }
+//    public void addSectorBacktoCase(Sector updatedSector) {
+//        presenter.addSectorBacktoCase(updatedSector);
+//    }
+//
+//    public void addGridBacktoCase(GeoRegion updatedGrid) {
+//        presenter.addGridBacktoCase(updatedGrid);
+//    }
 }

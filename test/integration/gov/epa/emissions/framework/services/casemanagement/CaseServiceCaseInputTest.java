@@ -231,7 +231,7 @@ public class CaseServiceCaseInputTest extends ServiceTestCase {
             service.updateCaseInput(user, returnedInput3);
             
             CaseInput[] loadedInputs = service.getCaseInputs(caseId);
-            service.removeCaseInputs(loadedInputs);
+            service.removeCaseInputs(user,loadedInputs);
             
             CaseInput[] loadedInputsAfterDeletion = service.getCaseInputs(caseId);
             

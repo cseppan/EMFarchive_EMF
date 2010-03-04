@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.casemanagement.editor;
 
-import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
 import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTabPresenter;
@@ -20,7 +19,6 @@ import gov.epa.emissions.framework.client.casemanagement.parameters.EditParamete
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
-import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -207,15 +205,15 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         }
     }
 
-    public void addSectorBacktoCase(Sector sector) {
-        if (summaryPresenter != null && sector != null)
-            summaryPresenter.addSector(sector);
-    }
-    
-    public void addGridBacktoCase(GeoRegion grid) {
-        if (summaryPresenter != null && grid != null)
-            summaryPresenter.addRegion(grid);
-    }
+//    public void addSectorBacktoCase(Sector sector) {
+//        if (summaryPresenter != null && sector != null)
+//            summaryPresenter.addSector(sector);
+//    }
+//    
+//    public void addGridBacktoCase(GeoRegion grid) {
+//        if (summaryPresenter != null && grid != null)
+//            summaryPresenter.addRegion(grid);
+//    }
     
     public Case getCaseFromName(String caseName) throws EmfException{
         return service().getCaseFromName(caseName);

@@ -51,8 +51,7 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
     
     public void saveJob() throws EmfException {
         parentView.setMessage("Saved \"" + job.getName() + "\". Refresh to see the changes in the table.");
-        parentPresenter.addNewSectorToSummary(jobFieldsPresenter.doSave());
-        parentPresenter.addNewRegionToSummary(jobFieldsPresenter.doSave());
+        jobFieldsPresenter.doSave();
         parentPresenter.refreshJobList();
     }
     

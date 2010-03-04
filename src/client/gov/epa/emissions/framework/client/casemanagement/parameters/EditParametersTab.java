@@ -16,7 +16,6 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
-import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
@@ -340,6 +339,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             tableData.remove(params);
             refresh();
             presenter.removeParameters(params);
+            messagePanel.setMessage("Click Refresh to see case updates.");
         }
     }
 
@@ -472,12 +472,12 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
         }
     }
 
-    public void addSectorBacktoCase(Sector updatedSector) {
-        presenter.addSectorBacktoCase(updatedSector);
-    }
-    
-    public void addGridBacktoCase(GeoRegion updatedGrid) {
-        presenter.addRegionBacktoCase(updatedGrid);
-    }
+//    public void addSectorBacktoCase(Sector updatedSector) {
+//        presenter.addSectorBacktoCase(updatedSector);
+//    }
+//    
+//    public void addGridBacktoCase(GeoRegion updatedGrid) {
+//        presenter.addRegionBacktoCase(updatedGrid);
+//    }
 
 }
