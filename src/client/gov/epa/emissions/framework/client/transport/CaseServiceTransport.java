@@ -1201,5 +1201,25 @@ public class CaseServiceTransport implements CaseService {
 
         return (Integer) call.requestResponse(new Object[] { cancelJobs, user });
     }
+    
+    public String[] isGeoRegionUsed(int caseId, GeoRegion[] grids) throws EmfException {
+        EmfCall call = call();
+        call.setOperation("isGeoRegionUsed");
+        call.addIntParam();
+        call.addParam("grids", dataMappings.geoRegions());
+        call.setStringArrayReturnType();
+        
+        return (String[]) call.requestResponse(new Object[] { caseId, grids });
+    }
+    
+    public String isGeoRegionInSummary(int caseId, GeoRegion[] grids) throws EmfException{
+        EmfCall call = call();
+        call.setOperation("isGeoRegionInSummary");
+        call.addIntParam();
+        call.addParam("grids", dataMappings.geoRegions());
+        call.setStringReturnType();
+        
+        return (String) call.requestResponse(new Object[] { caseId, grids });
+    }
 
 }

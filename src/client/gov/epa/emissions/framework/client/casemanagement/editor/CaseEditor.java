@@ -57,13 +57,13 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         this.parentConsole = parentConsole;
     }
 
-    private JTabbedPane createTabbedPane(MessagePanel messagePanel) {
+    private JTabbedPane createTabbedPane() {
         tabbedPane = new JTabbedPane();
 
-        tabbedPane.addTab("Summary", createSummaryTab(caseObj, messagePanel));
+        tabbedPane.addTab("Summary", createSummaryTab());
         tabbedPane.addTab("Jobs", createJobsTab());
         tabbedPane.addTab("Inputs", createInputTab());
-        tabbedPane.addTab("Parameters", createParameterTab(messagePanel));
+        tabbedPane.addTab("Parameters", createParameterTab());
         tabbedPane.addTab("Outputs", createOutputTab());
         tabbedPane.addTab("History", createHistoryTab());
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -89,10 +89,10 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         presenter.doLoad(tabTitle);
     }
 
-    private JPanel createSummaryTab(Case caseObj, MessagePanel messagePanel) {
+    private JPanel createSummaryTab() {
         EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, this, messagePanel, parentConsole);
         view.setDesktopManager(desktopManager);
-        EditCaseSummaryTabPresenter summaryPresenter = new EditCaseSummaryTabPresenter(session);
+        EditCaseSummaryTabPresenter summaryPresenter = new EditCaseSummaryTabPresenter(caseObj.getId(), session);
         view.observe(summaryPresenter);
         try {
             view.display();
@@ -103,7 +103,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         return view;
     }
 
-    private Component createParameterTab(MessagePanel messagePanel) {
+    private Component createParameterTab() {
         EditParametersTab view = new EditParametersTab(parentConsole, messagePanel, desktopManager);
         presenter.set(view);
         return view;
@@ -162,7 +162,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
-        panel.add(createTabbedPane(messagePanel), BorderLayout.CENTER);
+        panel.add(createTabbedPane(), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         if (msg != null && !msg.isEmpty())
@@ -250,7 +250,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         try {
             messagePanel.clear();
             tab.doRefresh();
-            if (tabbedPane.getSelectedIndex()!= 0)
+            if (tabbedPane.getSelectedIndex() != 0)
                 summaryTab.doRefresh();
         } catch (Exception e) {
             throw new EmfException(e.getMessage());

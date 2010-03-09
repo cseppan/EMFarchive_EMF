@@ -19,8 +19,11 @@ public class EditCaseSummaryTabPresenter {
     
     private CaseObjectManager caseObjectManager = null;
     
-    public EditCaseSummaryTabPresenter(EmfSession session) {
+    private int caseId; 
+    
+    public EditCaseSummaryTabPresenter(int caseId, EmfSession session) {
         this.caseObjectManager = CaseObjectManager.getCaseObjectManager(session);
+        this.caseId = caseId;
     }
 
     public Sector[] getAllSectors() throws EmfException {
@@ -109,6 +112,13 @@ public class EditCaseSummaryTabPresenter {
 
     public GeoRegion[] getAllGeoRegions() throws EmfException {
         return caseObjectManager.getGeoRegions();
+    }
+    
+    public String[] isGeoRegionUsed(GeoRegion[] grids)throws EmfException {
+        if ( (caseId ==0) || (grids == null) ){
+            throw new EmfException("Incorrect case Id or georegion values. ");
+        }       
+         return caseObjectManager.isGeoRegionUsed(caseId, grids);
     }
 
 }

@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import javax.swing.JComponent;
 
@@ -122,5 +123,10 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
     public void doViewRelated(RelatedCaseView view, Case[] casesByInputDataset, Case[] casesByOutputDataset) {
         RelatedCasePresenter presenter = new RelatedCasePresenter(view, session);
         presenter.doDisplay(casesByInputDataset, casesByOutputDataset);
+    }
+
+    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) throws EmfException {
+        // NOTE Auto-generated method stub
+        return null;
     }
 }

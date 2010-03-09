@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement.parameters;
 
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
 
 import javax.swing.JComponent;
@@ -18,21 +19,23 @@ public class EditCaseParameterPresenterImpl implements EditCaseParameterPresente
     
     private CaseParameter parameter;
     
-    private int caseid, model_id;
+    private Case caseObj;
+    
+    private int model_id;
 
-    public EditCaseParameterPresenterImpl(int caseid, EditCaseParameterView view, 
+    public EditCaseParameterPresenterImpl(Case caseObj, EditCaseParameterView view, 
             EditCaseParametersTabView parentView, EmfSession session) {
         this.view = view;
         this.parentView = parentView;
         this.session = session;
-        this.caseid = caseid;
+        this.caseObj = caseObj;
     }
     
-    public EditCaseParameterPresenterImpl(int caseid, 
+    public EditCaseParameterPresenterImpl(Case caseObj, 
             EditCaseParameterView view, EmfSession session) {
         this.view = view;
         this.session = session;
-        this.caseid = caseid;
+        this.caseObj = caseObj;
     }
     
     public void display(CaseParameter param, int model_id) throws EmfException {
@@ -45,7 +48,7 @@ public class EditCaseParameterPresenterImpl implements EditCaseParameterPresente
     
     public void doAddInputFields(JComponent container, 
             ParameterFieldsPanelView parameterFields) throws EmfException {
-        parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseid, parameterFields, session);
+        parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseObj, parameterFields, session);
         parameterFieldsPresenter.display(parameter, model_id, container);
     }
     

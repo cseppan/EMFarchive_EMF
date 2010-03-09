@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
@@ -472,6 +473,22 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             return;
         }
         
+        GeoRegion[] regions = presenter.getGeoregion(jobs);
+        if (regions.length >0 ){
+            String message= presenter.isGeoRegionInSummary(caseId, regions);
+            if (message.trim().length()>0){
+                message = "Add the regions " + message + " to Case (" +
+                caseId + ")? \n Note: if you don't add the region, the copy will be canceled. ";
+                      
+                int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+                if (selection == JOptionPane.YES_OPTION) 
+                    presenter.copyJobs(caseId, jobs);
+                return; 
+            }
+            presenter.copyJobs(caseId, jobs);
+            return; 
+        }
         presenter.copyJobs(caseId, jobs);
     }
 

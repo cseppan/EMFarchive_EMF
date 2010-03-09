@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
@@ -297,10 +298,31 @@ public class ViewableJobsTab extends JPanel implements JobsTabView, RefreshObser
         
         if (view.shouldCopy()){
             String selectedCase=view.getCases()[0];
-            presenter.copyJobs(getCaseId(selectedCase), jobs);
+            processCopyjobs(getCaseId(selectedCase), jobs);
         }
     }
-    
+ 
+    private void processCopyjobs(int caseId, List<CaseJob> jobs) throws Exception {
+        if (caseId != this.caseObj.getId()) {
+            GeoRegion[] regions = presenter.getGeoregion(jobs);
+            if (regions.length >0 ){
+                String message= presenter.isGeoRegionInSummary(caseId, regions);
+                if (message.trim().length()>0){
+                    message = "Add the regions " + message + " to Case (" +
+                    caseId + ")? \n Note: if you don't add the region, the copy will be canceled. ";
+                          
+                    int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
+                    if (selection == JOptionPane.YES_OPTION) 
+                        presenter.copyJobs(caseId, jobs);
+                    return; 
+                }
+                presenter.copyJobs(caseId, jobs);
+                return; 
+            }
+            presenter.copyJobs(caseId, jobs);   
+        }
+    }
      
     private int getCaseId(String selectedCase) {
         int index1 = selectedCase.indexOf("(") + 1;

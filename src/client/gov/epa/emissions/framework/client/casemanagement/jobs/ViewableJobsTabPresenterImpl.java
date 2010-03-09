@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -177,21 +178,17 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
     }
 
     public void copyJobs(int caseId, List<CaseJob> jobs) throws Exception {
-        if (caseId == this.caseObj.getId()) {
-            for (CaseJob job : jobs)
-                copyJob2CurrentCase(caseId, job, null);
-        } else {
-            CaseJob[] jobsArray = jobs.toArray(new CaseJob[0]);
-            User user = session.user();
+        CaseJob[] jobsArray = jobs.toArray(new CaseJob[0]);
+        User user = session.user();
 
-            for (int i = 0; i < jobs.size(); i++) {
-                jobsArray[i].setParentCaseId(this.caseObj.getId());
-                jobsArray[i].setRunJobUser(null); // not running at this moment
-                jobsArray[i].setUser(user); // job owner changes
-            }
-
-            service().addCaseJobs(user, caseId, jobsArray);
+        for (int i = 0; i < jobs.size(); i++) {
+            jobsArray[i].setParentCaseId(this.caseObj.getId());
+            jobsArray[i].setRunJobUser(null); // not running at this moment
+            jobsArray[i].setUser(user); // job owner changes
         }
+
+        service().addCaseJobs(user, caseId, jobsArray);
+
     }
 
     public void addNewSectorToSummary(CaseJob job) {
@@ -270,5 +267,20 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
         return null;
     }
 
+    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) throws EmfException {
+        return service().isGeoRegionInSummary(selectedCaseId, georegions);
+    }
+
+    public GeoRegion[] getGeoregion(List<CaseJob> jobs){
+        
+        List<GeoRegion>  regions = new ArrayList<GeoRegion>();
+
+        for (int i = 0; i < jobs.size(); i++){
+            GeoRegion region = jobs.get(i).getRegion();
+            if (region != null && !(regions.contains(region)))
+                regions.add(region);
+        }
+        return regions.toArray(new GeoRegion[0]);
+    }   
     
 }

@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.List;
 
@@ -39,4 +40,6 @@ public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
     void copyInput(int caseId, List<CaseInput> inputs) throws Exception;
     
     public Object[] getAllCaseNameIDs() throws EmfException;
+    
+    GeoRegion[] getGeoregion(List<CaseInput> inputs); 
 }

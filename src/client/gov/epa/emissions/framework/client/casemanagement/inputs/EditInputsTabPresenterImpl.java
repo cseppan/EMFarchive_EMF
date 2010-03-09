@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,7 +91,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     }
 
     public void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException {
-        EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(caseObj.getId(), inputEditor, view,
+        EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(caseObj, inputEditor, view,
                 session);
         editInputPresenter.display(input, caseObj.getModel().getId());
     }
@@ -120,7 +121,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
             throws EmfException {
         newInput.setId(view.numberOfRecord());
 
-        InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), inputFields,
+        InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj, inputFields,
                 session);
         inputFieldsPresenter.display(newInput, container, caseObj.getModel().getId());
     }
@@ -208,6 +209,22 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     public void doViewRelated(RelatedCaseView view, Case[] casesByInputDataset, Case[] casesByOutputDataset) {
         RelatedCasePresenter presenter = new RelatedCasePresenter(view, session);
         presenter.doDisplay(casesByInputDataset, casesByOutputDataset);
+    }
+
+    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) throws EmfException {
+        return service().isGeoRegionInSummary(selectedCaseId, georegions);
+    }
+    
+    public GeoRegion[] getGeoregion(List<CaseInput> inputs){
+        
+        List<GeoRegion>  regions = new ArrayList<GeoRegion>();
+
+        for (int i = 0; i < inputs.size(); i++){
+            GeoRegion region = inputs.get(i).getRegion();
+            if (region != null && !(regions.contains(region)))
+                regions.add(region);
+        }
+        return regions.toArray(new GeoRegion[0]);
     }
 
 }

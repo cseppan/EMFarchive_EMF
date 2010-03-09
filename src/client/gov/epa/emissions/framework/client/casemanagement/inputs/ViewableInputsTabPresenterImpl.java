@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +49,7 @@ public class ViewableInputsTabPresenterImpl {
     }
 
     public void doEditInput(CaseInput input, EditCaseInputView inputEditor) throws EmfException {
-        EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(caseObj.getId(), inputEditor,
+        EditInputPresenter editInputPresenter = new EditCaseInputPresenterImpl(caseObj, inputEditor,
                 session);
         editInputPresenter.display(input, caseObj.getModel().getId());
     }
@@ -56,7 +57,7 @@ public class ViewableInputsTabPresenterImpl {
     public void doAddInputFields(JComponent container, InputFieldsPanelView inputFields, CaseInput newInput) throws EmfException {
         newInput.setId(view.numberOfRecord());
         
-        InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), inputFields,
+        InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj, inputFields,
                 session);
         inputFieldsPresenter.display(newInput, container, caseObj.getModel().getId());
     }
@@ -146,6 +147,22 @@ public class ViewableInputsTabPresenterImpl {
             inputsArray[i].setParentCaseId(this.caseObj.getId());
         
         service().addCaseInputs(session.user(), caseId, inputsArray);
+    }
+    
+    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) throws EmfException {
+        return service().isGeoRegionInSummary(selectedCaseId, georegions);
+    }
+    
+    public GeoRegion[] getGeoregion(List<CaseInput> inputs){
+        
+        List<GeoRegion>  regions = new ArrayList<GeoRegion>();
+
+        for (int i = 0; i < inputs.size(); i++){
+            GeoRegion region = inputs.get(i).getRegion();
+            if (region != null && !(regions.contains(region)))
+                regions.add(region);
+        }
+        return regions.toArray(new GeoRegion[0]);
     }
     
 }

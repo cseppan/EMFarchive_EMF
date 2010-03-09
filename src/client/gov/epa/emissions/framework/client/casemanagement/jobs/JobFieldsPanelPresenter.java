@@ -138,7 +138,7 @@ public class JobFieldsPanelPresenter {
     public GeoRegion[] getGeoRegions() throws EmfException {
         List<GeoRegion> all = new ArrayList<GeoRegion>();
         all.add(new GeoRegion(""));
-        all.addAll(Arrays.asList(caseObjectManager.getGeoRegions()));
+        all.addAll(Arrays.asList(caseObj.getRegions()));
         
         return all.toArray(new GeoRegion[0]);
     }

@@ -5916,5 +5916,57 @@ public class ManagedCaseService {
 
         return jobCanceled;
     }
+    
+    public String isGeoRegionInSummary(int caseId, GeoRegion[] grids) throws EmfException{
+        String message = "";
+        
+        Case caseObj = getCase(caseId);
+        List<GeoRegion> regions= Arrays.asList(caseObj.getRegions());
+        
+        for (GeoRegion region : grids) {           
+            
+            if ((region != null) && !(regions.contains(region)))
+                message += "  ("+ region.getName() +") ";
+        }  
+        return message;
+        
+    }
+    
+    
+    public String[] isGeoRegionUsed(int caseId, GeoRegion[] grids) throws EmfException{
+        String[] message = new String[] {"", "",""};
+        
+        List<GeoRegion> regions = Arrays.asList(grids);
+        
+        CaseJob[] jobs = getCaseJobs(caseId);
+        for (CaseJob job : jobs) {           
+            GeoRegion region = job.getRegion();
+            if ((region != null) && regions.contains(region)){
+                if (!message[0].contains(region.getName())) 
+                    message[0] += " ("+ region.getName() + ") ";
+            }
+        }
+        
+        CaseInput[] inputs = getCaseInputs(caseId);
+        for (CaseInput input : inputs) {           
+            GeoRegion region = input.getRegion();
+            if ((region != null) && regions.contains(region)){
+                if (!message[1].contains(region.getName())) 
+                    message[1] += " ("+ region.getName()+ ") ";
+            }
+        }
+        
+        CaseParameter[] params = getCaseParameters(caseId);
+        for (CaseParameter param : params) {           
+            GeoRegion region = param.getRegion();
+            if ((region != null) && (regions.contains(region))){
+                if (!message[2].contains(region.getName())) 
+                    message[2] += " ("+ region.getName()+ ") ";
+            }
+        }  
+       
+        return  message;
+        
+    }
 
 }

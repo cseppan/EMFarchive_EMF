@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import javax.swing.JComponent;
 
@@ -48,12 +49,12 @@ public class ViewableParametersTabPresenterImpl {
     }
     
     public void editParameter(CaseParameter param, EditCaseParameterView parameterEditor) throws EmfException {
-        EditCaseParameterPresenter editParaPresenter = new EditCaseParameterPresenterImpl(caseObj.getId(), parameterEditor, session);
+        EditCaseParameterPresenter editParaPresenter = new EditCaseParameterPresenterImpl(caseObj, parameterEditor, session);
         editParaPresenter.display(param, caseObj.getModel().getId());
     }
 
     public void addParameterFields(CaseParameter newParameter, JComponent container, ParameterFieldsPanelView parameterFields) throws EmfException {
-        ParameterFieldsPanelPresenter parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseObj.getId(), parameterFields, session);
+        ParameterFieldsPanelPresenter parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseObj, parameterFields, session);
         parameterFieldsPresenter.display(newParameter,caseObj.getModel().getId(), container);
     }
 
@@ -90,6 +91,22 @@ public class ViewableParametersTabPresenterImpl {
     public Object[] getAllCaseNameIDs() throws EmfException {
         return service().getAllCaseNameIDs();
     }
+    
+    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) throws EmfException {
+        return service().isGeoRegionInSummary(selectedCaseId, georegions);
+    }
+    
+    public GeoRegion[] getGeoregion(List<CaseParameter> parms){
+        
+        List<GeoRegion>  regions = new ArrayList<GeoRegion>();
+
+        for (int i = 0; i < parms.size(); i++){
+            GeoRegion region = parms.get(i).getRegion();
+            if (region != null && !(regions.contains(region)))
+                regions.add(region);
+        }
+        return regions.toArray(new GeoRegion[0]);
+    } 
 
 
 }

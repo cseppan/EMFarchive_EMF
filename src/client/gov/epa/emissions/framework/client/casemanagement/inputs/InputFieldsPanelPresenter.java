@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseProgram;
 import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
@@ -40,11 +41,14 @@ public class InputFieldsPanelPresenter {
     private CaseObjectManager caseObjectManager = null;
 
     private CaseInput currentInput = null;
+    
+    private Case caseObj; 
 
-    public InputFieldsPanelPresenter(int caseId, InputFieldsPanelView inputFields, EmfSession session) {
+    public InputFieldsPanelPresenter(Case caseObj, InputFieldsPanelView inputFields, EmfSession session) {
         this.session = session;
         this.view = inputFields;
-        this.caseId = caseId;
+        this.caseObj = caseObj;
+        this.caseId = caseObj.getId();
         this.caseObjectManager = CaseObjectManager.getCaseObjectManager(session);
     }
 
@@ -176,8 +180,8 @@ public class InputFieldsPanelPresenter {
     public GeoRegion[] getGeoRegions() throws EmfException {
         List<GeoRegion> all = new ArrayList<GeoRegion>();
         all.add(new GeoRegion(""));
-        all.addAll(Arrays.asList(caseObjectManager.getGeoRegions()));
-        
+        //all.addAll(Arrays.asList(caseObjectManager.getGeoRegions()));
+        all.addAll(Arrays.asList(caseObj.getRegions()));
         return all.toArray(new GeoRegion[0]);
     }
 

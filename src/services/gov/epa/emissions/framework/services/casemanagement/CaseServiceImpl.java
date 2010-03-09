@@ -755,5 +755,13 @@ public class CaseServiceImpl implements CaseService {
     public int cancelJobs(int[] jobIds, User user) throws EmfException {
         return getCaseService().cancelJobs(jobIds, user);
     }
+    
+    public String[] isGeoRegionUsed(int caseId, GeoRegion[] grids) throws EmfException{
+        return getCaseService().isGeoRegionUsed(caseId, grids);
+    }
+    
+    public String isGeoRegionInSummary(int caseId, GeoRegion[] grids) throws EmfException{
+        return getCaseService().isGeoRegionInSummary(caseId, grids);
+    }
 
 }

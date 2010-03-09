@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorTabPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 public interface EditParametersTabPresenter extends CaseEditorTabPresenter {
 
@@ -28,4 +29,6 @@ public interface EditParametersTabPresenter extends CaseEditorTabPresenter {
     void copyParameter(NewCaseParameterDialog view, CaseParameter param) throws Exception;
 
     public Object[] getAllCaseNameIDs() throws EmfException;
+    
+    GeoRegion[] getGeoregion(List<CaseParameter> parms);
 }

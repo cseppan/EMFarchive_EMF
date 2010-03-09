@@ -204,7 +204,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     public GeoRegion[] getGeoRegions() throws EmfException {
         List<GeoRegion> all = new ArrayList<GeoRegion>();
         all.add(new GeoRegion(""));
-        all.addAll(Arrays.asList(caseObjectManager.getGeoRegions()));
+        all.addAll(Arrays.asList(caseObj.getRegions()));
 
         return all.toArray(new GeoRegion[0]);
     }
@@ -397,5 +397,21 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         dialog.register(this);
         dialog.display();
     }
+
+    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) throws EmfException {
+        return service().isGeoRegionInSummary(selectedCaseId, georegions);
+    }
+    
+    public GeoRegion[] getGeoregion(List<CaseJob> jobs){
+        
+        List<GeoRegion>  regions = new ArrayList<GeoRegion>();
+
+        for (int i = 0; i < jobs.size(); i++){
+            GeoRegion region = jobs.get(i).getRegion();
+            if (region != null && !(regions.contains(region)))
+                regions.add(region);
+        }
+        return regions.toArray(new GeoRegion[0]);
+    }   
 
 }

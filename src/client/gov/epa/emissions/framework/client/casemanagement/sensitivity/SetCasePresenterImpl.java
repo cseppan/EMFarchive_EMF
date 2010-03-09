@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.ModelToRun;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.Date;
 
@@ -52,7 +53,7 @@ public class SetCasePresenterImpl implements SetCasePresenter {
 
     public void doAddInputFields(CaseInput input, JPanel container, SetInputFieldsPanel setInputFieldsPanel) throws EmfException {
         ModelToRun model = caseObj.getModel();
-        InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj.getId(), setInputFieldsPanel, session);
+        InputFieldsPanelPresenter inputFieldsPresenter = new InputFieldsPanelPresenter(caseObj, setInputFieldsPanel, session);
         inputFieldsPresenter.display(input, container, (model == null ? 0 : model.getId()));
     }
 
@@ -133,6 +134,11 @@ public class SetCasePresenterImpl implements SetCasePresenter {
         caseObj.setLastModifiedBy(session.user());
         caseObj.setLastModifiedDate(new Date());
         service().updateCaseWithLock(caseObj);
+    }
+
+    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) throws EmfException {
+        // NOTE Auto-generated method stub
+        return null;
     }
 
 }

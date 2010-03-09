@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,7 +77,7 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     }
 
     public void editParameter(CaseParameter param, EditCaseParameterView parameterEditor) throws EmfException {
-        EditCaseParameterPresenter editParaPresenter = new EditCaseParameterPresenterImpl(caseObj.getId(),
+        EditCaseParameterPresenter editParaPresenter = new EditCaseParameterPresenterImpl(caseObj,
                 parameterEditor, view, session);
         editParaPresenter.display(param, caseObj.getModel().getId());
     }
@@ -98,7 +99,7 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
 
     public void addParameterFields(CaseParameter newParameter, JComponent container,
             ParameterFieldsPanelView parameterFields) throws EmfException {
-        ParameterFieldsPanelPresenter parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseObj.getId(),
+        ParameterFieldsPanelPresenter parameterFieldsPresenter = new ParameterFieldsPanelPresenter(caseObj,
                 parameterFields, session);
         parameterFieldsPresenter.display(newParameter, caseObj.getModel().getId(), container);
     }
@@ -148,13 +149,21 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
     public int getPageSize() {
         return this.defaultPageSize;
     }
+
+    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) throws EmfException {
+        return service().isGeoRegionInSummary(selectedCaseId, georegions);
+    }
     
-//    public void addSectorBacktoCase(Sector updatedSector) {
-//        parentPresenter.addSectorBacktoCase(updatedSector);
-//    }
-//    
-//    public void addRegionBacktoCase(GeoRegion updatedGrid) {
-//        parentPresenter.addGridBacktoCase(updatedGrid);
-//    }
+    public GeoRegion[] getGeoregion(List<CaseParameter> parms){
+        
+        List<GeoRegion>  regions = new ArrayList<GeoRegion>();
+
+        for (int i = 0; i < parms.size(); i++){
+            GeoRegion region = parms.get(i).getRegion();
+            if (region != null && !(regions.contains(region)))
+                regions.add(region);
+        }
+        return regions.toArray(new GeoRegion[0]);
+    } 
 
 }

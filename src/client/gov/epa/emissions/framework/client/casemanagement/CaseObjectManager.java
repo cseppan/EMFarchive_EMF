@@ -952,4 +952,8 @@ public class CaseObjectManager {
         }
         return casesSens;
     }
+    
+    public String[] isGeoRegionUsed(int caseId, GeoRegion[] grids) throws EmfException{
+         return caseService.isGeoRegionUsed(caseId, grids);
+    }
 }

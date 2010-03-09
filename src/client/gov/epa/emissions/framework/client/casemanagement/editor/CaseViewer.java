@@ -87,7 +87,7 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
 
     private JPanel createSummaryTab(Case caseObj, MessagePanel messagePanel) {
         ViewableCaseSummaryTab view = new ViewableCaseSummaryTab(caseObj, session, parentConsole);
-        EditCaseSummaryTabPresenter summaryPresenter = new EditCaseSummaryTabPresenter(session);
+        EditCaseSummaryTabPresenter summaryPresenter = new EditCaseSummaryTabPresenter(caseObj.getId(), session);
         view.observe(summaryPresenter);
         try {
             view.display();
@@ -226,9 +226,12 @@ public class CaseViewer extends DisposableInteralFrame implements CaseViewerView
 
     private void refreshCurrentTab() throws EmfException {
         RefreshObserver tab = (RefreshObserver)tabbedPane.getSelectedComponent();
+        RefreshObserver summaryTab = (RefreshObserver) tabbedPane.getComponentAt(0);
         try {
             messagePanel.clear();
             tab.doRefresh();
+            if (tabbedPane.getSelectedIndex() != 0)
+                summaryTab.doRefresh();
         } catch (Exception e) {
             throw new EmfException(tabbedPane.getSelectedComponent().getName() + e.getMessage());
         }

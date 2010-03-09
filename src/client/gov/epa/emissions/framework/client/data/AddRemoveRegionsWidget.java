@@ -122,8 +122,24 @@ public class AddRemoveRegionsWidget extends JPanel {
 
     private void removeGrids() {
         Object[] removeValues = regionsList.getSelectedValues();
-        regionsList.removeElements(removeValues);
-
+        if (removeValues.length>0){
+            try{
+                String warnMessage = ""; 
+                String[] message =((EditCaseSummaryTabPresenter)parentPresenter).isGeoRegionUsed(Arrays.asList(removeValues).toArray(new GeoRegion[0]));
+                if(message[0]!=null && message[0].trim().length() > 0)
+                    warnMessage = " Cannot remove region " + message[0] + ", used by one or more jobs";
+                if(message[1]!=null && message[1].trim().length() > 0)
+                    warnMessage += "\n Cannot remove region " + message[1] + ", used by one or more inputs";
+                if(message[2]!=null && message[2].trim().length() > 0)
+                    warnMessage += "\n Cannot remove region " + message[2] + ", used by one or more params";
+                if (warnMessage.trim().length()>0)
+                    JOptionPane.showMessageDialog(parentConsole, warnMessage);               
+                else
+                    regionsList.removeElements(removeValues);
+            }catch (EmfException e1) {
+                JOptionPane.showMessageDialog(parentConsole, e1.getMessage());
+            }
+        }
     }
 
     public void viewOnly() {

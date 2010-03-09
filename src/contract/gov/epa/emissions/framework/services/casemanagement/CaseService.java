@@ -222,4 +222,8 @@ public interface CaseService {
     String loadCMAQCase(String path, int jobId, int caseId, User user) throws EmfException;
 
     int cancelJobs(int[] jobIds, User user) throws EmfException;
+    
+    String[] isGeoRegionUsed(int caseId, GeoRegion[] grids) throws EmfException;
+    
+    String isGeoRegionInSummary(int caseId, GeoRegion[] grids) throws EmfException;
  }

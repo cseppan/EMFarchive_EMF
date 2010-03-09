@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
@@ -377,6 +378,22 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             String selectedCase=view.getCases()[0];
             int selectedCaseId = getCaseId(selectedCase);
             if (selectedCaseId != this.caseId) {
+                GeoRegion[] regions = presenter.getGeoregion(params);
+                if (regions.length >0 ) {
+                    String message = presenter.isGeoRegionInSummary(selectedCaseId, regions);
+                    if (message.trim().length()>0){
+                        message = "Add the region " + message + " to Case (" +
+                        selectedCase + ")? \n Note: if you don't add the region, the copy will be canceled. ";
+
+                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE);
+                        if (selection == JOptionPane.YES_OPTION) 
+                            presenter.copyParameter(selectedCaseId, params);
+                        return;
+                    }
+                    presenter.copyParameter(selectedCaseId, params);
+                    return;
+                }
                 presenter.copyParameter(selectedCaseId, params);
                 return;
             }

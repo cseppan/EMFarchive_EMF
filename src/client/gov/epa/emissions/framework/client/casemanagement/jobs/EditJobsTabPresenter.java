@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorTabPre
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.JobRunStatus;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
 
@@ -53,5 +54,7 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
     String cancelJobs(List<CaseJob> jobs) throws EmfException;
 
     void modifyJobs(ModifyJobsDialog dialog);
+    
+    GeoRegion[] getGeoregion(List<CaseJob> jobs);
 
 }
