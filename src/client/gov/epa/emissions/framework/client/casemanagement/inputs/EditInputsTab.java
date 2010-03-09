@@ -737,12 +737,4 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
         }
 
     }
-
-//    public void addSectorBacktoCase(Sector updatedSector) {
-//        presenter.addSectorBacktoCase(updatedSector);
-//    }
-//
-//    public void addGridBacktoCase(GeoRegion updatedGrid) {
-//        presenter.addGridBacktoCase(updatedGrid);
-//    }
 }

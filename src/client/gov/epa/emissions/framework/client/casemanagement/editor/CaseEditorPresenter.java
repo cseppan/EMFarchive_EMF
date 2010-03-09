@@ -34,10 +34,6 @@ public interface CaseEditorPresenter {
     
     void checkIfLockedByCurrentUser() throws EmfException;
     
-//    void addSectorBacktoCase(Sector sector);
-//    
-//    void addGridBacktoCase(GeoRegion grid);
-    
     Case getCaseFromName(String caseName) throws EmfException;
     
     void doView(CaseViewerView caseView, Case caseObj) throws EmfException;

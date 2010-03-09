@@ -62,9 +62,6 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
 
         if (param.getCaseID() == caseObj.getId()) {
             view.addParameter(loaded);
-//            refreshView();
-//            addSectorBacktoCase(loaded.getSector());
-//            addRegionBacktoCase(loaded.getRegion());
         }
     }
 

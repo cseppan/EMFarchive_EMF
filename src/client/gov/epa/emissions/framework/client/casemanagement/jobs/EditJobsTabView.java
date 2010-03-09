@@ -23,8 +23,4 @@ public interface EditJobsTabView extends JobsTabView {
     
     String getCaseOutputFileDir();
     
-//    void addSector(Sector sector);
-//    
-//    void addGrid(GeoRegion grid);
-
 }

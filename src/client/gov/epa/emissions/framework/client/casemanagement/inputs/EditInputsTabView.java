@@ -20,10 +20,6 @@ public interface EditInputsTabView {
 
     void clearMessage();
 
-//    void addSectorBacktoCase(Sector updatedSector);
-//    
-//    void addGridBacktoCase(GeoRegion updatedRegion );
-//    
     void setMessage(String message);
     
 //    void notifychanges();

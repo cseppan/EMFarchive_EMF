@@ -204,16 +204,6 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
             outputsLoaded = true;
         }
     }
-
-//    public void addSectorBacktoCase(Sector sector) {
-//        if (summaryPresenter != null && sector != null)
-//            summaryPresenter.addSector(sector);
-//    }
-//    
-//    public void addGridBacktoCase(GeoRegion grid) {
-//        if (summaryPresenter != null && grid != null)
-//            summaryPresenter.addRegion(grid);
-//    }
     
     public Case getCaseFromName(String caseName) throws EmfException{
         return service().getCaseFromName(caseName);

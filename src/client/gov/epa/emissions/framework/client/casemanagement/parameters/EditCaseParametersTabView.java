@@ -18,10 +18,6 @@ public interface EditCaseParametersTabView {
 
     void clearMessage();
     
-//    void addSectorBacktoCase(Sector updatedSector);
-//    
-//    void addGridBacktoCase(GeoRegion updatedGrid);
-    
     void setMessage(String msg);
 
 }

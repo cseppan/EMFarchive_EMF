@@ -488,13 +488,4 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
             throw new EmfException(e.getMessage());
         }
     }
-
-//    public void addSectorBacktoCase(Sector updatedSector) {
-//        presenter.addSectorBacktoCase(updatedSector);
-//    }
-//    
-//    public void addGridBacktoCase(GeoRegion updatedGrid) {
-//        presenter.addRegionBacktoCase(updatedGrid);
-//    }
-
 }

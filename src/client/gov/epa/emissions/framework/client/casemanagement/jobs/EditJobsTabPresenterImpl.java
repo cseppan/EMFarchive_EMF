@@ -324,24 +324,6 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
                     + " has it now.");
     }
 
-//    public void addNewSectorToSummary(CaseJob job) {
-//        Sector sector = job.getSector();
-//
-//        if (sector == null)
-//            return;
-//
-//        view.addSector(sector);
-//    }
-
-//    public void addNewRegionToSummary(CaseJob job) {
-//        GeoRegion region = job.getRegion();
-//
-//        if (region == null)
-//            return;
-//
-//        view.addGrid(region);
-//    }
-
     public void refreshJobList() throws EmfException {
         this.caseObjectManager.refreshJobList();
     }
