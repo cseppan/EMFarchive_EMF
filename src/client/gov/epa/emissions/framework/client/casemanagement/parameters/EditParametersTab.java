@@ -385,7 +385,7 @@ public class EditParametersTab extends JPanel implements EditCaseParametersTabVi
                         message = "Add the region " + message + " to Case (" +
                         selectedCase + ")? \n Note: if you don't add the region, the copy will be canceled. ";
 
-                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.OK_CANCEL_OPTION,
                                 JOptionPane.QUESTION_MESSAGE);
                         if (selection == JOptionPane.YES_OPTION) 
                             presenter.copyParameter(selectedCaseId, params);

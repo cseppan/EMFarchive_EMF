@@ -483,7 +483,7 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
                         message = "Add the region " + message + " to Case (" +
                         selectedCase + ")? \n Note: if you don't add the region, the copy will be canceled. ";
                               
-                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.OK_CANCEL_OPTION,
                                 JOptionPane.QUESTION_MESSAGE);
                         if (selection == JOptionPane.YES_OPTION) 
                             presenter.copyInput(selectedCaseId, inputs);
@@ -644,17 +644,6 @@ public class EditInputsTab extends JPanel implements EditInputsTabView, RefreshO
             return null;
         return inputDir.getText();
     }
-
-//    private int getDefultIndex(Object[] selected) {
-//        int currentCaseId = this.caseObj.getId();
-//        int length = selected.length;
-//
-//        for (int i = 0; i < length; i++)
-//            if (selected[i].toString().contains("(" + currentCaseId + ")"))
-//                return i;
-//
-//        return 0;
-//    }
 
     private int getCaseId(String selectedCase) {
         int index1 = selectedCase.indexOf("(") + 1;
