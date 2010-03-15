@@ -71,5 +71,6 @@
 	<classpathentry kind="lib" path="lib/epa-commons.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/postgresql-8.3-603.jdbc4.jar"/>
 	<classpathentry kind="lib" path="lib/kmlGenerator.jar"/>
+	<classpathentry kind="lib" path="lib/iText-5.0.1.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
