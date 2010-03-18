@@ -28,14 +28,10 @@ public class EditParametersTabPresenterImpl implements EditParametersTabPresente
 
     private int defaultPageSize = 20;
     
-    private CaseEditorPresenter parentPresenter;
-
     public EditParametersTabPresenterImpl(EmfSession session, EditCaseParametersTabView view, Case caseObj, CaseEditorPresenter caseEditorPresenterImpl) {
         this.caseObj = caseObj;
         this.view = view;
         this.session = session;
-        this.parentPresenter = caseEditorPresenterImpl;
-
         try {
             UserPreference pref = new DefaultUserPreferences();
             defaultPageSize = Integer.parseInt(pref.sortFilterPageSize());

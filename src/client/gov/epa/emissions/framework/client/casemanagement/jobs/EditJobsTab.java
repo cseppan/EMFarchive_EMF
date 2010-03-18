@@ -67,8 +67,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
     private DesktopManager desktopManager;
 
-    private CaseEditorPresenter parentPresenter;
-
     public EditJobsTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager, EmfSession session) {
         super.setName("editJobsTab");
@@ -89,7 +87,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         this.changeables.addChangeable(outputDir);
         this.caseObj = caseObj;
         this.presenter = presenter;
-        this.parentPresenter = parentPresenter;
         try {
             super.add(createLayout(new CaseJob[0], parentConsole), BorderLayout.CENTER);
         } catch (Exception e) {

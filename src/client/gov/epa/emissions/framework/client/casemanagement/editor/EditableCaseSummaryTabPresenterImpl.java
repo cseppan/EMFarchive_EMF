@@ -45,7 +45,7 @@ public class EditableCaseSummaryTabPresenterImpl implements EditableCaseSummaryT
         view.addRegion(region);
     }
 
-    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) throws EmfException {
+    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) {
         // NOTE Auto-generated method stub
         return null;
     }

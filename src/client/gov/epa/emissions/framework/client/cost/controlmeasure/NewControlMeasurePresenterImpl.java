@@ -74,7 +74,7 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         //parent.doRefresh();
     }
 
-    public void doReport() throws EmfException {
+    public void doReport() {
         createReport(measure, view);
     }
 

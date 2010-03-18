@@ -29,8 +29,6 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
 
     private EditInputsTabView view;
     
-    private CaseEditorPresenter parentPresenter;
-
     private EmfSession session;
     
     private int defaultPageSize = 20;
@@ -39,8 +37,6 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
         this.caseObj = caseObj;
         this.view = view;
         this.session = session;
-        this.parentPresenter = caseEditorPresenterImpl;
-        
         try {
             UserPreference pref = new DefaultUserPreferences();
             defaultPageSize = Integer.parseInt(pref.sortFilterPageSize());

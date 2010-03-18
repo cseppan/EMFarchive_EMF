@@ -125,7 +125,7 @@ public class EditOutputsTabPresenterImpl implements EditOutputsTabPresenter {
         presenter.doDisplay(casesByInputDataset, casesByOutputDataset);
     }
 
-    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) throws EmfException {
+    public String isGeoRegionInSummary(int selectedCaseId, GeoRegion[] georegions) {
         // NOTE Auto-generated method stub
         return null;
     }

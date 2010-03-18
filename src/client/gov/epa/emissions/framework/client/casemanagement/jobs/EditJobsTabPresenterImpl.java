@@ -201,7 +201,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         return this.caseObjectManager.getSectors();
     }
 
-    public GeoRegion[] getGeoRegions() throws EmfException {
+    public GeoRegion[] getGeoRegions() {
         List<GeoRegion> all = new ArrayList<GeoRegion>();
         all.add(new GeoRegion(""));
         all.addAll(Arrays.asList(caseObj.getRegions()));
