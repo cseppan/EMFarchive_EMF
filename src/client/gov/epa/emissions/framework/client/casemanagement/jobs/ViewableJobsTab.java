@@ -67,7 +67,7 @@ public class ViewableJobsTab extends JPanel implements JobsTabView, RefreshObser
         super.setLayout(new BorderLayout());
     }
 
-    public void display(EmfSession session, Case caseObj, ViewableJobsTabPresenterImpl presenter) {
+    public void display(Case caseObj, ViewableJobsTabPresenterImpl presenter) {
         super.removeAll();
         this.outputDir = new TextField("outputdir", 50);
         outputDir.setText(caseObj.getOutputFileDir());

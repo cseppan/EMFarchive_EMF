@@ -144,7 +144,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     public void set(EditInputsTabView inputsView) {
-        inputPresenter = new EditInputsTabPresenterImpl(session, inputsView, caseObj, this);
+        inputPresenter = new EditInputsTabPresenterImpl(session, inputsView, caseObj);
         presenters.add(inputPresenter);
     }
 

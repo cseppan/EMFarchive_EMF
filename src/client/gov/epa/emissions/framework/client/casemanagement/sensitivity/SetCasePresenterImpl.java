@@ -140,5 +140,4 @@ public class SetCasePresenterImpl implements SetCasePresenter {
         // NOTE Auto-generated method stub
         return null;
     }
-
 }

@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.client.casemanagement.inputs;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.RelatedCasePresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.RelatedCaseView;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
@@ -33,7 +32,7 @@ public class EditInputsTabPresenterImpl implements EditInputsTabPresenter {
     
     private int defaultPageSize = 20;
 
-    public EditInputsTabPresenterImpl(EmfSession session, EditInputsTabView view, Case caseObj, CaseEditorPresenter caseEditorPresenterImpl) {
+    public EditInputsTabPresenterImpl(EmfSession session, EditInputsTabView view, Case caseObj) {
         this.caseObj = caseObj;
         this.view = view;
         this.session = session;
