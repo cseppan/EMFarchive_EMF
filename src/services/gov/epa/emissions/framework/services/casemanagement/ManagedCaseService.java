@@ -2317,8 +2317,8 @@ public class ManagedCaseService {
             } catch (Exception e) {
                 throw new EmfException(e.getMessage() + " " + "Case can not be updated. ");
             } finally {    
-                if (session != null && session.isConnected());
-                session.close();
+                if (session != null && session.isConnected())
+                    session.close();
             }
         }
         
