@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 
+import java.util.Date;
 import java.util.HashMap;
 
 public class NewDatasetTypePresenter {
@@ -63,6 +64,11 @@ public class NewDatasetTypePresenter {
         newType.setImporterClassName((String) mapImport.get(type));
         newType.setExporterClassName((String) mapExport.get(type));
         newType.setExternal(type.equalsIgnoreCase("External File"));
+        
+        Date date = new Date();
+        newType.setCreationDate(date);
+        newType.setLastModifiedDate(date);
+        newType.setCreator(session.user());
 
         return newType;
     }

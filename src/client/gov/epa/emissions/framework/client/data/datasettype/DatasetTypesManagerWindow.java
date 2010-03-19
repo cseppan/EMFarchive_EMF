@@ -191,7 +191,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private void createDatasetType() {
-        NewDatasetTypeWindow view = new NewDatasetTypeWindow(desktopManager);
+        NewDatasetTypeWindow view = new NewDatasetTypeWindow(parentConsole, desktopManager, session);
         presenter.displayNewDatasetTypeView(view);
     }
 

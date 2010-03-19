@@ -550,6 +550,8 @@ insert into emf.keywords ("name")
 values('USE_COST_EQUATION');
 insert into emf.keywords ("name") 
 values('INCLUDE_UNSPECIFIED_COSTS');
+insert into emf.keywords ("name")
+values('REQUIRED_HEADER');
 -- emf.keywords
 --
 

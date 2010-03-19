@@ -150,6 +150,10 @@ CREATE TABLE emf.dataset_types
   exporter_classname varchar(255),
   lock_owner varchar(255),
   lock_date timestamp,
+  creation_date timestamp,
+  last_mod_date timestamp,
+  creator int4 REFERENCES emf.users (id),
+  file_format int4 REFERENCES emf.file_formats(id),
   table_per_dataset int4 NOT NULL DEFAULT 1
 ) 
 WITHOUT OIDS;
@@ -460,3 +464,39 @@ CREATE TABLE emf."references"
 WITH (OIDS=FALSE);
 ALTER TABLE emf."references" OWNER TO emf;
 -- emf.references
+
+-- emf.file_formats
+CREATE TABLE emf.file_formats
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(128) NOT NULL UNIQUE,
+  description text,
+  delimiter varchar(32),
+  fixed_format bool DEFAULT false,
+  date_added timestamp without time zone,
+  last_modified_date timestamp without time zone,
+  creator int4 NOT NULL REFERENCES emf.users (id)
+) 
+WITHOUT OIDS;
+-- emf.file_formats
+
+-- emf.fileformat_columns
+CREATE TABLE emf.fileformat_columns
+(
+  id SERIAL PRIMARY KEY,
+  file_format_id int4 NOT NULL REFERENCES emf.file_formats (id),
+  list_index int4,
+  name varchar(128) NOT NULL,
+  type varchar(64) NOT NULL,
+  default_value varchar(255),
+  description text,
+  formatter varchar(64),
+  constraints varchar(255),
+  mandatory bool DEFAULT false,
+  width int,
+  spaces int,
+  fix_format_start int,
+  fix_format_end int
+) 
+WITHOUT OIDS;
+-- emf.fileformat_columns

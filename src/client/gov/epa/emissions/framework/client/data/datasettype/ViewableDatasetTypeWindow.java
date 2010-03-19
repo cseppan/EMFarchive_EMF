@@ -9,6 +9,9 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.ViewButton;
+import gov.epa.emissions.commons.io.Column;
+import gov.epa.emissions.commons.io.XFileFormat;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -23,11 +26,13 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -45,8 +50,10 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     
     private DatasetType type;
 
+    private JTable fileFormat;
+
     public ViewableDatasetTypeWindow(DesktopManager desktopManager) {
-        super("View Dataset Type", new Dimension(600, 500), desktopManager);
+        super("View Dataset Type", new Dimension(600, 520), desktopManager);
 
         this.desktopManager = desktopManager;
         layout = new JPanel();
@@ -88,29 +95,85 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     }
 
     private JPanel createBasicDataPanel(DatasetType type) {
-        JPanel panel = new JPanel(new SpringLayout());
+        JPanel uPanel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         TextField name = new TextField("name", type.getName(), 40);
         name.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
+        layoutGenerator.addLabelWidgetPair("Name:", name, uPanel);
 
         TextArea description = new TextArea("description", type.getDescription(), 40);
         description.setEditable(false);
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(description);
         descScrollableTextArea.setMinimumSize(new Dimension(80, 80));
-        layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, panel);
+        layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, uPanel);
+        
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(uPanel, 2, 2, // rows, cols
+                5, 0, // initialX, initialY
+                10, 10);// xPad, yPad
+        
+        User user = type.getCreator();
+        Date cDate = type.getCreationDate();
+        Date mDate = type.getLastModifiedDate();
+        String spaces = "       ";
+        JPanel creator = new JPanel();
+        creator.setLayout(new BoxLayout(creator, BoxLayout.X_AXIS));
+        creator.add(new JLabel("Creator: " + (user == null ? " " : user.getName() + spaces)));
+        creator.add(new JLabel("Creation Date: " + CustomDateFormat.format_YYYY_MM_DD_HH_MM(cDate) + spaces));
+        creator.add(new JLabel("Last Modified Date: " + CustomDateFormat.format_YYYY_MM_DD_HH_MM(mDate)));
 
+        JPanel lPanel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator2 = new SpringLayoutGenerator();
+        
+        fileFormat = getFileFormat(type);
+        ScrollableComponent fileFomatTextArea = new ScrollableComponent(fileFormat);
+        fileFomatTextArea.setMinimumSize(new Dimension(80, 80));
+        layoutGenerator2.addLabelWidgetPair("File Format:", fileFomatTextArea, lPanel);
+        
         TextField sortOrder = new TextField("sortOrder", type.getDefaultSortOrder(), 40);
         sortOrder.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Default Sort Order:", sortOrder, panel);
+        layoutGenerator2.addLabelWidgetPair("Default Sort Order:", sortOrder, lPanel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
+        layoutGenerator2.makeCompactGrid(lPanel, 2, 2, // rows, cols
                 5, 0, // initialX, initialY
                 10, 10);// xPad, yPad
 
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(uPanel);
+        panel.add(creator);
+        panel.add(new JLabel("  "));
+        panel.add(lPanel);
+        
         return panel;
+    }
+    
+    private JTable getFileFormat(DatasetType type) {
+        XFileFormat fileFormat = type.getFileFormat();
+        
+        if (fileFormat == null)
+            return new JTable(10, 10);
+        
+        Column[] cols = fileFormat.getColumns();
+        
+        if (cols == null || cols.length == 0)
+            return new JTable(10,10);
+        
+        String[] titles = new String[]{"Column", "Type", "Default Value", "Mandatory", "Description"};
+        String[][] values = new String[cols.length][5];
+        
+        for (int i = 0; i < cols.length; i++) {
+            Column col = cols[i];
+            values[i][0] = col.getName();
+            values[i][1] = col.getSqlType();
+            values[i][2] = col.getDefaultValue();
+            values[i][3] = col.isMandatory()+"";
+            values[i][4] = col.getDescription();
+        }
+        
+        return new JTable(values, titles);
     }
 
     private JPanel createKeywordsPanel(KeyVal[] vals) {

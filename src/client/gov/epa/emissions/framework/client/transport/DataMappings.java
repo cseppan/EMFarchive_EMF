@@ -21,8 +21,10 @@ import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
+import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
+import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -122,6 +124,9 @@ public class DataMappings extends Mappings {
         bean(call, ColumnMetaData.class, columnmetadata());
 
         bean(call, EmfFileInfo.class, emfFileInfo());
+        
+        bean(call, XFileFormat.class, fileFormat());
+        bean(call, Column.class, fileFormatColumn());
 
         controlBeans(call);
     }
@@ -224,8 +229,10 @@ public class DataMappings extends Mappings {
         array(call, ControlMeasureProperty[].class, controlMeasureProperties());
         array(call, ControlMeasurePropertyCategory[].class, controlMeasurePropertyCategories());
         
-        
         array(call, EmfFileInfo[].class, emfFileInfos());
+        
+        array(call, XFileFormat[].class, fileFormats());
+        array(call, Column[].class, fileFormatColumns());
     }
 
     public QName logs() {
@@ -674,6 +681,22 @@ public class DataMappings extends Mappings {
 
     public QName regionTypes() {
         return qname("RegionTypes");
+    }
+    
+    public QName fileFormat() {
+        return qname("XFileFormat");
+    }
+    
+    public QName fileFormats() {
+        return qname("XFileFormats");
+    }
+    
+    public QName fileFormatColumn() {
+        return qname("Column");
+    }
+    
+    public QName fileFormatColumns() {
+        return qname("Columns");
     }
 
 }

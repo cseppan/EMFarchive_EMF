@@ -1007,3 +1007,47 @@ ALTER TABLE emf.georegions ADD CONSTRAINT georegions_abbr_key UNIQUE (abbr);
 
 --02/25/2010 change the width of phone column in emf.users
 ALTER TABLE emf.users ALTER phone TYPE varchar(36);
+
+--03/19/2010 add new columns
+ALTER TABLE emf.dataset_types ADD COLUMN creation_date timestamp;
+ALTER TABLE emf.dataset_types ADD COLUMN last_mod_date timestamp;
+ALTER TABLE emf.dataset_types ADD COLUMN creator int4 REFERENCES emf.users (id);
+ALTER TABLE emf.dataset_types ADD COLUMN file_format int4 REFERENCES emf.file_formats(id);
+insert into emf.keywords ("name") values('REQUIRED_HEADER');
+
+-- emf.file_formats
+CREATE TABLE emf.file_formats
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(128) NOT NULL UNIQUE,
+  description text,
+  delimiter varchar(32),
+  fixed_format bool DEFAULT false,
+  date_added timestamp without time zone,
+  last_modified_date timestamp without time zone,
+  creator int4 NOT NULL REFERENCES emf.users (id)
+) 
+WITHOUT OIDS;
+-- emf.file_formats
+
+-- emf.fileformat_columns
+CREATE TABLE emf.fileformat_columns
+(
+  id SERIAL PRIMARY KEY,
+  file_format_id int4 NOT NULL REFERENCES emf.file_formats (id),
+  list_index int4,
+  name varchar(128) NOT NULL,
+  type varchar(64) NOT NULL,
+  default_value varchar(255),
+  description text,
+  formatter varchar(64),
+  constraints varchar(255),
+  mandatory bool DEFAULT false,
+  width int,
+  spaces int,
+  fix_format_start int,
+  fix_format_end int
+) 
+WITHOUT OIDS;
+-- emf.fileformat_columns
+

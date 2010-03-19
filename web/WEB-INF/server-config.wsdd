@@ -705,6 +705,24 @@
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput[]"
 		innerType="ns1:CaseOutput"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.commons.io.XFileFormat"
+		qname="ns1:XFileFormat" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:XFileFormats" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.commons.io.XFileFormat[]"
+		innerType="ns1:XFileFormat"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+		
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.commons.io.Column"
+		qname="ns1:Column" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:Columns" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.commons.io.Column[]"
+		innerType="ns1:Column"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
 	<!-- ================================================================= -->
 	
