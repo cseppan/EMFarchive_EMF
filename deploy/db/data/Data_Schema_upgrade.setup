@@ -1008,13 +1008,10 @@ ALTER TABLE emf.georegions ADD CONSTRAINT georegions_abbr_key UNIQUE (abbr);
 --02/25/2010 change the width of phone column in emf.users
 ALTER TABLE emf.users ALTER phone TYPE varchar(36);
 
---03/19/2010 add new columns
-ALTER TABLE emf.dataset_types ADD COLUMN creation_date timestamp;
-ALTER TABLE emf.dataset_types ADD COLUMN last_mod_date timestamp;
-ALTER TABLE emf.dataset_types ADD COLUMN creator int4 REFERENCES emf.users (id);
-ALTER TABLE emf.dataset_types ADD COLUMN file_format int4 REFERENCES emf.file_formats(id);
-insert into emf.keywords ("name") values('REQUIRED_HEADER');
+--03/18/2010 add uniqueness constraint on georegions
+ALTER TABLE emf.georegions ALTER COLUMN abbr SET NOT NULL;
 
+--03/19/2010  Create table emf.file_formats
 -- emf.file_formats
 CREATE TABLE emf.file_formats
 (
@@ -1050,4 +1047,12 @@ CREATE TABLE emf.fileformat_columns
 ) 
 WITHOUT OIDS;
 -- emf.fileformat_columns
+
+-- create new columns
+ALTER TABLE emf.dataset_types ADD COLUMN creation_date timestamp;
+ALTER TABLE emf.dataset_types ADD COLUMN last_mod_date timestamp;
+ALTER TABLE emf.dataset_types ADD COLUMN creator int4 REFERENCES emf.users (id);
+ALTER TABLE emf.dataset_types ADD COLUMN file_format int4 REFERENCES emf.file_formats(id);
+insert into emf.keywords ("name") values('REQUIRED_HEADER');
+
 
