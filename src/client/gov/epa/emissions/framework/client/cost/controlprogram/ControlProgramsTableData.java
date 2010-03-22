@@ -21,7 +21,7 @@ public class ControlProgramsTableData extends AbstractTableData {
 
     public String[] columns() {
         return new String[] { "Name", "Type", 
-                "Start", "End", 
+                "Start", "Last Modified","End", 
                 "Dataset", "Version" };
     }
 
@@ -45,7 +45,7 @@ public class ControlProgramsTableData extends AbstractTableData {
         for (int i = 0; i < controlPrograms.length; i++) {
             ControlProgram element = controlPrograms[i];
             Object[] values = { element.getName(), controlProgramType(element), 
-                    format(element.getStartDate()), format(element.getEndDate()), 
+                    format(element.getStartDate()), this.format(element.getLastModifiedDate()), format(element.getEndDate()), 
                     dataset(element), datasetVersion(element) };
             Row row = new ViewableRow(element, values);
             rows.add(row);
