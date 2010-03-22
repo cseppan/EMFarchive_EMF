@@ -109,7 +109,14 @@
             <param name="compile.src" value="${src.contract.dir}" />
         </antcall>
     </target>
-    <target name="compile-client" depends="clean, init, compile-contract">
+
+    <target name="compile-contract-no-clean-init">
+        <antcall target="do-compile">
+            <param name="compile.src" value="${src.contract.dir}" />
+        </antcall>
+    </target>
+
+	<target name="compile-client" depends="clean, init, compile-contract">
         <antcall target="do-compile">
             <param name="compile.src" value="${src.client.dir}" />
         </antcall>
@@ -117,7 +124,17 @@
             <param name="target.dir" value="${build.classes.dir}" />
         </antcall>
     </target>
-    <target name="compile-services" depends="clean, init, compile-contract">
+
+	<target name="compile-client-no-clean-init" depends="compile-contract-no-clean-init">
+        <antcall target="do-compile">
+            <param name="compile.src" value="${src.client.dir}" />
+        </antcall>
+        <antcall target="copy-client-resources">
+            <param name="target.dir" value="${build.classes.dir}" />
+        </antcall>
+    </target>
+
+	<target name="compile-services" depends="clean, init, compile-contract">
         <antcall target="do-compile">
             <param name="compile.src" value="${src.services.dir}" />
         </antcall>
@@ -125,7 +142,16 @@
             <param name="resources.root" value="${src.services.dir}" />
         </antcall>
     </target>
-	
+
+	<target name="compile-services-no-clean-init" depends="compile-contract-no-clean-init">
+        <antcall target="do-compile">
+            <param name="compile.src" value="${src.services.dir}" />
+        </antcall>
+        <antcall target="copy-services-resources">
+            <param name="resources.root" value="${src.services.dir}" />
+        </antcall>
+    </target>
+
     <target name="build-version"
             depends="clean, init"
             description="Build EMF version" >
@@ -142,8 +168,27 @@
         </java>
     </target>
 
+    <target name="build-version-no-clean-init"
+            description="Build EMF version" >
+
+        <antcall target="do-compile">
+            <param name="compile.src" value="${src.common.dir}" />
+        </antcall>
+
+    	<java classname="gov.epa.emissions.common.version.EMFVersionPropertiesBuilder"
+              fork="true"
+              failonerror="true"
+        	  classpathref="classpath" >
+    		<arg value="/res/properties/version_generated.properties"/>
+        </java>
+    </target>
+
     <target name="compile-src"
             depends="clean, init, build-version, compile-contract, compile-client, compile-services"
+    />
+
+    <target name="compile-src-no-clean-init"
+            depends="build-version-no-clean-init, compile-contract-no-clean-init, compile-client-no-clean-init, compile-services-no-clean-init"
     />
 
     <target name="do-compile">
@@ -195,8 +240,38 @@
                debug="on"
         />
     </target>
+	
+    <target name="compile-tests-no-clean-init" depends="compile-src-no-clean-init">
+        <javac srcdir="${test.commons.dir}"
+               destdir="${build.classes.dir}"
+               classpathref="classpath"
+               debug="on"
+        />
+        <javac srcdir="${test.unit.dir}"
+               destdir="${build.classes.dir}"
+               classpathref="classpath"
+               debug="on"
+        />
+        <javac srcdir="${test.integration.dir}"
+               destdir="${build.classes.dir}"
+               classpathref="classpath"
+               debug="on"
+        />
+        <javac srcdir="${test.persistence.dir}"
+               destdir="${build.classes.dir}"
+               classpathref="classpath"
+               debug="on"
+        />
+        <javac srcdir="${test.uat.dir}"
+               destdir="${build.classes.dir}"
+               classpathref="classpath"
+               debug="on"
+        />
+    </target>
 
     <target name="compile" depends="clean, init, compile-src, compile-tests" />
+
+	<target name="compile-no-clean-init" depends="compile-src-no-clean-init, compile-tests-no-clean-init" />
     <!--  ===============END  Basic ====================================== -->
 
 
@@ -446,10 +521,20 @@
  
     </target>
 
-	<target name="client-dist-jar-only" depends="client-dist(only jar)"/>
-	
     <target name="client-dist(only jar)"
             depends="clean, init, compile-client"
+            description="Builds the EMF Client jar file excluding dependent jar file"
+    >
+        <jar jarfile="${build.home}/${app.name}-client.jar"
+             basedir="${build.classes.dir}"
+        >
+            <include name="**/*" />
+        </jar>
+
+    </target>
+
+	<target name="client-dist-jar-only-no-clean-init"
+            depends="compile-client-no-clean-init"
             description="Builds the EMF Client jar file excluding dependent jar file"
     >
         <jar jarfile="${build.home}/${app.name}-client.jar"
@@ -545,11 +630,35 @@
         </copy>
     </target>
 
+    <target name="services-dist-prepare-no-clean-init" depends="compile-no-clean-init">
+        <copy todir="${build.meta-inf.dir}">
+            <fileset dir="${web.dir}/${meta-inf.dir}" />
+        </copy>
+        <copy todir="${build.dist.dir}">
+            <fileset dir="${web.dir}" />
+        </copy>
+        <copy todir="${build.web-inf.dir}/lib">
+            <fileset dir="${lib.dir}">
+                <exclude name="dev/**" />
+                <exclude name="tomcat/**" />
+            </fileset>
+        </copy>
+    </target>
+
     <target name="app-dist"
             depends="clean, init, services-dist-prepare"
             description="Create EMF Services(server) binary distribution"
     >
         <jar jarfile="${build.home}/${app.name}.war"
+             basedir="${build.dist.dir}"
+        />
+    </target>
+
+	<target name="app-dist-no-clean-init"
+            depends="services-dist-prepare-no-clean-init"
+            description="Create EMF Services(server) binary distribution"
+    >
+		<jar jarfile="${build.home}/${app.name}.war"
              basedir="${build.dist.dir}"
         />
     </target>
