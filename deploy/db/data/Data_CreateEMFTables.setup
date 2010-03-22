@@ -493,10 +493,10 @@ CREATE TABLE emf.fileformat_columns
   formatter varchar(64),
   constraints varchar(255),
   mandatory bool DEFAULT false,
-  width int,
-  spaces int,
-  fix_format_start int,
-  fix_format_end int
+  width int DEFAULT 0,
+  spaces int DEFAULT 0,
+  fix_format_start int DEFAULT 0,
+  fix_format_end int DEFAULT 0
 ) 
 WITHOUT OIDS;
 -- emf.fileformat_columns
