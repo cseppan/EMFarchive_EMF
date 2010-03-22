@@ -446,6 +446,8 @@
  
     </target>
 
+	<target name="client-dist-jar-only" depends="client-dist(only jar)"/>
+	
     <target name="client-dist(only jar)"
             depends="clean, init, compile-client"
             description="Builds the EMF Client jar file excluding dependent jar file"
