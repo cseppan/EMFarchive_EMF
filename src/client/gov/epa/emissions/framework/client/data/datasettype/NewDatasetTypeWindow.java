@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
@@ -20,6 +19,7 @@ import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -28,10 +28,12 @@ import java.awt.event.ItemListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+import javax.swing.border.TitledBorder;
 
 public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewDatasetTypeView {
     private NewDatasetTypePresenter presenter;
@@ -64,8 +66,6 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
     private ComboBox delimiter;
 
-    private CheckBox fixed;
-
     private static int counter = 0;
 
     private static final String[] types = { "Flexible File Format", "External File", "CSV File", "Line-based File", "SMOKE Report File" };
@@ -73,7 +73,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     private static final String[] delimiters = {"          ,          ", "          ;", "          Tab", "          |"};
     
     public NewDatasetTypeWindow(EmfConsole parentConsole, DesktopManager desktopManager, EmfSession session) {
-        super("Create New Dataset Type", new Dimension(600, 300), desktopManager);
+        super("Create New Dataset Type", new Dimension(600, 500), desktopManager);
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         this.parentConsole = parentConsole;
@@ -84,7 +84,8 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     private void doLayout(JPanel layout) {
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
-        layout.add(createInputPanel());
+        layout.add(basicInputPanel());
+        layout.add(formatDefPanel());
         layout.add(createButtonsPanel());
     }
 
@@ -103,7 +104,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         super.display();
     }
 
-    private JPanel createInputPanel() {
+    private JPanel basicInputPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -120,8 +121,6 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         addChangeable(derivedFrom);
         layoutGenerator.addLabelWidgetPair("Derived From:", derivedFrom, panel);
 
-        layoutGenerator.addLabelWidgetPair("", formatDefPanel(), panel);
-        
         minFiles = new TextField("minfiles", 20);
         addChangeable(minFiles);
         layoutGenerator.addLabelWidgetPair("Min Files:", minFiles, panel);
@@ -129,7 +128,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         maxFiles = new TextField("maxfiles", 20);
         addChangeable(maxFiles);
         layoutGenerator.addLabelWidgetPair("Max Files:", maxFiles, panel);
-
+        
         derivedFrom.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 minFiles.setText("1");
@@ -143,7 +142,6 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
                 fileFormatDesc.setEditable(false);
                 fileFormatDesc.setText("");
                 delimiter.setEnabled(false);
-                fixed.setEnabled(false);
                 
                 if(((String)e.getItem()).equalsIgnoreCase(types[0])) {
                     formatFile.setEnabled(true);
@@ -153,7 +151,6 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
                     fileFormatDesc.setEditable(true);
                     fileFormatDesc.setText(description.getText());
                     delimiter.setEnabled(true);
-                    fixed.setEnabled(true);
                 }
                 
                 if(((String)e.getItem()).equalsIgnoreCase(types[1])) {
@@ -165,7 +162,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         });
         
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 0, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -176,27 +173,30 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         
-        fileFormatName = new TextField("fileformatname", name.getText(), 26);
+        fileFormatName = new TextField("fileformatname", name.getText(), 40);
         fileFormatName.setEditable(false);
         addChangeable(fileFormatName);
-        layoutGenerator.addLabelWidgetPair("File Format Name:", fileFormatName, panel);
+        layoutGenerator.addLabelWidgetPair("Name:", fileFormatName, panel);
         
-        fileFormatDesc = new TextArea("fileformatdescription", name.getText(), 26);
+        fileFormatDesc = new TextArea("fileformatdescription", name.getText(), 40);
         fileFormatDesc.setEditable(false);
         addChangeable(fileFormatDesc);
         ScrollableComponent formatDescScroll = new ScrollableComponent(fileFormatDesc);
-        layoutGenerator.addLabelWidgetPair("File Format Description:", formatDescScroll, panel);
+        layoutGenerator.addLabelWidgetPair("Description:", formatDescScroll, panel);
+        
+        layoutGenerator.addLabelWidgetPair("Definition File:", formatFilePanel(), panel);
         
         delimiter = new ComboBox("Choose one:", delimiters);
         addChangeable(delimiter);
         layoutGenerator.addLabelWidgetPair("Delimiter:", delimiterPanel(), panel);
         
-        layoutGenerator.addLabelWidgetPair("Format Definition File:", formatFilePanel(), panel);
-        
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
                 5, 0, // initialX, initialY
                 10, 10);// xPad, yPad
+        
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "File Format",
+                TitledBorder.CENTER, TitledBorder.TOP, getFont(), Color.BLUE));
         
         return panel;
     }
@@ -204,7 +204,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     private JPanel formatFilePanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        formatFile = new TextField("formatfile", 18);
+        formatFile = new TextField("formatfile", 32);
         formatFile.setEnabled(false);
         addChangeable(formatFile);
         
@@ -230,25 +230,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         delimiter = new ComboBox("Choose one:", delimiters);
         delimiter.setEnabled(false);
         addChangeable(delimiter);
-        delimiter.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                fixed.setEnabled(true);
-                
-                if (!((String)e.getItem()).equalsIgnoreCase("Choose one:")) {
-                    fixed.setSelected(false);
-                    fixed.setEnabled(false);
-                }
-                
-            }
-        });
-        
-        fixed = new CheckBox("", false);
-        fixed.setEnabled(false);
-        addChangeable(fixed);
-        
         panel.add(delimiter);
-        panel.add(new JLabel("  Fixed Format: "));
-        panel.add(fixed);
         
         return panel;
     }
