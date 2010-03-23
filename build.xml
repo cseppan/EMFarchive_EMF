@@ -662,7 +662,9 @@
              basedir="${build.dist.dir}"
         />
     </target>
-    <!--  =============END Services Distribution ====================================== -->
+
+	<target name="build-emf-for-dist" depends="clean, init, app-dist-no-clean-init, client-dist-jar-only-no-clean-init" description="Creates an entire EMF distribution build"/>
+	<!--  =============END Services Distribution ====================================== -->
 
     <!--  =============START Tomcat Deployment Targets ====================================== -->
     <target name="apps-list" description="List installed applications ">
