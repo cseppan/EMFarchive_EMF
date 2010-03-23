@@ -22,7 +22,6 @@ import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.format.FormattedCellRenderer;
-import gov.epa.mims.analysisengine.table.format.SignificantDigitsFormat;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
@@ -31,7 +30,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.Format;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
