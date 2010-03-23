@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
+import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -244,6 +245,10 @@ public class DataCommonsDAO {
 
     public void add(DatasetType datasetType, Session session) {
         datasetTypesDAO.add(datasetType, session);
+    }
+    
+    public void add(XFileFormat format, Session session) {
+        addObject(format, session);
     }
 
     public void add(Sector sector, Session session) {

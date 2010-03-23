@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Keyword;
@@ -9,8 +10,20 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
+import gov.epa.emissions.commons.io.CharFormatter;
+import gov.epa.emissions.commons.io.Column;
+import gov.epa.emissions.commons.io.IntegerFormatter;
+import gov.epa.emissions.commons.io.LongFormatter;
+import gov.epa.emissions.commons.io.NullFormatter;
+import gov.epa.emissions.commons.io.RealFormatter;
+import gov.epa.emissions.commons.io.SmallIntegerFormatter;
+import gov.epa.emissions.commons.io.StringFormatter;
+import gov.epa.emissions.commons.io.XFileFormat;
+import gov.epa.emissions.commons.io.csv.CSVFileReader;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFilePatternMatcher;
@@ -350,6 +363,22 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         } catch (RuntimeException e) {
             LOG.error("Could not add new DatasetType", e);
             throw new EmfException("DatasetType name already in use");
+        }
+    }
+    
+    public synchronized XFileFormat addFileFormat(XFileFormat format) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            dao.add(format, session);
+            return (XFileFormat)dao.load(XFileFormat.class, format.getName(), session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("Could not add new XFileFormat " + format.getName(), e);
+            throw new EmfException("Could not add new XFileFormat " + format.getName() + ". " + e.getLocalizedMessage());
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
 
@@ -1016,5 +1045,108 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
         }
     }
+
+    public void addDatasetTypeWithFileFormat(DatasetType dstype, XFileFormat format, String formatFile)
+            throws EmfException {
+        File file = new File(formatFile);
+        
+        if (file == null || !file.exists())
+            throw new EmfException("Format definition file " + formatFile + " doesn't exist.");
+        
+        try {
+            CSVFileReader reader = new CSVFileReader(file);
+            List<Column> colObjs = new ArrayList<Column>();
+            SqlDataTypes types = DbServerFactory.get().getDbServer().getSqlDataTypes();
+            
+            //NOTE: currently the format definition file has to follow this column sequence:
+            // name,type,default value,description,formatter,constraints,mandatory,width,spaces,fixformat start,fixformat end
+            
+            for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
+                String[] data = record.getTokens();
+                String type = getType(data[1], types, data[7]); //get sql data type
+                colObjs.add(new Column(data[0], type, data[2], data[3], getFormatter(type, types, data[4]),
+                        data[5], data[6], data[7], data[8], data[9], data[10]));
+                
+            }
+            
+            reader.close();
+            
+            format.setColumns(colObjs.toArray(new Column[0]));
+            
+            XFileFormat loadedFormat = addFileFormat(format);
+            dstype.setFileFormat(loadedFormat);
+            addDatasetType(dstype);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException(e.getMessage());
+        }
+        
+    }
+
+    private String getType(String type, SqlDataTypes types, String width) {
+        if (type == null || type.trim().isEmpty())
+            return types.text();
+        
+        if (type.toLowerCase().startsWith("varchar"))
+            return types.stringType(Integer.parseInt(width));
+        
+        if (type.toLowerCase().startsWith("text"))
+            return types.text();
+        
+        if (type.toLowerCase().startsWith("real"))
+            return types.realType();
+        
+        if (type.toLowerCase().startsWith("date"))
+            return types.timestamp();
+        
+        if (type.toLowerCase().startsWith("char"))
+            return types.charType();
+        
+        if (type.toLowerCase().startsWith("bool"))
+            return types.booleanType();
+        
+        if (type.toLowerCase().startsWith("integer"))
+            return types.intType();
+        
+        if (type.toLowerCase().startsWith("int4"))
+            return types.longType();
+        
+        if (type.toLowerCase().startsWith("int2"))
+            return types.smallInt();
+        
+        if (type.toLowerCase().startsWith("serial"))
+            return types.autoIncrement();
+            
+        return types.stringType();
+    }
+    
+    private String getFormatter(String sqlType, SqlDataTypes types, String formatter) {
+        if (formatter != null && !formatter.trim().isEmpty())
+            return formatter;
+        
+        if (sqlType.startsWith(types.stringType()))
+            return StringFormatter.class.getSimpleName();
+        
+        if (sqlType.equals(types.realType()))
+            return RealFormatter.class.getSimpleName();
+        
+        if (sqlType.equals(types.text()))
+            return NullFormatter.class.getSimpleName();
+        
+        if (sqlType.equals(types.longType()))
+            return LongFormatter.class.getSimpleName();
+        
+        if (sqlType.equals(types.charType()))
+            return CharFormatter.class.getSimpleName();
+        
+        if (sqlType.equals(types.intType()))
+            return IntegerFormatter.class.getSimpleName();
+        
+        if (sqlType.equals(types.smallInt()))
+            return SmallIntegerFormatter.class.getSimpleName();
+        
+        return NullFormatter.class.getSimpleName();
+    }
+
 
 }

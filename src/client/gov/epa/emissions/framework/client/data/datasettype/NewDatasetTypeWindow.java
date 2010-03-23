@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
+import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -292,8 +293,8 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
                 if (checkTextFields()) {
                     try {
                         resetChanges();
-                        presenter.doSave(name.getText(), minFiles.getText(), maxFiles.getText(), (String) derivedFrom
-                                .getSelectedItem());
+                        presenter.doSave(name.getText(), description.getText(), minFiles.getText(), maxFiles.getText(), 
+                                (String) derivedFrom.getSelectedItem(), getFileFormat(), formatFile.getText());
                     } catch (EmfException e) {
                         messagePanel.setError(e.getMessage());
                     }
@@ -304,6 +305,18 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         return action;
     }
     
+    protected XFileFormat getFileFormat() {
+        if (derivedFrom.getSelectedIndex() != 1)
+            return null;
+        
+        XFileFormat fileFormat = new XFileFormat();
+        fileFormat.setName(fileFormatName.getText());
+        fileFormat.setDescription(fileFormatDesc.getText());
+        fileFormat.setDelimiter(delimiter.getSelectedItem() == null ? "" : delimiter.getSelectedItem().toString());
+        
+        return fileFormat;
+    }
+
     public void windowClosing() {
         doClose();
     }

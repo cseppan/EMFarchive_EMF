@@ -27,7 +27,7 @@
             class="gov.epa.emissions.commons.security.User"
         	column="creator"/> 
         	
-        <many-to-one cascade="save-update"
+        <many-to-one
             name="fileFormat" 
             class="gov.epa.emissions.commons.io.XFileFormat"
         	column="file_format"/> 

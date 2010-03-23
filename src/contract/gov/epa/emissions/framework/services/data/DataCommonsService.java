@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
+import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -56,6 +57,8 @@ public interface DataCommonsService {
     DatasetType getDatasetType(String name) throws EmfException;
 
     void addDatasetType(DatasetType type) throws EmfException;
+    
+    void addDatasetTypeWithFileFormat(DatasetType type, XFileFormat format, String formatFile) throws EmfException;
 
     DatasetType obtainLockedDatasetType(User owner, DatasetType type) throws EmfException;
 

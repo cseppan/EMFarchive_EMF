@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
+import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -560,6 +561,19 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.setReturnType(mappings.geoRegion());
         
         return (GeoRegion) call.requestResponse(new Object[]{user, region});
+    }
+
+    public void addDatasetTypeWithFileFormat(DatasetType type, XFileFormat format, String formatFile)
+            throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addDatasetTypeWithFileFormat");
+        call.addParam("type", mappings.datasetType());
+        call.addParam("format", mappings.fileFormat());
+        call.addParam("formatFile", mappings.string());
+        call.setVoidReturnType();
+        
+        call.request(new Object[]{type, format, formatFile});
     }
 
 
