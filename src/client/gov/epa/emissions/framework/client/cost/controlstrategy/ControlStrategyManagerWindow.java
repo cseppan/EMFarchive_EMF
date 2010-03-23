@@ -21,6 +21,8 @@ import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.mims.analysisengine.table.format.FormattedCellRenderer;
+import gov.epa.mims.analysisengine.table.format.SignificantDigitsFormat;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
@@ -29,6 +31,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.Format;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -37,6 +41,10 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 public class ControlStrategyManagerWindow extends ReusableInteralFrame implements ControlStrategyManagerView,
         RefreshObserver, Runnable {
@@ -65,6 +73,14 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 
     private volatile Thread populateThread;
 
+    private static final List<String> COLUMN_NAMES_TO_FORMAT = new ArrayList<String>();
+    
+    static {
+        COLUMN_NAMES_TO_FORMAT.add("Total Cost");
+        COLUMN_NAMES_TO_FORMAT.add("Reduction (tons)");
+        COLUMN_NAMES_TO_FORMAT.add("Average Cost Per Ton");
+    }
+     
     public ControlStrategyManagerWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("Control Strategy Manager", new Dimension(850, 400), desktopManager);
         
@@ -140,9 +156,26 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     }
     
     private JPanel tablePanel(ControlStrategy[] controlStrategies, EmfConsole parentConsole, EmfSession session) {
+
         setupTableModel(controlStrategies);
         tablePanel = new JPanel(new BorderLayout());
         table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+
+        JTable innerTable = table.getTable();
+        TableColumnModel columnModel = innerTable.getColumnModel();
+        for (int i = 0; i < columnModel.getColumnCount(); i++) {
+
+            TableColumn column = columnModel.getColumn(i);
+            String[] headerValue = (String[]) column.getHeaderValue();
+            if (headerValue != null && headerValue.length > 0 && headerValue[0] != null
+                    && COLUMN_NAMES_TO_FORMAT.contains(headerValue[0])) {
+
+                ControlStrategyCustomFormat format = new ControlStrategyCustomFormat("#,##0");
+                FormattedCellRenderer formattedCellRenderer = new FormattedCellRenderer(format, SwingConstants.CENTER);
+                column.setCellRenderer(formattedCellRenderer);
+            }
+        }
+
         tablePanel.add(table, BorderLayout.CENTER);
 
         return tablePanel;

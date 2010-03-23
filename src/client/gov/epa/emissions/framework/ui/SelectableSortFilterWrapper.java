@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
 
@@ -93,6 +94,10 @@ public class SelectableSortFilterWrapper extends JPanel implements SelectModel {
     
     public SortFilterSelectModel getModel(){
         return selectModel;
+    }
+    
+    public JTable getTable() {
+        return this.sortFilterSelectionpanel.getTable();
     }
     
     //update()
