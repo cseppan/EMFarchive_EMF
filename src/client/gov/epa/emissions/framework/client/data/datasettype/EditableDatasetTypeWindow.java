@@ -67,6 +67,8 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private EmfSession session;
 
     private JTable fileFormat;
+    
+    private final String FLEXIBLE_IMPORTER = "gov.epa.emissions.commons.io.orl.NewORLImporter";
 
     public EditableDatasetTypeWindow(EmfSession session, EmfConsole parent, DesktopManager desktopManager) {
         super("Edit Dataset Type", new Dimension(600, 580), desktopManager);
@@ -136,10 +138,15 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         SpringLayoutGenerator layoutGenerator2 = new SpringLayoutGenerator();
 
         fileFormat = getFileFormat(type);
-        ScrollableComponent fileFomatTextArea = new ScrollableComponent(fileFormat);
-        fileFomatTextArea.setMinimumSize(new Dimension(80, 80));
-        layoutGenerator2.addLabelWidgetPair("File Format:", fileFomatTextArea, lPanel);
-        
+        if (fileFormat == null){
+            TextField fileFomatTextArea =new TextField(""," No file format for view.  ",40);
+            fileFomatTextArea.setEditable(false);
+            layoutGenerator2.addLabelWidgetPair("File Format:", fileFomatTextArea, lPanel);
+        }else{   
+            ScrollableComponent fileFomatTextArea = new ScrollableComponent(fileFormat);
+            fileFomatTextArea.setMinimumSize(new Dimension(80, 80));
+            layoutGenerator2.addLabelWidgetPair("File Format:", fileFomatTextArea, lPanel);
+        }
         sortOrder = new TextField("sortOrder", type.getDefaultSortOrder(), 40);
         addChangeable(sortOrder);
         layoutGenerator2.addLabelWidgetPair("Default Sort Order:", sortOrder, lPanel);
@@ -162,6 +169,11 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private JTable getFileFormat(DatasetType type) {
         XFileFormat fileFormat = type.getFileFormat();
         
+        if (!type.getImporterClassName().equalsIgnoreCase(FLEXIBLE_IMPORTER))
+            return null;
+        
+        if (fileFormat == null )
+            return new JTable(10, 10);
         if (fileFormat == null)
             return new JTable(10, 10);
         
