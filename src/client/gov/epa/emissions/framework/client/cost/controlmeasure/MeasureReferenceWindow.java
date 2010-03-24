@@ -211,5 +211,6 @@ public class MeasureReferenceWindow extends DisposableInteralFrame implements Me
 
         saveButton.setVisible(false);
         cancelButton.setText("Close");
+        this.descriptionField.setEditable(false);
     }
 }

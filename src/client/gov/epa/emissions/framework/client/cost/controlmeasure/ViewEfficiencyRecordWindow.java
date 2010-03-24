@@ -20,19 +20,8 @@ public class ViewEfficiencyRecordWindow extends EditEfficiencyRecordWindow {
         resetChanges();
     }
 
-
-    public void viewOnly() {
-        saveRecord.setVisible(false);
-        cancel.setText("Close");
+    @Override
+    public boolean shouldDiscardChanges() {
+        return true;
     }
-
-//    private void updateControlMeasureEfficiencyTab(EfficiencyRecord record) throws EmfException {
-//        presenter.checkForDuplicate(record);
-//    }
-//
-//    public void observe(EditEfficiencyRecordPresenter presenter) {
-//        this.presenter = presenter;
-//
-//    }
-
 }

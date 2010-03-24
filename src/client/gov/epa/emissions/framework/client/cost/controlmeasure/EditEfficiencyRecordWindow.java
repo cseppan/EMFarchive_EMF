@@ -74,12 +74,4 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
         this.presenter = presenter;
 
     }
-
-
-
-    public void viewOnly() {
-        // NOTE Auto-generated method stub
-        
-    }
-
 }

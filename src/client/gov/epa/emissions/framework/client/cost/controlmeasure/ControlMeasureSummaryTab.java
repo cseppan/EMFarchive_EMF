@@ -28,8 +28,10 @@ import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.util.Date;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -553,6 +555,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     }
 
     public void viewOnly() {
+        
         name.setEditable(false);
         description.setEditable(false);
         abbreviation.setEditable(false);
@@ -565,5 +568,34 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         cmClass.setEditable(false);
         sectorsWidget.viewOnly();
         monthsWidget.viewOnly();
+    
+        this.disableComboBoxChanges();
+    }
+    
+    private void disableComboBoxChanges() {
+
+        this.majorPollutant.addItemListener(new ComboBoxResetListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                majorPollutant.setSelectedItem(measure.getMajorPollutant());
+            }
+        }));
+
+        this.sourceGroup.addItemListener(new ComboBoxResetListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                sourceGroup.setSelectedItem(measure.getSourceGroup());
+            }
+        }));
+
+        this.controlTechnology.addItemListener(new ComboBoxResetListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                controlTechnology.setSelectedItem(measure.getControlTechnology());
+            }
+        }));
+
+        this.cmClass.addItemListener(new ComboBoxResetListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                cmClass.setSelectedItem(measure.getCmClass());
+            }
+        }));
     }
 }

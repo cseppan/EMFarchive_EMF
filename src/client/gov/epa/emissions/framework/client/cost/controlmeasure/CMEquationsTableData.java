@@ -14,6 +14,7 @@ import java.util.List;
 public class CMEquationsTableData extends AbstractEditableTableData {
 
     private List<EditableRow> rows;
+    private boolean editable = true;
     
     public CMEquationsTableData(ControlMeasureEquation[] equations) {
         rows = createRows(equations);
@@ -82,9 +83,13 @@ public class CMEquationsTableData extends AbstractEditableTableData {
     }
 
     public boolean isEditable(int col) {
-        if (col == 2)
+        if (this.editable && col == 2)
             return true;
         return false;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable  = editable;
     }
 
     public void refresh() {

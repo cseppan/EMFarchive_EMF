@@ -69,6 +69,8 @@ public class MeasurePropertyWindow extends DisposableInteralFrame {
     
     private ManageChangeables changeablesList;
 
+    private boolean viewOnly;
+    
     public MeasurePropertyWindow(String title, ManageChangeables changeablesList, 
             DesktopManager desktopManager, EmfSession session) {
         super(title, new Dimension(675, 500), desktopManager);
@@ -271,8 +273,29 @@ public class MeasurePropertyWindow extends DisposableInteralFrame {
     }
 
     public void viewOnly() {
+        
+        this.viewOnly = true;
+        
         saveButton.setVisible(false);
         cancelButton.setText("Close");
+
+        this.name.setEditable(false);
+        this.dataType.setEditable(false);
+        this.dbFieldName.setEditable(false);
+        this.value.setEditable(false);
+        this.units.setEditable(false);
+        this.category.setEditable(false);
+        this.disableComboBoxChanges();
+    }
+    
+    private void disableComboBoxChanges() {
+
+        this.category.addItemListener(new ComboBoxResetListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                category.setSelectedItem(property.getCategory());
+            }
+        }));
+
     }
 
     private void updateCategory() throws EmfException {
@@ -291,4 +314,9 @@ public class MeasurePropertyWindow extends DisposableInteralFrame {
     private ControlMeasurePropertyCategory category(String categoryName) throws EmfException {
         return new ControlMeasurePropertyCategories(session.controlMeasureService().getPropertyCategories(), session).get(categoryName);
     }
+
+    @Override
+    public boolean shouldDiscardChanges() {
+        return this.viewOnly || super.shouldDiscardChanges();
+    }    
 }

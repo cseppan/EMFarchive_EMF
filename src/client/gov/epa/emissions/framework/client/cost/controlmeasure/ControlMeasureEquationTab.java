@@ -291,8 +291,10 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
     }
 
     public void viewOnly() {
+        
         addButton.setVisible(false);
         removeButton.setVisible(false);
+        this.tableData.setEditable(false);
     }
 
 

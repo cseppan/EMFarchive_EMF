@@ -120,13 +120,16 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
     public void display(ControlMeasure measure, EfficiencyRecord record) {
         String name = measure.getName();
-        if (name == null)
+        if (name == null) {
             name = "New Control Measure";
+        }
+
+        this.record = record;
+
         super.setLabel(super.getTitle() + " " + (counter++) + " for " + name);
         JPanel layout = createLayout();
-        super.getContentPane().add(layout);
+        super.getContentPane().add(layout);        
         super.display();
-        this.record = record;
 
         resetChanges();
 
@@ -184,6 +187,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
             allPollutants = session.dataCommonsService().getPollutants();
             pollutant = new ComboBox("Select One", allPollutants);
             pollutant.setPreferredSize(new Dimension(113, 30));
+            pollutant.setSelectedItem(this.record.getPollutant());
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve Pollutants");
         }
@@ -320,6 +324,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         layoutGenerator.addLabelWidgetPair("Rule Penetration (%):", rulePenetration, panel);
 
         equationType = new ComboBox(equationTypes);
+        equationType.setSelectedItem(record.getEquationType());
         equationType.setPreferredSize(new Dimension(113, 20));
         this.addChangeable(equationType);
         layoutGenerator.addLabelWidgetPair("Equation Type:", equationType, panel);
@@ -576,5 +581,45 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
         if (shouldDiscardChanges())
             disposeView();
     }
+    
+    public void viewOnly() {
 
+        this.efficiency.setEditable(false);
+        this.minEmis.setEditable(false);
+        this.maxEmis.setEditable(false);
+        this.costYear.setEditable(false);
+        this.costperTon.setEditable(false);
+        this.measureAbbreviation.setEditable(false);
+        this.existingdevCode.setEditable(false);
+        this.locale.setEditable(false);
+        this.ruleEffectiveness.setEditable(false);
+        this.rulePenetration.setEditable(false);
+        this.caprecFactor.setEditable(false);
+        this.discountRate.setEditable(false);
+        this.detail.setEditable(false);
+        this.effectiveDate.setEditable(false);
+        this.capAnnRatio.setEditable(false);
+        this.incrementalCPT.setEditable(false);
+        this.detail.setEditable(false);
+        
+        this.saveRecord.setVisible(false);
+        this.cancel.setText("Close");
+
+        this.disableComboBoxChanges();
+    }
+    
+    private void disableComboBoxChanges() {
+
+        this.pollutant.addItemListener(new ComboBoxResetListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                pollutant.setSelectedItem(record.getPollutant());
+            }
+        }));
+
+        this.equationType.addItemListener(new ComboBoxResetListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                equationType.setSelectedItem(record.getEquationType());
+            }
+        }));
+    }
 }
