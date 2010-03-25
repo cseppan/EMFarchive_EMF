@@ -1093,7 +1093,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         if (type.toLowerCase().startsWith("text"))
             return types.text();
         
-        if (type.toLowerCase().startsWith("real"))
+        if (type.toLowerCase().startsWith("real")
+                || type.toLowerCase().startsWith("double precision"))
             return types.realType();
         
         if (type.toLowerCase().startsWith("date"))
