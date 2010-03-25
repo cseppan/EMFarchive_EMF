@@ -419,7 +419,7 @@
 			<fileset dir="${basedir}/build/sandbox" includes="epa-commons.jar" />
 		</copy>
 
-		<copy todir="${client.dist.dir}" file="${build.classes.dir}/gov/epa/emissions/framework/install/installer/runinstaller.bat" />
+		<copy todir="${client.dist.dir}" file="${src.client.dir}/gov/epa/emissions/framework/install/installer/runinstaller.bat" />
 
 		<java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList" fork="true" failonerror="true">
 			<classpath>
