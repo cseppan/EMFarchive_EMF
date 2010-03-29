@@ -34,7 +34,7 @@ public class ControlProgramSummaryTabPresenter  implements ControlProgramTabPres
     }
 
     public void doChangeControlProgramType(ControlProgramType controlProgramType) {
-        // NOTE Auto-generated method stub
+        this.controlProgram.setControlProgramType(controlProgramType);
     }
 
     public DatasetType[] getDatasetTypes() throws EmfException {
