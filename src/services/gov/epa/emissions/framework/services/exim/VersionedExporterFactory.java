@@ -39,17 +39,11 @@ public class VersionedExporterFactory {
                 throw new Exception("Exporter class name not specified with this dataset type.");
 
             Class exporterClass = Class.forName(exporterName);
-            if ( dataset.getDatasetType().getFileFormat() !=null && exporterName.toLowerCase().contains("neworl")){
-                classParams = new Class[] { Dataset.class, DbServer.class,
-                        DataFormatFactory.class, Integer.class };
-                params = new Object[] { dataset, dbServer, new VersionedDataFormatFactory(version, dataset),
-                        new Integer(batchSize) };
-            }else{
-                classParams = new Class[] { Dataset.class, DbServer.class, SqlDataTypes.class,
-                        DataFormatFactory.class, Integer.class };
-                params = new Object[] { dataset, dbServer, sqlDataTypes, new VersionedDataFormatFactory(version, dataset),
-                        new Integer(batchSize) };
-            }
+            classParams = new Class[] { Dataset.class, DbServer.class, SqlDataTypes.class,
+                    DataFormatFactory.class, Integer.class };
+            params = new Object[] { dataset, dbServer, sqlDataTypes, new VersionedDataFormatFactory(version, dataset),
+                    new Integer(batchSize) };
+
             Constructor exporterConstructor = exporterClass.getDeclaredConstructor(classParams);
             return (Exporter) exporterConstructor.newInstance(params);
         } catch (ClassNotFoundException e) {
