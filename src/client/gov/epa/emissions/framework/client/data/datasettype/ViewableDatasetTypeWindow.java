@@ -159,12 +159,13 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     
     private JTable getFileFormat(DatasetType type) {
         XFileFormat fileFormat = type.getFileFormat();
+        String importer = type.getImporterClassName();
         
-        if (!type.getImporterClassName().equalsIgnoreCase(FLEXIBLE_IMPORTER))
+        if (importer == null || !importer.equalsIgnoreCase(FLEXIBLE_IMPORTER))
             return null;
         
         if (fileFormat == null )
-            return new JTable(10, 10);
+            return null;
         
         Column[] cols = fileFormat.getColumns();
 

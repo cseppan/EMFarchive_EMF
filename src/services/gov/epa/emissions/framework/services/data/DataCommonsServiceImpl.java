@@ -12,14 +12,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
-import gov.epa.emissions.commons.io.CharFormatter;
 import gov.epa.emissions.commons.io.Column;
-import gov.epa.emissions.commons.io.IntegerFormatter;
-import gov.epa.emissions.commons.io.LongFormatter;
-import gov.epa.emissions.commons.io.NullFormatter;
-import gov.epa.emissions.commons.io.RealFormatter;
-import gov.epa.emissions.commons.io.SmallIntegerFormatter;
-import gov.epa.emissions.commons.io.StringFormatter;
 import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.io.csv.CSVFileReader;
 import gov.epa.emissions.commons.security.User;
@@ -1059,12 +1052,12 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             SqlDataTypes types = DbServerFactory.get().getDbServer().getSqlDataTypes();
             
             //NOTE: currently the format definition file has to follow this column sequence:
-            // name,type,default value,description,formatter,constraints,mandatory,width,spaces,fixformat start,fixformat end
+            // name,type,default value,mandatory,description,formatter,constraints,width,spaces,fixformat start,fixformat end
             
             for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
                 String[] data = record.getTokens();
                 String type = getType(data[1], types, data[7]); //get sql data type
-                colObjs.add(new Column(data[0], type, data[2], data[3], getFormatter(type, types, data[4]),
+                colObjs.add(new Column(data[0], type, data[2], data[3], data[4],
                         data[5], data[6], data[7], data[8], data[9], data[10]));
                 
             }
@@ -1087,8 +1080,20 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         if (type == null || type.trim().isEmpty())
             return types.text();
         
-        if (type.toLowerCase().startsWith("varchar"))
-            return types.stringType(Integer.parseInt(width));
+        int widthValue = 0;
+        
+        try {
+            widthValue = Integer.parseInt(width);
+        } catch (Exception e) {
+            int index1 = type.trim().indexOf('(');
+            int index2 = type.trim().indexOf(')');
+            
+            if (index1 > 0 && index2 > 0 && widthValue == 0)
+                widthValue = Integer.parseInt(type.substring(++index1, index2));
+        }
+        
+        if (type.toLowerCase().startsWith("varchar") && widthValue > 0)
+            return types.stringType(widthValue);
         
         if (type.toLowerCase().startsWith("text"))
             return types.text();
@@ -1106,14 +1111,14 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         if (type.toLowerCase().startsWith("bool"))
             return types.booleanType();
         
-        if (type.toLowerCase().startsWith("integer"))
-            return types.intType();
-        
         if (type.toLowerCase().startsWith("int4"))
             return types.longType();
         
         if (type.toLowerCase().startsWith("int2"))
             return types.smallInt();
+        
+        if (type.toLowerCase().startsWith("int"))
+            return types.intType();
         
         if (type.toLowerCase().startsWith("serial"))
             return types.autoIncrement();
@@ -1121,33 +1126,4 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         return types.stringType();
     }
     
-    private String getFormatter(String sqlType, SqlDataTypes types, String formatter) {
-        if (formatter != null && !formatter.trim().isEmpty())
-            return formatter;
-        
-        if (sqlType.startsWith(types.stringType()))
-            return StringFormatter.class.getSimpleName();
-        
-        if (sqlType.equals(types.realType()))
-            return RealFormatter.class.getSimpleName();
-        
-        if (sqlType.equals(types.text()))
-            return NullFormatter.class.getSimpleName();
-        
-        if (sqlType.equals(types.longType()))
-            return LongFormatter.class.getSimpleName();
-        
-        if (sqlType.equals(types.charType()))
-            return CharFormatter.class.getSimpleName();
-        
-        if (sqlType.equals(types.intType()))
-            return IntegerFormatter.class.getSimpleName();
-        
-        if (sqlType.equals(types.smallInt()))
-            return SmallIntegerFormatter.class.getSimpleName();
-        
-        return NullFormatter.class.getSimpleName();
-    }
-
-
 }
