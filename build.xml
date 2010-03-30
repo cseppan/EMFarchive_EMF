@@ -296,7 +296,7 @@
 	<target name="client-env">
 		<property name="client.dist" value="${build.home}/client" />
 		<property name="client.dist.lib" value="${client.dist}/lib" />
-		<property name="client.dist.dir" value="deploy/client" />
+		<property name="client.dist.dir" value="${build.home}/deploy/client" />
 		<property name="client.jar" value="${client.dist}/${app.name}-client.jar" />
 		<property name="client.dist.ref" value="${client.dist}/config/ref/delimited" />
 		<property name="scc.ref.dir" value="config/ref/delimited" />
@@ -309,6 +309,7 @@
 
 	<target name="client-dist-sandbox-no-clean-init" depends="compile-client-no-clean-init, client-env" description="Builds the sandbox for EMF Client distribution">
 		<mkdir dir="${client.dist}" />
+		<mkdir dir="${client.dist.dir}" />
 		<mkdir dir="${client.dist.lib}" />
 		<mkdir dir="${client.dist.ref}" />
 
@@ -394,6 +395,8 @@
 		<copy todir="${client.dist.dir}" file="./build/eclipse/gov/epa/emissions/framework/install/installer/runinstaller.bat" />
 
 		<java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList" fork="true" failonerror="true">
+			<arg value="./${lib.dir}"/>
+			<arg value="./${client.dist.dir}"/>
 			<classpath>
 				<pathelement location="${client.jar}" />
 				<fileset dir="${client.dist.lib}">
@@ -415,13 +418,23 @@
 			</manifest>
 		</jar>
 
-		<copy tofile="${client.dist.dir}/epa-commons.jar">
-			<fileset dir="${basedir}/build/sandbox" includes="epa-commons.jar" />
+		<jar jarfile="${client.dist.dir}/${app.name}-client.jar" basedir="${build.classes.dir}">
+			<include name="**/*" />
+		</jar>
+
+		<copy todir="${client.dist.dir}">
+			<fileset dir="${basedir}/lib" includes="epa-commons.jar" />
+		</copy>
+
+		<copy todir="${client.dist.dir}">
+			<fileset dir="${basedir}/lib" includes="analysis-engine.jar" />
 		</copy>
 
 		<copy todir="${client.dist.dir}" file="${src.client.dir}/gov/epa/emissions/framework/install/installer/runinstaller.bat" />
 
 		<java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList" fork="true" failonerror="true">
+			<arg value="./${lib.dir}"/>
+			<arg value="./${client.dist.dir}"/>
 			<classpath>
 				<pathelement location="${client.jar}" />
 				<fileset dir="${client.dist.lib}">

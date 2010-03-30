@@ -17,7 +17,9 @@ public class CreateDownloadFilesList {
 
     private char delimiter;
 
-    private String dir;
+    private String libDir;
+
+    private String outputDir;
 
     private PrintWriter printer;
 
@@ -27,27 +29,37 @@ public class CreateDownloadFilesList {
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mmaaa");
 
-    public CreateDownloadFilesList(String dir, char delimiter) {
-        this.dir = dir;
+    public CreateDownloadFilesList(String libDir, String outputDir, char delimiter) {
+
+        this.libDir = libDir;
+        this.outputDir = outputDir;
         this.delimiter = delimiter;
         this.clientJarFile = new File(Constants.CLIENT_JAR_FILE);
     }
 
     protected void createFilesList() throws Exception {
-        if (!isDirectory(dir)) {
-            throw new Exception("The '" + dir + "' is not a directory");
+
+        if (!isDirectory(this.libDir)) {
+            throw new Exception("The '" + this.libDir + "' is not a directory");
         }
 
+        if (!isDirectory(this.outputDir)) {
+            throw new Exception("The '" + this.outputDir + "' is not a directory");
+        }
+
+        System.out.println("Generating file '" + Constants.FILE_LIST + "' from lib dir '" + this.libDir + "'");
+        System.out.println("Generating file '" + Constants.FILE_LIST + "' in dir '" + this.outputDir + "'");
+        
         List<File> jarRefFiles = new ArrayList<File>();
-        File[] jarFiles = getFiles(dir);
+        File[] jarFiles = getFiles(this.libDir);
         File[] refFiles = getRefFiles(Constants.REFERENCE_PATH);
         File[] prefFiles = getRefFiles(Constants.PREFERENCE_PATH);
         jarRefFiles.addAll(Arrays.asList(jarFiles));
         jarRefFiles.addAll(Arrays.asList(refFiles));
         jarRefFiles.addAll(Arrays.asList(prefFiles));
         
-        printer = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.dir") + File.separatorChar
-                + "deploy" + File.separatorChar + "client" + File.separatorChar + Constants.FILE_LIST)));
+        printer = new PrintWriter(new BufferedWriter(new FileWriter(this.outputDir + File.separatorChar
+                + Constants.FILE_LIST)));
         printHeader();
         createFilesList(jarRefFiles.toArray(new File[0]));
         print(clientJarFile);
@@ -163,7 +175,7 @@ public class CreateDownloadFilesList {
     
     public static void main(String[] args) {
         try {
-            CreateDownloadFilesList filelist = new CreateDownloadFilesList(System.getProperty("user.dir") + "\\lib", ';');
+            CreateDownloadFilesList filelist = new CreateDownloadFilesList(args[0], args[1], ';');
             filelist.createFilesList();
         } catch (Exception e) {
             e.printStackTrace();
