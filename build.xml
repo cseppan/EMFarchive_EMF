@@ -422,7 +422,7 @@
 			<include name="**/*" />
 		</jar>
 
-		<copy todir="${client.dist.dir}" file="${basedir}/epa-commons.jar" failonerror="true" />
+		<copy todir="${client.dist.dir}" file="${basedir}/lib/epa-commons.jar" failonerror="true" />
 		<copy todir="${client.dist.dir}" file="${basedir}/lib/analysis-engine.jar" failonerror="true" />
 		<copy todir="${client.dist.dir}" file="${src.client.dir}/gov/epa/emissions/framework/install/installer/runinstaller.bat" failonerror="true" />
 
