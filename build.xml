@@ -395,8 +395,8 @@
 		<copy todir="${client.dist.dir}" file="./build/eclipse/gov/epa/emissions/framework/install/installer/runinstaller.bat" />
 
 		<java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList" fork="true" failonerror="true">
-			<arg value="${lib.dir}"/>
-			<arg value="${client.dist.dir}"/>
+			<arg value="${lib.dir}" />
+			<arg value="${client.dist.dir}" />
 			<classpath>
 				<pathelement location="${client.jar}" />
 				<fileset dir="${client.dist.lib}">
@@ -422,19 +422,13 @@
 			<include name="**/*" />
 		</jar>
 
-		<copy todir="${client.dist.dir}">
-			<fileset dir="${basedir}/lib" includes="epa-commons.jar" />
-		</copy>
-
-		<copy todir="${client.dist.dir}">
-			<fileset dir="${basedir}/lib" includes="analysis-engine.jar" />
-		</copy>
-
-		<copy todir="${client.dist.dir}" file="${src.client.dir}/gov/epa/emissions/framework/install/installer/runinstaller.bat" />
+		<copy todir="${client.dist.dir}" file="${basedir}/epa-commons.jar" failonerror="true" />
+		<copy todir="${client.dist.dir}" file="${basedir}/lib/analysis-engine.jar" failonerror="true" />
+		<copy todir="${client.dist.dir}" file="${src.client.dir}/gov/epa/emissions/framework/install/installer/runinstaller.bat" failonerror="true" />
 
 		<java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList" fork="true" failonerror="true">
-			<arg value="${lib.dir}"/>
-			<arg value="${client.dist.dir}"/>
+			<arg value="${lib.dir}" />
+			<arg value="${client.dist.dir}" />
 			<classpath>
 				<pathelement location="${client.jar}" />
 				<fileset dir="${client.dist.lib}">
