@@ -71,7 +71,7 @@ public class CreateDownloadFilesList {
         jarRefFiles.addAll(Arrays.asList(jarFiles));
 
         System.out.println("Adding ref files:");
-        if (jarFiles != null) {
+        if (refFiles != null) {
             for (File file : refFiles) {
                 System.out.println(" " + file.getCanonicalPath());
             }
@@ -82,7 +82,7 @@ public class CreateDownloadFilesList {
         jarRefFiles.addAll(Arrays.asList(refFiles));
 
         System.out.println("Adding pref files:");
-        if (jarFiles != null) {
+        if (prefFiles != null) {
             for (File file : prefFiles) {
                 System.out.println(" " + file.getCanonicalPath());
             }
