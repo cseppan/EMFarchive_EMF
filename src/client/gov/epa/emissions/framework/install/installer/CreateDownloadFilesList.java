@@ -178,20 +178,22 @@ public class CreateDownloadFilesList {
         System.out.println("Parent path: " + parentPath);
         System.out.println(Constants.REFERENCE_PATH);
         
-        if (absFilePath.indexOf("epa-commons") >= 0)
+        if (absFilePath.indexOf("epa-commons") >= 0) {
             relativePath = "/lib/epa-commons.jar";
-
-        if (absFilePath.indexOf("analysis-engine") >= 0)
+        } else if (absFilePath.indexOf("analysis-engine") >= 0) {
             relativePath = "/lib/analysis-engine.jar";
-        
-        if(parentPath.equalsIgnoreCase(Constants.REFERENCE_PATH))
+        } else if (parentPath.equalsIgnoreCase(Constants.REFERENCE_PATH)) {
             relativePath = "/config/ref/delimited/" + file.getName();
-        
-        if(parentPath.equalsIgnoreCase(Constants.PREFERENCE_PATH))
+        } else if (parentPath.equalsIgnoreCase(Constants.PREFERENCE_PATH)) {
             relativePath = "/config/preferences/" + file.getName();
-        
-        if(absFilePath.equalsIgnoreCase(Constants.CLIENT_JAR_FILE))
+        } else if (absFilePath.equalsIgnoreCase(Constants.CLIENT_JAR_FILE)) {
             relativePath = File.separatorChar + file.getName();
+        }
+        else {
+            System.out.println("Using default relative path for file '" + file.getAbsoluteFile() + "'");
+        }
+
+        System.out.println("For file '" + file.getAbsoluteFile() + "' using relative path '" + relativePath + "'");
         
         return relativePath;
     }
