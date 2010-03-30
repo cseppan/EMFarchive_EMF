@@ -68,7 +68,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private JTable fileFormat;
     
-    private final String FLEXIBLE_IMPORTER = "gov.epa.emissions.commons.io.orl.NewORLImporter";
+    private final String FLEXIBLE_IMPORTER = "gov.epa.emissions.commons.io.orl.FlexibleDBImporter";
 
     public EditableDatasetTypeWindow(EmfSession session, EmfConsole parent, DesktopManager desktopManager) {
         super("Edit Dataset Type", new Dimension(600, 580), desktopManager);

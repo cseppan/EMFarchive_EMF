@@ -52,7 +52,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private JTable fileFormat;
     
-    private final String FLEXIBLE_IMPORTER = "gov.epa.emissions.commons.io.orl.NewORLImporter";
+    private final String FLEXIBLE_IMPORTER = "gov.epa.emissions.commons.io.orl.FlexibleDBImporter";
 
     public ViewableDatasetTypeWindow(DesktopManager desktopManager) {
         super("View Dataset Type", new Dimension(600, 520), desktopManager);

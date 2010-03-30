@@ -29,7 +29,7 @@ public class NewDatasetTypePresenter {
     
     private final String SMOKE_IMPORTER = "gov.epa.emissions.commons.io.other.SMKReportImporter";
     
-    private final String FLEXIBLE_IMPORTER = "gov.epa.emissions.commons.io.orl.NewORLImporter";
+    private final String FLEXIBLE_IMPORTER = "gov.epa.emissions.commons.io.orl.FlexibleDBImporter";
     
     private final String EXTERNAL_EXPORTER = "gov.epa.emissions.commons.io.external.ExternalFilesExporter";
     
@@ -39,7 +39,7 @@ public class NewDatasetTypePresenter {
     
     private final String SMOKE_EXPORTER = "gov.epa.emissions.commons.io.other.SMKReportExporter";
     
-    private final String FLEXIBLE_EXPORTER = "gov.epa.emissions.commons.io.orl.NewORLExporter";
+    private final String FLEXIBLE_EXPORTER = "gov.epa.emissions.commons.io.orl.FlexibleDBExporter";
     
     private NewDatasetTypeView view;
 
