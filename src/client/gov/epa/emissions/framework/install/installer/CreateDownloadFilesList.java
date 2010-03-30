@@ -59,8 +59,37 @@ public class CreateDownloadFilesList {
         System.out.println("Getting pref files from dir '" + Constants.PREFERENCE_PATH + "'");
         File[] prefFiles = getRefFiles(Constants.PREFERENCE_PATH);
         
+        System.out.println("Adding jar files:");
+        if (jarFiles != null) {
+            for (File file : jarFiles) {
+                System.out.println(" " + file.getCanonicalPath());
+            }
+        }
+        else {
+            System.out.println("Warning: jar files array is null!");
+        }
         jarRefFiles.addAll(Arrays.asList(jarFiles));
+
+        System.out.println("Adding ref files:");
+        if (jarFiles != null) {
+            for (File file : refFiles) {
+                System.out.println(" " + file.getCanonicalPath());
+            }
+        }
+        else {
+            System.out.println("Warning: ref files array is null!");
+        }
         jarRefFiles.addAll(Arrays.asList(refFiles));
+
+        System.out.println("Adding pref files:");
+        if (jarFiles != null) {
+            for (File file : prefFiles) {
+                System.out.println(" " + file.getCanonicalPath());
+            }
+        }
+        else {
+            System.out.println("Warning: pref files array is null!");
+        }
         jarRefFiles.addAll(Arrays.asList(prefFiles));
         
         printer = new PrintWriter(new BufferedWriter(new FileWriter(this.outputDir + File.separatorChar

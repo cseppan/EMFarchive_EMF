@@ -13,7 +13,7 @@
 	<property name="src.contract.dir" value="${src.dir}/contract" />
 	<property name="src.services.dir" value="${src.dir}/services" />
 	<property name="src.common.dir" value="${src.dir}/common" />
-	<property name="lib.dir" value="lib" />
+	<property name="lib.dir" value="${basedir}/lib" />
 	<property name="res.dir" value="res" />
 
 	<property name="test.dir" value="test" />
@@ -23,7 +23,7 @@
 	<property name="test.commons.dir" value="${test.dir}/commons" />
 	<property name="test.uat.dir" value="${test.dir}/uat" />
 
-	<property name="build.home" value="build/sandbox" />
+	<property name="build.home" value="${basedir}/build/sandbox" />
 	<property name="web.dir" value="web" />
 	<property name="meta-inf.dir" value="META-INF" />
 	<property name="build.dist.dir" value="${build.home}/dist" />
@@ -395,8 +395,8 @@
 		<copy todir="${client.dist.dir}" file="./build/eclipse/gov/epa/emissions/framework/install/installer/runinstaller.bat" />
 
 		<java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList" fork="true" failonerror="true">
-			<arg value="./${lib.dir}"/>
-			<arg value="./${client.dist.dir}"/>
+			<arg value="${lib.dir}"/>
+			<arg value="${client.dist.dir}"/>
 			<classpath>
 				<pathelement location="${client.jar}" />
 				<fileset dir="${client.dist.lib}">
