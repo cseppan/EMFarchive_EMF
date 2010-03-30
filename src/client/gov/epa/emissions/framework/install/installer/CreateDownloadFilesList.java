@@ -52,8 +52,13 @@ public class CreateDownloadFilesList {
         
         List<File> jarRefFiles = new ArrayList<File>();
         File[] jarFiles = getFiles(this.libDir);
+        
+        System.out.println("Getting ref files from dir '" + Constants.REFERENCE_PATH + "'");
         File[] refFiles = getRefFiles(Constants.REFERENCE_PATH);
+ 
+        System.out.println("Getting pref files from dir '" + Constants.PREFERENCE_PATH + "'");
         File[] prefFiles = getRefFiles(Constants.PREFERENCE_PATH);
+        
         jarRefFiles.addAll(Arrays.asList(jarFiles));
         jarRefFiles.addAll(Arrays.asList(refFiles));
         jarRefFiles.addAll(Arrays.asList(prefFiles));
