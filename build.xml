@@ -433,8 +433,8 @@
 		<copy todir="${client.dist.dir}" file="${src.client.dir}/gov/epa/emissions/framework/install/installer/runinstaller.bat" />
 
 		<java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList" fork="true" failonerror="true">
-			<arg value="./${lib.dir}"/>
-			<arg value="./${client.dist.dir}"/>
+			<arg value="${lib.dir}"/>
+			<arg value="${client.dist.dir}"/>
 			<classpath>
 				<pathelement location="${client.jar}" />
 				<fileset dir="${client.dist.lib}">
