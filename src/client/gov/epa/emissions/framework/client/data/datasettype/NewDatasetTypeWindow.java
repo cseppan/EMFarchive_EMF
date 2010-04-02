@@ -279,7 +279,11 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
             messagePanel.setError("Max Files field should only contain a number.");
         else if (derivedFrom.getSelectedItem() == null)
             messagePanel.setError("Derived From field should have a value.");
-        else {
+        else if (((String) derivedFrom.getSelectedItem()).equalsIgnoreCase("Flexible File Format") 
+                && delimiter.getSelectedItem() == null ){
+            messagePanel.setError("Delimiter field should have a value.");
+        }
+        else{
             messagePanel.clear();
             return true;
         }

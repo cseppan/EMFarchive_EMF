@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -73,6 +74,7 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
 
         verifyDuplicates(keyVals);
         type.setKeyVals(keyVals);
+        type.setLastModifiedDate(new Date());
     }
 
     private void verifyDuplicates(KeyVal[] keyVals) throws EmfException {

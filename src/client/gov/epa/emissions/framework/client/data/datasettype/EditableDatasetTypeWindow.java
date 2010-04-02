@@ -71,7 +71,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private final String FLEXIBLE_IMPORTER = "gov.epa.emissions.commons.io.orl.FlexibleDBImporter";
 
     public EditableDatasetTypeWindow(EmfSession session, EmfConsole parent, DesktopManager desktopManager) {
-        super("Edit Dataset Type", new Dimension(600, 580), desktopManager);
+        super("Edit Dataset Type", new Dimension(620, 580), desktopManager);
 
         this.desktopManager = desktopManager;
         this.parent = parent;
