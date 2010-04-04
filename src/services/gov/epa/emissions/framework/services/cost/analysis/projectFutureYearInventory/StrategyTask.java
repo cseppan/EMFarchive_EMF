@@ -88,6 +88,7 @@ public class StrategyTask extends AbstractStrategyTask {
             //run any post processes
             try {
                 afterRun();
+                updateVersionInfo();
             } catch (Exception e) {
                 status = "Failed. Error processing input dataset";
                 e.printStackTrace();

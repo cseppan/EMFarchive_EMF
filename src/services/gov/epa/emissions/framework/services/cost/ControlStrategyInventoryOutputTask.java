@@ -51,6 +51,7 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
             ControlStrategyInventoryOutputFactory factory = new ControlStrategyInventoryOutputFactory(user, controlStrategy,
                     namePrefix, sessionFactory, 
                     dbServerFactory);
+            
             for (int i = 0; i < controlStrategyResults.length; i++) {
                 if (controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)
                         || controlStrategyResults[i].getStrategyResultType().getName().equals(StrategyResultType.annotatedInventory)) {
@@ -59,15 +60,16 @@ public class ControlStrategyInventoryOutputTask implements Runnable {
                     ++count;
                 }
             }
+            
             if (count > 0) {
                 endStatus(new StatusDAO(sessionFactory));
             }
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("Could not create inventory output. " + e.getMessage());
-        }
+        } 
     }
-
+    
     private void close(DbServer dbServer) {
         try {
             if (dbServer != null)

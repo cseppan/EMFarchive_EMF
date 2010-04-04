@@ -16,5 +16,7 @@ public interface StrategyLoader {
     public int getRecordCount();
     
     public int getMessageDatasetRecordCount();
+    
+    public ControlStrategyResult[] getControlStrategyResults();
 
 }

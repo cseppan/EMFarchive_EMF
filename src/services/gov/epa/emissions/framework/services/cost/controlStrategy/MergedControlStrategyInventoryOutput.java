@@ -76,6 +76,7 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
                     result.setCompletionTime(new Date());
                     result.setRunStatus("Completed.");
                     saveControlStrategyResult(result);
+                    updateVersion(dataset, dbServer, sessionFactory.getSession(), user);
                 }
             }
         } catch (Exception e) {

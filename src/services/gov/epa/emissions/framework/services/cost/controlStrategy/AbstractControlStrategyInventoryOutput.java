@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -97,6 +98,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
             }        
 
             setControlStrategyResultContolledInventory(result, dataset);
+            updateVersion(dataset, dbServer, sessionFactory.getSession(), user);
         } catch (Exception e) {
             failStatus(statusServices, e.getMessage());
             e.printStackTrace();
@@ -105,6 +107,18 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
 //            setandRunQASteps();
         }
         dbServer.disconnect();
+    }
+    
+    protected void updateVersion(EmfDataset dataset, DbServer dbsrv, Session session, User usr) throws Exception {
+        Version version = version(dataset, dataset.getDefaultVersion());
+        
+        if (version == null)
+            return;
+        
+        DatasetDAO dao = new DatasetDAO();
+        version = dao.obtainLockOnVersion(usr, version.getId(), session);
+        version.setNumberRecords((int)dao.getDatasetRecordsNumber(dbsrv, session, dataset, version));
+        dao.updateVersionNReleaseLock(version, session);
     }
 
 //    private void setandRunQASteps() throws EmfException {

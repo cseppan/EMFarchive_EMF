@@ -73,6 +73,7 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
             //run any post processes
             try {
                 afterRun();
+                updateVersionInfo();
             } catch (Exception e) {
                 status = "Failed. Error processing input dataset";
                 e.printStackTrace();

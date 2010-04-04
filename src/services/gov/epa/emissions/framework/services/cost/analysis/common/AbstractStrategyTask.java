@@ -25,6 +25,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -160,6 +161,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             //run any post processes
             try {
                 afterRun();
+                updateVersionInfo();
             } catch (Exception e) {
                 status = "Failed. Error processing input dataset";
                 e.printStackTrace();
@@ -169,6 +171,13 @@ public abstract class AbstractStrategyTask implements Strategy {
                 disconnectDbServer();
             }
         }
+    }
+
+    protected void updateVersionInfo() throws EmfException {
+        ControlStrategyResult[] results = getControlStrategyResults();
+        
+        for (ControlStrategyResult result : results)
+            updateResultDataset(result);
     }
 
     protected void deleteStrategyResults() throws EmfException {
@@ -759,11 +768,47 @@ public abstract class AbstractStrategyTask implements Strategy {
         Session session = sessionFactory.getSession();
         try {
             controlStrategyDAO.updateControlStrategyResult(strategyResult, session);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             throw new EmfException("Could not save control strategy results: " + e.getMessage());
         } finally {
             session.close();
         }
+    }
+    
+    protected void updateResultDataset(ControlStrategyResult strategyResult) throws EmfException {
+        Session session = sessionFactory.getSession();
+        DatasetDAO dao = new DatasetDAO();
+        
+        try {
+            EmfDataset result = (EmfDataset) strategyResult.getDetailedResultDataset();
+            EmfDataset contldInv = (EmfDataset) strategyResult.getControlledInventoryDataset();
+            
+            if (result != null) {
+                Version version = dao.getVersion(session, result.getId(), result.getDefaultVersion());
+                
+                if (version != null)
+                    updateVersion(result, version, dbServer, session, dao);
+            }
+            
+            if (contldInv != null) {
+                Version version = dao.getVersion(session, contldInv.getId(), contldInv.getDefaultVersion());
+
+
+                if (version != null)
+                    updateVersion(contldInv, version, dbServer, session, dao);
+            }
+        } catch (Exception e) {
+            throw new EmfException("Cannot update result datasets (strategy id: " + strategyResult.getControlStrategyId() + "). " + e.getMessage());
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
+    
+    private void updateVersion(EmfDataset dataset, Version version, DbServer dbServer, Session session, DatasetDAO dao) throws Exception {
+        version = dao.obtainLockOnVersion(user, version.getId(), session);
+        version.setNumberRecords((int)dao.getDatasetRecordsNumber(dbServer, session, dataset, version));
+        dao.updateVersionNReleaseLock(version, session);
     }
 
     private void removeControlStrategyResults() throws EmfException {

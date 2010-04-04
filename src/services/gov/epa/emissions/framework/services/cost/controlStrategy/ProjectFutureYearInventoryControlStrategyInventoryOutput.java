@@ -76,6 +76,7 @@ public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends Ab
                     inputDataset, datasource);
 
             setControlStrategyResultContolledInventory(result, dataset);
+            updateVersion(dataset, dbServer, sessionFactory.getSession(), user);
         } catch (Exception e) {
             failStatus(statusServices, e.getMessage());
             e.printStackTrace();
