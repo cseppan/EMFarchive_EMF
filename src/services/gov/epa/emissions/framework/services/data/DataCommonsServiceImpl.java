@@ -1053,9 +1053,14 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             
             //NOTE: currently the format definition file has to follow this column sequence:
             // name,type,default value,mandatory,description,formatter,constraints,width,spaces,fixformat start,fixformat end
+            int nRequiredFormatCols = 11;
             
             for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
                 String[] data = record.getTokens();
+                if (data.length != nRequiredFormatCols ) {
+                    throw new EmfException("Format definition file must have " + nRequiredFormatCols + " cols");
+                    
+                }
                 String type = getType(data[1], types, data[7]); //get sql data type
                 colObjs.add(new Column(data[0], type, data[2], data[3], data[4],
                         data[5], data[6], data[7], data[8], data[9], data[10]));
