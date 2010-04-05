@@ -229,6 +229,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         
         delimiter = new ComboBox("Choose one:", delimiters);
+        delimiter.setSelectedIndex(1);
         delimiter.setEnabled(false);
         addChangeable(delimiter);
         panel.add(delimiter);
