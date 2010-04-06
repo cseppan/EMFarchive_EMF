@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.DateUtil;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -169,6 +170,8 @@ public class SQLECControlScenarioQuery {
         if (inventory == null) {
             errors += "Uknown inventory dataset, " + inventoryName + ". ";
         }
+        boolean isPointInventory = inventory.getDatasetType().getName().equals(DatasetType.orlPointInventory);
+        boolean isNonPointInventory = inventory.getDatasetType().getName().equals(DatasetType.orlNonpointInventory);
         
         //make sure tolerance dataset exists
         EmfDataset detailedResult = null;
@@ -190,37 +193,61 @@ public class SQLECControlScenarioQuery {
         }
         
 //        capIsPoint = checkTableForColumns(emissionTableName(dataset), "plantid,pointid,stackid,segment");
+
+        
+        int month = inventory.applicableMonth();
+        int noOfDaysInMonth = 31;
+        if (month != -1) {
+            noOfDaysInMonth = getDaysInMonth(inventory.getYear(), month);
+        }
         
         //Outer SELECT clause
         sql = "select inv.fips,\n"
-                + "inv.plantid,\n"
-                + "inv.pointid,\n"
-                + "inv.stackid,\n"
-                + "inv.segment,\n"
+                + (isPointInventory ?
+                        "inv.plantid,\n"
+                        + "inv.pointid,\n"
+                        + "inv.stackid,\n"
+                        + "inv.segment,\n"
+                        : 
+                        ""
+                        )
                 + "inv.scc,\n"
-                + "case when gspro.species = 'PEC' then 'EC' when gspro.species = 'POC' then 'OC' end as poll,\n"
+                + "gspro.species as poll,\n"
                 + "scc.scc_description,\n"
-                + "inv.plant,\n"
-                + "inv.nei_unique_id,\n"
-                + "inv.ann_emis * gspro.massfrac as inv_ann_emis,\n"
-                + "coalesce(dr.final_emissions, inv.ann_emis) * gspro.massfrac as strat_ann_emis,\n"
-                + "inv.ann_emis * gspro.massfrac - coalesce(dr.final_emissions, inv.ann_emis) * gspro.massfrac as inv_minus_strat_emis,\n"
-                + "case when inv.ann_emis is not null and inv.ann_emis != 0.0 then (inv.ann_emis - coalesce(dr.final_emissions, inv.ann_emis)) / inv.ann_emis * 100.0 else null end as pct_diff_inv_minus_strat,\n"
+                + (isPointInventory ?
+                        "inv.plant,\n"
+                        + "inv.nei_unique_id,\n"
+                        : 
+                        ""
+                        )
+                + "coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) * gspro.massfrac as inv_ann_emis,\n"
+                + "coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * gspro.massfrac as strat_ann_emis,\n"
+                + "coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) * gspro.massfrac - coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * gspro.massfrac as inv_minus_strat_emis,\n"
+                + "case when coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) is not null and coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) != 0.0 then (coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) - coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis))) / (coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * 100.0 else null end as pct_diff_inv_minus_strat,\n"
                 + "dr.cm_abbrev,\n"
                 + "ct.name as control_technology,\n"
                 + "sg.name as source_group,\n"
-                + "dr.annual_cost,\n"
-                + "inv.design_capacity,\n"
+                + "dr.annual_cost\n"
+                + (isPointInventory ?
+                ",inv.design_capacity,\n"
                 + "inv.design_capacity_unit_numerator,\n"
-                + "inv.design_capacity_unit_denominator,\n"
-                + "inv.ANNUAL_AVG_DAYS_PER_WEEK,\n"
+                + "inv.design_capacity_unit_denominator\n"
+                : 
+                ""
+                )
+                + (isPointInventory || isNonPointInventory ?
+                ",inv.ANNUAL_AVG_DAYS_PER_WEEK,\n"
                 + "inv.ANNUAL_AVG_WEEKS_PER_YEAR,\n"
                 + "inv.ANNUAL_AVG_HOURS_PER_DAY,\n"
-                + "inv.ANNUAL_AVG_HOURS_PER_YEAR\n";
+                + "inv.ANNUAL_AVG_HOURS_PER_YEAR\n"
+                : 
+                ""
+                );
 
         sql += "from " + inventoryTableName + " inv\n"
             + "left outer join " + detailedResultTableName + " dr\n"
             + "on dr.source_id = inv.record_id\n"
+            + "and coalesce(dr.original_dataset_id, inv.dataset_id) = inv.dataset_id\n"
             + "and " + detailedResultVersion + " \n"
             + "left outer join emf.control_measures cm\n"
             + "on cm.abbreviation = dr.cm_abbrev\n"
@@ -268,8 +295,8 @@ public class SQLECControlScenarioQuery {
                 + "species,\n"
                 + "massfrac\n"
                 + "from " + table + " smk \n"
-                + "where " + version + "\n"
-                + "and species in ('PEC','POC')\n";
+                + "where " + version + "\n";
+//                + "and species in ('PEC','POC')\n";
             ++i;
         }
 
@@ -284,34 +311,51 @@ public class SQLECControlScenarioQuery {
         //add PM2_5 records
         sql += "union all\n"
             + "select inv.fips,\n"
-            + "inv.plantid,\n"
-            + "inv.pointid,\n"
-            + "inv.stackid,\n"
-            + "inv.segment,\n"
+            + (isPointInventory ?
+                    "inv.plantid,\n"
+                    + "inv.pointid,\n"
+                    + "inv.stackid,\n"
+                    + "inv.segment,\n"
+                    : 
+                    ""
+                    )
             + "inv.scc,\n"
             + "inv.poll,\n"
             + "scc.scc_description,\n"
-            + "inv.plant,\n"
-            + "inv.nei_unique_id,\n"
-            + "inv.ann_emis as inv_ann_emis,\n"
-            + "coalesce(dr.final_emissions, inv.ann_emis) as strat_ann_emis,\n"
-            + "inv.ann_emis - coalesce(dr.final_emissions, inv.ann_emis) as inv_minus_strat_emis,\n"
-            + "case when inv.ann_emis is not null and inv.ann_emis != 0.0 then (inv.ann_emis - coalesce(dr.final_emissions, inv.ann_emis)) / inv.ann_emis * 100.0 else null end as pct_diff_inv_minus_strat,\n"
+            + (isPointInventory ?
+                    "inv.plant,\n"
+                    + "inv.nei_unique_id,\n"
+                    : 
+                    ""
+                    )
+            + "coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) as inv_ann_emis,\n"
+            + "coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) as strat_ann_emis,\n"
+            + "coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) - coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) as inv_minus_strat_emis,\n"
+            + "case when coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) is not null and coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) != 0.0 then (coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) - coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis))) / (coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * 100.0 else null end as pct_diff_inv_minus_strat,\n"
             + "dr.cm_abbrev,\n"
             + "ct.name as control_technology,\n"
             + "sg.name as source_group,\n"
-            + "dr.annual_cost,\n"
-            + "inv.design_capacity,\n"
-            + "inv.design_capacity_unit_numerator,\n"
-            + "inv.design_capacity_unit_denominator,\n"
-            + "inv.ANNUAL_AVG_DAYS_PER_WEEK,\n"
-            + "inv.ANNUAL_AVG_WEEKS_PER_YEAR,\n"
-            + "inv.ANNUAL_AVG_HOURS_PER_DAY,\n"
-            + "inv.ANNUAL_AVG_HOURS_PER_YEAR\n";
+            + "dr.annual_cost\n"
+            + (isPointInventory ?
+                    ",inv.design_capacity,\n"
+                    + "inv.design_capacity_unit_numerator,\n"
+                    + "inv.design_capacity_unit_denominator\n"
+                    : 
+                    ""
+                    )
+                    + (isPointInventory || isNonPointInventory ?
+                    ",inv.ANNUAL_AVG_DAYS_PER_WEEK,\n"
+                    + "inv.ANNUAL_AVG_WEEKS_PER_YEAR,\n"
+                    + "inv.ANNUAL_AVG_HOURS_PER_DAY,\n"
+                    + "inv.ANNUAL_AVG_HOURS_PER_YEAR\n"
+                    : 
+                    ""
+                    );
 
         sql += "from " + inventoryTableName + " inv\n"
             + "left outer join " + detailedResultTableName + " dr\n"
             + "on dr.source_id = inv.record_id\n"
+            + "and coalesce(dr.original_dataset_id, inv.dataset_id) = inv.dataset_id\n"
             + "and " + detailedResultVersion + " \n"
             + "left outer join emf.control_measures cm\n"
             + "on cm.abbreviation = dr.cm_abbrev\n"
@@ -326,7 +370,13 @@ public class SQLECControlScenarioQuery {
         sql += "where inv.poll = 'PM2_5'\n"
             + "and " + inventoryVersion + "\n";
 
-        sql += "order by fips, plantid, pointid, stackid, segment, scc, poll\n";
+        sql += "order by fips"
+            + (isPointInventory ?
+                    ", plantid, pointid, stackid, segment"
+                    : 
+                    ""
+                    )
+            +", scc, poll\n";
         
 //        sql = query(sql, true);
         sql = "CREATE TABLE " + emissionDatasourceName + "." + tableName + " AS " + sql;
@@ -396,5 +446,9 @@ public class SQLECControlScenarioQuery {
                 }
         }
         return tableHasColumns;
+    }
+
+    private int getDaysInMonth(int year, int month) {
+        return month != -1 ? DateUtil.daysInZeroBasedMonth(year, month) : 31;
     }
 }

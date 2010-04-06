@@ -162,7 +162,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     
     private static final String smokeOutputAnnStateSummaryCrosstabProgram = "SMOKE output annual state summaries crosstab";
     
-    private static final String ecControlScenarioProgram = "EC Control Scenario";
+    private static final String ecControlScenarioProgram = "Estimate EC Impacts";
     
     private static final String sqlProgram = "SQL";
     
@@ -1401,7 +1401,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 if (datasets != null && datasets.length > 0) invDataset = datasets[0];
             }
             if (detailedResultIndex != -1) {
-                datasets = getDatasets(programSwitches, detailedResultIndex, programSwitches.indexOf("\n-", detailedResultIndex) != -1 ? programSwitches.indexOf("\n-", detailedResultIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
+                //check for the $TABLE[1] tag in the detailed_result tag
+                String programSwitches2 = programSwitches.replace("$TABLE[1]", origDataset.getName());
+                datasets = getDatasets(programSwitches2, detailedResultIndex, programSwitches2.indexOf("\n-", detailedResultIndex) != -1 ? programSwitches2.indexOf("\n-", detailedResultIndex) : programSwitches2.length()).toArray(new EmfDataset[0]);
                 if (datasets != null && datasets.length > 0) detailedResultDataset = datasets[0];
             }
             if (gsproIndex != -1) {

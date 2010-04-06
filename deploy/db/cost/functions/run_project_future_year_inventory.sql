@@ -346,7 +346,7 @@ BEGIN
 				' || emis_sql || ' as inv_emissions,
 --				' || emis_sql || ' as input_emis,
 --				0.0 as output_emis,
-				1,
+				0,
 				substr(inv.fips, 1, 2),
 				substr(inv.fips, 3, 3),
 				' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
@@ -471,7 +471,12 @@ BEGIN
 --		raise notice '%', sql;
 
 	IF length(sql) > 0 THEN
-		sql := sql || ' order by record_id, ranking';
+		sql := 'select distinct on (record_id)
+				record_id,proj_factor,
+				control_program_name, ranking
+			from (' || sql;
+		sql := sql || ') tbl order by record_id, ranking';
+
 		-- make sure the apply order is 1, this should be the first thing happening to a source....this is important when the controlled inventpory is created.
 		execute 
 		--raise notice '%', 
@@ -655,7 +660,13 @@ BEGIN
 
 	IF length(sql) > 0 THEN
 		raise notice '%', 'next lets do controls ' || clock_timestamp();
-		sql := sql || ' order by record_id, replacement, ranking';
+		sql := 'select distinct on (record_id)
+				record_id,ceff,rpen,reff,pri_cm_abbrev,replacement,
+				control_program_name, control_program_id,
+				control_program_technologies_count, control_program_measures_count, 
+				ranking
+			from (' || sql;
+		sql := sql || ') tbl order by record_id, replacement, ranking';
 
 		inv_percent_reduction_sql := '(coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end, 0.0) * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end, 100) / 100 ' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end, 100.0) / 100.0 ' else '' end || ')';
 		cont_packet_percent_reduction_sql := '(cont.ceff * coalesce(cont.reff, 100) / 100 * coalesce(cont.rpen, 100) / 100)';
@@ -762,7 +773,7 @@ BEGIN
 			)
 		select distinct on (inv.record_id)
 			' || detailed_result_dataset_id || '::integer,
-			coalesce(cont.pri_cm_abbrev, case when cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision then m.abbreviation else null::character varying end, ''UNKNOWNMSR'') as abbreviation,
+			coalesce(cont.pri_cm_abbrev, case when cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0 then m.abbreviation else null::character varying end, ''UNKNOWNMSR'') as abbreviation,
 			inv.poll,
 			inv.scc,
 			inv.fips,
@@ -1007,7 +1018,14 @@ BEGIN
 
 	IF length(sql) > 0 THEN
 		raise notice '%', 'next lets do caps and replacemnts ' || clock_timestamp();
-		sql := sql || ' order by record_id, allowable_type, ranking';
+
+		sql := 'select distinct on (record_id)
+				record_id,cap,replacement,allowable_type,
+				control_program_name, 
+				control_program_technologies_count, control_program_measures_count, 
+				ranking
+			from (' || sql;
+		sql := sql || ') tbl order by record_id, allowable_type, ranking';
 
 		uncontrolled_emis_sql := 
 				case 
@@ -1105,7 +1123,7 @@ BEGIN
 			' || emis_sql || ' as inv_emissions,
 	--				' || emis_sql || ' as input_emis,
 	--				0.0 as output_emis,
-			case when allowable_type = ''C'' then 4 when allowable_type = ''R'' then 5 end as apply_order,
+			case when allowable_type = ''C'' then 3 when allowable_type = ''R'' then 4 end as apply_order,
 			substr(inv.fips, 1, 2),
 			substr(inv.fips, 3, 3),
 			' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',

@@ -16,7 +16,11 @@ BEGIN
 								regexp_replace(
 									regexp_replace(
 										regexp_replace(
-											filter, 
+											regexp_replace(
+												regexp_replace(
+													filter, 
+												'avd_emis', table_alias || '.avd_emis', 'gi'), 
+											'ann_emis', table_alias || '.ann_emis', 'gi'), 
 										'scc', table_alias || '.scc', 'gi'), 
 									'fips', table_alias || '.fips', 'gi'), 
 								'plantid', table_alias || '.plantid', 'gi'), 

@@ -750,8 +750,23 @@ end
 --					and (' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' is null or ((' ||  emis_sql || ' - case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end  * (1 - ' || percent_reduction_sql || ' / 100)) / ' ||  emis_sql || ' * 100 >= ' || replacement_control_min_eff_diff_constraint || '))
 
 
+					-- make sure the new control is worthy
+					-- this is only relevant for Replacement controls, not Add-on controls or sources with no existing control
 					and (
-						((' ||  emis_sql || ') - (' || remaining_emis_sql || ')) / (' ||  emis_sql || ') * 100 >= ' || replacement_control_min_eff_diff_constraint || '
+						-- source has no existing control
+						(
+							' || case when not has_pm_target_pollutant then 'coalesce(inv.ceff, 0.0)' else 'coalesce(inv.ceff, invpm25or10.ceff, 0.0)' end || ' = 0.0
+						)
+						-- control is add-on type
+						or (
+							(coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0)
+						)
+						-- replacement control that meets the constraint, source has existing control
+						or (
+							' || case when not has_pm_target_pollutant then 'coalesce(inv.ceff, 0.0)' else 'coalesce(inv.ceff, invpm25or10.ceff, 0.0)' end || ' <> 0.0
+							and (coalesce(er.existing_measure_abbr, '''') = '''' and coalesce(er.existing_dev_code, 0) = 0)
+							and ((' ||  emis_sql || ') - (' || remaining_emis_sql || ')) / (' ||  emis_sql || ') * 100 >= ' || replacement_control_min_eff_diff_constraint || '
+						)
 					)
 
 					-- dont include measures already on the source...

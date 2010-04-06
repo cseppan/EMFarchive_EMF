@@ -11,6 +11,7 @@ DECLARE
 	inv_has_naics_column boolean := false;
 	inv_has_mact_column boolean := false;
 	control_packet_has_mact_column boolean := false;
+	control_packet_has_naics_column boolean := false;
 	sql text := '';
 BEGIN
 
@@ -22,6 +23,9 @@ BEGIN
 
 	-- see if there is a mact column in the control packet
 	control_packet_has_mact_column := public.check_table_for_columns(control_program_table_name, 'mact', ',');
+
+	-- see if there is a naics column in the control packet
+	control_packet_has_naics_column := public.check_table_for_columns(control_program_table_name, 'naics', ',');
 
 	-- see if there is a sic column in the inventory
 	inv_has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
@@ -57,6 +61,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 
 			and ' || where_filter || '
@@ -88,6 +93,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			
 			and ' || where_filter || '
@@ -118,6 +124,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -146,6 +153,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -174,6 +182,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -203,6 +212,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			and proj.mact is not null
 			and ' || where_filter || '
 
@@ -231,6 +241,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -261,6 +272,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -290,6 +302,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -318,6 +331,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -346,6 +360,7 @@ BEGIN
 			and proj.poll is null
 			and proj.sic is null
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			and ' || where_filter || '
 
 
@@ -372,6 +387,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -400,6 +416,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			and proj.mact is not null
 			and ' || where_filter || '
 
@@ -427,6 +444,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -458,6 +476,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			and proj.mact is not null
 			and ' || where_filter || '
 
@@ -486,6 +505,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			and proj.mact is not null
 			and ' || where_filter || '
 
@@ -512,6 +532,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			and proj.mact is not null
 			and ' || where_filter || '
 
@@ -537,6 +558,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			and proj.mact is not null
 			and ' || where_filter || '
 
@@ -565,6 +587,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			and proj.mact is not null
 			and ' || where_filter || '
 
@@ -592,6 +615,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			and proj.mact is not null
 			and ' || where_filter || '
 
@@ -617,6 +641,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			and proj.mact is not null
 			and ' || where_filter || '
 
@@ -641,10 +666,253 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			and proj.mact is not null
 			and ' || where_filter || '
 
 		' else '' end || '
+
+
+
+/*
+25.01	Country/State/County code, NAICS code, 8-digit SCC code, pollutant	point, nonpoint	control, projection
+25.02	Country/State/County code, NAICS code, pollutant	point, nonpoint	control, projection
+25.03	Country/State code, NAICS code, 8-digit SCC code, pollutant	point, nonpoint	control, projection
+25.04	Country/State code, NAICS code, pollutant	point, nonpoint	control, projection
+25.05	NAICS code, 8-digit SCC code, pollutant	point, nonpoint	control, projection
+25.06	NAICS code, pollutant	point, nonpoint	control, projection
+25.07	Country/State/County code, NAICS code, 8-digit SCC code	point, nonpoint	control, projection
+25.08	Country/State/County code, NAICS code	point, nonpoint	control, projection
+25.09	Country/State code, NAICS code, 8-digit SCC code	point, nonpoint	control, projection
+25.10	Country/State code, NAICS code	point, nonpoint	control, projection
+25.11	NAICS code, 8-digit SCC code	point, nonpoint	control, projection
+25.12	NAICS code	point, nonpoint	control, projection
+*/
+
+
+
+		' || case when inv_has_naics_column and control_packet_has_naics_column then '
+		--25.01,25.03 - Country/State/County code or Country/State code, NAICS code, 8-digit SCC code, pollutant
+		union all
+		select 
+			inv.record_id,' || select_columns || '
+			case 
+				when (proj.fips is not null) and (length(proj.fips) = 5 or length(proj.fips) = 6) and (proj.naics is not null) and (proj.scc is not null) and (proj.poll is not null) then 25.01::double precision
+				when (proj.fips is not null) and (length(proj.fips) = 2 or length(proj.fips) = 3) and (proj.naics is not null) and (proj.scc is not null) and (proj.poll is not null) then 25.03::double precision
+			end as ranking
+		FROM emissions.' || control_program_table_name || ' proj
+			inner join emissions.' || inv_table_name || ' inv
+					
+			on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2) or (substr(proj.fips,3,3) = ''000'' and substr(proj.fips, 1, 2) = substr(inv.fips, 1, 2)))
+			and proj.naics = inv.naics
+			and proj.scc = inv.scc
+			and proj.poll = inv.poll
+
+		where proj.fips is not null 
+			and proj.plantid is null 
+			and proj.pointid is null 
+			and proj.stackid is null 
+			and proj.segment is null 
+			and proj.scc is not null
+			and proj.poll is not null
+			and proj.sic is null
+			and proj.naics is not null
+			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
+			and ' || where_filter || '
+
+
+		--25.02,25.04 - Country/State/County code or Country/State code, NAICS code, pollutant
+		union all
+		select 
+			inv.record_id,' || select_columns || '
+			case 
+				when (proj.fips is not null) and (length(proj.fips) = 5 or length(proj.fips) = 6) and (proj.naics is not null) and (proj.poll is not null) then 25.02::double precision
+				when (proj.fips is not null) and (length(proj.fips) = 2 or length(proj.fips) = 3) and (proj.naics is not null) and (proj.poll is not null) then 25.04::double precision
+			end as ranking
+		FROM emissions.' || control_program_table_name || ' proj
+			inner join emissions.' || inv_table_name || ' inv
+					
+			on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2) or (substr(proj.fips,3,3) = ''000'' and substr(proj.fips, 1, 2) = substr(inv.fips, 1, 2)))
+			and proj.naics = inv.naics
+			and proj.poll = inv.poll
+
+		where proj.fips is not null 
+			and proj.plantid is null 
+			and proj.pointid is null 
+			and proj.stackid is null 
+			and proj.segment is null 
+			and proj.scc is null
+			and proj.poll is not null
+			and proj.sic is null
+			and proj.naics is not null
+			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
+			and ' || where_filter || '
+
+
+		--25.05 - NAICS code, 8-digit SCC code, pollutant
+		union all
+		select 
+			inv.record_id,' || select_columns || '
+			case 
+				when (proj.naics is not null) and (proj.scc is not null) and (proj.poll is not null) then 25.05::double precision
+			end as ranking
+		FROM emissions.' || control_program_table_name || ' proj
+			inner join emissions.' || inv_table_name || ' inv
+					
+			on proj.naics = inv.naics
+			and proj.scc = inv.scc
+			and proj.poll = inv.poll
+
+		where proj.fips is null 
+			and proj.plantid is null 
+			and proj.pointid is null 
+			and proj.stackid is null 
+			and proj.segment is null 
+			and proj.scc is not null 
+			and proj.poll is not null
+			and proj.sic is null
+			and proj.naics is not null
+			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
+			and ' || where_filter || '
+
+
+		--25.06 - NAICS code, pollutant
+		union all
+		select 
+			inv.record_id,' || select_columns || '
+			case 
+				when (proj.naics is not null) and (proj.poll is not null) then 25.06::double precision
+			end as ranking
+		FROM emissions.' || control_program_table_name || ' proj
+			inner join emissions.' || inv_table_name || ' inv
+					
+			on proj.naics = inv.naics
+			and proj.poll = inv.poll
+
+		where proj.fips is null 
+			and proj.plantid is null 
+			and proj.pointid is null 
+			and proj.stackid is null 
+			and proj.segment is null 
+			and proj.scc is null 
+			and proj.poll is not null
+			and proj.sic is null
+			and proj.naics is not null
+			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
+			and ' || where_filter || '
+
+
+		--25.07,25.09 - Country/State/County code or Country/State code, NAICS code, 8-digit SCC code
+		union all
+		select 
+			inv.record_id,' || select_columns || '
+			case 
+				when (proj.fips is not null) and (length(proj.fips) = 5 or length(proj.fips) = 6) and (proj.naics is not null) and (proj.scc is not null) then 25.07::double precision
+				when (proj.fips is not null) and (length(proj.fips) = 2 or length(proj.fips) = 3) and (proj.naics is not null) and (proj.scc is not null) then 25.09::double precision
+			end as ranking
+		FROM emissions.' || control_program_table_name || ' proj
+			inner join emissions.' || inv_table_name || ' inv
+					
+			on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2) or (substr(proj.fips,3,3) = ''000'' and substr(proj.fips, 1, 2) = substr(inv.fips, 1, 2)))
+			and proj.naics = inv.naics
+			and proj.scc = inv.scc
+
+		where proj.fips is not null 
+			and proj.plantid is null 
+			and proj.pointid is null 
+			and proj.stackid is null 
+			and proj.segment is null 
+			and proj.scc is not null
+			and proj.poll is null
+			and proj.sic is null
+			and proj.naics is not null
+			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
+			and ' || where_filter || '
+
+
+		--25.08,25.10 - Country/State/County code or Country/State code, NAICS code
+		union all
+		select 
+			inv.record_id,' || select_columns || '
+			case 
+				when (proj.fips is not null) and (length(proj.fips) = 5 or length(proj.fips) = 6) and (proj.naics is not null) then 25.08::double precision
+				when (proj.fips is not null) and (length(proj.fips) = 2 or length(proj.fips) = 3) and (proj.naics is not null) then 25.10::double precision
+			end as ranking
+		FROM emissions.' || control_program_table_name || ' proj
+			inner join emissions.' || inv_table_name || ' inv
+					
+			on (proj.fips = inv.fips or proj.fips = substr(inv.fips, 1, 2) or (substr(proj.fips,3,3) = ''000'' and substr(proj.fips, 1, 2) = substr(inv.fips, 1, 2)))
+			and proj.naics = inv.naics
+
+		where proj.fips is not null 
+			and proj.plantid is null 
+			and proj.pointid is null 
+			and proj.stackid is null 
+			and proj.segment is null 
+			and proj.scc is null
+			and proj.poll is null
+			and proj.sic is null
+			and proj.naics is not null
+			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
+			and ' || where_filter || '
+
+
+		--25.11 - NAICS code, 8-digit SCC code
+		union all
+		select 
+			inv.record_id,' || select_columns || '
+			case 
+				when (proj.naics is not null) and (proj.scc is not null) then 25.11::double precision
+			end as ranking
+		FROM emissions.' || control_program_table_name || ' proj
+			inner join emissions.' || inv_table_name || ' inv
+					
+			on proj.naics = inv.naics
+			and proj.scc = inv.scc
+
+		where proj.fips is null 
+			and proj.plantid is null 
+			and proj.pointid is null 
+			and proj.stackid is null 
+			and proj.segment is null 
+			and proj.scc is not null 
+			and proj.poll is null
+			and proj.sic is null
+			and proj.naics is not null
+			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
+			and ' || where_filter || '
+
+
+		--25.12 - NAICS code
+		union all
+		select 
+			inv.record_id,' || select_columns || '
+			case 
+				when (proj.naics is not null) then 25.12::double precision
+			end as ranking
+		FROM emissions.' || control_program_table_name || ' proj
+			inner join emissions.' || inv_table_name || ' inv
+					
+			on proj.naics = inv.naics
+
+		where proj.fips is null 
+			and proj.plantid is null 
+			and proj.pointid is null 
+			and proj.stackid is null 
+			and proj.segment is null 
+			and proj.scc is null 
+			and proj.poll is null
+			and proj.sic is null
+			and proj.naics is not null
+			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
+			and ' || where_filter || '
+
+		' else '' end || '
+
+
+
+
+
 
 		' || case when inv_has_sic_column then '
 		--25.5,27.5 - Country/State/County code or Country/State code, 8-digit SCC code, 4-digit SIC code, pollutant
@@ -671,6 +939,7 @@ BEGIN
 			and proj.scc is not null
 			and proj.poll is not null
 			and proj.sic is not null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -698,6 +967,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is not null
 			and proj.sic is not null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -724,6 +994,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is not null
 			and proj.sic is not null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -749,6 +1020,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is not null
 			and proj.sic is not null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -776,6 +1048,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is null
 			and proj.sic is not null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -802,6 +1075,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is null
 			and proj.sic is not null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -827,6 +1101,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is null
 			and proj.sic is not null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -851,6 +1126,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is null
 			and proj.sic is not null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -879,6 +1155,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -904,6 +1181,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -930,6 +1208,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -954,6 +1233,7 @@ BEGIN
 			and proj.scc is not null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -980,6 +1260,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -1005,6 +1286,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '
 
@@ -1029,6 +1311,7 @@ BEGIN
 			and proj.scc is null 
 			and proj.poll is not null
 			and proj.sic is null
+			' || case when control_packet_has_naics_column then 'and proj.naics is null' else '' end || '
 			' || case when control_packet_has_mact_column then 'and proj.mact is null' else '' end || '
 			and ' || where_filter || '';
 	return sql;

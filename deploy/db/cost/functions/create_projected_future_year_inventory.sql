@@ -517,7 +517,7 @@ BEGIN
 		) cont
 		on inv.record_id = cont.source_id
 
-		-- deal with caps and replacements, an apply order of 4 and 5 delineates a control, only get the cap if there are both a cap and replacement...
+		-- deal with caps and replacements, an apply order of 3 and 4 delineates a control, only get the cap if there are both a cap and replacement...
 		-- the distinct on source id and order by source_id, apply_order makes sure the cap is the first one to use 
 		left outer join (
 
@@ -527,7 +527,7 @@ BEGIN
 				cm_abbrev, 
 				adj_factor
 			FROM emissions.' || detailed_result_table_name || '
-			where apply_order in (4,5)
+			where apply_order in (3,4)
 			order by source_id, apply_order
 
 		) cr
@@ -540,7 +540,7 @@ BEGIN
 			select 1 
 			from emissions.' || detailed_result_table_name || ' dr
 			where inv.record_id = dr.source_id
-				and cm_abbrev = ''PLTCLOSURE'')';
+				and apply_order = 0)';
 
 END;
 $BODY$

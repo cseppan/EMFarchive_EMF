@@ -52,6 +52,7 @@ BEGIN
 					poll = case when poll is null or trim(poll) = ''0'' or trim(poll) = ''-9'' or trim(poll) = '''' then null::character varying(16) else poll end,
 					mact = case when mact is null or trim(mact) = ''0'' or trim(mact) = ''-9'' or trim(mact) = '''' then null::character varying(6) else mact end,
 					sic = case when sic is null or trim(sic) = ''0'' or trim(sic) = ''-9'' or trim(sic) = '''' then null::character varying(4) else sic end,
+					naics = case when naics is null or trim(naics) = ''0'' or trim(naics) = ''-9'' or trim(naics) = '''' then null::character varying(6) else naics end,
 					pri_cm_abbrev = case when pri_cm_abbrev is null or trim(pri_cm_abbrev) = ''0'' or trim(pri_cm_abbrev) = ''-9'' or trim(pri_cm_abbrev) = '''' then null::character varying(4) else pri_cm_abbrev end 
 				where trim(plantid) in (''0'',''-9'','''')
 					or trim(pointid) in (''0'',''-9'','''')
@@ -62,6 +63,7 @@ BEGIN
 					or trim(poll) in (''0'',''-9'','''')
 					or trim(mact) in (''0'',''-9'','''')
 					or trim(sic) in (''0'',''-9'','''') 
+					or trim(naics) in (''0'',''-9'','''') 
 					or trim(pri_cm_abbrev) in (''0'',''-9'','''');';
 
 /*
@@ -135,7 +137,8 @@ vacuum analyze emissions.ds_deletions_2005_1050880615;
 					scc = case when scc is null or trim(scc) = ''0'' or trim(scc) = ''-9'' or trim(scc) = '''' then null::character varying(10) else scc end,
 					poll = case when poll is null or trim(poll) = ''0'' or trim(poll) = ''-9'' or trim(poll) = '''' then null::character varying(16) else poll end,
 					mact = case when mact is null or trim(mact) = ''0'' or trim(mact) = ''-9'' or trim(mact) = '''' then null::character varying(6) else mact end,
-					sic = case when sic is null or trim(sic) = ''0'' or trim(sic) = ''-9'' or trim(sic) = '''' then null::character varying(4) else sic end 
+					sic = case when sic is null or trim(sic) = ''0'' or trim(sic) = ''-9'' or trim(sic) = '''' then null::character varying(4) else sic end,
+					naics = case when naics is null or trim(naics) = ''0'' or trim(naics) = ''-9'' or trim(naics) = '''' then null::character varying(6) else naics end
 				where trim(plantid) in (''0'',''-9'','''')
 					or trim(pointid) in (''0'',''-9'','''')
 					or trim(stackid) in (''0'',''-9'','''')
@@ -144,7 +147,8 @@ vacuum analyze emissions.ds_deletions_2005_1050880615;
 					or trim(scc) in (''0'',''-9'','''')
 					or trim(poll) in (''0'',''-9'','''')
 					or trim(mact) in (''0'',''-9'','''')
-					or trim(sic) in (''0'',''-9'','''');';
+					or trim(sic) in (''0'',''-9'','''')
+					or trim(naics) in (''0'',''-9'','''');';
 
 
 		-- look at the cap control program table format (make sure all the right columns are in the table)
@@ -160,7 +164,8 @@ vacuum analyze emissions.ds_deletions_2005_1050880615;
 					scc = case when scc is null or trim(scc) = ''0'' or trim(scc) = ''-9'' or trim(scc) = '''' then null::character varying(10) else scc end,
 					poll = case when poll is null or trim(poll) = ''0'' or trim(poll) = ''-9'' or trim(poll) = '''' then null::character varying(16) else poll end,
 --					mact = case when mact is null or trim(mact) = ''0'' or trim(mact) = ''-9'' or trim(mact) = '''' then null::character varying(6) else mact end,
-					sic = case when sic is null or trim(sic) = ''0'' or trim(sic) = ''-9'' or trim(sic) = '''' then null::character varying(4) else sic end 
+					sic = case when sic is null or trim(sic) = ''0'' or trim(sic) = ''-9'' or trim(sic) = '''' then null::character varying(4) else sic end,
+					naics = case when naics is null or trim(naics) = ''0'' or trim(naics) = ''-9'' or trim(naics) = '''' then null::character varying(6) else naics end
 				where trim(plantid) in (''0'',''-9'','''')
 					or trim(pointid) in (''0'',''-9'','''')
 					or trim(stackid) in (''0'',''-9'','''')

@@ -1,8 +1,8 @@
 /*
  * $Source: /home/catherine/Projects/emf_cvs/cvs_repo/EMF/src/client/gov/epa/emissions/framework/client/cost/controlmeasure/ControlMeasurePDFReportGenerator.java,v $
- * $Revision: 1.3 $
- * $Author: qunhe $
- * $Date: 2010/03/18 14:42:06 $
+ * $Revision: 1.4 $
+ * $Author: ddelvecchio $
+ * $Date: 2010/04/06 05:33:08 $
  */
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
@@ -434,7 +434,7 @@ public class ControlMeasurePDFReportGenerator {
                 labelCell.setBorderColor(borderColor);
                 topTable.addCell(labelCell);
 
-                PdfPCell valueCell = new PdfPCell(new Phrase("<Equation Name Goes Here>", REGULAR_FONT));
+                PdfPCell valueCell = new PdfPCell(new Phrase(equation.getEquationType().getName(), REGULAR_FONT));
                 valueCell.setHorizontalAlignment(Element.ALIGN_LEFT);
                 valueCell.setVerticalAlignment(Element.ALIGN_CENTER);
                 valueCell.setPadding(5);
@@ -448,7 +448,21 @@ public class ControlMeasurePDFReportGenerator {
                 labelCell.setBorderColor(borderColor);
                 topTable.addCell(labelCell);
 
-                valueCell = new PdfPCell(new Phrase("<Equation Description Goes Here>", REGULAR_FONT));
+                valueCell = new PdfPCell(new Phrase(equation.getEquationType().getDescription(), REGULAR_FONT));
+                valueCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                valueCell.setVerticalAlignment(Element.ALIGN_CENTER);
+                valueCell.setPadding(5);
+                valueCell.setBorderColor(borderColor);
+                topTable.addCell(valueCell);
+
+                labelCell = new PdfPCell(new Phrase("Inventory Fields:", BOLD_FONT));
+                labelCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                labelCell.setVerticalAlignment(Element.ALIGN_CENTER);
+                labelCell.setPadding(5);
+                labelCell.setBorderColor(borderColor);
+                topTable.addCell(labelCell);
+
+                valueCell = new PdfPCell(new Phrase(equation.getEquationType().getInventoryFields() + "", REGULAR_FONT));
                 valueCell.setHorizontalAlignment(Element.ALIGN_LEFT);
                 valueCell.setVerticalAlignment(Element.ALIGN_CENTER);
                 valueCell.setPadding(5);
@@ -462,7 +476,7 @@ public class ControlMeasurePDFReportGenerator {
                 labelCell.setBorderColor(borderColor);
                 topTable.addCell(labelCell);
 
-                valueCell = new PdfPCell(new Phrase("<Equation Formula Goes Here>", REGULAR_FONT));
+                valueCell = new PdfPCell(new Phrase(equation.getEquationType().getEquation() + "", REGULAR_FONT));
                 valueCell.setHorizontalAlignment(Element.ALIGN_LEFT);
                 valueCell.setVerticalAlignment(Element.ALIGN_CENTER);
                 valueCell.setPadding(5);
@@ -473,17 +487,9 @@ public class ControlMeasurePDFReportGenerator {
 
                 borderColor = COLORED_BORDER;
 
-                PdfPTable table = new PdfPTable(3);
+                PdfPTable table = new PdfPTable(2);
                 table.setWidthPercentage(100);
-                table.setWidths(new float[] { 1, 3, 2 });
-
-                PdfPCell typeCell = new PdfPCell(new Phrase("Equations Type", BOLD_FONT));
-                typeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                typeCell.setVerticalAlignment(Element.ALIGN_CENTER);
-                typeCell.setPadding(5);
-                typeCell.setBackgroundColor(BaseColor.GRAY.brighter());
-                typeCell.setBorderColor(borderColor);
-                table.addCell(typeCell);
+                table.setWidths(new float[] { 4, 2 });
 
                 PdfPCell variableNameCell = new PdfPCell(new Phrase("Variable Name", BOLD_FONT));
                 variableNameCell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -504,14 +510,6 @@ public class ControlMeasurePDFReportGenerator {
                 /*
                  * add Pollutant
                  */
-                String equationName = equation.getEquationType().getName();
-                typeCell = new PdfPCell(new Phrase(equationName, REGULAR_FONT));
-                typeCell.setHorizontalAlignment(Element.ALIGN_LEFT);
-                typeCell.setVerticalAlignment(Element.ALIGN_CENTER);
-                typeCell.setPadding(5);
-                typeCell.setBorderColor(borderColor);
-                table.addCell(typeCell);
-
                 variableNameCell = new PdfPCell(new Phrase("Pollutant", REGULAR_FONT));
                 variableNameCell.setHorizontalAlignment(Element.ALIGN_LEFT);
                 variableNameCell.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -529,13 +527,6 @@ public class ControlMeasurePDFReportGenerator {
                 /*
                  * add Cost Year
                  */
-                typeCell = new PdfPCell(new Phrase(equationName, REGULAR_FONT));
-                typeCell.setHorizontalAlignment(Element.ALIGN_LEFT);
-                typeCell.setVerticalAlignment(Element.ALIGN_CENTER);
-                typeCell.setPadding(5);
-                typeCell.setBorderColor(borderColor);
-                table.addCell(typeCell);
-
                 variableNameCell = new PdfPCell(new Phrase("Cost Year", REGULAR_FONT));
                 variableNameCell.setHorizontalAlignment(Element.ALIGN_LEFT);
                 variableNameCell.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -590,13 +581,6 @@ public class ControlMeasurePDFReportGenerator {
                     default:
                         break;
                     }
-
-                    typeCell = new PdfPCell(new Phrase(equationName, REGULAR_FONT));
-                    typeCell.setHorizontalAlignment(Element.ALIGN_LEFT);
-                    typeCell.setVerticalAlignment(Element.ALIGN_CENTER);
-                    typeCell.setPadding(5);
-                    typeCell.setBorderColor(borderColor);
-                    table.addCell(typeCell);
 
                     variableNameCell = new PdfPCell(new Phrase(variableName, REGULAR_FONT));
                     variableNameCell.setHorizontalAlignment(Element.ALIGN_LEFT);

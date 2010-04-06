@@ -647,9 +647,23 @@ BEGIN
 			-- dont include sources that have been fully controlled...
 			and coalesce(100 * inv.ceff / 100 * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end || ', 0) <> 100.0
 
-			-- make sure the new control is worthy, compare existing emis with new resulting emis, see if you get required percent decrease in emissions ((orig emis - new resulting emis) / orig emis * 100 ...
+			-- make sure the new control is worthy
+			-- this is only relevant for Replacement controls, not Add-on controls or sources with no existing control
 			and (
-				((' ||  emis_sql || ') - (' || remaining_emis_sql || ')) / (' ||  emis_sql || ') * 100 >= ' || replacement_control_min_eff_diff_constraint || '
+				-- source has no existing control
+				(
+					coalesce(inv.ceff, 0.0) = 0.0
+				)
+				-- control is add-on type
+				or (
+					(coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0)
+				)
+				-- replacement control that meets the constraint, source has existing control
+				or (
+					coalesce(inv.ceff, 0.0) <> 0.0
+					and (coalesce(er.existing_measure_abbr, '''') = '''' and coalesce(er.existing_dev_code, 0) = 0)
+					and ((' ||  emis_sql || ') - (' || remaining_emis_sql || ')) / (' ||  emis_sql || ') * 100 >= ' || replacement_control_min_eff_diff_constraint || '
+				)
 			)
 
 			-- dont include measures already on the source...

@@ -196,6 +196,7 @@ public class StrategyTask extends AbstractStrategyTask {
                 indexTable(tableName, "segment", "segment");
                 indexTable(tableName, "sic", "sic");
                 indexTable(tableName, "stackid", "stackid");
+                indexTable(tableName, "naics", "naics");
 
                 analyzeTable(qualifiedTableName);
            }
@@ -211,6 +212,7 @@ public class StrategyTask extends AbstractStrategyTask {
                 indexTable(tableName, "segment", "segment");
                 indexTable(tableName, "sic", "sic");
                 indexTable(tableName, "stackid", "stackid");
+                indexTable(tableName, "naics", "naics");
 
                 analyzeTable(qualifiedTableName);
            }
@@ -226,6 +228,7 @@ public class StrategyTask extends AbstractStrategyTask {
                 indexTable(tableName, "segment", "segment");
                 indexTable(tableName, "sic", "sic");
                 indexTable(tableName, "stackid", "stackid");
+                indexTable(tableName, "naics", "naics");
 
                 analyzeTable(qualifiedTableName);
             }

@@ -139,8 +139,6 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(5,10,10,10)); 
-        mainPanel.add(new JLabel("Specify EITHER an emission reduction (tons) or percent reduction (%) for the Target Pollutant:"),
-           BorderLayout.WEST);
 
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -253,8 +251,8 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
                 throw new EmfException("Constraints Tab: The replacement control minimum control efficiencny difference is missing.");
             if (constraint.getDomainWideEmisReduction() == null && constraint.getDomainWidePctReduction() == null) 
                 throw new EmfException("Constraints Tab: Please specify either an emission reduction or percent reduction.");
-            if (constraint.getDomainWideEmisReduction() != null && constraint.getDomainWidePctReduction() != null) 
-                throw new EmfException("Constraints Tab: Specify only an emission reduction or a percent reduction.");
+//            if (constraint.getDomainWideEmisReduction() != null && constraint.getDomainWidePctReduction() != null) 
+//                throw new EmfException("Constraints Tab: Specify only an emission reduction or a percent reduction.");
         }
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.leastCostCurve)) {
             //make sure that the Pct Reduction Increment was specified for the Least Cost Curve.  This is needed for the run.
@@ -346,20 +344,44 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         if (strategyType != null) {
             if (strategyType.getName().equals(StrategyType.leastCost)) {
                 leastCostPanelContainer.add(leastCostPanel, BorderLayout.NORTH);
+                emisReduction.setEnabled(true);
+                contrlEff.setEnabled(true);
+                costPerTon.setEnabled(true);
+                annCost.setEnabled(true);
                 replacementControlMinEfficiencyDiff.setEnabled(true);
             } else if (strategyType.getName().equals(StrategyType.leastCostCurve)) {
                 leastCostPanelContainer.add(leastCostCurvePanel, BorderLayout.NORTH);
+                emisReduction.setEnabled(true);
+                contrlEff.setEnabled(true);
+                costPerTon.setEnabled(true);
+                annCost.setEnabled(true);
                 replacementControlMinEfficiencyDiff.setEnabled(true);
             } else if (strategyType.getName().equals(StrategyType.maxEmissionsReduction)) {
+                emisReduction.setEnabled(true);
+                contrlEff.setEnabled(true);
+                costPerTon.setEnabled(true);
+                annCost.setEnabled(true);
                 replacementControlMinEfficiencyDiff.setEnabled(true);
             } else if (strategyType.getName().equals(StrategyType.projectFutureYearInventory)) {
                 leastCostPanelContainer.add(controlProgramPanel, BorderLayout.NORTH);
+                emisReduction.setEnabled(false);
+                contrlEff.setEnabled(false);
+                costPerTon.setEnabled(false);
+                annCost.setEnabled(false);
                 replacementControlMinEfficiencyDiff.setEnabled(false);
             } else {
+                emisReduction.setEnabled(true);
+                contrlEff.setEnabled(true);
+                costPerTon.setEnabled(true);
+                annCost.setEnabled(true);
                 replacementControlMinEfficiencyDiff.setEnabled(false);
             }
         } else {
             replacementControlMinEfficiencyDiff.setEnabled(false);
+            emisReduction.setEnabled(true);
+            contrlEff.setEnabled(true);
+            costPerTon.setEnabled(true);
+            annCost.setEnabled(true);
         }
     }
 
