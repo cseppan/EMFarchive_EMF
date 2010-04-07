@@ -97,11 +97,15 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         String currentRunStatus = service().getStrategyRunStatus(controlStrategy.getId());
         if (currentRunStatus == null) currentRunStatus = "Not Started";
         controlStrategy.setRunStatus(currentRunStatus);
+        
+        ControlStrategy loadedStrategy = service().getById(controlStrategy.getId());
 
         saveTabs(controlStrategy);
         validateName(controlStrategy);
         controlStrategy.setCreator(session.user());
         controlStrategy.setLastModifiedDate(new Date());
+        controlStrategy.setTotalCost(loadedStrategy.getTotalCost());
+        controlStrategy.setTotalReduction(loadedStrategy.getTotalReduction());
         controlStrategy = service().updateControlStrategyWithLock(controlStrategy);
 //        managerPresenter.doRefresh();
     }

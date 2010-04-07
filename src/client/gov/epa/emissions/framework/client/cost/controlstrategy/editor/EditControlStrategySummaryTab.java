@@ -21,7 +21,6 @@ import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
-import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.DoubleTextField;
 import gov.epa.emissions.framework.ui.IntTextField;
@@ -493,7 +492,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     public void setRunMessage(ControlStrategy controlStrategy) {
         messagePanel.clear();
         updateStartDate(controlStrategy);
-        updateSummaryPanelValuesExceptStartDate("Running", "", "", "");
+        updateSummaryPanelValuesExceptStartDate("Running", "", null, null);
     }
 
     public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
@@ -517,11 +516,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         String runStatus = controlStrategy.getRunStatus(); //summary.getRunStatus();
         if (controlStrategyResults == null || controlStrategyResults.length == 0) {
             updateStartDate(controlStrategy);
-            updateSummaryPanelValuesExceptStartDate(""+runStatus, "", "", "");
+            updateSummaryPanelValuesExceptStartDate(""+runStatus, "", null, null);
             return;
         }
-        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
-        summary.getCompletionTime();
+//        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
+//        summary.getCompletionTime();
         
         String completionTime; 
         if (runStatus.indexOf("Finished") == -1 )
@@ -533,8 +532,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         Date startTime = controlStrategy.getStartDate()== null? null:controlStrategy.getStartDate();
         updateStartDate(startTime);
         
-        updateSummaryPanelValuesExceptStartDate(""+completionTime, "" + userName , "" + summary.getStrategyTotalCost(), 
-                ""+ summary.getStrategyTotalReduction());
+        updateSummaryPanelValuesExceptStartDate(""+completionTime, "" + userName , controlStrategy.getTotalCost(), 
+                controlStrategy.getTotalReduction());
     }
 
     private void updateStartDate(Date startTime) {
@@ -547,11 +546,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         startDate.setText((startDateString == null ||startDateString.trim()=="" ? "Not started" : startDateString));
     }
 
-    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName,  String cost, String emisReduction) {
+    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName,  Double cost, Double emisReduction) {
         completionDate.setText(closeDate);
         user.setText(userName);
-        costValue.setText(cost.length() == 0 ? "" : "$" + decFormat.format(new Double(cost)));
-        emissionReductionValue.setText(emisReduction.length() == 0 ? "" : decFormat.format(new Double(emisReduction)));
+        costValue.setText(cost == null ? "" : "$" + decFormat.format(cost));
+        emissionReductionValue.setText(emisReduction == null ? "" : decFormat.format(emisReduction));
     }
 
     public void stopRun() {

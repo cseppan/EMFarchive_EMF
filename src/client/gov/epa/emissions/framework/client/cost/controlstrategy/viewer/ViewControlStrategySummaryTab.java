@@ -511,7 +511,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
         clearMessage();
 
         updateStartDate(controlStrategy);
-        updateSummaryPanelValuesExceptStartDate("Running", "", "", "");
+        updateSummaryPanelValuesExceptStartDate("Running", "", null, null);
     }
 
     public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
@@ -533,7 +533,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
         String runStatus = controlStrategy.getRunStatus(); // summary.getRunStatus();
         if (controlStrategyResults == null || controlStrategyResults.length == 0) {
             updateStartDate(controlStrategy);
-            updateSummaryPanelValuesExceptStartDate("" + runStatus, "", "", "");
+            updateSummaryPanelValuesExceptStartDate("" + runStatus, "", null, null);
             return;
         }
         ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
@@ -550,7 +550,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
         updateStartDate(startTime);
 
         updateSummaryPanelValuesExceptStartDate("" + completionTime, "" + userName,
-                "" + summary.getStrategyTotalCost(), "" + summary.getStrategyTotalReduction());
+                controlStrategy.getTotalCost(), controlStrategy.getTotalReduction());
     }
 
     private void updateStartDate(Date startTime) {
@@ -563,12 +563,12 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
         startDate.setText((startDateString == null || startDateString.trim() == "" ? "Not started" : startDateString));
     }
 
-    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName, String cost,
-            String emisReduction) {
+    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName, Double cost,
+            Double reduction) {
         completionDate.setText(closeDate);
         user.setText(userName);
-        costValue.setText(cost.length() == 0 ? "" : "$" + decFormat.format(new Double(cost)));
-        emissionReductionValue.setText(emisReduction.length() == 0 ? "" : decFormat.format(new Double(emisReduction)));
+        costValue.setText(cost == null ? "" : "$" + decFormat.format(cost));
+        emissionReductionValue.setText(reduction == null ? "" : decFormat.format(reduction));
     }
 
     public void stopRun() {

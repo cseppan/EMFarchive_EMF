@@ -162,6 +162,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             try {
                 afterRun();
                 updateVersionInfo();
+                updateStrategy();
             } catch (Exception e) {
                 status = "Failed. Error processing input dataset";
                 e.printStackTrace();
@@ -178,6 +179,32 @@ public abstract class AbstractStrategyTask implements Strategy {
         
         for (ControlStrategyResult result : results)
             updateResultDataset(result);
+    }
+    
+    protected void updateStrategy() throws EmfException {
+        double totalCost = 0;
+        double totalReduction = 0;
+        
+        for (ControlStrategyResult result: strategyResultList) {
+            totalCost += result.getTotalCost() != null ? result.getTotalCost() : 0.0;
+            totalReduction += result.getTotalReduction() != null ? result.getTotalReduction() : 0.0;
+        }
+        
+        controlStrategy.setTotalCost(new Double(totalCost));
+        controlStrategy.setTotalReduction(new Double(totalReduction));
+        
+        Session session = sessionFactory.getSession();
+        
+        try {
+            controlStrategyDAO.updateWithLock(controlStrategy, session); //NOTE: user should have lock at this time
+            System.out.println("totalCost: " + totalCost + "  totalReduciton: " + totalReduction);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException("Error updating control strategy's total cost and reduction. " + e.getMessage());
+        } finally {
+            if (session != null && session.isConnected())
+                session.clear();
+        }
     }
 
     protected void deleteStrategyResults() throws EmfException {

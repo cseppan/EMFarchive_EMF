@@ -12,6 +12,8 @@
 	<property name="description" column="description" type="java.lang.String"/>
 	<property name="runStatus" column="run_status"	type="java.lang.String"/>
 	<property name="discountRate" column="discount_rate" type="double"/>
+	<property name="totalCost" column="total_cost" type="double"/>
+	<property name="totalReduction" column="reduction" type="double"/>
 	<property name="costYear" column="cost_year" type="integer" not-null="false"/>
 	<property name="inventoryYear" column="analysis_year" type="integer" not-null="false"/>
 	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
