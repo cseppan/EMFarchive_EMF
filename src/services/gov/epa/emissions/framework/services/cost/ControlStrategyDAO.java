@@ -116,7 +116,8 @@ public class ControlStrategyDAO {
                 "cS.region, cS.targetPollutant, " +
                 "cS.project, cS.strategyType, " +
                 "cS.costYear, cS.inventoryYear, " +
-                "cS.creator, (select sum(sR.totalCost) from ControlStrategyResult sR where sR.controlStrategyId = cS.id), (select sum(sR.totalReduction) from ControlStrategyResult sR where sR.controlStrategyId = cS.id)) " +
+//                "cS.creator, (select sum(sR.totalCost) from ControlStrategyResult sR where sR.controlStrategyId = cS.id), (select sum(sR.totalReduction) from ControlStrategyResult sR where sR.controlStrategyId = cS.id)) " +
+                "cS.creator, cS.totalCost, cS.totalReduction) " +
                 "from ControlStrategy cS " +
                 "left join cS.targetPollutant " +
                 "left join cS.strategyType " +
