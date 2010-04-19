@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.util.CustomDateFormat;
+import gov.epa.emissions.framework.Utils;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -31,6 +32,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -441,15 +443,14 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveEffectiveDate() throws EmfException {
+
+        String dateStr = this.effectiveDate.getText().trim();
+        String fieldName = "Effective Date";
+        Utils.validateDate(dateStr, fieldName);
         try {
-            String date = effectiveDate.getText().trim();
-            if (date.length() == 0) {
-                record.setEffectiveDate(null);
-                return;
-            }
-            record.setEffectiveDate(CustomDateFormat.parse_MMddyyyy(date));
-        } catch (Exception e) {
-            throw new EmfException("Please Correct the Date Format(MM/dd/yyyy) in Effective Date");
+            record.setEffectiveDate(CustomDateFormat.parse_MMddyyyy(dateStr));
+        } catch (ParseException e) {
+            throw new EmfException("Error while parsing date '" + dateStr + "' for '" + fieldName + "'.");
         }
     }
 

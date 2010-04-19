@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.util.CustomDateFormat;
+import gov.epa.emissions.framework.Utils;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.casemanagement.editor.AddRemoveSectorWidget;
@@ -29,6 +30,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.text.ParseException;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -406,15 +408,14 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     }
 
     private void updateDateReviewed(ControlMeasure measure) throws EmfException {
+
+        String dateStr = this.dateReviewed.getText().trim();
+        String fieldName = "Date Reviewed";
+        Utils.validateDate(dateStr, fieldName);
         try {
-            String date = dateReviewed.getText().trim();
-            if (date.length() == 0) {
-                measure.setDateReviewed(null);
-                return;
-            }
-            measure.setDateReviewed(CustomDateFormat.parse_MMddyyyy(date));
-        } catch (Exception e) {
-            throw new EmfException("Please Correct the Date Format(MM/dd/yyyy) in Date Reviewed");
+            measure.setDateReviewed(CustomDateFormat.parse_MMddyyyy(dateStr));
+        } catch (ParseException e) {
+            throw new EmfException("Error while parsing date '" + dateStr + "' for '" + fieldName + "'.");
         }
     }
 
@@ -519,6 +520,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         if (equipmentLife.getText().trim().length() > 0)
             life = verifier.parseFloat(equipmentLife);
 
+        Utils.validateDate(this.dateReviewed.getText().trim(), "Date Reviewed");
     }
 
     private Sector[] getAllSectors() {
