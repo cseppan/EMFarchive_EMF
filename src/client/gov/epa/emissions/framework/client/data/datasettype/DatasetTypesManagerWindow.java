@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.NewButton;
+import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -26,6 +27,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class DatasetTypesManagerWindow extends ReusableInteralFrame implements DatasetTypesManagerView, RefreshObserver {
@@ -151,14 +153,23 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
             }
         };
         Button newButton = new NewButton(createAction);
+        
+        Action removeAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                removeDatasetType();
+            }
+        };
+        Button removeButton = new RemoveButton(removeAction);
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
         crudPanel.add(viewButton);
         crudPanel.add(editButton);
         crudPanel.add(newButton);
+        crudPanel.add(removeButton);
         if (!session.user().isAdmin()){
             editButton.setEnabled(false);
             newButton.setEnabled(false);
+            removeButton.setEnabled(false);
         }
 
         return crudPanel;
@@ -179,6 +190,11 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private void editDatasetTypes() {
         List selected = selected();
+        if (selected.isEmpty()) {
+            messagePanel.setMessage("Please select one or more dataset types");
+            return;
+        }   
+        
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             DatasetType type = (DatasetType) iter.next();
             try {
@@ -194,6 +210,31 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         NewDatasetTypeWindow view = new NewDatasetTypeWindow(parentConsole, desktopManager, session);
         presenter.displayNewDatasetTypeView(view);
     }
+    
+    private void removeDatasetType() {
+        messagePanel.clear();
+        List<?> selected = selected();
+        if (selected.isEmpty()) {
+            messagePanel.setMessage("Please select one or more dataset types");
+            return;
+        }   
+
+        String message = "Are you sure you want to remove the selected " + selected.size() + " dataset type(s)?";
+        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.YES_OPTION) {
+            try {
+                presenter.doRemove(selected.toArray(new DatasetType[0]));
+                messagePanel.setMessage(selected.size()
+                        + " dataset types have been removed. Please Refresh to see the revised list of types.");
+            } catch (EmfException e) {
+                messagePanel.clear();
+                messagePanel.setError(e.getMessage());
+            }
+        }
+    }
+
 
     private List selected() {
         return table.selected();

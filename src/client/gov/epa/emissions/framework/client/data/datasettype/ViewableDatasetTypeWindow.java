@@ -51,8 +51,6 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     private DatasetType type;
 
     private JTable fileFormat;
-    
-    private final String FLEXIBLE_IMPORTER = "gov.epa.emissions.commons.io.orl.FlexibleDBImporter";
 
     public ViewableDatasetTypeWindow(DesktopManager desktopManager) {
         super("View Dataset Type", new Dimension(600, 520), desktopManager);
@@ -161,7 +159,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         XFileFormat fileFormat = type.getFileFormat();
         String importer = type.getImporterClassName();
         
-        if (importer == null || !importer.equalsIgnoreCase(FLEXIBLE_IMPORTER))
+        if (importer == null || !importer.equalsIgnoreCase(DatasetType.FLEXIBLE_IMPORTER))
             return null;
         
         if (fileFormat == null )

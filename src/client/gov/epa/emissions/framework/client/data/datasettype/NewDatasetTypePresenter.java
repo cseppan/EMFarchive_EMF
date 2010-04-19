@@ -10,37 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class NewDatasetTypePresenter {
-    
-    private final String EXTERNAL = "External File";
-    
-    private final String CSV = "CSV File";
-    
-    private final String LINE_BASED = "Line-based";
-    
-    private final String SMOKE = "SMOKE Report File";
-    
-    private final String FLEXIBLE = "Flexible File Format";
-    
-    private final String EXTERNAL_IMPORTER = "gov.epa.emissions.commons.io.external.ExternalFilesImporter";
-    
-    private final String CSV_IMPORTER = "gov.epa.emissions.commons.io.csv.CSVImporter";
-    
-    private final String LINE_IMPORTER = "gov.epa.emissions.commons.io.generic.LineImporter";
-    
-    private final String SMOKE_IMPORTER = "gov.epa.emissions.commons.io.other.SMKReportImporter";
-    
-    private final String FLEXIBLE_IMPORTER = "gov.epa.emissions.commons.io.orl.FlexibleDBImporter";
-    
-    private final String EXTERNAL_EXPORTER = "gov.epa.emissions.commons.io.external.ExternalFilesExporter";
-    
-    private final String CSV_EXPORTER = "gov.epa.emissions.commons.io.csv.CSVExporter";
-    
-    private final String LINE_EXPORTER = "gov.epa.emissions.commons.io.generic.LineExporter";
-    
-    private final String SMOKE_EXPORTER = "gov.epa.emissions.commons.io.other.SMKReportExporter";
-    
-    private final String FLEXIBLE_EXPORTER = "gov.epa.emissions.commons.io.orl.FlexibleDBExporter";
-    
+       
     private NewDatasetTypeView view;
 
     private EmfSession session;
@@ -56,17 +26,17 @@ public class NewDatasetTypePresenter {
     }
 
     private void setMap() {
-        mapImport.put(EXTERNAL, EXTERNAL_IMPORTER);
-        mapImport.put(CSV, CSV_IMPORTER);
-        mapImport.put(LINE_BASED, LINE_IMPORTER);
-        mapImport.put(SMOKE, SMOKE_IMPORTER);
-        mapImport.put(FLEXIBLE, FLEXIBLE_IMPORTER);
+        mapImport.put(DatasetType.EXTERNAL, DatasetType.EXTERNAL_IMPORTER);
+        mapImport.put(DatasetType.CSV, DatasetType.CSV_IMPORTER);
+        mapImport.put(DatasetType.LINE_BASED, DatasetType.LINE_IMPORTER);
+        mapImport.put(DatasetType.SMOKE, DatasetType.SMOKE_IMPORTER);
+        mapImport.put(DatasetType.FLEXIBLE, DatasetType.FLEXIBLE_IMPORTER);
         
-        mapExport.put(EXTERNAL, EXTERNAL_EXPORTER);
-        mapExport.put(CSV, CSV_EXPORTER);
-        mapExport.put(LINE_BASED, LINE_EXPORTER);
-        mapExport.put(SMOKE, SMOKE_EXPORTER);
-        mapExport.put(FLEXIBLE, FLEXIBLE_EXPORTER);
+        mapExport.put(DatasetType.EXTERNAL, DatasetType.EXTERNAL_EXPORTER);
+        mapExport.put(DatasetType.CSV, DatasetType.CSV_EXPORTER);
+        mapExport.put(DatasetType.LINE_BASED, DatasetType.LINE_EXPORTER);
+        mapExport.put(DatasetType.SMOKE, DatasetType.SMOKE_EXPORTER);
+        mapExport.put(DatasetType.FLEXIBLE, DatasetType.FLEXIBLE_EXPORTER);
     }
 
     public void doDisplay() {
@@ -83,13 +53,13 @@ public class NewDatasetTypePresenter {
     }
 
     public void doSave(String name, String desc, String minfiles, String maxfiles, String type, XFileFormat fileFormat, String formatFile) throws EmfException {
-        if (type.equals(FLEXIBLE))
+        if (type.equals(DatasetType.FLEXIBLE))
             saveTypeWithFileFormat(name, desc, type, fileFormat, formatFile, new Date());
         else {
             DatasetType newType = setNewDatasetType(name, desc, minfiles, maxfiles, type, new Date());
             service().addDatasetType(newType);
         }
-        
+       
         closeView();
     }
 
@@ -100,11 +70,11 @@ public class NewDatasetTypePresenter {
         newType.setMinFiles(Integer.parseInt(minfiles));
         newType.setMaxFiles(Integer.parseInt(maxfiles));
         newType.setDefaultSortOrder("");
-        if (type.equalsIgnoreCase(LINE_BASED))
+        if (type.equalsIgnoreCase(DatasetType.LINE_BASED))
             newType.setDefaultSortOrder("Line_Number");
         newType.setImporterClassName(mapImport.get(type));
         newType.setExporterClassName(mapExport.get(type));
-        newType.setExternal(type.equalsIgnoreCase(EXTERNAL));
+        newType.setExternal(type.equalsIgnoreCase(DatasetType.EXTERNAL));
         
         newType.setCreationDate(date);
         newType.setLastModifiedDate(date);

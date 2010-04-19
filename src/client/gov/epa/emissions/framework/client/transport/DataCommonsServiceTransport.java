@@ -576,5 +576,14 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[]{type, format, formatFile});
     }
 
-
+    public void deleteDatasetTypes(User owner, DatasetType[] types) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("deleteDatasetTypes");
+        call.addParam("owner", mappings.user());
+        call.addParam("type", mappings.datasetTypes());
+        call.setVoidReturnType();
+        
+        call.request(new Object[]{owner, types}); 
+    }
 }

@@ -67,8 +67,6 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private EmfSession session;
 
     private JTable fileFormat;
-    
-    private final String FLEXIBLE_IMPORTER = "gov.epa.emissions.commons.io.orl.FlexibleDBImporter";
 
     public EditableDatasetTypeWindow(EmfSession session, EmfConsole parent, DesktopManager desktopManager) {
         super("Edit Dataset Type", new Dimension(620, 580), desktopManager);
@@ -170,7 +168,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         XFileFormat fileFormat = type.getFileFormat();
         String importer = type.getImporterClassName();
         
-        if (importer == null || !importer.equalsIgnoreCase(FLEXIBLE_IMPORTER))
+        if (importer == null || !importer.equalsIgnoreCase(DatasetType.FLEXIBLE_IMPORTER))
             return null;
         
         if (fileFormat == null )

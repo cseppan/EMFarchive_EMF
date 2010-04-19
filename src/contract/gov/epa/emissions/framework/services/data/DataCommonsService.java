@@ -59,7 +59,9 @@ public interface DataCommonsService {
     void addDatasetType(DatasetType type) throws EmfException;
     
     void addDatasetTypeWithFileFormat(DatasetType type, XFileFormat format, String formatFile) throws EmfException;
-
+    
+    void deleteDatasetTypes(User owner, DatasetType[] types) throws EmfException;
+    
     DatasetType obtainLockedDatasetType(User owner, DatasetType type) throws EmfException;
 
     DatasetType updateDatasetType(DatasetType type) throws EmfException;

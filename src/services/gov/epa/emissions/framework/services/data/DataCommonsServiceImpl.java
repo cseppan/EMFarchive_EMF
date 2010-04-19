@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.commons.io.Column;
@@ -17,6 +18,7 @@ import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.io.csv.CSVFileReader;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFilePatternMatcher;
@@ -24,6 +26,7 @@ import gov.epa.emissions.framework.services.basic.EmfFileSerializer;
 import gov.epa.emissions.framework.services.basic.EmfServerFileSystemView;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -37,6 +40,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 public class DataCommonsServiceImpl implements DataCommonsService {
 
@@ -229,6 +234,65 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             throw new EmfException("Could not release lock on DatasetType: " + type.getName());
         }
     }
+    
+    public void deleteDatasetTypes(User owner, DatasetType[] types) throws EmfException {
+
+        Session session = this.sessionFactory.getSession();
+        DbServer dbServer;
+        try {
+            dbServer = new EmfDbServer();
+        } catch (Exception e1) {
+            throw new EmfException(e1.getMessage());
+        }
+        
+        try {
+            if (owner.isAdmin()){
+                for (int i =0; i<types.length; i++) {
+                    checkIfUsedByCases(types[i], session); 
+                    checkIfUsedByDatasets(types[i], session); 
+                    dao.removeDatasetTypes(types[i], session);
+                    if (types[i].getFileFormat()!=null ){
+                        dao.removeXFileFormatColumns(types[i].getFileFormat(), dbServer);
+                        dao.removeXFileFormat(types[i].getFileFormat(), session);
+                    }
+                }
+            }
+            dbServer.disconnect();
+        } catch (Exception e) {          
+            LOG.error("Error deleting dataset types. " , e);
+            throw new EmfException("Error deleting dataset types. " + e.getMessage());
+        } finally{
+            session.close(); 
+        }
+    }
+    
+    public void checkIfUsedByCases(DatasetType type, Session session) throws EmfException {
+        List list = null;
+
+        // check if dataset is an input dataset for some cases (via the cases.cases_caseinputs table)
+        list = session.createQuery(
+                "select CI.caseID from CaseInput as CI " + "where (CI.datasetType.id = "
+                        + type.getId()+ ")").list();
+
+        if (list != null && list.size() > 0) {
+            Criterion criterion = Restrictions.eq("id", list.get(0));
+            Case usedCase = (Case) dao.get(Case.class, criterion, session).get(0);
+            throw new EmfException("Dataset type \" " + type.getName()+ "\" is used by case " + usedCase.getName() + ".");
+        }
+    }
+    
+    public void checkIfUsedByDatasets(DatasetType type, Session session) throws EmfException {
+        List list = null;
+
+        // check if dataset is an input dataset for some cases (via the cases.cases_caseinputs table)
+        list = session.createQuery(
+                "select DS.id from EmfDataset as DS " + "where (DS.datasetType.id = "
+                        + type.getId()+ ")").list();
+
+        if (list != null && list.size() > 0) {
+            throw new EmfException("Dataset type \" " + type.getName()+ "\" is used by datasets " + list.get(0) );
+        }
+    }
 
     public synchronized Status[] getStatuses(String username) throws EmfException {
         try {
@@ -360,6 +424,23 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
     
     public synchronized XFileFormat addFileFormat(XFileFormat format) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            dao.add(format, session);
+            return (XFileFormat)dao.load(XFileFormat.class, format.getName(), session);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("Could not add new XFileFormat " + format.getName(), e);
+            throw new EmfException("Could not add new XFileFormat " + format.getName() + ". " + e.getLocalizedMessage());
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
+    
+    // under construction
+    public synchronized XFileFormat deleteFileFormat(XFileFormat format) throws EmfException {
         Session session = sessionFactory.getSession();
         
         try {
@@ -1130,5 +1211,5 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             
         return types.stringType();
     }
-    
+
 }

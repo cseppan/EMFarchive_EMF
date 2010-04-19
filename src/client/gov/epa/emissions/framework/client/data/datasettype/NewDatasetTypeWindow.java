@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
@@ -69,7 +70,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
     private static int counter = 0;
 
-    private static final String[] types = { "Flexible File Format", "External File", "CSV File", "Line-based File", "SMOKE Report File" };
+    private static final String[] types = { DatasetType.FLEXIBLE, DatasetType.EXTERNAL, DatasetType.CSV, DatasetType.LINE_BASED, DatasetType.SMOKE };
 
     private static final String[] delimiters = {"          ,          ", "          ;", "          Tab", "          |"};
     

@@ -114,32 +114,35 @@ public class DatasetDAO {
     public List all(Session session) {
         return hibernateFacade.getAll(EmfDataset.class, session);
     }
-    
+
     public int getNumOfDatasets(Session session) {
-        List<?> num = session.createQuery("SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted'").list();
+        List<?> num = session.createQuery("SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted'")
+                .list();
         return Integer.parseInt(num.get(0).toString());
     }
-    
+
     public int getNumOfDatasets(Session session, String name) {
         String ns = getPattern(name.toLowerCase().trim());
-        List<?> num = session.createQuery("SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " +
-        		" AND lower(ds.name) like " + ns).list();
+        List<?> num = session.createQuery(
+                "SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " + " AND lower(ds.name) like "
+                        + ns).list();
         return Integer.parseInt(num.get(0).toString());
     }
-    
+
     public int getNumOfDatasets(Session session, int dsTypeId) {
-        List<?> num = session.createQuery("SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " +
-                " AND ds.datasetType.id = " + dsTypeId).list();
-        
+        List<?> num = session.createQuery(
+                "SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " + " AND ds.datasetType.id = "
+                        + dsTypeId).list();
+
         return Integer.parseInt(num.get(0).toString());
     }
-    
+
     public int getNumOfDatasets(Session session, int dsTypeId, String name) {
         String ns = getPattern(name.toLowerCase().trim());
-        List<?> num = session.createQuery("SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " +
-                " AND ds.datasetType.id = " + dsTypeId +
-                " AND lower(ds.name) like " + ns).list();
-        
+        List<?> num = session.createQuery(
+                "SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " + " AND ds.datasetType.id = "
+                        + dsTypeId + " AND lower(ds.name) like " + ns).list();
+
         return Integer.parseInt(num.get(0).toString());
     }
 
@@ -151,14 +154,15 @@ public class DatasetDAO {
                                 + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region"
                                 + " where DS.status <> 'Deleted' order by DS.name").list();
     }
-    
+
     public List allNonDeleted(Session session, String nameContains) {
         String ns = getPattern(nameContains.toLowerCase().trim());
         return session
                 .createQuery(
                         "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region"
-                                + " where lower(DS.name) like " + ns
+                                + " where lower(DS.name) like "
+                                + ns
                                 + " and DS.status <> 'Deleted' "
                                 + " order by DS.name").list();
     }
@@ -170,9 +174,9 @@ public class DatasetDAO {
     public void add(Version version, Session session) {
         hibernateFacade.add(version, session);
     }
-    
-    //NOTE: make sure dataset has no changes in name, emission table name(s)
-    //when call this update method. Not for updating status to be 'Deleted'.
+
+    // NOTE: make sure dataset has no changes in name, emission table name(s)
+    // when call this update method. Not for updating status to be 'Deleted'.
     public void updateDSPropNoLocking(EmfDataset dataset, Session session) throws Exception {
         hibernateFacade.updateOnly(dataset, session);
     }
@@ -192,15 +196,15 @@ public class DatasetDAO {
         if (DebugLevels.DEBUG_12)
             System.out.println("dataset dao remove(dataset, session) called: " + dataset.getId() + " "
                     + dataset.getName());
-        
+
         ExternalSource[] extSrcs = null;
-        
+
         if (dataset.isExternal())
             extSrcs = getExternalSrcs(dataset.getId(), -1, null, session);
 
         if (extSrcs != null && extSrcs.length > 0)
             hibernateFacade.removeObjects(extSrcs, session);
-        
+
         hibernateFacade.remove(dataset, session);
     }
 
@@ -346,7 +350,7 @@ public class DatasetDAO {
                                 + datasetTypeId
                                 + " and DS.status <> 'Deleted' order by DS.name").list();
     }
-    
+
     public List getDatasetsWithFilter(Session session, int datasetTypeId, String nameContains) {
         String ns = getPattern(nameContains.toLowerCase().trim());
         return session
@@ -355,9 +359,9 @@ public class DatasetDAO {
                                 + " from EmfDataset as DS left join DS.intendedUse left join DS.project left join DS.region"
                                 + " where DS.datasetType.id = "
                                 + datasetTypeId
-                                + " and lower(DS.name) like " + ns
-                                + " and DS.status <> 'Deleted' " 
-                                + " order by DS.name").list();
+                                + " and lower(DS.name) like "
+                                + ns
+                                + " and DS.status <> 'Deleted' " + " order by DS.name").list();
     }
 
     public List getDatasets(Session session, int datasetTypeId, String nameContains) {
@@ -366,37 +370,37 @@ public class DatasetDAO {
                 .createQuery(
                         "select new EmfDataset( DS.id, DS.name, DS.defaultVersion, DS.datasetType.id, DS.datasetType.name) from EmfDataset as DS where DS.datasetType.id = "
                                 + datasetTypeId
-                                + " and lower(DS.name) like " + ns
-                                + " and DS.status <> 'Deleted' " 
-                                + " order by DS.name")
-                .list();
+                                + " and lower(DS.name) like "
+                                + ns
+                                + " and DS.status <> 'Deleted' "
+                                + " order by DS.name").list();
     }
 
     public void addExternalSources(ExternalSource[] srcs, Session session) {
         hibernateFacade.add(srcs, session);
     }
 
-    //NOTE: limit < 0 will return all external sources
+    // NOTE: limit < 0 will return all external sources
     public ExternalSource[] getExternalSrcs(int datasetId, int limit, String filter, Session session) {
         String query = " FROM " + ExternalSource.class.getSimpleName() + " as ext WHERE ext.datasetId=" + datasetId;
-        
+
         if (filter != null && !filter.trim().isEmpty() && !filter.trim().equals("*"))
             query += " AND lower(ext.datasource) LIKE '%%" + filter + "%%'";
-        
+
         List<ExternalSource> srcsList = new ArrayList<ExternalSource>();
-        
+
         if (limit < 0)
             srcsList = session.createQuery(query).list();
-        
+
         if (limit > 0)
             srcsList = session.createQuery(query).setMaxResults(limit).list();
-        
+
         return srcsList.toArray(new ExternalSource[0]);
     }
 
     public boolean isExternal(int datasetId, Session session) {
-        String query = "SELECT COUNT(ext) FROM " + ExternalSource.class.getSimpleName() + " as ext WHERE ext.datasetId="
-                + datasetId;
+        String query = "SELECT COUNT(ext) FROM " + ExternalSource.class.getSimpleName()
+                + " as ext WHERE ext.datasetId=" + datasetId;
         List count = session.createSQLQuery(query).list();
 
         return count != null && count.size() > 0;
@@ -410,10 +414,10 @@ public class DatasetDAO {
         Criterion criterion = Restrictions.and(statusCrit, nameCrit);
         Order order = Order.asc("name");
         List<EmfDataset> list = hibernateFacade.get(EmfDataset.class, criterion, order, session);
-        
+
         if (list == null || list.size() == 0)
             return null;
-        
+
         return list.get(0);
     }
 
@@ -598,7 +602,7 @@ public class DatasetDAO {
             String importerclass = (type == null ? "" : type.getImporterClassName());
             importerclass = (importerclass == null ? "" : importerclass.trim());
 
-            if (importerclass.equals("gov.epa.emissions.commons.io.other.SMKReportImporter") 
+            if (importerclass.equals("gov.epa.emissions.commons.io.other.SMKReportImporter")
                     || importerclass.equals("gov.epa.emissions.commons.io.csv.CSVImporter")
                     || importerclass.equals("gov.epa.emissions.commons.io.generic.LineImporter"))
                 return false;
@@ -625,17 +629,17 @@ public class DatasetDAO {
             System.out.println("new table name: " + newTableName + " old table name:" + oldTableName);
 
         table.rename(oldTableName, newTableName);
-        //only set this if there wasn't an error.
+        // only set this if there wasn't an error.
         sources[0].setTable(newTableName);
     }
 
     public boolean datasetNameUsed(String name, Session session) throws Exception {
         Criterion crit = Restrictions.eq("name", name).ignoreCase();
-        EmfDataset ds = (EmfDataset)hibernateFacade.load(EmfDataset.class, crit, session);
-        
+        EmfDataset ds = (EmfDataset) hibernateFacade.load(EmfDataset.class, crit, session);
+
         if (ds == null)
             return false;
-        
+
         return true;
     }
 
@@ -712,7 +716,7 @@ public class DatasetDAO {
             } catch (Exception e) {
                 LOG.error(e);
                 exception = e;
-          }
+            }
 
             try {
                 dropDataTables(deletableDatasets, emissionTableTool);
@@ -932,7 +936,7 @@ public class DatasetDAO {
         importerclass = (importerclass == null ? "" : importerclass.trim());
 
         try {
-            if (importerclass.equals("gov.epa.emissions.commons.io.temporal.TemporalProfileImporter") 
+            if (importerclass.equals("gov.epa.emissions.commons.io.temporal.TemporalProfileImporter")
                     || importerclass.equals("gov.epa.emissions.commons.io.other.CountryStateCountyDataImporter")
                     || importerclass.equals("gov.epa.emissions.commons.io.other.SMKReportImporter")
                     || importerclass.equals("gov.epa.emissions.commons.io.csv.CSVImporter")
@@ -1182,25 +1186,31 @@ public class DatasetDAO {
     }
 
     public void updateExternalSrcsWithoutLocking(ExternalSource[] srcs, Session session) {
-        //NOTE: update without locking objects
+        // NOTE: update without locking objects
         hibernateFacade.update(srcs, session);
     }
 
-    public String[] getTableColumnDistinctValues(int datasetId, int datasetVersion, String columnName, String whereFilter, String sortOrder, Session session, DbServer dbServer) throws EmfException {
+    public String[] getTableColumnDistinctValues(int datasetId, int datasetVersion, String columnName,
+            String whereFilter, String sortOrder, Session session, DbServer dbServer) throws EmfException {
         List<String> values = new ArrayList<String>();
         ResultSet rs = null;
         try {
             EmfDataset dataset = getDataset(session, datasetId);
             Version version = version(session, datasetId, dataset.getDefaultVersion());
             String datasetVersionedQuery = new VersionedQuery(version).query();
-            String query = "select distinct " + columnName + " from " + qualifiedEmissionTableName(dataset) + " where " + datasetVersionedQuery + (whereFilter != null && whereFilter.trim().length() > 0 ? " and (" + whereFilter + ")": "") + " order by " + (sortOrder != null && sortOrder.trim().length() > 0 ? sortOrder : columnName) + ";";
+            String query = "select distinct " + columnName + " from " + qualifiedEmissionTableName(dataset) + " where "
+                    + datasetVersionedQuery
+                    + (whereFilter != null && whereFilter.trim().length() > 0 ? " and (" + whereFilter + ")" : "")
+                    + " order by " + (sortOrder != null && sortOrder.trim().length() > 0 ? sortOrder : columnName)
+                    + ";";
             rs = dbServer.getEmissionsDatasource().query().executeQuery(query);
             while (rs.next()) {
                 values.add(rs.getString(1));
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new EmfException(e.getMessage());//new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+            throw new EmfException(e.getMessage());// new EmfException("Could not execute query -" + query + "\n" +
+                                                    // e.getMessage());
         } finally {
             //
         }
@@ -1211,6 +1221,7 @@ public class DatasetDAO {
         Versions versions = new Versions();
         return versions.get(datasetId, version, session);
     }
+
     private String qualifiedEmissionTableName(Dataset dataset) {
         return qualifiedName(emissionTableName(dataset));
     }
@@ -1226,54 +1237,60 @@ public class DatasetDAO {
 
     public void importRemoteDataset() {
         //
-        
+
     }
 
     @SuppressWarnings("unchecked")
     public List<EmfDataset> findSimilarDatasets(EmfDataset ds, boolean unconditional, Session session) {
-        String dsTypeStr = (ds.getDatasetType() == null ? "" : " AND DS.datasetType.id = " + ds.getDatasetType().getId());
+        String dsTypeStr = (ds.getDatasetType() == null ? "" : " AND DS.datasetType.id = "
+                + ds.getDatasetType().getId());
         String name = ds.getName();
-        String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE " + getPattern(name.toLowerCase().trim()));
+        String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE "
+                + getPattern(name.toLowerCase().trim()));
         String dsKeyStr = getDSKeyStr(ds.getKeyVals());
         String desc = ds.getDescription();
-        String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE " + getPattern(desc.toLowerCase().trim()));
+        String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE "
+                + getPattern(desc.toLowerCase().trim()));
         String dsProjStr = (ds.getProject() == null ? "" : " AND DS.project.id = " + ds.getProject().getId());
         String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
-        		+ " DS.creator, DS.creatorFullName, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
-        		+ " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse LEFT JOIN DS.project LEFT JOIN DS.region"
-        		+ dsKeyStr
-        		+ " WHERE DS.status <> 'Deleted'"
-                + dsTypeStr + dsNameStr + checkBackSlash(descStr) + dsProjStr + " ORDER BY DS.name";
-        
-        List<EmfDataset> ds1 = session.createQuery(dsquery).list();
-        
-        String dsTypeKeyStr = getDSTypeKeyStr(ds.getKeyVals());
-        String dstypequery = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
                 + " DS.creator, DS.creatorFullName, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
-                + " FROM EmfDataset AS DS" 
-                + (dsTypeKeyStr.isEmpty() ? "" : ", DatasetType AS TYPE") 
-                + " LEFT JOIN DS.intendedUse LEFT JOIN DS.project LEFT JOIN DS.region"
-                + dsTypeKeyStr
-                + " WHERE DS.status <> 'Deleted'" 
-                + dsTypeStr + (dsTypeKeyStr.isEmpty() ? "" : " AND TYPE.id = DS.datasetType.id")
+                + " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse LEFT JOIN DS.project LEFT JOIN DS.region"
+                + dsKeyStr
+                + " WHERE DS.status <> 'Deleted'"
+                + dsTypeStr
                 + dsNameStr
                 + checkBackSlash(descStr)
                 + dsProjStr
                 + " ORDER BY DS.name";
-        
+
+        List<EmfDataset> ds1 = session.createQuery(dsquery).list();
+
+        String dsTypeKeyStr = getDSTypeKeyStr(ds.getKeyVals());
+        String dstypequery = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
+                + " DS.creator, DS.creatorFullName, DS.intendedUse.name, DS.project.name, DS.region.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
+                + " FROM EmfDataset AS DS"
+                + (dsTypeKeyStr.isEmpty() ? "" : ", DatasetType AS TYPE")
+                + " LEFT JOIN DS.intendedUse LEFT JOIN DS.project LEFT JOIN DS.region"
+                + dsTypeKeyStr
+                + " WHERE DS.status <> 'Deleted'"
+                + dsTypeStr
+                + (dsTypeKeyStr.isEmpty() ? "" : " AND TYPE.id = DS.datasetType.id")
+                + dsNameStr
+                + checkBackSlash(descStr) + dsProjStr + " ORDER BY DS.name";
+
         List<EmfDataset> ds2 = session.createQuery(dstypequery).list();
         List<EmfDataset> all = new ArrayList<EmfDataset>();
         all.addAll(ds1);
         all.addAll(ds2);
-        
+
         TreeSet<EmfDataset> set = new TreeSet<EmfDataset>(all);
         List<EmfDataset> total = new ArrayList<EmfDataset>(set);
-        
+
         if (total.size() > 300 && !unconditional) {
             total.get(0).setName("Alert!!! More than 300 datasets selected.");
             return total.subList(0, 1);
         }
-        
+
         return total;
     }
 
@@ -1285,54 +1302,54 @@ public class DatasetDAO {
         name = name.replaceAll("!", "!!");
         name = name.replaceAll("'", "''");
         name = name.replaceAll("_", "!_");
-        
+
         return "'%%" + name + "%%'" + (name.contains("!") ? " ESCAPE '!'" : "");
     }
 
     private String getDSKeyStr(KeyVal[] keyVals) {
         if (keyVals.length == 0)
             return "";
-        
+
         StringBuilder withStr = new StringBuilder(" INNER JOIN DS.keyVals keyVal WITH ");
-        
+
         for (KeyVal kv : keyVals) {
             String name = kv.getName();
             String value = checkBackSlash(kv.getValue());
             value = value.replaceAll("'", "''");
-            
+
             if (!value.trim().isEmpty())
                 value = " AND lower(keyVal.value) = '" + value.trim().toLowerCase() + "'";
-            
+
             withStr.append("(keyVal.kwname = '" + name + "'" + value + ") OR ");
         }
-        
-        return withStr.toString().substring(0, withStr.length()-3);
+
+        return withStr.toString().substring(0, withStr.length() - 3);
     }
-    
+
     private String getDSTypeKeyStr(KeyVal[] keyVals) {
         if (keyVals.length == 0)
             return "";
-        
+
         StringBuilder typeWithStr = new StringBuilder(" INNER JOIN TYPE.keyVals keyVal WITH ");
-        
+
         for (KeyVal kv : keyVals) {
             String name = kv.getName();
             String value = checkBackSlash(kv.getValue());
             value = value.replaceAll("'", "''");
-            
+
             if (!value.trim().isEmpty())
                 value = " AND lower(keyVal.value) = '" + value.trim().toLowerCase() + "'";
-            
+
             typeWithStr.append("(keyVal.kwname = '" + name + "'" + value + ") OR ");
         }
-        
-        return typeWithStr.toString().substring(0, typeWithStr.length()-3);
+
+        return typeWithStr.toString().substring(0, typeWithStr.length() - 3);
     }
-    
+
     private String checkBackSlash(String str) {
         if (str == null)
             return "";
-        
+
         return str.replaceAll("\\\\", "\\\\\\\\");
     }
 
