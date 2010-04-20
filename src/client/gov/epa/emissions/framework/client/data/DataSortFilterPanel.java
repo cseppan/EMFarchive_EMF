@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -10,13 +11,17 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -34,9 +39,20 @@ public class DataSortFilterPanel extends JPanel {
 
     private boolean forEditor = true;
 
-    public DataSortFilterPanel(MessagePanel messagePanel, EmfDataset dataset, String rowFilters) {
+    private TextField decimalPlacesField;
+
+    private JButton formatButton;
+
+    private JCheckBox groupCheckBox;
+
+    private DoubleRenderer doubleRenderer;
+
+    public DataSortFilterPanel(MessagePanel messagePanel, EmfDataset dataset, String rowFilters,
+            DoubleRenderer doubleRenderer) {
+
         this.messagePanel = messagePanel;
         this.dataset = dataset;
+        this.doubleRenderer = doubleRenderer;
 
         super.setLayout(new BorderLayout(5, 5));
         super.add(sortFilterPanel(rowFilters), BorderLayout.CENTER);
@@ -45,11 +61,68 @@ public class DataSortFilterPanel extends JPanel {
     }
 
     private JPanel sortFilterPanel(String rowFilters) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 1, 5, 5));
 
-        panel.add(sortOrderPanel());
-        panel.add(rowFilterPanel(rowFilters));
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+
+        GridBagConstraints labelGBC = new GridBagConstraints();
+        GridBagConstraints fieldGBC = new GridBagConstraints();
+        GridBagConstraints buttonGBC = new GridBagConstraints();
+
+        labelGBC.gridx = 0;
+        labelGBC.anchor = GridBagConstraints.EAST;
+        labelGBC.insets = new Insets(2, 2, 2, 2);
+
+        fieldGBC.gridx = 1;
+        fieldGBC.weightx = 1;
+        fieldGBC.gridwidth = 5;
+        fieldGBC.fill = GridBagConstraints.BOTH;
+
+        buttonGBC.gridx = 2;
+        buttonGBC.weightx = 0;
+        buttonGBC.insets = new Insets(2, 2, 2, 5);
+
+        panel.add(new Label("Sort Order"), labelGBC);
+
+        sortOrder = new TextArea("sortOrder", dataset.getDatasetType().getDefaultSortOrder(), 25, 2);
+        sortOrder.setToolTipText(sortOrder.getText());
+        panel.add(ScrollableComponent.createWithVerticalScrollBar(sortOrder), fieldGBC);
+
+        labelGBC.gridy = 1;
+        panel.add(new Label("Row Filter"), labelGBC);
+
+        fieldGBC.gridy = 1;
+        rowFilter = new TextArea("rowFilter", rowFilters, 25, 2);
+        rowFilter.setToolTipText(rowFilter.getText());
+        panel.add(ScrollableComponent.createWithVerticalScrollBar(rowFilter), fieldGBC);
+
+        labelGBC.gridy = 2;
+        panel.add(new Label("Decimal Places"), labelGBC);
+
+        fieldGBC.gridy = 2;
+        fieldGBC.weightx = 0;
+        fieldGBC.gridwidth = 1;
+        decimalPlacesField = new TextField("decimalPlaces", 10);
+        decimalPlacesField.setText(Integer.toString(doubleRenderer.getDecimalPlaces()));
+        decimalPlacesField.setToolTipText("Number of decimal places to display");
+        panel.add(decimalPlacesField, fieldGBC);
+
+        buttonGBC.gridy = 2;
+        buttonGBC.weightx = 0;
+        buttonGBC.gridwidth = 1;
+
+        groupCheckBox = new JCheckBox("Show Commas");
+        groupCheckBox.setSelected(doubleRenderer.isGroup());
+        groupCheckBox.setToolTipText("Group large numbers using commas");
+        panel.add(groupCheckBox, buttonGBC);
+
+        buttonGBC.gridy = 2;
+        buttonGBC.gridx = 3;
+        buttonGBC.weightx = 0;
+        buttonGBC.gridwidth = 1;
+
+        formatButton = new JButton();
+        panel.add(formatButton, buttonGBC);
 
         return panel;
     }
@@ -64,43 +137,53 @@ public class DataSortFilterPanel extends JPanel {
         return panel;
     }
 
-    private JPanel sortOrderPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-
-        panel.add(new Label("Sort Order "), BorderLayout.WEST);
-        sortOrder = new TextArea("sortOrder", dataset.getDatasetType().getDefaultSortOrder(), 25, 2);
-        sortOrder.setToolTipText(sortOrder.getText());
-        panel.add(ScrollableComponent.createWithVerticalScrollBar(sortOrder), BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    private JPanel rowFilterPanel(String rowFilters) {
-        JPanel panel = new JPanel(new BorderLayout());
-        // System.out.println("row filter is " + rowFilters);
-        panel.add(new Label("Row Filter  "), BorderLayout.WEST);
-        rowFilter = new TextArea("rowFilter", rowFilters, 25, 2);
-        rowFilter.setToolTipText(rowFilter.getText());
-        panel.add(ScrollableComponent.createWithVerticalScrollBar(rowFilter), BorderLayout.CENTER);
-
-        return panel;
-    }
-
     public void init(final TablePresenter presenter) {
+
+        this.formatButton.setAction(new AbstractAction("Format") {
+            public void actionPerformed(ActionEvent e) {
+                doApplyFormat(presenter);
+            }
+        });
+
         Button apply = new Button("Apply", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doApplyConstraints(presenter);
             }
         });
         apply.setToolTipText("Apply the Row Filter & Sort Order constraints to the table");
-        actionPanel.add(new JLabel(""));
         actionPanel.add(apply);
-        actionPanel.add(new JLabel(""));
+    }
+
+    private void doApplyFormat(final TablePresenter presenter) {
+
+        if (false) {
+            throw new RuntimeException("asdfas asdfasd");
+        }
+
+        messagePanel.clear();
+
+        try {
+            String text = decimalPlacesField.getText();
+            String trim = text.trim();
+            int decimalPlaces = Integer.parseInt(trim);
+
+            if (decimalPlaces < 0) {
+                throw new RuntimeException();
+            }
+
+            this.doubleRenderer.setGroup(this.groupCheckBox.isSelected());
+            this.doubleRenderer.setDecimalPlaces(decimalPlaces);
+            presenter.doApplyFormat();
+        } catch (Exception e) {
+            messagePanel.setError("'Decimal Places' must be an integer value greater than, or equal to 0.");
+        }
     }
 
     private void doApplyConstraints(final TablePresenter presenter) {
         try {
+
             messagePanel.clear();
+
             String rowFilterValue = rowFilter.getText().trim();
             String sortOrderValue = sortOrder.getText().trim();
             presenter.doApplyConstraints(rowFilterValue, sortOrderValue);

@@ -25,6 +25,8 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
 
     private DatasetType datasetType;
 
+    private Page page;
+
     public TablePresenterDelegateImpl(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,
             TableView view, DataAccessService service) {
         this.datasetType = datasetType;
@@ -84,9 +86,13 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
     }
 
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
-        Page page = applyConstraints(rowFilter, sortOrder);
+        page = applyConstraints(rowFilter, sortOrder);
         view.display(page);
         updateFilteredCount();
+    }
+
+    public void doApplyFormat() throws EmfException {
+        view.display(page);
     }
 
     Page applyConstraints(String rowFilter, String sortOrder) throws EmfException {

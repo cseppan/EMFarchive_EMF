@@ -145,4 +145,8 @@ public class ScrollableTable extends JScrollPane {
     public void resetTextFont(Font font) {
         table.setFont(font);
     }
+
+    public JTable getTable() {
+        return table;
+    }
 }

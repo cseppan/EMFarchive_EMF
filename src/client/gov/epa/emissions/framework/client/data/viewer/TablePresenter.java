@@ -22,4 +22,5 @@ public interface TablePresenter {
 
     void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException;
 
+    void doApplyFormat() throws EmfException;
 }

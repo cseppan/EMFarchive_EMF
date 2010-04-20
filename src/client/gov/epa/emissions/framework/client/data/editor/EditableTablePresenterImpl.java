@@ -109,4 +109,7 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
         delegate.updateFilteredCount();
     }
 
+    public void doApplyFormat() throws EmfException {
+        delegate.doApplyFormat();
+    }
 }

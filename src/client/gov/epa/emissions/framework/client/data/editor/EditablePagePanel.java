@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.ClipBoardCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.data.DoubleRenderer;
 import gov.epa.emissions.framework.client.data.ObserverPanel;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -42,7 +43,7 @@ public class EditablePagePanel extends JPanel {
 
     private EditableEmfTableModel tableModel;
 
-    private ScrollableTable table;
+    private ScrollableTable scrollTable;
 
     private MessagePanel messagePanel;
 
@@ -64,8 +65,13 @@ public class EditablePagePanel extends JPanel {
     
     private EditablePage tableData;
 
+    private DoubleRenderer doubleRenderer;
+    
     public EditablePagePanel(EditablePage page, ObserverPanel observer, MessagePanel messagePanel,
-            ManageChangeables listOfChangeables) {
+            ManageChangeables listOfChangeables, DoubleRenderer doubleRenderer) {
+
+        this.doubleRenderer = doubleRenderer;
+        
         this.listOfChangeables = listOfChangeables;
         this.messagePanel = messagePanel;
         this.tableData = page; 
@@ -146,15 +152,20 @@ public class EditablePagePanel extends JPanel {
             editableTable = new DataEditorTable(tableModel, tableData.getTableMetadata(), messagePanel);
             listOfChangeables.addChangeable(editableTable);
 
-            table = new ScrollableTable(editableTable, monospacedFont);
+            scrollTable = new ScrollableTable(editableTable, monospacedFont);
+            
+            JTable table = scrollTable.getTable();            
+            table.setDefaultRenderer(Double.class, doubleRenderer);
+            table.setDefaultRenderer(Float.class, doubleRenderer);
+ 
             addCopyPasteClipBoard(editableTable);
         }
         else{
             tableModel.refresh(tableData);
             editableTable.setModel(tableModel);
-            table.repaint();
+            scrollTable.repaint();
         }
-        return table;
+        return scrollTable;
     }
 
     private void addCopyPasteClipBoard(JTable viewTable) {
@@ -357,7 +368,7 @@ public class EditablePagePanel extends JPanel {
     }
 
     public void scrollToPageEnd() {
-        table.moveToBottom();
+        scrollTable.moveToBottom();
     }
 
     protected ImageIcon createImageIcon(String path) {

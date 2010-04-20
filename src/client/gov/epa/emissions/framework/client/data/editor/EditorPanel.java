@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.DataSortFilterPanel;
+import gov.epa.emissions.framework.client.data.DoubleRenderer;
 import gov.epa.emissions.framework.client.data.PaginationPanel;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -47,11 +48,19 @@ public class EditorPanel extends JPanel implements EditorPanelView {
 
     private EmfSession emfSession;
 
+    private DoubleRenderer doubleRenderer; 
+
+    private Page page;
+
     public EditorPanel(EmfDataset dataset, Version version, TableMetadata tableMetadata, 
             MessagePanel messagePanel, ManageChangeables changeablesList) {
         super(new BorderLayout());
         super.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         
+        this.doubleRenderer = new DoubleRenderer(); 
+        this.doubleRenderer.setGroup(true);
+        this.doubleRenderer.setDecimalPlaces(4);
+
         this.dataset = dataset;
         this.version = version;
         this.tableMetadata = tableMetadata;
@@ -80,7 +89,7 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     }
 
     private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset, "");
+        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset, "", this.doubleRenderer);
         return sortFilterPanel;
     }
 
@@ -91,9 +100,15 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     }
 
     public void display(Page page) {
+
+        if (page != null) {
+            this.page = page;
+        }
+
         pageContainer.removeAll();
-        paginationPanel.updateStatus(page);
-        pageContainer.add(createEditablePage(page), BorderLayout.CENTER);
+        paginationPanel.updateStatus(this.page);
+        pageContainer.add(createEditablePage(this.page), BorderLayout.CENTER);
+        pageContainer.validate();
     }
 
     private EditablePagePanel createEditablePage(Page page) {
@@ -101,7 +116,8 @@ public class EditorPanel extends JPanel implements EditorPanelView {
             editablePage = new EditablePage(dataset.getId(), version, page, tableMetadata);
             editablePage.setDatasetName(dataset.getName());
 
-            editablePagePanel = new EditablePagePanel(editablePage, paginationPanel, messagePanel, changeablesList);
+            editablePagePanel = new EditablePagePanel(editablePage, paginationPanel, messagePanel, changeablesList,
+                    this.doubleRenderer);
             editablePagePanel.setDesktopManager(desktopManager);
             editablePagePanel.setEmfSession(emfSession);
             editablePagePanel.setRowFilter(sortFilterPanel.getRowFilter());

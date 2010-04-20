@@ -43,11 +43,21 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
 
     private TableMetadata tableMetadata;
     
-    private String rowFilter; 
+    private String rowFilter;
+
+    private DoubleRenderer doubleRenderer; 
+    
+    private Page page;
 
     public ViewerPanel(MessagePanel messagePanel, EmfDataset dataset, 
             TableMetadata tableMetadata, String filter) {
+
         super(new BorderLayout());
+
+        this.doubleRenderer = new DoubleRenderer();
+        this.doubleRenderer.setGroup(true);
+        this.doubleRenderer.setDecimalPlaces(4);
+
         this.tableMetadata = tableMetadata;
         this.dataset = dataset;
         this.rowFilter =filter;
@@ -87,7 +97,7 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
     }
 
     private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset, rowFilter);
+        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset, rowFilter, this.doubleRenderer);
         sortFilterPanel.setForEditor(false);
         return sortFilterPanel;
     }
@@ -98,10 +108,15 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
     }
 
     public void display(Page page) {
+
+        if (page != null) {
+            this.page = page;
+        }
+        
         pageContainer.removeAll();
 
-        paginationPanel.updateStatus(page);
-        pageContainer.add(table(page), BorderLayout.CENTER);
+        paginationPanel.updateStatus(this.page);
+        pageContainer.add(table(this.page), BorderLayout.CENTER);
         pageContainer.validate();
     }
 
@@ -132,8 +147,9 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
     private void viewTableConfig(JTable viewTable) {
         new TableColumnHeaders(viewTable, tableMetadata).renderHeader();
         new TableColumnWidth(viewTable, tableMetadata).columnWidths();
-        viewTable.setDefaultRenderer(Double.class, new DoubleRenderer());
-        viewTable.setDefaultRenderer(Float.class, new DoubleRenderer());
+
+        viewTable.setDefaultRenderer(Double.class, doubleRenderer);
+        viewTable.setDefaultRenderer(Float.class, doubleRenderer);
         viewTable.repaint();
     }
 

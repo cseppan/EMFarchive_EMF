@@ -70,6 +70,10 @@ public class ViewableTablePresenter implements TablePresenter {
         delegate.doApplyConstraints(rowFilter, sortOrder);
     }
 
+    public void doApplyFormat() throws EmfException {
+        delegate.doApplyFormat();
+    }
+    
 //    public String getRowFilter(){
 //        return rowFilter; 
 //    }
