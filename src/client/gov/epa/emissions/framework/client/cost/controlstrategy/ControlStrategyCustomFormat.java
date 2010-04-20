@@ -26,8 +26,6 @@ public class ControlStrategyCustomFormat extends DecimalFormat {
 
         super(pattern);
         setUserDefaults();
-
-        System.out.println("Pattern: " + pattern);
     }
 
     private void setUserDefaults() {
