@@ -144,6 +144,7 @@ public class DataSortFilterPanel extends JPanel {
                 doApplyFormat(presenter);
             }
         });
+        this.formatButton.setToolTipText("Apply the new format settings to the table");
 
         Button apply = new Button("Apply", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
