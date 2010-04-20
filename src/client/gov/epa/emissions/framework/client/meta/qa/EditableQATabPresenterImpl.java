@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -129,7 +131,7 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         if (qaResult == null || qaResult.getTable() == null || qaResult.getTable().isEmpty())
             throw new EmfException("No QA Step result available to view.");
         
-        File localFile = new File(tempQAStepFilePath(qaStep.getOutputFolder(), qaResult));
+        File localFile = new File(tempQAStepFilePath());
         try {
             if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
                 Writer output = new BufferedWriter(new FileWriter(localFile));
@@ -148,21 +150,24 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         view.displayResultsTable(qaStep.getName(), localFile.getAbsolutePath());
     }
 
-    private String tempQAStepFilePath(String exportDir, QAStepResult qaStepResult) throws EmfException {
-        String separator = exportDir != null && exportDir.length() > 0 ? (exportDir.charAt(0) == '/') ? "/" : "\\" : "\\";
-        String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR");
+    private String tempQAStepFilePath() throws EmfException {
 
-        if (tempDir == null || tempDir.isEmpty())
+        String separator = File.separator;
+        UserPreference preferences = new DefaultUserPreferences();
+        String tempDir = preferences.localTempDir();
+
+        if (tempDir == null || tempDir.isEmpty()) {
             tempDir = System.getProperty("java.io.tmpdir");
+        }
 
         File tempDirFile = new File(tempDir);
 
-        if (!(tempDirFile.exists() && tempDirFile.isDirectory() && tempDirFile.canWrite() && tempDirFile.canRead()))
+        if (!tempDirFile.exists() || !tempDirFile.isDirectory() || !tempDirFile.canWrite() || !tempDirFile.canRead()) {
             throw new EmfException("Import-export temporary folder does not exist or lacks write permissions: "
                     + tempDir);
+        }
 
-
-        return tempDir + separator + qaStepResult.getTable() + ".csv"; // this is how exported file name was
+        return tempDir + separator + dataset.getName() + ".csv"; // this is how exported file name was
     }
     
     private String writerHeader(QAStep qaStep, QAStepResult stepResult, String dsName){
