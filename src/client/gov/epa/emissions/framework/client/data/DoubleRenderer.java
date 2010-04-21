@@ -46,7 +46,7 @@ public class DoubleRenderer extends DefaultTableCellRenderer {
     private double roundDecimalPaces(double d, int digits) {
 
         double pow = Math.pow(10, digits);
-        return ((double) Math.round(d * pow)) / pow;
+        return Math.round(d * pow) / pow;
     }
 
     public void setDecimalPlaces(int decimalPlaces) {
