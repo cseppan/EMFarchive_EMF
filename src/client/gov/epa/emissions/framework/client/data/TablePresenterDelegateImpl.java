@@ -91,7 +91,7 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
         updateFilteredCount();
     }
 
-    public void doApplyFormat() throws EmfException {
+    public void doApplyFormat() {
         view.display(page);
     }
 
