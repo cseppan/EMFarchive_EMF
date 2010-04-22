@@ -229,8 +229,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
                 messagePanel.setMessage(selected.size()
                         + " dataset types have been removed. Please Refresh to see the revised list of types.");
             } catch (EmfException e) {
-                messagePanel.clear();
-                messagePanel.setError(e.getMessage());
+              JOptionPane.showConfirmDialog(parentConsole, e.getMessage(), "Error", JOptionPane.CLOSED_OPTION);
             }
         }
     }

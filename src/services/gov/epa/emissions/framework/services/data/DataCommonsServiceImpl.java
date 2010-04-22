@@ -249,6 +249,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             if (owner.isAdmin()){
                 for (int i =0; i<types.length; i++) {
                     checkIfUsedByCases(types[i], session); 
+                    checkIfUsedByDeletedDS(types[i], session);
                     checkIfUsedByDatasets(types[i], session); 
                     dao.removeDatasetTypes(types[i], session);
                     if (types[i].getFileFormat()!=null ){
@@ -260,13 +261,13 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             dbServer.disconnect();
         } catch (Exception e) {          
             LOG.error("Error deleting dataset types. " , e);
-            throw new EmfException("Error deleting dataset types. " + e.getMessage());
+            throw new EmfException("Error deleting dataset types. \n" + e.getMessage());
         } finally{
             session.close(); 
         }
     }
     
-    public void checkIfUsedByCases(DatasetType type, Session session) throws EmfException {
+    private void checkIfUsedByCases(DatasetType type, Session session) throws EmfException {
         List list = null;
 
         // check if dataset is an input dataset for some cases (via the cases.cases_caseinputs table)
@@ -281,7 +282,25 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
     
-    public void checkIfUsedByDatasets(DatasetType type, Session session) throws EmfException {
+    private void checkIfUsedByDeletedDS(DatasetType type, Session session) throws EmfException {
+        List list = null;
+
+        // check if dataset is an input dataset for some cases (via the cases.cases_caseinputs table)
+        list = session.createQuery(
+                "select DS.id from EmfDataset as DS " + "where (lower(DS.status) like '%deleted%')"
+                 + "and DS.datasetType.id = "
+                        + type.getId()+ ")").list();
+
+        if (list != null && list.size() > 0) {
+            Criterion criterion = Restrictions.eq("id", list.get(0));
+            EmfDataset deletedDS = (EmfDataset) dao.get(EmfDataset.class, criterion, session).get(0);
+            throw new EmfException(" Cannot delete dataset type <"+ type.getName()
+                    + ">. \n The following user have removed but not purged datasets of this type. \n" 
+                    + "<" + deletedDS.getCreator() + ", " + deletedDS.getCreatorFullName() +">");
+        }
+    }
+    
+    private void checkIfUsedByDatasets(DatasetType type, Session session) throws EmfException {
         List list = null;
 
         // check if dataset is an input dataset for some cases (via the cases.cases_caseinputs table)
@@ -290,7 +309,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
                         + type.getId()+ ")").list();
 
         if (list != null && list.size() > 0) {
-            throw new EmfException("Dataset type \" " + type.getName()+ "\" is used by datasets " + list.get(0) );
+            throw new EmfException("Dataset type \" " + type.getName()+ "\" is used by dataset " + list.get(0) );
         }
     }
 
