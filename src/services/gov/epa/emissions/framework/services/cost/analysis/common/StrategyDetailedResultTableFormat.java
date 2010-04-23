@@ -61,6 +61,8 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
     }
 
     private Column[] baseCols() {
+        
+        System.out.println("###############################################This is test output from baseCols...###############################################");
         List<Column> cols = new ArrayList<Column>();
 
         cols.add(new Column("Disable", types.booleanType(), new StringFormatter(5)));
@@ -118,7 +120,10 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         cols.add(new Column("REPLACEMENT_ADDON", types.stringType(1), 1, new StringFormatter(1)));
         cols.add(new Column("EXISTING_MEASURE_ABBREVIATION", types.stringType(10), 10, new StringFormatter(10)));
         cols.add(new Column("EXISTING_PRIMARY_DEVICE_TYPE_CODE", types.stringType(4), 4, new StringFormatter(4)));
-        
+
+        cols.add(new Column("Strategy_Name", types.stringType(255), 255, new StringFormatter(255)));
+        cols.add(new Column("Control_Technology", types.stringType(128), 128, new StringFormatter(128)));        
+        cols.add(new Column("Source_Group", types.stringType(255), 255, new StringFormatter(255)));
         
         cols.add(new Column("Comment", types.stringType(128), new StringFormatter(128)));
         
