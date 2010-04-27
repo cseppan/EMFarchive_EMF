@@ -110,10 +110,10 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         addChangeable(name);
         layoutGenerator.addLabelWidgetPair("Name:", name, uPanel);
 
-        description = new TextArea("description", type.getDescription(), 40);
+        description = new TextArea("description", type.getDescription(), 40, 2);
         addChangeable(description);
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(description);
-        descScrollableTextArea.setMinimumSize(new Dimension(80, 80));
+        descScrollableTextArea.setMinimumSize(new Dimension(80, 50));
         layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, uPanel);
         
         // Lay out the panel.
@@ -142,7 +142,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
             layoutGenerator2.addLabelWidgetPair("File Format:", fileFomatTextArea, lPanel);
         }else{   
             ScrollableComponent fileFomatTextArea = new ScrollableComponent(fileFormat);
-            fileFomatTextArea.setMinimumSize(new Dimension(80, 80));
+            fileFomatTextArea.setMinimumSize(new Dimension(80, 50));
             layoutGenerator2.addLabelWidgetPair("File Format:", fileFomatTextArea, lPanel);
         }
         sortOrder = new TextField("sortOrder", type.getDefaultSortOrder(), 40);
@@ -198,7 +198,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         keywordsTableData = new EditableKeyValueTableData(type.getKeyVals(), new Keywords(keywords));
         keywordsPanel = new DatasetTypeKeywordsPanel(keywordsTableData, keywords, this, parent);
         keywordsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-
+        keywordsPanel.setMinimumSize(new Dimension(80, 100));
         return keywordsPanel;
     }
 
@@ -206,7 +206,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         qaStepTemplatesPanel = new EditQAStepTemplatesPanel(session, type, programs, this, desktopManager, parent,messagePanel);
         QAStepTemplatesPanelPresenter presenter = new QAStepTemplatesPanelPresenter(session,type, qaStepTemplatesPanel);
         presenter.display();
-
+        qaStepTemplatesPanel.setMinimumSize(new Dimension(80, 100));
         return qaStepTemplatesPanel;
     }
 
