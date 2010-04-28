@@ -361,6 +361,25 @@ public class CaseDAO {
 
         return new Criterion[] { c1, c2, c3, c4, c5, c6 };
     }
+    
+    public boolean caseJobExists(CaseJob job, Session session) {
+        Criterion[] criterions = uniqueCaseJobCriteria(job.getCaseId(), job);
+
+        return hibernateFacade.exists(CaseJob.class, criterions, session);
+    }
+
+    private Criterion[] uniqueCaseJobCriteria(int caseId, CaseJob job) {
+        String jobname = job.getName();
+        Sector sector = job.getSector();
+        GeoRegion region = job.getRegion();
+
+        Criterion c1 = Restrictions.eq("caseId", new Integer(caseId));
+        Criterion c2 = (jobname == null) ? Restrictions.isNull("name") : Restrictions.eq("name", jobname);
+        Criterion c3 = (region == null) ? Restrictions.isNull("region") : Restrictions.eq("region", region);
+        Criterion c4 = (sector == null) ? Restrictions.isNull("sector") : Restrictions.eq("sector", sector);
+
+        return new Criterion[] { c1, c2, c3, c4 };
+    }
 
     public Object load(Class<?> clazz, String name, Session session) {
         Criterion criterion = Restrictions.eq("name", name);
@@ -786,19 +805,18 @@ public class CaseDAO {
     }
 
     public CaseJob getCaseJob(int caseId, CaseJob job, Session session) {
-        Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
-        Criterion crit2 = Restrictions.eq("name", job.getName());
-        // region criteria doesn't work w/ no region
-        //Criterion crit3 = Restrictions.eq("region", job.getRegion());
+        Criterion[] crits = uniqueCaseJobCriteria(caseId, job);
 
-        return (CaseJob) hibernateFacade.load(CaseJob.class, new Criterion[] { crit1, crit2 }, session);
+        return (CaseJob) hibernateFacade.load(CaseJob.class, crits, session);
     }
 
+    @SuppressWarnings("unchecked")
     public CaseJob getCaseJob(int caseId, String jobName, Session session) {
         Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
         Criterion crit2 = Restrictions.eq("name", jobName);
+        List<CaseJob> jobs = hibernateFacade.get(CaseJob.class, new Criterion[] { crit1, crit2 }, session);
 
-        return (CaseJob) hibernateFacade.load(CaseJob.class, new Criterion[] { crit1, crit2 }, session);
+        return (jobs != null && jobs.size() > 0) ? jobs.get(0) : null;
     }
 
     public void updateCaseJob(CaseJob job) {
@@ -1142,27 +1160,46 @@ public class CaseDAO {
     }
 
     public CaseJob loadCaseJob(CaseJob job, Session session) {
-        Criterion c1 = Restrictions.eq("caseId", new Integer(job.getCaseId()));
-        Criterion c2 = Restrictions.eq("name", job.getName());
-        Criterion[] criterions = { c1, c2 };
+        Criterion[] criterions = uniqueCaseJobCriteria(job.getCaseId(), job);
         return (CaseJob) hibernateFacade.load(CaseJob.class, criterions, session);
     }
 
+    @SuppressWarnings("unchecked")
     public CaseJob loadCaseJobByName(CaseJob job) {
         Session session = sessionFactory.getSession();
-        Object obj = null;
+        CaseJob obj = null;
+        
         try {
             Criterion c1 = Restrictions.eq("caseId", new Integer(job.getCaseId()));
             Criterion c2 = Restrictions.eq("name", job.getName());
             Criterion[] criterions = { c1, c2 };
-            obj = hibernateFacade.load(CaseJob.class, criterions, session);
+            List<CaseJob> jobs = hibernateFacade.get(CaseJob.class, criterions, session);
+            
+            if (jobs != null && jobs.size() > 0) 
+                obj = jobs.get(0);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             session.close();
         }
-        return (CaseJob) obj;
+        
+        return obj;
 
+    }
+    
+    public CaseJob loadUniqueCaseJob(CaseJob job) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
+        try {
+            Criterion[] criterions = uniqueCaseJobCriteria(job.getCaseId(), job);
+            return (CaseJob)hibernateFacade.load(CaseJob.class, criterions, session);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new EmfException("Can't load case job: " + job.getName() + ".");
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
     }
 
     public void removeCaseJobs(CaseJob[] jobs, Session session) {

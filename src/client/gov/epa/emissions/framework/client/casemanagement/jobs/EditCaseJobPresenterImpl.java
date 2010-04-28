@@ -50,8 +50,8 @@ public class EditCaseJobPresenterImpl implements EditJobPresenter {
     }
     
     public void saveJob() throws EmfException {
-        parentView.setMessage("Saved \"" + job.getName() + "\". Refresh to see the changes in the table.");
-        jobFieldsPresenter.doSave();
+        CaseJob savedJob = jobFieldsPresenter.doSave();
+        parentView.setMessage("Saved \"" + savedJob.getName() + "\". Refresh to see the changes in the table.");
         parentPresenter.refreshJobList();
     }
     

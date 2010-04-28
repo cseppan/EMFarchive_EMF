@@ -123,7 +123,10 @@ public class CaseJob implements Serializable, Comparable<CaseJob> {
     }
 
     public String toString() {
-        return this.name;
+        String secName = (sector == null) ? "All sectors" : sector.getName();
+        String regionName = (region == null) ? "All regions" : region.getAbbreviation();
+        
+        return this.name + " (" + secName + ", " + regionName + ")";
     }
 
     public int compareTo(CaseJob other) {

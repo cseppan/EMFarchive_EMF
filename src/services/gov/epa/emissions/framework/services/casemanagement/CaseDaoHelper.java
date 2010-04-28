@@ -721,10 +721,8 @@ public class CaseDaoHelper {
         Session session = sessionFactory.getSession();
 
         try {
-            CaseJob existed = caseDao.getCaseJob(job.getCaseId(), job.getName(), session);
-            
-            if (existed != null)
-                return existed;
+            if (caseDao.caseJobExists(job, session))
+                return caseDao.loadCaseJob(job, session);
             
             caseDao.addObject(job, session);
             session.clear();

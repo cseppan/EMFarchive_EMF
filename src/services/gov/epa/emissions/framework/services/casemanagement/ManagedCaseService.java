@@ -1537,9 +1537,8 @@ public class ManagedCaseService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new Exception(e);
+            throw e;
         } finally {
-
             session.close();
         }
 
@@ -2169,6 +2168,10 @@ public class ManagedCaseService {
         try {
             if (job.getRunstatus() == null)
                 job.setRunstatus(dao.getJobRunStatuse("Not Started"));
+            
+            if (dao.caseJobExists(job, session))
+                throw new EmfException(
+                        "The combination of 'Name', 'Region', 'Sector' should be unique.");
 
             job.setIdInQueue(null);
             dao.add(job, session);
@@ -2181,11 +2184,12 @@ public class ManagedCaseService {
             if (region != null && !regions.contains(region))
                 regions.add(region);
             
-            return dao.loadCaseJobByName(job);
+            session.clear();
+            
+            return dao.loadCaseJob(job, session);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Could not add new case job '" + job.getName() + "'\n" + e.getMessage());
-            throw new EmfException("Could not add new case job '" + job.getName() + "'");
+            log.error("Adding new job " + job.getName() + " failed.", e);
+            throw new EmfException(e.getMessage());
         } finally {
             try {
                 updateCase(user, job.getCaseId(), session, sectors, regions);
@@ -2929,7 +2933,8 @@ public class ManagedCaseService {
 
     public synchronized void updateCaseJob(User user, CaseJob job) throws EmfException {
         try {
-            CaseJob loaded = dao.loadCaseJobByName(job);
+            CaseJob loaded = dao.loadUniqueCaseJob(job);
+            
             if (user == null)
                 throw new EmfException("Running Case Job requires a valid user");
 
@@ -2963,7 +2968,12 @@ public class ManagedCaseService {
         Session localSession = sessionFactory.getSession();
         List<Sector> sectors = new ArrayList<Sector>();
         List<GeoRegion> regions = new ArrayList<GeoRegion>();
-             
+       
+        CaseJob loaded = dao.loadUniqueCaseJob(job);
+
+        if (loaded != null && loaded.getId() != job.getId())
+            throw new EmfException("The combination of 'Name', 'Region', 'Sector' should be unique.");
+
         Sector sector = job.getSector();
         GeoRegion region = job.getRegion();
 
@@ -2987,11 +2997,6 @@ public class ManagedCaseService {
         }
 
         try {
-            CaseJob loaded = dao.loadCaseJobByName(job);
-
-            if (loaded != null && loaded.getId() != job.getId())
-                throw new EmfException("Case job uniqueness check failed (" + loaded.getId() + "," + job.getId() + ")");
-
             // maintain current running user from server
             // do NOT update the running user from the client
             job.setRunJobUser(dao.getCaseJob(job.getId()).getRunJobUser());
@@ -3632,7 +3637,7 @@ public class ManagedCaseService {
         // ASJ
         sbuf.append(eolString);
         if (inputsASJ != null) {
-            sbuf.append(this.runComment + " Inputs -- all regions and  sector (" + sector + ") and job (" + job + ")"
+            sbuf.append(this.runComment + " Inputs -- all regions and  sector (" + sector + ") and job (" + job.getName() + ")"
                     + eolString);
             for (CaseInput input : inputsASJ) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
@@ -3643,7 +3648,7 @@ public class ManagedCaseService {
         sbuf.append(eolString);
         if (inputsRSJ != null) {
             sbuf.append(this.runComment + " Inputs -- region (" + region + ") and  sector (" + sector + ") and job ("
-                    + job + ")" + eolString);
+                    + job.getName() + ")" + eolString);
             for (CaseInput input : inputsRSJ) {
                 sbuf.append(setenvInput(input, caseObj, job, expSvc));
             }
@@ -3766,7 +3771,7 @@ public class ManagedCaseService {
         // AAJ
         sbuf.append(eolString);
         if (paramsAAJ != null) {
-            sbuf.append(this.runComment + " Parameters -- all regions, all sectors, job (" + job + ")" + eolString);
+            sbuf.append(this.runComment + " Parameters -- all regions, all sectors, job (" + job.getName() + ")" + eolString);
             for (CaseParameter param : paramsAAJ) {
                 sbuf.append(setenvParameter(param));
             }
@@ -3775,7 +3780,7 @@ public class ManagedCaseService {
         // RAJ
         sbuf.append(eolString);
         if (paramsRAJ != null) {
-            sbuf.append(this.runComment + " Parameters -- region (" + region + "), all sectors, job (" + job + ")"
+            sbuf.append(this.runComment + " Parameters -- region (" + region + "), all sectors, job (" + job.getName() + ")"
                     + eolString);
             for (CaseParameter param : paramsRAJ) {
                 sbuf.append(setenvParameter(param));
@@ -3785,7 +3790,7 @@ public class ManagedCaseService {
         // ASJ
         sbuf.append(eolString);
         if (paramsASJ != null) {
-            sbuf.append(this.runComment + " Parameters -- all regions, sector (" + sector + "), all job (" + job + ")"
+            sbuf.append(this.runComment + " Parameters -- all regions, sector (" + sector + "), all job (" + job.getName() + ")"
                     + eolString);
             for (CaseParameter param : paramsASJ) {
                 sbuf.append(setenvParameter(param));
@@ -3796,7 +3801,7 @@ public class ManagedCaseService {
         sbuf.append(eolString);
         if (paramsRSJ != null) {
             sbuf.append(this.runComment + " Parameters -- region (" + region + "), sector (" + sector + "), job ("
-                    + job + ")" + eolString);
+                    + job.getName() + ")" + eolString);
             for (CaseParameter param : paramsRSJ) {
                 sbuf.append(setenvParameter(param));
             }
@@ -3883,7 +3888,23 @@ public class ManagedCaseService {
         String dateStamp = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
         String jobName = job.getName().replace(" ", "_");
         Case caseObj = this.getCase(job.getCaseId(), session);
-
+        
+        //Get sector name and region abbreviation
+        String secName = job.getSector() == null ? "" : job.getSector().getName();
+        String regionAbbr = job.getRegion() == null ? "" : job.getRegion().getAbbreviation();
+        
+        if (!secName.isEmpty() && jobName.toLowerCase().contains(secName.toLowerCase()))
+            secName = "";
+        
+        if (!regionAbbr.isEmpty() && jobName.toLowerCase().contains(regionAbbr.toLowerCase()))
+            regionAbbr = "";
+        
+        if (!secName.isEmpty())
+            secName = "_" + secName;
+        
+        if (!regionAbbr.isEmpty())
+            regionAbbr = "_" + regionAbbr;
+        
         // Get case abbreviation, if no case abbreviation construct one from id
         String defaultAbbrev = "case" + job.getCaseId();
         String caseAbbrev = (caseObj.getAbbreviation() == null) ? defaultAbbrev : caseObj.getAbbreviation().getName();
@@ -3902,7 +3923,7 @@ public class ManagedCaseService {
                         "The output job scripts directory must be set on the Jobs tab prior to running any jobs");
             }
 
-            String fileName = replaceNonDigitNonLetterChars(jobName + "_" + caseAbbrev + "_" + dateStamp
+            String fileName = replaceNonDigitNonLetterChars(jobName + secName + regionAbbr + "_" + caseAbbrev + "_" + dateStamp
                     + this.runSuffix);
             fileName = outputDirExpanded + delimeter + fileName;
             return fileName;
@@ -4707,13 +4728,33 @@ public class ManagedCaseService {
     private void checkJobsDuplication(List<CaseJob> existingJobs, CaseJob[] jobs2copy, String jobPrefix)
             throws EmfException {
         for (Iterator<CaseJob> iter = existingJobs.iterator(); iter.hasNext();) {
-            String jobName = iter.next().getName();
+            CaseJob job = iter.next();
+            String jobName = job.getName();
+            Sector sector = job.getSector();
+            GeoRegion region = job.getRegion();
 
-            for (CaseJob job : jobs2copy)
-                if (jobName.equalsIgnoreCase(jobPrefix + job.getName()))
-                    throw new EmfException("Job (" + job.getName() + ") plus job prefix (" + jobPrefix
-                            + ") already exists.");
+            for (CaseJob temp : jobs2copy)
+                if (jobName.equalsIgnoreCase(jobPrefix + temp.getName()) &&
+                        objectsEqual(sector, temp.getSector()) &&
+                        objectsEqual(region, temp.getRegion()))
+                    throw new EmfException("Job (" + temp.getName() + ") has an equivalent one existing.");
         }
+    }
+
+    private boolean objectsEqual(Object obj1, Object obj2) {
+        if (obj1 == null && obj2 == null)
+            return true;
+        
+        if (obj1 == null && obj2 != null)
+            return false;
+        
+        if (obj1 != null && obj2 == null)
+            return false;
+        
+        if (obj1 != null && obj2 != null)
+            return obj1.equals(obj2);
+        
+        return false;
     }
 
     private CaseInput[] removeRedundantInputs(CaseInput[] inputs, List<CaseInput> existingInputs, String jobPrefix)

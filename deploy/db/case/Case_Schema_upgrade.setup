@@ -275,3 +275,6 @@ ALTER TABLE cases.cases_caseinputs ADD CONSTRAINT cases_inputs_uniqueness_key UN
 ALTER TABLE cases.cases_parameters DROP CONSTRAINT cases_parameters_case_id_key;
 ALTER TABLE cases.cases_parameters ADD CONSTRAINT cases_parameters_uniqueness_key UNIQUE (case_id,param_name_id,env_vars_id,region_id,sector_id,case_job_id);
 
+-- 4/21/2010 update job uniqueness criterion
+ALTER TABLE cases.cases_casejobs DROP CONSTRAINT  cases_casejobs_case_id_key;
+ALTER TABLE cases.cases_casejobs ADD CONSTRAINT  cases_casejobs_case_id_key  UNIQUE (case_id, name, sector_id, region_id);

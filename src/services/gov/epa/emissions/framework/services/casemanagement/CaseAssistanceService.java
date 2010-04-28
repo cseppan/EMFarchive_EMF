@@ -483,9 +483,10 @@ public class CaseAssistanceService {
             EmfDataset ds = helper.getDataset(input.getDataset().getName(), type);
             Version ver = null;
             Version tempVer = input.getVersion();
-            int verNum = (tempVer == null ? ds.getDefaultVersion() : tempVer.getVersion());
+            int verNum = 0;
             
             if (ds != null) {
+                verNum = (tempVer == null ? ds.getDefaultVersion() : tempVer.getVersion());
                 ver = helper.getDatasetVersion(ds.getId(), verNum);
                 ver = (ver == null ? helper.getDatasetVersion(ds.getId(), ds.getDefaultVersion()) : ver);
             }
