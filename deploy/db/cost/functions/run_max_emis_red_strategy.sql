@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION public.run_max_emis_red_strategy(control_strategy_id integer, input_dataset_id integer, 
 	input_dataset_version integer, strategy_result_id int) RETURNS void AS $$
 DECLARE
+	strategy_name varchar(255) := '';
 	inv_table_name varchar(64) := '';
 	inv_filter text := '';
 	inv_fips_filter text := '';
@@ -95,7 +96,8 @@ BEGIN
 	END IF;
 
 	-- get target pollutant, inv filter, and county dataset info if specified
-	SELECT cs.pollutant_id,
+	SELECT cs.name,
+		cs.pollutant_id,
 		case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
 		cs.cost_year,
 		cs.analysis_year,
@@ -109,7 +111,8 @@ BEGIN
 		inner join emf.pollutants p
 		on p.id = cs.pollutant_id
 	where cs.id = control_strategy_id
-	INTO target_pollutant_id,
+	INTO strategy_name,
+		target_pollutant_id,
 		inv_filter,
 		cost_year,
 		inventory_year,
@@ -407,7 +410,10 @@ end
 		"comment",
 		REPLACEMENT_ADDON,
 		EXISTING_MEASURE_ABBREVIATION,
-		EXISTING_PRIMARY_DEVICE_TYPE_CODE
+		EXISTING_PRIMARY_DEVICE_TYPE_CODE,
+		strategy_name,
+		control_technology,
+		source_group
 		)
 	select DISTINCT ON (inv.fips, inv.scc, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id) 
 		' || detailed_result_dataset_id || '::integer,
@@ -451,7 +457,10 @@ end
 		'''',
 		REPLACEMENT_ADDON,
 		tpm.existing_measure_abbr,
-		tpm.existing_dev_code
+		tpm.existing_dev_code,
+		' || quote_literal(strategy_name) || ' as strategy_name,
+		ct.name,
+		sg.name
 	FROM emissions.' || inv_table_name || ' inv
 
 		inner join emf.pollutants p
@@ -504,12 +513,16 @@ end
 				equipment_life,
 				REPLACEMENT_ADDON,
 				existing_measure_abbr,
-				existing_dev_code
+				existing_dev_code,
+				control_technology,
+				source_group
 
 			from (
 				-- get best measures for sources target pollutants, there could be a tie for a paticular source.
 				select DISTINCT ON (inv.fips, inv.scc' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || ', er.control_measures_id) 
 					m.abbreviation,
+					m.control_technology,
+					m.source_group,
 					inv.scc,
 					inv.fips,
 					' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment,' end || '
@@ -946,6 +959,12 @@ end
 
 		left outer join reference.gdplev
 		on gdplev.annual = eq.cost_year
+
+		left outer join emf.control_technologies ct
+		on ct.id = tpm.control_technology
+
+		left outer join emf.source_groups sg
+		on sg.id = tpm.source_group
 
 		--this part will get best eff rec...
 		inner join emf.control_measure_efficiencyrecords er

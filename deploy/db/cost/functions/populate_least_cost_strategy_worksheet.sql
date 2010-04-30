@@ -2,6 +2,7 @@ CREATE OR REPLACE FUNCTION public.populate_least_cost_strategy_worksheet(control
 	input_dataset_id integer, 
 	input_dataset_version integer) RETURNS void AS $$
 DECLARE
+	strategy_name varchar(255) := '';
 	inv_table_name varchar(64) := '';
 	inv_filter text := '';
 	inv_fips_filter text := '';
@@ -110,7 +111,8 @@ BEGIN
 	END IF;
 
 	-- get target pollutant, inv filter, and county dataset info if specified
-	SELECT cs.pollutant_id,
+	SELECT cs.name,
+		cs.pollutant_id,
 		case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
 		cs.cost_year,
 		cs.analysis_year,
@@ -124,7 +126,8 @@ BEGIN
 		inner join emf.strategy_types st
 		on st.id = cs.strategy_type_id
 	where cs.id = control_strategy_id
-	INTO target_pollutant_id,
+	INTO strategy_name,
+		target_pollutant_id,
 		inv_filter,
 		cost_year,
 		inventory_year,
@@ -487,7 +490,8 @@ BEGIN
 			plant,
 			REPLACEMENT_ADDON,
 			EXISTING_MEASURE_ABBREVIATION,
-			EXISTING_PRIMARY_DEVICE_TYPE_CODE) 
+			EXISTING_PRIMARY_DEVICE_TYPE_CODE
+			) 
 	select *
 	from (
 		select DISTINCT ON (inv.record_id, er.control_measures_id) 

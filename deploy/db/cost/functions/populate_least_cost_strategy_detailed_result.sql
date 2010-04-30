@@ -5,6 +5,7 @@ CREATE OR REPLACE FUNCTION public.populate_least_cost_strategy_detailed_result(c
 	strategy_result_id integer,
 	domain_wide_emis_reduction double precision) RETURNS integer AS $$
 DECLARE
+	strategy_name varchar(255) := '';
 	inv_table_name varchar(64) := '';
 	inv_filter text := '';
 	inv_fips_filter text := '';
@@ -100,7 +101,8 @@ BEGIN
 		costcurve_table_name;
 
 	-- get target pollutant, inv filter, and county dataset info if specified
-	SELECT cs.pollutant_id,
+	SELECT cs.name,
+		cs.pollutant_id,
 		case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
 		cs.cost_year,
 		cs.analysis_year,
@@ -110,7 +112,8 @@ BEGIN
 		cs.discount_rate / 100
 	FROM emf.control_strategies cs
 	where cs.id = control_strategy_id
-	INTO target_pollutant_id,
+	INTO strategy_name,
+		target_pollutant_id,
 		inv_filter,
 		cost_year,
 		inventory_year,
@@ -322,7 +325,10 @@ BEGIN
 		plant,
 		REPLACEMENT_ADDON,
 		EXISTING_MEASURE_ABBREVIATION,
-		EXISTING_PRIMARY_DEVICE_TYPE_CODE
+		EXISTING_PRIMARY_DEVICE_TYPE_CODE,
+		strategy_name,
+		control_technology,
+		source_group
 		) 
 	select 	
 		' || detailed_result_dataset_id || '::integer,
@@ -367,7 +373,10 @@ BEGIN
 		plant,
 		REPLACEMENT_ADDON,
 		EXISTING_MEASURE_ABBREVIATION,
-		EXISTING_PRIMARY_DEVICE_TYPE_CODE
+		EXISTING_PRIMARY_DEVICE_TYPE_CODE,
+		' || quote_literal(strategy_name) || ' as strategy_name,
+		ct.name,
+		sg.name
 	from (
 
 
@@ -385,6 +394,16 @@ BEGIN
 					and tp.poll = ' || quote_literal(target_pollutant) || '
 				ORDER BY ap.source, ap.poll
 	) as tbl
+	
+	inner join emf.control_measures cm
+	on cm.id = tbl.cm_id
+	
+	left outer join emf.control_technologies ct
+	on ct.id = cm.control_technology
+
+	left outer join emf.source_groups sg
+	on sg.id = cm.source_group
+	
 	order by apply_order';
 	raise notice '%', 'populate the detailed result with the relevant results - ' || clock_timestamp();
 --order by marginal, emis_reduction desc, record_id
