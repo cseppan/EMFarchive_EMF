@@ -3,3 +3,4 @@ CREATE SCHEMA cases AUTHORIZATION emf;
 CREATE SCHEMA emissions AUTHORIZATION emf;
 --Restore of this will create schema, see SetupEMFDatabase.setup file
 --CREATE SCHEMA reference AUTHORIZATION emf;
+create schema sms AUTHORIZATION emf;
