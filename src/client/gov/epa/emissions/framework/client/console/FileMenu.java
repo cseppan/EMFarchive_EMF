@@ -25,6 +25,7 @@ public class FileMenu extends JMenu {
         super.setName("file");
 
         super.add(createImport(session, messagePanel, parent));
+//        super.add(createTransfer(session, parent));
         super.addSeparator();
         super.add(createLogout(session, parent));
         super.add(createExit(parent));
@@ -70,6 +71,26 @@ public class FileMenu extends JMenu {
             presenter.display(view);
         }
 
+    }
+
+    protected JMenuItem createTransfer(final EmfSession session, final EmfConsole parent) {
+        JMenuItem logout = new JMenuItem("Transfer");
+        logout.setName("transfer");
+        logout.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                transfer(session, parent, desktopManager);
+            }
+        });
+        return logout;
+    }
+
+    private void transfer(EmfSession session, EmfConsole parent, DesktopManager desktopManager) {
+//        try {
+//            session.dataService().importRemoteEMFDataset(1, session.user());
+//        } catch (EmfException e) {
+//            // NOTE Auto-generated catch block
+//            e.printStackTrace();
+//        }
     }
 
     private JMenuItem createImport(final EmfSession session, final MessagePanel messagePanel, final EmfConsole parent) {

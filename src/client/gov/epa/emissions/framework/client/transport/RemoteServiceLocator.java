@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.cost.ControlProgramService;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
+import gov.epa.emissions.framework.services.cost.SectorScenarioService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureExportService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureImportService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -48,6 +49,8 @@ public class RemoteServiceLocator implements ServiceLocator {
     private ControlMeasureImportService controlMeasureImportService;
     
     private ControlMeasureExportService controlMeasureExportService;
+    
+    private SectorScenarioService sectorScenarioService;
     
     public RemoteServiceLocator(String baseUrl) throws Exception {
         this.baseUrl = baseUrl;
@@ -149,6 +152,13 @@ public class RemoteServiceLocator implements ServiceLocator {
             controlMeasureExportService = new ControlMeasureExportServiceTransport(baseUrl + "/gov.epa.emf.services.cost.controlmeasure.ControlMeasureExportService");
         
         return controlMeasureExportService;
+    }
+    
+    public SectorScenarioService sectorScenarioService() {
+        if (sectorScenarioService == null)
+            sectorScenarioService = new SectorScenarioServiceTransport(baseUrl + "/gov.epa.emf.services.sms.SectorScenarioService");
+        
+        return sectorScenarioService;
     }
     
     /*

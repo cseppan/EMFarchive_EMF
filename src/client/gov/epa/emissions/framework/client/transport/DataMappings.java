@@ -64,6 +64,10 @@ import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.data.RegionType;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.Revision;
+import gov.epa.emissions.framework.services.sms.SectorScenario;
+import gov.epa.emissions.framework.services.sms.SectorScenarioInventory;
+import gov.epa.emissions.framework.services.sms.SectorScenarioOutput;
+import gov.epa.emissions.framework.services.sms.SectorScenarioOutputType;
 
 import javax.xml.namespace.QName;
 
@@ -127,6 +131,12 @@ public class DataMappings extends Mappings {
         
         bean(call, XFileFormat.class, fileFormat());
         bean(call, Column.class, fileFormatColumn());
+
+        //sms project
+        bean(call, SectorScenario.class, sectorScenario());
+        bean(call, SectorScenarioOutput.class, sectorScenarioOutput());
+        bean(call, SectorScenarioOutputType.class, sectorScenarioOutputType());
+        bean(call, SectorScenarioInventory.class, sectorScenarioInventory());
 
         controlBeans(call);
     }
@@ -233,6 +243,12 @@ public class DataMappings extends Mappings {
         
         array(call, XFileFormat[].class, fileFormats());
         array(call, Column[].class, fileFormatColumns());
+        
+        //sms project
+        array(call, SectorScenario[].class, sectorScenarios());
+        array(call, SectorScenarioOutput[].class, sectorScenarioOutputs());
+        array(call, SectorScenarioOutputType[].class, sectorScenarioOutputTypes());
+        array(call, SectorScenarioInventory[].class, sectorScenarioInventories());
     }
 
     public QName logs() {
@@ -697,6 +713,38 @@ public class DataMappings extends Mappings {
     
     public QName fileFormatColumns() {
         return qname("Columns");
+    }
+
+    public QName sectorScenario() {
+        return qname("SectorScenario");
+    }
+    
+    public QName sectorScenarios() {
+        return qname("SectorScenarios");
+    }
+
+    public QName sectorScenarioInventory() {
+        return qname("SectorScenarioInventory");
+    }
+    
+    public QName sectorScenarioInventories() {
+        return qname("SectorScenarioInventories");
+    }
+
+    public QName sectorScenarioOutput() {
+        return qname("SectorScenarioOutput");
+    }
+    
+    public QName sectorScenarioOutputs() {
+        return qname("SectorScenarioOutputs");
+    }
+
+    public QName sectorScenarioOutputType() {
+        return qname("SectorScenarioOutputType");
+    }
+    
+    public QName sectorScenarioOutputTypes() {
+        return qname("SectorScenarioOutputTypes");
     }
 
 }

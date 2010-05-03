@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.ControlProgramService;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
+import gov.epa.emissions.framework.services.cost.SectorScenarioService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureExportService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureImportService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -47,4 +48,6 @@ public interface ServiceLocator {
     ControlMeasureImportService controlMeasureImportService();
 
     ControlMeasureExportService controlMeasureExportService();
+
+    SectorScenarioService sectorScenarioService();
 }
