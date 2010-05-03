@@ -26,7 +26,6 @@ public class SectorScenario implements Lockable, Serializable {
     private Mutex lock;
     private String copiedFrom;
     private String exportDirectory;
-    private Integer eecsVersion;
     private EmfDataset eecsMapppingDataset;
     private Integer eecsMapppingDatasetVersion;
     private EmfDataset sectorMapppingDataset;
@@ -156,14 +155,6 @@ public class SectorScenario implements Lockable, Serializable {
 
     public void setExportDirectory(String exportDirectory) {
         this.exportDirectory = exportDirectory;
-    }
-
-    public Integer getEecsVersion() {
-        return eecsVersion;
-    }
-
-    public void setEecsVersion(Integer eecsVersion) {
-        this.eecsVersion = eecsVersion;
     }
 
     public EmfDataset getEecsMapppingDataset() {
