@@ -1,19 +1,11 @@
-create table sms.eecs_version (
-  id serial primary key NOT NULL,
-  version_number int NOT NULL UNIQUE,
-  name character varying(128) NOT NULL UNIQUE,
-  description character varying(255)
-);
-
 create table sms.eecs (
   id serial primary key NOT NULL,
   eecs character varying(10) NOT NULL,
   eecs_name character varying(128) NOT NULL,
   eecs_description character varying(128),
   path ltree NOT NULL,
-  eecs_version_id int NOT NULL REFERENCES sms.eecs_version(id),
-  UNIQUE(eecs,eecs_version_id),
-  UNIQUE(eecs_name,eecs_version_id)
+  UNIQUE(eecs),
+  UNIQUE(eecs_name)
 );
 
 create table sms.sector_scenario (
