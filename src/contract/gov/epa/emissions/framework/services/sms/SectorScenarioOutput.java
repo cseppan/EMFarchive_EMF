@@ -42,24 +42,24 @@ public class SectorScenarioOutput implements Serializable {
         return type;
     }
 
-    public void setType(SectorScenarioOutputType resultType) {
-        this.type = resultType;
+    public void setType(SectorScenarioOutputType type) {
+        this.type = type;
     }
 
     public Date getCompletionDate() {
         return completionDate;
     }
 
-    public void setCompletionDate(Date completionTime) {
-        this.completionDate = completionTime;
+    public void setCompletionDate(Date completionDate) {
+        this.completionDate = completionDate;
     }
 
     public EmfDataset getOutputDataset() {
         return outputDataset;
     }
 
-    public void setOutputDataset(EmfDataset detailedResultDataset) {
-        this.outputDataset = detailedResultDataset;
+    public void setOutputDataset(EmfDataset outputDataset) {
+        this.outputDataset = outputDataset;
     }
 
     public EmfDataset getInventoryDataset() {
@@ -82,8 +82,8 @@ public class SectorScenarioOutput implements Serializable {
         return startDate;
     }
 
-    public void setStartDate(Date startTime) {
-        this.startDate = startTime;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
     public void setInventoryDatasetVersion(Integer inputDatasetVersion) {

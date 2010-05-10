@@ -272,4 +272,15 @@ public class SectorScenarioServiceTransport implements SectorScenarioService {
         return (String) call.requestResponse(new Object[] { new Integer(id) });
     }
 
+    public synchronized String[] getDistinctSectorListFromDataset(int datasetId, int versionNumber) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getDistinctSectorListFromDataset");
+        call.addIntegerParam("datasetId");
+        call.addIntegerParam("versionNumber");
+        call.setReturnType(mappings.strings());
+
+        return (String[]) call.requestResponse(new Object[] { new Integer(datasetId), new Integer(versionNumber) });
+    }
+
 }

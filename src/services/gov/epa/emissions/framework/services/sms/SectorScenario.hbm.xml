@@ -29,6 +29,11 @@
     <property name="eecsMapppingDatasetVersion" column="eecs_mappping_dataset_version" type="integer"/>
 	<many-to-one name="sectorMapppingDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="sector_mappping_dataset_id"/>
     <property name="sectorMapppingDatasetVersion" column="sector_mappping_dataset_version" type="integer"/>
+	<array name="sectors" table="sector_scenario_sector" schema="sms">
+    	<key column="sector_scenario_id" not-null="true"/>
+    	<list-index column="list_index"/>
+		<element column="sector_name" type="java.lang.String"	not-null="true"/>
+	</array>
 	<array name="inventories" table="sector_scenario_inventory" schema="sms">
     	<key column="sector_scenario_id" not-null="true"/>
     	<list-index column="list_index"/>

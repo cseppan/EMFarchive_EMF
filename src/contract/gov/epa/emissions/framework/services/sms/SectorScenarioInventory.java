@@ -18,6 +18,11 @@ public class SectorScenarioInventory implements Serializable {
         this.dataset = dataset;
     }
 
+    public SectorScenarioInventory(EmfDataset dataset, int version) {
+        this.dataset = dataset;
+        this.version = version;
+    }
+
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof SectorScenarioInventory)) {
             return false;

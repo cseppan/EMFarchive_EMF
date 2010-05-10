@@ -251,7 +251,7 @@ public class SectorScenario implements Lockable, Serializable {
         return sectors;
     }
 
-    public void setInventories(String[] sectors) {
+    public void setSectors(String[] sectors) {
         this.sectors = sectors;
     }
 

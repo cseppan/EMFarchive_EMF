@@ -982,6 +982,15 @@
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.sms.SectorScenarioInventory"
+		qname="ns1:SectorScenarioInventory" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<arrayMapping qname="ns1:SectorScenarioInventories" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.sms.SectorScenarioInventory[]"
+		innerType="ns1:SectorScenarioInventory"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.sms.SectorScenarioOutput"
 		qname="ns1:SectorScenarioOutput" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 

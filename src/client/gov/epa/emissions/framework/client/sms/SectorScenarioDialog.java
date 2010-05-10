@@ -14,20 +14,27 @@ import gov.epa.emissions.framework.client.meta.EmfImageTool;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
+import gov.epa.emissions.framework.services.sms.SectorScenarioInventory;
+import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 public class SectorScenarioDialog extends JDialog implements SectorScenarioView {
@@ -50,9 +57,15 @@ public class SectorScenarioDialog extends JDialog implements SectorScenarioView 
 
     private ComboBox sectorMappingDatasetVersion;
 
+    private ComboBox inventoryDataset;
+
+    private ComboBox inventoryDatasetVersion;
+
     private JList datasetList;
     
     private EmfSession session;
+
+    private ListWidget sectorsList;
     
     public SectorScenarioDialog(EmfConsole parent, EmfSession session) {
         super(parent);
@@ -69,7 +82,7 @@ public class SectorScenarioDialog extends JDialog implements SectorScenarioView 
         panel.add(buildTopPanel(), BorderLayout.NORTH);
         panel.add(buttonPanel(), BorderLayout.SOUTH);
         contentPane.add(panel);
-        setTitle("Select Inventory Datasets");
+        setTitle("Sector Scenario Analysis");
         this.pack();
         this.setSize(500, 400);
         this.setLocation(ScreenUtils.getPointToCenter(this));
@@ -84,6 +97,7 @@ public class SectorScenarioDialog extends JDialog implements SectorScenarioView 
         JPanel panel = new JPanel ();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(buildNameContains());
+        panel.add(createClassesPanel());
         return panel; 
     }
 
@@ -131,39 +145,98 @@ public class SectorScenarioDialog extends JDialog implements SectorScenarioView 
 //      if (controlStrategy.getCountyDataset() != null) dataset.setSelectedItem(controlStrategy.getCountyDataset());
 
         sectorMappingDataset.addActionListener(new AbstractAction() {
-          public void actionPerformed(ActionEvent e) {
-              try {
-                  fillVersions(sectorMappingDatasetVersion, (EmfDataset)sectorMappingDataset.getSelectedItem());
-              } catch (EmfException e1) {
-                  // NOTE Auto-generated catch block
-                  e1.printStackTrace();
+            public void actionPerformed(ActionEvent e) {
+                  try {
+                      fillVersions(sectorMappingDatasetVersion, (EmfDataset)sectorMappingDataset.getSelectedItem());
+                      fillSectorList();
+                  } catch (EmfException e1) {
+                      // NOTE Auto-generated catch block
+                      e1.printStackTrace();
+                  }
               }
-          }
-      });
+        });
 
         sectorMappingDatasetVersion = new ComboBox(new Version[0]);      
-//      version.setPrototypeDisplayValue(width);
-      try {
-          fillVersions(sectorMappingDatasetVersion, (EmfDataset)sectorMappingDataset.getSelectedItem());
-      } catch (EmfException e1) {
-          // NOTE Auto-generated catch block
-          e1.printStackTrace();
-      }
-//      if (controlStrategy.getCountyDataset() != null) version.setSelectedItem(controlStrategy.getCountyDatasetVersion());
+        sectorMappingDatasetVersion.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                  try {
+                    fillSectorList();
+                } catch (EmfException e1) {
+                    // NOTE Auto-generated catch block
+                    e1.printStackTrace();
+                }
+              }
+        });
+        try {
+            fillVersions(sectorMappingDatasetVersion, (EmfDataset)sectorMappingDataset.getSelectedItem());
+        } catch (EmfException e1) {
+            // NOTE Auto-generated catch block
+            e1.printStackTrace();
+        }
+
    
       layoutGenerator.addLabelWidgetPair("Sector Mapping Dataset:", sectorMappingDataset, panel);
       layoutGenerator.addLabelWidgetPair("Sector Mapping Dataset Version:", sectorMappingDatasetVersion, panel);
 
-        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
+      inventoryDataset = new ComboBox("Not selected", presenter.getDatasets(presenter.getDatasetType(DatasetType.ORL_POINT_NATA)));
+//    if (controlStrategy.getCountyDataset() != null) dataset.setSelectedItem(controlStrategy.getCountyDataset());
+
+      inventoryDataset.addActionListener(new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            try {
+                fillVersions(inventoryDatasetVersion, (EmfDataset)inventoryDataset.getSelectedItem());
+            } catch (EmfException e1) {
+                // NOTE Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+    });
+
+      inventoryDatasetVersion = new ComboBox(new Version[0]);      
+//    version.setPrototypeDisplayValue(width);
+    try {
+        fillVersions(inventoryDatasetVersion, (EmfDataset)inventoryDataset.getSelectedItem());
+    } catch (EmfException e1) {
+        // NOTE Auto-generated catch block
+        e1.printStackTrace();
+    }
+//    if (controlStrategy.getCountyDataset() != null) version.setSelectedItem(controlStrategy.getCountyDatasetVersion());
+    layoutGenerator.addLabelWidgetPair("Inventory:", inventoryDataset, panel);
+    layoutGenerator.addLabelWidgetPair("Inventory Version:", inventoryDatasetVersion, panel);
+
+      
+      layoutGenerator.makeCompactGrid(panel, 9, 2, // rows, cols
                 25, 10, // initialX, initialY
                 5, 5);// xPad, yPad
         return panel; 
     }
     
+    private JPanel createClassesPanel() throws EmfException {
+        // build list widget
+        
+        String[] sectors = new String[] {};
+        if (sectorMappingDataset.getSelectedItem() != null) {
+            sectors = presenter.getDistinctSectorListFromDataset(((EmfDataset)sectorMappingDataset.getSelectedItem()).getId(), ((Version)sectorMappingDatasetVersion.getSelectedItem()).getVersion());
+        }
+        this.sectorsList = new ListWidget(sectors, new Object[] {});
+        this.sectorsList.setToolTipText("Use Ctrl or Shift to select multiple classes");
+
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 100, 0, 300));
+        JLabel label = new JLabel("Sectors to Include:");
+        JScrollPane scrollPane = new JScrollPane(sectorsList);
+        scrollPane.setPreferredSize(new Dimension(20, 100));
+        panel.add(label, BorderLayout.NORTH);
+        JPanel scrollPanel = new JPanel(new BorderLayout());
+        scrollPanel.add(scrollPane, BorderLayout.NORTH);
+        panel.add(scrollPanel);
+        return panel;
+    }
+
     private void fillVersions(ComboBox version, EmfDataset dataset) throws EmfException{
         version.setEnabled(true);
 
-        if (dataset != null && dataset.getName().equals("None")) dataset = null;
+        if (dataset != null && dataset.getName().equals("Not selected")) dataset = null;
         Version[] versions = presenter.getVersions(dataset);
         version.removeAllItems();
         version.setModel(new DefaultComboBoxModel(versions));
@@ -171,6 +244,15 @@ public class SectorScenarioDialog extends JDialog implements SectorScenarioView 
         if (versions.length > 0)
             version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
 
+    }
+    
+    private void fillSectorList() throws EmfException {
+        sectorsList.removeAllElements();
+        if (sectorMappingDataset.getSelectedItem() == null ) 
+            return;
+        for (String sector : presenter.getDistinctSectorListFromDataset(((EmfDataset)sectorMappingDataset.getSelectedItem()).getId(), ((Version)sectorMappingDatasetVersion.getSelectedItem()).getVersion())) {
+            sectorsList.addElement(sector);
+        }
     }
     
     private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
@@ -211,12 +293,19 @@ public class SectorScenarioDialog extends JDialog implements SectorScenarioView 
                 sectorScenario.setRunStatus("Not started");
                 sectorScenario.setLastModifiedDate(new Date());
                 sectorScenario.setEecsMapppingDataset((EmfDataset)eecsMappingDataset.getSelectedItem());
-                sectorScenario.setEecsMapppingDatasetVersion(0);
+                sectorScenario.setEecsMapppingDatasetVersion(((Version)eecsMappingDatasetVersion.getSelectedItem()).getVersion());
                 sectorScenario.setSectorMapppingDataset((EmfDataset)sectorMappingDataset.getSelectedItem());
+                sectorScenario.setSectorMapppingDatasetVersion(((Version)sectorMappingDatasetVersion.getSelectedItem()).getVersion());
+
+//                SectorScenarioInventory sectorScenarioInventory = new SectorScenarioInventory((EmfDataset)inventoryDataset.getSelectedItem(), (Integer)inventoryDatasetVersion.getSelectedItem());
+                sectorScenario.setInventories(new SectorScenarioInventory[] { new SectorScenarioInventory((EmfDataset)inventoryDataset.getSelectedItem(), ((Version)inventoryDatasetVersion.getSelectedItem()).getVersion()) });
                 sectorScenario.setSectorMapppingDatasetVersion(0);
+                sectorScenario.setSectors(Arrays.asList(sectorsList.getAllElements()).toArray(new String[0]));
 
                 try {
-                    presenter.addSectorScenario(sectorScenario);
+                    int id = presenter.addSectorScenario(sectorScenario);
+                    presenter.getSectorScenario(session.user(), id);
+                    presenter.runSectorScenario(id);
                 } catch (EmfException e1) {
                     // NOTE Auto-generated catch block
                     e1.printStackTrace();

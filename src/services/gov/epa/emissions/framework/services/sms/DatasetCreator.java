@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.cost.controlStrategy;
+package gov.epa.emissions.framework.services.sms;
 
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
@@ -20,8 +20,6 @@ import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.DateUtil;
-import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
-import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -48,7 +46,7 @@ public class DatasetCreator {
 
 //    private String datasetNamePrefix;
     
-    private ControlStrategy controlStrategy;
+    private SectorScenario sectorScenario;
 
     private Keywords keywordMasterList;
     
@@ -57,7 +55,7 @@ public class DatasetCreator {
     public DatasetCreator() {
         //
     }
-    public DatasetCreator(ControlStrategy controlStrategy, User user, 
+    public DatasetCreator(SectorScenario sectorScenario, User user, 
             HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory,
             Datasource datasource, Keywords keywordMasterList) {
 //        this.datasetNamePrefix = datasetNamePrefix;
@@ -66,7 +64,7 @@ public class DatasetCreator {
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
 //        this.outputDatasetName = getResultDatasetName(strategy.getName());
-        this.controlStrategy = controlStrategy;
+        this.sectorScenario = sectorScenario;
         this.datasource = datasource;
         this.keywordMasterList = keywordMasterList;//new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords());
     }
@@ -102,7 +100,7 @@ public class DatasetCreator {
         String outputTableName = createTableName(tablePrefix, datasetName);
         
         //create dataset
-        EmfDataset dataset = createDataset(datasetName, description, type);
+        EmfDataset dataset = createDataset(datasetName, description, type, null);
 
         setDatasetInternalSource(dataset, outputTableName, 
                 tableFormat, datasetName);
@@ -168,66 +166,6 @@ public class DatasetCreator {
         return dataset;
     }
 
-
-    public EmfDataset addControlledInventoryDataset(String datasetName, 
-            EmfDataset inputDataset, DatasetType type, 
-            TableFormat tableFormat, String description
-//            ,Map<String,String> keywordValues
-            ) throws EmfException {
-//        return addDataset(datasetName, "DS", 
-//                inputDataset, type, 
-//                tableFormat, description);
-        
-        String outputDatasetName = datasetName;
-        //check and see if this name is already being used, if so add a timestamp.
-        if (isDatasetNameUsed(datasetName)) 
-            outputDatasetName = createDatasetName(datasetName);
-
-        String outputTableName = createTableName(datasetName);
-        
-        //create dataset
-        EmfDataset dataset = createDataset(outputDatasetName, description, type, inputDataset);
-        
-        //update dataset start and stop date time to correct year
-        Calendar cal = Calendar.getInstance();
-        Date dateTime = inputDataset.getStartDateTime();
-        cal.setTime(dateTime);
-        cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
-        dataset.setStartDateTime(cal.getTime());
-        dateTime = inputDataset.getStopDateTime();
-        cal.setTime(dateTime);
-        cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
-        dataset.setStopDateTime(cal.getTime());
-        
-//        Iterator iterator = keywordValues.entrySet().iterator();
-//
-//        Map.Entry entry =  (Map.Entry)iterator.next();
-//        String keyword = (String) entry.getKey();
-//        String value = (String) entry.getValue();
-//
-//        while (iterator.hasNext()) {
-//            entry =  (Map.Entry)iterator.next();
-//            keyword = (String) entry.getKey();
-//            value = (String) entry.getValue();
-//            addKeyVal(dataset, keyword, value);
-//        }
-
-        setDatasetInternalSource(dataset, outputTableName, 
-                tableFormat, inputDataset.getName());
-
-        //persist dataset to db
-        add(dataset);
-        try {
-            addVersionZeroEntryToVersionsTable(dataset);
-        } catch (Exception e) {
-            throw new EmfException("Cannot add version zero entry to versions table for dataset: " + dataset.getName());
-        }
-
-        createTable(outputTableName, tableFormat);
-
-        return dataset;
-    }
-
     public EmfDataset addDataset(String datasetNamePrefix, String tablePrefix, 
             EmfDataset inputDataset, DatasetType type, 
             TableFormat tableFormat) throws EmfException {
@@ -239,100 +177,89 @@ public class DatasetCreator {
     private EmfDataset createDataset(String name, 
             String description,
             DatasetType type,
-            EmfDataset inputDataset) {
-        EmfDataset dataset = createDataset(name, 
-                description,
-                type);
-
-        //Add properties from input dataset...
-        dataset.setStartDateTime(inputDataset.getStartDateTime());
-        dataset.setStopDateTime(inputDataset.getStopDateTime());
-        dataset.setTemporalResolution(inputDataset.getTemporalResolution());
-        dataset.setSectors(inputDataset.getSectors());
-        dataset.setRegion(inputDataset.getRegion());
-        dataset.setCountry(inputDataset.getCountry());
-        
-        return dataset;
-    }
-    
-    private EmfDataset createDataset(String name, 
-            String description,
-            DatasetType type) {
-        EmfDataset dataset = new EmfDataset();
+            EmfDataset inventory) {
+        EmfDataset newDataset = new EmfDataset();
         Date start = new Date();
 
-        dataset.setName(name);
-        dataset.setCreator(user.getUsername());
-        dataset.setCreatorFullName(user.getName());
-        dataset.setDatasetType(type);
-        dataset.setDescription(description);
-        dataset.setCreatedDateTime(start);
-        dataset.setModifiedDateTime(start);
-        dataset.setAccessedDateTime(start);
-        dataset.setStatus("Created by control strategy");
-        
-        dataset.setRegion(controlStrategy.getRegion());
+        newDataset.setName(name);
+        newDataset.setCreator(user.getUsername());
+        newDataset.setCreatorFullName(user.getName());
+        newDataset.setDatasetType(type);
+        newDataset.setDescription(description);
+        newDataset.setCreatedDateTime(start);
+        newDataset.setModifiedDateTime(start);
+        newDataset.setAccessedDateTime(start);
+        newDataset.setStatus("Created by sector scenario");
 
+        //Add properties from input dataset...
+        if (inventory != null) {
+            newDataset.setStartDateTime(inventory.getStartDateTime());
+            newDataset.setStopDateTime(inventory.getStopDateTime());
+            newDataset.setTemporalResolution(inventory.getTemporalResolution());
+            newDataset.setSectors(inventory.getSectors());
+            newDataset.setRegion(inventory.getRegion());
+            newDataset.setCountry(inventory.getCountry());
+        }
+    
         //Add keywords to the dataset
-        //addKeyVals(dataset);
+        addKeyVals(newDataset, inventory);
         
-        return dataset;
+        return newDataset;
     }
     
-    protected void addKeyVals(EmfDataset dataset) {
-        if (controlStrategy == null) return;
+    protected void addKeyVals(EmfDataset newDataset, EmfDataset inventory) {
+        if (sectorScenario == null) return;
         //Add keywords to the dataset
-        addKeyVal(dataset, "STRATEGY_NAME", controlStrategy.getName());
-        addKeyVal(dataset, "STRATEGY_ID", controlStrategy.getId()+"");
-        addKeyVal(dataset, "STRATEGY_TYPE", controlStrategy.getStrategyType().getName());
-        addKeyVal(dataset, "TARGET_POLLUTANT", controlStrategy.getTargetPollutant() != null ? controlStrategy.getTargetPollutant().getName() : "Unspecified");
-        addKeyVal(dataset, "COST_YEAR", controlStrategy.getCostYear() + "");
-        addKeyVal(dataset, "REGION", controlStrategy.getRegion() != null && controlStrategy.getRegion().getName().length() > 0 ? controlStrategy.getRegion().getName() : "Unspecified");
-//        addKeyVal(dataset, "STRATEGY_INVENTORY_NAME", inputDataset.getName());
-//        addKeyVal(dataset, "STRATEGY_INVENTORY_VERSION", inputDataset.getDefaultVersion()+"");
-        int measureCount = (controlStrategy.getControlMeasures() != null ? controlStrategy.getControlMeasures().length : 0);
-        ControlMeasureClass[] controlMeasureClasses = controlStrategy.getControlMeasureClasses();
-        String classList = "All";
-        if (controlMeasureClasses != null) {
-            if (controlMeasureClasses.length > 0) classList = "";
-            for (int i = 0; i < controlMeasureClasses.length; i++) {
-                if (classList.length() > 0) classList += ", ";  
-                classList += controlMeasureClasses[i].getName();
+        addKeyVal(newDataset, "SCENARIO_NAME", sectorScenario.getName());
+        addKeyVal(newDataset, "SCENARIO_ABBREVIATION", sectorScenario.getAbbreviation());
+        addKeyVal(newDataset, "SCENARIO_ID", sectorScenario.getId()+"");
+        if (inventory != null) {
+            addKeyVal(newDataset, "SCENARIO_INVENTORY_NAME", inventory.getName());
+            addKeyVal(newDataset, "SCENARIO_INVENTORY_VERSION", inventory.getDefaultVersion()+"");
+        }
+        addKeyVal(newDataset, "SCENARIO_EECS_MAPPING_NAME", sectorScenario.getEecsMapppingDataset().getName());
+        addKeyVal(newDataset, "SCENARIO_EECS_MAPPING_VERSION", sectorScenario.getEecsMapppingDatasetVersion()+"");
+        addKeyVal(newDataset, "SCENARIO_SECTOR_MAPPING_NAME", sectorScenario.getSectorMapppingDataset().getName());
+        addKeyVal(newDataset, "SCENARIO_SECTOR_MAPPING_VERSION", sectorScenario.getSectorMapppingDatasetVersion()+"");
+        String[] sectors = sectorScenario.getSectors();
+        String sectorList = "All";
+        if (sectors != null) {
+            if (sectors.length > 0) sectorList = "";
+            for (int i = 0; i < sectors.length; i++) {
+                if (sectorList.length() > 0) sectorList += ", ";  
+                sectorList += sectors[i];
             }
         }
-        if (measureCount > 0) 
-            addKeyVal(dataset, "MEASURES_INCLUDED", measureCount + "");
-        else
-            addKeyVal(dataset, "MEASURE_CLASSES", classList);
-        addKeyVal(dataset, "DISCOUNT_RATE", controlStrategy.getDiscountRate()+"%");
-        addKeyVal(dataset, "USE_COST_EQUATION", (controlStrategy.getUseCostEquations()==true? "true" : "false"));
-        addKeyVal(dataset, "INCLUDE_UNSPECIFIED_COSTS", (controlStrategy.getIncludeUnspecifiedCosts()==true? "true" : "false"));
+        addKeyVal(newDataset, "SCENARIO_SECTORS", sectorList);
+        addKeyVal(newDataset, "SCENARIO_SHOULD_DOUBLE_COUNT", (sectorScenario.getShouldDoubleCount() ? "true" : "false"));
+        addKeyVal(newDataset, "SCENARIO_ANNOTATE_INVENTORY_WITH_EECS", (sectorScenario.getAnnotateInventoryWithEECS() ? "true" : "false"));
     }
     
-    protected String getKeyValsAsHeaderString() {
+    protected String getKeyValsAsHeaderString(EmfDataset inventory) {
         String header = "";
-        header = "#STRATEGY_NAME=" + controlStrategy.getName();
-        header += "\n#STRATEGY_TYPE=" + controlStrategy.getStrategyType().getName();
-        header += "\n#TARGET_POLLUTANT=" + (controlStrategy.getTargetPollutant() != null ? controlStrategy.getTargetPollutant().getName() : "Unspecified");
-        header += "\n#COST_YEAR=" + controlStrategy.getCostYear() + "";
-        header += "\n#REGION=" + (controlStrategy.getRegion() != null && controlStrategy.getRegion().getName().length() > 0 ? controlStrategy.getRegion().getName() : "Unspecified");
-        int measureCount = (controlStrategy.getControlMeasures() != null ? controlStrategy.getControlMeasures().length : 0);
-        ControlMeasureClass[] controlMeasureClasses = controlStrategy.getControlMeasureClasses();
-        String classList = "All";
-        if (controlMeasureClasses != null) {
-            if (controlMeasureClasses.length > 0) classList = "";
-            for (int i = 0; i < controlMeasureClasses.length; i++) {
-                if (classList.length() > 0) classList += ", ";  
-                classList += controlMeasureClasses[i].getName();
+        header = "#SCENARIO_NAME=" + sectorScenario.getName();
+        header += "\n#SCENARIO_ABBREVIATION=" + sectorScenario.getAbbreviation();
+        header += "\n#SCENARIO_ID=" + sectorScenario.getId() + "";
+        if (inventory != null) {
+            header += "\nSCENARIO_INVENTORY_NAME=" + inventory.getName();
+            header += "\nSCENARIO_INVENTORY_VERSION=" + inventory.getDefaultVersion()+"";
+        }
+        header += "\nSCENARIO_EECS_MAPPING_NAME=" + sectorScenario.getEecsMapppingDataset().getName();
+        header += "\nSCENARIO_EECS_MAPPING_VERSION=" + sectorScenario.getEecsMapppingDatasetVersion()+"";
+        header += "\nSCENARIO_SECTOR_MAPPING_NAME=" + sectorScenario.getSectorMapppingDataset().getName();
+        header += "\nSCENARIO_SECTOR_MAPPING_VERSION=" + sectorScenario.getSectorMapppingDatasetVersion()+"";
+        String[] sectors = sectorScenario.getSectors();
+        String sectorList = "All";
+        if (sectors != null) {
+            if (sectors.length > 0) sectorList = "";
+            for (int i = 0; i < sectors.length; i++) {
+                if (sectorList.length() > 0) sectorList += ", ";  
+                sectorList += sectors[i];
             }
         }
-        if (measureCount > 0) 
-            header += "\n#MEASURES_INCLUDED=" + measureCount;
-        else
-            header += "\n#MEASURE_CLASSES=" + classList;
-        header += "\n#DISCOUNT_RATE=" + controlStrategy.getDiscountRate()+"%";
-        header += "\n#USE_COST_EQUATION=" + (controlStrategy.getUseCostEquations()==true? "true" : "false");
-        header += "\n#INCLUDE_UNSPECIFIED_COSTS=" + (controlStrategy.getIncludeUnspecifiedCosts()==true? "true" : "false");
+        header += "\nSCENARIO_SECTORS=" + sectorList;
+        header += "\nSCENARIO_SHOULD_DOUBLE_COUNT=" + (sectorScenario.getShouldDoubleCount() ? "true" : "false");
+        header += "\nSCENARIO_ANNOTATE_INVENTORY_WITH_EECS=" + (sectorScenario.getAnnotateInventoryWithEECS() ? "true" : "false");
         return header;
     }
     
@@ -603,7 +530,7 @@ public class DatasetCreator {
     
     public String detailedResultDescription(EmfDataset inputDataset) {
         return "#Control strategy detailed result\n" + 
-           "#Implements control strategy: " + controlStrategy.getName() + "\n"
+           "#Implements control strategy: " + sectorScenario.getName() + "\n"
                 + "#Input dataset used: " + inputDataset.getName()+"\n#";
     }
 

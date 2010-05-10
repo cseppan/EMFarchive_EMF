@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.sms;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -487,6 +488,28 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             throw new EmfException("Could not retrieve strategy run status.");
         } finally {
             session.close();
+        }
+    }
+
+    public synchronized String[] getDistinctSectorListFromDataset(int datasetId, int versionNumber) throws EmfException {
+        Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
+        try {
+            return dao.getDistinctSectorListFromDataset(session, dbServer, datasetId, versionNumber);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve distinct sector list from a dataset.", e);
+            throw new EmfException("Could not retrieve distinct sector list from a dataset.");
+        } finally {
+            try {
+                session.close();
+            } catch (Exception e) {
+                throw new EmfException("Could not close hibernate session - " + e.getMessage());
+            }
+            try {
+                dbServer.disconnect();
+            } catch (Exception e) {
+                throw new EmfException("Could not disconnect DbServer - " + e.getMessage());
+            }
         }
     }
 }

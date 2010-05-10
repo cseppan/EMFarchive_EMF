@@ -1,17 +1,9 @@
 package gov.epa.emissions.framework.services.sms;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -24,6 +16,18 @@ import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
+
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 
 public class SectorScenarioDAO {
@@ -242,17 +246,8 @@ public class SectorScenarioDAO {
 //    }
 
     public void removeSectorScenarioResults(int sectorScenarioId, Session session) {
-        String hqlDelete = "delete SectorScenarioResult sr where sr.sectorScenarioId = :sectorScenarioId";
+        String hqlDelete = "delete SectorScenarioOutput sr where sr.sectorScenarioId = :sectorScenarioId";
         session.createQuery( hqlDelete )
-             .setInteger("sectorScenarioId", sectorScenarioId)
-             .executeUpdate();
-        session.flush();
-    }
-
-    public void removeSectorScenarioResult(int sectorScenarioId, int resultId, Session session) {
-        String hqlDelete = "delete SectorScenarioResult sr where sr.id = :resultId and sr.sectorScenarioId = :sectorScenarioId";
-        session.createQuery( hqlDelete )
-             .setInteger("resultId", resultId)
              .setInteger("sectorScenarioId", sectorScenarioId)
              .executeUpdate();
         session.flush();
@@ -269,7 +264,7 @@ public class SectorScenarioDAO {
     }
 
     public List<SectorScenarioOutput> getSectorScenarioOutputs(int sectorScenarioId, Session session) {
-        return session.createCriteria(SectorScenarioOutput.class).add(Restrictions.eq("sectorScenarioId", sectorScenarioId)).addOrder(Order.desc("startTime")).list();
+        return session.createCriteria(SectorScenarioOutput.class).add(Restrictions.eq("sectorScenarioId", sectorScenarioId)).addOrder(Order.desc("startDate")).list();
     }
     
     public void removeResultDatasets(EmfDataset[] datasets, User user, Session session, DbServer dbServer) throws EmfException {
@@ -405,6 +400,29 @@ public class SectorScenarioDAO {
     public String getStrategyRunStatus(Session session, int id) {
         return (String)session.createQuery("select cS.runStatus " +
                 "from SectorScenario cS where cS.id = " + id).uniqueResult();
+    }
+    
+    public String[] getDistinctSectorListFromDataset(Session session, DbServer dbServer, int datasetId, int versionNumber) throws EmfException {
+        List<String> sectors = new ArrayList<String>();
+        try {
+            EmfDataset dataset = new DatasetDAO().getDataset(session, datasetId);
+            Versions versions = new Versions();
+            Version version = versions.get(datasetId, versionNumber, session);
+            VersionedQuery versionedQuery = new VersionedQuery(version);
+            String inventoryTableName = dataset.getInternalSources()[0].getTable();
+            ResultSet rs = dbServer.getEmfDatasource().query().executeQuery("select distinct sector from emissions." + inventoryTableName + " where " + versionedQuery.query() + " and sector is not null order by sector");
+            while (rs.next()) {
+                sectors.add(rs.getString(1));
+            }
+
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not retrieve distinct sector list. Ex=" + e.getMessage());
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            //
+        }
+        return sectors.toArray(new String[0]);
     }
 
 }

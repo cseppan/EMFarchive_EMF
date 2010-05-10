@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.sms;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
@@ -22,6 +23,7 @@ public class SectorScenarioPresenter {
 
     public void display() throws Exception {
         view.observe(this);
+
         view.display();
     }
 
@@ -58,6 +60,18 @@ public class SectorScenarioPresenter {
 
     public int addSectorScenario(SectorScenario sectorScenario) throws EmfException {
         return session.sectorScenarioService().addSectorScenario(sectorScenario);
+    }
+
+    public SectorScenario getSectorScenario(User user, int sectorScenarioId) throws EmfException {
+        return session.sectorScenarioService().obtainLocked(user, sectorScenarioId);
+    }
+
+    public String[] getDistinctSectorListFromDataset(int datasetId, int versionNumber) throws EmfException {
+        return session.sectorScenarioService().getDistinctSectorListFromDataset(datasetId, versionNumber);
+    }
+
+    public void runSectorScenario(int sectorScenarioId) throws EmfException {
+        session.sectorScenarioService().runStrategy(session.user(), sectorScenarioId);
     }
 
 }

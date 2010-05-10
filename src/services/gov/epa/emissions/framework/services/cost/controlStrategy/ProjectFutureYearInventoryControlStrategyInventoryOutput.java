@@ -59,7 +59,7 @@ public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends Ab
                     break;
                 }
             }
-            desc = desc.replace(yearHeader, "#YEAR     " + controlStrategy.getInventoryYear());
+            desc = desc.replaceFirst(yearHeader, "#YEAR     " + controlStrategy.getInventoryYear());
             desc = addControlProgramsInfo(desc);
             
             //create controlled inventory dataset

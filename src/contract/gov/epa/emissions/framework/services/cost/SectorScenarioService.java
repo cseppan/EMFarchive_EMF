@@ -49,4 +49,6 @@ public interface SectorScenarioService extends EMFService {
     public String getDefaultExportDirectory() throws EmfException;
 
     public String getStrategyRunStatus(int id) throws EmfException;
+    
+    public String[] getDistinctSectorListFromDataset(int datasetId, int versionNumber) throws EmfException;
 }

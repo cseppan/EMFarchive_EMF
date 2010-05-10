@@ -10,11 +10,11 @@ public class SectorScenarioOutputType implements Serializable, Comparable {
 
     public static final String annotatedInventoryWithEECS = "Annotated Inventory with EECS";
 
-    public static final String detailedSectorMapping = "Detailed Sector Mapping Result";
+    public static final String DETAILED_SECTOR_MAPPING_RESULT = "Detailed Sector Mapping Result";
 
-    public static final String detailedEECSMapping = "Detailed EECS Mapping Result";
+    public static final String DETAILED_EECS_MAPPING_RESULT = "Detailed EECS Mapping Result";
 
-    public static final String sectorSpecificInventory = "Sector Specific Inventory";
+    public static final String SECTOR_SPECIFIC_INVENTORY = "Sector Specific Inventory";
 
     public SectorScenarioOutputType() {
         //
