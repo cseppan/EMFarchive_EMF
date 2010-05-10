@@ -18,6 +18,9 @@ import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerPr
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerView;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerPresenter;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerView;
+import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerPresenter;
+import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerPresenterImpl;
+import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerView;
 import gov.epa.emissions.framework.services.EmfException;
 
 public class ManageMenuPresenter {
@@ -71,6 +74,11 @@ public class ManageMenuPresenter {
 
     public void doDisplayControlPrograms(ControlProgramManagerView view) throws EmfException {
         ControlProgramManagerPresenter presenter = new ControlProgramManagerPresenter(session,view);
+        presenter.display();
+    }
+    
+    public void doDisplaySectorScenarios(SectorScenarioManagerView view) throws EmfException {
+        SectorScenarioManagerPresenter presenter = new SectorScenarioManagerPresenterImpl(session,view);
         presenter.display();
     }
 

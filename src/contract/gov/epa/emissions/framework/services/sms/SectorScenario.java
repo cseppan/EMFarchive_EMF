@@ -37,9 +37,31 @@ public class SectorScenario implements Lockable, Serializable {
         this.lock = new Mutex();
     }
     
+    public SectorScenario(String name){
+        this();
+        this.name = name; 
+    }
+    
+    public SectorScenario(int id, String name){
+        this(name);
+        this.id = id; 
+    }
+    public SectorScenario(int id, String name, String abbreviation,
+            String runStatus, User creator, Date lastModifiedDate, 
+            Date startDate, Date completionDate){
+        this(id, name); 
+        this.abbreviation = abbreviation; 
+        //this.description = description;
+        this.runStatus = runStatus;
+        this.creator = creator;
+        this.lastModifiedDate = lastModifiedDate;
+        this.startDate = startDate;
+        this.completionDate = completionDate;
+    }
+    
     public int getId() {
         return id;
-    }
+    } 
 
     public void setId(int id) {
         this.id = id;

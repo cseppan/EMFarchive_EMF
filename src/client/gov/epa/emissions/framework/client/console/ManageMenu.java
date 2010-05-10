@@ -24,6 +24,8 @@ import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerVi
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerWindow;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerView;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerWindow;
+import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerView;
+import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -62,6 +64,8 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         super.add(createControlMeasures(parent, messagePanel));
         super.add(createControlStrategies(parent, messagePanel));
         super.add(createControlPrograms(parent, messagePanel));
+        super.addSeparator();
+        super.add(createSectorScenario(parent, messagePanel));
         super.addSeparator();
 
         manageUsers(session.user(), messagePanel);
@@ -185,6 +189,18 @@ public class ManageMenu extends JMenu implements ManageMenuView {
 
         return menuItem;
     }
+    
+    private JMenuItem createSectorScenario(final EmfConsole parent, final MessagePanel messagePanel) {
+        JMenuItem menuItem = new JMenuItem("Sector Scenario");
+        menuItem.setName("SectorScenario");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                doManageSectorScenario(parent, messagePanel);
+            }
+        });
+
+        return menuItem;
+    }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
         UpdateUserWindow updatable = new UpdateUserWindow(new AddAdminOption(false), desktopManager);
@@ -270,6 +286,15 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         ControlProgramManagerView view = new ControlProgramManagerWindow(parent, session, desktopManager);
         try {
             presenter.doDisplayControlPrograms(view);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }       
+    }
+    
+    private void doManageSectorScenario(final EmfConsole parent, final MessagePanel messagePanel) {
+        SectorScenarioManagerView view = new SectorScenarioManagerWindow(parent, session, desktopManager);
+        try {
+            presenter.doDisplaySectorScenarios(view);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

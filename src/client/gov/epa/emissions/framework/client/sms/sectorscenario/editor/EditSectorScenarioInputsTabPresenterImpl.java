@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.sms;
+package gov.epa.emissions.framework.client.sms.sectorscenario.editor;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
@@ -9,32 +9,30 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 
-public class SectorScenarioPresenter {
+public class EditSectorScenarioInputsTabPresenterImpl implements EditSectorScenarioInputsTabPresenter{
 
     private EmfSession session;
 
-    private SectorScenarioView view;
+    private EditSectorScenarioInputsTabView view;
     
-    public SectorScenarioPresenter(SectorScenarioView view, EmfSession session) {
+    public EditSectorScenarioInputsTabPresenterImpl(EmfSession session, EditSectorScenarioInputsTabView view) {
         this.session = session;
         this.view = view;
     }
+    
+    public void doSave(){
+        view.save();
+    }   
 
-    public void display() throws Exception {
-        view.observe(this);
-        view.display();
-    }
 
     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {
-        view.clearMessage();
-
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
         presenter.doDisplay(propertiesView);
     }
-    
-    public EmfSession getSession(){
-        return session; 
-    }
+//    
+//    public EmfSession getSession(){
+//        return session; 
+//    }
 
     public EmfDataset getDatasets(int id) throws EmfException{
         return session.dataService().getDataset(id);
@@ -56,8 +54,8 @@ public class SectorScenarioPresenter {
         return session.dataEditorService().getVersions(dataset.getId());
     }
 
-    public int addSectorScenario(SectorScenario sectorScenario) throws EmfException {
-        return session.sectorScenarioService().addSectorScenario(sectorScenario);
+    public void doRefresh(SectorScenario sectorScenario) throws EmfException {
+        view.refresh(sectorScenario);  
+        
     }
-
 }

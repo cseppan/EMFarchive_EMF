@@ -96,29 +96,10 @@ public class SectorScenarioDAO {
     // return SectorScenarios orderby name
     public List all(Session session) {
 
-//        "Name", "Last Modified", "Run Status", "Region", 
-//        "Target Pollutant", "Total Cost", "Reduction", 
-//        "Project", "Strategy Type", "Cost Year", 
-//        "Inv. Year", "Creator"
-//        element.getName(), format(element.getLastModifiedDate()), element.getRunStatus(), region(element),
-//        element.getTargetPollutant(), getTotalCost(element.getId()), getReduction(element.getId()), 
-//        project(element), analysisType(element), costYear(element), 
-//        "" + (element.getInventoryYear() != 0 ? element.getInventoryYear() : ""), 
-//        element.getCreator().getName()
-        return session.createQuery("select new SectorScenario(cS.id, cS.name, " +
-                "cS.lastModifiedDate, cS.runStatus, " +
-                "cS.region, cS.targetPollutant, " +
-                "cS.project, cS.strategyType, " +
-                "cS.costYear, cS.inventoryYear, " +
-//                "cS.creator, (select sum(sR.totalCost) from SectorScenarioResult sR where sR.sectorScenarioId = cS.id), (select sum(sR.totalReduction) from SectorScenarioResult sR where sR.sectorScenarioId = cS.id)) " +
-                "cS.creator, cS.totalCost, cS.totalReduction) " +
-                "from SectorScenario cS " +
-                "left join cS.targetPollutant " +
-                "left join cS.strategyType " +
-                "left join cS.region " +
-                "left join cS.project " +
-                "left join cS.region " +
-                "order by cS.name").list();
+        return session.createQuery("select new SectorScenario(sS.id, sS.name, " +
+                "sS.abbreviation, sS.runStatus, sS.creator, " +
+                "sS.lastModifiedDate, " +
+                "sS.startDate, sS.completionDate").list();
         //return hibernateFacade.getAll(SectorScenario.class, Order.asc("name"), session);
     }
 //    // return SectorScenarios orderby name
