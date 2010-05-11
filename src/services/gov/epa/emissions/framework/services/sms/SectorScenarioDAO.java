@@ -259,6 +259,11 @@ public class SectorScenarioDAO {
         SectorScenario cs = (SectorScenario) hibernateFacade.load(SectorScenario.class, Restrictions.eq("name", new String(name)), session);
         return cs;
     }
+    
+    public SectorScenario getByAbbre(String abbre, Session session) {
+        SectorScenario cs = (SectorScenario) hibernateFacade.load(SectorScenario.class, Restrictions.eq("abbreviation", new String(abbre)), session);
+        return cs;
+    }
 
     public SectorScenario getById(int id, Session session) {
         SectorScenario cs = (SectorScenario) hibernateFacade.load(SectorScenario.class, Restrictions.eq("id", new Integer(id)), session);

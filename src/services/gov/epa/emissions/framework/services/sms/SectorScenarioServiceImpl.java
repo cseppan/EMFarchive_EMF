@@ -83,8 +83,8 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
         try {
             csId = dao.add(element, session);
         } catch (RuntimeException e) {
-            LOG.error("Could not add Control Strategy: " + element, e);
-            throw new EmfException("Could not add Control Strategy: " + element);
+            LOG.error("Could not add Sector Scenario: " + element, e);
+            throw new EmfException("Could not add Sector Scenario: " + element);
         } finally {
             session.close();
         }
@@ -387,8 +387,21 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             SectorScenario cs = dao.getByName(name, session);
             return cs == null ? 0 : cs.getId();
         } catch (RuntimeException e) {
-            LOG.error("Could not retrieve if SectorScenario name is already used", e);
-            throw new EmfException("Could not retrieve if SectorScenario name is already used");
+            LOG.error("Could not retrieve if Sector Scenario name is already used", e);
+            throw new EmfException("Could not retrieve if Sector Scenario name is already used");
+        } finally {
+            session.close();
+        }
+    }
+    
+    public synchronized int isDuplicateAbbre(String abbre) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            SectorScenario cs = dao.getByAbbre(abbre, session);
+            return cs == null ? 0 : cs.getId();
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve if Sector Scenario abbreviation is already used", e);
+            throw new EmfException("Could not retrieve if Sector Scenario abbreviation is already used");
         } finally {
             session.close();
         }

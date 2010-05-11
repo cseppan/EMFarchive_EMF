@@ -36,6 +36,8 @@ public interface SectorScenarioService extends EMFService {
     String sectorScenarioRunStatus(int id) throws EmfException;
 
     int isDuplicateName(String name) throws EmfException;
+    
+    int isDuplicateAbbre(String abbre) throws EmfException;
 
     int copySectorScenario(int id, User creator) throws EmfException;
 

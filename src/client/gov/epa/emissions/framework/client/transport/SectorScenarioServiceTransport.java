@@ -198,6 +198,15 @@ public class SectorScenarioServiceTransport implements SectorScenarioService {
         call.setIntegerReturnType();
         return (Integer) call.requestResponse(new Object[] { new String(name) });
     }
+    
+    public synchronized int isDuplicateAbbre(String abbre) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("isDuplicateAbbre");
+        call.addStringParam("abbre");
+        call.setIntegerReturnType();
+        return (Integer) call.requestResponse(new Object[] { new String(abbre) });
+    }
 
     public synchronized int copySectorScenario(int id, User creator) throws EmfException {
         EmfCall call = call();

@@ -45,7 +45,7 @@ public class NewSectorScenarioPresenterImpl implements NewSectorScenarioPresente
         managerPresenter.addNewSSToTableData(sectorScenario);
     }
        
-    protected void validateNameAndAbbre(SectorScenario sectorScenario) throws EmfException {
+    private void validateNameAndAbbre(SectorScenario sectorScenario) throws EmfException {
         // emptyName
         String name = sectorScenario.getName();
         String abbre = sectorScenario.getAbbreviation();
@@ -56,15 +56,23 @@ public class NewSectorScenarioPresenterImpl implements NewSectorScenarioPresente
             throw new EmfException("Empty string is not allowed for the abbre.");
 
         if (isDuplicate(name))
-            throw new EmfException("A Control Strategy named '" + name + "' already exists.");
+            throw new EmfException("A Sector Scenario named '" + name + "' already exists.");
+    
+        if (isDuplicateAbbre(abbre))
+            throw new EmfException("A Sector Scenario with abbre  '" + abbre + "' already exists.");
     }
 
-    protected boolean isDuplicate(String name) throws EmfException {
+    private boolean isDuplicate(String name) throws EmfException {
         int id = service().isDuplicateName(name);
         return (id != 0);
     }
     
-    protected SectorScenarioService service(){    
+    private boolean isDuplicateAbbre(String abbre) throws EmfException {
+        int id = service().isDuplicateAbbre(abbre);
+        return (id != 0);
+    }
+    
+    private SectorScenarioService service(){    
         return session.sectorScenarioService();
     }
 }

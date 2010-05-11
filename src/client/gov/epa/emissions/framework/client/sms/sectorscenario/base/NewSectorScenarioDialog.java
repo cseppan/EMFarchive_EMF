@@ -128,17 +128,13 @@ public class NewSectorScenarioDialog extends JDialog implements NewSectorScenari
                 sectorScenario.setRunStatus("Not started");
 
                 try {
-                    presenter.addSectorScenario(sectorScenario);
-//                    sectorScenario.setId(id);
-//
-//                    //open the edit window for the new scenario
-//                    
+                    presenter.addSectorScenario(sectorScenario);              
                     setVisible(false);
                     dispose();
 
                 } catch (EmfException e1) {
                     messagePanel.setError(e1.getMessage());
-                    e1.printStackTrace();
+                    //e1.printStackTrace();
                 }
             }
         };

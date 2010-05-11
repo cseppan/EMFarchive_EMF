@@ -12,7 +12,7 @@ create table sms.sector_scenario (
   id serial primary key NOT NULL,
   name character varying(128) NOT NULL unique,
   description character varying(128),
-  abbreviation character varying(20),
+  abbreviation character varying(20) NOT NULL unique,
   run_status character varying(255) NOT NULL,
   should_double_count boolean,
   annotate_inventory_with_eecs boolean,
@@ -27,10 +27,10 @@ create table sms.sector_scenario (
   copied_from character varying(255),
   export_directory character varying,
 --  eecs_version_id integer NOT NULL REFERENCES sms.eecs_version(id),
-  eecs_mappping_dataset_id integer NOT NULL REFERENCES emf.datasets(id),
-  eecs_mappping_dataset_version integer NOT NULL,
-  sector_mappping_dataset_id integer NOT NULL REFERENCES emf.datasets(id),
-  sector_mappping_dataset_version integer NOT NULL
+  eecs_mappping_dataset_id integer REFERENCES emf.datasets(id),
+  eecs_mappping_dataset_version integer,
+  sector_mappping_dataset_id integer REFERENCES emf.datasets(id),
+  sector_mappping_dataset_version integer 
   /*,
   CONSTRAINT sector_scenario_eecs_mappping_dataset_version_fkey FOREIGN KEY (eecs_mappping_dataset_version, eecs_mappping_dataset_version)
     REFERENCES emissions.versions (dataset_id, version) MATCH SIMPLE
