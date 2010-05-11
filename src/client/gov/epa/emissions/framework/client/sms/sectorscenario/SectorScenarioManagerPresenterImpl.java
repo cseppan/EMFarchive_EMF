@@ -28,7 +28,10 @@ public class SectorScenarioManagerPresenterImpl implements RefreshObserver, Sect
 
     public void display() throws EmfException {
         view.observe(this);
-        view.display(service().getSectorScenarios());
+        SectorScenario[] sectorScenarios= service().getSectorScenarios();
+        
+        //System.out.print("Size: " + sectorScenarios.length + sectorScenarios[0].getName());
+        view.display(sectorScenarios);
 
         //view.display(new SectorScenario[0]);
     }
@@ -38,8 +41,7 @@ public class SectorScenarioManagerPresenterImpl implements RefreshObserver, Sect
     }
 
     public void doRefresh() throws EmfException {
-        // loadControlMeasures();
-        view.refresh(new SectorScenario[0]);
+        view.refresh(service().getSectorScenarios());
     }
 
     public void doClose() {

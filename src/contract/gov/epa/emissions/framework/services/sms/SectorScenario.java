@@ -49,7 +49,9 @@ public class SectorScenario implements Lockable, Serializable {
     public SectorScenario(int id, String name, String abbreviation,
             String runStatus, User creator, Date lastModifiedDate, 
             Date startDate, Date completionDate){
-        this(id, name); 
+        this();
+        this.id = id;
+        this.name = name; 
         this.abbreviation = abbreviation; 
         //this.description = description;
         this.runStatus = runStatus;

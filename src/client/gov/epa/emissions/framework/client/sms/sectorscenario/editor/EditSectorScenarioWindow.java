@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -28,6 +29,7 @@ import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -103,9 +105,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     }
 
     private JTabbedPane createTabbedPane() {
-        tabbedPane.addTab("Summary", createSummaryTab());
-        
-        
+        tabbedPane.addTab("Summary", createSummaryTab());       
         tabbedPane.addTab("Inputs", createInputsTab());
         tabbedPane.addTab("Options", createOptionsTab());
         tabbedPane.addTab("Outputs", createOutputsTab());
@@ -131,31 +131,32 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     }
     
     private JPanel createInputsTab() {
-        return null; 
-//        try {
-//            EditSectorScenarioInputsTab inputsTabView = new EditSectorScenarioInputsTab(sectorScenario, this, 
-//                    messagePanel, parentConsole, 
-//                    session, desktopManager,
-//                    presenter);      
-//            this.presenter.set(inputsTabView);
-//            inputsTabView.display();
-//            //return inputsTabView;
-//            return null; 
-//        } catch (EmfException e) {
-//            showError("Could not load inputs tab." + e.getMessage());
-//            return createErrorTab("Could not load inputs tab." + e.getMessage());
-//        }
+        
+        try {
+            EditSectorScenarioInputsTab inputsTabView = new EditSectorScenarioInputsTab(sectorScenario, this, 
+                    messagePanel, parentConsole, 
+                    session, desktopManager,
+                    presenter);      
+            this.presenter.set(inputsTabView);
+            inputsTabView.display();
+            return inputsTabView;
+            //return null; 
+        } catch (EmfException e) {
+            e.printStackTrace();
+            showError("Could not load inputs tab." + e.getMessage());
+            return createErrorTab("Could not load inputs tab." + e.getMessage());
+        }
     }
     
-//    private JPanel createErrorTab(String message) {
-//        JPanel panel = new JPanel(false);
-//        JLabel label = new JLabel(message);
-//        label.setForeground(Color.RED);
-//        panel.add(label);
-//
-//        return panel;
-//    } 
-//    
+    private JPanel createErrorTab(String message) {
+        JPanel panel = new JPanel(false);
+        JLabel label = new JLabel(message);
+        label.setForeground(Color.RED);
+        panel.add(label);
+
+        return panel;
+    } 
+    
     private JPanel createOptionsTab() {
         return null; 
     }
@@ -279,7 +280,8 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     protected void doClose() {
         try {
             //first check whether cs is running before checking the discard changes
-            //if (isRunButtonClicked() || shouldDiscardChanges())
+            if(shouldDiscardChanges()) System.out.print("  true  ");
+            if (isRunButtonClicked() || shouldDiscardChanges())
                 presenter.doClose();
         } catch (EmfException e) {
             messagePanel.setError("Could not close: " + e.getMessage());
@@ -358,9 +360,9 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
     public void notifyEditFailure(SectorScenario sectorScenario) {
         String message = "Cannot edit Case: " + sectorScenario.getName() + System.getProperty("line.separator")
-        + " as it was locked by User: " + sectorScenario.getLockOwner() + "(at " + format(sectorScenario.getLockDate()) + ")";
-           InfoDialog dialog = new InfoDialog(parentConsole, "Message", message);
-         dialog.confirm();
+        + " because you must be the creator of the sector scenario or an Administrator";
+        InfoDialog dialog = new InfoDialog(this, "Message", message);
+        dialog.confirm();
         
     }
 

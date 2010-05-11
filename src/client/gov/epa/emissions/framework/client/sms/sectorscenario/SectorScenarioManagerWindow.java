@@ -106,11 +106,11 @@ public class SectorScenarioManagerWindow extends ReusableInteralFrame implements
         layout.setLayout(new BorderLayout());
 
         layout.add(createTopPanel(), BorderLayout.NORTH);
-        layout.add(tablePanel(sectorScenarios, parentConsole, session), BorderLayout.CENTER);
+        layout.add(tablePanel(sectorScenarios, session), BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
     }
     
-    private JPanel tablePanel(SectorScenario[] sectorScenarios, EmfConsole parentConsole, EmfSession session) {
+    private JPanel tablePanel(SectorScenario[] sectorScenarios, EmfSession session) {
 
         setupTableModel(sectorScenarios);
         tablePanel = new JPanel(new BorderLayout());
@@ -244,15 +244,15 @@ public class SectorScenarioManagerWindow extends ReusableInteralFrame implements
             messagePanel.setMessage("Please select one or more Sector Scenarios");
             return;
         }
-        
+
         for (int i = 0; i < sectorScenarios.size(); i++) {
             SectorScenario sectorScenario = (SectorScenario) sectorScenarios.get(i);
             EditSectorScenarioView view = new EditSectorScenarioWindow("Edit Sector Scenario", desktopManager, session, parentConsole);
-            
+
             try {
                 presenter.doEdit(view, sectorScenario);
             } catch (EmfException e) {
-                messagePanel.setError(e.getMessage());
+                messagePanel.setError("Problem:" + e.getMessage());
             }
         }
     }

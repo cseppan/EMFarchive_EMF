@@ -296,7 +296,8 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         try {
             presenter.doDisplaySectorScenarios(view);
         } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
+            e.printStackTrace();
+            messagePanel.setError("Problem in showing all sector scenario: " +e.getMessage());
         }
     }
 

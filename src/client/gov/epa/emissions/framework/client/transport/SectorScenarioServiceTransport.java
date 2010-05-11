@@ -35,7 +35,7 @@ public class SectorScenarioServiceTransport implements SectorScenarioService {
         EmfCall call = call();
 
         call.setOperation("getSectorScenarios");
-        call.setReturnType(mappings.controlStrategies());
+        call.setReturnType(mappings.sectorScenarios());
 
         return (SectorScenario[]) call.requestResponse(new Object[] {});
     }

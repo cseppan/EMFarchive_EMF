@@ -99,11 +99,13 @@ public class SectorScenarioDAO {
 
     // return SectorScenarios orderby name
     public List all(Session session) {
-
+        
         return session.createQuery("select new SectorScenario(sS.id, sS.name, " +
                 "sS.abbreviation, sS.runStatus, sS.creator, " +
                 "sS.lastModifiedDate, " +
-                "sS.startDate, sS.completionDate").list();
+                "sS.startDate, sS.completionDate) " +
+                "from SectorScenario as sS " +
+                "order by sS.name").list();
         //return hibernateFacade.getAll(SectorScenario.class, Order.asc("name"), session);
     }
 //    // return SectorScenarios orderby name

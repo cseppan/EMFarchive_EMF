@@ -29,6 +29,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
@@ -102,7 +103,7 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
         panel.add(createMiddleSection(), BorderLayout.CENTER);
         
         setLayout(new BorderLayout(5, 5));
-        add(panel,BorderLayout.SOUTH);
+        add(panel,BorderLayout.NORTH);
         // mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
         //mainPanel = new JPanel(new BorderLayout(10, 10));
         //buildSortFilterPanel();
@@ -173,8 +174,10 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
             }
         });
         panel.add(viewDataButton);
+        JPanel container = new JPanel(new BorderLayout());
+        container.add(panel, BorderLayout.LINE_START);
 
-        return panel;
+        return container;
     }
 
 
@@ -335,25 +338,29 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
         
     }
     
-    private void viewDatasetData(ComboBox datasetCom) {
+    private void viewDatasetData(ComboBox datasetCom) throws EmfException {
         messagePanel.clear();
         EmfDataset dataset = (EmfDataset) datasetCom.getSelectedItem();
         if (dataset == null){
             messagePanel.setError("Please select an item to view.");
             return;
         }
+        dataset = editPresenter.getDataset(dataset.getId());
         showDatasetDataViewer(dataset);
     }
     
-    
     private JPanel createMiddleSection() throws EmfException {
+        Dimension dimension = new Dimension(400, 15);
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(new Border("Filters"));
+        panel.setBorder(new Border("Mappings"));
 
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         eecsMappingDataset = new ComboBox("Not selected", presenter.getDatasets(presenter.getDatasetType(DatasetType.EECS_MAPPING)));
-
+        eecsMappingDataset.setPreferredSize(dimension);
+        if (sectorScenario.getEecsMapppingDataset() != null )
+            eecsMappingDataset.setSelectedItem(sectorScenario.getEecsMapppingDataset());
+        
         eecsMappingDataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -375,10 +382,13 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
         }
 
         layoutGenerator.addLabelWidgetPair("EECS Mapping Dataset:", datasetPanel(eecsMappingDataset), panel);
-        layoutGenerator.addLabelWidgetPair("EECS Mapping Dataset Version:", eecsMappingDatasetVersion, panel);
+        layoutGenerator.addLabelWidgetPair("Dataset Version:", eecsMappingDatasetVersion, panel);
 
         sectorMappingDataset = new ComboBox("Not selected", presenter.getDatasets(presenter.getDatasetType(DatasetType.SECTOR_MAPPING)));
-
+        sectorMappingDataset.setPreferredSize(dimension);
+        if (sectorScenario.getSectorMapppingDataset() != null )
+            sectorMappingDataset.setSelectedItem(sectorScenario.getSectorMapppingDataset());
+        
         sectorMappingDataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -400,10 +410,10 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
         }
 
         layoutGenerator.addLabelWidgetPair("Sector Mapping Dataset:", datasetPanel(sectorMappingDataset), panel);
-        layoutGenerator.addLabelWidgetPair("Sector Mapping Dataset Version:", sectorMappingDatasetVersion, panel);
+        layoutGenerator.addLabelWidgetPair("Dataset Version:", sectorMappingDatasetVersion, panel);
 
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
-                25, 10, // initialX, initialY
+                5, 10, // initialX, initialY
                 5, 5);// xPad, yPad
         return panel; 
 
@@ -438,7 +448,11 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
     private Action viewDatasetDataAction(final ComboBox datasetCom) {
         return new AbstractAction(){
             public void actionPerformed(ActionEvent event) {
-                viewDatasetData(datasetCom);
+                try {
+                    viewDatasetData(datasetCom);
+                } catch (EmfException e) {
+                    messagePanel.setError("Error viewing dataset data: " + e.getMessage());
+                }
             }
         };
     }

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.sms.sectorscenario.viewer;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.sms.sectorscenario.editor.EditSectorScenarioPresenterImpl;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 
 public class ViewSectorScenarioPresenterImpl  extends EditSectorScenarioPresenterImpl implements ViewSectorScenarioPresenter {
@@ -13,7 +14,7 @@ public class ViewSectorScenarioPresenterImpl  extends EditSectorScenarioPresente
         //this.view = view; 
     }
 
-    public void doDisplay() {
+    public void doDisplay() throws EmfException {
         super.doDisplay();
         ((ViewSectorScenarioView)view).viewOnly();
     }

@@ -39,25 +39,26 @@ public class EditSectorScenarioPresenterImpl  implements EditSectorScenarioPrese
         this.presenters = new ArrayList();
     }
 
-    public void doDisplay() {
+    public void doDisplay() throws EmfException {
         view.observe(this);
 
         //  make sure the editor is EITHER the admin or creator   
         
-        if (!sectorScenario.isLocked(session.user())) {// view mode, locked by another user
-//            view.notifyLockFailure(sectorScenario);
-//            return;
+        if (!sectorScenario.getCreator().equals(session.user()) && !session.user().isAdmin()) {// view mode, locked by another user
+            view.notifyEditFailure(sectorScenario);
+            return;
         }
-        //sectorScenario = session.sectorScenarioService().obtainLocked(session.user(), sectorScenario.getId());
+        sectorScenario = session.sectorScenarioService().obtainLocked(session.user(), sectorScenario.getId());
         if (!sectorScenario.isLocked(session.user())) {// view mode, locked by another user
-            //view.notifyLockFailure(sectorScenario);
-            //return;
+            view.notifyLockFailure(sectorScenario);
+            return;
         }
+       
         view.display(sectorScenario);
     }
 
-    public void doClose() {
-        //service().releaseLocked(session.user(), sectorScenario.getId());
+    public void doClose() throws EmfException {
+        service().releaseLocked(session.user(), sectorScenario.getId());
         closeView();
     }
     

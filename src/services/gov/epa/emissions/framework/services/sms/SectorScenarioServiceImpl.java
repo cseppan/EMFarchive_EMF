@@ -70,7 +70,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             List cs = dao.all(session);
             return (SectorScenario[]) cs.toArray(new SectorScenario[0]);
         } catch (HibernateException e) {
-            LOG.error("Could not retrieve all sector scenarios.");
+            LOG.error("Could not retrieve all sector scenarios." +e.getMessage());
             throw new EmfException("Could not retrieve all sector scenarios.");
         } finally {
             session.close();

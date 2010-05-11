@@ -132,8 +132,7 @@ public class NewSectorScenarioDialog extends JDialog implements NewSectorScenari
 //                    sectorScenario.setId(id);
 //
 //                    //open the edit window for the new scenario
-//                    EditSectorScenarioView view = new EditSectorScenarioWindow(desktopManager, session, parent);
-//                    managerPresenter.doEdit(view, sectorScenario);
+//                    
                     setVisible(false);
                     dispose();
 

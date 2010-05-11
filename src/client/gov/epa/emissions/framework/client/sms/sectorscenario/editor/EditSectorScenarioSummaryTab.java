@@ -68,7 +68,6 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
             MessagePanel messagePanel, EmfConsole parentConsole) {
 
         super.setName("scenarioSummary");
-
         this.sectorScenario = sectorScenario;
         this.changeablesList = changeablesList;
         this.parentConsole = parentConsole;
@@ -210,6 +209,7 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
         this.projectsCombo = new ComboBox(getProjects());
         //this.projectsCombo.setSelectedItem(ario);
         this.projectsCombo.setPreferredSize(name.getPreferredSize());
+        changeablesList.addChangeable(projectsCombo);
 
         return this.projectsCombo;
     }

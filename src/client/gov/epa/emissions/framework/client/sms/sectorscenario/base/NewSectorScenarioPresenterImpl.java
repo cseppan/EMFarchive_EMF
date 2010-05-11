@@ -40,11 +40,11 @@ public class NewSectorScenarioPresenterImpl implements NewSectorScenarioPresente
     public void addSectorScenario(SectorScenario sectorScenario) throws EmfException {
         validateNameAndAbbre(sectorScenario);
         sectorScenario.setLastModifiedDate(new Date());
-        //SectorScenario loaded= service().addSectorScenario(sectorScenario);
+        service().addSectorScenario(sectorScenario);
+        //SectorScenario loaded = service().getById(id);
         managerPresenter.addNewSSToTableData(sectorScenario);
     }
-    
-    
+       
     protected void validateNameAndAbbre(SectorScenario sectorScenario) throws EmfException {
         // emptyName
         String name = sectorScenario.getName();
