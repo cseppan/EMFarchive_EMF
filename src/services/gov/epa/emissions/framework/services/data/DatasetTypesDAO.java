@@ -1,11 +1,15 @@
 package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -85,6 +89,40 @@ public class DatasetTypesDAO {
 
     private DatasetType current(DatasetType datasetType, Session session) {
         return current(datasetType.getId(), DatasetType.class, session);
+    }
+
+    public void validateDatasetTypeIndicesKeyword(DatasetType datasetType) throws EmfException {
+        //validate INDICES keyword...
+        //first validate columns to index actually exist! 
+        KeyVal[] keyVal = keyValFound(datasetType, Keyword.INDICES);
+        if (keyVal != null && keyVal.length > 0) {
+            for (String columnList : keyVal[0].getValue().split("\\|")) {
+                for (String columnName : columnList.split("\\,")) {
+                    if (!hasColName(datasetType, columnName))
+                        throw new EmfException("DatasetType keyword, INDICES, contains an invalid column name, " + columnName + ".");
+                }
+            }
+        }
+    }
+
+    private  KeyVal[] keyValFound(DatasetType datasetType, String keyword) {
+        KeyVal[] keys = datasetType.getKeyVals();
+        List<KeyVal> list = new ArrayList<KeyVal>();
+        
+        for (KeyVal key : keys)
+            if (key.getName().equalsIgnoreCase(keyword)) 
+                list.add(key);
+        
+        return list.toArray(new KeyVal[0]);
+    }
+    
+    private boolean hasColName(DatasetType datasetType, String colName) {
+        Column[] cols = datasetType.getFileFormat().cols();
+        boolean hasIt = false;
+        for (int i = 0; i < cols.length; i++)
+            if (colName.equalsIgnoreCase(cols[i].name())) hasIt = true;
+
+        return hasIt;
     }
 
 }

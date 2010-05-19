@@ -212,6 +212,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             if (!dao.canUpdate(type, session))
                 throw new EmfException("DatasetType name already in use");
 
+            //validate INDICES keyword...
+            dao.validateDatasetTypeIndicesKeyword(type);
+            
             DatasetType locked = dao.updateDatasetType(type, session);
             session.close();
 
@@ -434,6 +437,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             if (dao.nameUsed(type.getName(), DatasetType.class, session))
                 throw new EmfException("The DatasetType name is already in use");
 
+            //validate INDICES keyword...
+            dao.validateDatasetTypeIndicesKeyword(type);
+            
             dao.add(type, session);
             session.close();
         } catch (RuntimeException e) {
