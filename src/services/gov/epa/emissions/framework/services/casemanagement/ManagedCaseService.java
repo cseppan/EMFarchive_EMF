@@ -2665,6 +2665,7 @@ public class ManagedCaseService {
                     System.out.println("before getJobFileName");
 
                 String jobFileName = this.getJobFileName(caseJob, session);
+                String jobLogFile = this.getLog(jobFileName);
 
                 if (DebugLevels.DEBUG_6)
                     System.out.println("setJobFileContent");
@@ -2672,14 +2673,13 @@ public class ManagedCaseService {
                 if (DebugLevels.DEBUG_9)
                     System.out.println("before setJobFileContent");
 
-                cjt.setJobFileContent(this.createJobFileContent(caseJob, user, jobFileName, expSvc, session));
+                cjt.setJobFileContent(this.createJobFileContent(caseJob, user, jobFileName, jobLogFile, expSvc, session));
 
                 if (DebugLevels.DEBUG_15) {
                     logNumDBConn("after creation of job file (jobID: " + jid + ")");
                 }
 
                 cjt.setJobFile(jobFileName);
-                String jobLogFile = this.getLog(jobFileName);
                 cjt.setLogFile(jobLogFile);
                 cjt.setJobName(caseJob.getName());
                 if (DebugLevels.DEBUG_6)
@@ -3394,7 +3394,7 @@ public class ManagedCaseService {
     }
 
     public synchronized String createJobFileContent(CaseJob job, User user, String jobFileName,
-            ManagedExportService expSvc, Session session) throws EmfException {
+            String jobLogFile, ManagedExportService expSvc, Session session) throws EmfException {
         /**
          * Creates the content string for a job run file w/ all necessary inputs and parameters set.
          * 
@@ -3560,6 +3560,7 @@ public class ManagedCaseService {
             throw new EmfException("Output folder: " + e.getMessage());
         }
         sbuf.append(shellSetenv("EMF_SCRIPTNAME", jobFileName));
+        sbuf.append(shellSetenv("EMF_LOGNAME", jobLogFile));
 
         // Generate and get a unique job key, add it to the job,
         // update the db, and write it to the script
