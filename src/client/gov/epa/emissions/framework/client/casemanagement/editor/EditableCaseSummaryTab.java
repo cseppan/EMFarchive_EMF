@@ -403,7 +403,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private JPanel sectors() throws EmfException {
         sectorsWidget = new AddRemoveSectorWidget(presenter.getAllSectors(), changeablesList, parentConsole);
-        sectorsWidget.setSectors(caseObj.getSectors());
+        if (caseObj.getSectors() == null )
+            sectorsWidget.setSectors(new Sector[0]);
+        else 
+            sectorsWidget.setSectors(caseObj.getSectors());
         sectorsWidget.setPreferredSize(new Dimension(255, 80));
         return sectorsWidget;
     }

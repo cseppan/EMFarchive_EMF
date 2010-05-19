@@ -326,8 +326,13 @@ public class CaseAssistanceService {
         List<Sector> all = new ArrayList<Sector>();
 
         for (Sector sector : sectors) {
-            Sector temp = (Sector) checkDB(sector, Sector.class, sector.getName(), session);
-            all.add(temp);
+            if ( (sector != null) && (sector.getName().trim().length()>0)){
+                //System.out.print("name = " +sector.getName()+"\n");
+                if (sector.getName().toLowerCase().contains("all sectors"))
+                    sector = new Sector("All Sectors", "All Sectors");
+                Sector temp = (Sector) checkDB(sector, Sector.class, sector.getName(), session);
+                all.add(temp);
+            }
         }
 
         newCase.setSectors(all.toArray(new Sector[0]));
