@@ -1220,33 +1220,33 @@ public class CaseDAO {
         return (CaseParameter) hibernateFacade.load(CaseParameter.class, crit, session);
     }
 
-    public String[] getAllValidJobs(int jobId, int caseId) {
-        List<String> validJobNames = new ArrayList<String>();
+    public CaseJob[] getAllValidJobs(int jobId, int caseId) {
+        List<CaseJob> validJobs = new ArrayList<CaseJob>();
         List<CaseJob> jobs = getCaseJobs(caseId);
 
         for (Iterator<CaseJob> iter = jobs.iterator(); iter.hasNext();) {
             CaseJob job = iter.next();
 
             if (canDependOn(jobId, job.getId()))
-                validJobNames.add(job.getName());
+                validJobs.add(job);
         }
 
-        return validJobNames.toArray(new String[0]);
+        return validJobs.toArray(new CaseJob[0]);
     }
 
-    public String[] getDependentJobs(int jobId) {
+    public CaseJob[] getDependentJobs(int jobId) {
         if (jobId <= 0)
-            return new String[0];
+            return new CaseJob[0];
 
         DependentJob[] dependentJobs = getCaseJob(jobId).getDependentJobs();
-        String[] dependentJobNames = new String[dependentJobs.length];
+        CaseJob[] selectedJobs = new CaseJob[dependentJobs.length];
 
         for (int i = 0; i < dependentJobs.length; i++) {
             int id = dependentJobs[i].getJobId();
-            dependentJobNames[i] = getCaseJob(id).getName();
+            selectedJobs[i] = getCaseJob(id);
         }
 
-        return dependentJobNames;
+        return selectedJobs;
     }
 
     private boolean canDependOn(int jobId, int dependentJobId) {

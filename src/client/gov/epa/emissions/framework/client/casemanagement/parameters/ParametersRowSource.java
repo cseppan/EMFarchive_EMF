@@ -76,7 +76,7 @@ public class ParametersRowSource implements RowSource {
                 return caseObjectManager.getJobForAll().getName();
             }
             
-            return job.getName();
+            return job.toString();
         } catch (EmfException e) {
             return null;
         }

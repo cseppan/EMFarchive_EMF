@@ -285,6 +285,7 @@ public class HibernateFacade {
             tx.commit();
             return criteria.list();
         } catch (HibernateException e) {
+            e.printStackTrace();
             tx.rollback();
             throw e;
         }

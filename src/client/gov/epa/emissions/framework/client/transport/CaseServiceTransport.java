@@ -786,25 +786,25 @@ public class CaseServiceTransport implements CaseService {
         return (JobMessage[]) call.requestResponse(new Object[] { new Integer(caseId), new Integer(jobId) });
     }
 
-    public synchronized String[] getAllValidJobs(int jobId, int caseId) throws EmfException {
+    public synchronized CaseJob[] getAllValidJobs(int jobId, int caseId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getAllValidJobs");
         call.addIntegerParam("jobId");
         call.addIntegerParam("caseId");
-        call.setStringArrayReturnType();
+        call.setReturnType(caseMappings.casejobIds());
 
-        return (String[]) call.requestResponse(new Object[] { new Integer(jobId), new Integer(caseId) });
+        return (CaseJob[]) call.requestResponse(new Object[] { new Integer(jobId), new Integer(caseId) });
     }
 
-    public synchronized String[] getDependentJobs(int jobId) throws EmfException {
+    public synchronized CaseJob[] getDependentJobs(int jobId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getDependentJobs");
         call.addIntegerParam("jobId");
-        call.setStringArrayReturnType();
+        call.setReturnType(caseMappings.casejobIds());
 
-        return (String[]) call.requestResponse(new Object[] { new Integer(jobId) });
+        return (CaseJob[]) call.requestResponse(new Object[] { new Integer(jobId) });
     }
 
     public synchronized int[] getJobIds(int caseId, String[] names) throws EmfException {

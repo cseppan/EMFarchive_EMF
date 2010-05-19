@@ -498,13 +498,8 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
         job.setQueOptions(qoption.getText().trim());
         job.setLocal(localBox.isSelected());
         job.setJobGroup(jobGroup.getText().trim());
-        Object[] objects = dependentJobsList.getObjects();
-        String[] jobNames = new String[objects.length];
-
-        for (int i = 0; i < jobNames.length; i++)
-            jobNames[i] = objects[i].toString();
-
-        job.setDependentJobs(presenter.dependentJobs(jobNames));
+        Object[] dependentJobs = dependentJobsList.getObjects();
+        job.setDependentJobs(presenter.dependentJobs(dependentJobs));
 
         if (edit && job.getId() > 0) {
             job.setRunLog(lastMsg.getText());
@@ -636,25 +631,25 @@ public class JobFieldsPanel extends JPanel implements JobFieldsPanelView {
     }
 
     private JPanel jobDependencyPanel() throws EmfException {
-        String[] jobNames = null;
-        String[] dependentJobNames = null;
+        CaseJob[] jobs = null;
+        CaseJob[] dependentJobs = null;
 
         if (edit)
-            jobNames = presenter.getAllValidJobs(job.getId());
+            jobs = presenter.getAllValidJobs(job.getId());
         else
-            jobNames = new String[0];
+            jobs = new CaseJob[0];
 
-        dependentJobNames = presenter.getDependentJobs(job.getId());
+        dependentJobs = presenter.getDependentJobs(job.getId());
 
-        Arrays.sort(jobNames, new Comparator() {
-            public final int compare(Object a, Object b) {
-                return (((String) a).compareToIgnoreCase((String) b));
+        Arrays.sort(jobs, new Comparator<CaseJob>() {
+            public final int compare(CaseJob a, CaseJob b) {
+                return a.toString().compareToIgnoreCase(b.toString());
             }
         });
-        Arrays.sort(dependentJobNames);
+        Arrays.sort(dependentJobs);
 
-        dependentJobsList = new AddRemoveWidget(jobNames, changeablesList, parent, true, true);
-        dependentJobsList.setObjects(dependentJobNames);
+        dependentJobsList = new AddRemoveWidget(jobs, changeablesList, parent, true, true);
+        dependentJobsList.setObjects(dependentJobs);
         dependentJobsList.setPreferredSize(new Dimension(190, 120));
         return dependentJobsList;
     }

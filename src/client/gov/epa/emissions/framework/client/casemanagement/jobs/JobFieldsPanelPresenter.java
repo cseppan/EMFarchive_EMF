@@ -114,23 +114,22 @@ public class JobFieldsPanelPresenter {
         return names;
     }
     
-    public String[] getAllValidJobs(int jobId) throws EmfException {
+    public CaseJob[] getAllValidJobs(int jobId) throws EmfException {
         return caseService().getAllValidJobs(jobId, caseObj.getId());
     }
 
-    public String[] getDependentJobs(int jobId) throws EmfException {
+    public CaseJob[] getDependentJobs(int jobId) throws EmfException {
         if (jobId <= 0)
-            return new String[0];
+            return new CaseJob[0];
         
         return caseService().getDependentJobs(jobId);
     }
 
-    public DependentJob[] dependentJobs(String[] jobNames) throws EmfException {
-        int[] jobIds = caseService().getJobIds(caseObj.getId(), jobNames);
-        DependentJob[] dependentJobs = new DependentJob[jobIds.length];
+    public DependentJob[] dependentJobs(Object[] jobs) {
+        DependentJob[] dependentJobs = new DependentJob[jobs.length];
         
-        for (int i = 0; i < jobIds.length; i++)
-            dependentJobs[i] = new DependentJob(jobIds[i]);
+        for (int i = 0; i < jobs.length; i++)
+            dependentJobs[i] = new DependentJob(((CaseJob)jobs[i]).getId());
         
         return dependentJobs;
     }

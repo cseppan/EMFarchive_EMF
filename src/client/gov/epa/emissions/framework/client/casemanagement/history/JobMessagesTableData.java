@@ -29,8 +29,6 @@ public class JobMessagesTableData extends ChangeableTableData {
     public String[] columns() {
         return new String[] { "Job", "Exec. Name", "Period", "Type", "Message", "Status",
                  "Remote User", "Received Date", "Exec. Mod. Date", "Exec. Path" };
-//        return new String[] {"Job", "Exec. Path", "Exec. Name", "Period", "Message",  
-//                "Message Type", "Status", "Remote User", "Exec. Mod. Date", "Received Date"};
     }
 
     public Class getColumnClass(int col) {
@@ -68,7 +66,7 @@ public class JobMessagesTableData extends ChangeableTableData {
     private String getJob(JobMessage msg) {
         try {
             CaseJob job = session.caseService().getCaseJob(msg.getJobId());
-            return job.getName();
+            return job.toString();
         } catch (EmfException e) {
             e.printStackTrace();
             return "";

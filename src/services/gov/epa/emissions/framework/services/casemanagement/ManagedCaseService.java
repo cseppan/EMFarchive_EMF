@@ -4048,7 +4048,7 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized String[] getAllValidJobs(int jobId, int caseId) throws EmfException {
+    public synchronized CaseJob[] getAllValidJobs(int jobId, int caseId) throws EmfException {
         try {
             return dao.getAllValidJobs(jobId, caseId);
         } catch (Exception e) {
@@ -4058,7 +4058,7 @@ public class ManagedCaseService {
         }
     }
 
-    public synchronized String[] getDependentJobs(int jobId) throws EmfException {
+    public synchronized CaseJob[] getDependentJobs(int jobId) throws EmfException {
         try {
             return dao.getDependentJobs(jobId);
         } catch (Exception e) {

@@ -546,11 +546,11 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getJobMessages(caseId, jobId);
     }
 
-    public String[] getAllValidJobs(int jobId, int caseId) throws EmfException {
+    public CaseJob[] getAllValidJobs(int jobId, int caseId) throws EmfException {
         return getCaseService().getAllValidJobs(jobId, caseId);
     }
 
-    public String[] getDependentJobs(int jobId) throws EmfException {
+    public CaseJob[] getDependentJobs(int jobId) throws EmfException {
         return getCaseService().getDependentJobs(jobId);
     }
 

@@ -81,7 +81,7 @@ public class InputsRowSource implements RowSource {
     private String getJob(CaseInput input) {
         try {
             CaseJob job = session.caseService().getCaseJob(input.getCaseJobID());
-            return (job == null) ? InputFieldsPanelPresenter.ALL_FOR_SECTOR : job.getName();
+            return (job == null) ? InputFieldsPanelPresenter.ALL_FOR_SECTOR : job.toString();
         } catch (EmfException e) {
             e.printStackTrace();
             return null;
