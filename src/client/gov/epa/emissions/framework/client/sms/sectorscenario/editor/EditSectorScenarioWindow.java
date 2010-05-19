@@ -15,7 +15,6 @@ import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManag
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 import gov.epa.emissions.framework.ui.InfoDialog;
-import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -142,7 +141,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
             return inputsTabView;
             //return null; 
         } catch (EmfException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             showError("Could not load inputs tab." + e.getMessage());
             return createErrorTab("Could not load inputs tab." + e.getMessage());
         }
@@ -158,11 +157,23 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     } 
     
     private JPanel createOptionsTab() {
-        return null; 
+        EditSectorScenarioOptionsTab optionsTabView = new EditSectorScenarioOptionsTab(sectorScenario, 
+                messagePanel, parentConsole, 
+                session, desktopManager);      
+        this.presenter.set(optionsTabView);
+        optionsTabView.display();
+        return optionsTabView;
+        //return null; 
     }
     
-    private JPanel createOutputsTab() {
-        return null; 
+    private JPanel createOutputsTab(){
+        EditSectorScenarioOutputsTab outputsTabView = new EditSectorScenarioOutputsTab(sectorScenario, 
+                messagePanel, parentConsole, 
+                session, desktopManager);      
+        this.presenter.set(outputsTabView);
+        outputsTabView.display(sectorScenario);
+        return outputsTabView;
+        //return null; 
     }
     
 
@@ -195,7 +206,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         Button refreshButton = new Button("Refresh", new AbstractAction(){
             public void actionPerformed(ActionEvent event) {
                 try {
-                    refreshCurrentTab();
+                    presenter.doRefresh();
                 } catch (EmfException e) {
                     showError(e.getMessage());
                 }
@@ -213,18 +224,18 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         return panel;
     }
     
-    private void refreshCurrentTab() throws EmfException {
-        RefreshObserver tab = (RefreshObserver) tabbedPane.getSelectedComponent();
-        RefreshObserver summaryTab = (RefreshObserver) tabbedPane.getComponentAt(0);
-        try {
-            messagePanel.clear();
-            tab.doRefresh();
-            if (tabbedPane.getSelectedIndex() != 0)
-                summaryTab.doRefresh();
-        } catch (Exception e) {
-            throw new EmfException(e.getMessage());
-        }
-    }
+//    private void refreshCurrentTab() throws EmfException {
+//        RefreshObserver tab = (RefreshObserver) tabbedPane.getSelectedComponent();
+//        RefreshObserver summaryTab = (RefreshObserver) tabbedPane.getComponentAt(0);
+//        try {
+//            messagePanel.clear();
+//            tab.doRefresh();
+//            if (tabbedPane.getSelectedIndex() != 0)
+//                summaryTab.doRefresh();
+//        } catch (Exception e) {
+//            throw new EmfException(e.getMessage());
+//        }
+//    }
     
 
     private Action stopAction() {
@@ -260,7 +271,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
     private void save() throws EmfException {
         clearMessage();
-        presenter.doSave();
+        presenter.doSave(sectorScenario);
         messagePanel
             .setMessage("Sector Scenario was saved successfully.");
         resetChanges();
@@ -280,8 +291,9 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     protected void doClose() {
         try {
             //first check whether cs is running before checking the discard changes
-            if(shouldDiscardChanges()) System.out.print("  true  ");
-            if (isRunButtonClicked() || shouldDiscardChanges())
+            //if(shouldDiscardChanges()) System.out.print("  true  ");
+            //if (isRunButtonClicked() || shouldDiscardChanges())
+            if (shouldDiscardChanges())
                 presenter.doClose();
         } catch (EmfException e) {
             messagePanel.setError("Could not close: " + e.getMessage());
@@ -382,11 +394,6 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         messagePanel.setMessage(msg);  
         
     }
-
-//    public void refresh(SectorScenario sectorScenario) {
-//        // NOTE Auto-generated method stub
-//        
-//    }
 
     public void run(SectorScenario sectorScenario) {
         // NOTE Auto-generated method stub

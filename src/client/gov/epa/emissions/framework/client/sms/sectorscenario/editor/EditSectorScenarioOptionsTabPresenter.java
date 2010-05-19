@@ -1,21 +1,18 @@
 package gov.epa.emissions.framework.client.sms.sectorscenario.editor;
 
 import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.meta.PropertiesView;
-import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 
-public class EditSectorScenarioInputsTabPresenterImpl implements EditSectorScenarioInputsTabPresenter{
+public class EditSectorScenarioOptionsTabPresenter implements EditSectorScenarioTabPresenter{
 
     private EmfSession session;
 
-    private EditSectorScenarioInputsTabView view;
+    private EditSectorScenarioOptionsTabView view;
     
-    public EditSectorScenarioInputsTabPresenterImpl(EmfSession session, EditSectorScenarioInputsTabView view) {
+    public EditSectorScenarioOptionsTabPresenter(EmfSession session, EditSectorScenarioOptionsTabView view) {
         this.session = session;
         this.view = view;
     }
@@ -23,16 +20,6 @@ public class EditSectorScenarioInputsTabPresenterImpl implements EditSectorScena
     public void doSave(SectorScenario sectorScenario){
         view.save(sectorScenario);
     }   
-
-
-    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {
-        PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
-        presenter.doDisplay(propertiesView);
-    }
-//    
-//    public EmfSession getSession(){
-//        return session; 
-//    }
 
     public EmfDataset getDatasets(int id) throws EmfException{
         return session.dataService().getDataset(id);
@@ -44,14 +31,6 @@ public class EditSectorScenarioInputsTabPresenterImpl implements EditSectorScena
     
     public DatasetType getDatasetType(String name) throws EmfException{
         return session.dataCommonsService().getDatasetType(name);
-    }
-    
-    public Version[] getVersions(EmfDataset dataset) throws EmfException 
-    {
-        if (dataset == null) {
-            return new Version[0];
-        }
-        return session.dataEditorService().getVersions(dataset.getId());
     }
 
     public void doRefresh(SectorScenario sectorScenario) throws EmfException {

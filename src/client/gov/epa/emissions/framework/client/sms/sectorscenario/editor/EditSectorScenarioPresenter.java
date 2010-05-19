@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.sms.SectorScenario;
 
 public interface EditSectorScenarioPresenter{
 
@@ -21,13 +22,13 @@ public interface EditSectorScenarioPresenter{
     
     void set(EditSectorScenarioInputsTabView summaryView);
     
-    //void set(EditSectorScenarioOptionsTabView summaryView);
+    void set(EditSectorScenarioOptionsTabView summaryView);
     
-    //void set(EditSectorScenarioOutputsTabView view) throws EmfException;
+    void set(EditSectorScenarioOutputsTabView view);
 
     void doRefresh() throws EmfException;
     
-    void doSave() throws EmfException; 
+    void doSave(SectorScenario sectorScenario) throws EmfException; 
     
     void fireTracking();
     //doRun(SectorScenario sectorScenario) throws EmfException;

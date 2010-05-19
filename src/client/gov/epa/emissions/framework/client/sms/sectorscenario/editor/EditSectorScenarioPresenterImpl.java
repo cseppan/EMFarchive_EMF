@@ -18,6 +18,8 @@ public class EditSectorScenarioPresenterImpl  implements EditSectorScenarioPrese
     protected EditSectorScenarioView view; 
     protected EditSectorScenarioSummaryTabView summaryTabView;
     private EditSectorScenarioInputsTabView inputsTabView;
+    private EditSectorScenarioOptionsTabView optionsTabView;
+    private EditSectorScenarioOutputsTabView outputsTabView;
     protected EmfSession session;
 
     //protected SectorScenarioManagerPresenter managerPresenter;
@@ -27,6 +29,10 @@ public class EditSectorScenarioPresenterImpl  implements EditSectorScenarioPrese
     private EditSectorScenarioSummaryTabPresenter summaryTabPresenter;
     
     private EditSectorScenarioInputsTabPresenter inputsTabPresenter;
+    
+    private EditSectorScenarioOptionsTabPresenter optionsTabPresenter;
+    
+    private EditSectorScenarioOutputsTabPresenter outputsTabPresenter;
 
     protected SectorScenario sectorScenario;
     
@@ -92,9 +98,20 @@ public class EditSectorScenarioPresenterImpl  implements EditSectorScenarioPrese
         presenters.add(inputsTabPresenter);
     }
     
+    public void set(EditSectorScenarioOptionsTabView view) {
+        this.optionsTabView = view;
+        this.optionsTabPresenter = new EditSectorScenarioOptionsTabPresenter(session, optionsTabView);
+        view.observe(optionsTabPresenter);
+        presenters.add(optionsTabPresenter);
+    }
     
-    
-   
+    public void set(EditSectorScenarioOutputsTabView view) {
+        this.outputsTabView = view;
+        this.outputsTabPresenter = new EditSectorScenarioOutputsTabPresenter(session, outputsTabView);
+        view.observe(outputsTabPresenter);
+        presenters.add(outputsTabPresenter);
+    }   
+       
     public void stopRun() {
         //service().stopRunStrategy(sectorScenario.getId());
         //view.stopRun();
@@ -105,19 +122,18 @@ public class EditSectorScenarioPresenterImpl  implements EditSectorScenarioPrese
        // service().runStrategy(session.user(), sectorScenario.getId());
     }
 
-    public void doRefresh() {
+    public void doRefresh() throws EmfException {
         //ControlStrategyResult result = session.controlStrategyService().controlStrategyResults(controlStrategy);
 //        ControlStrategyResult[] controlStrategyResults = getResult();
-//        ControlStrategy strategy = getControlStrategy(controlStrategy.getId());
+          SectorScenario ss = service().getById(sectorScenario.getId());
 //        hasResults = false;
 //        if (controlStrategyResults!= null && controlStrategyResults.length > 0) hasResults = true;
 //        String runStatus = service().controlStrategyRunStatus(controlStrategy.getId());
 //        if (runStatus == null || !runStatus.equalsIgnoreCase("Running")) {
             for (Iterator iter = presenters.iterator(); iter.hasNext();) {
-                //EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
-                //element.doRefresh(strategy);
+                EditSectorScenarioTabPresenter element = (EditSectorScenarioTabPresenter) iter.next();
+                element.doRefresh(ss);
             }
-//        }
     }
 
 
@@ -147,17 +163,16 @@ public class EditSectorScenarioPresenterImpl  implements EditSectorScenarioPrese
         return session;
     }
 
-    public void doSave() throws EmfException {
-        saveTabs();
-        validateNameAndAbbre(sectorScenario);
-        
-        //return service().updateSectorScenario(sectorScenario);
+    public void doSave(SectorScenario sectorScenario) throws EmfException {
+        saveTabs(sectorScenario);
+        validateNameAndAbbre(sectorScenario);       
+        sectorScenario=service().updateSectorScenarioWithLock(sectorScenario);
     }
     
-    private void saveTabs() throws EmfException {
+    private void saveTabs(SectorScenario sectorScenario) throws EmfException {
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {
             EditSectorScenarioTabPresenter element = (EditSectorScenarioTabPresenter) iter.next();
-            element.doSave();
+            element.doSave(sectorScenario);
         }
     }
     
@@ -171,14 +186,14 @@ public class EditSectorScenarioPresenterImpl  implements EditSectorScenarioPrese
         if (abbre.trim().equals(""))
             throw new EmfException("Empty string is not allowed for the abbre.");
 
-        if (isDuplicate(name))
-            throw new EmfException("A Control Strategy named '" + name + "' already exists.");
+//        if (isDuplicate(name))
+//            throw new EmfException("A Control Strategy named '" + name + "' already exists.");
     }
     
-    private boolean isDuplicate(String name) throws EmfException {
-        int id = service().isDuplicateName(name);
-        return (id != 0);
-    }
+//    private boolean isDuplicate(String name) throws EmfException {
+//        int id = service().isDuplicateName(name);
+//        return (id != 0);
+//    }
     
     private SectorScenarioService service(){    
         return session.sectorScenarioService();

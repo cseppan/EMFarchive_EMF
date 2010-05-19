@@ -15,8 +15,6 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionView;
-import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
-import gov.epa.emissions.framework.client.data.viewer.DataViewer;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioInputDatasetTableData;
@@ -164,16 +162,16 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
             }
         });
         panel.add(viewButton);
-        Button viewDataButton = new BorderlessButton("View Data", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    viewDataAction();
-                } catch (EmfException e) {
-                    messagePanel.setError("Error viewing dataset data: " + e.getMessage());
-                }
-            }
-        });
-        panel.add(viewDataButton);
+//        Button viewDataButton = new BorderlessButton("View Data", new AbstractAction() {
+//            public void actionPerformed(ActionEvent event) {
+//                try {
+//                    viewDataAction();
+//                } catch (EmfException e) {
+//                    messagePanel.setError("Error viewing dataset data: " + e.getMessage());
+//                }
+//            }
+//        });
+//        panel.add(viewDataButton);
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);
 
@@ -181,29 +179,26 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
     }
 
 
-    private void viewDataAction() throws EmfException {
-        messagePanel.clear();
-        List selected = table.selected();
-
-        if (selected.size() == 0) {
-            messagePanel.setError("Please select an item to view.");
-            return;
-        }
-
-        for (int i = 0; i < selected.size(); i++) {
-            EmfDataset dataset = editPresenter.getDataset(((SectorScenarioInventory)selected.get(i)).getDataset().getId());
-            showDatasetDataViewer(dataset);
-        }
-    }
+//    private void viewDataAction() throws EmfException {
+//        messagePanel.clear();
+//        List selected = table.selected();
+//
+//        if (selected.size() == 0) {
+//            messagePanel.setError("Please select an item to view.");
+//            return;
+//        }
+//
+//        for (int i = 0; i < selected.size(); i++) {
+//            EmfDataset dataset = editPresenter.getDataset(((SectorScenarioInventory)selected.get(i)).getDataset().getId());
+//            showDatasetDataViewer(dataset);
+//        }
+//    }
 
     private void addAction() throws EmfException {
         InputDatasetSelectionView view = new InputDatasetSelectionDialog(parentConsole);
         InputDatasetSelectionPresenter selPresenter = new InputDatasetSelectionPresenter(view, session,
                 new DatasetType[] { 
-                    presenter.getDatasetType(DatasetType.orlPointInventory),
-                    presenter.getDatasetType(DatasetType.orlNonpointInventory),
-                    presenter.getDatasetType(DatasetType.orlNonroadInventory),
-                    presenter.getDatasetType(DatasetType.orlOnroadInventory)
+                    presenter.getDatasetType(DatasetType.ORL_POINT_NATA)
                 });
         try {
             selPresenter.display(null, false);
@@ -338,17 +333,17 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
         
     }
     
-    private void viewDatasetData(ComboBox datasetCom) throws EmfException {
-        messagePanel.clear();
-        EmfDataset dataset = (EmfDataset) datasetCom.getSelectedItem();
-        if (dataset == null){
-            messagePanel.setError("Please select an item to view.");
-            return;
-        }
-        dataset = editPresenter.getDataset(dataset.getId());
-        showDatasetDataViewer(dataset);
-    }
-    
+//    private void viewDatasetData(ComboBox datasetCom) throws EmfException {
+//        messagePanel.clear();
+//        EmfDataset dataset = (EmfDataset) datasetCom.getSelectedItem();
+//        if (dataset == null){
+//            messagePanel.setError("Please select an item to view.");
+//            return;
+//        }
+//        dataset = editPresenter.getDataset(dataset.getId());
+//        showDatasetDataViewer(dataset);
+//    }
+//    
     private JPanel createMiddleSection() throws EmfException {
         Dimension dimension = new Dimension(400, 15);
         JPanel panel = new JPanel(new SpringLayout());
@@ -371,11 +366,17 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
                 }
             }
         });
-
+        
         eecsMappingDatasetVersion =new ComboBox(new Version[0]);      
 //      version.setPrototypeDisplayValue(width);
-        try {
+        try {       
             fillVersions(eecsMappingDatasetVersion, (EmfDataset)eecsMappingDataset.getSelectedItem());
+            
+            Integer eecsMapppingDatasetVersion = sectorScenario.getEecsMapppingDatasetVersion();  
+            if (eecsMapppingDatasetVersion != null ) {
+                //System.out.print("eccs mapping is " + eecsMapppingDatasetVersion + "\n");
+                eecsMappingDatasetVersion.setSelectedIndex(eecsMapppingDatasetVersion);
+            }
         } catch (EmfException e1) {
             // NOTE Auto-generated catch block
             e1.printStackTrace();
@@ -404,6 +405,9 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
 //      version.setPrototypeDisplayValue(width);
         try {
             fillVersions(sectorMappingDatasetVersion, (EmfDataset)sectorMappingDataset.getSelectedItem());
+            Integer sectorMapppingDatasetVersion = sectorScenario.getSectorMapppingDatasetVersion();
+            if (sectorMapppingDatasetVersion != null ) 
+                sectorMappingDatasetVersion.setSelectedIndex(sectorMapppingDatasetVersion);
         } catch (EmfException e1) {
             // NOTE Auto-generated catch block
             e1.printStackTrace();
@@ -428,8 +432,8 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
 
         invPanel.add(datasetCom, BorderLayout.LINE_START);
         invPanel.add(viewButton);
-        Button viewDataButton = new BorderlessButton("View Data", viewDatasetDataAction(datasetCom)); 
-        invPanel.add(viewDataButton, BorderLayout.LINE_END );
+//        Button viewDataButton = new BorderlessButton("View Data", viewDatasetDataAction(datasetCom)); 
+//        invPanel.add(viewDataButton, BorderLayout.LINE_END );
         return invPanel;
     }
     
@@ -445,33 +449,33 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
         };
     }
     
-    private Action viewDatasetDataAction(final ComboBox datasetCom) {
-        return new AbstractAction(){
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    viewDatasetData(datasetCom);
-                } catch (EmfException e) {
-                    messagePanel.setError("Error viewing dataset data: " + e.getMessage());
-                }
-            }
-        };
-    }
+//    private Action viewDatasetDataAction(final ComboBox datasetCom) {
+//        return new AbstractAction(){
+//            public void actionPerformed(ActionEvent event) {
+//                try {
+//                    viewDatasetData(datasetCom);
+//                } catch (EmfException e) {
+//                    messagePanel.setError("Error viewing dataset data: " + e.getMessage());
+//                }
+//            }
+//        };
+//    }
     
-    public void save(){
+    public void save(SectorScenario sectorScenario){
         
         EmfDataset ds =(EmfDataset) eecsMappingDataset.getSelectedItem();
-        if (ds == null) {
-            ds = null;
-        }
+//        if (ds == null) {
+//            ds = null;
+//        }
         sectorScenario.setEecsMapppingDataset(ds);
         Version ver = (ds !=null ? (Version) eecsMappingDatasetVersion.getSelectedItem(): null);
         Integer verValue = (ver !=null? ver.getVersion(): null);
         sectorScenario.setEecsMapppingDatasetVersion(verValue);
         
         EmfDataset sectorDS =(EmfDataset) sectorMappingDataset.getSelectedItem();
-        if (sectorDS == null) {
-            sectorDS = null;
-        }
+//        if (sectorDS == null) {
+//            sectorDS = null;
+//        }
         sectorScenario.setSectorMapppingDataset(sectorDS);
         Version sectorVer = (sectorDS !=null ? (Version) sectorMappingDatasetVersion.getSelectedItem(): null);
         Integer sectorVerValue = (sectorVer !=null? sectorVer.getVersion(): null);
@@ -488,7 +492,8 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
     }
 
     public void refresh(SectorScenario sectorScenario) {
-        tableData.add(sectorScenario.getInventories());
+        if (sectorScenario.getInventories()!=null && sectorScenario.getInventories().length > 0)
+            tableData.add(sectorScenario.getInventories());
         refresh();
     }
 
@@ -501,25 +506,25 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
 //    }
 
     
-    private void showDatasetDataViewer(EmfDataset dataset) {
-        try {
-            Version[] versions = presenter.getVersions(dataset);
-            //if just one version, then go directly to the dataviewer
-            if (versions.length == 1) {
-                DataViewer dataViewerView = new DataViewer(dataset, parentConsole, desktopManager);
-                DataViewPresenter dataViewPresenter = new DataViewPresenter(dataset, versions[0], getTableName(dataset), dataViewerView, session);
-                dataViewPresenter.display();
-            //else goto to dataset editior and display different version to display
-            } else {
-                DatasetPropertiesViewer datasetPropertiesViewerView = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
-                presenter.doDisplayPropertiesView(datasetPropertiesViewerView, dataset);
-                datasetPropertiesViewerView.setDefaultTab(1);
-            }
-//            presenter.doView(version, table, view);
-        } catch (EmfException e) {
-//            displayError(e.getMessage());
-        }
-    }
+//    private void showDatasetDataViewer(EmfDataset dataset) {
+//        try {
+//            Version[] versions = presenter.getVersions(dataset);
+//            //if just one version, then go directly to the dataviewer
+//            if (versions.length == 1) {
+//                DataViewer dataViewerView = new DataViewer(dataset, parentConsole, desktopManager);
+//                DataViewPresenter dataViewPresenter = new DataViewPresenter(dataset, versions[0], getTableName(dataset), dataViewerView, session);
+//                dataViewPresenter.display();
+//            //else goto to dataset editior and display different version to display
+//            } else {
+//                DatasetPropertiesViewer datasetPropertiesViewerView = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
+//                presenter.doDisplayPropertiesView(datasetPropertiesViewerView, dataset);
+//                datasetPropertiesViewerView.setDefaultTab(1);
+//            }
+////            presenter.doView(version, table, view);
+//        } catch (EmfException e) {
+////            displayError(e.getMessage());
+//        }
+//    }
     
     protected String getTableName(Dataset dataset) {
         InternalSource[] internalSources = dataset.getInternalSources();

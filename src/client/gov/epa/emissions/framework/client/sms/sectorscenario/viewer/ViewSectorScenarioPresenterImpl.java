@@ -21,7 +21,12 @@ public class ViewSectorScenarioPresenterImpl  extends EditSectorScenarioPresente
 
 
     public void doRefresh() {
-        super.doRefresh();
+        try {
+            super.doRefresh();
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void viewOnly() {

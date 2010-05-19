@@ -19,8 +19,8 @@ public class EditSectorScenarioSummaryTabPresenterImpl implements EditSectorScen
         this.view = view;
     }
 
-    public void doSave(){
-        view.save();
+    public void doSave(SectorScenario sectorScenario){
+        view.save(sectorScenario);
     }
 
     public Project[] getProjects() throws EmfException {

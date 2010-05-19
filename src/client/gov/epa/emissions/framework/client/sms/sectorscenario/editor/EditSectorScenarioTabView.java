@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.services.sms.SectorScenario;
 
 public interface EditSectorScenarioTabView {
     
-    void save();
+    void save(SectorScenario sectorScenario);
     //void run(SectorScenario sectorScenario) throws EmfException;
     void refresh(SectorScenario sectorScenario) throws EmfException;
  

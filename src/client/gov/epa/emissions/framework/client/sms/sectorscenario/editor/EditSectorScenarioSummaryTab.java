@@ -147,7 +147,7 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
     private JComponent createLowerSection(){
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(getBorderedPanel(createLowerLeftSection(), "Parameters"), BorderLayout.WEST);
+        //panel.add(getBorderedPanel(createLowerLeftSection(), "Parameters"), BorderLayout.WEST);
         panel.add(resultsPanel(), BorderLayout.CENTER);
 
         return panel;
@@ -223,21 +223,21 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
         return label;
     }
     
-    private JPanel createLowerLeftSection() {
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        JPanel panel = new JPanel(new SpringLayout());
-        JPanel panelBottom = new JPanel(new BorderLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        layoutGenerator.addLabelWidgetPair("Region:", new JLabel("under construction. "), panel);
-        
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
-        mainPanel.add(panel);
-        mainPanel.add(panelBottom);
-        return mainPanel;
-    }
+//    private JPanel createLowerLeftSection() {
+//        JPanel mainPanel = new JPanel();
+//        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+//        JPanel panel = new JPanel(new SpringLayout());
+//        JPanel panelBottom = new JPanel(new BorderLayout());
+//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+//        layoutGenerator.addLabelWidgetPair("Region:", new JLabel("under construction. "), panel);
+//        
+//        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+//                5, 5, // initialX, initialY
+//                10, 10);// xPad, yPad
+//        mainPanel.add(panel);
+//        mainPanel.add(panelBottom);
+//        return mainPanel;
+//    }
 
     private JComponent resultsPanel() {
 
@@ -268,7 +268,7 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
         return panel;
     }
 
-    public void save() {
+    public void save(SectorScenario sectorScenario) {
         messagePanel.clear();
         sectorScenario.setName(name.getText());
         sectorScenario.setAbbreviation(abbrev.getText());
