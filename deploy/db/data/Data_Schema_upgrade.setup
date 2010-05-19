@@ -1055,4 +1055,7 @@ ALTER TABLE emf.dataset_types ADD COLUMN creator int4 REFERENCES emf.users (id);
 ALTER TABLE emf.dataset_types ADD COLUMN file_format int4 REFERENCES emf.file_formats(id);
 insert into emf.keywords ("name") values('REQUIRED_HEADER');
 
+--5/18/10 
+insert into emf.keywords ("name") values('INDICES');
+
 
