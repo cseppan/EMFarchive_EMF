@@ -45,9 +45,9 @@
 	<property name="war-path" value="file:///${tomcat.webapps}/${app.name}.war" />
 
 	<property name="tomcat.manager.url" value="http://${tomcat.server}:8080/manager" />
-	<property name="tomcat.start.prefix" value="-jar -Duser.dir=${tomcat.home} -Djava.endorsed.dirs=${tomcat.home}/common/endorsed -Xms128M -Xmx512M ${tomcat.home}/bin/bootstrap.jar" />
+	<property name="tomcat.start.prefix" value="-jar -Duser.dir=${tomcat.home} -Djava.endorsed.dirs=${tomcat.home}/common/endorsed ${tomcat.memory.vmargs} ${tomcat.home}/bin/bootstrap.jar" />
 	<property name="tomcat.start" value="${tomcat.start.prefix} start" />
-	<property name="tomcat.start.debug.prefix" value="-jar -Duser.dir=${tomcat.home} -Djava.endorsed.dirs=${tomcat.home}/common/endorsed -Xms128M -Xmx512M ${tomcat.vmargs} ${tomcat.home}/bin/bootstrap.jar" />
+	<property name="tomcat.start.debug.prefix" value="-jar -Duser.dir=${tomcat.home} -Djava.endorsed.dirs=${tomcat.home}/common/endorsed ${tomcat.memory.vmargs} ${tomcat.debug.vmargs} ${tomcat.home}/bin/bootstrap.jar" />
 	<property name="tomcat.start.debug" value="${tomcat.start.debug.prefix} start" />
 
 	<property name="tomcat.stop.prefix" value="-jar -Duser.dir=${tomcat.home} ${tomcat.home}/bin/bootstrap.jar" />
