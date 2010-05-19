@@ -22,5 +22,3 @@ tomcat.vmargs=-Xdebug -Xrunjdwp:transport=dt_socket,address=<host name:port numb
 tomcat.server=localhost
 tomcat.manager.username=admin
 tomcat.manager.password=admin
-
-commons.basedir=../Commons_COST
