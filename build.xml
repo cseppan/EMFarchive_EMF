@@ -47,6 +47,8 @@
 	<property name="tomcat.manager.url" value="http://${tomcat.server}:8080/manager" />
 	<property name="tomcat.start.prefix" value="-jar -Duser.dir=${tomcat.home} -Djava.endorsed.dirs=${tomcat.home}/common/endorsed -Xms128M -Xmx512M ${tomcat.home}/bin/bootstrap.jar" />
 	<property name="tomcat.start" value="${tomcat.start.prefix} start" />
+	<property name="tomcat.start.debug.prefix" value="-jar -Duser.dir=${tomcat.home} -Djava.endorsed.dirs=${tomcat.home}/common/endorsed -Xms128M -Xmx512M ${tomcat.vmargs} ${tomcat.home}/bin/bootstrap.jar" />
+	<property name="tomcat.start.debug" value="${tomcat.start.debug.prefix} start" />
 
 	<property name="tomcat.stop.prefix" value="-jar -Duser.dir=${tomcat.home} ${tomcat.home}/bin/bootstrap.jar" />
 	<property name="tomcat.stop" value="${tomcat.stop.prefix} stop" />
@@ -501,6 +503,14 @@
 		<!-- Note Linux executable -->
 		<exec executable="${jdk.home}/bin/java.exe" dir="${build.home}" output="${build.home}/tomcat-start.txt" error="${build.home}/tomcat-start-error.txt" failonerror="yes">
 			<arg line="${tomcat.start}" />
+		</exec>
+	</target>
+
+	<target name="tomcat-start-with-debug">
+		<echo message="Starting with debug: ${tomcat.start.debug}" />
+		<!-- Note Linux executable -->
+		<exec executable="${jdk.home}/bin/java.exe" dir="${build.home}" output="${build.home}/tomcat-start.txt" error="${build.home}/tomcat-start-error.txt" failonerror="yes">
+			<arg line="${tomcat.start.debug}" />
 		</exec>
 	</target>
 
