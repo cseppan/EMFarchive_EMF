@@ -64,6 +64,16 @@ import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.data.RegionType;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.Revision;
+import gov.epa.emissions.framework.services.fast.FastAnalysis;
+import gov.epa.emissions.framework.services.fast.FastAnalysisOutput;
+import gov.epa.emissions.framework.services.fast.FastAnalysisOutputType;
+import gov.epa.emissions.framework.services.fast.FastDataset;
+import gov.epa.emissions.framework.services.fast.FastNonPointDataset;
+import gov.epa.emissions.framework.services.fast.FastRun;
+import gov.epa.emissions.framework.services.fast.FastRunInventory;
+import gov.epa.emissions.framework.services.fast.FastRunOutput;
+import gov.epa.emissions.framework.services.fast.FastRunOutputType;
+import gov.epa.emissions.framework.services.fast.Grid;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 import gov.epa.emissions.framework.services.sms.SectorScenarioInventory;
 import gov.epa.emissions.framework.services.sms.SectorScenarioOutput;
@@ -137,6 +147,19 @@ public class DataMappings extends Mappings {
         bean(call, SectorScenarioOutput.class, sectorScenarioOutput());
         bean(call, SectorScenarioOutputType.class, sectorScenarioOutputType());
         bean(call, SectorScenarioInventory.class, sectorScenarioInventory());
+
+        //fast project
+        bean(call, FastDataset.class, fastDataset());
+        bean(call, FastNonPointDataset.class, fastNonPointDataset());
+        bean(call, Grid.class, grid());
+        bean(call, FastRun.class, fastRun());
+        bean(call, FastRunOutput.class, fastRunOutput());
+        bean(call, FastRunOutputType.class, fastRunOutputType());
+        bean(call, FastRunInventory.class, fastRunInventory());
+
+        bean(call, FastAnalysis.class, fastAnalysis());
+        bean(call, FastAnalysisOutput.class, fastAnalysisOutput());
+        bean(call, FastAnalysisOutputType.class, fastAnalysisOutputType());
 
         controlBeans(call);
     }
@@ -249,6 +272,19 @@ public class DataMappings extends Mappings {
         array(call, SectorScenarioOutput[].class, sectorScenarioOutputs());
         array(call, SectorScenarioOutputType[].class, sectorScenarioOutputTypes());
         array(call, SectorScenarioInventory[].class, sectorScenarioInventories());
+
+        //fast project
+        array(call, FastDataset[].class, fastDatasets());
+        array(call, FastNonPointDataset[].class, fastNonPointDatasets());
+        array(call, Grid[].class, grids());
+        array(call, FastRun[].class, fastRuns());
+        array(call, FastRunOutput[].class, fastRunOutputs());
+        array(call, FastRunOutputType[].class, fastRunOutputTypes());
+        array(call, FastRunInventory[].class, fastRunInventories());
+
+        array(call, FastAnalysis[].class, fastAnalyses());
+        array(call, FastAnalysisOutput[].class, fastAnalysisOutputs());
+        array(call, FastAnalysisOutputType[].class, fastAnalysisOutputTypes());
     }
 
     public QName logs() {
@@ -745,6 +781,86 @@ public class DataMappings extends Mappings {
     
     public QName sectorScenarioOutputTypes() {
         return qname("SectorScenarioOutputTypes");
+    }
+
+    public QName grid() {
+        return qname("Grid");
+    }
+
+    public QName grids() {
+        return qname("Grids");
+    }
+
+    public QName fastDataset() {
+        return qname("FastDataset");
+    }
+
+    public QName fastDatasets() {
+        return qname("FastDatasets");
+    }
+
+    public QName fastNonPointDataset() {
+        return qname("FastNonPointDataset");
+    }
+
+    public QName fastNonPointDatasets() {
+        return qname("FastNonPointDatasets");
+    }
+
+    public QName fastRun() {
+        return qname("FastRun");
+    }
+
+    public QName fastRuns() {
+        return qname("FastRuns");
+    }
+
+    public QName fastAnalysis() {
+        return qname("FastAnalysis");
+    }
+
+    public QName fastAnalyses() {
+        return qname("FastAnalyses");
+    }
+
+    public QName fastRunOutput() {
+        return qname("FastRunOutput");
+    }
+
+    public QName fastRunOutputs() {
+        return qname("FastRunOutputs");
+    }
+
+    public QName fastAnalysisOutput() {
+        return qname("FastAnalysisOutput");
+    }
+
+    public QName fastAnalysisOutputs() {
+        return qname("FastAnalysisOutputs");
+    }
+
+    public QName fastRunInventory() {
+        return qname("FastRunInventory");
+    }
+
+    public QName fastRunInventories() {
+        return qname("FastRunInventories");
+    }
+
+    public QName fastRunOutputType() {
+        return qname("FastRunOutputType");
+    }
+
+    public QName fastRunOutputTypes() {
+        return qname("FastRunOutputTypes");
+    }
+
+    public QName fastAnalysisOutputType() {
+        return qname("FastAnalysisOutputType");
+    }
+
+    public QName fastAnalysisOutputTypes() {
+        return qname("FastAnalysisOutputTypes");
     }
 
 }

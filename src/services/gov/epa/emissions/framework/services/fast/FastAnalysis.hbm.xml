@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false"> 
+  <class name="gov.epa.emissions.framework.services.fast.FastAnalysis" table="fast_analyses" schema="fast"> 
+ 	<id name="id" type="integer" column="id">
+	  <generator class="identity"/>
+ 	</id>
+	<property name="name" column="name"	type="java.lang.String"	not-null="true"/>
+	<property name="description" column="description" type="java.lang.String"/>
+	<many-to-one
+            name="grid" 
+            class="gov.epa.emissions.framework.services.fast.Grid"
+            column="grid_id"/>
+	<property name="runStatus" column="run_status"	type="java.lang.String"/>
+	<many-to-one
+            name="creator" 
+            class="gov.epa.emissions.commons.security.User"
+            column="creator"/>
+	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
+  	<property name="startDate" column="start_date" type="java.util.Date" not-null="false" length="4"/>
+  	<property name="completionDate" column="completion_date" type="java.util.Date" not-null="false" length="4"/>
+	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
+  	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
+	<property name="copiedFrom" column="copied_from" type="java.lang.String" not-null="false"/>
+	<many-to-one name="cancerRiskDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="cancer_risk_dataset_id"/>
+    <property name="cancerRiskDatasetVersion" column="cancer_risk_dataset_version" type="integer"/>
+
+	<array name="inputSectors" table="fast_analysis_input_sectors" schema="fast">
+    	<key column="fast_analysis_id" not-null="true"/>
+    	<list-index column="list_index"/>
+    	<composite-element class="gov.epa.emissions.framework.services.fast.FastAnalysisInputSector">
+			<property name="fastRunId" column="fast_run_id" type="integer" not-null="true"/>
+			<property name="gridId" column="grid_id" type="integer" not-null="true"/>
+        	<many-to-one name="sector" class="gov.epa.emissions.commons.data.Sector" column="sector_id" not-null="true" cascade="none"/>
+    	</composite-element>
+	</array>
+
+  </class> 
+</hibernate-mapping>  
