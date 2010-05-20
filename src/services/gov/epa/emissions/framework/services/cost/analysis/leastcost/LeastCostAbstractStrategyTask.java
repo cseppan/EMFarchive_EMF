@@ -286,7 +286,7 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractStrategyTask
                 ControlStrategyInputDataset controlStrategyInputDataset = new ControlStrategyInputDataset(mergedDataset);
                 loader.makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset);
                 controlStrategy.addControlStrategyInputDatasets(controlStrategyInputDataset);
-                saveControlStrategy(controlStrategy);
+                updateControlStrategyWithLock(controlStrategy);
             } else {
                 if (controlStrategy.getDeleteResults() || results.length == 0) truncateORLMergedDataset(mergedDataset);
             }

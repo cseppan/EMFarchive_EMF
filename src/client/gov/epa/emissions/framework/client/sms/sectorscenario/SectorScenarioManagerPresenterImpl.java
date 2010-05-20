@@ -12,7 +12,7 @@ import gov.epa.emissions.framework.client.sms.sectorscenario.viewer.ViewSectorSc
 import gov.epa.emissions.framework.client.sms.sectorscenario.viewer.ViewSectorScenarioPresenterImpl;
 import gov.epa.emissions.framework.client.sms.sectorscenario.viewer.ViewSectorScenarioView;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.cost.SectorScenarioService;
+import gov.epa.emissions.framework.services.sms.SectorScenarioService;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 

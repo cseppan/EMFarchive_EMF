@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
-import gov.epa.emissions.framework.services.cost.SectorScenarioService;
+import gov.epa.emissions.framework.services.sms.SectorScenarioService;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 

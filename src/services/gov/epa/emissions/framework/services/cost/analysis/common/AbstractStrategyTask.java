@@ -791,6 +791,17 @@ public abstract class AbstractStrategyTask implements Strategy {
         }
     }
 
+    protected void updateControlStrategyWithLock(ControlStrategy strategy) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            controlStrategyDAO.updateWithLock(strategy, session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not save control strategy: " + e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
+
     protected void saveControlStrategySummaryResult(ControlStrategyResult strategyResult) throws EmfException {
         Session session = sessionFactory.getSession();
         try {

@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.cost.ControlProgramService;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
-import gov.epa.emissions.framework.services.cost.SectorScenarioService;
+import gov.epa.emissions.framework.services.sms.SectorScenarioService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureExportService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureImportService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 import gov.epa.emissions.framework.services.editor.DataViewService;
 import gov.epa.emissions.framework.services.exim.ExImService;
+import gov.epa.emissions.framework.services.fast.FastService;
 import gov.epa.emissions.framework.services.qa.QAService;
 
 public class RemoteServiceLocator implements ServiceLocator {
@@ -51,6 +52,8 @@ public class RemoteServiceLocator implements ServiceLocator {
     private ControlMeasureExportService controlMeasureExportService;
     
     private SectorScenarioService sectorScenarioService;
+    
+    private FastService fastService;
     
     public RemoteServiceLocator(String baseUrl) throws Exception {
         this.baseUrl = baseUrl;
@@ -159,6 +162,13 @@ public class RemoteServiceLocator implements ServiceLocator {
             sectorScenarioService = new SectorScenarioServiceTransport(baseUrl + "/gov.epa.emf.services.sms.SectorScenarioService");
         
         return sectorScenarioService;
+    }
+    
+    public FastService fastService() {
+        if (fastService == null)
+            fastService = new FastServiceTransport(baseUrl + "/gov.epa.emf.services.fast.FastService");
+        
+        return fastService;
     }
     
     /*

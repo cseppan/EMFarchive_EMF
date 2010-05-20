@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
-import gov.epa.emissions.framework.services.cost.SectorScenarioService;
+import gov.epa.emissions.framework.services.sms.SectorScenarioService;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.sms.SectorScenario;

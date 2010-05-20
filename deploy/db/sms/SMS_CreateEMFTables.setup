@@ -2,7 +2,7 @@ create table sms.eecs (
   id serial primary key NOT NULL,
   eecs character varying(10) NOT NULL,
   eecs_name character varying(128) NOT NULL,
-  eecs_description character varying(128),
+  eecs_description text,
   path ltree NOT NULL,
   UNIQUE(eecs),
   UNIQUE(eecs_name)

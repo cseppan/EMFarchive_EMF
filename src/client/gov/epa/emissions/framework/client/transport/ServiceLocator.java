@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.ControlProgramService;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
-import gov.epa.emissions.framework.services.cost.SectorScenarioService;
+import gov.epa.emissions.framework.services.sms.SectorScenarioService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureExportService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureImportService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 import gov.epa.emissions.framework.services.editor.DataViewService;
 import gov.epa.emissions.framework.services.exim.ExImService;
+import gov.epa.emissions.framework.services.fast.FastService;
 import gov.epa.emissions.framework.services.qa.QAService;
 
 public interface ServiceLocator {
@@ -50,4 +51,6 @@ public interface ServiceLocator {
     ControlMeasureExportService controlMeasureExportService();
 
     SectorScenarioService sectorScenarioService();
+
+    FastService fastService();
 }

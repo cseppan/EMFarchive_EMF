@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.sms.sectorscenario.base;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerPresenter;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.cost.SectorScenarioService;
+import gov.epa.emissions.framework.services.sms.SectorScenarioService;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 
 import java.util.Date;
