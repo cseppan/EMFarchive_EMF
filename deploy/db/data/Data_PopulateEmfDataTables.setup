@@ -1431,6 +1431,11 @@ select (select id from emf.dataset_types where "name" = 'State Comparison Tolera
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'State Comparison Tolerance (CSV)')) as list_index,
   (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
   'varchar(100)|varchar(255)|float8(17)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
+select (select id from emf.dataset_types where "name" = 'Plant Closure (CSV)') as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'Plant Closure (CSV)')) as list_index,
+  (select id from emf.keywords where "name" = 'EXPORT_INLINE_COMMENTS') as keyword_id,
+  'false' as "value", 'EXPORT_INLINE_COMMENTS' as kwname;
 -- emf.dataset_type_keywords
 
 -- emf.qa_programs
