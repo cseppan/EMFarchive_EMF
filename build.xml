@@ -124,6 +124,8 @@
 
 	<target name="build-version" depends="clean, init, build-version-no-clean-init" description="Build EMF version" />
 
+	<target name="update-version-for-deploy" depends="clean, init, update-version-for-deploy-no-clean-init" description="Update EMF version file for deployment" />
+
 	<target name="build-version-no-clean-init" description="Build EMF version">
 
 		<antcall target="do-compile">
@@ -132,6 +134,17 @@
 
 		<java classname="gov.epa.emissions.common.version.EMFVersionPropertiesBuilder" fork="true" failonerror="true" classpathref="classpath">
 			<arg value="/res/properties/version_generated.properties" />
+		</java>
+	</target>
+
+	<target name="update-version-for-deploy-no-clean-init" description="Update EMF version file for deployment">
+
+		<antcall target="do-compile">
+			<param name="compile.src" value="${src.common.dir}" />
+		</antcall>
+
+		<java classname="gov.epa.emissions.common.version.EMFVersionPropertiesUpdater" fork="true" failonerror="true" classpathref="classpath">
+			<arg value="/res/properties/version_for_deploy.properties" />
 		</java>
 	</target>
 
