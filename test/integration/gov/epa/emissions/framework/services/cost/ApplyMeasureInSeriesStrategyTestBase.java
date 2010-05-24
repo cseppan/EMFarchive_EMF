@@ -18,6 +18,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries.StrategyLoader;
 import gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries.StrategyTask;
 import gov.epa.emissions.framework.services.cost.controlStrategy.AbstractControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
@@ -275,8 +276,9 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
     }
     
     protected void runStrategy(ControlStrategy strategy) throws EmfException {
-        StrategyTask strategyTask = new StrategyTask(strategy, emfUser(), dbServerFactory,
-                sessionFactory);
+
+        StrategyLoader loader = new StrategyLoader(emfUser(), dbServerFactory, sessionFactory, strategy);
+        StrategyTask strategyTask = new StrategyTask(strategy, emfUser(), dbServerFactory, sessionFactory, loader);
         strategyTask.run();
     }
     

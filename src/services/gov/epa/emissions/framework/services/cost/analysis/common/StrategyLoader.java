@@ -6,17 +6,15 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 
 public interface StrategyLoader {
 
-    //implement code that is specific to the strategy type
-//    void doBatchInsert(ResultSet resultSet) throws Exception;
-
-    public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset inputDataset) throws Exception;
+    ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset inputDataset) throws Exception;
     
-    public void disconnectDbServer() throws EmfException;
+    void disconnectDbServer() throws EmfException;
 
-    public int getRecordCount();
+    int getRecordCount();
     
-    public int getMessageDatasetRecordCount();
+    int getMessageDatasetRecordCount();
     
-    public ControlStrategyResult[] getControlStrategyResults();
+    ControlStrategyResult[] getControlStrategyResults();
 
+    ControlStrategyResult getStrategyMessagesResult();
 }

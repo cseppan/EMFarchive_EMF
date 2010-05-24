@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRedStrategy;
+import gov.epa.emissions.framework.services.cost.analysis.maxreduction.StrategyLoader;
 import gov.epa.emissions.framework.services.cost.controlStrategy.AbstractControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
@@ -27,6 +28,7 @@ import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMImportTask;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+
 import java.io.File;
 
 import org.hibernate.Session;
@@ -36,7 +38,8 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     protected DbServer dbServer;
 
     private SqlDataTypes sqlDataTypes;
-//    protected ControlStrategyService service;
+
+    // protected ControlStrategyService service;
 
     protected String tableName = "test" + Math.round(Math.random() * 1000) % 1000;
 
@@ -44,16 +47,16 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         dbServer = dbServerFactory.getDbServer();
         sqlDataTypes = dbServer.getSqlDataTypes();
         setProperties();
-        //import control measures to use...
+        // import control measures to use...
         importControlMeasures();
-//        service = new ControlStrategyServiceImpl(sessionFactory);
+        // service = new ControlStrategyServiceImpl(sessionFactory);
     }
 
     protected ControlStrategyInputDataset setInputDataset(String type) throws Exception {
         EmfDataset inputDataset = new EmfDataset();
         inputDataset.setName("test" + Math.round(Math.random() * 1000) % 1000);
         inputDataset.setCreator(emfUser().getUsername());
-        inputDataset.setDatasetType(getDatasetType(type));//orlNonpointDatasetType());
+        inputDataset.setDatasetType(getDatasetType(type));// orlNonpointDatasetType());
 
         add(inputDataset);
         session.flush();
@@ -67,7 +70,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
             inputDataset = addORLOnroadDataset(inputDataset);
         else if (type.equalsIgnoreCase("ORL Nonroad"))
             inputDataset = addORLNonroadDataset(inputDataset);
-        
+
         addVersionZeroEntryToVersionsTable(inputDataset, dbServer.getEmissionsDatasource());
         inputDataset = (EmfDataset) load(EmfDataset.class, inputDataset.getName());
         ControlStrategyInputDataset controlStrategyInputDataset = new ControlStrategyInputDataset(inputDataset);
@@ -79,14 +82,14 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         EmfDataset inputDataset = new EmfDataset();
         inputDataset.setName("test" + Math.round(Math.random() * 1000) % 1000);
         inputDataset.setCreator(emfUser().getUsername());
-        inputDataset.setDatasetType(getDatasetType("List of Counties (CSV)"));//orlNonpointDatasetType());
+        inputDataset.setDatasetType(getDatasetType("List of Counties (CSV)"));// orlNonpointDatasetType());
 
         add(inputDataset);
         session.flush();
         inputDataset = (EmfDataset) load(EmfDataset.class, inputDataset.getName());
 
         inputDataset = addRegionDataset(inputDataset);
-        
+
         addVersionZeroEntryToVersionsTable(inputDataset, dbServer.getEmissionsDatasource());
         inputDataset = (EmfDataset) load(EmfDataset.class, inputDataset.getName());
         return inputDataset;
@@ -94,7 +97,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
 
     private DatasetType getDatasetType(String type) {
         DatasetType ds = null;
-        if (type.equalsIgnoreCase("ORL nonpoint")) 
+        if (type.equalsIgnoreCase("ORL nonpoint"))
             ds = (DatasetType) load(DatasetType.class, DatasetType.orlNonpointInventory);
         else if (type.equalsIgnoreCase("ORL point"))
             ds = (DatasetType) load(DatasetType.class, DatasetType.orlPointInventory);
@@ -107,9 +110,9 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         return ds;
     }
 
-//    private DatasetType orlNonpointDatasetType() {
-//        return (DatasetType) load(DatasetType.class, DatasetType.orlNonpointInventory);
-//    }
+    // private DatasetType orlNonpointDatasetType() {
+    // return (DatasetType) load(DatasetType.class, DatasetType.orlNonpointInventory);
+    // }
 
     private void addVersionZeroEntryToVersionsTable(Dataset dataset, Datasource datasource) throws Exception {
         TableModifier modifier = new TableModifier(datasource, "versions");
@@ -118,17 +121,18 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     }
 
     protected void doTearDown() throws Exception {
-//        dropTable(tableName, dbServer.getEmissionsDatasource());
+        // dropTable(tableName, dbServer.getEmissionsDatasource());
 
-//        dropAll(Version.class);
-//        dropAll(InternalSource.class);
-//        dropAll(QAStepResult.class);
-//        dropAll(QAStep.class);
-//        dropAll(EmfDataset.class);
+        // dropAll(Version.class);
+        // dropAll(InternalSource.class);
+        // dropAll(QAStepResult.class);
+        // dropAll(QAStep.class);
+        // dropAll(EmfDataset.class);
         dbServer.disconnect();
     }
 
-    protected ControlStrategy controlStrategy(ControlStrategyInputDataset inputDataset, String name, Pollutant pollutant, ControlMeasureClass[] classes) throws Exception {
+    protected ControlStrategy controlStrategy(ControlStrategyInputDataset inputDataset, String name,
+            Pollutant pollutant, ControlMeasureClass[] classes) throws Exception {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
         strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { inputDataset });
@@ -137,13 +141,14 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
         strategy.setTargetPollutant(pollutant);
         strategy.setStrategyType(maxEmisRedStrategyType());
         strategy.setControlMeasureClasses(classes);
-//        strategy.setCountyFile("c:\\cep\\EMF\\test\\data\\cost\\controlStrategy\\070 Run Counties_OTC and West States Statewide.csv");
-//        strategy.setFilter("srctype = 2");
+        // strategy.setCountyFile("c:\\cep\\EMF\\test\\data\\cost\\controlStrategy\\070 Run Counties_OTC and West States Statewide.csv");
+        // strategy.setFilter("srctype = 2");
         add(strategy);
         return (ControlStrategy) load(ControlStrategy.class, strategy.getName());
     }
 
-    protected ControlStrategy controlStrategy(ControlStrategyInputDataset inputDataset, String name, Pollutant pollutant, ControlStrategyMeasure[] measures) {
+    protected ControlStrategy controlStrategy(ControlStrategyInputDataset inputDataset, String name,
+            Pollutant pollutant, ControlStrategyMeasure[] measures) {
         ControlStrategy strategy = new ControlStrategy();
         strategy.setName(name);
         strategy.setControlStrategyInputDatasets(new ControlStrategyInputDataset[] { inputDataset });
@@ -295,38 +300,41 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     protected ControlStrategyResult getControlStrategyResult(ControlStrategy controlStrategy, int index) {
         Session session = sessionFactory.getSession();
         try {
-//            return new ControlStrategyDAO().getControlStrategyResults(controlStrategy.getId(), session)[index];
-            return (new ControlStrategyDAO()).getControlStrategyResults(controlStrategy.getId(), session).toArray(new ControlStrategyResult[0])[index];
+            // return new ControlStrategyDAO().getControlStrategyResults(controlStrategy.getId(), session)[index];
+            return (new ControlStrategyDAO()).getControlStrategyResults(controlStrategy.getId(), session).toArray(
+                    new ControlStrategyResult[0])[index];
         } finally {
             session.close();
         }
     }
-    
+
     protected ControlStrategyResult getControlStrategyResult(ControlStrategy controlStrategy) {
         return getControlStrategyResult(controlStrategy, 0);
     }
- 
+
     private void importControlMeasures() throws EmfException, Exception {
         File folder = new File("test/data/cost/controlMeasure");
         String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
         CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory, dbServerFactory());
         task.run();
     }
-    
+
     protected void runStrategy(ControlStrategy strategy) throws EmfException {
-        MaxEmsRedStrategy strategyTask = new MaxEmsRedStrategy(strategy, emfUser(), dbServerFactory,
-                sessionFactory);
+
+        StrategyLoader loader = new StrategyLoader(emfUser(), dbServerFactory, sessionFactory, strategy);
+        MaxEmsRedStrategy strategyTask = new MaxEmsRedStrategy(strategy, emfUser(), dbServerFactory, sessionFactory,
+                loader);
         strategyTask.run();
     }
-    
-    protected void createControlledInventory(ControlStrategy strategy, ControlStrategyResult controlStrategyResult) throws Exception {
-        //create the controlled inventory for this strategy run....
+
+    protected void createControlledInventory(ControlStrategy strategy, ControlStrategyResult controlStrategyResult)
+            throws Exception {
+        // create the controlled inventory for this strategy run....
         ControlStrategyInventoryOutput output = new AbstractControlStrategyInventoryOutput(emfUser(), strategy,
-                controlStrategyResult, "", sessionFactory, 
-                dbServerFactory);
+                controlStrategyResult, "", sessionFactory, dbServerFactory);
         output.create();
     }
-    
+
     protected String getExportDirectory() {
         // TBD: make this use the new temp dir
         String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR");

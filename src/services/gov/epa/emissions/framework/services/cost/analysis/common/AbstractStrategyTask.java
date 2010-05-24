@@ -70,14 +70,18 @@ public abstract class AbstractStrategyTask implements Strategy {
     
     protected List<ControlStrategyResult> strategyResultList;
 
+    private StrategyLoader loader;
+    
     public AbstractStrategyTask(ControlStrategy controlStrategy, User user, 
-            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws EmfException {
+            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory, StrategyLoader loader) throws EmfException {
+
         this.controlStrategy = controlStrategy;
         this.controlStrategyInputDatasetCount = controlStrategy.getControlStrategyInputDatasets().length;
         this.dbServerFactory = dbServerFactory;
         this.dbServer = dbServerFactory.getDbServer();
         this.datasource = dbServer.getEmissionsDatasource();
         this.sessionFactory = sessionFactory;
+        this.loader = loader;
         this.user = user;
         this.statusDAO = new StatusDAO(sessionFactory);
         this.controlStrategyDAO = new ControlStrategyDAO(dbServerFactory, sessionFactory);
@@ -979,6 +983,10 @@ public abstract class AbstractStrategyTask implements Strategy {
         } finally {
             session.close();
         }
+    }
+
+    public StrategyLoader getLoader() {
+        return loader;
     }
 
 }

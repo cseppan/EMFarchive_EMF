@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
+import gov.epa.emissions.framework.services.cost.analysis.common.StrategyLoader;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -12,18 +13,12 @@ import java.util.Date;
 
 public class StrategyTask extends LeastCostAbstractStrategyTask {
 
-    private StrategyLoader loader;
-    
-    public StrategyTask(ControlStrategy controlStrategy, User user, 
-            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws EmfException {
-        super(controlStrategy, user, 
-                dbServerFactory, sessionFactory);
-        this.loader = new StrategyLoader(user, dbServerFactory, 
-                sessionFactory, controlStrategy);
+    public StrategyTask(ControlStrategy controlStrategy, User user, DbServerFactory dbServerFactory,
+            HibernateSessionFactory sessionFactory, StrategyLoader loader) throws EmfException {
+        super(controlStrategy, user, dbServerFactory, sessionFactory, loader);
     }
 
     public void run() throws EmfException {
-//        super.run(loader);
         
         //get rid of strategy results
         deleteStrategyResults();
@@ -44,8 +39,8 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
             ControlStrategyInputDataset controlStrategyInputDataset = getInventory();
             ControlStrategyResult result = null;
             try {
-                result = loader.loadStrategyResult(controlStrategyInputDataset);
-                recordCount = loader.getRecordCount();
+                result = this.getLoader().loadStrategyResult(controlStrategyInputDataset);
+                recordCount = this.getLoader().getRecordCount();
                 result.setRecordCount(recordCount);
                 status = "Completed.";
             } catch (Exception e) {
@@ -80,7 +75,7 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
                 e.printStackTrace();
                 throw new EmfException(e.getMessage());
             } finally {
-                loader.disconnectDbServer();
+                this.getLoader().disconnectDbServer();
                 disconnectDbServer();
             }
         }
@@ -91,27 +86,26 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
 
         //now create the county summary result based on the results from the strategy run...
         generateStrategyCountySummaryResult(strategyResultList.toArray(new ControlStrategyResult[0]));
-        
+
+        this.checkMessagesForWarnings();
     }
 
     public void beforeRun() throws EmfException {
         //populate the Sources Table
         populateSourcesTable();
 
-//        ControlStrategyResult[] results = getControlStrategyResults();
-        //create the worksheet (strat result), if needed, maybe they don't want to recreate these...
-//        if (controlStrategy.getDeleteResults() || results.length == 0) {
-            leastCostCMWorksheetResult = loader.loadLeastCostCMWorksheetResult();
-//        } else {
-//            for (ControlStrategyResult result : results ) {
-//                if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostControlMeasureWorksheet)) {
-//                    leastCostCMWorksheetResult = result;
-//                    break;
-//                }
-//            }
-//        }
-        //create just in case these don't exist, maybe the strategy type was changed...
-        if (leastCostCMWorksheetResult == null) leastCostCMWorksheetResult = loader.loadLeastCostCMWorksheetResult();
-        mergeInventoryDatasets();
-    }
+        StrategyLoader loader = this.getLoader();
+        if (loader instanceof LeastCostAbstractStrategyLoader) {
+
+            LeastCostAbstractStrategyLoader leastCostAbstractStrategyLoader = (LeastCostAbstractStrategyLoader) loader;
+            leastCostCMWorksheetResult = leastCostAbstractStrategyLoader.loadLeastCostCMWorksheetResult();
+
+            // create just in case these don't exist, maybe the strategy type was changed...
+            if (leastCostCMWorksheetResult == null) {
+                leastCostCMWorksheetResult = leastCostAbstractStrategyLoader.loadLeastCostCMWorksheetResult();
+            }
+
+            mergeInventoryDatasets();
+        }
+   }
 }

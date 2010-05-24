@@ -5,6 +5,8 @@ import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
+import gov.epa.emissions.framework.services.cost.analysis.common.StrategyLoader;
+import gov.epa.emissions.framework.services.cost.analysis.leastcost.LeastCostAbstractStrategyLoader;
 import gov.epa.emissions.framework.services.cost.analysis.leastcost.LeastCostAbstractStrategyTask;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
@@ -12,14 +14,9 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 public class StrategyTask extends LeastCostAbstractStrategyTask {
 
-    private StrategyLoader loader;
-    
-    public StrategyTask(ControlStrategy controlStrategy, User user, 
-            DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws EmfException {
-        super(controlStrategy, user, 
-                dbServerFactory, sessionFactory);
-        this.loader = new StrategyLoader(user, dbServerFactory, 
-                sessionFactory, controlStrategy);
+    public StrategyTask(ControlStrategy controlStrategy, User user, DbServerFactory dbServerFactory,
+            HibernateSessionFactory sessionFactory, StrategyLoader loader) throws EmfException {
+        super(controlStrategy, user, dbServerFactory, sessionFactory, loader);
     }
 
     public void run() throws EmfException {
@@ -43,7 +40,7 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
             //process/load each input dataset
             ControlStrategyInputDataset controlStrategyInputDataset = getInventory();
             try {
-                loader.loadStrategyResult(controlStrategyInputDataset);
+                this.getLoader().loadStrategyResult(controlStrategyInputDataset);
             } catch (Exception e) {
                 e.printStackTrace();
                 status = "Failed. Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". " + e.getMessage();
@@ -66,7 +63,7 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
                 e.printStackTrace();
                 throw new EmfException(e.getMessage());
             } finally {
-                loader.disconnectDbServer();
+                this.getLoader().disconnectDbServer();
                 disconnectDbServer();
             }
         }
@@ -77,6 +74,8 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
         super.finalizeCMWorksheetResult();
 
         super.finalizeCostCuveSummaryResult();
+        
+        this.checkMessagesForWarnings();
     }
 
     public void beforeRun() throws EmfException {
@@ -84,25 +83,33 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
         populateSourcesTable();
 
         //create the worksheet (strat result), if needed, maybe they don't want to recreate these...
-        ControlStrategyResult[] results = loader.getControlStrategyResults();
-        if (controlStrategy.getDeleteResults() || results.length == 0) {
-            leastCostCMWorksheetResult = loader.loadLeastCostCMWorksheetResult();
-            leastCostCurveSummaryResult = loader.loadLeastCostCurveSummaryResult();
-        } else {
-            for (ControlStrategyResult result : results) {
-                if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostControlMeasureWorksheet)) {
-                    leastCostCMWorksheetResult = result;
-                } else if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostCurveSummary)) {
-                    leastCostCurveSummaryResult = result;
+        StrategyLoader loader = this.getLoader();
+        if (loader instanceof LeastCostAbstractStrategyLoader) {
+
+            LeastCostAbstractStrategyLoader leastCostAbstractStrategyLoader = (LeastCostAbstractStrategyLoader) loader;
+            ControlStrategyResult[] results = leastCostAbstractStrategyLoader.getControlStrategyResults();
+            if (controlStrategy.getDeleteResults() || results.length == 0) {
+                
+                leastCostCMWorksheetResult = leastCostAbstractStrategyLoader.loadLeastCostCMWorksheetResult();
+                leastCostCurveSummaryResult = leastCostAbstractStrategyLoader.loadLeastCostCurveSummaryResult();
+            } else {
+            
+                for (ControlStrategyResult result : results) {
+                    if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostControlMeasureWorksheet)) {
+                        leastCostCMWorksheetResult = result;
+                    } else if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostCurveSummary)) {
+                        leastCostCurveSummaryResult = result;
+                    }
                 }
             }
+            
+            //create just in case these don't exist, maybe the strategy type was changed...
+            if (leastCostCMWorksheetResult == null) leastCostCMWorksheetResult = leastCostAbstractStrategyLoader.loadLeastCostCMWorksheetResult();
+            if (leastCostCurveSummaryResult == null) leastCostCurveSummaryResult = leastCostAbstractStrategyLoader.loadLeastCostCurveSummaryResult();
+            
+            //if there is more than one input inventory, then merge these into one dataset, 
+            //then we use that as the input to the strategy run
+            mergeInventoryDatasets();
         }
-        //create just in case these don't exist, maybe the strategy type was changed...
-        if (leastCostCMWorksheetResult == null) leastCostCMWorksheetResult = loader.loadLeastCostCMWorksheetResult();
-        if (leastCostCurveSummaryResult == null) leastCostCurveSummaryResult = loader.loadLeastCostCurveSummaryResult();
-        
-        //if there is more than one input inventory, then merge these into one dataset, 
-        //then we use that as the input to the strategy run
-        mergeInventoryDatasets();
     }
 }
