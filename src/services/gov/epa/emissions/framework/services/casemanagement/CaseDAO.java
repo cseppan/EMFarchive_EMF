@@ -810,15 +810,6 @@ public class CaseDAO {
         return (CaseJob) hibernateFacade.load(CaseJob.class, crits, session);
     }
 
-    @SuppressWarnings("unchecked")
-    public CaseJob getCaseJob(int caseId, String jobName, Session session) {
-        Criterion crit1 = Restrictions.eq("caseId", new Integer(caseId));
-        Criterion crit2 = Restrictions.eq("name", jobName);
-        List<CaseJob> jobs = hibernateFacade.get(CaseJob.class, new Criterion[] { crit1, crit2 }, session);
-
-        return (jobs != null && jobs.size() > 0) ? jobs.get(0) : null;
-    }
-
     public void updateCaseJob(CaseJob job) {
         Session session = sessionFactory.getSession();
         try {

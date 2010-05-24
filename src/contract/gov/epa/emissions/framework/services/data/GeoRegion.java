@@ -36,6 +36,8 @@ public class GeoRegion implements Serializable, Lockable, Comparable<GeoRegion> 
     
     private Mutex lock;
     
+    public static GeoRegion generic_grid = new GeoRegion("Generic template region", "Generic template region", "template_region");
+    
     public int getDatasetId() {
         return datasetId;
     }
@@ -156,6 +158,13 @@ public class GeoRegion implements Serializable, Lockable, Comparable<GeoRegion> 
         this();
         this.name = name;
         this.description = desc;
+    }
+    
+    public GeoRegion(String name, String desc, String abbr) {
+        this();
+        this.name = name;
+        this.description = desc;
+        this.abbreviation = abbr;
     }
 
     public int getId() {

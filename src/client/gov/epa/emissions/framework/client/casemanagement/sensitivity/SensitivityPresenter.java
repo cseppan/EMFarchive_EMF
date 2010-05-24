@@ -117,13 +117,14 @@ public class SensitivityPresenter {
         return service().getCaseJobs(caseObj.getId());
     }
 
-    public CaseJob[] getCaseJobs(Case caseObj, Sector[] sectors) throws EmfException {
+    public CaseJob[] getCaseJobs(Case caseObj, GeoRegion region, Sector[] sectors) throws EmfException {
         CaseJob[] jobs = getCaseJobs(caseObj);
         List<CaseJob> filteredJobs1 = new ArrayList<CaseJob>();
         filteredJobs1.addAll(new ArrayList<CaseJob>(Arrays.asList(jobs)));
 
         // Find jobs contain selected sectors
         List<CaseJob> filteredJobs2 = new ArrayList<CaseJob>();
+
         if (filteredJobs1.size() > 0 && sectors != null && sectors.length > 0) {
             for (Sector sector : sectors) {
                 for (CaseJob job : filteredJobs1) {
@@ -131,9 +132,26 @@ public class SensitivityPresenter {
                         filteredJobs2.add(job);
                 }
             }
-            
-            return filteredJobs2.toArray(new CaseJob[0]);
         }
+
+        // Find jobs contain selected georegions
+        List<CaseJob> filteredJobs3 = new ArrayList<CaseJob>();
+        List<CaseJob> toFilter = (filteredJobs2.size() == 0) ? filteredJobs1 : filteredJobs2;
+
+        if (toFilter.size() > 0 && region != null) {
+            for (CaseJob job : toFilter) {
+                GeoRegion temp = job.getRegion();
+                
+                if (temp != null && !temp.equals(region) && !temp.equals(GeoRegion.generic_grid)) continue;
+                    
+                if (temp != null) job.setRegion(region);
+                    
+                filteredJobs3.add(job);
+            }
+        }
+
+        if (filteredJobs3.size() > 0)
+            return filteredJobs3.toArray(new CaseJob[0]);
 
         return filteredJobs1.toArray(new CaseJob[0]);
     }

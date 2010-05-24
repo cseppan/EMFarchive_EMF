@@ -507,7 +507,7 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
                 messagePanel.clear();
                 try {
                     validateFields();
-                    CaseJob[] filteredJobs = presenter.getCaseJobs(selectedTem, getSelectedSectors());
+                    CaseJob[] filteredJobs = presenter.getCaseJobs(selectedTem, getSelectedRegion(), getSelectedSectors());
                     if (filteredJobs == null || filteredJobs.length == 0) {
                         messagePanel.setMessage("There is no jobs for the selected region and sectors");
                         return;
@@ -574,6 +574,10 @@ public class SensitivityWindow extends DisposableInteralFrame implements Sensiti
         presenter.doDisplaySetCaseWindow(newCase, title, parentConsole, desktopManager, parentPresenter,
                 existingInputs, existingParas);
         presenter.doClose();
+    }
+    
+    private GeoRegion getSelectedRegion() {
+        return (GeoRegion) grids.getSelectedValue();
     }
 
     private Sector[] getSelectedSectors() {

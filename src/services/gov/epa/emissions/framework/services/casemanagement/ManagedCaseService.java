@@ -1070,17 +1070,20 @@ public class ManagedCaseService {
         }
     }
 
-    private synchronized void addCaseInputs(User user, int caseId, CaseInput[] inputs, String jobPrefix)
+    private synchronized void addCaseInputs(int sensitivityCaseId, CaseInput[] inputs, String jobPrefix, GeoRegion region)
             throws EmfException {
         Session session = sessionFactory.getSession();
         
         try {
             for (int i = 0; i < inputs.length; i++) {
-                inputs[i].setCaseID(caseId);
+                inputs[i].setCaseID(sensitivityCaseId);
                 CaseJob job = dao.getCaseJob(inputs[i].getCaseJobID());
 
                 if (job != null) {
-                    CaseJob targetJob = dao.getCaseJob(caseId, jobPrefix + job.getName(), session);
+                    if (job.getRegion() != null && region != null) job.setRegion(region);
+                    job.setName(jobPrefix + job.getName());
+                    
+                    CaseJob targetJob = dao.getCaseJob(sensitivityCaseId, job, session);
 
                     if (targetJob == null)
                         throw new EmfException("Required case job: " + jobPrefix + job.getName()
@@ -1750,7 +1753,7 @@ public class ManagedCaseService {
         dao.updateWithLock(locked, session);
     } 
 
-    private synchronized void addCaseParameters(User user, int caseId, CaseParameter[] params, String jobPrefix)
+    private synchronized void addCaseParameters(int caseId, CaseParameter[] params, String jobPrefix, GeoRegion region)
             throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -1759,9 +1762,14 @@ public class ManagedCaseService {
                 params[i].setCaseID(caseId);
 
                 CaseJob job = dao.getCaseJob(params[i].getJobId());
+                //this is where we need to change the region in job object to the user selected region if 
+                //region value is not null inside the job
 
                 if (job != null) {
-                    CaseJob targetJob = dao.getCaseJob(caseId, jobPrefix + job.getName(), session);
+                    if (job.getRegion() != null && region != null) job.setRegion(region);
+                    job.setName(jobPrefix + job.getName());
+                    
+                    CaseJob targetJob = dao.getCaseJob(caseId, job, session);
 
                     if (targetJob == null)
                         throw new EmfException("Required case job: " + jobPrefix + job.getName()
@@ -4692,8 +4700,8 @@ public class ManagedCaseService {
                     getValidCaseParameters4SensitivityCase(template.getId(), jobIds, jobs2copy, session), region, session);
 
             addCaseJobs4Sensitivity(user, targetId, jobs);
-            addCaseInputs(user, targetId, removeRedundantInputs(inputs, existingInputs, jobPrefix), jobPrefix);
-            addCaseParameters(user, targetId, removeRedundantParams(params, existingParams, jobPrefix), jobPrefix);
+            addCaseInputs(targetId, removeRedundantInputs(inputs, existingInputs, jobPrefix), jobPrefix, region);
+            addCaseParameters(targetId, removeRedundantParams(params, existingParams, jobPrefix), jobPrefix, region);
 
             // NOTE: add sectors to sensitivity case from the selected jobs
             existingJobs.addAll(Arrays.asList(jobs));
@@ -4914,8 +4922,8 @@ public class ManagedCaseService {
                     getValidCaseParameters4SensitivityCase(template.getId(), jobIds, jobs2copy, session), senRegion, session);
 
             addCaseJobs4Sensitivity(user, targetId, jobs);
-            addCaseInputs(user, targetId, inputs, jobPrefix);
-            addCaseParameters(user, targetId, params, jobPrefix);
+            addCaseInputs(targetId, inputs, jobPrefix, senRegion);
+            addCaseParameters(targetId, params, jobPrefix, senRegion);
             copySummaryInfo(lockedPC, lockedSC);
 
             // NOTE: copy input/output folder from template case
