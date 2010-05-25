@@ -89,8 +89,8 @@ public class SensitivityPresenter {
         return session.caseService();
     }
 
-    public Case copyCase(int caseId) throws EmfException {
-        return service().copyCaseObject(new int[] { caseId }, session.user())[0];
+    public void copyCase(int caseId) throws EmfException {
+        service().copyCaseObject(new int[] { caseId }, session.user());
     }
 
     public Case updateCase(Case caseObj) throws EmfException {
