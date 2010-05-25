@@ -28,5 +28,9 @@ public class TaskManagerFactory {
     public static synchronized ImportTaskManager getImportTaskManager() {
         return ImportTaskManager.getImportTaskManager();
     }
+    
+    public static synchronized CopyTaskManager getCopyTaskManager() {
+        return CopyTaskManager.getCopyTaskManager();
+    }
 	
 }

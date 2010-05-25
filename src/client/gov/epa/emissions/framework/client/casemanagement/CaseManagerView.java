@@ -20,4 +20,6 @@ public interface CaseManagerView extends ManagedView {
     CaseCategory getSelectedCategory();
     
     void setSelectedCategory();
+    
+    void setMessage(String message);
 }

@@ -99,7 +99,7 @@ public interface CaseService {
     
     String validateNLParameters(int caseId) throws EmfException;
     
-    Case[] copyCaseObject(int[] toCopy, User user) throws EmfException;
+    void copyCaseObject(int[] toCopy, User user) throws EmfException;
     
     CaseJob addCaseJob(User user, CaseJob job) throws EmfException;
     

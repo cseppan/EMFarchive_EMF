@@ -153,7 +153,8 @@ public class CaseServiceTest2 extends ServiceTestCase {
             add(inputOne);
             add(inputTwo);
 
-            copied = service.copyCaseObject(new int[] { caseId }, owner)[0];
+            service.copyCaseObject(new int[] { caseId }, owner);
+            copied = service.reloadCase(caseId);
             CaseInput[] copiedInputs = service.getCaseInputs(copied.getId());
             cpdInput1 = copiedInputs[0];
             cpdInput2 = copiedInputs[1];

@@ -422,7 +422,7 @@ public class CaseServiceTransport implements CaseService {
                 envNameContains, showAll });
     }
 
-    public synchronized Case[] copyCaseObject(int[] toCopy, User user) throws EmfException {
+    public void copyCaseObject(int[] toCopy, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("copyCaseObject");
@@ -430,7 +430,7 @@ public class CaseServiceTransport implements CaseService {
         call.addParam("user", dataMappings.user());
         call.setReturnType(caseMappings.cases());
 
-        return (Case[]) call.requestResponse(new Object[] { toCopy, user });
+        call.requestResponse(new Object[] { toCopy, user });
     }
 
     public synchronized CaseJob addCaseJob(User user, CaseJob job) throws EmfException {

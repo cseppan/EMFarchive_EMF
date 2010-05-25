@@ -462,13 +462,13 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private void copySelectedCases() {
         cases = selected();
 
-        if (cases.isEmpty()) {
-            messagePanel.setMessage("Please select one or more Cases to copy");
+        if (cases.isEmpty() ) {
+            messagePanel.setMessage("Please select one or more case to copy");
             return;
         }
 
-        messagePanel.setMessage("Please wait while copying cases...");
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        //messagePanel.setMessage("Please wait while copying cases...");
+        //setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         int[] caseIds = new int[cases.size()];
 
         for (int i = 0; i < caseIds.length; i++)
@@ -476,14 +476,13 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
         try {
             presenter.doCopyCases(caseIds);
-            doRefresh();
-            clearMsgPanel();
-            messagePanel.setMessage("Finished copying cases.");
+            //doRefresh();
+            //clearMsgPanel();
+            //messagePanel.setMessage("Finished copying cases.");
         } catch (Exception e) {
             showError("Could not copy cases." + e.getMessage());
-        } finally {
-            setCursor(Cursor.getDefaultCursor());
         }
+
     }
 
     private void showError(String message) {
@@ -501,6 +500,8 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private void clearMsgPanel() {
         messagePanel.clear();
     }
+    
+    
 
     public void doRefresh(){
         try {
@@ -532,5 +533,10 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         ImportCasePresenter importPresenter = new ImportCasePresenter(session);
         importPresenter.display(importView);
     }
+    
+    public void setMessage(String message) {
+        messagePanel.setMessage(message);
+
+    }   
 
 }

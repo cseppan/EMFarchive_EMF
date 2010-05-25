@@ -249,8 +249,8 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().getCaseInputs(pageSize, caseId, sector, envNameContains, showAll);
     }
     
-    public Case[] copyCaseObject(int[] toCopy, User user) throws EmfException {
-        return getCaseService().copyCaseObject(toCopy, user);
+    public void copyCaseObject(int[] toCopy, User user) throws EmfException {
+        getCaseService().copyCaseObject(toCopy, user);
     }
 
     public CaseJob addCaseJob(User user, CaseJob job) throws EmfException {
