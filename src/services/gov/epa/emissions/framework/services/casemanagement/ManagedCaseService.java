@@ -214,14 +214,14 @@ public class ManagedCaseService {
     private synchronized ManagedCopyService getCopyService() throws EmfException {
         log.info("ManagedCaseService::getCopyService");
 
-        //if (copyService == null) {
+    //    if (copyService == null) {
             try {
                 copyService = new ManagedCopyService(dbFactory, sessionFactory);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new EmfException(e.getMessage());
             }
-        //}
+    //    }
 
         return copyService;
     }
@@ -1521,10 +1521,11 @@ public class ManagedCaseService {
     }
 
     public void copyCaseObject(int[] toCopy, User user) throws EmfException {
-        for (int i = 0; i < toCopy.length; i++) {
-            Case caseToCopy = getCase(toCopy[i]);
+        
+//        for (int i = 0; i < toCopy.length; i++) {
+//            Case caseToCopy = getCase(toCopy[i]);
   
-            String submitterID = getCopyService().copyCases(user, caseToCopy, this);
+            String submitterID = getCopyService().copyCases(user, toCopy, this);
             if (DebugLevels.DEBUG_4)
                 System.out.println("In ExImServiceImpl:CopyCase() SUBMITTERID = " + submitterID);
         
@@ -1535,7 +1536,7 @@ public class ManagedCaseService {
 //                log.error("Could not copy case " + caseToCopy.getName() + ".", e);
 //                throw new EmfException("Could not copy case " + caseToCopy.getName() + ". " + e.getMessage());
 //            }
-        }
+//        }
 
         
     }

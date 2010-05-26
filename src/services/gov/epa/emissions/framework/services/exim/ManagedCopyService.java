@@ -80,7 +80,7 @@ public class ManagedCopyService {
         return services;
     }
 
-    public synchronized String copyCases(User user, Case toCopy, ManagedCaseService caseService) throws EmfException {
+    public synchronized String copyCases(User user, int[] toCopy, ManagedCaseService caseService) throws EmfException {
         if ( copyCaseSubmitter == null ){
             copyCaseSubmitter = new CopyCaseSubmitter();        
             TaskManagerFactory.getCopyTaskManager().registerTaskSubmitter(copyCaseSubmitter);
@@ -88,14 +88,17 @@ public class ManagedCopyService {
         //this.caseService = caseService;
         Services services = services();
         try {
-            //Case caseToCopy = getCase(toCopy[0]);
-            CopyTask copyTask = new CopyTask(toCopy, user, services, dbServerFactory, sessionFactory, caseService);
-            copyTasks.add(copyTask);
-            copyCaseSubmitter.addTasksToSubmitter(copyTasks);
-            copyTasks.removeAll(copyTasks);
+            for (int i = 0; i < toCopy.length; i++) {
+                Case caseToCopy = caseService.getCase(toCopy[i]);
+                //Case caseToCopy = getCase(toCopy[0]);
+                CopyTask copyTask = new CopyTask(caseToCopy, user, services, dbServerFactory, sessionFactory, caseService);
+                copyTasks.add(copyTask);
+                copyCaseSubmitter.addTasksToSubmitter(copyTasks);
+                copyTasks.removeAll(copyTasks);
+            }
         }catch (Exception e) {
             e.printStackTrace();
-            log.error("ERROR copying case : " + toCopy.getName());
+            //log.error("ERROR copying case : " + caseToCopy.getName());
             throw new EmfException(e.getMessage());
         }
         return copyCaseSubmitter.getSubmitterId();
