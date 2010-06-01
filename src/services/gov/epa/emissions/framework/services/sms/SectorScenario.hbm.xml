@@ -16,10 +16,16 @@
 	<property name="annotateInventoryWithEECS" column="annotate_inventory_with_eecs" type="boolean" not-null="false"/>
 	<property name="autoRunQASteps" column="auto_run_qa_steps" type="short"/>
 	<property name="annotatingEecsOption" column="annotating_eecs_option" type="short"/>
-	<many-to-one
+		<many-to-one
             name="creator" 
             class="gov.epa.emissions.commons.security.User"
             column="creator"/> 
+    
+    	<many-to-one
+            name="project" 
+            class="gov.epa.emissions.commons.data.Project"
+            column="project_id"/> 
+            
 	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
   	<property name="startDate" column="start_date" type="java.util.Date" not-null="false" length="4"/>
   	<property name="completionDate" column="completion_date" type="java.util.Date" not-null="false" length="4"/>

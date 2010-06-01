@@ -10,11 +10,8 @@ public class EditSectorScenarioSummaryTabPresenterImpl implements EditSectorScen
     protected EmfSession session;
     
     private EditSectorScenarioSummaryTabView view;
-    //private int sectorScenarioId;
-    //private EditSectorScenarioPresenter editPresenter;
     
     public EditSectorScenarioSummaryTabPresenterImpl(EmfSession session, EditSectorScenarioSummaryTabView view) {
-        //this.sectorScenarioId = sectorScenarioId;
         this.session = session;
         this.view = view;
     }

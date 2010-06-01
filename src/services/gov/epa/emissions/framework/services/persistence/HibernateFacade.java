@@ -91,8 +91,15 @@ public class HibernateFacade {
     }
 
     public Object current(int id, Class clazz, Session session) {
-        Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("id", new Integer(id)));
-        return crit.uniqueResult();
+        try {
+            Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("id", new Integer(id)));
+            return crit.uniqueResult();
+        } catch (HibernateException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        return null;
     }
 
     public boolean isUsed(String key, String value, Class clazz, Session session) {

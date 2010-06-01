@@ -27,11 +27,11 @@ public interface SectorScenarioService extends EMFService {
     
     SectorScenario updateSectorScenarioWithLock(SectorScenario element) throws EmfException;
     
-    void runStrategy (User user, int sectorScenarioId) throws EmfException;
+    void runSectorScenario (User user, int sectorScenarioId) throws EmfException;
 
     List<SectorScenario> getSectorScenariosByRunStatus(String runStatus) throws EmfException;
     
-    void stopRunStrategy(int sectorScenarioId) throws EmfException;
+    void stopRunSectorScenario(int sectorScenarioId) throws EmfException;
 
     String sectorScenarioRunStatus(int id) throws EmfException;
 

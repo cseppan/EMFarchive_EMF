@@ -21,15 +21,11 @@ import javax.swing.SpringLayout;
 
 public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorScenarioOptionsTabView {
 
-//    private TextField countyFileTextField;
-
     private MessagePanel messagePanel;
     
     protected SectorScenario sectorScenario;
     
     protected JCheckBox annoInvEECS;
-    
-    //protected JCheckBox shouldDoubleCount;
     
     private JRadioButton addEECSCol;
     
@@ -49,13 +45,8 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
     
     protected EmfConsole parentConsole;
 
-    //private ManageChangeables changeablesList;
-
     private EditSectorScenarioOptionsTabPresenter presenter;
     
-    //private EditSectorScenarioPresenter editPresenter;
-    
-
     public EditSectorScenarioOptionsTab(SectorScenario sectorScenario, 
             MessagePanel messagePanel, EmfConsole parentConsole, 
             EmfSession session, DesktopManager desktopManager){
@@ -65,7 +56,6 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
         this.sectorScenario = sectorScenario;
         this.parentConsole = parentConsole;
         this.session = session;
-        //this.editPresenter = editPresenter; 
     }
 
 
@@ -74,16 +64,12 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
     }
 
     public void display() {
-        
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(getBorderedPanel(createmMainSection(), ""), BorderLayout.NORTH);
         panel.add(doubleCount());
         
         setLayout(new BorderLayout(5, 5));
         add(panel,BorderLayout.NORTH);
-        // mainPanel.add(buttonPanel(), BorderLayout.SOUTH);
-        //mainPanel = new JPanel(new BorderLayout(10, 10));
-        //buildSortFilterPanel();
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         this.add(radioPanel(), BorderLayout.CENTER);
         this.add(buildListPanel(), BorderLayout.SOUTH);
@@ -98,11 +84,20 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
         buttonGroup.add(addEECSCol);     
         buttonGroup.add(useEECSFromInv);
         buttonGroup.add(fillMissEECS);
-        buttonGroup.setSelected(addEECSCol.getModel(), true);
+        
+        short annEccsOpt = sectorScenario.getAnnotatingEecsOption();
+        
+        if (annEccsOpt == 1)
+            addEECSCol.setSelected(true);
+        else if (annEccsOpt == 2)
+            useEECSFromInv.setSelected(true);
+        else
+            fillMissEECS.setSelected(true);
+        
         JPanel radioPanel = new JPanel();
         radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.Y_AXIS));
         radioPanel.add(new JLabel(" "));
-        radioPanel.add(new JLabel("annotate eecs options"));
+        radioPanel.add(new JLabel("Annotate eecs options"));
         radioPanel.add(addEECSCol);
         radioPanel.add(useEECSFromInv);
         radioPanel.add(fillMissEECS);
@@ -127,8 +122,6 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         
         layoutGenerator.addLabelWidgetPair("Annotate inventory with eecs:", annoInv(), panel);
-        //layoutGenerator.addLabelWidgetPair("Double count options:", doubleCount(), panel);
-        //layoutGenerator.addLabelWidgetPair("Annotate eecs options:", regions(), panel); 
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
@@ -137,7 +130,7 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
     }
     
     private JCheckBox annoInv() {
-        annoInvEECS = new JCheckBox(" ", null, sectorScenario.getAnnotateInventoryWithEECS() != null ? sectorScenario.getAnnotateInventoryWithEECS() : true);
+        annoInvEECS = new JCheckBox("", null, sectorScenario.getAnnotateInventoryWithEECS() != null ? sectorScenario.getAnnotateInventoryWithEECS() : true);
         return annoInvEECS;
     } 
     
@@ -147,7 +140,11 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
         doubleButtonGroup = new ButtonGroup();
         doubleButtonGroup.add(mappedToOne);     
         doubleButtonGroup.add(mappedToAll);
-        doubleButtonGroup.setSelected(mappedToOne.getModel(), true);
+        
+        if (sectorScenario.getShouldDoubleCount())
+            mappedToAll.setSelected(true);
+        else
+            mappedToOne.setSelected(true);
        
         JPanel radioPanel = new JPanel();
         radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.Y_AXIS));
@@ -161,8 +158,6 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
 
     private JPanel buildListPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        //panel.setBorder(new Border("Inventories to Process"));
-        //SortFilterSelectionPanel sfpanel = sortFilterPanel();
         panel.add(listPanel(), BorderLayout.CENTER);
         presenter.getClass();
         
@@ -174,15 +169,7 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
         JPanel panel = new JPanel(new BorderLayout());
         return panel;
     }
-
-
     
-    private void refresh(){
-//        table.refresh(tableData);
-//        panelRefresh();
-    }
-    
- 
     public void save(SectorScenario sectorScenario){
         sectorScenario.setAnnotateInventoryWithEECS(annoInvEECS.isSelected());
         if (doubleButtonGroup.getSelection().equals(mappedToOne.getModel()))
@@ -203,9 +190,22 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
         }
     }
 
-    public void refresh(SectorScenario sectorScenario) {
-        //tableData.add(sectorScenario.getInventories());
-        refresh();
+    public void refresh(SectorScenario secSce) {
+        annoInvEECS.setSelected(secSce.getAnnotateInventoryWithEECS());
+        
+        if (secSce.getShouldDoubleCount())
+            mappedToAll.setSelected(true);
+        else
+            mappedToOne.setSelected(true);
+        
+        short annEccsOpt = secSce.getAnnotatingEecsOption();
+        
+        if (annEccsOpt == 1)
+            addEECSCol.setSelected(true);
+        else if (annEccsOpt == 2)
+            useEECSFromInv.setSelected(true);
+        else
+            fillMissEECS.setSelected(true);
     }
 
 

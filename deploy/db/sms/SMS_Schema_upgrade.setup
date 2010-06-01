@@ -2,3 +2,6 @@ ALTER TABLE sms.eecs ALTER eecs_description TYPE text;
 
 ALTER TABLE sms.eecs ADD CONSTRAINT uq_eecs_eecs UNIQUE (eecs);
 ALTER TABLE sms.eecs ADD CONSTRAINT uq_eecs_name UNIQUE (eecs_name);
+
+--5/26/2010 add project_id column to persist project object in SectorScenario object
+ALTER TABLE sms.sector_scenario ADD COLUMN project_id int REFERENCES emf.projects(id);

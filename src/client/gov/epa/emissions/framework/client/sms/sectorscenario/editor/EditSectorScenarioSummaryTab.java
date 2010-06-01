@@ -42,8 +42,6 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
 
     protected ComboBox projectsCombo;
 
-    //private Dimension comboSize = new Dimension(200, 20);
-
     protected JLabel startDate;
 
     protected JLabel completionDate;
@@ -52,13 +50,7 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
     
     private ManageChangeables changeablesList;
     
-    //private EmfSession session;
-    
     protected MessagePanel messagePanel; 
-
-    //private DecimalFormat decFormat;
-
-    //private NumberFieldVerifier verifier;
 
     private  EditSectorScenarioSummaryTabPresenter presenter;
     
@@ -129,8 +121,7 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
         try {
             layoutGenerator.addLabelWidgetPair("Project:", projects(), panelTop);
         } catch (EmfException e) {
-            // NOTE Auto-generated catch block
-            e.printStackTrace();
+            messagePanel.setError(e.getMessage());
         }
         panelBottom.add(middleLeftPanel);
         panelBottom.add(middleRightPanel);
@@ -147,7 +138,6 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
     private JComponent createLowerSection(){
 
         JPanel panel = new JPanel(new BorderLayout());
-        //panel.add(getBorderedPanel(createLowerLeftSection(), "Parameters"), BorderLayout.WEST);
         panel.add(resultsPanel(), BorderLayout.CENTER);
 
         return panel;
@@ -194,7 +184,6 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
         this.abbrev = new TextField("abbrev", 15);
         this.abbrev.setEditable(true);
         this.abbrev.setText(sectorScenario.getAbbreviation());
-        //this.abbrev.setMaximumSize(new Dimension(120, 15));
         changeablesList.addChangeable(abbrev);
 
         return abbrev;
@@ -205,42 +194,23 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
     }
 
     private JComponent projects() throws EmfException {
-
-        this.projectsCombo = new ComboBox(getProjects());
-        //this.projectsCombo.setSelectedItem(ario);
-        this.projectsCombo.setPreferredSize(name.getPreferredSize());
+        projectsCombo = new ComboBox(getProjects());
+        projectsCombo.setSelectedItem(sectorScenario.getProject());
+        projectsCombo.setPreferredSize(name.getPreferredSize());
         changeablesList.addChangeable(projectsCombo);
 
-        return this.projectsCombo;
+        return projectsCombo;
     }
 
 
     private JComponent createLeftAlignedLabel(String name) {
-
         JLabel label = new JLabel(name);
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         return label;
     }
     
-//    private JPanel createLowerLeftSection() {
-//        JPanel mainPanel = new JPanel();
-//        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-//        JPanel panel = new JPanel(new SpringLayout());
-//        JPanel panelBottom = new JPanel(new BorderLayout());
-//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-//        layoutGenerator.addLabelWidgetPair("Region:", new JLabel("under construction. "), panel);
-//        
-//        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-//                5, 5, // initialX, initialY
-//                10, 10);// xPad, yPad
-//        mainPanel.add(panel);
-//        mainPanel.add(panelBottom);
-//        return mainPanel;
-//    }
-
     private JComponent resultsPanel() {
-
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Results"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -273,39 +243,17 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
         sectorScenario.setName(name.getText());
         sectorScenario.setAbbreviation(abbrev.getText());
         sectorScenario.setDescription(description.getText());
+        sectorScenario.setProject((Project)projectsCombo.getSelectedItem());
         sectorScenario.setLastModifiedDate(new Date());
-        updateProject();
-        //presenter.doSave();
     }
-
-
-
-    private void updateProject(){
-        Object selected = projectsCombo.getSelectedItem();
-        if (selected instanceof String) {
-            String projectName = ((String) selected).trim();
-            if (projectName.length() > 0) {
-                //Project project = project(projectName);// checking for duplicates
-                //controlStrategy.setProject(project);
-            }
-        } else if (selected instanceof Project) {
-            //controlStrategy.setProject((Project) selected);
-        }
-    }
-
-//    private Project project(String projectName) throws EmfException {
-//        return new Projects(this.getSession().dataCommonsService().getProjects()).get(projectName);
-//    }
 
     public void refresh(SectorScenario sectorScenario) {
         this.sectorScenario = sectorScenario;
         updateSummaryResultPanel();
 
-        // ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
-        // String runStatus = summary.getRunStatus();
-        String runStatus = sectorScenario.getRunStatus();
+        String runStatus = sectorScenario.getRunStatus().toLowerCase();
 
-        if (runStatus.indexOf("Running") == -1 && runStatus.indexOf("Waiting") == -1) {
+        if (runStatus.indexOf("running") == -1 && runStatus.indexOf("waiting") == -1) {
             clearMessage();
             //presenter.resetButtons(true);
         }
@@ -313,12 +261,12 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
 
     private void updateSummaryResultPanel() {
 
-        String runStatus = sectorScenario.getRunStatus(); // summary.getRunStatus();
+        String runStatus = sectorScenario.getRunStatus().toLowerCase(); 
 
         updateStartDate();
 
         String completionTime;
-        if (runStatus.indexOf("Finished") == -1)
+        if (runStatus.indexOf("finished") == -1)
             completionTime = runStatus;
         else
             completionTime = CustomDateFormat.format_MM_DD_YYYY_HH_mm_ss(sectorScenario.getCompletionDate());
@@ -326,11 +274,6 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
         
         updateSummaryPanelValuesExceptStartDate(completionTime, userName);
     }
-
-//    private void updateStartDate(Date startTime) {
-//        String time = startTime == null ? "" : CustomDateFormat.format_MM_DD_YYYY_HH_mm_ss(startTime);
-//        startDate.setText(time);
-//    }
 
     private void updateStartDate() {
         String startDateString = CustomDateFormat.format_MM_DD_YYYY_HH_mm_ss(sectorScenario.getStartDate());

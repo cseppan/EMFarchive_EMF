@@ -29,11 +29,7 @@ public class SectorScenarioManagerPresenterImpl implements RefreshObserver, Sect
     public void display() throws EmfException {
         view.observe(this);
         SectorScenario[] sectorScenarios= service().getSectorScenarios();
-        
-        //System.out.print("Size: " + sectorScenarios.length + sectorScenarios[0].getName());
         view.display(sectorScenarios);
-
-        //view.display(new SectorScenario[0]);
     }
 
     private SectorScenarioService service() {

@@ -71,7 +71,7 @@ public class SectorScenarioPresenter {
     }
 
     public void runSectorScenario(int sectorScenarioId) throws EmfException {
-        session.sectorScenarioService().runStrategy(session.user(), sectorScenarioId);
+        session.sectorScenarioService().runSectorScenario(session.user(), sectorScenarioId);
     }
 
 }

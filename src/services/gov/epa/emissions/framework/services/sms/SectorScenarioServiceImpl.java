@@ -110,40 +110,23 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             SectorScenario locked = dao.obtainLocked(owner, id, session);
 
             return locked;
-        } catch (RuntimeException e) {
-            LOG
-                    .error("Could not obtain lock for Control Strategy: id = " + id + " by owner: "
+        } catch (Exception e) {
+            LOG.error("Could not obtain lock for Sector Scenario: id = " + id + " by owner: "
                             + owner.getUsername(), e);
-            throw new EmfException("Could not obtain lock for Control Strategy: id = " + id + " by owner: "
+            throw new EmfException("Could not obtain lock for Sector Scenario: id = " + id + " by owner: "
                     + owner.getUsername());
         } finally {
             session.close();
         }
     }
 
-    // FIXME
-    // public void releaseLocked(SectorScenario locked) throws EmfException {
-    // Session session = sessionFactory.getSession();
-    // try {
-    // dao.releaseLocked(locked, session);
-    // } catch (RuntimeException e) {
-    // LOG.error(
-    // "Could not release lock for Control Strategy : " + locked + " by owner: " + locked.getLockOwner(),
-    // e);
-    // throw new EmfException("Could not release lock for Control Strategy: " + locked + " by owner: "
-    // + locked.getLockOwner());
-    // } finally {
-    // session.close();
-    // }
-    // }
-
     public synchronized void releaseLocked(User user, int id) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             dao.releaseLocked(user, id, session);
         } catch (RuntimeException e) {
-            LOG.error("Could not release lock for Control Strategy id: " + id, e);
-            throw new EmfException("Could not release lock for Control Strategy id: " + id);
+            LOG.error("Could not release lock for Sector Scenario id: " + id, e);
+            throw new EmfException("Could not release lock for Sector Scenario id: " + id);
         } finally {
             session.close();
         }
@@ -153,13 +136,13 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
         Session session = sessionFactory.getSession();
         try {
             if (!dao.canUpdate(element, session))
-                throw new EmfException("The Control Strategy name is already in use");
+                throw new EmfException("The Sector Scenario name is already in use");
 
             SectorScenario released = dao.update(element, session);
 
             return released;
         } catch (RuntimeException e) {
-            LOG.error("Could not update Control Strategy: " + element, e);
+            LOG.error("Could not update Sector Scenario: " + element, e);
             throw new EmfException("Could not update SectorScenario: " + element);
         } finally {
             session.close();
@@ -175,7 +158,6 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             SectorScenario csWithLock = dao.updateWithLock(element, session);
 
             return csWithLock;
-            // return dao.getById(csWithLock.getId(), session);
         } catch (RuntimeException e) {
             LOG.error("Could not update Sector Scenario: " + element, e);
             throw new EmfException("Could not update Sector Scenario: " + element);
@@ -183,21 +165,6 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             session.close();
         }
     }
-
-    // public void removeSectorScenarios(SectorScenario[] elements, User user) throws EmfException {
-    // try {
-    // for (int i = 0; i < elements.length; i++) {
-    // if (!user.equals(elements[i].getCreator()))
-    // throw new EmfException("Only the creator of " + elements[i].getName()
-    // + " can remove it from the database.");
-    // remove(elements[i]);
-    // }
-    //
-    // } catch (RuntimeException e) {
-    // LOG.error("Could not update Control Strategy: " + elements, e);
-    // throw new EmfException("Could not update SectorScenario: " + elements);
-    // }
-    // }
 
     public synchronized void removeSectorScenarios(int[] ids, User user) throws EmfException {
         Session session = sessionFactory.getSession();
@@ -273,7 +240,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
         }
     }
 
-    public synchronized void runStrategy(User user, int sectorScenarioId) throws EmfException {
+    public synchronized void runSectorScenario(User user, int sectorScenarioId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             // first see if the strategy has been canceled, is so don't run it...
@@ -310,17 +277,6 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
         }
     }
 
-//    private void validateSectors(SectorScenario strategy) throws EmfException {
-//        SectorScenarioInventory[] inputDatasets = strategy.getInventories();
-//        if (inputDatasets == null || inputDatasets.length == 0)
-//            throw new EmfException("Input Dataset does not exist. ");
-//        for (SectorScenarioInventory dataset : inputDatasets) {
-//            Sector[] sectors = dataset.getInputDataset().getSectors();
-//            if (sectors == null || sectors.length == 0)
-//                throw new EmfException("Inventory, " + dataset.getInputDataset().getName() + ", is missing a sector.  Edit dataset to add sector.");
-//        }
-//    }
-
     public List<SectorScenario> getSectorScenariosByRunStatus(String runStatus) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -343,17 +299,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
         }
     }
 
-//    private File validatePath(String folderPath) throws EmfException {
-//        File file = new File(folderPath);
-//
-//        if (!file.exists() || !file.isDirectory()) {
-//            LOG.error("Folder " + folderPath + " does not exist");
-//            throw new EmfException("Export folder does not exist: " + folderPath);
-//        }
-//        return file;
-//    }
-
-    public synchronized void stopRunStrategy(int sectorScenarioId) throws EmfException {
+    public synchronized void stopRunSectorScenario(int sectorScenarioId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             // look at the current status, if waiting or running, then update to Cancelled.
@@ -361,7 +307,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             if (status.toLowerCase().startsWith("waiting") || status.toLowerCase().startsWith("running"))
                 dao.setSectorScenarioRunStatusAndCompletionDate(sectorScenarioId, "Cancelled", null, session);
         } catch (RuntimeException e) {
-            LOG.error("Could not set Control Strategy run status: " + sectorScenarioId, e);
+            LOG.error("Could not set Sector Scenario run status: " + sectorScenarioId, e);
             throw new EmfException("Could not add Sector Scenario run status: " + sectorScenarioId);
         } finally {
             session.close();
@@ -380,7 +326,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
         }
     }
 
-    // returns control strategy Id for the given name
+    // returns Sector Scenario Id for the given name
     public synchronized int isDuplicateName(String name) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -443,7 +389,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             LOG.error("Could not copy Sector Scenario", e);
             throw new EmfException("Could not copy Sector Scenario");
         } catch (Exception e) {
-            LOG.error("Could not copy control strategy", e);
+            LOG.error("Could not copy Sector Scenario", e);
             throw new EmfException("Could not copy Sector Scenario");
         } finally {
             session.close();
@@ -472,7 +418,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             List all = dao.getSectorScenarioOutputs(sectorScenarioId, session);
             return (SectorScenarioOutput[]) all.toArray(new SectorScenarioOutput[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not retrieve control strategy results.", e);
+            LOG.error("Could not retrieve Sector Scenario results.", e);
             throw new EmfException("Could not retrieve Sector Scenario results.");
         } finally {
             session.close();

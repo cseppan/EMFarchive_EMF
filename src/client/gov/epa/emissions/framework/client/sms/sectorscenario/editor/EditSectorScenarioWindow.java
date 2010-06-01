@@ -43,14 +43,6 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
     protected Button stopButton;
     
-//    private EditControlStrategyMeasuresTab measuresTabView;
-//
-//    private ControlStrategyProgramsTab programsTabView;
-//
-//    private EditSectorScenarioOutputTabView outputTabView;
-
-    //private EditSectorScenarioSummaryTabView summaryTabView;
-    
     final protected JTabbedPane tabbedPane = new JTabbedPane();
     
     protected SingleLineMessagePanel messagePanel;
@@ -70,7 +62,6 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     public EditSectorScenarioWindow(String name, DesktopManager desktopManager, EmfSession session, 
             EmfConsole parentConsole) {
         super(name, new Dimension(700, 570), desktopManager);
-//      this.setMinimumSize(new Dimension(700, 300));
       this.session = session;
       this.parentConsole = parentConsole;
       this.desktopManager = desktopManager;
@@ -84,7 +75,6 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     public void display(SectorScenario sectorScenario) {
         super.setLabel(super.getTitle() + ": " + sectorScenario.getName());
         this.sectorScenario = sectorScenario;
-        //System.out.print(sectorScenario.getName() +"  abbre  "+ sectorScenario.getAbbreviation());
         super.display();
         messagePanel = new SingleLineMessagePanel();
        
@@ -96,9 +86,6 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         layout.add(messagePanel, BorderLayout.PAGE_START);
         layout.add(createTabbedPane(), BorderLayout.CENTER);
         layout.add(createButtonsPanel(), BorderLayout.PAGE_END);
-
-//      if (controlStrategy.getRunStatus().equalsIgnoreCase("Running"))
-//      enableButtons(false);
 
         contentPane.add(layout);
     }
@@ -113,12 +100,6 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         return tabbedPane;
     }
     
-//    protected void loadComponents() throws EmfException {
-//        int tabIndex = tabbedPane.getSelectedIndex();
-//        tabTitle = tabbedPane.getTitleAt(tabIndex);
-//        presenter.doLoad(tabTitle);
-//    }    
-
     private JPanel createSummaryTab() {
 
         EditSectorScenarioSummaryTab summaryTabView = new EditSectorScenarioSummaryTab(sectorScenario,session, this, messagePanel, parentConsole);
@@ -201,7 +182,6 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
         runButton = new RunButton(runAction());
         container.add(runButton);
-        runButton.setEnabled(false);
 
         Button refreshButton = new Button("Refresh", new AbstractAction(){
             public void actionPerformed(ActionEvent event) {
@@ -224,27 +204,13 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         return panel;
     }
     
-//    private void refreshCurrentTab() throws EmfException {
-//        RefreshObserver tab = (RefreshObserver) tabbedPane.getSelectedComponent();
-//        RefreshObserver summaryTab = (RefreshObserver) tabbedPane.getComponentAt(0);
-//        try {
-//            messagePanel.clear();
-//            tab.doRefresh();
-//            if (tabbedPane.getSelectedIndex() != 0)
-//                summaryTab.doRefresh();
-//        } catch (Exception e) {
-//            throw new EmfException(e.getMessage());
-//        }
-//    }
-    
-
     private Action stopAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 clearMessage();
                 String title = "Warning";
                 
-                String message = "Would you like to stop the strategy run?  This could several minutes to cancel the run.";
+                String message = "Would you like to stop running the sector scenario?\nThis could take several minutes to cancel the run.";
                 int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 boolean cancel = false;
@@ -255,8 +221,13 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
                 } else if (selection == JOptionPane.NO_OPTION){
                     cancel = false; 
                 }
+                
                 if (cancel) {
-                    //presenter.stopRun();
+                    try {
+                        presenter.stopRunningSectorScenario(sectorScenario.getId());
+                    } catch (EmfException e) {
+                        showError(e.getMessage());
+                    }
                 }
             }
         };
@@ -272,8 +243,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     private void save() throws EmfException {
         clearMessage();
         presenter.doSave(sectorScenario);
-        messagePanel
-            .setMessage("Sector Scenario was saved successfully.");
+        messagePanel.setMessage("Sector Scenario was saved successfully.");
         resetChanges();
     }
 
@@ -311,7 +281,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
                     clearMessage();
                     save();
                 } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
+                    showError(e.getMessage());
                 }
             }
         };
@@ -320,7 +290,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     }
 
     public void notifyLockFailure() {
-        String message = "Cannot edit Control Strategy: " + sectorScenario
+        String message = "Cannot edit Sector Scenario: " + sectorScenario
                 + System.getProperty("line.separator") + " as it was locked by User: " + sectorScenario.getLockOwner()
                 + "(at " + format(sectorScenario.getLockDate()) + ")";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
@@ -328,7 +298,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     }
 
     public void notifyEditFailure() {
-        String message = "Cannot edit Control Strategy: " + sectorScenario.getName()
+        String message = "Cannot edit Sector Scenario: " + sectorScenario.getName()
                 + " because you must be the creator of the strategy or an Administrator";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
@@ -351,12 +321,6 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         super.signalChanges();
     }
 
-//    public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-//        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(controlStrategyResults);
-//        if (summary.getRunStatus().equalsIgnoreCase("Completed."))
-//            stopButton.setEnabled(false);
-//    }
-
     public void stopRun()  {
         enableButtons(true);
         //stopButton.setEnabled(false);
@@ -364,14 +328,22 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
     private Action runAction() {
         return new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                //
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    stopButton.setEnabled(true);
+                    presenter.runSectorScenario(sectorScenario.getId());
+                } catch (EmfException e1) {
+                    stopButton.setEnabled(false);
+                    showError(e1.getMessage());
+                }
+                
             }
         };
     }
 
     public void notifyEditFailure(SectorScenario sectorScenario) {
-        String message = "Cannot edit Case: " + sectorScenario.getName() + System.getProperty("line.separator")
+        String message = "Cannot edit Sector Scenario: " + sectorScenario.getName() + System.getProperty("line.separator")
         + " because you must be the creator of the sector scenario or an Administrator";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
@@ -379,11 +351,10 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     }
 
     public void notifyLockFailure(SectorScenario sectorScenario) {
-        String message = "Cannot edit Case: " + sectorScenario.getName() + System.getProperty("line.separator")
+        String message = "Cannot edit Sector Scenario: " + sectorScenario.getName() + System.getProperty("line.separator")
         + " as it was locked by User: " + sectorScenario.getLockOwner() + "(at " + format(sectorScenario.getLockDate()) + ")";
            InfoDialog dialog = new InfoDialog(parentConsole, "Message", message);
          dialog.confirm();
-        
     }
 
     public void showError(String message) {
@@ -392,20 +363,6 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
     public void showRemindingMessage(String msg) {
         messagePanel.setMessage(msg);  
-        
     }
-
-    public void run(SectorScenario sectorScenario) {
-        // NOTE Auto-generated method stub
-        
-    }
-
-//    public void notifyTypeChange(SectorScenarioOutputType type) {
-//        String message = "Cannot edit Case: " + sectorScenario.getName() + System.getProperty("line.separator")
-//        + " as it was locked by User: " + sectorScenario.getLockOwner() + "(at " + format(sectorScenario.getLockDate()) + ")";
-//           InfoDialog dialog = new InfoDialog(parentConsole, "Message", message);
-//         dialog.confirm();        
-//        
-//    }
 
 }

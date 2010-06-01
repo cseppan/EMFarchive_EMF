@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.sms;
 
 import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
+import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -15,10 +16,10 @@ public class SectorScenario implements Lockable, Serializable {
     private String description = "";
     private String abbreviation;
     private String runStatus;
-    private Boolean shouldDoubleCount;
-    private Boolean annotateInventoryWithEECS;
+    private Boolean shouldDoubleCount = true;
+    private Boolean annotateInventoryWithEECS = true;
     private Short autoRunQASteps;
-    private Short annotatingEecsOption;
+    private Short annotatingEecsOption = 1;
     private User creator;
     private Date lastModifiedDate;
     private Date startDate;
@@ -32,6 +33,7 @@ public class SectorScenario implements Lockable, Serializable {
     private Integer sectorMapppingDatasetVersion;
     private SectorScenarioInventory[] inventories = new SectorScenarioInventory[] {};
     private String[] sectors = new String[] {};
+    private Project project;
 
     public SectorScenario() {
         this.lock = new Mutex();
@@ -53,7 +55,6 @@ public class SectorScenario implements Lockable, Serializable {
         this.id = id;
         this.name = name; 
         this.abbreviation = abbreviation; 
-        //this.description = description;
         this.runStatus = runStatus;
         this.creator = creator;
         this.lastModifiedDate = lastModifiedDate;
@@ -268,5 +269,13 @@ public class SectorScenario implements Lockable, Serializable {
 
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

@@ -19,6 +19,7 @@ create table sms.sector_scenario (
   auto_run_qa_steps smallint,
   annotating_eecs_option smallint,
   creator int NOT NULL,
+  project_id int REFERENCES emf.projects(id),
   last_modified_date timestamp without time zone NOT NULL,
   start_date timestamp without time zone,
   completion_date timestamp without time zone,

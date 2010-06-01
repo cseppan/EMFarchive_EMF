@@ -125,10 +125,10 @@ public class SectorScenarioServiceTransport implements SectorScenarioService {
         call.request(new Object[] { ids, user });
     }
 
-    public synchronized void runStrategy(User user, int sectorScenarioId) throws EmfException {
+    public synchronized void runSectorScenario(User user, int sectorScenarioId) throws EmfException {
         EmfCall call = call();
 
-        call.setOperation("runStrategy");
+        call.setOperation("runSectorScenario");
         call.addParam("user", mappings.user());
         call.addIntegerParam("sectorScenarioId");
         call.setVoidReturnType();
@@ -159,10 +159,10 @@ public class SectorScenarioServiceTransport implements SectorScenarioService {
         return (StrategyType[]) call.requestResponse(new Object[] {});
     }
 
-    public synchronized void stopRunStrategy(int sectorScenarioId) throws EmfException {
+    public synchronized void stopRunSectorScenario(int sectorScenarioId) throws EmfException {
         EmfCall call = call();
 
-        call.setOperation("stopRunStrategy");
+        call.setOperation("stopRunSectorScenario");
         call.addIntegerParam("sectorScenarioId");
         call.setVoidReturnType();
 

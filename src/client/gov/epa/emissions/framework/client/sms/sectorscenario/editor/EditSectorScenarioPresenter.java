@@ -31,7 +31,11 @@ public interface EditSectorScenarioPresenter{
     void doSave(SectorScenario sectorScenario) throws EmfException; 
     
     void fireTracking();
-    //doRun(SectorScenario sectorScenario) throws EmfException;
+
+    void runSectorScenario(int sectorScenarioId) throws EmfException;
+    
+    void stopRunningSectorScenario(int sectorScenarioId) throws EmfException;
+    
     EmfDataset getDataset(int id) throws EmfException;
     
 }

@@ -53,8 +53,6 @@ public class SectorScenarioManagerWindow extends ReusableInteralFrame implements
     
     private SelectableSortFilterWrapper table;
 
-    //private EmfTableModel model;
-
     private JPanel layout;
 
     private MessagePanel messagePanel;

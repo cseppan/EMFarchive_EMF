@@ -49,12 +49,10 @@ public class InputDatasetSelectionPresenter {
         if ((lastDatasets!=null) && (lastDatasetType!=null) && datasetType.getName().equals(lastDatasetType.getName()) && (nameContaining.equals(lastNameContains)))
         {
             // nothing has changed since last time, so just refresh with the previously retrieved list
-            System.out.println("Using previously retrieved datasets: name="+nameContaining+", dstype="+datasetType.getName());
             view.refreshDatasets(lastDatasets);
         }    
         else 
         {
-            System.out.println("Getting new datasets");
             lastDatasets = session.dataService().getDatasets(datasetType.getId(), nameContaining);
             view.refreshDatasets(lastDatasets);      
         }
