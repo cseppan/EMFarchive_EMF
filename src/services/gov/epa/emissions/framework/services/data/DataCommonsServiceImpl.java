@@ -1151,7 +1151,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         
         if (file == null || !file.exists())
             throw new EmfException("Format definition file " + formatFile + " doesn't exist.");
-        
+     
         try {
             CSVFileReader reader = new CSVFileReader(file);
             List<Column> colObjs = new ArrayList<Column>();
@@ -1160,7 +1160,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             //NOTE: currently the format definition file has to follow this column sequence:
             // name,type,default value,mandatory,description,formatter,constraints,width,spaces,fixformat start,fixformat end
             int nRequiredFormatCols = 11;
-            
+            int line = 1;
             for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
                 String[] data = record.getTokens();
                 if (data.length != nRequiredFormatCols ) {
@@ -1168,9 +1168,14 @@ public class DataCommonsServiceImpl implements DataCommonsService {
                     
                 }
                 String type = getType(data[1], types, data[7]); //get sql data type
+                if (type.contains("error"))
+                    throw new EmfException("Line " + line + type);
+                // mandatory value has to be true or false
+                if ( !data[3].equalsIgnoreCase("true") && !data[3].equalsIgnoreCase("false") ) 
+                    throw new EmfException("Line " + line + " error: the Format Definition File has an unrecognized value: "+data[3]);
                 colObjs.add(new Column(data[0], type, data[2], data[3], data[4],
                         data[5], data[6], data[7], data[8], data[9], data[10]));
-                
+                line++;
             }
             
             reader.close();
@@ -1180,6 +1185,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             XFileFormat loadedFormat = addFileFormat(format);
             dstype.setFileFormat(loadedFormat);
             addDatasetType(dstype);
+           
         } catch (Exception e) {
             e.printStackTrace();
             throw new EmfException(e.getMessage());
@@ -1189,7 +1195,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     private String getType(String type, SqlDataTypes types, String width) {
         if (type == null || type.trim().isEmpty())
-            return types.text();
+            return " error: the Format Definition File is missing a data type";
         
         int widthValue = 0;
         
@@ -1234,7 +1240,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         if (type.toLowerCase().startsWith("serial"))
             return types.autoIncrement();
             
-        return types.stringType();
+        return " error: the Format Definition File has an unrecognized data type:"+ type;
     }
 
 }
