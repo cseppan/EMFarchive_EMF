@@ -1151,9 +1151,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         
         if (file == null || !file.exists())
             throw new EmfException("Format definition file " + formatFile + " doesn't exist.");
-     
+        CSVFileReader reader = null;
         try {
-            CSVFileReader reader = new CSVFileReader(file);
+            reader = new CSVFileReader(file);
             List<Column> colObjs = new ArrayList<Column>();
             SqlDataTypes types = DbServerFactory.get().getDbServer().getSqlDataTypes();
             
@@ -1164,15 +1164,16 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             for (Record record = reader.read(); !record.isEnd(); record = reader.read()) {
                 String[] data = record.getTokens();
                 if (data.length != nRequiredFormatCols ) {
-                    throw new EmfException("Format definition file must have " + nRequiredFormatCols + " cols");
-                    
+                    throw new EmfException("Format definition file must have " + nRequiredFormatCols + " cols");     
                 }
                 String type = getType(data[1], types, data[7]); //get sql data type
-                if (type.contains("error"))
-                    throw new EmfException("Line " + line + type);
+                if (type.contains("error:")){
+                    int index = type.indexOf(":");
+                    throw new EmfException("Line " + line + " of "+ type.substring(index+1));
+                }
                 // mandatory value has to be true or false
                 if ( !data[3].equalsIgnoreCase("true") && !data[3].equalsIgnoreCase("false") ) 
-                    throw new EmfException("Line " + line + " error: the Format Definition File has an unrecognized value: "+data[3]);
+                    throw new EmfException("Line " + line + " of the Format Definition File has an unrecognized boolean value: "+data[3]);
                 colObjs.add(new Column(data[0], type, data[2], data[3], data[4],
                         data[5], data[6], data[7], data[8], data[9], data[10]));
                 line++;
@@ -1189,6 +1190,12 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         } catch (Exception e) {
             e.printStackTrace();
             throw new EmfException(e.getMessage());
+        }finally{
+            try {
+                reader.close();
+            } catch (IOException e) {
+                throw new EmfException(e.getMessage());
+            } 
         }
         
     }
@@ -1240,7 +1247,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         if (type.toLowerCase().startsWith("serial"))
             return types.autoIncrement();
             
-        return " error: the Format Definition File has an unrecognized data type:"+ type;
+        return " error: the Format Definition File has an unrecognized data type: "+ type;
     }
 
 }
