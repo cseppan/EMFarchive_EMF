@@ -1,0 +1,55 @@
+insert into emf.dataset_types ("name",description,min_files,max_files,"external",default_sortorder,importer_classname,exporter_classname,lock_owner,lock_date,table_per_dataset) 
+values('FAST Cancer Risk','FAST Cancer Risk',1,1,false,'','gov.epa.emissions.commons.io.csv.CSVImporter','gov.epa.emissions.commons.io.csv.CSVExporter',null::character varying(255),null::timestamp without time zone,1);
+insert into emf.dataset_types ("name",description,min_files,max_files,"external",default_sortorder,importer_classname,exporter_classname,lock_owner,lock_date,table_per_dataset) 
+values('FAST Species Mapping','FAST Species Mapping',1,1,false,'','gov.epa.emissions.commons.io.csv.CSVImporter','gov.epa.emissions.commons.io.csv.CSVExporter',null::character varying(255),null::timestamp without time zone,1);
+insert into emf.dataset_types ("name",description,min_files,max_files,"external",default_sortorder,importer_classname,exporter_classname,lock_owner,lock_date,table_per_dataset) 
+values('FAST Gridded Summary Emission and Air Quality','FAST Gridded Summary Emission and Air Quality',1,1,false,'','gov.epa.emissions.commons.io.csv.CSVImporter','gov.epa.emissions.commons.io.csv.CSVExporter',null::character varying(255),null::timestamp without time zone,1);
+insert into emf.dataset_types ("name",description,min_files,max_files,"external",default_sortorder,importer_classname,exporter_classname,lock_owner,lock_date,table_per_dataset) 
+values('FAST Gridded Detailed Emission and Air Quality','FAST Gridded Detailed Emission and Air Quality',1,1,false,'','gov.epa.emissions.commons.io.csv.CSVImporter','gov.epa.emissions.commons.io.csv.CSVExporter',null::character varying(255),null::timestamp without time zone,1);
+insert into emf.dataset_types ("name",description,min_files,max_files,"external",default_sortorder,importer_classname,exporter_classname,lock_owner,lock_date,table_per_dataset) 
+values('FAST Gridded Detailed Emission','FAST Gridded Detailed Emission',1,1,false,'','gov.epa.emissions.commons.io.csv.CSVImporter','gov.epa.emissions.commons.io.csv.CSVExporter',null::character varying(255),null::timestamp without time zone,1);
+insert into emf.dataset_types ("name",description,min_files,max_files,"external",default_sortorder,importer_classname,exporter_classname,lock_owner,lock_date,table_per_dataset) 
+values('FAST Gridded Sector-SCC-Pollutant Emission','FAST Gridded Sector-SCC-Pollutant Emission',1,1,false,'','gov.epa.emissions.commons.io.csv.CSVImporter','gov.epa.emissions.commons.io.csv.CSVExporter',null::character varying(255),null::timestamp without time zone,1);
+
+
+insert into emf.dataset_types ("name",description,min_files,max_files,"external",default_sortorder,importer_classname,exporter_classname,lock_owner,lock_date,table_per_dataset) 
+values('FAST SMOKE Gridded SCC Report','FAST SMOKE Gridded SCC Report',1,1,false,'','gov.epa.emissions.commons.io.other.SMKReportImporter','gov.epa.emissions.commons.io.other.SMKReportExporter',null::character varying(255),null::timestamp without time zone,1);
+
+
+
+INSERT INTO fast.fast_run_output_types (name) VALUES ('Gridded Emissions');
+INSERT INTO fast.fast_run_output_types (name) VALUES ('Gridded Summary Emissions and Air Quality');
+INSERT INTO fast.fast_run_output_types (name) VALUES ('Gridded Detailed Emissions and Air Quality');
+
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
+select (select id from emf.dataset_types where "name" = 'FAST Gridded Sector-SCC-Pollutant Emission') as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'FAST Gridded Sector-SCC-Pollutant Emission')) as list_index,
+  (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
+  'varchar(64)|varchar(64)|varchar(10)|int4|int4|float8(17)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
+select (select id from emf.dataset_types where "name" = 'FAST Gridded Detailed Emission') as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'FAST Gridded Detailed Emission')) as list_index,
+  (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
+  'varchar(64)|varchar(64)|varchar(64)|float8(17)|int4|int4|float8(17)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
+select (select id from emf.dataset_types where "name" = 'FAST Gridded Detailed Emission and Air Quality') as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'FAST Gridded Detailed Emission and Air Quality')) as list_index,
+  (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
+  'varchar(64)|varchar(64)|varchar(64)|float8(17)|int4|int4|float8(17)|float8(17)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
+select (select id from emf.dataset_types where "name" = 'FAST Gridded Summary Emission and Air Quality') as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'FAST Gridded Summary Emission and Air Quality')) as list_index,
+  (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
+  'varchar(64)|varchar(64)|int4|int4|float8(17)|float8(17)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
+select (select id from emf.dataset_types where "name" = 'FAST Species Mapping') as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'FAST Species Mapping')) as list_index,
+  (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
+  'varchar(64)|varchar(64)|varchar(64)|varchar(64)|varchar(64)|varchar(15)|float8(17)' as "value", 'COLUMN_TYPES' as kwname;
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
+select (select id from emf.dataset_types where "name" = 'FAST Cancer Risk') as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'FAST Cancer Risk')) as list_index,
+  (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
+  'varchar(64)|float8(17)' as "value", 'COLUMN_TYPES' as kwname;
+
+  

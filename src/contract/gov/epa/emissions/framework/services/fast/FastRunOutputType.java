@@ -16,6 +16,12 @@ public class FastRunOutputType implements Serializable, Comparable {
 
     public static final String SECTOR_SPECIFIC_INVENTORY = "Sector Specific Inventory";
 
+    public static final String GRIDDED_EMISSIONS = "Gridded Emissions";
+
+    public static final String GRIDDED_SUMMARY_EMISSIONS_AIR_QUALITY = "Gridded Summary Emissions and Air Quality";
+
+    public static final String GRIDDED_DETAILED_EMISSIONS_AIR_QUALITY = "Gridded Summary Emissions and Air Quality";
+
     public FastRunOutputType() {
         //
     }

@@ -1,10 +1,16 @@
 package gov.epa.emissions.framework.services.fast;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.cost.controlStrategy.FileFormatFactory;
+import gov.epa.emissions.framework.services.data.DataCommonsDAO;
+import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -15,6 +21,7 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -37,10 +44,13 @@ public class FastDAO {
     
     private DatasetDAO datasetDao;
 
+    private DataCommonsDAO dataCommonsDao;
+
     public FastDAO() {
         lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
         this.datasetDao = new DatasetDAO();
+        this.dataCommonsDao = new DataCommonsDAO();
     }
 
     public FastDAO(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
@@ -458,7 +468,7 @@ public class FastDAO {
     
     
     
-    
+
     public String getFastAnalysisRunStatus(int fastAnalysisId, Session session) {
         return (String)session.createQuery("select cS.runStatus from FastAnalysis cS where cS.id = " + fastAnalysisId).uniqueResult();
     }
@@ -686,9 +696,71 @@ public class FastDAO {
         return (String)session.createQuery("select cS.runStatus " +
                 "from FastAnalysis cS where cS.id = " + id).uniqueResult();
     }
+
+    private EmfDataset getDataset(String name, Session session) {
+        return datasetDao.getDataset(session, name);
+    }
+
+    private DatasetType getDatasetType(String name, Session session) {
+        return dataCommonsDao.getDatasetType(name, session);
+    }
+
+    private User getUser(String name, Session session) {
+        return new UserDAO().get(name, session);
+    }
+
+    public int addFastNonPointDataset(String newInventoryDatasetName, String baseNonPointDatasetName,
+            int baseNonPointDatasetVersion, String griddedSMKDatasetName, int griddedSMKDatasetVersion,
+            String invTableDatasetName, int invTableDatasetVersion,
+            String gridName, String userName, 
+            Session session, DbServer dbServer) throws EmfException {
+        
+        EmfDataset dataset = createFastQuasiPointDataset(newInventoryDatasetName, userName, session, dbServer);
+//            getDataset("ptnonipm_xportfrac_cap2005v2_20nov2008_revised_20jan2009_v0", session);
+
+        FastDataset fastDataset = new FastDataset();
+        fastDataset.setDataset(dataset);
+        fastDataset.setAddedDate(Calendar.getInstance().getTime());
+//        fastService.addFastDataset(fastDataset);
+        
+        
+
+        EmfDataset baseNonPointDataset = getDataset(baseNonPointDatasetName, session);
+        EmfDataset griddedSMKDataset = getDataset(griddedSMKDatasetName, session);
+        EmfDataset invTableDataset = getDataset(invTableDatasetName, session);
+        FastNonPointDataset fastNonPointDataset = new FastNonPointDataset();
+        fastNonPointDataset.setBaseNonPointDataset(baseNonPointDataset);
+        fastNonPointDataset.setBaseNonPointDatasetVersion(baseNonPointDatasetVersion);
+        fastNonPointDataset.setGriddedSMKDataset(griddedSMKDataset);
+        fastNonPointDataset.setGriddedSMKDatasetVersion(griddedSMKDatasetVersion);
+        fastNonPointDataset.setInvTableDataset(invTableDataset);
+        fastNonPointDataset.setInvTableDatasetVersion(invTableDatasetVersion);
+        fastNonPointDataset.setGrid(getGrid(session, gridName));
+        fastNonPointDataset.setFastDataset(fastDataset);
+//        fastNonPointDataset.setId(fastService.addFastNonPointDataset(fastNonPointDataset));
+        fastDataset.setFastNonPointDataset(fastNonPointDataset);
+        addFastNonPointDataset(fastNonPointDataset, session);
+        return dataset.getId();
+    }
     
-
-
+    private EmfDataset createFastQuasiPointDataset(String newInventoryDatasetName, String userName, Session session, DbServer dbServer) throws EmfException {
+        DatasetType datasetType = getDatasetType(DatasetType.orlPointInventory, session);
+        Keywords keywords = new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords());
+        DatasetCreator creator = new DatasetCreator(null, getUser(userName, session), 
+                sessionFactory, dbServerFactory,
+                dbServer.getEmissionsDatasource(), keywords);
+        if (creator.isDatasetNameUsed(newInventoryDatasetName))
+            throw new EmfException("Dataset name is already used, " + newInventoryDatasetName);
+        try {
+            return creator.addDataset("ds", newInventoryDatasetName, 
+                    datasetType, new FileFormatFactory(dbServer).tableFormat(datasetType),
+                    "");
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+            // NOTE Auto-generated catch block
+        //    e.printStackTrace();
+        }
+    }
 
 
 }

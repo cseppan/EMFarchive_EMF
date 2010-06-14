@@ -13,6 +13,8 @@ public class FastDataset implements Serializable {
     
     private Date addedDate;
     
+    private FastNonPointDataset fastNonPointDataset;
+    
     public EmfDataset getDataset() {
         return dataset;
     }
@@ -36,10 +38,10 @@ public class FastDataset implements Serializable {
     }
 
     public boolean equals(Object other) {
-        if (other == null || !(other instanceof FastDataset))
+        if (other == null || !(other instanceof FastDataset) || ((FastDataset)other).getDataset() == null || this.getDataset() == null)
             return false;
 
-        return this.id == ((FastDataset) other).getId();
+        return this.getDataset().getId() == ((FastDataset)other).getDataset().getId();
     }
 
     public int hashCode() {
@@ -52,5 +54,13 @@ public class FastDataset implements Serializable {
 
     public Date getAddedDate() {
         return addedDate;
+    }
+
+    public void setFastNonPointDataset(FastNonPointDataset fastNonPointDataset) {
+        this.fastNonPointDataset = fastNonPointDataset;
+    }
+
+    public FastNonPointDataset getFastNonPointDataset() {
+        return fastNonPointDataset;
     }
 }

@@ -189,7 +189,7 @@ public class DatasetCreator {
         newDataset.setCreatedDateTime(start);
         newDataset.setModifiedDateTime(start);
         newDataset.setAccessedDateTime(start);
-        newDataset.setStatus("Created by sector scenario");
+        newDataset.setStatus("Created by FAST Tool");
 
         //Add properties from input dataset...
         if (inventory != null) {
@@ -475,7 +475,7 @@ public class DatasetCreator {
         return table.trim().replaceAll(" ", "_") + "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date());
     }
 
-    private boolean isDatasetNameUsed(String name) throws EmfException {
+    public boolean isDatasetNameUsed(String name) throws EmfException {
         boolean nameUsed = false;
         Session session = sessionFactory.getSession();
         try {

@@ -27,5 +27,6 @@
             column="dataset_id" not-null="true"/> 
 -->
   	<property name="addedDate" column="added_date" type="java.util.Date" not-null="true" length="4"/>
+	 <one-to-one name="fastNonPointDataset" class="gov.epa.emissions.framework.services.fast.FastNonPointDataset"/>
   </class> 
 </hibernate-mapping>  

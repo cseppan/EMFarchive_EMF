@@ -33,6 +33,11 @@
 	<many-to-one name="transferCoefficientsDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="transfer_coefficients_dataset_id"/>
     <property name="transferCoefficientsDatasetVersion" column="transfer_coefficients_dataset_version" type="integer"/>
 
+	<many-to-one name="cancerRiskDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="cancer_risk_dataset_id"/>
+    <property name="cancerRiskDatasetVersion" column="cancer_risk_dataset_version" type="integer"/>
+	<many-to-one name="domainPopulationDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="domain_population_dataset_id"/>
+    <property name="domainPopulationDatasetVersion" column="domain_population_dataset_version" type="integer"/>
+
 	<array name="outputSectors" table="fast_run_output_sectors" schema="fast">
     	<key column="fast_run_id" not-null="true"/>
     	<list-index column="list_index"/>

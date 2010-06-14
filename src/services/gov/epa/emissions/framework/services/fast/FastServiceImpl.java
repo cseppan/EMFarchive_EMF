@@ -1,10 +1,12 @@
 package gov.epa.emissions.framework.services.fast;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
+import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -43,7 +45,7 @@ public class FastServiceImpl implements FastService {
     private synchronized void init(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
-        dao = new FastDAO();
+        dao = new FastDAO(dbServerFactory, sessionFactory);
         threadPool = createThreadPool();
 
     }
@@ -518,6 +520,45 @@ public class FastServiceImpl implements FastService {
         return csId;
     }
 
+    public synchronized int addFastNonPointDataset(String newInventoryDatasetName, String baseNonPointDatasetName, 
+            int baseNonPointDatasetVersion, String griddedSMKDatasetName, 
+            int griddedSMKDatasetVersion, String invTableDatasetName, 
+            int invTableDatasetVersion, String gridName, 
+            String userName) throws EmfException {
+        Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
+        int fastDatasetId;
+        try {
+            fastDatasetId = dao.addFastNonPointDataset(newInventoryDatasetName, baseNonPointDatasetName, 
+                    baseNonPointDatasetVersion, griddedSMKDatasetName, 
+                    griddedSMKDatasetVersion, invTableDatasetName, 
+                    invTableDatasetVersion, gridName, 
+                    userName, session, 
+                    dbServer);
+            
+            populateFastQuasiPointDataset((new UserDAO()).get(userName, session), fastDatasetId);
+            
+        } catch (RuntimeException e) {
+            LOG.error("Could not add FastDataset: " + newInventoryDatasetName, e);
+            throw new EmfException("Could not add FastDataset: " + newInventoryDatasetName);
+        } finally {
+            session.close();
+            close(dbServer);
+        }
+        return fastDatasetId;
+    }
+
+    private synchronized void close(DbServer dbServer) throws EmfException {
+        try {
+            if (dbServer != null)
+                dbServer.disconnect();
+
+        } catch (Exception e) {
+            LOG.error("Could not close database server", e);
+            throw new EmfException("Could not close database server");
+        }
+    }
+
     public synchronized void removeFastDataset(int fastDatasetId, User user) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -582,13 +623,14 @@ public class FastServiceImpl implements FastService {
         }
     }
 
-    public synchronized void createFastQuasiPointDataset(User user, int fastNonPointDatasetId) throws EmfException {
+    private void populateFastQuasiPointDataset(User user, int fastNonPointDatasetId) throws EmfException {
         try {
-            CreateFastQuasiPointDatasetTask task = new CreateFastQuasiPointDatasetTask(user,
-                    getFastNonPointDataset(fastNonPointDatasetId), sessionFactory, dbServerFactory);
+            FastDataset fastDataset = getFastDataset(fastNonPointDatasetId);
+            PopulateFastQuasiPointDatasetTask task = new PopulateFastQuasiPointDatasetTask(user,
+                    fastDataset, sessionFactory, dbServerFactory);
             if (task.shouldProceed())
                 threadPool
-                        .execute(new GCEnforcerTask("Create Inventories: " + ""/* controlStrategy.getName() */, task));
+                        .execute(new GCEnforcerTask("Populate FAST Quasi Point Inventory: " + fastDataset.getDataset().getName(), task));
         } catch (Exception e) {
             LOG.error("Error running control strategy: " + ""/* controlStrategy.getName() */, e);
             throw new EmfException(e.getMessage());

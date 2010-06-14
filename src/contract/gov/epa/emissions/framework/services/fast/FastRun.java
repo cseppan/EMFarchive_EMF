@@ -29,6 +29,10 @@ public class FastRun implements Lockable, Serializable {
     private Integer speciesMapppingDatasetVersion;
     private EmfDataset transferCoefficientsDataset;
     private Integer transferCoefficientsDatasetVersion;
+    private EmfDataset cancerRiskDataset;
+    private Integer cancerRiskDatasetVersion;
+    private EmfDataset domainPopulationDataset;
+    private Integer domainPopulationDatasetVersion;
     private FastRunInventory[] inventories = new FastRunInventory[] {};
     private Sector[] outputSectors = new Sector[] {};
 
@@ -237,5 +241,37 @@ public class FastRun implements Lockable, Serializable {
 
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public void setDomainPopulationDatasetVersion(Integer domainPopulationDatasetVersion) {
+        this.domainPopulationDatasetVersion = domainPopulationDatasetVersion;
+    }
+
+    public Integer getDomainPopulationDatasetVersion() {
+        return domainPopulationDatasetVersion;
+    }
+
+    public void setDomainPopulationDataset(EmfDataset domainPopulationDataset) {
+        this.domainPopulationDataset = domainPopulationDataset;
+    }
+
+    public EmfDataset getDomainPopulationDataset() {
+        return domainPopulationDataset;
+    }
+
+    public void setCancerRiskDatasetVersion(Integer cancerRiskDatasetVersion) {
+        this.cancerRiskDatasetVersion = cancerRiskDatasetVersion;
+    }
+
+    public Integer getCancerRiskDatasetVersion() {
+        return cancerRiskDatasetVersion;
+    }
+
+    public void setCancerRiskDataset(EmfDataset cancerRiskDataset) {
+        this.cancerRiskDataset = cancerRiskDataset;
+    }
+
+    public EmfDataset getCancerRiskDataset() {
+        return cancerRiskDataset;
     }
 }

@@ -35,6 +35,9 @@ public class SectorScenario implements Lockable, Serializable {
     private String[] sectors = new String[] {};
     private Project project;
 
+    public static final short CREATE_SINGLE_INVENTORY = 0;
+    public static final short CREATE_N_SECTOR_INVENTORIES = 1;
+    
     public SectorScenario() {
         this.lock = new Mutex();
     }
@@ -269,6 +272,11 @@ public class SectorScenario implements Lockable, Serializable {
 
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public Short getCreateInventoryMethod() {
+        // NOTE Auto-generated method stub
+        return null;
     }
 
     public Project getProject() {

@@ -16,6 +16,8 @@ public class SectorScenarioOutputType implements Serializable, Comparable {
 
     public static final String SECTOR_SPECIFIC_INVENTORY = "Sector Specific Inventory";
 
+    public static final String SECTOR_ANNOTATED_INVENTORY = "Sector Annotated Inventory";
+
     public SectorScenarioOutputType() {
         //
     }

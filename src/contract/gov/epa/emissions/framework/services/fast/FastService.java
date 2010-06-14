@@ -58,9 +58,13 @@ public interface FastService extends EMFService {
 
     public int addFastNonPointDataset(FastNonPointDataset fastNonPointDataset) throws EmfException;
 
+    public int addFastNonPointDataset(String newInventoryDatasetName, String baseNonPointDatasetName, 
+            int baseNonPointDatasetVersion, String griddedSMKDatasetName, 
+            int griddedSMKDatasetVersion, String invTableDatasetName, 
+            int invTableDatasetVersion, String gridName, 
+            String userName) throws EmfException;
+    
     public void removeFastNonPointDataset(int fastNonPointDatasetId, User user) throws EmfException;
-
-    public void createFastQuasiPointDataset(User user, int fastNonPointDatasetId) throws EmfException;
 
     public Grid[] getGrids() throws EmfException;
 

@@ -298,18 +298,6 @@ public class FastServiceTransport implements FastService {
         call.request(new Object[] { new Integer(fastNonPointDatasetId), user });
     }
 
-    public void createFastQuasiPointDataset(User user, int fastNonPointDatasetId)
-            throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("createFastQuasiPointDataset");
-        call.addParam("user", mappings.user());
-        call.addIntegerParam("fastNonPointDatasetId");
-        call.setVoidReturnType();
-
-        call.request(new Object[] { user, new Integer(fastNonPointDatasetId) });
-    }
-
     public synchronized Grid[] getGrids() throws EmfException {
         EmfCall call = call();
 
@@ -547,5 +535,28 @@ public class FastServiceTransport implements FastService {
         call.setReturnType(mappings.fastRunOutputTypes());
 
         return (FastRunOutputType[]) call.requestResponse(new Object[] {  });
+    }
+
+    public int addFastNonPointDataset(String newInventoryDatasetName, String baseNonPointDatasetName,
+            int baseNonPointDatasetVersion, String griddedSMKDatasetName, int griddedSMKDatasetVersion,
+            String invTableDatasetName, int invTableDatasetVersion, String gridName, String userName) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addFastNonPointDataset");
+        call.addStringParam("newInventoryDatasetName");
+        call.addStringParam("baseNonPointDatasetName");
+        call.addIntegerParam("baseNonPointDatasetVersion");
+        call.addStringParam("griddedSMKDatasetName");
+        call.addIntegerParam("griddedSMKDatasetVersion");
+        call.addStringParam("invTableDatasetName");
+        call.addIntegerParam("invTableDatasetVersion");
+        call.addStringParam("gridName");
+        call.addStringParam("userName");
+        call.setIntegerReturnType();
+
+        return (Integer) call.requestResponse(new Object[] { newInventoryDatasetName, baseNonPointDatasetName,
+                new Integer(baseNonPointDatasetVersion), griddedSMKDatasetName, new Integer(griddedSMKDatasetVersion),
+                invTableDatasetName, new Integer(invTableDatasetVersion),
+                gridName, userName});
     }
 }

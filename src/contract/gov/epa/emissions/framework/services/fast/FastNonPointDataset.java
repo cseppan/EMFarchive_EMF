@@ -11,8 +11,11 @@ public class FastNonPointDataset implements Serializable {
     private int griddedSMKDatasetVersion;
     private EmfDataset baseNonPointDataset;
     private int baseNonPointDatasetVersion;
+    private EmfDataset invTableDataset;
+    private int invTableDatasetVersion;
     private Grid grid;
     private EmfDataset quasiPointDataset;
+    private FastDataset fastDataset;
 
     /*
      * Default constructor needed for hibernate and axis serialization
@@ -110,5 +113,29 @@ public class FastNonPointDataset implements Serializable {
             + this.grid.getId() 
             + this.quasiPointDataset.getId() 
             ;
+    }
+
+    public void setFastDataset(FastDataset fastDataset) {
+        this.fastDataset = fastDataset;
+    }
+
+    public FastDataset getFastDataset() {
+        return fastDataset;
+    }
+
+    public void setInvTableDataset(EmfDataset invTableDataset) {
+        this.invTableDataset = invTableDataset;
+    }
+
+    public EmfDataset getInvTableDataset() {
+        return invTableDataset;
+    }
+
+    public void setInvTableDatasetVersion(int invTableDatasetVersion) {
+        this.invTableDatasetVersion = invTableDatasetVersion;
+    }
+
+    public int getInvTableDatasetVersion() {
+        return invTableDatasetVersion;
     }
 }
