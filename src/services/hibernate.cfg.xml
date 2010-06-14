@@ -113,6 +113,17 @@
 	   	<mapping resource="gov/epa/emissions/framework/services/sms/SectorScenario.hbm.xml"/>
 	   	<mapping resource="gov/epa/emissions/framework/services/sms/SectorScenarioOutput.hbm.xml"/>
 	   	<mapping resource="gov/epa/emissions/framework/services/sms/SectorScenarioOutputType.hbm.xml"/>
+
+		<!-- Mappings : Fast -->
+	   	<mapping resource="gov/epa/emissions/framework/services/fast/FastDataset.hbm.xml"/>
+	   	<mapping resource="gov/epa/emissions/framework/services/fast/FastNonPointDataset.hbm.xml"/>
+	   	<mapping resource="gov/epa/emissions/framework/services/fast/Grid.hbm.xml"/>
+	   	<mapping resource="gov/epa/emissions/framework/services/fast/FastRun.hbm.xml"/>
+	   	<mapping resource="gov/epa/emissions/framework/services/fast/FastRunOutput.hbm.xml"/>
+	   	<mapping resource="gov/epa/emissions/framework/services/fast/FastRunOutputType.hbm.xml"/>
+	   	<mapping resource="gov/epa/emissions/framework/services/fast/FastAnalysis.hbm.xml"/>
+	   	<mapping resource="gov/epa/emissions/framework/services/fast/FastAnalysisOutput.hbm.xml"/>
+	   	<mapping resource="gov/epa/emissions/framework/services/fast/FastAnalysisOutputType.hbm.xml"/>
     </session-factory>
-    
+
 </hibernate-configuration>
