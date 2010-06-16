@@ -62,4 +62,29 @@ select dt.id as dataset_type_id,
   'varchar(64)|varchar(64)|varchar(64)|float8(17)|float8(17)' as "value", 'COLUMN_TYPES' as kwname
 from emf.dataset_types dt
 where "name" = 'FAST Transfer Coefficients';
+
+
+
+
+-- Add new projections
+INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) VALUES (104307, 'WRF', 104307, 'PROJCS["Lambert_Conformal_Conic", 
+  GEOGCS["unnamed ellipse", 
+    DATUM["D_unknown", 
+      SPHEROID["Unknown", 6370000.0, 0.0]], 
+    PRIMEM["Greenwich", 0.0], 
+    UNIT["degree", 0.017453292519943295], 
+    AXIS["Lon", EAST], 
+    AXIS["Lat", NORTH]], 
+  PROJECTION["Lambert_Conformal_Conic"], 
+  PARAMETER["central_meridian", -97.0], 
+  PARAMETER["latitude_of_origin", 40.0], 
+  PARAMETER["standard_parallel_1", 33.0], 
+  PARAMETER["scale_factor", 1.0], 
+  PARAMETER["false_easting", 0.0], 
+  PARAMETER["false_northing", 0.0], 
+  PARAMETER["standard_parallel_2", 45.0], 
+  UNIT["m", 1.0], 
+  AXIS["x", EAST], 
+  AXIS["y", NORTH]]', '+proj=lcc +a=6370000.0 +b=6370000.0 +lat_1=33 +lat_2=45 +lat_0=40.0 +lon_0=-97.0');
+INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) VALUES (104308, 'WRF', 104308, NULL, '+proj=latlong +a=6370000.0 +b=6370000.0');
   
