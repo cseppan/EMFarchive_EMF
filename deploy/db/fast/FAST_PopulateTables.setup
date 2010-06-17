@@ -64,6 +64,17 @@ from emf.dataset_types dt
 where "name" = 'FAST Transfer Coefficients';
 
 
+-- FAST Domain Population Dataset Type setup
+insert into emf.dataset_types ("name",description,min_files,max_files,"external",default_sortorder,importer_classname,exporter_classname,lock_owner,lock_date,table_per_dataset) 
+values('FAST Domain Population','FAST Domain Population',1,1,false,'','gov.epa.emissions.commons.io.csv.CSVImporter','gov.epa.emissions.commons.io.csv.CSVExporter',null::character varying(255),null::timestamp without time zone,1);
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
+select dt.id as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = dt.id) as list_index,
+  (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
+  'int|int|float8(17)|float8(17)|float8(17)' as "value", 'COLUMN_TYPES' as kwname
+from emf.dataset_types dt
+where "name" = 'FAST Domain Population';
+
 
 
 -- Add new projections
