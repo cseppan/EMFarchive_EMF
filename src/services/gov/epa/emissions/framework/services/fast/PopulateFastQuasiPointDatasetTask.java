@@ -163,16 +163,16 @@ public class PopulateFastQuasiPointDatasetTask implements Runnable {
                     sql += ", 0 as version";
                     columnList += "," + columnName;
                 } else if (columnName.equalsIgnoreCase("plantid")) {
-                    sql += ", smk.x as plantid";
+                    sql += ", smk.x || '' as plantid";
                     columnList += "," + columnName;
                 } else if (columnName.equalsIgnoreCase("pointid")) {
-                    sql += ", smk.y as pointid";
+                    sql += ", smk.y || '' as pointid";
                     columnList += "," + columnName;
                 } else if (columnName.equalsIgnoreCase("stackid")) {
-                    sql += ", smk.x as stackid";
+                    sql += ", smk.x || '' as stackid";
                     columnList += "," + columnName;
                 } else if (columnName.equalsIgnoreCase("segment")) {
-                    sql += ", smk.y as segment";
+                    sql += ", smk.y || '' as segment";
                     columnList += "," + columnName;
                 } else if (columnName.equalsIgnoreCase("poll")) {
                     sql += ", coalesce(invtable.cas, smk.poll) as poll";
@@ -239,7 +239,7 @@ public class PopulateFastQuasiPointDatasetTask implements Runnable {
     //            + ") as total" 
     //            + " on total.fips = inv.fips and total.scc = inv.scc and total.smoke_name = invtable.name"
                 + " inner join ("
-                + buildSQLSelectForSMOKEGriddedSCCRpt(smokeRpt, smokeRptVersion, true)
+                + buildSQLSelectForSMOKEGriddedSCCRpt(smokeRpt, smokeRptVersion, grid)
                 + ") as smk" 
                 + " on inv.fips = smk.fips and inv.scc = smk.scc and invtable.name = smk.poll" 
                 + " left outer join " + qualifiedTable(newInvTableName, datasource) + " as newinv "
@@ -279,8 +279,10 @@ public class PopulateFastQuasiPointDatasetTask implements Runnable {
     }
 
     private String buildSQLSelectForSMOKEGriddedSCCRpt(EmfDataset griddedSCCDataset, int griddedSCCDatasetVersionNumber,
-            boolean includeFIPS) throws EmfException {
+            Grid grid) throws EmfException {
         String sql = "";
+        if (griddedSCCDataset.getSectors() == null || griddedSCCDataset.getSectors().length == 0)
+            throw new EmfException("Dataset " + griddedSCCDataset.getName() + " is missing the sector.");
         Sector sector = griddedSCCDataset.getSectors()[0];
         String tableName = griddedSCCDataset.getInternalSources()[0].getTable();
         if (sector == null)
@@ -291,11 +293,11 @@ public class PopulateFastQuasiPointDatasetTask implements Runnable {
         for (int i = 0; i < pollutantColumns.size(); i++) {
             String pollutant = pollutantColumns.get(i);
             sql += (i > 0 ? " union all " : "") + "select '" + sector.getName().replace("'", "''")
-                    + "'::varchar(64) as sector" + (includeFIPS ? ", substring(region,2) as fips" : "") + ", scc, '" + pollutant.toUpperCase() + "' as poll, sum("
-                    + (!isMonthly ? "" : "365 * ") + pollutant + ") as emis, x_cell as x, y_cell as y from emissions."
+                    + "'::varchar(64) as sector, substring(region,2) as fips, scc, '" + pollutant.toUpperCase() + "' as poll, sum("
+                    + (!isMonthly ? "" : "365 * ") + pollutant + ") as emis, x_cell::integer as x, y_cell::integer as y from emissions."
                     + tableName + " where  " + griddedSCCDatasetVersionedQuery.query()
-                    + " and x_cell between 1 and 36 and y_cell between 1 and 45 and coalesce(" + pollutant
-                    + ",0.0) <> 0.0 group by x_cell, y_cell" + (includeFIPS ? ", substring(region,2)" : "") + ", scc \n";
+                    + " and x_cell::integer between 1 and " + grid.getNcols() + " and y_cell::integer between 1 and " + grid.getNrows() + " and coalesce(" + pollutant
+                    + ",0.0) <> 0.0 group by x_cell::integer, y_cell::integer, substring(region,2), scc \n";
         }
         return sql;
     }

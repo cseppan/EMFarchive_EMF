@@ -34,21 +34,11 @@ gridded_smk_dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
 gridded_smk_dataset_version int4 NOT NULL,
 base_nonpoint_dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
 base_nonpoint_dataset_version int4 NOT NULL,
-grid_id int4 REFERENCES fast.grids(id)
+grid_id int4 REFERENCES fast.grids(id),
+invtable_dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
+invtable_dataset_version int4 NOT NULL
 --,FOREIGN KEY (quasi_point_dataset_id, grid_id) REFERENCES fast.fast_datasets(dataset_id, grid_id)
 );
-
-create table fast.fast_nonpoint_datasets (
-id serial primary key NOT NULL,
-gridded_smk_dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
-gridded_smk_dataset_version int4 NOT NULL,
-base_nonpoint_dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
-base_nonpoint_dataset_version int4 NOT NULL,
-quasi_point_dataset_id int4 REFERENCES emf.datasets(id),
-grid_id int4 REFERENCES fast.grids(id)
---,FOREIGN KEY (quasi_point_dataset_id, grid_id) REFERENCES fast.fast_datasets(dataset_id, grid_id)
-);
-
 
 CREATE TABLE fast.fast_runs (
 id serial NOT NULL PRIMARY KEY,

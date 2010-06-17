@@ -13,12 +13,12 @@ public class FastGriddedInventoryPollutantAirQualityEmissionResult {
     private String tranferCoefficient;
 
     public FastGriddedInventoryPollutantAirQualityEmissionResult(String inventoryPollutant, float adjustmentFactor,
-            String tranferCoefficient, int numerOfXGridCells, int numerOfYGridCells) {
+            String tranferCoefficient, int nCols, int nRows) {
         this.inventoryPollutant = inventoryPollutant;
         this.adjustmentFactor = adjustmentFactor;
         this.tranferCoefficient = tranferCoefficient;
-        this.emission = new double[numerOfXGridCells][numerOfYGridCells];
-        this.airQuality = new double[numerOfXGridCells][numerOfYGridCells];
+        this.emission = new double[nCols][nRows];
+        this.airQuality = new double[nCols][nRows];
     }
 
     public void setPollutant(String inventoryPollutant) {

@@ -61,8 +61,8 @@ public class FastRunRunTask implements Runnable {
                 addCompletedStatus();
             } catch (EmfException e) {
                 completeStatus = "Failed";
-                logError("Failed to run sector scenario : ", e);
-                setStatus("Failed to run sector scenario: " + "Reason: " + e.getMessage());
+                logError("Failed to run FAST run : ", e);
+                setStatus("Failed to run FAST run: " + "Reason: " + e.getMessage());
             } finally {
 //                    closeConnection();
                 
@@ -148,11 +148,11 @@ public class FastRunRunTask implements Runnable {
     }
     
     private void addStartStatus() {
-        setStatus("Started running sector scenario: " + fastRunTask.getFastRun().getName());
+        setStatus("Started running FAST run: " + fastRunTask.getFastRun().getName());
     }
 
     private void addCompletedStatus() {
-        setStatus("Completed running sector scenario: " + fastRunTask.getFastRun().getName() + ".");
+        setStatus("Completed running FAST run: " + fastRunTask.getFastRun().getName() + ".");
     }
 
     private void setStatus(String message) {

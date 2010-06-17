@@ -55,27 +55,36 @@ public class FastGriddedCMAQPollutantAirQualityEmissionResult {
     }
 
     public double[][] getEmission() {
-        double[][] emission = new double[36][45];
+        double[][] emission = new double[][] {};
         for (FastGriddedInventoryPollutantAirQualityEmissionResult result : inventoryPollutantResults) {
             double[][] resultEmission = result.getEmission();
-            for (int x = 1; x <= 36; x++) {
-                for (int y = 1; y <= 45; y++) {
-                    emission[x - 1][y - 1] += resultEmission[x - 1][y - 1];
+            if (resultEmission != null) {
+                int nCols = resultEmission.length;
+                int nRows = resultEmission[nCols - 1].length;
+                emission = new double[nCols][nRows];
+                for (int x = 1; x <= nCols; x++) {
+                    for (int y = 1; y <= nRows; y++) {
+                        emission[x - 1][y - 1] += resultEmission[x - 1][y - 1];
+                    }
                 }
             }
-          
         }
         return emission;
     }
 
     public double[][] getAirQuality() {
-        double[][] airQuality = new double[36][45];
+        double[][] airQuality = new double[][] {};
         for (FastGriddedInventoryPollutantAirQualityEmissionResult result : inventoryPollutantResults) {
             double[][] resultAirQuality = result.getAirQuality();
-            double adjustmentFactor = result.getAdjustmentFactor();
-            for (int x = 1; x <= 36; x++) {
-                for (int y = 1; y <= 45; y++) {
-                    airQuality[x - 1][y - 1] += adjustmentFactor * resultAirQuality[x - 1][y - 1];
+            if (resultAirQuality != null) {
+                int nCols = resultAirQuality.length;
+                int nRows = resultAirQuality[nCols - 1].length;
+                airQuality = new double[nCols][nRows];
+                double adjustmentFactor = result.getAdjustmentFactor();
+                for (int x = 1; x <= nCols; x++) {
+                    for (int y = 1; y <= nRows; y++) {
+                        airQuality[x - 1][y - 1] += adjustmentFactor * resultAirQuality[x - 1][y - 1];
+                    }
                 }
             }
           
