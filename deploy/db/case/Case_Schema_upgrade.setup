@@ -278,3 +278,16 @@ ALTER TABLE cases.cases_parameters ADD CONSTRAINT cases_parameters_uniqueness_ke
 -- 4/21/2010 update job uniqueness criterion
 ALTER TABLE cases.cases_casejobs DROP CONSTRAINT  cases_casejobs_case_id_key;
 ALTER TABLE cases.cases_casejobs ADD CONSTRAINT  cases_casejobs_case_id_key  UNIQUE (case_id, name, sector_id, region_id);
+
+-- 06/21/2010 -- null of case_caseinputts subdir_id column for external dataset types
+update cases.cases_caseinputs
+set subdir_id = null
+where dataset_id in (
+	select id
+	from emf.datasets
+	where dataset_type in (
+		select id
+		from emf.dataset_types
+		where "external" = true
+	)
+);
