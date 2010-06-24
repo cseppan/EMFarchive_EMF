@@ -145,4 +145,36 @@ public class UserServiceTransport implements UserService {
         call.request(new Object[] { user });
     }
 
+    public byte[] getEncodedPublickey() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getEecodedPublickey");
+        call.setByteArrayReturnType();
+
+        return (byte[]) call.requestResponse(new Object[] { });
+    }
+
+    public void updateEncryptedPassword(String host, String username, byte[] encodedPassword) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("updateEncryptedPassword");
+        call.addStringParam("host");
+        call.addStringParam("username");
+        call.addByteArrayParam();
+        call.setVoidReturnType();
+
+        call.request(new Object[] { host, username, encodedPassword });
+    }
+
+    public boolean passwordRegistered(String user, String host) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("passwordRegistered");
+        call.addStringParam("user");
+        call.addStringParam("host");
+        call.setBooleanReturnType();
+
+        return (Boolean) call.requestResponse(new Object[] { user, host });
+    }
+
 }

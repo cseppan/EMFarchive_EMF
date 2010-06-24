@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
@@ -37,8 +38,14 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     private CaseParameter[] parametersBySelectedJobs;
 
     private List<Integer> jobs2Cancel = new ArrayList<Integer>();
+    
+    private String smokeHost;
 
     private EmfSession session;
+
+    private String smokeUser;
+    
+    private boolean smkPassRegistered = true; //set to false after all security features implemented.
 
     public EditJobsTabPresenterImpl(EmfSession session, EditJobsTabView view, Case caseObj) {
         this.caseObj = caseObj;
@@ -398,6 +405,39 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
                 regions.add(region);
         }
         return regions.toArray(new GeoRegion[0]);
+    }
+
+    public boolean passwordRegistered() throws EmfException {
+        if (smkPassRegistered)
+            return true;
+        
+        if (smokeHost == null || smokeHost.trim().isEmpty())
+            return false;
+        
+        UserService secServ = session.userService();
+        
+        if (session.getPublicKey() == null) {
+            session.setPublicKey(secServ.getEncodedPublickey());
+        }
+            
+        smkPassRegistered = secServ.passwordRegistered(smokeUser, smokeHost);
+        
+        return smkPassRegistered;
+    }
+
+    public void setSmokeLogin(String username, String host, char[] passcode) throws EmfException {
+        smokeUser = username;
+        smokeHost = host;
+        
+        UserService secServ = session.userService();
+        
+        if (session.getPublicKey() == null) {
+            session.setPublicKey(secServ.getEncodedPublickey());
+        }
+        
+        session.setEncryptedPassword(passcode);
+        secServ.updateEncryptedPassword(host, username, session.getEncryptedPassword());
+        smkPassRegistered = true;
     }   
 
 }

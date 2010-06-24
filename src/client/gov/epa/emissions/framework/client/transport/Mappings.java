@@ -120,21 +120,39 @@ public class Mappings {
     }
     
     public void addIntParam(Call call) {
-        Class cls = int.class;
+        Class<?> cls = int.class;
         call.addParameter("int",qname("int"),cls,ParameterMode.IN);
     }
 
     public void addIntArrayParam(Call call){
-        Class cls = int[].class;
+        Class<?> cls = int[].class;
         call.addParameter("intArray",qname("intArray"),cls,ParameterMode.IN);
     }
     
     public void setIntArrayReturnType(Call call) {
         call.setReturnType(qname("intArray"));
     }
+    
+    public void addByteParam(Call call) {
+        Class<?> cls = byte.class;
+        call.addParameter("byte",qname("byte"),cls,ParameterMode.IN);
+    }
+
+    public void addByteArrayParam(Call call){
+        Class<?> cls = byte[].class;
+        call.addParameter("byteArray",qname("byteArray"),cls,ParameterMode.IN);
+    }
+    
+    public void setByteReturnType(Call call) {
+        call.setReturnType(Constants.XSD_BYTE);
+    }
+    
+    public void setByteArrayReturnType(Call call) {
+        call.setReturnType(qname("byteArray"));
+    }
 
     public void addFileArrayParam(Call call){
-        Class cls = File[].class;
+        Class<?> cls = File[].class;
         call.addParameter("Files", files(), cls, ParameterMode.IN);
     }
 

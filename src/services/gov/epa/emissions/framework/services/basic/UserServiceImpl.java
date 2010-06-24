@@ -40,12 +40,11 @@ public class UserServiceImpl implements UserService {
 
         if (DebugLevels.DEBUG_1)
             System.out.println(">>>> " + myTag());
-
     }
 
     public UserServiceImpl(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        dao = new UserDAO();
+        this.dao = new UserDAO();
         myTag();
 
         if (DebugLevels.DEBUG_1)
@@ -108,11 +107,11 @@ public class UserServiceImpl implements UserService {
     public synchronized User[] getUsers() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            List all = dao.all(session);
+            List<?> all = dao.all(session);
             session.close();
 
-            return (User[]) all.toArray(new User[0]);
-        } catch (RuntimeException e) {
+            return all.toArray(new User[0]);
+        } catch (Exception e) {
             LOG.error("Could not get all Users", e);
             throw new EmfException("Unable to fetch all users due to data access failure");
         }
@@ -146,7 +145,7 @@ public class UserServiceImpl implements UserService {
 
     public synchronized void updateUser(User user) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             dao.update(user, session);
         } catch (RuntimeException e) {
@@ -179,10 +178,10 @@ public class UserServiceImpl implements UserService {
 
     public synchronized User obtainLocked(User owner, User object) throws EmfException {
         Session session = sessionFactory.getSession();
-        
+
         try {
             User locked = null;
-            
+
             if (owner.isAdmin() || owner.equals(object))
                 locked = dao.obtainLocked(owner, object, session);
 
@@ -224,7 +223,7 @@ public class UserServiceImpl implements UserService {
             session.close();
         }
     }
-    
+
     public synchronized String getEmfPasswordEffDays() throws EmfException {
         Session session = sessionFactory.getSession();
 
@@ -257,15 +256,16 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    // public String getEmfVersion() throws EmfException {
-    //        
-    // try {
-    // EmfProperty property = new EmfPropertiesDAO(sessionFactory).getProperty("EMF-version");
-    // return property == null ? null : property.getValue();
-    // } catch (Exception e) {
-    // LOG.error("Could not get EMF version info.", e);
-    // throw new EmfException("Could not get EMF version info.");
-    // }
-    // }
+    public byte[] getEncodedPublickey() throws EmfException {
+        return SecurityManager.getInstance().getEncodedPublickey();
+    }
+
+    public void updateEncryptedPassword(String host, String username, byte[] encodedPassword) throws EmfException {
+        SecurityManager.getInstance().updateEncryptedPassword(host, username, encodedPassword);
+    }
+
+    public boolean passwordRegistered(String user, String host) {
+        return SecurityManager.getInstance().passwordRegistered(user, host);
+    }
 
 }

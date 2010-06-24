@@ -134,6 +134,22 @@ public class EmfCall {
         mappings.addIntParam(call);
 
     }
+    
+    public void addByteParam() {
+        mappings.addByteParam(call);
+    }
+    
+    public void addByteArrayParam() {
+        mappings.addByteArrayParam(call);
+    }
+    
+    public void setByteReturnType() {
+        mappings.setByteReturnType(call);
+    }
+    
+    public void setByteArrayReturnType() {
+        mappings.setByteArrayReturnType(call);
+    }
 
     public void setTimeOut(int milliseconds) {
         call.setTimeout(new Integer(milliseconds));

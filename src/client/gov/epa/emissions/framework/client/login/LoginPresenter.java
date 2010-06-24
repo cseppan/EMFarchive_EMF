@@ -19,7 +19,6 @@ public class LoginPresenter {
     private String update;
 
     private UserPreference preferences;
-    
 
     public LoginPresenter(UserService model) {
         this.userAdmin = model;
@@ -31,24 +30,20 @@ public class LoginPresenter {
         } catch (CommonsException e) {
             throw new EmfException(e.getMessage());
         }
-        
-        
-        
+
         User user = userAdmin.getUser(username);
-        
-        //if (!user.isLoggedIn()){
-            user = userAdmin.obtainLocked(userAdmin.getUser(username), userAdmin.getUser(username));
-            
-            if ( user == null )        
-                throw new EmfException("Unable to fetch lock on user: " + username + ".");
-            
-            user.setLoggedIn(true);
-            user.setLastLoginDate(new Date());
-            if ( user.getPasswordResetDate() == null )
-                user.setPasswordResetDate(new Date());
-            userAdmin.updateUser(user);
-        //}
-        
+
+        user = userAdmin.obtainLocked(userAdmin.getUser(username), userAdmin.getUser(username));
+
+        if (user == null)
+            throw new EmfException("Unable to fetch lock on user: " + username + ".");
+
+        user.setLoggedIn(true);
+        user.setLastLoginDate(new Date());
+        if (user.getPasswordResetDate() == null)
+            user.setPasswordResetDate(new Date());
+        userAdmin.updateUser(user);
+
         return user;
     }
 
@@ -68,7 +63,7 @@ public class LoginPresenter {
     public String getUpdatedEmfVersion() {
         return update;
     }
-    
+
     public Integer getEffectiveDays() throws EmfException {
         try {
             return Integer.valueOf(userAdmin.getEmfPasswordEffDays());
@@ -92,14 +87,14 @@ public class LoginPresenter {
     public String userName() throws EmfException {
         if (this.preferences == null)
             this.preferences = new DefaultUserPreferences();
-        
+
         return preferences.userName();
     }
 
     public String userPassword() throws EmfException {
         if (this.preferences == null)
             this.preferences = new DefaultUserPreferences();
-        
+
         return preferences.userPassword();
     }
 

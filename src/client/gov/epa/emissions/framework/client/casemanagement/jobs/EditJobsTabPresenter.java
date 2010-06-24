@@ -17,10 +17,6 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
     
     CaseJob addNewJob(CaseJob job) throws EmfException;
     
-//    void addNewSectorToSummary(CaseJob job);
-//    
-//    void addNewRegionToSummary(CaseJob job);
-    
     void refreshJobList() throws EmfException;
 
     void editJob(CaseJob job, EditCaseJobView jobEditor) throws EmfException;
@@ -56,5 +52,9 @@ public interface EditJobsTabPresenter extends CaseEditorTabPresenter {
     void modifyJobs(ModifyJobsDialog dialog);
     
     GeoRegion[] getGeoregion(List<CaseJob> jobs);
+    
+    boolean passwordRegistered() throws EmfException;
+    
+    void setSmokeLogin(String username, String host, char[] passcode) throws EmfException;
 
 }

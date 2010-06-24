@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseObjectManager;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
@@ -23,6 +24,12 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
     private List<Integer> jobs2Cancel = new ArrayList<Integer>();
 
     private EmfSession session;
+
+    private String smokeHost;
+
+    private String smokeUser;
+
+    private boolean smkPassRegistered;
 
     public ViewableJobsTabPresenterImpl(EmfSession session, ViewableJobsTab view, Case caseObj) {
         this.caseObj = caseObj;
@@ -61,6 +68,7 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
         presenter.display(job);
     }
 
+    @SuppressWarnings("unused")
     public void copyJob2CurrentCase(int caseId, CaseJob job, EditCaseJobView jobEditor) throws Exception {
  //
     }
@@ -148,10 +156,8 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
         
         for (CaseJob job : jobs)
             ids.add(new Integer(job.getId()));
-//      System.out.println("Validating input datasets of jobs");
-        String msg = service().validateJobs(ids.toArray(new Integer[0]));
-//        System.out.println("Finished validating case jobs.");
-        return msg;
+        
+        return service().validateJobs(ids.toArray(new Integer[0]));
     }
 
     public void addNewJobDialog(NewJobView view) {
@@ -191,10 +197,12 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
 
     }
 
+    @SuppressWarnings("unused")
     public void addNewSectorToSummary(CaseJob job) {
         // NOTE Auto-generated method stub
     }
     
+    @SuppressWarnings("unused")
     public void addNewRegionToSummary(CaseJob job) {
         // NOTE Auto-generated method stub
     }
@@ -281,6 +289,39 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
                 regions.add(region);
         }
         return regions.toArray(new GeoRegion[0]);
-    }   
+    }
+
+    public boolean passwordRegistered() throws EmfException {
+        if (smkPassRegistered)
+            return true;
+        
+        if (smokeHost == null || smokeHost.trim().isEmpty())
+            return false;
+        
+        UserService secServ = session.userService();
+        
+        if (session.getPublicKey() == null) {
+            session.setPublicKey(secServ.getEncodedPublickey());
+        }
+            
+        smkPassRegistered = secServ.passwordRegistered(smokeUser, smokeHost);
+        
+        return smkPassRegistered;
+    } 
+    
+    public void setSmokeLogin(String username, String host, char[] passcode) throws EmfException {
+        smokeUser = username;
+        smokeHost = host;
+        
+        UserService secServ = session.userService();
+        
+        if (session.getPublicKey() == null) {
+            session.setPublicKey(secServ.getEncodedPublickey());
+        }
+        
+        session.setEncryptedPassword(passcode);
+        secServ.updateEncryptedPassword(host, username, session.getEncryptedPassword());
+        smkPassRegistered = true;
+    }
     
 }

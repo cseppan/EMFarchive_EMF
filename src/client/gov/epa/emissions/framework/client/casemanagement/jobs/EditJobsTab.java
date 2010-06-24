@@ -509,33 +509,12 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         presenter.modifyJobs(dialog);
     }
 
-//    private int getDefultIndex(Object[] selected) {
-//        int currentCaseId = this.caseObj.getId();
-//        int length = selected.length;
-//
-//        for (int i = 0; i < length; i++)
-//            if (selected[i].toString().contains("(" + currentCaseId + ")"))
-//                return i;
-//
-//        return 0;
-//    }
-
     private int getCaseId(String selectedCase) {
         int index1 = selectedCase.indexOf("(") + 1;
         int index2 = selectedCase.indexOf(")");
 
         return Integer.parseInt(selectedCase.substring(index1, index2));
     }
-
-//    private Icon getCopyIcon() {
-//        URL imgURL = getClass().getResource("/toolbarButtonGraphics/general/Copy24.gif");
-//
-//        if (imgURL != null) {
-//            return new ImageIcon(imgURL);
-//        }
-//
-//        return null;
-//    }
 
     private void validateJobDatasets() throws EmfException {
         CaseJob[] jobs = getSelectedJobs().toArray(new CaseJob[0]);
@@ -578,6 +557,12 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         }
 
         try {
+            if (!presenter.passwordRegistered()) {
+                SMKLoginDialog login = new SMKLoginDialog(parentConsole);
+                login.register(presenter);
+                login.display();
+            }
+                
             String msg = presenter.getJobsStatus(jobs);
             int option = JOptionPane.NO_OPTION;
             String lineSeparator = System.getProperty("line.separator");

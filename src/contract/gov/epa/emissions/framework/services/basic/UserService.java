@@ -35,5 +35,11 @@ public interface UserService extends EMFService {
     String getEmfPasswordEffDays() throws EmfException;
     
     void logExitMessage(User user) throws EmfException;
+    
+    byte[] getEncodedPublickey() throws EmfException;
+    
+    void updateEncryptedPassword(String host, String username, byte[] encodedPassword) throws EmfException;
+
+    boolean passwordRegistered(String smokeUser, String host) throws EmfException;
 
 }
