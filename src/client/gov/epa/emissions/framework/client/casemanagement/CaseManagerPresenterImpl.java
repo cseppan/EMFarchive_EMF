@@ -101,12 +101,12 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
     }
 
     public void doCopyCases(int[] caseIds) throws EmfException {
-        startCopyMessage();
+        startCopyMessage(caseIds.length > 1 ? "s" : "");
         service().copyCaseObject(caseIds, session.user());
     }
     
-    private void startCopyMessage() {
-        String message = "Started copy. Please monitor the Status window to track your Copy request.";
+    private void startCopyMessage(String pad) {
+        String message = "Started copying case" + pad + ".  See Status window below.";
         view.setMessage(message);
     }
 

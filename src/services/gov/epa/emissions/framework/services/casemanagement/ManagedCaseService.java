@@ -5196,18 +5196,62 @@ public class ManagedCaseService {
     // (all jobs and same sector and same region) )
 
     @SuppressWarnings("unchecked")
-    private CaseParameter getParentCaseParameters4SensitivityCase(int caseId, CaseParameter param, Session session) {
+    private CaseParameter getParentCaseParameters4SensitivityCase(int parentcaseId, CaseParameter templateparam, Session session) {
 
         if (DebugLevels.DEBUG_9) {
-            System.out.println("Trying to find match for " + param.getName());
+            System.out.println("Trying to find match for " + templateparam.getName());
         }
         
-        ParameterEnvVar env = param.getEnvVar();
-        Sector sector = param.getSector();
-        GeoRegion region = param.getRegion();
+        ParameterEnvVar env = templateparam.getEnvVar();
+        
+        if (env == null)
+            return null; // NOTE: parameter's got to have an environment variable.
+        
+        Sector sector = templateparam.getSector();
+        GeoRegion region = templateparam.getRegion();
+        
+        CaseParameter matchedParameter = null;
+        
+        //NOTE: if templateJob is NOT null it means that this template parameter is job specific
+        CaseJob templateJob = dao.getCaseJob(templateparam.getJobId(), session);
+        CaseJob parentJob = (templateJob == null) ? null : dao.getCaseJob(parentcaseId, templateJob, session);
+        
+        //NOTE: if template parameter is job specific and this job doesn't exist in parent case, then there is definitely no matches
+        if (templateJob != null && parentJob == null) return null;
+        
+        //NOTE: parentJob is NOT null, implies that this template parameter is job specific
+        if (parentJob != null) {
+            //NOTE: get all job specific params by this specific job
+            List<CaseParameter> params = dao.getCaseParametersByJobId(parentcaseId, parentJob.getId(), session);
+            
+            //NOTE: if there is no job specific params in parent case, then no matches
+            if (params == null || params.size() == 0) return null;
+            
+            for (CaseParameter temp : params) {
+                ParameterEnvVar tempEnv = temp.getEnvVar();
+                
+                //NOTE: if env var doesn't match, then it is not a match
+                if (tempEnv == null || !env.equals(tempEnv)) continue;
+                
+                Sector tempSector = temp.getSector();
+                GeoRegion tempRegion = temp.getRegion();
+                
+                //NOTE: if either sector or region doesn't match, then it is not a match
+                if (tempSector != null && !tempSector.equals(sector)) continue;
+                if (tempSector == null && sector != null) continue;
+                if (tempRegion != null && !tempRegion.equals(region)) continue;
+                if (tempRegion == null && region != null) continue;
+                
+                matchedParameter = temp;
+                break; //NOTE: The first match would be it.
+            }
+            
+            //NOTE: got to return even if matchedParameter is null
+            return matchedParameter;
+        }
 
         String query = "SELECT obj.id from " + CaseParameter.class.getSimpleName() + " as obj WHERE obj.caseID = "
-                + caseId + " AND obj.envVar.id = " + env.getId();
+                + parentcaseId + " AND obj.envVar.id = " + env.getId();
 
         String suffix = " AND ((obj.jobId = 0 AND obj.sector.id is null AND obj.region.id is null) ";
 
@@ -5243,10 +5287,8 @@ public class ManagedCaseService {
             parameters.add(dao.getCaseParameter(id, session));
         }
         
-        CaseParameter matchedParameter = null;
-
         if (DebugLevels.DEBUG_9) {
-            System.out.println("Attempting to match: " + Utils.stringify(param));
+            System.out.println("Attempting to match: " + Utils.stringify(templateparam));
         }
         
         /*
@@ -5273,21 +5315,60 @@ public class ManagedCaseService {
     }
 
     @SuppressWarnings("unchecked")
-    private CaseInput getParentCaseInputs4SensitivityCase(int caseId, CaseInput input, Session session) {
+    private CaseInput getParentCaseInputs4SensitivityCase(int parentcaseId, CaseInput templateinput, Session session) {
 
         if (DebugLevels.DEBUG_9) {
-            System.out.println("Trying to find match for " + input.getName());
+            System.out.println("Trying to find match for " + templateinput.getName());
         }
         
-        InputEnvtVar env = input.getEnvtVars();
-        GeoRegion region = input.getRegion();
+        InputEnvtVar env = templateinput.getEnvtVars();
 
         if (env == null)
-            return null; // NOTE: this policy is to be determined.
-
-        Sector sector = input.getSector();
-
-        String query = "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = " + caseId
+            return null; // NOTE: input's got to have an environment variable.
+        
+        CaseInput matchedInput = null;
+        GeoRegion region = templateinput.getRegion();
+        Sector sector = templateinput.getSector();
+        
+        //NOTE: if templateJob is NOT null it means that this template input is job specific
+        CaseJob templateJob = dao.getCaseJob(templateinput.getCaseJobID(), session);
+        CaseJob parentJob = (templateJob == null) ? null : dao.getCaseJob(parentcaseId, templateJob, session);
+        
+        //NOTE: if template input is job specific and this job doesn't exist in parent case, then there is definitely no matches
+        if (templateJob != null && parentJob == null) return null;
+        
+        //NOTE: parentJob is NOT null, implies that this template input is job specific
+        if (parentJob != null) {
+            //NOTE: get all job specific inputs by this specific job
+            List<CaseInput> inputs = dao.getCaseInputsByJobIds(parentcaseId, new int[] {parentJob.getId()}, session);
+            
+            //NOTE: if there is no job specific inputs in parent case, then no matches
+            if (inputs == null || inputs.size() == 0) return null;
+            
+            for (CaseInput temp : inputs) {
+                InputEnvtVar tempEnv = temp.getEnvtVars();
+                
+                //NOTE: if env var doesn't match, then it is not a match
+                if (tempEnv == null || !env.equals(tempEnv)) continue;
+                
+                Sector tempSector = temp.getSector();
+                GeoRegion tempRegion = temp.getRegion();
+                
+                //NOTE: if either sector or region doesn't match, then it is not a match
+                if (tempSector != null && !tempSector.equals(sector)) continue;
+                if (tempSector == null && sector != null) continue;
+                if (tempRegion != null && !tempRegion.equals(region)) continue;
+                if (tempRegion == null && region != null) continue;
+                
+                matchedInput = temp;
+                break; //NOTE: The first match would be it.
+            }
+            
+            //NOTE: got to return even if matchedInput is null
+            return matchedInput;
+        }
+        
+        String query = "SELECT obj.id from " + CaseInput.class.getSimpleName() + " as obj WHERE obj.caseID = " + parentcaseId
                 + " AND obj.envtVars.id = " + env.getId();
 
         String suffix = " AND ((obj.caseJobID = 0 AND obj.sector.id is null AND obj.region.id is null) ";
@@ -5323,10 +5404,8 @@ public class ManagedCaseService {
             inputs.add(dao.getCaseInput(id, session));
         }
         
-        CaseInput matchedInput = null;
-
         if (DebugLevels.DEBUG_9) {
-            System.out.println("Attempting to match: " + Utils.stringify(input));
+            System.out.println("Attempting to match: " + Utils.stringify(templateinput));
         }
         
         /*

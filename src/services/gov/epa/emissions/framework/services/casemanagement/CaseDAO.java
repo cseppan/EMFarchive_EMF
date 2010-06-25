@@ -781,6 +781,9 @@ public class CaseDAO {
     }
 
     public CaseJob getCaseJob(int jobId, Session session) {
+        if (jobId == 0)      //NOTE: to save a db access
+            return null;
+        
         Criterion crit = Restrictions.eq("id", new Integer(jobId));
         return (CaseJob) hibernateFacade.load(CaseJob.class, crit, session);
     }
@@ -791,6 +794,9 @@ public class CaseDAO {
     }
 
     public CaseJob getCaseJob(int jobId) {
+        if (jobId == 0)
+            return null;
+        
         CaseJob caseJob = null;
         Session session = sessionFactory.getSession();
         try {
