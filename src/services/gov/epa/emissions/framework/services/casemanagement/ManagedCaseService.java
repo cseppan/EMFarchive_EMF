@@ -5233,15 +5233,6 @@ public class ManagedCaseService {
                 //NOTE: if env var doesn't match, then it is not a match
                 if (tempEnv == null || !env.equals(tempEnv)) continue;
                 
-                Sector tempSector = temp.getSector();
-                GeoRegion tempRegion = temp.getRegion();
-                
-                //NOTE: if either sector or region doesn't match, then it is not a match
-                if (tempSector != null && !tempSector.equals(sector)) continue;
-                if (tempSector == null && sector != null) continue;
-                if (tempRegion != null && !tempRegion.equals(region)) continue;
-                if (tempRegion == null && region != null) continue;
-                
                 matchedParameter = temp;
                 break; //NOTE: The first match would be it.
             }
@@ -5350,15 +5341,6 @@ public class ManagedCaseService {
                 
                 //NOTE: if env var doesn't match, then it is not a match
                 if (tempEnv == null || !env.equals(tempEnv)) continue;
-                
-                Sector tempSector = temp.getSector();
-                GeoRegion tempRegion = temp.getRegion();
-                
-                //NOTE: if either sector or region doesn't match, then it is not a match
-                if (tempSector != null && !tempSector.equals(sector)) continue;
-                if (tempSector == null && sector != null) continue;
-                if (tempRegion != null && !tempRegion.equals(region)) continue;
-                if (tempRegion == null && region != null) continue;
                 
                 matchedInput = temp;
                 break; //NOTE: The first match would be it.
