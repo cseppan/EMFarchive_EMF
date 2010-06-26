@@ -4849,7 +4849,7 @@ public class ManagedCaseService {
             if (tempInput.getRegion() != null)
                 tempInput.setRegion(region);
             
-            CaseInput inputFromParent = getParentCaseInputs4SensitivityCase(parentCaseId, tempInput, session);
+            CaseInput inputFromParent = getParentCaseInputs4SensitivityCase(parentCaseId, tempInput, region, session);
             boolean modifiedFromParent = false;
 
             if (inputFromParent != null) {
@@ -4904,7 +4904,7 @@ public class ManagedCaseService {
             if (tempParam.getRegion() != null)
                 tempParam.setRegion(senRegion);
             
-            CaseParameter parentParameter = getParentCaseParameters4SensitivityCase(parentCaseId, tempParam, session);
+            CaseParameter parentParameter = getParentCaseParameters4SensitivityCase(parentCaseId, tempParam, senRegion, session);
             boolean modifiedFromParent = false;
 
             if (parentParameter != null) {
@@ -5196,7 +5196,7 @@ public class ManagedCaseService {
     // (all jobs and same sector and same region) )
 
     @SuppressWarnings("unchecked")
-    private CaseParameter getParentCaseParameters4SensitivityCase(int parentcaseId, CaseParameter templateparam, Session session) {
+    private CaseParameter getParentCaseParameters4SensitivityCase(int parentcaseId, CaseParameter templateparam, GeoRegion selectedRegion, Session session) {
 
         if (DebugLevels.DEBUG_9) {
             System.out.println("Trying to find match for " + templateparam.getName());
@@ -5214,6 +5214,12 @@ public class ManagedCaseService {
         
         //NOTE: if templateJob is NOT null it means that this template parameter is job specific
         CaseJob templateJob = dao.getCaseJob(templateparam.getJobId(), session);
+        
+        //NOTE: if template input is job specific, this job's region (usually a generic region)
+        // has to be reset to the selected region before it is used to search the relavant job
+        // from the parent case
+        if (templateJob != null && templateJob.getRegion() != null) templateJob.setRegion(selectedRegion);
+        
         CaseJob parentJob = (templateJob == null) ? null : dao.getCaseJob(parentcaseId, templateJob, session);
         
         //NOTE: if template parameter is job specific and this job doesn't exist in parent case, then there is definitely no matches
@@ -5306,7 +5312,7 @@ public class ManagedCaseService {
     }
 
     @SuppressWarnings("unchecked")
-    private CaseInput getParentCaseInputs4SensitivityCase(int parentcaseId, CaseInput templateinput, Session session) {
+    private CaseInput getParentCaseInputs4SensitivityCase(int parentcaseId, CaseInput templateinput, GeoRegion selectedRegion, Session session) {
 
         if (DebugLevels.DEBUG_9) {
             System.out.println("Trying to find match for " + templateinput.getName());
@@ -5323,6 +5329,12 @@ public class ManagedCaseService {
         
         //NOTE: if templateJob is NOT null it means that this template input is job specific
         CaseJob templateJob = dao.getCaseJob(templateinput.getCaseJobID(), session);
+        
+        //NOTE: if template input is job specific, this job's region (usually a generic region)
+        // has to be reset to the selected region before it is used to search the relavant job
+        // from the parent case
+        if (templateJob != null && templateJob.getRegion() != null) templateJob.setRegion(selectedRegion);
+        
         CaseJob parentJob = (templateJob == null) ? null : dao.getCaseJob(parentcaseId, templateJob, session);
         
         //NOTE: if template input is job specific and this job doesn't exist in parent case, then there is definitely no matches
