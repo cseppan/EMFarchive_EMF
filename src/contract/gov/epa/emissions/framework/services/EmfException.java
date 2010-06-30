@@ -15,6 +15,10 @@ public class EmfException extends RemoteException {
     public EmfException() {//
     }
 
+    public EmfException(String message, Exception e) {
+        super(message, e);
+    }
+    
     public EmfException(String message) {
         super(message);
         this.details = message;

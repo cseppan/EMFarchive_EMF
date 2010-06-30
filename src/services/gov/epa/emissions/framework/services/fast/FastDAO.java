@@ -117,7 +117,7 @@ public class FastDAO {
         return hibernateFacade.getAll(FastRun.class, Order.asc("name"), session);
     }
 
-    public List getFastRunOutputTypes(Session session) {
+    public List<FastRunOutputType> getFastRunOutputTypes(Session session) {
         return hibernateFacade.getAll(FastRunOutputType.class, Order.asc("name"), session);
     }
 
@@ -391,7 +391,7 @@ public class FastDAO {
                 "from FastRun cS where cS.id = " + id).uniqueResult();
     }
     
-    public List getFastDatasets(Session session) {
+    public List<FastDataset> getFastDatasets(Session session) {
         return hibernateFacade.getAll(FastDataset.class, session);
     }
 
@@ -411,7 +411,7 @@ public class FastDAO {
         session.flush();
     }
 
-    public List getFastNonPointDatasets(Session session) {
+    public List<FastNonPointDataset> getFastNonPointDatasets(Session session) {
         return hibernateFacade.getAll(FastNonPointDataset.class, session);
     }
 
@@ -431,7 +431,7 @@ public class FastDAO {
         session.flush();
     }
 
-    public List getGrids(Session session) {
+    public List<Grid> getGrids(Session session) {
         return hibernateFacade.getAll(Grid.class, session);
     }
 
@@ -503,7 +503,7 @@ public class FastDAO {
     }
 
     // return FastAnalyses orderby name
-    public List getFastAnalyses(Session session) {
+    public List<FastAnalysis> getFastAnalyses(Session session) {
         return hibernateFacade.getAll(FastAnalysis.class, Order.asc("name"), session);
     }
 
@@ -558,7 +558,7 @@ public class FastDAO {
         return (FastAnalysisOutputType)hibernateFacade.load(FastAnalysisOutputType.class, critName, session);
     }
 
-    public List getFastAnalysisOutputTypes(Session session) {
+    public List<FastAnalysisOutputType> getFastAnalysisOutputTypes(Session session) {
         return hibernateFacade.getAll(FastAnalysisOutputType.class, Order.asc("name"), session);
     }
 

@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
@@ -64,63 +63,75 @@ public class FastServiceImpl implements FastService {
         return threadPool;
     }
 
+    private <T> T executeDaoCommand(AbstractDaoCommand<T> daoCommand) throws EmfException {
+
+        daoCommand.setSessionFactory(this.sessionFactory);
+        daoCommand.setLog(LOG);
+        return (T) daoCommand.execute().getReturnValue();
+    }
+
     public synchronized FastRun[] getFastRuns() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            List cs = dao.getFastRuns(session);
-            return (FastRun[]) cs.toArray(new FastRun[0]);
-        } catch (HibernateException e) {
-            e.printStackTrace();
-            LOG.error("Could not retrieve all FastRuns.");
-            throw new EmfException("Could not retrieve all FastRuns.");
-        } finally {
-            session.close();
-        }
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastRun[]>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List cs = dao.getFastRuns(session);
+                this.setReturnValue((FastRun[]) cs.toArray(new FastRun[0]));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve all FastRuns.";
+            }
+        });
     }
 
-    public synchronized int addFastRun(FastRun fastRun) throws EmfException {
-        Session session = sessionFactory.getSession();
-        int csId;
-        try {
-            csId = dao.add(fastRun, session);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            LOG.error("Could not add Control Strategy: " + fastRun, e);
-            throw new EmfException("Could not add Control Strategy: " + fastRun);
-        } finally {
-            session.close();
-        }
-        return csId;
+    public synchronized int addFastRun(final FastRun fastRun) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.add(fastRun, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not add Control Strategy: " + fastRun;
+            }
+        });
     }
 
-    public synchronized void setFastRunRunStatusAndCompletionDate(int id, String runStatus, Date completionDate)
-            throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            dao.setFastRunRunStatusAndCompletionDate(id, runStatus, completionDate, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not set Control Strategy run status: " + id, e);
-            throw new EmfException("Could not add Control Strategy run status: " + id);
-        } finally {
-            session.close();
-        }
+    public synchronized void setFastRunRunStatusAndCompletionDate(final int id, final String runStatus,
+            final Date completionDate) throws EmfException {
+
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                dao.setFastRunRunStatusAndCompletionDate(id, runStatus, completionDate, session);
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not set Control Strategy run status: " + id;
+            }
+        });
     }
 
-    public synchronized FastRun obtainLockedFastRun(User owner, int id) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            FastRun locked = dao.obtainLockedFastRun(owner, id, session);
+    public synchronized FastRun obtainLockedFastRun(final User owner, final int id) throws EmfException {
 
-            return locked;
-        } catch (RuntimeException e) {
-            LOG
-                    .error("Could not obtain lock for Control Strategy: id = " + id + " by owner: "
-                            + owner.getUsername(), e);
-            throw new EmfException("Could not obtain lock for Control Strategy: id = " + id + " by owner: "
-                    + owner.getUsername());
-        } finally {
-            session.close();
-        }
+        return this.executeDaoCommand(new AbstractDaoCommand<FastRun>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+
+                FastRun locked = dao.obtainLockedFastRun(owner, id, session);
+                this.setReturnValue(locked);
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not obtain lock for Control Strategy: id = " + id + " by owner: " + owner.getUsername();
+            }
+        });
     }
 
     // FIXME
@@ -139,51 +150,63 @@ public class FastServiceImpl implements FastService {
     // }
     // }
 
-    public synchronized void releaseLockedFastRun(User user, int id) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            dao.releaseLockedFastRun(user, id, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not release lock for Control Strategy id: " + id, e);
-            throw new EmfException("Could not release lock for Control Strategy id: " + id);
-        } finally {
-            session.close();
-        }
+    public synchronized void releaseLockedFastRun(final User user, final int id) throws EmfException {
+
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                dao.releaseLockedFastRun(user, id, session);
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not release lock for Control Strategy id: " + id;
+            }
+        });
     }
 
-    public synchronized FastRun updateFastRun(FastRun fastRun) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            if (!dao.canUpdateFastRun(fastRun, session))
-                throw new EmfException("The Control Strategy name is already in use");
+    public synchronized FastRun updateFastRun(final FastRun fastRun) throws EmfException {
 
-            FastRun released = dao.updateFastRun(fastRun, session);
+        return this.executeDaoCommand(new AbstractDaoCommand<FastRun>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
 
-            return released;
-        } catch (RuntimeException e) {
-            LOG.error("Could not update Control Strategy: " + fastRun, e);
-            throw new EmfException("Could not update FastRun: " + fastRun);
-        } finally {
-            session.close();
-        }
+                if (!dao.canUpdateFastRun(fastRun, session)) {
+                    throw new EmfException("The Control Strategy name is already in use");
+                }
+
+                FastRun released = dao.updateFastRun(fastRun, session);
+
+                this.setReturnValue(released);
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not update Control Strategy: " + fastRun;
+            }
+        });
     }
 
-    public synchronized FastRun updateFastRunWithLock(FastRun fastRun) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            if (!dao.canUpdateFastRun(fastRun, session))
-                throw new EmfException("Control Strategy name already in use");
+    public synchronized FastRun updateFastRunWithLock(final FastRun fastRun) throws EmfException {
 
-            FastRun csWithLock = dao.updateFastRunWithLock(fastRun, session);
+        return this.executeDaoCommand(new AbstractDaoCommand<FastRun>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
 
-            return csWithLock;
-            // return dao.getById(csWithLock.getId(), session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not update Control Strategy: " + fastRun, e);
-            throw new EmfException("Could not update FastRun: " + fastRun);
-        } finally {
-            session.close();
-        }
+                if (!dao.canUpdateFastRun(fastRun, session)) {
+                    throw new EmfException("Control Strategy name already in use");
+                }
+
+                FastRun csWithLock = dao.updateFastRunWithLock(fastRun, session);
+
+                this.setReturnValue(csWithLock);
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not update Control Strategy: " + fastRun;
+            }
+        });
     }
 
     // public void removeFastRuns(FastRun[] elements, User user) throws EmfException {
@@ -201,113 +224,143 @@ public class FastServiceImpl implements FastService {
     // }
     // }
 
-    public synchronized void removeFastRuns(int[] ids, User user) throws EmfException {
-        Session session = sessionFactory.getSession();
-        String exception = "";
-        try {
-            for (int i = 0; i < ids.length; i++) {
-                FastRun cs = dao.getFastRun(ids[i], session);
-                session.clear();
+    public synchronized void removeFastRuns(final int[] ids, final User user) throws EmfException {
 
-                // check if admin user, then allow it to be removed.
-                if (user.equals(cs.getCreator()) || user.isAdmin()) {
-                    if (cs.isLocked())
-                        exception += "The control strategy, " + cs.getName()
-                                + ", is in edit mode and can not be removed. ";
-                    else
-                        removeFastRun(cs);
-                } else {
-                    exception += "You do not have permission to remove the strategy: " + cs.getName() + ". ";
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+
+                String exception = "";
+                for (int i = 0; i < ids.length; i++) {
+                    FastRun cs = dao.getFastRun(ids[i], session);
+                    session.clear();
+
+                    // check if admin user, then allow it to be removed.
+                    if (user.equals(cs.getCreator()) || user.isAdmin()) {
+                        if (cs.isLocked()) {
+                            exception += "The control strategy, " + cs.getName()
+                                    + ", is in edit mode and can not be removed. ";
+                        } else {
+                            removeFastRun(cs);
+                        }
+                    } else {
+                        exception += "You do not have permission to remove the strategy: " + cs.getName() + ". ";
+                    }
+                }
+
+                if (exception.length() > 0) {
+                    throw new EmfException(exception);
                 }
             }
 
-            if (exception.length() > 0)
-                throw new EmfException(exception);
-        } catch (RuntimeException e) {
-            LOG.error("Could not remove Control Strategy", e);
-            throw new EmfException("Could not remove SectorScenario");
-        } finally {
-            session.close();
-        }
+            @Override
+            protected String getErrorMessage() {
+                return "Could not remove Control Strategy";
+            }
+        });
     }
 
-    private synchronized void removeFastRun(FastRun fastRun) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
+    private synchronized void removeFastRun(final FastRun fastRun) throws EmfException {
 
-            if (!dao.canUpdateFastRun(fastRun, session))
-                throw new EmfException("Control Strategy name already in use");
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
 
-            FastRunOutput[] controlStrategyResults = getFastRunOutputs(fastRun.getId());
-            for (int i = 0; i < controlStrategyResults.length; i++) {
-                dao.remove(controlStrategyResults[i], session);
+                if (!dao.canUpdateFastRun(fastRun, session))
+                    throw new EmfException("Control Strategy name already in use");
+
+                FastRunOutput[] controlStrategyResults = getFastRunOutputs(fastRun.getId());
+                for (int i = 0; i < controlStrategyResults.length; i++) {
+                    dao.remove(controlStrategyResults[i], session);
+                }
+
+                dao.remove(fastRun, session);
             }
 
-            dao.remove(fastRun, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not remove control strategy: " + fastRun, e);
-            throw new EmfException("Could not remove control strategy: " + fastRun.getName());
-        } finally {
-            session.close();
-        }
+            @Override
+            protected String getErrorMessage() {
+                return "Could not remove control strategy: " + fastRun;
+            }
+        });
     }
 
-    public synchronized void removeResultDatasets(Integer[] ids, User user) throws EmfException {
-        Session session = sessionFactory.getSession();
-        DatasetDAO dsDao = new DatasetDAO();
-        try {
-            for (Integer id : ids) {
-                EmfDataset dataset = dsDao.getDataset(session, id);
+    public synchronized void removeResultDatasets(final Integer[] ids, final User user) throws EmfException {
 
-                if (dataset != null) {
-                    try {
-                        dsDao.remove(user, dataset, session);
-                    } catch (EmfException e) {
-                        if (DebugLevels.DEBUG_12)
-                            System.out.println(e.getMessage());
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
 
-                        throw new EmfException(e.getMessage());
+                DatasetDAO dsDao = new DatasetDAO();
+                for (Integer id : ids) {
+                    EmfDataset dataset = dsDao.getDataset(session, id);
+
+                    if (dataset != null) {
+                        try {
+                            dsDao.remove(user, dataset, session);
+                        } catch (EmfException e) {
+
+                            if (DebugLevels.DEBUG_12) {
+                                System.out.println(e.getMessage());
+                            }
+
+                            throw new EmfException(e.getMessage());
+                        }
                     }
                 }
             }
-        } finally {
-            session.close();
-        }
+
+            @Override
+            protected String getErrorMessage() {
+                return "";
+            }
+        });
     }
 
-    public synchronized void runFastRun(User user, int fastRunId) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            // first see if the strategy has been canceled, is so don't run it...
-            String runStatus = dao.getFastRunRunStatus(fastRunId, session);
-            if (runStatus.equals("Cancelled"))
-                return;
+    public synchronized void runFastRun(final User user, final int fastRunId) throws EmfException {
 
-            FastRun strategy = getFastRun(fastRunId);
-            // validateSectors(strategy);
-            // get rid of for now, since we don't auto export anything
-            // make sure a valid server-side export path was specified
-            // validateExportPath(strategy.getExportDirectory());
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
 
-            // make the runner of the strategy is the owner of the strategy...
-            // NEED TO TALK TO ALISON ABOUT ISSUES, LOCEKD owner might not be the creator of resulting datsets,
-            // hence a exception when trying to purge/delete the resulting datasets
-            // if (control);
+                try {
 
-            // queue up the strategy to be run, by setting runStatus to Waiting
-            dao.setFastRunRunStatusAndCompletionDate(fastRunId, "Waiting", null, session);
+                    // first see if the strategy has been canceled, is so don't run it...
+                    String runStatus = dao.getFastRunRunStatus(fastRunId, session);
+                    if (runStatus.equals("Cancelled")) {
+                        return;
+                    }
 
-            // validatePath(strategy.getExportDirectory());
-            RunFastRun runStrategy = new RunFastRun(sessionFactory, dbServerFactory, threadPool);
-            runStrategy.run(user, strategy, this);
-        } catch (EmfException e) {
-            // queue up the strategy to be run, by setting runStatus to Waiting
-            dao.setFastRunRunStatusAndCompletionDate(fastRunId, "Failed", null, session);
+                    FastRun strategy = getFastRun(fastRunId);
+                    // validateSectors(strategy);
+                    // get rid of for now, since we don't auto export anything
+                    // make sure a valid server-side export path was specified
+                    // validateExportPath(strategy.getExportDirectory());
 
-            throw new EmfException(e.getMessage());
-        } finally {
-            session.close();
-        }
+                    // make the runner of the strategy is the owner of the strategy...
+                    // NEED TO TALK TO ALISON ABOUT ISSUES, LOCEKD owner might not be the creator of resulting datsets,
+                    // hence a exception when trying to purge/delete the resulting datasets
+                    // if (control);
+
+                    // queue up the strategy to be run, by setting runStatus to Waiting
+                    dao.setFastRunRunStatusAndCompletionDate(fastRunId, "Waiting", null, session);
+
+                    // validatePath(strategy.getExportDirectory());
+                    RunFastRun runStrategy = new RunFastRun(sessionFactory, dbServerFactory, threadPool);
+                    runStrategy.run(user, strategy, FastServiceImpl.this);
+                } catch (EmfException e) {
+
+                    // queue up the strategy to be run, by setting runStatus to Waiting
+                    dao.setFastRunRunStatusAndCompletionDate(fastRunId, "Failed", null, session);
+
+                    throw new EmfException(e.getMessage());
+                }
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "";
+            }
+        });
     }
 
     // private void validateSectors(FastRun strategy) throws EmfException {
@@ -322,26 +375,34 @@ public class FastServiceImpl implements FastService {
     // }
     // }
 
-    public List<FastRun> getFastRunsByRunStatus(String runStatus) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getFastRunsByRunStatus(runStatus, session);
-        } catch (RuntimeException e) {
-            throw new EmfException("Could not get Control Strategies by run status: " + runStatus);
-        } finally {
-            session.close();
-        }
+    public List<FastRun> getFastRunsByRunStatus(final String runStatus) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<List<FastRun>>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getFastRunsByRunStatus(runStatus, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not get Control Strategies by run status: " + runStatus;
+            }
+        });
     }
 
     public Long getFastRunRunningCount() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getFastRunRunningCount(session);
-        } catch (RuntimeException e) {
-            throw new EmfException("Could not get Control Strategies running count");
-        } finally {
-            session.close();
-        }
+
+        return this.executeDaoCommand(new AbstractDaoCommand<Long>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getFastRunRunningCount(session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not get Control Strategies running count";
+            }
+        });
     }
 
     // private File validatePath(String folderPath) throws EmfException {
@@ -354,409 +415,470 @@ public class FastServiceImpl implements FastService {
     // return file;
     // }
 
-    public synchronized void stopFastRun(int fastRunId) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            // look at the current status, if waiting or running, then update to Cancelled.
-            String status = dao.getFastRunRunStatus(fastRunId, session);
-            if (status.toLowerCase().startsWith("waiting") || status.toLowerCase().startsWith("running"))
-                dao.setFastRunRunStatusAndCompletionDate(fastRunId, "Cancelled", null, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not set Control Strategy run status: " + fastRunId, e);
-            throw new EmfException("Could not add Control Strategy run status: " + fastRunId);
-        } finally {
-            session.close();
-        }
+    public synchronized void stopFastRun(final int fastRunId) throws EmfException {
+
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                // look at the current status, if waiting or running, then update to Cancelled.
+                String status = dao.getFastRunRunStatus(fastRunId, session);
+                if (status.toLowerCase().startsWith("waiting") || status.toLowerCase().startsWith("running")) {
+                    dao.setFastRunRunStatusAndCompletionDate(fastRunId, "Cancelled", null, session);
+                }
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not add Control Strategy run status: " + fastRunId;
+            }
+        });
     }
 
     // returns control strategy Id for the given name
-    public synchronized int isDuplicateFastRunName(String name) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            FastRun cs = dao.getFastRun(name, session);
-            return cs == null ? 0 : cs.getId();
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve if FastRun name is already used", e);
-            throw new EmfException("Could not retrieve if FastRun name is already used");
-        } finally {
-            session.close();
-        }
-    }
+    public synchronized int isDuplicateFastRunName(final String name) throws EmfException {
 
-    public synchronized int copyFastRun(int id, User creator) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            // get cs to copy
-            FastRun cs = dao.getFastRun(id, session);
+        return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
 
-            session.clear();// clear to flush current
-
-            String name = "Copy of " + cs.getName();
-            // make sure this won't cause duplicate issues...
-            if (isDuplicateFastRunName(name) != 0)
-                throw new EmfException("A control strategy named '" + name + "' already exists.");
-
-            // do a deep copy
-            FastRun copied = (FastRun) DeepCopy.copy(cs);
-            // change to applicable values
-            copied.setName(name);
-            copied.setCreator(creator);
-            copied.setLastModifiedDate(new Date());
-            copied.setRunStatus("Not started");
-            copied.setCopiedFrom(cs.getName());
-            if (copied.isLocked()) {
-                copied.setLockDate(null);
-                copied.setLockOwner(null);
+                FastRun cs = dao.getFastRun(name, session);
+                this.setReturnValue(cs == null ? 0 : cs.getId());
             }
 
-            dao.add(copied, session);
-            int csId = copied.getId();
-            return csId;
-        } catch (EmfException e) {
-            LOG.error(e.getMessage());
-            throw e;
-        } catch (RuntimeException e) {
-            LOG.error("Could not copy control strategy", e);
-            throw new EmfException("Could not copy control strategy");
-        } catch (Exception e) {
-            LOG.error("Could not copy control strategy", e);
-            throw new EmfException("Could not copy control strategy");
-        } finally {
-            session.close();
-        }
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve if FastRun name is already used";
+            }
+        });
     }
 
-//    private synchronized boolean isDuplicate(String name) throws EmfException {
-//        return (isDuplicateName(name) != 0);
-//    }
+    public synchronized int copyFastRun(final int id, final User creator) throws EmfException {
 
-    public synchronized FastRun getFastRun(int id) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getFastRun(id, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not get control strategy", e);
-            throw new EmfException("Could not get control strategy");
-        } finally {
-            session.close();
-        }
+        return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                // get cs to copy
+                FastRun cs = dao.getFastRun(id, session);
+
+                session.clear();// clear to flush current
+
+                String name = "Copy of " + cs.getName();
+                // make sure this won't cause duplicate issues...
+                if (isDuplicateFastRunName(name) != 0)
+                    throw new EmfException("A control strategy named '" + name + "' already exists.");
+
+                // do a deep copy
+                FastRun copied = (FastRun) DeepCopy.copy(cs);
+                // change to applicable values
+                copied.setName(name);
+                copied.setCreator(creator);
+                copied.setLastModifiedDate(new Date());
+                copied.setRunStatus("Not started");
+                copied.setCopiedFrom(cs.getName());
+                if (copied.isLocked()) {
+                    copied.setLockDate(null);
+                    copied.setLockOwner(null);
+                }
+
+                dao.add(copied, session);
+                this.setReturnValue(copied.getId());
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not copy control strategy";
+            }
+        });
     }
 
-    public synchronized FastRunOutput[] getFastRunOutputs(int fastRunId) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            List all = dao.getFastRunOutputs(fastRunId, session);
-            return (FastRunOutput[]) all.toArray(new FastRunOutput[0]);
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve control strategy results.", e);
-            throw new EmfException("Could not retrieve control strategy results.");
-        } finally {
-            session.close();
-        }
+    // private synchronized boolean isDuplicate(String name) throws EmfException {
+    // return (isDuplicateName(name) != 0);
+    // }
+
+    public synchronized FastRun getFastRun(final int id) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastRun>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getFastRun(id, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not get control strategy";
+            }
+        });
+    }
+
+    public synchronized FastRunOutput[] getFastRunOutputs(final int fastRunId) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastRunOutput[]>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List<FastRunOutput> all = dao.getFastRunOutputs(fastRunId, session);
+                this.setReturnValue(all.toArray(new FastRunOutput[0]));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve control strategy results";
+            }
+        });
     }
 
     public synchronized String getDefaultExportDirectory() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            String dir = dao.getDefaultExportDirectory(session);
-            return dir;
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve default export directory.", e);
-            throw new EmfException("Could not retrieve default export directory.");
-        } finally {
-            session.close();
-        }
+
+        return this.executeDaoCommand(new AbstractDaoCommand<String>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getDefaultExportDirectory(session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve default export directory";
+            }
+        });
     }
 
-    public synchronized String getFastRunStatus(int id) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getStrategyRunStatus(session, id);
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve strategy run status.", e);
-            throw new EmfException("Could not retrieve strategy run status.");
-        } finally {
-            session.close();
-        }
+    public synchronized String getFastRunStatus(final int id) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<String>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getStrategyRunStatus(session, id));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve strategy run status";
+            }
+        });
     }
 
     public FastDataset[] getFastDatasets() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            List all = dao.getFastDatasets(session);
-            return (FastDataset[]) all.toArray(new FastDataset[0]);
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve fast datasets.", e);
-            throw new EmfException("Could not retrieve fast datasets.");
-        } finally {
-            session.close();
-        }
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastDataset[]>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List<FastDataset> all = dao.getFastDatasets(session);
+                this.setReturnValue(all.toArray(new FastDataset[0]));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve fast datasets";
+            }
+        });
     }
 
-    public FastDataset getFastDataset(int fastDatasetId) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            FastDataset fastDataset = dao.getFastDataset(session, fastDatasetId);
-            return fastDataset;
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve fast datasets.", e);
-            throw new EmfException("Could not retrieve fast datasets.");
-        } finally {
-            session.close();
-        }
+    public FastDataset getFastDataset(final int fastDatasetId) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastDataset>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getFastDataset(session, fastDatasetId));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve fast datasets";
+            }
+        });
     }
 
-    public synchronized int addFastDataset(FastDataset fastDataset) throws EmfException {
-        Session session = sessionFactory.getSession();
-        int csId;
-        try {
-            csId = dao.addFastDataset(fastDataset, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not add FastDataset: " + fastDataset, e);
-            throw new EmfException("Could not add FastDataset: " + fastDataset);
-        } finally {
-            session.close();
-        }
-        return csId;
+    public int getFastDatasetCount() throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List<FastDataset> all = dao.getFastDatasets(session);
+                this.setReturnValue(all.size());
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve fast datasets";
+            }
+        });
     }
 
-    public synchronized int addFastNonPointDataset(String newInventoryDatasetName, String baseNonPointDatasetName, 
-            int baseNonPointDatasetVersion, String griddedSMKDatasetName, 
-            int griddedSMKDatasetVersion, String invTableDatasetName, 
-            int invTableDatasetVersion, String gridName, 
-            String userName) throws EmfException {
-        Session session = sessionFactory.getSession();
-        DbServer dbServer = dbServerFactory.getDbServer();
-        int fastDatasetId;
-        try {
-            fastDatasetId = dao.addFastNonPointDataset(newInventoryDatasetName, baseNonPointDatasetName, 
-                    baseNonPointDatasetVersion, griddedSMKDatasetName, 
-                    griddedSMKDatasetVersion, invTableDatasetName, 
-                    invTableDatasetVersion, gridName, 
-                    userName, session, 
-                    dbServer);
-            
-            populateFastQuasiPointDataset((new UserDAO()).get(userName, session), fastDatasetId);
-            
-        } catch (RuntimeException e) {
-            LOG.error("Could not add FastDataset: " + newInventoryDatasetName, e);
-            throw new EmfException("Could not add FastDataset: " + newInventoryDatasetName);
-        } finally {
-            session.close();
-            close(dbServer);
-        }
-        return fastDatasetId;
+    public synchronized int addFastDataset(final FastDataset fastDataset) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.addFastDataset(fastDataset, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not add FastDataset: " + fastDataset;
+            }
+        });
     }
 
-    private synchronized void close(DbServer dbServer) throws EmfException {
-        try {
-            if (dbServer != null)
-                dbServer.disconnect();
+    // public synchronized int addFastNonPointDataset(final String newInventoryDatasetName,
+    // final String baseNonPointDatasetName, final int baseNonPointDatasetVersion,
+    // final String griddedSMKDatasetName, final int griddedSMKDatasetVersion, final String invTableDatasetName,
+    // final int invTableDatasetVersion, final String gridName, final String userName) throws EmfException {
+    //
+    // return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
+    // @Override
+    // protected void doExecute(Session session) throws Exception {
+    //
+    // DbServer dbServer = dbServerFactory.getDbServer();
+    //
+    // int fastDatasetId = dao.addFastNonPointDataset(newInventoryDatasetName, baseNonPointDatasetName,
+    // baseNonPointDatasetVersion, griddedSMKDatasetName, griddedSMKDatasetVersion,
+    // invTableDatasetName, invTableDatasetVersion, gridName, userName, session, dbServer);
+    //
+    // populateFastQuasiPointDataset((new UserDAO()).get(userName, session), fastDatasetId);
+    //
+    // this.setReturnValue(fastDatasetId);
+    // }
+    //
+    // @Override
+    // protected String getErrorMessage() {
+    // return "Could not add FastDataset: " + newInventoryDatasetName;
+    // }
+    // });
+    // }
 
-        } catch (Exception e) {
-            LOG.error("Could not close database server", e);
-            throw new EmfException("Could not close database server");
-        }
+    public synchronized void removeFastDataset(final int fastDatasetId, User user) throws EmfException {
+
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                dao.removeFastDataset(fastDatasetId, session);
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not remove FastDataset: " + fastDatasetId;
+            }
+        });
     }
 
-    public synchronized void removeFastDataset(int fastDatasetId, User user) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            dao.removeFastDataset(fastDatasetId, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not remove FastDataset: " + fastDatasetId, e);
-            throw new EmfException("Could not remove FastDataset: " + fastDatasetId);
-        } finally {
-            session.close();
-        }
+    private synchronized void close(final DbServer dbServer) throws EmfException {
+
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                if (dbServer != null) {
+                    dbServer.disconnect();
+                }
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not close database server";
+            }
+        });
     }
 
     public FastNonPointDataset[] getFastNonPointDatasets() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            List all = dao.getFastNonPointDatasets(session);
-            return (FastNonPointDataset[]) all.toArray(new FastNonPointDataset[0]);
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve fast NonPoint datasets.", e);
-            throw new EmfException("Could not retrieve fast NonPoint datasets.");
-        } finally {
-            session.close();
-        }
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastNonPointDataset[]>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List<FastNonPointDataset> all = dao.getFastNonPointDatasets(session);
+                this.setReturnValue(all.toArray(new FastNonPointDataset[0]));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve fast NonPoint datasets";
+            }
+        });
     }
 
-    public FastNonPointDataset getFastNonPointDataset(int fastNonPointDatasetId) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            FastNonPointDataset fastNonPointDataset = dao.getFastNonPointDataset(session, fastNonPointDatasetId);
-            return fastNonPointDataset;
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve fast NonPoint datasets.", e);
-            throw new EmfException("Could not retrieve fast NonPoint datasets.");
-        } finally {
-            session.close();
-        }
+    public FastNonPointDataset getFastNonPointDataset(final int fastNonPointDatasetId) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastNonPointDataset>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getFastNonPointDataset(session, fastNonPointDatasetId));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve fast NonPoint datasets";
+            }
+        });
     }
 
-    public synchronized int addFastNonPointDataset(FastNonPointDataset fastNonPointDataset) throws EmfException {
-        Session session = sessionFactory.getSession();
-        int csId;
-        try {
-            csId = dao.addFastNonPointDataset(fastNonPointDataset, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not add FastNonPointDataset: " + fastNonPointDataset, e);
-            throw new EmfException("Could not add FastNonPointDataset: " + fastNonPointDataset);
-        } finally {
-            session.close();
-        }
-        return csId;
+    public int getFastNonPointDatasetCount() throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List<FastNonPointDataset> all = dao.getFastNonPointDatasets(session);
+                this.setReturnValue(all.size());
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve fast datasets";
+            }
+        });
     }
 
-    public synchronized void removeFastNonPointDataset(int fastNonPointDatasetId, User user) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            dao.removeFastNonPointDataset(fastNonPointDatasetId, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not remove FastNonPointDataset: " + fastNonPointDatasetId, e);
-            throw new EmfException("Could not remove FastNonPointDataset: " + fastNonPointDatasetId);
-        } finally {
-            session.close();
-        }
+    public synchronized int addFastNonPointDataset(final FastNonPointDataset fastNonPointDataset, final User user)
+            throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+
+                DbServer dbServer = dbServerFactory.getDbServer();
+
+                int fastDatasetId = dao.addFastNonPointDataset(fastNonPointDataset.getName(), fastNonPointDataset
+                        .getBaseNonPointDataset().getName(), fastNonPointDataset.getBaseNonPointDatasetVersion(),
+                        fastNonPointDataset.getGriddedSMKDataset().getName(), fastNonPointDataset
+                                .getGriddedSMKDatasetVersion(), fastNonPointDataset.getInvTableDataset().getName(),
+                        fastNonPointDataset.getInvTableDatasetVersion(), fastNonPointDataset.getGrid().getName(), user
+                                .getName(), session, dbServer);
+
+                populateFastQuasiPointDataset((new UserDAO()).get(user.getName(), session), fastDatasetId);
+
+                this.setReturnValue(fastDatasetId);
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not add FastNonPointDataset: " + fastNonPointDataset;
+            }
+        });
     }
 
-    private void populateFastQuasiPointDataset(User user, int fastNonPointDatasetId) throws EmfException {
-        try {
-            FastDataset fastDataset = getFastDataset(fastNonPointDatasetId);
-            PopulateFastQuasiPointDatasetTask task = new PopulateFastQuasiPointDatasetTask(user,
-                    fastDataset, sessionFactory, dbServerFactory);
-            if (task.shouldProceed())
-                threadPool
-                        .execute(new GCEnforcerTask("Populate FAST Quasi Point Inventory: " + fastDataset.getDataset().getName(), task));
-        } catch (Exception e) {
-            LOG.error("Error running control strategy: " + ""/* controlStrategy.getName() */, e);
-            throw new EmfException(e.getMessage());
-        }
+    public synchronized void removeFastNonPointDataset(final int fastNonPointDatasetId, User user) throws EmfException {
+
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                dao.removeFastNonPointDataset(fastNonPointDatasetId, session);
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not remove FastNonPointDataset: " + fastNonPointDatasetId;
+            }
+        });
+    }
+
+    private void populateFastQuasiPointDataset(final User user, final int fastNonPointDatasetId) throws EmfException {
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+
+                FastDataset fastDataset = getFastDataset(fastNonPointDatasetId);
+                PopulateFastQuasiPointDatasetTask task = new PopulateFastQuasiPointDatasetTask(user, fastDataset,
+                        sessionFactory, dbServerFactory);
+                if (task.shouldProceed()) {
+                    threadPool.execute(new GCEnforcerTask("Populate FAST Quasi Point Inventory: "
+                            + fastDataset.getDataset().getName(), task));
+                }
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Error running control strategy: " + ""/* controlStrategy.getName() */;
+            }
+        });
     }
 
     public Grid[] getGrids() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            List all = dao.getGrids(session);
-            return (Grid[]) all.toArray(new Grid[0]);
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve fast NonPoint datasets.", e);
-            throw new EmfException("Could not retrieve fast NonPoint datasets.");
-        } finally {
-            session.close();
-        }
+
+        return this.executeDaoCommand(new AbstractDaoCommand<Grid[]>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List<Grid> all = dao.getGrids(session);
+                this.setReturnValue(all.toArray(new Grid[0]));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve fast NonPoint datasets";
+            }
+        });
     }
 
-    public Grid getGrid(String name) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            Grid grid = dao.getGrid(session, name);
-            return grid;
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve grid, " + name + ".", e);
-            throw new EmfException("Could not retrieve grid, " + name + ".");
-        } finally {
-            session.close();
-        }
+    public Grid getGrid(final String name) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<Grid>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getGrid(session, name));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve grid " + name;
+            }
+        });
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public synchronized FastAnalysis[] getFastAnalyses() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            List cs = dao.getFastAnalyses(session);
-            return (FastAnalysis[]) cs.toArray(new FastAnalysis[0]);
-        } catch (HibernateException e) {
-            e.printStackTrace();
-            LOG.error("Could not retrieve all FastAnalyses.");
-            throw new EmfException("Could not retrieve all FastAnalyses.");
-        } finally {
-            session.close();
-        }
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastAnalysis[]>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List<FastAnalysis> cs = dao.getFastAnalyses(session);
+                this.setReturnValue(cs.toArray(new FastAnalysis[0]));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve all FastAnalyses";
+            }
+        });
     }
 
-    public synchronized int addFastAnalysis(FastAnalysis fastAnalysis) throws EmfException {
-        Session session = sessionFactory.getSession();
-        int csId;
-        try {
-            csId = dao.add(fastAnalysis, session);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            LOG.error("Could not add Control Strategy: " + fastAnalysis, e);
-            throw new EmfException("Could not add Control Strategy: " + fastAnalysis);
-        } finally {
-            session.close();
-        }
-        return csId;
+    public synchronized int addFastAnalysis(final FastAnalysis fastAnalysis) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.add(fastAnalysis, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not add Control Strategy: " + fastAnalysis;
+            }
+        });
     }
 
-    public synchronized void setFastAnalysisRunStatusAndCompletionDate(int id, String runStatus, Date completionDate)
-            throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            dao.setFastAnalysisRunStatusAndCompletionDate(id, runStatus, completionDate, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not set Control Strategy run status: " + id, e);
-            throw new EmfException("Could not add Control Strategy run status: " + id);
-        } finally {
-            session.close();
-        }
+    public synchronized void setFastAnalysisRunStatusAndCompletionDate(final int id, final String runStatus,
+            final Date completionDate) throws EmfException {
+
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                dao.setFastAnalysisRunStatusAndCompletionDate(id, runStatus, completionDate, session);
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not set Control Strategy run status: " + id;
+            }
+        });
     }
 
-    public synchronized FastAnalysis obtainLockedFastAnalysis(User owner, int id) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            FastAnalysis locked = dao.obtainLockedFastAnalysis(owner, id, session);
+    public synchronized FastAnalysis obtainLockedFastAnalysis(final User owner, final int id) throws EmfException {
 
-            return locked;
-        } catch (RuntimeException e) {
-            LOG
-                    .error("Could not obtain lock for Control Strategy: id = " + id + " by owner: "
-                            + owner.getUsername(), e);
-            throw new EmfException("Could not obtain lock for Control Strategy: id = " + id + " by owner: "
-                    + owner.getUsername());
-        } finally {
-            session.close();
-        }
+        return this.executeDaoCommand(new AbstractDaoCommand<FastAnalysis>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.obtainLockedFastAnalysis(owner, id, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not obtain lock for Control Strategy: id = " + id + " by owner: " + owner.getUsername();
+            }
+        });
     }
 
     // FIXME
@@ -775,342 +897,369 @@ public class FastServiceImpl implements FastService {
     // }
     // }
 
-    public synchronized void releaseLockedFastAnalysis(User user, int id) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            dao.releaseLockedFastAnalysis(user, id, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not release lock for Control Strategy id: " + id, e);
-            throw new EmfException("Could not release lock for Control Strategy id: " + id);
-        } finally {
-            session.close();
-        }
+    public synchronized void releaseLockedFastAnalysis(final User user, final int id) throws EmfException {
+
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                dao.releaseLockedFastAnalysis(user, id, session);
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not release lock for Control Strategy id: " + id;
+            }
+        });
     }
 
-    public synchronized FastAnalysis updateFastAnalysis(FastAnalysis fastAnalysis) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            if (!dao.canUpdate(fastAnalysis, session))
-                throw new EmfException("The Control Strategy name is already in use");
+    public synchronized FastAnalysis updateFastAnalysis(final FastAnalysis fastAnalysis) throws EmfException {
 
-            FastAnalysis released = dao.updateFastAnalysis(fastAnalysis, session);
+        return this.executeDaoCommand(new AbstractDaoCommand<FastAnalysis>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
 
-            return released;
-        } catch (RuntimeException e) {
-            LOG.error("Could not update Control Strategy: " + fastAnalysis, e);
-            throw new EmfException("Could not update FastAnalysis: " + fastAnalysis);
-        } finally {
-            session.close();
-        }
+                if (!dao.canUpdate(fastAnalysis, session)) {
+                    throw new EmfException("The Control Strategy name is already in use");
+                }
+
+                this.setReturnValue(dao.updateFastAnalysis(fastAnalysis, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not update Control Strategy: " + fastAnalysis;
+            }
+        });
     }
 
-    public synchronized FastAnalysis updateFastAnalysisWithLock(FastAnalysis fastAnalysis) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            if (!dao.canUpdate(fastAnalysis, session))
-                throw new EmfException("Control Strategy name already in use");
+    public synchronized FastAnalysis updateFastAnalysisWithLock(final FastAnalysis fastAnalysis) throws EmfException {
 
-            FastAnalysis csWithLock = dao.updateWithLock(fastAnalysis, session);
+        return this.executeDaoCommand(new AbstractDaoCommand<FastAnalysis>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                if (!dao.canUpdate(fastAnalysis, session)) {
+                    throw new EmfException("Control Strategy name already in use");
+                }
 
-            return csWithLock;
-            // return dao.getById(csWithLock.getId(), session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not update Control Strategy: " + fastAnalysis, e);
-            throw new EmfException("Could not update FastAnalysis: " + fastAnalysis);
-        } finally {
-            session.close();
-        }
+                this.setReturnValue(dao.updateWithLock(fastAnalysis, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not update Control Strategy: " + fastAnalysis;
+            }
+        });
     }
 
-    // public void removeFastAnalyses(FastAnalysis[] elements, User user) throws EmfException {
-    // try {
-    // for (int i = 0; i < elements.length; i++) {
-    // if (!user.equals(elements[i].getCreator()))
-    // throw new EmfException("Only the creator of " + elements[i].getName()
-    // + " can remove it from the database.");
-    // remove(elements[i]);
-    // }
-    //
-    // } catch (RuntimeException e) {
-    // LOG.error("Could not update Control Strategy: " + elements, e);
-    // throw new EmfException("Could not update FastAnalysis: " + elements);
-    // }
-    // }
+    public synchronized void removeFastAnalyses(final int[] ids, final User user) throws EmfException {
 
-    public synchronized void removeFastAnalyses(int[] ids, User user) throws EmfException {
-        Session session = sessionFactory.getSession();
-        String exception = "";
-        try {
-            for (int i = 0; i < ids.length; i++) {
-                FastAnalysis cs = dao.getFastAnalysis(ids[i], session);
-                session.clear();
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
 
-                // check if admin user, then allow it to be removed.
-                if (user.equals(cs.getCreator()) || user.isAdmin()) {
-                    if (cs.isLocked())
-                        exception += "The control strategy, " + cs.getName()
-                                + ", is in edit mode and can not be removed. ";
-                    else
-                        removeFastAnalysis(cs);
-                } else {
-                    exception += "You do not have permission to remove the strategy: " + cs.getName() + ". ";
+                String exception = "";
+                for (int i = 0; i < ids.length; i++) {
+                    FastAnalysis cs = dao.getFastAnalysis(ids[i], session);
+                    session.clear();
+
+                    // check if admin user, then allow it to be removed.
+                    if (user.equals(cs.getCreator()) || user.isAdmin()) {
+                        if (cs.isLocked()) {
+                            exception += "The control strategy, " + cs.getName()
+                                    + ", is in edit mode and can not be removed. ";
+                        } else {
+                            removeFastAnalysis(cs);
+                        }
+                    } else {
+                        exception += "You do not have permission to remove the strategy: " + cs.getName() + ". ";
+                    }
+                }
+
+                if (exception.length() > 0) {
+                    throw new EmfException(exception);
                 }
             }
 
-            if (exception.length() > 0)
-                throw new EmfException(exception);
-        } catch (RuntimeException e) {
-            LOG.error("Could not remove Control Strategy", e);
-            throw new EmfException("Could not remove SectorScenario");
-        } finally {
-            session.close();
-        }
+            @Override
+            protected String getErrorMessage() {
+                return "Could not remove Control Strategy";
+            }
+        });
     }
 
-    public synchronized void removeFastAnalysis(FastAnalysis fastAnalysis) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
+    public synchronized void removeFastAnalysis(final FastAnalysis fastAnalysis) throws EmfException {
 
-            if (!dao.canUpdate(fastAnalysis, session))
-                throw new EmfException("Control Strategy name already in use");
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                if (!dao.canUpdate(fastAnalysis, session)) {
+                    throw new EmfException("Control Strategy name already in use");
+                }
 
-            FastAnalysisOutput[] controlStrategyResults = getFastAnalysisOutputs(fastAnalysis.getId());
-            for (int i = 0; i < controlStrategyResults.length; i++) {
-                dao.remove(controlStrategyResults[i], session);
+                FastAnalysisOutput[] controlStrategyResults = getFastAnalysisOutputs(fastAnalysis.getId());
+                for (int i = 0; i < controlStrategyResults.length; i++) {
+                    dao.remove(controlStrategyResults[i], session);
+                }
+
+                dao.remove(fastAnalysis, session);
             }
 
-            dao.remove(fastAnalysis, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not remove control strategy: " + fastAnalysis, e);
-            throw new EmfException("Could not remove control strategy: " + fastAnalysis.getName());
-        } finally {
-            session.close();
-        }
+            @Override
+            protected String getErrorMessage() {
+                return "Could not remove control strategy: " + fastAnalysis;
+            }
+        });
     }
 
-    public synchronized void runFastAnalysis(User user, int fastAnalysisId) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            // first see if the strategy has been canceled, is so don't run it...
-            String runStatus = dao.getFastAnalysisRunStatus(fastAnalysisId, session);
-            if (runStatus.equals("Cancelled"))
-                return;
+    public synchronized void runFastAnalysis(final User user, final int fastAnalysisId) throws EmfException {
 
-            FastAnalysis strategy = getFastAnalysis(fastAnalysisId);
-            // validateSectors(strategy);
-            // get rid of for now, since we don't auto export anything
-            // make sure a valid server-side export path was specified
-            // validateExportPath(strategy.getExportDirectory());
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
 
-            // make the runner of the strategy is the owner of the strategy...
-            // NEED TO TALK TO ALISON ABOUT ISSUES, LOCEKD owner might not be the creator of resulting datsets,
-            // hence a exception when trying to purge/delete the resulting datasets
-            // if (control);
+                try {
+                    // first see if the strategy has been canceled, is so don't run it...
+                    String runStatus = dao.getFastAnalysisRunStatus(fastAnalysisId, session);
+                    if (runStatus.equals("Cancelled")) {
+                        return;
+                    }
 
-            // queue up the strategy to be run, by setting runStatus to Waiting
-            dao.setFastAnalysisRunStatusAndCompletionDate(fastAnalysisId, "Waiting", null, session);
+                    FastAnalysis strategy = getFastAnalysis(fastAnalysisId);
+                    // validateSectors(strategy);
+                    // get rid of for now, since we don't auto export anything
+                    // make sure a valid server-side export path was specified
+                    // validateExportPath(strategy.getExportDirectory());
 
-            // validatePath(strategy.getExportDirectory());
-            RunFastAnalysis runStrategy = new RunFastAnalysis(sessionFactory, dbServerFactory, threadPool);
-            runStrategy.run(user, strategy, this);
-        } catch (EmfException e) {
-            // queue up the strategy to be run, by setting runStatus to Waiting
-            dao.setFastAnalysisRunStatusAndCompletionDate(fastAnalysisId, "Failed", null, session);
+                    // make the runner of the strategy is the owner of the strategy...
+                    // NEED TO TALK TO ALISON ABOUT ISSUES, LOCEKD owner might not be the creator of resulting datsets,
+                    // hence a exception when trying to purge/delete the resulting datasets
+                    // if (control);
 
-            throw new EmfException(e.getMessage());
-        } finally {
-            session.close();
-        }
+                    // queue up the strategy to be run, by setting runStatus to Waiting
+                    dao.setFastAnalysisRunStatusAndCompletionDate(fastAnalysisId, "Waiting", null, session);
+
+                    // validatePath(strategy.getExportDirectory());
+                    RunFastAnalysis runStrategy = new RunFastAnalysis(sessionFactory, dbServerFactory, threadPool);
+                    runStrategy.run(user, strategy, FastServiceImpl.this);
+                } finally {
+                    // queue up the strategy to be run, by setting runStatus to Waiting
+                    dao.setFastAnalysisRunStatusAndCompletionDate(fastAnalysisId, "Failed", null, session);
+                }
+            }
+        });
     }
 
-    public List<FastAnalysis> getFastAnalysesByRunStatus(String runStatus) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getFastAnalysesByRunStatus(runStatus, session);
-        } catch (RuntimeException e) {
-            throw new EmfException("Could not get Control Strategies by run status: " + runStatus);
-        } finally {
-            session.close();
-        }
+    public List<FastAnalysis> getFastAnalysesByRunStatus(final String runStatus) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<List<FastAnalysis>>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getFastAnalysesByRunStatus(runStatus, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not get Control Strategies by run status: " + runStatus;
+            }
+        });
     }
 
     public Long getFastAnalysisRunningCount() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getFastAnalysisRunningCount(session);
-        } catch (RuntimeException e) {
-            throw new EmfException("Could not get Control Strategies running count");
-        } finally {
-            session.close();
-        }
+
+        return this.executeDaoCommand(new AbstractDaoCommand<Long>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getFastAnalysisRunningCount(session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not get Control Strategies running count";
+            }
+        });
     }
 
-    // private File validatePath(String folderPath) throws EmfException {
-    // File file = new File(folderPath);
-    //
-    // if (!file.exists() || !file.isDirectory()) {
-    // LOG.error("Folder " + folderPath + " does not exist");
-    // throw new EmfException("Export folder does not exist: " + folderPath);
-    // }
-    // return file;
-    // }
+    public synchronized void stopFastAnalysis(final int fastAnalysisId) throws EmfException {
 
-    public synchronized void stopFastAnalysis(int fastAnalysisId) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            // look at the current status, if waiting or running, then update to Cancelled.
-            String status = dao.getFastAnalysisRunStatus(fastAnalysisId, session);
-            if (status.toLowerCase().startsWith("waiting") || status.toLowerCase().startsWith("running"))
-                dao.setFastAnalysisRunStatusAndCompletionDate(fastAnalysisId, "Cancelled", null, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not set Control Strategy run status: " + fastAnalysisId, e);
-            throw new EmfException("Could not add Control Strategy run status: " + fastAnalysisId);
-        } finally {
-            session.close();
-        }
+        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                // look at the current status, if waiting or running, then update to Cancelled.
+                String status = dao.getFastAnalysisRunStatus(fastAnalysisId, session);
+                if (status.toLowerCase().startsWith("waiting") || status.toLowerCase().startsWith("running")) {
+                    dao.setFastAnalysisRunStatusAndCompletionDate(fastAnalysisId, "Cancelled", null, session);
+                }
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not add Control Strategy run status: " + fastAnalysisId;
+            }
+        });
     }
 
     // returns control strategy Id for the given name
-    public synchronized int isDuplicateFastAnalysisName(String name) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            FastAnalysis cs = dao.getFastAnalysis(name, session);
-            return cs == null ? 0 : cs.getId();
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve if FastAnalysis name is already used", e);
-            throw new EmfException("Could not retrieve if FastAnalysis name is already used");
-        } finally {
-            session.close();
-        }
-    }
+    public synchronized int isDuplicateFastAnalysisName(final String name) throws EmfException {
 
-    public synchronized int copyFastAnalysis(int id, User creator) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            // get cs to copy
-            FastAnalysis cs = dao.getFastAnalysis(id, session);
-
-            session.clear();// clear to flush current
-
-            String name = "Copy of " + cs.getName();
-            // make sure this won't cause duplicate issues...
-            if (isDuplicateFastAnalysisName(name) != 0)
-                throw new EmfException("A control strategy named '" + name + "' already exists.");
-
-            // do a deep copy
-            FastAnalysis copied = (FastAnalysis) DeepCopy.copy(cs);
-            // change to applicable values
-            copied.setName(name);
-            copied.setCreator(creator);
-            copied.setLastModifiedDate(new Date());
-            copied.setRunStatus("Not started");
-            copied.setCopiedFrom(cs.getName());
-            if (copied.isLocked()) {
-                copied.setLockDate(null);
-                copied.setLockOwner(null);
+        return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                FastAnalysis cs = dao.getFastAnalysis(name, session);
+                this.setReturnValue(cs == null ? 0 : cs.getId());
             }
 
-            dao.add(copied, session);
-            int csId = copied.getId();
-            return csId;
-        } catch (EmfException e) {
-            LOG.error(e.getMessage());
-            throw e;
-        } catch (RuntimeException e) {
-            LOG.error("Could not copy control strategy", e);
-            throw new EmfException("Could not copy control strategy");
-        } catch (Exception e) {
-            LOG.error("Could not copy control strategy", e);
-            throw new EmfException("Could not copy control strategy");
-        } finally {
-            session.close();
-        }
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve if FastAnalysis name is already used";
+            }
+        });
     }
 
-    public synchronized FastAnalysis getFastAnalysis(int id) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getFastAnalysis(id, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not get control strategy", e);
-            throw new EmfException("Could not get control strategy");
-        } finally {
-            session.close();
-        }
+    public synchronized int copyFastAnalysis(final int id, final User creator) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+
+                // get cs to copy
+                FastAnalysis cs = dao.getFastAnalysis(id, session);
+
+                session.clear();// clear to flush current
+
+                String name = "Copy of " + cs.getName();
+                // make sure this won't cause duplicate issues...
+                if (isDuplicateFastAnalysisName(name) != 0)
+                    throw new EmfException("A control strategy named '" + name + "' already exists.");
+
+                // do a deep copy
+                FastAnalysis copied = (FastAnalysis) DeepCopy.copy(cs);
+                // change to applicable values
+                copied.setName(name);
+                copied.setCreator(creator);
+                copied.setLastModifiedDate(new Date());
+                copied.setRunStatus("Not started");
+                copied.setCopiedFrom(cs.getName());
+                if (copied.isLocked()) {
+                    copied.setLockDate(null);
+                    copied.setLockOwner(null);
+                }
+
+                dao.add(copied, session);
+                this.setReturnValue(copied.getId());
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not copy control strategy";
+            }
+        });
     }
 
-    public synchronized FastAnalysisOutput[] getFastAnalysisOutputs(int fastAnalysisId) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            List all = dao.getFastAnalysisOutputs(fastAnalysisId, session);
-            return (FastAnalysisOutput[]) all.toArray(new FastAnalysisOutput[0]);
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve control strategy results.", e);
-            throw new EmfException("Could not retrieve control strategy results.");
-        } finally {
-            session.close();
-        }
+    public synchronized FastAnalysis getFastAnalysis(final int id) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastAnalysis>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getFastAnalysis(id, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not get control strategy";
+            }
+        });
     }
 
-    public synchronized String getFastAnalysisStatus(int id) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getFastAnalysisRunStatus(session, id);
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve strategy run status.", e);
-            throw new EmfException("Could not retrieve strategy run status.");
-        } finally {
-            session.close();
-        }
+    public synchronized FastAnalysisOutput[] getFastAnalysisOutputs(final int fastAnalysisId) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastAnalysisOutput[]>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List<FastAnalysisOutput> all = dao.getFastAnalysisOutputs(fastAnalysisId, session);
+                this.setReturnValue(all.toArray(new FastAnalysisOutput[0]));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve control strategy results";
+            }
+        });
     }
 
-    public FastAnalysisOutputType getFastAnalysisOutputType(String name) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getFastAnalysisOutputType(name, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve FastAnalysisOutputType.", e);
-            throw new EmfException("Could not retrieve FastAnalysisOutputType.");
-        } finally {
-            session.close();
-        }
+    public synchronized String getFastAnalysisStatus(final int id) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<String>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getFastAnalysisRunStatus(session, id));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve strategy run status";
+            }
+        });
+    }
+
+    public FastAnalysisOutputType getFastAnalysisOutputType(final String name) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastAnalysisOutputType>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getFastAnalysisOutputType(name, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve FastAnalysisOutputType";
+            }
+        });
     }
 
     public FastAnalysisOutputType[] getFastAnalysisOutputTypes() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            List all = dao.getFastAnalysisOutputTypes(session);
-            return (FastAnalysisOutputType[]) all.toArray(new FastAnalysisOutputType[0]);
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve FastAnalysisOutputType.", e);
-            throw new EmfException("Could not retrieve FastAnalysisOutputType.");
-        } finally {
-            session.close();
-        }
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastAnalysisOutputType[]>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List<FastAnalysisOutputType> all = dao.getFastAnalysisOutputTypes(session);
+                this.setReturnValue(all.toArray(new FastAnalysisOutputType[0]));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve FastAnalysisOutputType";
+            }
+        });
     }
 
-    public FastRunOutputType getFastRunOutputType(String name) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getFastRunOutputType(name, session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve FastRunOutputType.", e);
-            throw new EmfException("Could not retrieve FastRunOutputType.");
-        } finally {
-            session.close();
-        }
+    public FastRunOutputType getFastRunOutputType(final String name) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastRunOutputType>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                this.setReturnValue(dao.getFastRunOutputType(name, session));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve FastRunOutputType";
+            }
+        });
     }
 
     public FastRunOutputType[] getFastRunOutputTypes() throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            List all = dao.getFastAnalysisOutputTypes(session);
-            return (FastRunOutputType[]) all.toArray(new FastRunOutputType[0]);
-        } catch (RuntimeException e) {
-            LOG.error("Could not retrieve FastRunOutputTypes.", e);
-            throw new EmfException("Could not retrieve FastRunOutputTypes.");
-        } finally {
-            session.close();
-        }
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastRunOutputType[]>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List<FastRunOutputType> all = dao.getFastRunOutputTypes(session);
+                this.setReturnValue(all.toArray(new FastRunOutputType[0]));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve FastRunOutputTypes";
+            }
+        });
     }
 }

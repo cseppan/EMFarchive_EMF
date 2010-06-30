@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.fast;
 
-import gov.epa.emissions.commons.data.Lockable;
-import gov.epa.emissions.commons.data.Mutex;
+import gov.epa.emissions.commons.data.LockableImpl;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -9,7 +8,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import java.io.Serializable;
 import java.util.Date;
 
-public class FastAnalysis implements Lockable, Serializable {
+public class FastAnalysis extends LockableImpl implements Serializable {
 
     private int id;
     private String name;
@@ -20,7 +19,6 @@ public class FastAnalysis implements Lockable, Serializable {
     private Date lastModifiedDate;
     private Date startDate;
     private Date completionDate;
-    private Mutex lock;
     private String copiedFrom;
     private EmfDataset cancerRiskDataset;
     private Integer cancerRiskDatasetVersion;
@@ -28,7 +26,6 @@ public class FastAnalysis implements Lockable, Serializable {
     private Sector[] outputSectors = new Sector[] {};
 
     public FastAnalysis() {
-        this.lock = new Mutex();
     }
     
     public FastAnalysis(String name) {
@@ -135,34 +132,6 @@ public class FastAnalysis implements Lockable, Serializable {
 
     public void setCancerRiskDataset(EmfDataset cancerRiskDataset) {
         this.cancerRiskDataset = cancerRiskDataset;
-    }
-
-    public Date getLockDate() {
-        return lock.getLockDate();
-    }
-
-    public void setLockDate(Date lockDate) {
-        lock.setLockDate(lockDate);
-    }
-
-    public String getLockOwner() {
-        return lock.getLockOwner();
-    }
-
-    public void setLockOwner(String owner) {
-        lock.setLockOwner(owner);
-    }
-
-    public boolean isLocked(String owner) {
-        return lock.isLocked(owner);
-    }
-
-    public boolean isLocked(User owner) {
-        return lock.isLocked(owner);
-    }
-
-    public boolean isLocked() {
-        return lock.isLocked();
     }
 
     public FastAnalysisInputSector[] getInputSectors() {

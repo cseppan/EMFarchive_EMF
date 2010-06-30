@@ -7,6 +7,7 @@ import java.io.Serializable;
 public class FastNonPointDataset implements Serializable {
 
     private int id;
+    private String name;
     private EmfDataset griddedSMKDataset;
     private int griddedSMKDatasetVersion;
     private EmfDataset baseNonPointDataset;
@@ -30,6 +31,20 @@ public class FastNonPointDataset implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getName() {
+
+        String retVal = name;
+        if (this.quasiPointDataset != null) {
+            retVal = this.quasiPointDataset.getName();
+        }
+
+        return retVal;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public EmfDataset getGriddedSMKDataset() {
@@ -106,13 +121,12 @@ public class FastNonPointDataset implements Serializable {
     }
 
     public int hashCode() {
-        return this.griddedSMKDataset.getId() 
-            + this.griddedSMKDatasetVersion
-            + this.baseNonPointDataset.getId() 
-            + this.baseNonPointDatasetVersion
-            + this.grid.getId() 
-            + this.quasiPointDataset.getId() 
-            ;
+        return new String(this.griddedSMKDataset.getId() + "_" 
+            + this.griddedSMKDatasetVersion + "_"
+            + this.baseNonPointDataset.getId() + "_"
+            + this.baseNonPointDatasetVersion + "_"
+            + this.grid.getId() + "_"
+            + this.quasiPointDataset.getId()).hashCode();
     }
 
     public void setFastDataset(FastDataset fastDataset) {

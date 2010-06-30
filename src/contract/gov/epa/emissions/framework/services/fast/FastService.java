@@ -10,11 +10,11 @@ import java.util.List;
 public interface FastService extends EMFService {
 
     FastRun[] getFastRuns() throws EmfException;
-    
+
     FastRunOutput[] getFastRunOutputs(int fastRunId) throws EmfException;
-    
+
     int addFastRun(FastRun fastRun) throws EmfException;
-    
+
     void removeFastRuns(int[] ids, User user) throws EmfException;
 
     FastRun obtainLockedFastRun(User owner, int id) throws EmfException;
@@ -22,13 +22,13 @@ public interface FastService extends EMFService {
     void releaseLockedFastRun(User user, int id) throws EmfException;
 
     FastRun updateFastRun(FastRun fastRun) throws EmfException;
-    
+
     FastRun updateFastRunWithLock(FastRun fastRun) throws EmfException;
-    
+
     void runFastRun(User user, int fastRunId) throws EmfException;
 
     List<FastRun> getFastRunsByRunStatus(String runStatus) throws EmfException;
-    
+
     void stopFastRun(int fastRunId) throws EmfException;
 
     int copyFastRun(int id, User creator) throws EmfException;
@@ -36,8 +36,9 @@ public interface FastService extends EMFService {
     FastRun getFastRun(int fastRunId) throws EmfException;
 
     void setFastRunRunStatusAndCompletionDate(int id, String runStatus, Date completionDate) throws EmfException;
-    //StrategyType[] getEquaitonTypes();
-    
+
+    // StrategyType[] getEquaitonTypes();
+
     Long getFastRunRunningCount() throws EmfException;
 
     public String getDefaultExportDirectory() throws EmfException;
@@ -45,6 +46,8 @@ public interface FastService extends EMFService {
     public String getFastRunStatus(int id) throws EmfException;
 
     public FastDataset[] getFastDatasets() throws EmfException;
+
+    public int getFastDatasetCount() throws EmfException;
 
     public FastDataset getFastDataset(int fastDatasetId) throws EmfException;
 
@@ -56,48 +59,28 @@ public interface FastService extends EMFService {
 
     public FastNonPointDataset getFastNonPointDataset(int fastNonPointDatasetId) throws EmfException;
 
-    public int addFastNonPointDataset(FastNonPointDataset fastNonPointDataset) throws EmfException;
+    public int getFastNonPointDatasetCount() throws EmfException;
 
-    public int addFastNonPointDataset(String newInventoryDatasetName, String baseNonPointDatasetName, 
-            int baseNonPointDatasetVersion, String griddedSMKDatasetName, 
-            int griddedSMKDatasetVersion, String invTableDatasetName, 
-            int invTableDatasetVersion, String gridName, 
-            String userName) throws EmfException;
-    
+    public int addFastNonPointDataset(FastNonPointDataset fastNonPointDataset, User user) throws EmfException;
+
+    // public int addFastNonPointDataset(String newInventoryDatasetName, String baseNonPointDatasetName,
+    // int baseNonPointDatasetVersion, String griddedSMKDatasetName,
+    // int griddedSMKDatasetVersion, String invTableDatasetName,
+    // int invTableDatasetVersion, String gridName,
+    // String userName) throws EmfException;
+
     public void removeFastNonPointDataset(int fastNonPointDatasetId, User user) throws EmfException;
 
     public Grid[] getGrids() throws EmfException;
 
     public Grid getGrid(String name) throws EmfException;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     FastAnalysis[] getFastAnalyses() throws EmfException;
-    
+
     FastAnalysisOutput[] getFastAnalysisOutputs(int fastAnalysisId) throws EmfException;
-    
+
     int addFastAnalysis(FastAnalysis fastAnalysis) throws EmfException;
-    
+
     void removeFastAnalyses(int[] ids, User user) throws EmfException;
 
     FastAnalysis obtainLockedFastAnalysis(User owner, int id) throws EmfException;
@@ -105,13 +88,13 @@ public interface FastService extends EMFService {
     void releaseLockedFastAnalysis(User user, int id) throws EmfException;
 
     FastAnalysis updateFastAnalysis(FastAnalysis fastRun) throws EmfException;
-    
+
     FastAnalysis updateFastAnalysisWithLock(FastAnalysis fastRun) throws EmfException;
-    
+
     void runFastAnalysis(User user, int fastAnalysisId) throws EmfException;
 
     List<FastAnalysis> getFastAnalysesByRunStatus(String runStatus) throws EmfException;
-    
+
     void stopFastAnalysis(int fastAnalysisId) throws EmfException;
 
     int copyFastAnalysis(int id, User creator) throws EmfException;
@@ -119,17 +102,17 @@ public interface FastService extends EMFService {
     FastAnalysis getFastAnalysis(int fastAnalysisId) throws EmfException;
 
     void setFastAnalysisRunStatusAndCompletionDate(int id, String runStatus, Date completionDate) throws EmfException;
-    //StrategyType[] getEquaitonTypes();
-    
+
+    // StrategyType[] getEquaitonTypes();
+
     Long getFastAnalysisRunningCount() throws EmfException;
 
     public String getFastAnalysisStatus(int id) throws EmfException;
 
-    
     FastAnalysisOutputType[] getFastAnalysisOutputTypes() throws EmfException;
 
     FastAnalysisOutputType getFastAnalysisOutputType(String name) throws EmfException;
-    
+
     FastRunOutputType[] getFastRunOutputTypes() throws EmfException;
 
     FastRunOutputType getFastRunOutputType(String name) throws EmfException;

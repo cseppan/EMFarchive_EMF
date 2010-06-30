@@ -18,6 +18,9 @@ import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerPr
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerView;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerPresenter;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerView;
+import gov.epa.emissions.framework.client.fast.MPSDTManagerPresenter;
+import gov.epa.emissions.framework.client.fast.MPSDTManagerPresenterImpl;
+import gov.epa.emissions.framework.client.fast.MPSDTManagerView;
 import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerPresenter;
 import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerPresenterImpl;
 import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerView;
@@ -61,25 +64,31 @@ public class ManageMenuPresenter {
     public void doDisplayCases(CaseManagerView view) {
         new CaseManagerPresenterImpl(session, view).display();
     }
-    
+
     public void doDisplayControlMeasuresManager(ControlMeasuresManagerView view) throws EmfException {
         ControlMeasuresManagerPresenter presenter = new ControlMeasuresManagerPresenter(session);
         presenter.doDisplay(view);
     }
 
     public void doDisplayControlStrategies(ControlStrategyManagerView view) throws EmfException {
-        ControlStrategiesManagerPresenter presenter = new ControlStrategiesManagerPresenterImpl(session,view);
+        ControlStrategiesManagerPresenter presenter = new ControlStrategiesManagerPresenterImpl(session, view);
         presenter.display();
     }
 
     public void doDisplayControlPrograms(ControlProgramManagerView view) throws EmfException {
-        ControlProgramManagerPresenter presenter = new ControlProgramManagerPresenter(session,view);
+        ControlProgramManagerPresenter presenter = new ControlProgramManagerPresenter(session, view);
         presenter.display();
     }
     
     public void doDisplaySectorScenarios(SectorScenarioManagerView view) throws EmfException {
         SectorScenarioManagerPresenter presenter = new SectorScenarioManagerPresenterImpl(session,view);
         presenter.display();
+    }
+
+    public void doDisplayFast(MPSDTManagerView view) throws EmfException {
+
+        MPSDTManagerPresenter presenter = new MPSDTManagerPresenterImpl(this.session, view);
+        presenter.doDisplay();
     }
 
 }

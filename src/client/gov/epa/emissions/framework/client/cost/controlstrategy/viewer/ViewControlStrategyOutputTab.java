@@ -229,10 +229,6 @@ public class ViewControlStrategyOutputTab extends EmfPanel implements ViewContro
 
     protected void doCustomize() {
 
-        if (true) {
-            throw new RuntimeException();
-        }
-
         // StrategySummarySelectionView view = new StrategySummarySelectionDialog(parentConsole);
         // StrategySummarySelectionPresenter presenter = new StrategySummarySelectionPresenter(view, session);
         // try {

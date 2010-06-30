@@ -1,0 +1,138 @@
+package gov.epa.emissions.framework.client.fast.run.edit;
+
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.fast.run.FastRunManagerPresenter;
+import gov.epa.emissions.framework.client.fast.run.FastRunPresenter;
+import gov.epa.emissions.framework.client.fast.run.FastRunView;
+import gov.epa.emissions.framework.client.fast.run.tabs.FastRunTabPresenter;
+import gov.epa.emissions.framework.client.fast.run.tabs.FastRunTabPresenterImpl;
+import gov.epa.emissions.framework.client.fast.run.tabs.FastRunTabView;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.fast.FastRun;
+import gov.epa.emissions.framework.services.fast.FastService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class FastRunEditorPresenterImpl implements FastRunPresenter {
+
+    private EmfSession session;
+
+    private FastRunView view;
+
+    private FastRun run;
+
+    private int id;
+
+    private List<FastRunTabPresenter> presenters;
+
+    // private boolean inputsLoaded = false;
+
+    private boolean hasResults = false;
+
+    // private FastManagerPresenter fastManagerPresenter;
+
+    public FastRunEditorPresenterImpl(int id, EmfSession session, FastRunView view,
+            FastRunManagerPresenter fastManagerPresenter) {
+
+        this(id, session, view);
+        // this.fastManagerPresenter = fastManagerPresenter;
+    }
+
+    public FastRunEditorPresenterImpl(int id, EmfSession session, FastRunView view) {
+
+        this.id = id;
+        this.session = session;
+        this.view = view;
+        this.presenters = new ArrayList<FastRunTabPresenter>();
+    }
+
+    public void doDisplay() throws EmfException {
+
+        this.view.observe(this);
+
+        this.run = this.getService().obtainLockedFastRun(this.session.user(), this.id);
+
+        if (!this.run.isLocked(this.session.user())) {
+            this.view.notifyLockFailure(this.run);
+        } else {
+            this.view.display(this.run);
+        }
+    }
+
+    public void doCreate() {
+
+        view.observe(this);
+        view.display(this.run);
+    }
+
+    public FastRun getRun(int id) throws EmfException {
+        return this.getService().getFastRun(id);
+    }
+
+    public void doClose() throws EmfException {
+
+        /*
+         * only release if its an existing fast run
+         */
+        if (this.run.getId() != 0) {
+            this.getService().releaseLockedFastRun(this.session.user(), this.run.getId());
+        }
+
+        this.closeView();
+    }
+
+    private void closeView() {
+        this.view.disposeView();
+    }
+
+    public void doSave() throws EmfException {
+
+        this.saveTabs();
+        this.run = getService().updateFastRunWithLock(this.run);
+    }
+
+    protected void saveTabs() throws EmfException {
+
+        for (FastRunTabPresenter presenter : this.presenters) {
+            presenter.doSave(this.run);
+        }
+    }
+
+    private FastService getService() {
+        return this.session.fastService();
+    }
+
+    public void addTab(FastRunTabView view) {
+
+        FastRunTabPresenter tabPresenter = new FastRunTabPresenterImpl(view);
+        tabPresenter.doDisplay();
+        this.presenters.add(tabPresenter);
+    }
+
+    public void fireTracking() {
+        view.signalChanges();
+    }
+
+    public boolean hasResults() {
+        return this.hasResults;
+    }
+
+    public DatasetType getDatasetType(String name) throws EmfException {
+        return session.dataCommonsService().getDatasetType(name);
+    }
+
+    public Version[] getVersions(EmfDataset dataset) throws EmfException {
+
+        Version[] versions = new Version[0];
+
+        if (dataset != null) {
+            versions = this.session.dataEditorService().getVersions(dataset.getId());
+        }
+
+        return versions;
+    }
+}

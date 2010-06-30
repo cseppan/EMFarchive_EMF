@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.fast;
 
-import gov.epa.emissions.commons.data.Lockable;
-import gov.epa.emissions.commons.data.Mutex;
+import gov.epa.emissions.commons.data.LockableImpl;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -9,37 +8,52 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import java.io.Serializable;
 import java.util.Date;
 
-public class FastRun implements Lockable, Serializable {
+public class FastRun extends LockableImpl implements Serializable {
 
     private int id;
+
     private String name;
+
     private String description = "";
+
     private String abbreviation;
+
     private Grid grid;
+
     private String runStatus;
+
     private User creator;
+
     private Date lastModifiedDate;
+
     private Date startDate;
+
     private Date completionDate;
-    private Mutex lock;
+
     private String copiedFrom;
+
     private EmfDataset invTableDataset;
+
     private Integer invTableDatasetVersion;
+
     private EmfDataset speciesMapppingDataset;
+
     private Integer speciesMapppingDatasetVersion;
+
     private EmfDataset transferCoefficientsDataset;
+
     private Integer transferCoefficientsDatasetVersion;
     private EmfDataset cancerRiskDataset;
     private Integer cancerRiskDatasetVersion;
     private EmfDataset domainPopulationDataset;
     private Integer domainPopulationDatasetVersion;
     private FastRunInventory[] inventories = new FastRunInventory[] {};
+
     private Sector[] outputSectors = new Sector[] {};
 
     public FastRun() {
-        this.lock = new Mutex();
     }
-    
+
     public FastRun(String name) {
         this();
         this.name = name;
@@ -184,34 +198,6 @@ public class FastRun implements Lockable, Serializable {
 
     public void setTransferCoefficientsDataset(EmfDataset transferCoefficientsDataset) {
         this.transferCoefficientsDataset = transferCoefficientsDataset;
-    }
-
-    public Date getLockDate() {
-        return lock.getLockDate();
-    }
-
-    public void setLockDate(Date lockDate) {
-        lock.setLockDate(lockDate);
-    }
-
-    public String getLockOwner() {
-        return lock.getLockOwner();
-    }
-
-    public void setLockOwner(String owner) {
-        lock.setLockOwner(owner);
-    }
-
-    public boolean isLocked(String owner) {
-        return lock.isLocked(owner);
-    }
-
-    public boolean isLocked(User owner) {
-        return lock.isLocked(owner);
-    }
-
-    public boolean isLocked() {
-        return lock.isLocked();
     }
 
     public FastRunInventory[] getInventories() {

@@ -157,10 +157,6 @@ public class DataSortFilterPanel extends JPanel {
 
     private void doApplyFormat(final TablePresenter presenter) {
 
-        if (false) {
-            throw new RuntimeException("asdfas asdfasd");
-        }
-
         messagePanel.clear();
 
         try {

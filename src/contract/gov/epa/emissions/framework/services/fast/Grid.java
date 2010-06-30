@@ -20,6 +20,40 @@ public class Grid implements Serializable, Comparable<Grid> {
     
     private int ncols, nrows, nthik;
     
+    /*
+     * Default constructor needed for hibernate and axis serialization
+     */
+    public Grid() {
+        //
+    }
+
+    public Grid(String name) {
+        this();
+        this.name = name;
+    }
+    
+    public Grid(String name, String desc) {
+        this();
+        this.name = name;
+        this.description = desc;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getResolution() {
         return resolution;
     }
@@ -114,40 +148,6 @@ public class Grid implements Serializable, Comparable<Grid> {
 
     public void setNthik(int nthik) {
         this.nthik = nthik;
-    }
-
-    /*
-     * Default constructor needed for hibernate and axis serialization
-     */
-    public Grid() {
-        //
-    }
-
-    public Grid(String name) {
-        this();
-        this.name = name;
-    }
-    
-    public Grid(String name, String desc) {
-        this();
-        this.name = name;
-        this.description = desc;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public boolean equals(Object other) {

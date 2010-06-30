@@ -742,7 +742,7 @@ public class FastRunTask {
             System.out.println("time to populate fast_emis_by_cmaq_inventory_poll dataset = " + (System.currentTimeMillis() - timing));
             creator.updateVersionZeroRecordCount(griddedSectorSCCPollDataset);
         } catch (SQLException e) {
-            throw new EmfException("Could not execute query \n" + e.getMessage());
+            throw new EmfException("Could not execute query \n" + e.getMessage(), e);
         } finally {
             if (statement != null) {
                 try {

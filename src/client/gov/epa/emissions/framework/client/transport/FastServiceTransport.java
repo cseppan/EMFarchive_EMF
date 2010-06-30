@@ -237,6 +237,16 @@ public class FastServiceTransport implements FastService {
         return (FastDataset) call.requestResponse(new Object[] { new Integer(fastDatasetId) });
     }
 
+    public int getFastDatasetCount() throws EmfException {
+
+        EmfCall call = call();
+
+        call.setOperation("getFastDatasetCount");
+        call.setIntegerReturnType();
+
+        return (Integer) call.requestResponse(new Object[] {});
+    }
+
     public synchronized int addFastDataset(FastDataset fastDataset) throws EmfException {
         EmfCall call = call();
 
@@ -277,14 +287,26 @@ public class FastServiceTransport implements FastService {
         return (FastNonPointDataset) call.requestResponse(new Object[] { new Integer(fastNonPointDatasetId) });
     }
 
-    public synchronized int addFastNonPointDataset(FastNonPointDataset fastNonPointDataset) throws EmfException {
+    public int getFastNonPointDatasetCount() throws EmfException {
+
+        EmfCall call = call();
+
+        call.setOperation("getFastNonPointDatasetCount");
+        call.setIntegerReturnType();
+
+        return (Integer) call.requestResponse(new Object[] {});
+    }
+
+    public int addFastNonPointDataset(FastNonPointDataset fastNonPointDataset, User user) throws EmfException {
+
         EmfCall call = call();
 
         call.setOperation("addFastNonPointDataset");
         call.addParam("fastNonPointDataset", mappings.fastNonPointDataset());
+        call.addParam("user", mappings.user());
         call.setIntegerReturnType();
 
-        return (Integer) call.requestResponse(new Object[] { fastNonPointDataset });
+        return (Integer) call.requestResponse(new Object[] { fastNonPointDataset, user });
     }
 
     public synchronized void removeFastNonPointDataset(int fastNonPointDatasetId, User user) throws EmfException {
@@ -535,28 +557,5 @@ public class FastServiceTransport implements FastService {
         call.setReturnType(mappings.fastRunOutputTypes());
 
         return (FastRunOutputType[]) call.requestResponse(new Object[] {  });
-    }
-
-    public int addFastNonPointDataset(String newInventoryDatasetName, String baseNonPointDatasetName,
-            int baseNonPointDatasetVersion, String griddedSMKDatasetName, int griddedSMKDatasetVersion,
-            String invTableDatasetName, int invTableDatasetVersion, String gridName, String userName) throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("addFastNonPointDataset");
-        call.addStringParam("newInventoryDatasetName");
-        call.addStringParam("baseNonPointDatasetName");
-        call.addIntegerParam("baseNonPointDatasetVersion");
-        call.addStringParam("griddedSMKDatasetName");
-        call.addIntegerParam("griddedSMKDatasetVersion");
-        call.addStringParam("invTableDatasetName");
-        call.addIntegerParam("invTableDatasetVersion");
-        call.addStringParam("gridName");
-        call.addStringParam("userName");
-        call.setIntegerReturnType();
-
-        return (Integer) call.requestResponse(new Object[] { newInventoryDatasetName, baseNonPointDatasetName,
-                new Integer(baseNonPointDatasetVersion), griddedSMKDatasetName, new Integer(griddedSMKDatasetVersion),
-                invTableDatasetName, new Integer(invTableDatasetVersion),
-                gridName, userName});
     }
 }
