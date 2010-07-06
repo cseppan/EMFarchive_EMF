@@ -145,11 +145,20 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         sector.setPreferredSize(preferredSize);
         layoutGenerator.addLabelWidgetPair("Sector:", sector, panel);
 
+        final DatasetType inputDSType = input.getDatasetType();
         dsType = new ComboBox(presenter.getDSTypes());
         addPopupMenuListener(dsType, "dstypes");
-        dsType.setSelectedItem(input.getDatasetType());
+        dsType.setSelectedItem(inputDSType);
         dsType.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
+                DatasetType selectedType = (DatasetType) dsType.getSelectedItem();
+                
+                if (subDir != null && selectedType != null && selectedType.isExternal()) {
+                    subDir.setSelectedItem(null);
+                    subDir.setEnabled(false);
+                } else if (subDir != null)
+                    subDir.setEnabled(true);
+                
                 dataset.setText("");
                 fillVersions(null);
             }
@@ -179,7 +188,14 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         layoutGenerator.addLabelWidgetPair("QA Status:", qaStatus, panel);
 
         subDir = new EditableComboBox(presenter.getSubdirs(modelToRunId));
-        subDir.setSelectedItem(input.getSubdirObj());
+        
+        if (inputDSType != null && inputDSType.isExternal()) {
+            subDir.setSelectedItem(null);
+            subDir.setEnabled(false);
+        } else {
+            subDir.setSelectedItem(input.getSubdirObj());
+        }
+        
         addPopupMenuListener(subDir, "subdirs");
         changeablesList.addChangeable(subDir);
         subDir.setPreferredSize(preferredSize);
@@ -397,7 +413,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
     private void updateSubdir() throws EmfException {
         Object selected = subDir.getSelectedItem();
-        if (selected == null) {
+        DatasetType inputDSType = (DatasetType) dsType.getSelectedItem();
+        
+        if (selected == null || (inputDSType != null && inputDSType.isExternal())) {
             input.setSubdirObj(null);
             return;
         }

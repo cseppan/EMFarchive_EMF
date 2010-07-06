@@ -71,7 +71,9 @@ public class InputsRowSource implements RowSource {
     }
 
     private String getSubDir(CaseInput input) {
-        return (input.getSubdirObj() == null) ? "" : input.getSubdirObj().toString();
+        return (input.getSubdirObj() == null || 
+                (input.getDatasetType() != null && input.getDatasetType().isExternal())) ? 
+                        "" : input.getSubdirObj().toString();
     }
     
     private String getLastModifiedDate(CaseInput input) {
