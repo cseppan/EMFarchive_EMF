@@ -673,12 +673,14 @@
 	<!--  ===============START EMF-dependent modules ============================== -->
 	<!-- Commons -->
 	<target name="commons.basedir.check">
-		<property name="commons.basedir" value="${basedir}/../Commons" />
+		<property name="commons.basedir" value="${basedir}/../${commons.project.name}" />
+		<echo message="Checking existence of Commons project in '${commons.basedir}'"/>
 		<available file="${commons.basedir}" property="commons.basedir.present" />
 	</target>
 
 	<target name="commons-dist-warning" depends="commons.basedir.check" unless="commons.basedir.present">
-		<echo message="You need to checkout Commons module from CVS in the same parent folder as EMF before attempting to build Commons" />
+		<property name="parent.basedir" value="${basedir}/.." />
+		<echo message="You need to checkout Commons module from CVS into ${commons.basedir} before attempting to build the Commons codebase" />
 	</target>
 
 	<target name="commons-dist" depends="commons.basedir.check, commons-dist-warning" if="commons.basedir.present">
@@ -690,12 +692,14 @@
 
 	<!-- Analysis Engine -->
 	<target name="analysisengine.basedir.check">
-		<property name="analysisengine.basedir" value="${basedir}/../AnalysisEngine" />
+		<property name="analysisengine.basedir" value="${basedir}/../${analysisengine.project.name}" />
+		<echo message="Checking existence of AnalysisEngine project in '${analysisengine.basedir}'"/>
 		<available file="${analysisengine.basedir}" property="analysisengine.basedir.present" />
 	</target>
 
 	<target name="analysisengine-dist-warning" depends="analysisengine.basedir.check" unless="analysisengine.basedir.present">
-		<echo message="You need to checkout AnalysisEngine module from CVS in the same parent folder as EMF before attempting to build AnalysisEngine" />
+		<property name="parent.basedir" value="${basedir}/.." />
+		<echo message="You need to checkout the AnalysisEngine module from CVS into ${analysisengine.basedir} before attempting to build the AnalysisEngine codebase" />
 	</target>
 
 	<target name="analysisengine-dist" depends="analysisengine.basedir.check, analysisengine-dist-warning" if="analysisengine.basedir.present">

@@ -23,3 +23,7 @@ tomcat.memory.vmargs=-Xms128M -Xmx512M
 tomcat.server=localhost
 tomcat.manager.username=admin
 tomcat.manager.password=admin
+
+# Project Names
+commons.project.name=Commons
+analysisengine.project.name=AnalysisEngine
