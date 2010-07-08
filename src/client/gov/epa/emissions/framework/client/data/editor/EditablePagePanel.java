@@ -101,31 +101,31 @@ public class EditablePagePanel extends JPanel {
         String insertAbove = "/toolbarButtonGraphics/table/RowInsertBefore" + 24 + ".gif";
         ImageIcon iconAbove = createImageIcon(insertAbove);
         String nameAbove = "Insert Above";
-        JButton buttonAbove = toolbar.add(insertRowAction(tableData, true, nameAbove, iconAbove));
+        JButton buttonAbove = toolbar.add(insertRowAction(true, nameAbove, iconAbove));
         buttonAbove.setToolTipText(nameAbove);
 
         String insertBelow = "/toolbarButtonGraphics/table/RowInsertAfter" + 24 + ".gif";
         ImageIcon iconBelow = createImageIcon(insertBelow);
         String nameBelow = "Insert Below";
-        JButton buttonBelow = toolbar.add(insertRowAction(tableData, false, nameBelow, iconBelow));
+        JButton buttonBelow = toolbar.add(insertRowAction(false, nameBelow, iconBelow));
         buttonBelow.setToolTipText(nameBelow);
 
         String delete = "/toolbarButtonGraphics/table/RowDelete" + 24 + ".gif";
         ImageIcon iconDelete = createImageIcon(delete);
         String nameDelete = "Delete";
-        JButton buttonDelete = toolbar.add(deleteAction(tableData, nameDelete, iconDelete));
+        JButton buttonDelete = toolbar.add(deleteAction(nameDelete, iconDelete));
         buttonDelete.setToolTipText(nameDelete);
 
         String selectAll = "/selectAll.jpeg";
         ImageIcon iconSelectAll = createImageIcon(selectAll);
         String nameSelectAll = "Select All";
-        JButton buttonSelectAll = toolbar.add(selectAction(true, tableData, nameSelectAll, iconSelectAll));
+        JButton buttonSelectAll = toolbar.add(selectAction(true,nameSelectAll, iconSelectAll));
         buttonSelectAll.setToolTipText(nameSelectAll);
 
         String clearAll = "/clearAll.jpeg";
         ImageIcon iconClearAll = createImageIcon(clearAll);
         String nameClearAll = "Clear All";
-        JButton buttonClearAll = toolbar.add(selectAction(false, tableData, nameClearAll, iconClearAll));
+        JButton buttonClearAll = toolbar.add(selectAction(false,nameClearAll, iconClearAll));
         buttonClearAll.setToolTipText(nameClearAll);
 
         String replace = "/toolbarButtonGraphics/general/Replace24.gif";
@@ -173,12 +173,12 @@ public class EditablePagePanel extends JPanel {
         clipBoardCopy.registerCopyKeyStroke();
     }
 
-    private AbstractAction deleteAction(final EditablePage tableData, String nameDelete, ImageIcon iconDelete) {
+    private AbstractAction deleteAction(String nameDelete, ImageIcon iconDelete) {
         return new AbstractAction(nameDelete, iconDelete) {
             public void actionPerformed(ActionEvent e) {
                 try {
                     messagePanel.clear();
-                    doRemove(tableData);
+                    doRemove();
                 } catch (Exception e1) {
                     e1.printStackTrace();
                     messagePanel.setError(e1.getMessage());
@@ -187,15 +187,15 @@ public class EditablePagePanel extends JPanel {
         };
     }
 
-    private Action insertRowAction(final EditablePage tableData, final boolean above, String name, ImageIcon icon) {
+    private Action insertRowAction(final boolean above, String name, ImageIcon icon) {
         return new AbstractAction(name, icon) {
             public void actionPerformed(ActionEvent e) {
-                doAdd(tableData, editableTable, above);
+                doAdd(editableTable, above);
             }
         };
     }
 
-    private Action selectAction(final boolean select, final EditablePage tableData, String name, ImageIcon icon) {
+    private Action selectAction(final boolean select, String name, ImageIcon icon) {
         return new AbstractAction(name, icon) {
             public void actionPerformed(ActionEvent e) {
                 messagePanel.clear();
@@ -240,7 +240,7 @@ public class EditablePagePanel extends JPanel {
         setupLayout();
     }
 
-    private void doAdd(final EditablePage tableData, DataEditorTable editableTable, boolean above) {
+    private void doAdd(DataEditorTable editableTable, boolean above) {
         int selectedRow = editableTable.getSelectedRow();
         messagePanel.clear();
         if (selectedRow != -1 || editableTable.getRowCount() == 0) {
@@ -250,6 +250,7 @@ public class EditablePagePanel extends JPanel {
             editableTable.setRowSelectionInterval(insertRowNo, insertRowNo);
         } else {
             messagePanel.setError("Please highlight a row before clicking the insert button");
+            return; 
         }
 
         this.observer.update(1);
@@ -262,7 +263,7 @@ public class EditablePagePanel extends JPanel {
         return (above) ? selectedRow : selectedRow + 1;
     }
 
-    private void doRemove(final EditablePage tableData) throws EmfException {
+    private void doRemove() throws EmfException {
         clearMessagesWithTableRefresh();
 
         int selected = tableData.getSelected().length;
@@ -287,8 +288,9 @@ public class EditablePagePanel extends JPanel {
 
         if (regularDel == JOptionPane.YES_OPTION) {
             tableData.removeSelected();
-            int numOfDeltd = tableData.changeset().getDeletedRecords().length;
-            this.observer.update(-numOfDeltd);
+            //int numOfDeltd = tableData.changeset().getDeletedRecords().length;
+            //System.out.print("deleted record is " + numOfDeltd);
+            this.observer.update(-selected);
             refresh();
         }
     }
