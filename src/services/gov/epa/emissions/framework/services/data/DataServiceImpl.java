@@ -853,7 +853,7 @@ public class DataServiceImpl implements DataService {
             copied.setName(getUniqueNewName("Copy of " + dataset.getName() + "_v" + version.getVersion()));
             copied.setStatus(dataset.getStatus());
             copied.setDescription("#Copied from version " + version.getVersion() + " of dataset " + dataset.getName()
-                    + " on " + time + System.getProperty("line.separator") + dataset.getDescription());
+                    + " on " + time + System.getProperty("line.separator") + (dataset.getDescription()==null? "":dataset.getDescription()));
             copied.setCreator(user.getUsername());
             copied.setCreatorFullName(user.getName());
             copied.setDefaultVersion(0);
@@ -882,6 +882,7 @@ public class DataServiceImpl implements DataService {
             defaultVersion.setNumberRecords(version.getNumberRecords());
             defaultVersion.setFinalVersion(true);
             defaultVersion.setDescription("");
+            session.clear();
             dao.add(defaultVersion, session);
         } catch (Exception e) {
             String error = "Error copying dataset...";
