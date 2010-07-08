@@ -98,4 +98,16 @@ INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) VALU
   AXIS["x", EAST], 
   AXIS["y", NORTH]]', '+proj=lcc +a=6370000.0 +b=6370000.0 +lat_1=33 +lat_2=45 +lat_0=40.0 +lon_0=-97.0');
 INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) VALUES (104308, 'WRF', 104308, NULL, '+proj=latlong +a=6370000.0 +b=6370000.0');
+
+-- DS Type that was missed
+
+-- FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission
+INSERT INTO dataset_types (name, description, min_files, max_files, external, default_sortorder, importer_classname, exporter_classname, lock_owner, lock_date, table_per_dataset, creation_date, last_mod_date, creator, file_format) VALUES ('FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission', 'FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission', 1, 1, false, '', 'gov.epa.emissions.commons.io.other.SMKReportImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter', NULL, NULL, 1, NULL, NULL, NULL, NULL);
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
+select dt.id as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = dt.id) as list_index,
+  (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
+  'varchar(64)|varchar(64)|varchar(64)|int4|int4|float8(17)|float8(17)|varchar(64)' as "value", 'COLUMN_TYPES' as kwname
+from emf.dataset_types dt
+where "name" = 'FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission';
   
