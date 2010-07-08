@@ -288,8 +288,6 @@ public class EditablePagePanel extends JPanel {
 
         if (regularDel == JOptionPane.YES_OPTION) {
             tableData.removeSelected();
-            //int numOfDeltd = tableData.changeset().getDeletedRecords().length;
-            //System.out.print("deleted record is " + numOfDeltd);
             this.observer.update(-selected);
             refresh();
         }
