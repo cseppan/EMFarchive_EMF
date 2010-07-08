@@ -785,19 +785,21 @@ public class DataServiceImpl implements DataService {
             int vNum = version.getVersion();
 
             String whereClause = " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")"
-                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") + " AND version <> " + vNum;
+                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
+                    + " AND dataset_id = " + version.getDatasetId() + " AND version <> " + vNum;
 
             String selectQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols) + " FROM "
                     + table + whereClause;
 
             String selectCurVerQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols)
                     + " FROM " + table + " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")"
-                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") + " AND version = " + vNum;
+                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
+                    + " AND dataset_id = " + version.getDatasetId() + " AND version = " + vNum;
 
             String insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")" + selectQuery;
 
             String updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith + "' WHERE " + col + "='"
-                    + find + "' AND version=" + vNum;
+                    + find + "' AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ;
 
             String updateDelVersions = "UPDATE " + table + " SET delete_versions = coalesce(delete_versions,'')||',"
                     + vNum + "'" + whereClause;
