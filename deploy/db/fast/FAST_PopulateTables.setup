@@ -99,6 +99,7 @@ INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) VALU
   AXIS["y", NORTH]]', '+proj=lcc +a=6370000.0 +b=6370000.0 +lat_1=33 +lat_2=45 +lat_0=40.0 +lon_0=-97.0');
 INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) VALUES (104308, 'WRF', 104308, NULL, '+proj=latlong +a=6370000.0 +b=6370000.0');
 
+-- 7/8/2010
 -- DS Type that was missed
 
 -- FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission
@@ -110,4 +111,36 @@ select dt.id as dataset_type_id,
   'varchar(64)|varchar(64)|varchar(64)|int4|int4|float8(17)|float8(17)|varchar(64)' as "value", 'COLUMN_TYPES' as kwname
 from emf.dataset_types dt
 where "name" = 'FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission';
+
+
+-- 7/9/2010 -- new table
+
+-- Table: fast.fast_analysis_runs
+CREATE TABLE fast.fast_analysis_runs
+(
+  id serial NOT NULL,
+  list_index integer NOT NULL,
+  fast_analysis_id integer NOT NULL,
+  fast_run_id integer NOT NULL,
+  adjustment_factor double precision NOT NULL DEFAULT 1.0,
+  grid_id integer NOT NULL,
+  baseline_sensitivity character(1) NOT NULL DEFAULT 'B'::bpchar,
+  CONSTRAINT fast_analysis_runs_pkey PRIMARY KEY (id),
+  CONSTRAINT fast_analysis_runs_fast_analysis_id_fkey FOREIGN KEY (fast_analysis_id)
+      REFERENCES fast.fast_analyses (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_fast_analysis_id_fkey1 FOREIGN KEY (fast_analysis_id, grid_id)
+      REFERENCES fast.fast_analyses (id, grid_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_fast_run_id_fkey FOREIGN KEY (fast_run_id)
+      REFERENCES fast.fast_runs (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_fast_run_id_fkey1 FOREIGN KEY (fast_run_id, grid_id)
+      REFERENCES fast.fast_runs (id, grid_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_grid_id_fkey FOREIGN KEY (grid_id)
+      REFERENCES fast.grids (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
   
