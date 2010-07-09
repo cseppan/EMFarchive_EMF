@@ -29,7 +29,7 @@ public class FastAnalysisInputSector implements Serializable {
     }
 
     public int hashCode() {
-        return "".hashCode();
+        return (this.fastRunId + "_" + this.gridId + "_" + this.sector.getId()).hashCode();
     }
 
     public Sector getSector() {

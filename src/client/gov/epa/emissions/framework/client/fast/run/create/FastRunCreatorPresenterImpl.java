@@ -80,6 +80,27 @@ public class FastRunCreatorPresenterImpl implements FastRunPresenter {
         this.closeView();
     }
 
+    public void doRun() throws EmfException {
+        
+        this.doSave();
+        this.getService().runFastRun(this.session.user(), this.run.getId());
+    }
+
+    public void doRefresh() throws EmfException {
+        this.refreshTabs();
+    }
+
+    protected void refreshTabs() {
+
+        if (false) {
+            throw new RuntimeException("asdf asdfasdf asdfasdf a");
+        }
+
+        for (FastRunTabPresenter presenter : this.presenters) {
+            presenter.doRefresh(this.run);
+        }
+    }
+
     private void closeView() {
         this.view.disposeView();
     }

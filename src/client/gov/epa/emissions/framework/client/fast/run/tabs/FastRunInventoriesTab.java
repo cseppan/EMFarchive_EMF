@@ -39,7 +39,7 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
             ManageChangeables changeablesList, EmfConsole parentConsole, FastRunPresenter presenter) {
 
         super(run, session, messagePanel, changeablesList, parentConsole, presenter);
-        this.setName("inputs");
+        this.setName("Inventories");
     }
 
     public void display() {
@@ -56,8 +56,27 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
          */
     }
 
-    public void save(FastRun run) {
+    public void save(FastRun run) throws EmfException {
+
+        if (false) {
+            throw new RuntimeException("asdf asdf asdfasd asd fasd");
+        }
+        
         this.clearMessage();
+
+        validateFields();
+
+        run.setInventories(this.getRun().getInventories());
+    }
+
+    private void validateFields() throws EmfException {
+
+        this.clearMessage();
+
+        FastRunInventory[] inventories = this.getRun().getInventories();
+        if (inventories == null || inventories.length == 0) {
+            throw new EmfException(this.getName() + " tab: At least one Fast run inventory must be specified");
+        }
     }
 
     @Override

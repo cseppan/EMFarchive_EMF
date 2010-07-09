@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.fast.run;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -30,6 +31,7 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
@@ -44,6 +46,8 @@ public abstract class AbstractFastRunWindow extends DisposableInteralFrame imple
     private EmfConsole parentConsole;
 
     private Button saveButton;
+
+    private RunButton runButton;
 
     public AbstractFastRunWindow(String title, DesktopManager desktopManager, EmfSession session,
             EmfConsole parentConsole) {
@@ -157,11 +161,62 @@ public abstract class AbstractFastRunWindow extends DisposableInteralFrame imple
         container.add(closeButton);
         getRootPane().setDefaultButton(saveButton);
 
+        runButton = new RunButton("Execute", this.runAction());
+        container.add(runButton);
+
+        Button refreshButton = new Button("Refresh", refreshAction());
+        container.add(refreshButton);
+
         container.add(Box.createHorizontalStrut(20));
 
         panel.add(container, BorderLayout.CENTER);
 
         return panel;
+    }
+
+    protected Action refreshAction() {
+        Action action = new AbstractFastAction(this.getMessagePanel(), "Error refreshing Fast run") {
+
+            @Override
+            protected void doActionPerformed(ActionEvent e) throws EmfException {
+                doRefreshRun();
+            }
+        };
+
+        return action;
+    }
+
+    private void doRefreshRun() throws EmfException {
+        presenter.doRefresh();
+    }
+
+    protected Action runAction() {
+        Action action = new AbstractFastAction(this.getMessagePanel(), "Error executing Fast run") {
+
+            @Override
+            protected void doActionPerformed(ActionEvent e) throws EmfException {
+                doExecuteRun();
+            }
+        };
+
+        return action;
+    }
+
+    private void doExecuteRun() throws EmfException {
+
+        this.clearMessage();
+
+        String message = "Are you sure you want to execute the Fast run?";
+
+        int selection = JOptionPane.showConfirmDialog(this, message, "Warning", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.YES_OPTION) {
+
+            presenter.doRun();
+            this
+                    .showMessage("Executing Fast run. Monitor the status window for progress, and refresh this window after completion to see results");
+        }
     }
 
     protected Action closeAction() {

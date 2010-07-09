@@ -113,7 +113,7 @@ public class FastDAO {
     }
 
     // return FastRuns orderby name
-    public List getFastRuns(Session session) {
+    public List<FastRun> getFastRuns(Session session) {
         return hibernateFacade.getAll(FastRun.class, Order.asc("name"), session);
     }
 

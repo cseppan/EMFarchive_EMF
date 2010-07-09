@@ -14,12 +14,16 @@ public interface FastRunPresenter {
 
     void doSave() throws EmfException;
 
+    void doRun() throws EmfException;
+
+    void doRefresh() throws EmfException;
+
     void addTab(FastRunTabView view) throws EmfException;
 
     void fireTracking();
 
     boolean hasResults();
-    
+
     DatasetType getDatasetType(String dataset) throws EmfException;
 
     Version[] getVersions(EmfDataset dataset) throws EmfException;

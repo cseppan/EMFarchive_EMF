@@ -229,6 +229,10 @@ public class FastRun extends LockableImpl implements Serializable {
         return name.hashCode();
     }
 
+    public String toString() {
+        return this.name;
+    }
+
     public void setDomainPopulationDatasetVersion(Integer domainPopulationDatasetVersion) {
         this.domainPopulationDatasetVersion = domainPopulationDatasetVersion;
     }

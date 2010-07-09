@@ -33,7 +33,10 @@ import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 @SuppressWarnings("serial")
 public class FastRunConfigurationTab extends AbstractFastRunTab {
@@ -45,6 +48,8 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
     private TextField speciesMappingDatasetField;
 
     private ComboBox speciesMappingDatasetVersionComboBox;
+
+    private JList pollutantList;
 
     private TextField transferCoeffDatasetField;
 
@@ -64,7 +69,7 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
             ManageChangeables changeablesList, EmfConsole parentConsole, FastRunPresenter presenter) {
 
         super(run, session, messagePanel, changeablesList, parentConsole, presenter);
-        this.setName("summary");
+        this.setName("Configuration");
     }
 
     public void display() {
@@ -289,6 +294,32 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
             constraints.gridx = 0;
             constraints.gridy += 1;
             constraints.weightx = 0;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.NORTHWEST;
+            constraints.insets = labelInsets;
+
+            JLabel pollutantsLabel = new JLabel("Pollutant(s):");
+            panel.add(pollutantsLabel, constraints);
+
+            constraints.gridx = 1;
+            constraints.weightx = 0;
+            constraints.weighty = 1;
+            constraints.fill = GridBagConstraints.BOTH;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = valueInsets;
+
+            this.pollutantList = new JList();
+            this.pollutantList.setVisibleRowCount(5);
+            this.pollutantList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+            JScrollPane scrollPane = new JScrollPane(this.pollutantList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            panel.add(scrollPane, constraints);
+
+            constraints.gridx = 0;
+            constraints.gridy += 1;
+            constraints.weightx = 0;
+            constraints.weighty = 0;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.anchor = GridBagConstraints.WEST;
             constraints.insets = labelInsets;
@@ -699,23 +730,23 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
         this.clearMessage();
 
         if (this.invTableDatasetField.getText().trim().length() == 0) {
-            throw new EmfException("Configuration tab: An inventory table dataset must be specified");
+            throw new EmfException(this.getName() + " tab: An inventory table dataset must be specified");
         }
 
         if (this.speciesMappingDatasetField.getText().trim().length() == 0) {
-            throw new EmfException("Configuration tab: A species mapping dataset must be specified");
+            throw new EmfException(this.getName() + " tab: A species mapping dataset must be specified");
         }
 
         if (this.transferCoeffDatasetField.getText().trim().length() == 0) {
-            throw new EmfException("Configuration tab: A transfer coefficient dataset must be specified");
+            throw new EmfException(this.getName() + " tab: A transfer coefficient dataset must be specified");
         }
 
         if (this.domainPopulationDatasetField.getText().trim().length() == 0) {
-            throw new EmfException("Configuration tab: A domain population dataset must be specified");
+            throw new EmfException(this.getName() + " tab: A domain population dataset must be specified");
         }
 
         if (this.cancerRiskDatasetField.getText().trim().length() == 0) {
-            throw new EmfException("Configuration tab: A cancer risk dataset must be specified");
+            throw new EmfException(this.getName() + " tab: A cancer risk dataset must be specified");
         }
     }
 

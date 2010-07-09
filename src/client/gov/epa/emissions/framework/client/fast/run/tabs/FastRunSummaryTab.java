@@ -51,7 +51,7 @@ public class FastRunSummaryTab extends AbstractFastRunTab {
             ManageChangeables changeablesList, EmfConsole parentConsole, FastRunPresenter presenter) {
 
         super(run, session, messagePanel, changeablesList, parentConsole, presenter);
-        this.setName("summary");
+        this.setName("Summary");
     }
 
     public void display() {
@@ -326,11 +326,11 @@ public class FastRunSummaryTab extends AbstractFastRunTab {
         this.clearMessage();
 
         if (this.nameField.getText().trim().length() == 0) {
-            throw new EmfException("Summary tab: A name must be specified");
+            throw new EmfException(this.getName() + " tab: A name must be specified");
         }
 
         if (this.abbreviationField.getText().trim().length() == 0) {
-            throw new EmfException("Summary tab: An abbreviation must be specified");
+            throw new EmfException(this.getName() + " tab: An abbreviation must be specified");
         }
     }
 

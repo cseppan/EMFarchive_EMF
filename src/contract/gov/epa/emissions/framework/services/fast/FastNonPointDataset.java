@@ -129,6 +129,10 @@ public class FastNonPointDataset implements Serializable {
             + this.quasiPointDataset.getId()).hashCode();
     }
 
+    public String toString() {
+        return this.name;
+    }
+
     public void setFastDataset(FastDataset fastDataset) {
         this.fastDataset = fastDataset;
     }

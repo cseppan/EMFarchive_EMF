@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.fast;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
@@ -75,13 +76,13 @@ public class FastServiceImpl implements FastService {
         return this.executeDaoCommand(new AbstractDaoCommand<FastRun[]>() {
             @Override
             protected void doExecute(Session session) throws Exception {
-                List cs = dao.getFastRuns(session);
-                this.setReturnValue((FastRun[]) cs.toArray(new FastRun[0]));
+                List<FastRun> fastRuns = dao.getFastRuns(session);
+                this.setReturnValue(fastRuns.toArray(new FastRun[0]));
             }
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve all FastRuns.";
+                return "Could not retrieve all Fast runs.";
             }
         });
     }
@@ -96,7 +97,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not add Control Strategy: " + fastRun;
+                return "Could not add Fast run: " + fastRun;
             }
         });
     }
@@ -112,7 +113,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not set Control Strategy run status: " + id;
+                return "Could not set Fast run run status: " + id;
             }
         });
     }
@@ -129,7 +130,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not obtain lock for Control Strategy: id = " + id + " by owner: " + owner.getUsername();
+                return "Could not obtain lock for Fast run with id: " + id + " by owner: " + owner.getUsername();
             }
         });
     }
@@ -160,7 +161,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not release lock for Control Strategy id: " + id;
+                return "Could not release lock for Fast run id: " + id;
             }
         });
     }
@@ -172,7 +173,7 @@ public class FastServiceImpl implements FastService {
             protected void doExecute(Session session) throws Exception {
 
                 if (!dao.canUpdateFastRun(fastRun, session)) {
-                    throw new EmfException("The Control Strategy name is already in use");
+                    throw new EmfException("The Fast run name is already in use");
                 }
 
                 FastRun released = dao.updateFastRun(fastRun, session);
@@ -182,7 +183,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not update Control Strategy: " + fastRun;
+                return "Could not update Fast run: " + fastRun;
             }
         });
     }
@@ -194,17 +195,17 @@ public class FastServiceImpl implements FastService {
             protected void doExecute(Session session) throws Exception {
 
                 if (!dao.canUpdateFastRun(fastRun, session)) {
-                    throw new EmfException("Control Strategy name already in use");
+                    throw new EmfException("Fast run name already in use");
                 }
 
-                FastRun csWithLock = dao.updateFastRunWithLock(fastRun, session);
+                FastRun fastRunWithLock = dao.updateFastRunWithLock(fastRun, session);
 
-                this.setReturnValue(csWithLock);
+                this.setReturnValue(fastRunWithLock);
             }
 
             @Override
             protected String getErrorMessage() {
-                return "Could not update Control Strategy: " + fastRun;
+                return "Could not update Fast run: " + fastRun;
             }
         });
     }
@@ -232,19 +233,20 @@ public class FastServiceImpl implements FastService {
 
                 String exception = "";
                 for (int i = 0; i < ids.length; i++) {
-                    FastRun cs = dao.getFastRun(ids[i], session);
+
+                    FastRun fastRun = dao.getFastRun(ids[i], session);
                     session.clear();
 
                     // check if admin user, then allow it to be removed.
-                    if (user.equals(cs.getCreator()) || user.isAdmin()) {
-                        if (cs.isLocked()) {
-                            exception += "The control strategy, " + cs.getName()
+                    if (user.equals(fastRun.getCreator()) || user.isAdmin()) {
+                        if (fastRun.isLocked()) {
+                            exception += "The Fast run, " + fastRun.getName()
                                     + ", is in edit mode and can not be removed. ";
                         } else {
-                            removeFastRun(cs);
+                            removeFastRun(fastRun);
                         }
                     } else {
-                        exception += "You do not have permission to remove the strategy: " + cs.getName() + ". ";
+                        exception += "You do not have permission to remove the strategy: " + fastRun.getName() + ". ";
                     }
                 }
 
@@ -255,7 +257,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not remove Control Strategy";
+                return "Could not remove all Fast runs";
             }
         });
     }
@@ -266,12 +268,13 @@ public class FastServiceImpl implements FastService {
             @Override
             protected void doExecute(Session session) throws Exception {
 
-                if (!dao.canUpdateFastRun(fastRun, session))
-                    throw new EmfException("Control Strategy name already in use");
+                if (!dao.canUpdateFastRun(fastRun, session)) {
+                    throw new EmfException("Fast run " + fastRun + " already in use");
+                }
 
-                FastRunOutput[] controlStrategyResults = getFastRunOutputs(fastRun.getId());
-                for (int i = 0; i < controlStrategyResults.length; i++) {
-                    dao.remove(controlStrategyResults[i], session);
+                FastRunOutput[] fastRunOutputs = getFastRunOutputs(fastRun.getId());
+                for (int i = 0; i < fastRunOutputs.length; i++) {
+                    dao.remove(fastRunOutputs[i], session);
                 }
 
                 dao.remove(fastRun, session);
@@ -279,7 +282,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not remove control strategy: " + fastRun;
+                return "Could not remove Fast run: " + fastRun;
             }
         });
     }
@@ -385,7 +388,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not get Control Strategies by run status: " + runStatus;
+                return "Could not get Fast runs by run status: " + runStatus;
             }
         });
     }
@@ -400,7 +403,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not get Control Strategies running count";
+                return "Could not get Fast run running count";
             }
         });
     }
@@ -429,25 +432,24 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not add Control Strategy run status: " + fastRunId;
+                return "Could not stop Fast run: " + fastRunId;
             }
         });
     }
 
-    // returns control strategy Id for the given name
     public synchronized int isDuplicateFastRunName(final String name) throws EmfException {
 
         return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
             @Override
             protected void doExecute(Session session) throws Exception {
 
-                FastRun cs = dao.getFastRun(name, session);
-                this.setReturnValue(cs == null ? 0 : cs.getId());
+                FastRun fastRun = dao.getFastRun(name, session);
+                this.setReturnValue(fastRun == null ? 0 : fastRun.getId());
             }
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve if FastRun name is already used";
+                return "Could not determine if Fast run name is already used";
             }
         });
     }
@@ -457,28 +459,28 @@ public class FastServiceImpl implements FastService {
         return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
             @Override
             protected void doExecute(Session session) throws Exception {
-                // get cs to copy
-                FastRun cs = dao.getFastRun(id, session);
+                // get fast run to copy
+                FastRun fastRun = dao.getFastRun(id, session);
 
                 session.clear();// clear to flush current
 
-                String name = "Copy of " + cs.getName();
+                String name = "Copy of " + fastRun.getName();
                 // make sure this won't cause duplicate issues...
-                if (isDuplicateFastRunName(name) != 0)
-                    throw new EmfException("A control strategy named '" + name + "' already exists.");
+                if (isDuplicateFastRunName(name) != 0) {
+                    throw new EmfException("A Fast run named '" + name + "' already exists.");
+                }
 
                 // do a deep copy
-                FastRun copied = (FastRun) DeepCopy.copy(cs);
+                FastRun copied = (FastRun) DeepCopy.copy(fastRun);
                 // change to applicable values
                 copied.setName(name);
+                copied.setAbbreviation(CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date()));
                 copied.setCreator(creator);
                 copied.setLastModifiedDate(new Date());
                 copied.setRunStatus("Not started");
-                copied.setCopiedFrom(cs.getName());
-                if (copied.isLocked()) {
-                    copied.setLockDate(null);
-                    copied.setLockOwner(null);
-                }
+                copied.setCopiedFrom(fastRun.getName());
+                copied.setLockDate(null);
+                copied.setLockOwner(null);
 
                 dao.add(copied, session);
                 this.setReturnValue(copied.getId());
@@ -486,7 +488,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not copy control strategy";
+                return "Could not copy Fast run: " + id;
             }
         });
     }
@@ -505,7 +507,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not get control strategy";
+                return "Could not get Fast run: " + id;
             }
         });
     }
@@ -521,7 +523,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve control strategy results";
+                return "Could not retrieve Fast run outputs: " + fastRunId;
             }
         });
     }
@@ -561,13 +563,14 @@ public class FastServiceImpl implements FastService {
         return this.executeDaoCommand(new AbstractDaoCommand<FastDataset[]>() {
             @Override
             protected void doExecute(Session session) throws Exception {
+
                 List<FastDataset> all = dao.getFastDatasets(session);
                 this.setReturnValue(all.toArray(new FastDataset[0]));
             }
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve fast datasets";
+                return "Could not retrieve Fast datasets";
             }
         });
     }
@@ -582,7 +585,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve fast datasets";
+                return "Could not retrieve Fast dataset: " + fastDatasetId;
             }
         });
     }
@@ -598,7 +601,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve fast datasets";
+                return "Could not deterimine Fast dataset count";
             }
         });
     }
@@ -613,7 +616,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not add FastDataset: " + fastDataset;
+                return "Could not add Fast dataset: " + fastDataset;
             }
         });
     }
@@ -655,7 +658,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not remove FastDataset: " + fastDatasetId;
+                return "Could not remove Fast dataset: " + fastDatasetId;
             }
         });
     }
@@ -688,7 +691,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve fast NonPoint datasets";
+                return "Could not retrieve Fast non-point datasets";
             }
         });
     }
@@ -703,7 +706,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve fast NonPoint datasets";
+                return "Could not retrieve Fast non-point dataset: " + fastNonPointDatasetId;
             }
         });
     }
@@ -719,7 +722,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve fast datasets";
+                return "Could not retrieve Fast non-point datasets";
             }
         });
     }
@@ -747,7 +750,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not add FastNonPointDataset: " + fastNonPointDataset;
+                return "Could not add Fast non-point dataset: " + fastNonPointDataset;
             }
         });
     }
@@ -762,7 +765,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not remove FastNonPointDataset: " + fastNonPointDatasetId;
+                return "Could not remove Fast non-point dataset: " + fastNonPointDatasetId;
             }
         });
     }
@@ -783,7 +786,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Error running control strategy: " + ""/* controlStrategy.getName() */;
+                return "Error creating Fast point dataset: " + fastNonPointDatasetId;
             }
         });
     }
@@ -799,7 +802,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve fast NonPoint datasets";
+                return "Could not retrieve Fast grids";
             }
         });
     }
@@ -824,13 +827,13 @@ public class FastServiceImpl implements FastService {
         return this.executeDaoCommand(new AbstractDaoCommand<FastAnalysis[]>() {
             @Override
             protected void doExecute(Session session) throws Exception {
-                List<FastAnalysis> cs = dao.getFastAnalyses(session);
-                this.setReturnValue(cs.toArray(new FastAnalysis[0]));
+                List<FastAnalysis> fastAnalyses = dao.getFastAnalyses(session);
+                this.setReturnValue(fastAnalyses.toArray(new FastAnalysis[0]));
             }
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve all FastAnalyses";
+                return "Could not retrieve all Fast analyses";
             }
         });
     }
@@ -845,7 +848,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not add Control Strategy: " + fastAnalysis;
+                return "Could not add Fast analysis: " + fastAnalysis;
             }
         });
     }
@@ -861,7 +864,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not set Control Strategy run status: " + id;
+                return "Could not set Fast analysis run status: " + id;
             }
         });
     }
@@ -876,7 +879,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not obtain lock for Control Strategy: id = " + id + " by owner: " + owner.getUsername();
+                return "Could not obtain lock for Fast analysis: id = " + id + " by owner: " + owner.getUsername();
             }
         });
     }
@@ -907,7 +910,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not release lock for Control Strategy id: " + id;
+                return "Could not release lock for Fast analysis: " + id;
             }
         });
     }
@@ -919,7 +922,7 @@ public class FastServiceImpl implements FastService {
             protected void doExecute(Session session) throws Exception {
 
                 if (!dao.canUpdate(fastAnalysis, session)) {
-                    throw new EmfException("The Control Strategy name is already in use");
+                    throw new EmfException("The Fast analysis " + fastAnalysis + " is already in use");
                 }
 
                 this.setReturnValue(dao.updateFastAnalysis(fastAnalysis, session));
@@ -927,7 +930,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not update Control Strategy: " + fastAnalysis;
+                return "Could not update Fast analysis: " + fastAnalysis;
             }
         });
     }
@@ -937,8 +940,9 @@ public class FastServiceImpl implements FastService {
         return this.executeDaoCommand(new AbstractDaoCommand<FastAnalysis>() {
             @Override
             protected void doExecute(Session session) throws Exception {
+
                 if (!dao.canUpdate(fastAnalysis, session)) {
-                    throw new EmfException("Control Strategy name already in use");
+                    throw new EmfException("The Fast analysis " + fastAnalysis + " is already in use");
                 }
 
                 this.setReturnValue(dao.updateWithLock(fastAnalysis, session));
@@ -946,7 +950,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not update Control Strategy: " + fastAnalysis;
+                return "Could not update Fast analysis: " + fastAnalysis;
             }
         });
     }
@@ -959,19 +963,19 @@ public class FastServiceImpl implements FastService {
 
                 String exception = "";
                 for (int i = 0; i < ids.length; i++) {
-                    FastAnalysis cs = dao.getFastAnalysis(ids[i], session);
+                    FastAnalysis fastAnalysis = dao.getFastAnalysis(ids[i], session);
                     session.clear();
 
                     // check if admin user, then allow it to be removed.
-                    if (user.equals(cs.getCreator()) || user.isAdmin()) {
-                        if (cs.isLocked()) {
-                            exception += "The control strategy, " + cs.getName()
+                    if (user.equals(fastAnalysis.getCreator()) || user.isAdmin()) {
+                        if (fastAnalysis.isLocked()) {
+                            exception += "The Fast analysis, " + fastAnalysis
                                     + ", is in edit mode and can not be removed. ";
                         } else {
-                            removeFastAnalysis(cs);
+                            removeFastAnalysis(fastAnalysis);
                         }
                     } else {
-                        exception += "You do not have permission to remove the strategy: " + cs.getName() + ". ";
+                        exception += "You do not have permission to remove the Fast analysis: " + fastAnalysis + ". ";
                     }
                 }
 
@@ -982,7 +986,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not remove Control Strategy";
+                return "Could not remove all Fast analyses";
             }
         });
     }
@@ -993,12 +997,12 @@ public class FastServiceImpl implements FastService {
             @Override
             protected void doExecute(Session session) throws Exception {
                 if (!dao.canUpdate(fastAnalysis, session)) {
-                    throw new EmfException("Control Strategy name already in use");
+                    throw new EmfException("The Fast analysis " + fastAnalysis + " already in use");
                 }
 
-                FastAnalysisOutput[] controlStrategyResults = getFastAnalysisOutputs(fastAnalysis.getId());
-                for (int i = 0; i < controlStrategyResults.length; i++) {
-                    dao.remove(controlStrategyResults[i], session);
+                FastAnalysisOutput[] fastAnalysisOutputs = getFastAnalysisOutputs(fastAnalysis.getId());
+                for (int i = 0; i < fastAnalysisOutputs.length; i++) {
+                    dao.remove(fastAnalysisOutputs[i], session);
                 }
 
                 dao.remove(fastAnalysis, session);
@@ -1006,7 +1010,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not remove control strategy: " + fastAnalysis;
+                return "Could not remove Fast analysis: " + fastAnalysis;
             }
         });
     }
@@ -1059,7 +1063,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not get Control Strategies by run status: " + runStatus;
+                return "Could not retrieve Fast analyses by run status: " + runStatus;
             }
         });
     }
@@ -1074,7 +1078,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not get Control Strategies running count";
+                return "Could not retrieve Fast analyses running count";
             }
         });
     }
@@ -1093,7 +1097,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not add Control Strategy run status: " + fastAnalysisId;
+                return "Could not stop Fast analysis: " + fastAnalysisId;
             }
         });
     }
@@ -1104,13 +1108,13 @@ public class FastServiceImpl implements FastService {
         return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
             @Override
             protected void doExecute(Session session) throws Exception {
-                FastAnalysis cs = dao.getFastAnalysis(name, session);
-                this.setReturnValue(cs == null ? 0 : cs.getId());
+                FastAnalysis fastAnalysis = dao.getFastAnalysis(name, session);
+                this.setReturnValue(fastAnalysis == null ? 0 : fastAnalysis.getId());
             }
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve if FastAnalysis name is already used";
+                return "Could not determine if Fast analysis name " + name + " is already used";
             }
         });
     }
@@ -1121,24 +1125,24 @@ public class FastServiceImpl implements FastService {
             @Override
             protected void doExecute(Session session) throws Exception {
 
-                // get cs to copy
-                FastAnalysis cs = dao.getFastAnalysis(id, session);
+                // get fast analysis to copy
+                FastAnalysis fastAnalysis = dao.getFastAnalysis(id, session);
 
                 session.clear();// clear to flush current
 
-                String name = "Copy of " + cs.getName();
+                String name = "Copy of " + fastAnalysis.getName();
                 // make sure this won't cause duplicate issues...
                 if (isDuplicateFastAnalysisName(name) != 0)
-                    throw new EmfException("A control strategy named '" + name + "' already exists.");
+                    throw new EmfException("A Fast analysis named '" + name + "' already exists.");
 
                 // do a deep copy
-                FastAnalysis copied = (FastAnalysis) DeepCopy.copy(cs);
+                FastAnalysis copied = (FastAnalysis) DeepCopy.copy(fastAnalysis);
                 // change to applicable values
                 copied.setName(name);
                 copied.setCreator(creator);
                 copied.setLastModifiedDate(new Date());
                 copied.setRunStatus("Not started");
-                copied.setCopiedFrom(cs.getName());
+                copied.setCopiedFrom(fastAnalysis.getName());
                 if (copied.isLocked()) {
                     copied.setLockDate(null);
                     copied.setLockOwner(null);
@@ -1150,7 +1154,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not copy control strategy";
+                return "Could not copy Fast analysis";
             }
         });
     }
@@ -1165,7 +1169,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not get control strategy";
+                return "Could not get Fast analysis: " + id;
             }
         });
     }
@@ -1181,7 +1185,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve control strategy results";
+                return "Could not retrieve Fast analysis outputs";
             }
         });
     }
@@ -1196,7 +1200,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve strategy run status";
+                return "Could not retrieve Fast analysis run status: " + id;
             }
         });
     }
@@ -1211,7 +1215,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve FastAnalysisOutputType";
+                return "Could not retrieve Fast analysis output type: " + name;
             }
         });
     }
@@ -1227,7 +1231,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve FastAnalysisOutputType";
+                return "Could not retrieve Fast analysis output type";
             }
         });
     }
@@ -1242,7 +1246,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve FastRunOutputType";
+                return "Could not retrieve Fast analysis output type: " + name;
             }
         });
     }
@@ -1258,7 +1262,7 @@ public class FastServiceImpl implements FastService {
 
             @Override
             protected String getErrorMessage() {
-                return "Could not retrieve FastRunOutputTypes";
+                return "Could not retrieve Fast analysis output types";
             }
         });
     }

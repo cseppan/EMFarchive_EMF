@@ -186,6 +186,7 @@ public class FastRunManagerWindow extends AbstractMPSDTManagerTab implements Fas
         };
 
         SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, this.table, confirmDialog);
+        viewButton.setEnabled(false);
         return viewButton;
     }
 
@@ -224,6 +225,10 @@ public class FastRunManagerWindow extends AbstractMPSDTManagerTab implements Fas
     }
 
     protected void removeSelectedRuns() throws EmfException {
+
+        if (false) {
+            throw new RuntimeException("sadfasd fasdf");
+        }
 
         this.clearMessage();
         final List<FastRun> runs = getSelected();
@@ -294,6 +299,10 @@ public class FastRunManagerWindow extends AbstractMPSDTManagerTab implements Fas
 
     private void executeRuns() throws EmfException {
 
+        if (false) {
+            throw new RuntimeException("2dfasdfas");
+        }
+
         this.clearMessage();
         final List<FastRun> runs = getSelected();
 
@@ -321,6 +330,7 @@ public class FastRunManagerWindow extends AbstractMPSDTManagerTab implements Fas
                 };
 
                 this.executeCommand(executeCommand);
+                showMessage("Executing Fast run(s). Monitor the status window for progress, and refresh this window after completion to see results");
             }
         }
     }

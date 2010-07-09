@@ -69,10 +69,6 @@ public class FastRunEditorPresenterImpl implements FastRunPresenter {
         view.display(this.run);
     }
 
-    public FastRun getRun(int id) throws EmfException {
-        return this.getService().getFastRun(id);
-    }
-
     public void doClose() throws EmfException {
 
         /*
@@ -83,6 +79,27 @@ public class FastRunEditorPresenterImpl implements FastRunPresenter {
         }
 
         this.closeView();
+    }
+
+    public void doRun() throws EmfException {
+
+        this.doSave();
+        this.getService().runFastRun(this.session.user(), this.run.getId());
+    }
+
+    public void doRefresh() throws EmfException {
+        this.refreshTabs();
+    }
+
+    protected void refreshTabs() {
+
+        if (false) {
+            throw new RuntimeException("asdf asdfasdf asdfasdf a");
+        }
+
+        for (FastRunTabPresenter presenter : this.presenters) {
+            presenter.doRefresh(this.run);
+        }
     }
 
     private void closeView() {

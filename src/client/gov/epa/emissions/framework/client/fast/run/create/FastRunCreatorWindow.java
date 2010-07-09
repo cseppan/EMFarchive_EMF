@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.fast.FastRun;
 import java.awt.BorderLayout;
 import java.awt.Container;
 
+import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
 
 @SuppressWarnings("serial")
@@ -32,10 +33,19 @@ public class FastRunCreatorWindow extends AbstractFastRunWindow {
 
         final JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        tabbedPane.addTab("Summary", this.createSummaryTab(run));
-        tabbedPane.addTab("Configuration", this.createConfigurationTab(run));
-        tabbedPane.addTab("Inventories", this.createInventoriesTab(run));
-        tabbedPane.addTab("Outputs", this.createOutputsTab(run));
+
+        JComponent summaryTab = this.createSummaryTab(run);
+        tabbedPane.addTab(summaryTab.getName(), summaryTab);
+
+        JComponent configurationTab = this.createConfigurationTab(run);
+        tabbedPane.addTab(configurationTab.getName(), configurationTab);
+
+        JComponent inventoriesTab = this.createInventoriesTab(run);
+        tabbedPane.addTab(inventoriesTab.getName(), inventoriesTab);
+
+        JComponent outputsTab = this.createOutputsTab(run);
+        tabbedPane.addTab(outputsTab.getName(), outputsTab);
+
         return tabbedPane;
     }
 

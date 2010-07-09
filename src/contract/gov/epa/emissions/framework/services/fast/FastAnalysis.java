@@ -11,23 +11,36 @@ import java.util.Date;
 public class FastAnalysis extends LockableImpl implements Serializable {
 
     private int id;
+
     private String name;
+
     private String description = "";
+
     private Grid grid;
+
     private String runStatus;
+
     private User creator;
+
     private Date lastModifiedDate;
+
     private Date startDate;
+
     private Date completionDate;
+
     private String copiedFrom;
+
     private EmfDataset cancerRiskDataset;
+
     private Integer cancerRiskDatasetVersion;
+
     private FastAnalysisInputSector[] inputSectors = new FastAnalysisInputSector[] {};
+
     private Sector[] outputSectors = new Sector[] {};
 
     public FastAnalysis() {
     }
-    
+
     public FastAnalysis(String name) {
         this();
         this.name = name;
@@ -162,4 +175,10 @@ public class FastAnalysis extends LockableImpl implements Serializable {
     public int hashCode() {
         return name.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
+
 }
