@@ -117,6 +117,11 @@ public class FastDAO {
         return hibernateFacade.getAll(FastRun.class, Order.asc("name"), session);
     }
 
+    // return FastRuns by Grid and orderby name
+    public List<FastRun> getFastRuns(int gridId, Session session) {
+        return hibernateFacade.get(FastRun.class, Restrictions.eq("grid.id", new Integer(gridId)), Order.asc("name"), session);
+    }
+
     public List<FastRunOutputType> getFastRunOutputTypes(Session session) {
         return hibernateFacade.getAll(FastRunOutputType.class, Order.asc("name"), session);
     }

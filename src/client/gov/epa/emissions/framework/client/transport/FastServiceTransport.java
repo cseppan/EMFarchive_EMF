@@ -44,6 +44,16 @@ public class FastServiceTransport implements FastService {
         return (FastRun[]) call.requestResponse(new Object[] {});
     }
 
+    public synchronized FastRun[] getFastRuns(int gridId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getFastRuns");
+        call.addIntegerParam("gridId");
+        call.setReturnType(mappings.fastRuns());
+
+        return (FastRun[]) call.requestResponse(new Object[] { new Integer(gridId) });
+    }
+
     public synchronized int addFastRun(FastRun fastRun) throws EmfException {
         EmfCall call = call();
 

@@ -11,6 +11,8 @@ public interface FastService extends EMFService {
 
     FastRun[] getFastRuns() throws EmfException;
 
+    FastRun[] getFastRuns(int gridId) throws EmfException;
+
     FastRunOutput[] getFastRunOutputs(int fastRunId) throws EmfException;
 
     int addFastRun(FastRun fastRun) throws EmfException;

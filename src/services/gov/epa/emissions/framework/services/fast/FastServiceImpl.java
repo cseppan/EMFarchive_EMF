@@ -91,6 +91,22 @@ public class FastServiceImpl implements FastService {
         });
     }
 
+    public synchronized FastRun[] getFastRuns(final int gridId) throws EmfException {
+
+        return this.executeDaoCommand(new AbstractDaoCommand<FastRun[]>() {
+            @Override
+            protected void doExecute(Session session) throws Exception {
+                List<FastRun> fastRuns = dao.getFastRuns(gridId, session);
+                this.setReturnValue(fastRuns.toArray(new FastRun[0]));
+            }
+
+            @Override
+            protected String getErrorMessage() {
+                return "Could not retrieve all Fast runs.";
+            }
+        });
+    }
+
     public synchronized int addFastRun(final FastRun fastRun) throws EmfException {
 
         return this.executeDaoCommand(new AbstractDaoCommand<Integer>() {
