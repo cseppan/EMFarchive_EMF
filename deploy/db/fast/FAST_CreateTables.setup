@@ -125,7 +125,7 @@ copied_from varchar(255),
 cancer_risk_dataset_id int4 REFERENCES emf.datasets(id),
 cancer_risk_dataset_version int4,
 CONSTRAINT uq_fast_analyses_name UNIQUE (name),
-CONSTRAINT uq_fast_analyses_abbreviation UNIQUE (abbreviation),,
+CONSTRAINT uq_fast_analyses_abbreviation UNIQUE (abbreviation),
 CONSTRAINT uq_fast_analyses_grid UNIQUE (id, grid_id)
 );
 
