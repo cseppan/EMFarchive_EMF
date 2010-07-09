@@ -111,6 +111,7 @@ CONSTRAINT uq_fast_run_outputs_dataset_grid UNIQUE (output_dataset_id, grid_id)
 CREATE TABLE fast.fast_analyses (
 id serial NOT NULL PRIMARY KEY,
 name varchar(128) NOT NULL,
+abbreviation varchar(20) NOT NULL,
 description text,
 grid_id int4 REFERENCES fast.grids(id),
 run_status varchar(255),
@@ -124,6 +125,7 @@ copied_from varchar(255),
 cancer_risk_dataset_id int4 REFERENCES emf.datasets(id),
 cancer_risk_dataset_version int4,
 CONSTRAINT uq_fast_analyses_name UNIQUE (name),
+CONSTRAINT uq_fast_analyses_abbreviation UNIQUE (abbreviation),,
 CONSTRAINT uq_fast_analyses_grid UNIQUE (id, grid_id)
 );
 
