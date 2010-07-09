@@ -1,0 +1,81 @@
+-- 7/8/2010
+-- DS Type that was missed
+
+-- FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission
+INSERT INTO dataset_types (name, description, min_files, max_files, external, default_sortorder, importer_classname, exporter_classname, lock_owner, lock_date, table_per_dataset, creation_date, last_mod_date, creator, file_format) VALUES ('FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission', 'FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission', 1, 1, false, '', 'gov.epa.emissions.commons.io.other.SMKReportImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter', NULL, NULL, 1, NULL, NULL, NULL, NULL);
+insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
+select dt.id as dataset_type_id,
+  (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = dt.id) as list_index,
+  (select id from emf.keywords where "name" = 'COLUMN_TYPES') as keyword_id,
+  'varchar(64)|varchar(64)|varchar(64)|int4|int4|float8(17)|float8(17)|varchar(64)' as "value", 'COLUMN_TYPES' as kwname
+from emf.dataset_types dt
+where "name" = 'FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission';
+
+
+-- 7/9/2010 -- new table
+
+-- Table: fast.fast_analysis_runs
+CREATE TABLE fast.fast_analysis_runs
+(
+  id serial NOT NULL,
+  list_index integer NOT NULL,
+  fast_analysis_id integer NOT NULL,
+  fast_run_id integer NOT NULL,
+  adjustment_factor double precision NOT NULL DEFAULT 1.0,
+  grid_id integer NOT NULL,
+  baseline_sensitivity character(1) NOT NULL DEFAULT 'B'::bpchar,
+  CONSTRAINT fast_analysis_runs_pkey PRIMARY KEY (id),
+  CONSTRAINT fast_analysis_runs_fast_analysis_id_fkey FOREIGN KEY (fast_analysis_id)
+      REFERENCES fast.fast_analyses (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_fast_analysis_id_fkey1 FOREIGN KEY (fast_analysis_id, grid_id)
+      REFERENCES fast.fast_analyses (id, grid_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_fast_run_id_fkey FOREIGN KEY (fast_run_id)
+      REFERENCES fast.fast_runs (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_fast_run_id_fkey1 FOREIGN KEY (fast_run_id, grid_id)
+      REFERENCES fast.fast_runs (id, grid_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_grid_id_fkey FOREIGN KEY (grid_id)
+      REFERENCES fast.grids (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+  
+-- add abbreviation column to the analyses table
+alter table fast.fast_analyses
+add column abbreviation character varying(20) NOT NULL DEFAULT '';
+
+CREATE OR REPLACE FUNCTION fast.populate_analysis_abbreviation_with_unique_value() RETURNS void AS $$
+DECLARE
+	analysis_record RECORD;
+BEGIN
+
+	-- only look at tables with the 
+	FOR analysis_record IN 
+		select id
+		from fast.fast_analyses
+		WHERE abbreviation = ''
+	LOOP
+	
+		update fast.fast_analyses
+		set abbreviation = ceiling(999999999999999999 * random())::bigint
+		--regexp_replace(regexp_replace(regexp_replace(clock_timestamp() || '', '-', '', 'gi'), ':', '', 'gi'), ' ', '', 'gi')
+		where id = analysis_record.id;
+
+	END LOOP;
+
+	return;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- run procedure
+select fast.populate_analysis_abbreviation_with_unique_value();
+
+ALTER TABLE fast.fast_analyses ADD UNIQUE (abbreviation);
+
+drop function fast.populate_analysis_abbreviation_with_unique_value();
+
+
