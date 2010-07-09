@@ -155,28 +155,31 @@ create table fast.fast_analysis_outputs (
   run_status character varying(255)
 );
 
--- Populate Scripts
-insert into fast.grids ("name", description, abbreviation, resltn, map_projtn, xorig, yorig, xcell, ycell, ncols, nrows, nthik, xcent, ycent)
-select 'Detroit_36_45_4km' as "name", 
-	'Detroit_36_45_4km' as description, 
-	'Detroit_36_45_4km' as abbreviation, 
-	1 as resltn, 
-	'+proj=lcc +a=6370000.0 +b=6370000.0 +lat_1=33 +lat_2=45 +lat_0=40.0 +lon_0=-97.0' as  map_projtn, 
-	-97.0 as xorig, 
-	40.0 as yorig, 
-	4000 as xcell, 
-	4000 as ycell, 
-	36 as ncols, 
-	45 as nrows, 
-	1 as nthik, 
-	1044000 as xcent, 
-	252000 as ycent
-where not exists (select 1 from fast.grids where name = 'Detroit_36_45_4km');
 
-insert into fast.fast_analysis_output_types (name) 
-select 'FAST Gridded Difference'
-where not exists (select 1 from fast.fast_analysis_output_types where name = 'FAST Gridded Difference');
-
-INSERT INTO fast.fast_run_output_types (name) VALUES ('Gridded Emissions');
-INSERT INTO fast.fast_run_output_types (name) VALUES ('Gridded Summary Emissions and Air Quality');
-INSERT INTO fast.fast_run_output_types (name) VALUES ('Gridded Detailed Emissions and Air Quality');
+-- Table: fast.fast_analysis_runs
+CREATE TABLE fast.fast_analysis_runs
+(
+  id serial NOT NULL,
+  list_index integer NOT NULL,
+  fast_analysis_id integer NOT NULL,
+  fast_run_id integer NOT NULL,
+  adjustment_factor double precision NOT NULL DEFAULT 1.0,
+  grid_id integer NOT NULL,
+  baseline_sensitivity character(1) NOT NULL DEFAULT 'B'::bpchar,
+  CONSTRAINT fast_analysis_runs_pkey PRIMARY KEY (id),
+  CONSTRAINT fast_analysis_runs_fast_analysis_id_fkey FOREIGN KEY (fast_analysis_id)
+      REFERENCES fast.fast_analyses (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_fast_analysis_id_fkey1 FOREIGN KEY (fast_analysis_id, grid_id)
+      REFERENCES fast.fast_analyses (id, grid_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_fast_run_id_fkey FOREIGN KEY (fast_run_id)
+      REFERENCES fast.fast_runs (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_fast_run_id_fkey1 FOREIGN KEY (fast_run_id, grid_id)
+      REFERENCES fast.fast_runs (id, grid_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fast_analysis_runs_grid_id_fkey FOREIGN KEY (grid_id)
+      REFERENCES fast.grids (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+);

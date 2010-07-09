@@ -35,10 +35,15 @@ public class FastAnalysis extends LockableImpl implements Serializable {
     private Integer cancerRiskDatasetVersion;
 
     private FastAnalysisInputSector[] inputSectors = new FastAnalysisInputSector[] {};
-
+    
+    private FastAnalysisRun[] baselineRuns = new FastAnalysisRun[] {};
+    
+    private FastAnalysisRun[] sensitivityRuns = new FastAnalysisRun[] {};
+    
     private Sector[] outputSectors = new Sector[] {};
 
     public FastAnalysis() {
+        //
     }
 
     public FastAnalysis(String name) {
@@ -174,6 +179,27 @@ public class FastAnalysis extends LockableImpl implements Serializable {
 
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public void setBaselineRuns(FastAnalysisRun[] baselineRuns) {
+        this.baselineRuns = baselineRuns;
+    }
+
+    public FastAnalysisRun[] getBaselineRuns() {
+        return baselineRuns;
+    }
+
+    public void setSensitivityRuns(FastAnalysisRun[] sensitivityRuns) {
+        this.sensitivityRuns = sensitivityRuns;
+    }
+
+    public FastAnalysisRun[] getSensitivityRuns() {
+        return sensitivityRuns;
+    }
+
+    public String getAbbreviation() {
+        // NOTE Auto-generated method stub
+        return null;
     }
 
     @Override

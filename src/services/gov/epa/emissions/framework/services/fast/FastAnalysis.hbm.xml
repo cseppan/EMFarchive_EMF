@@ -38,5 +38,25 @@
     	</composite-element>
 	</array>
 
+	<array name="baselineRuns" table="fast_analysis_runs" schema="fast" where="baseline_sensitivity = 'B'">
+    	<key column="fast_analysis_id" not-null="true"/>
+    	<list-index column="list_index"/>
+    	<composite-element class="gov.epa.emissions.framework.services.fast.FastAnalysisRun">
+	       	<many-to-one name="fastRun" class="gov.epa.emissions.framework.services.fast.FastRun" column="fast_run_id" not-null="true" cascade="none"/>
+	       	<many-to-one name="grid" class="gov.epa.emissions.framework.services.fast.Grid" column="grid_id" not-null="true" cascade="none"/>
+			<property name="type" column="baseline_sensitivity" type="string" not-null="true"/>
+    	</composite-element>
+	</array>
+
+	<array name="sensitivityRuns" table="fast_analysis_runs" schema="fast" where="baseline_sensitivity = 'S'">
+    	<key column="fast_analysis_id" not-null="true"/>
+    	<list-index column="list_index"/>
+    	<composite-element class="gov.epa.emissions.framework.services.fast.FastAnalysisRun">
+	       	<many-to-one name="fastRun" class="gov.epa.emissions.framework.services.fast.FastRun" column="fast_run_id" not-null="true" cascade="none"/>
+	       	<many-to-one name="grid" class="gov.epa.emissions.framework.services.fast.Grid" column="grid_id" not-null="true" cascade="none"/>
+			<property name="type" column="baseline_sensitivity" type="string" not-null="true"/>
+    	</composite-element>
+	</array>
+
   </class> 
 </hibernate-mapping>  

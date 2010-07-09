@@ -626,9 +626,7 @@ public class FastRunTask {
 //            
 //            connection = datasource.getConnection();
 //            statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-//            System.out.println("start fix check query " + System.currentTimeMillis());
 //            rs = statement.executeQuery(sql);
-//            System.out.println("end fix check query " + System.currentTimeMillis());
 //            boolean foundNegative9 = false;
 //            while (rs.next()) {
 //                foundNegative9 = true;

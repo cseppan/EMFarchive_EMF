@@ -67,6 +67,7 @@ import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
 import gov.epa.emissions.framework.services.fast.FastAnalysisOutput;
 import gov.epa.emissions.framework.services.fast.FastAnalysisOutputType;
+import gov.epa.emissions.framework.services.fast.FastAnalysisRun;
 import gov.epa.emissions.framework.services.fast.FastDataset;
 import gov.epa.emissions.framework.services.fast.FastNonPointDataset;
 import gov.epa.emissions.framework.services.fast.FastRun;
@@ -160,6 +161,7 @@ public class DataMappings extends Mappings {
         bean(call, FastAnalysis.class, fastAnalysis());
         bean(call, FastAnalysisOutput.class, fastAnalysisOutput());
         bean(call, FastAnalysisOutputType.class, fastAnalysisOutputType());
+        bean(call, FastAnalysisRun.class, fastAnalysisRun());
 
         controlBeans(call);
     }
@@ -285,6 +287,7 @@ public class DataMappings extends Mappings {
         array(call, FastAnalysis[].class, fastAnalyses());
         array(call, FastAnalysisOutput[].class, fastAnalysisOutputs());
         array(call, FastAnalysisOutputType[].class, fastAnalysisOutputTypes());
+        array(call, FastAnalysisRun[].class, fastAnalysisRuns());
     }
 
     public QName logs() {
@@ -861,6 +864,14 @@ public class DataMappings extends Mappings {
 
     public QName fastAnalysisOutputTypes() {
         return qname("FastAnalysisOutputTypes");
+    }
+
+    public QName fastAnalysisRun() {
+        return qname("FastAnalysisRun");
+    }
+
+    public QName fastAnalysisRuns() {
+        return qname("FastAnalysisRuns");
     }
 
 }

@@ -17,7 +17,6 @@ import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.QAStepTask;
-import gov.epa.emissions.framework.services.basic.DateUtil;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
@@ -87,9 +86,9 @@ public class FastAnalysisTask {
         //
     }
     
-    protected FastRunOutput createFastRunOutput(FastRunOutputType fastRunOutputType, EmfDataset outputDataset, EmfDataset inventory, int inventoryVersion) throws EmfException {
-        FastRunOutput result = new FastRunOutput();
-        result.setFastRunId(fastAnalysis.getId());
+    protected FastAnalysisOutput createFastAnalysisOutput(FastAnalysisOutputType fastRunOutputType, EmfDataset outputDataset, EmfDataset inventory, int inventoryVersion) throws EmfException {
+        FastAnalysisOutput result = new FastAnalysisOutput();
+        result.setFastAnalysisId(fastAnalysis.getId());
         result.setOutputDataset(outputDataset);
 //        result.setInventoryDataset(inventory);
 //        result.setInventoryDatasetVersion(inventoryVersion);
@@ -99,15 +98,15 @@ public class FastAnalysisTask {
         result.setRunStatus("Start processing inventory dataset");
 
         //persist output
-        saveFastRunOutput(result);
+        saveFastAnalysisOutput(result);
         return result;
     }
     
-    public FastRunOutput createEECSDetailedMappingResultOutput(FastRunInventory fastRunInventory) throws Exception {
+    public FastAnalysisOutput createEECSDetailedMappingResultOutput(FastRunInventory fastRunInventory) throws Exception {
         EmfDataset inventory = fastRunInventory.getDataset();
 
         //setup result
-        FastRunOutput eecsDetailedMappingOutput = null;
+        FastAnalysisOutput eecsDetailedMappingOutput = null;
         String runStatus = "";
         
         //Create EECS Detailed Mapping Result Output
@@ -118,7 +117,7 @@ public class FastAnalysisTask {
             
             EmfDataset eecsDetailedMapping =  createEECSDetailedMappingDataset(inventory);
 
-            eecsDetailedMappingOutput = createFastRunOutput(getFastRunOutputType(FastRunOutputType.DETAILED_EECS_MAPPING_RESULT), eecsDetailedMapping, inventory, fastRunInventory.getVersion());
+            eecsDetailedMappingOutput = createFastAnalysisOutput(getFastAnalysisOutputType(FastRunOutputType.DETAILED_EECS_MAPPING_RESULT), eecsDetailedMapping, inventory, fastRunInventory.getVersion());
 
             populateEECSDetailedMapping(fastRunInventory, eecsDetailedMappingOutput);
             
@@ -138,92 +137,24 @@ public class FastAnalysisTask {
             if (eecsDetailedMappingOutput != null) {
                 eecsDetailedMappingOutput.setCompletionDate(new Date());
                 eecsDetailedMappingOutput.setRunStatus(runStatus);
-                saveFastRunOutput(eecsDetailedMappingOutput);
+                saveFastAnalysisOutput(eecsDetailedMappingOutput);
             }
         }
 
         return eecsDetailedMappingOutput;
     }
 
-    public FastRunOutput createSectorDetailedMappingResultOutput(FastRunInventory fastRunInventory) throws Exception {
-        EmfDataset inventory = fastRunInventory.getDataset();
-
-        //setup result
-        FastRunOutput sectorDetailedMappingOutput = null;
-        String runStatus = "";
-        
-        //Create EECS Detailed Mapping Result Output
+    private FastAnalysisOutputType getFastAnalysisOutputType(String name) throws EmfException {
+        FastAnalysisOutputType resultType = null;
+        Session session = sessionFactory.getSession();
         try {
-            setStatus("Started creating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the inventory, " 
-                    + fastRunInventory.getDataset().getName() 
-                    + ".");
-            EmfDataset eecsDetailedMapping =  createSectorDetailedMappingDataset(inventory);
-
-            sectorDetailedMappingOutput = createFastRunOutput(getFastRunOutputType(FastRunOutputType.DETAILED_SECTOR_MAPPING_RESULT), eecsDetailedMapping, inventory, fastRunInventory.getVersion());
-
-            populateSectorDetailedMapping(fastRunInventory, sectorDetailedMappingOutput);
-            
-            updateOutputDatasetVersionRecordCount(sectorDetailedMappingOutput);
-
-            runStatus = "Completed.";
-
-            setStatus("Completed creating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the inventory, " 
-                    + fastRunInventory.getDataset().getName() 
-                    + ".");
-        } catch(EmfException ex) {
-            runStatus = "Failed creating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + ". Error processing inventory, " + fastRunInventory.getDataset().getName() + ". Exception = " + ex.getMessage();
-            setStatus(runStatus);
-            throw ex;
+            resultType = fastRunDAO.getFastAnalysisOutputType(name, session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not get FAST analysis output type");
         } finally {
-            if (sectorDetailedMappingOutput != null) {
-                sectorDetailedMappingOutput.setCompletionDate(new Date());
-                sectorDetailedMappingOutput.setRunStatus(runStatus);
-                saveFastRunOutput(sectorDetailedMappingOutput);
-            }
+            session.close();
         }
-
-        return sectorDetailedMappingOutput;
-    }
-
-    public FastRunOutput createSectorSpecificInventoryOutput(String sector, FastRunInventory fastRunInventory) throws Exception {
-        EmfDataset inventory = fastRunInventory.getDataset();
-
-        //setup result
-        FastRunOutput sectorSpecificInventoryOutput = null;
-        String runStatus = "";
-        
-        //Create EECS Detailed Mapping Result Output
-        try {
-            setStatus("Started creating sector (" + sector + ") specific " + inventory.getDatasetType().getName() + " inventory from the inventory, " 
-                    + fastRunInventory.getDataset().getName() 
-                    + ".");
-
-            EmfDataset newInventory =  createSectorSpecificInventoryDataset(sector, inventory);
-
-            sectorSpecificInventoryOutput = createFastRunOutput(getFastRunOutputType(FastRunOutputType.SECTOR_SPECIFIC_INVENTORY), newInventory, inventory, fastRunInventory.getVersion());
-
-            populateSectorSpecificInventory(sector, fastRunInventory, sectorSpecificInventoryOutput);
-            
-            updateOutputDatasetVersionRecordCount(sectorSpecificInventoryOutput);
-
-            runStatus = "Completed.";
-
-            setStatus("Completed creating sector (" + sector + ") specific " + inventory.getDatasetType().getName() + " inventory from the inventory, " 
-                    + fastRunInventory.getDataset().getName() 
-                    + ".");
-        } catch(EmfException ex) {
-            runStatus = "Failed creating sector (" + sector + ") specific " + inventory.getDatasetType().getName() + ". Error processing inventory, " + fastRunInventory.getDataset().getName() + ". Exception = " + ex.getMessage();
-            setStatus(runStatus);
-            throw ex;
-        } finally {
-            if (sectorSpecificInventoryOutput != null) {
-                sectorSpecificInventoryOutput.setCompletionDate(new Date());
-                sectorSpecificInventoryOutput.setRunStatus(runStatus);
-                saveFastRunOutput(sectorSpecificInventoryOutput);
-            }
-        }
-
-        return sectorSpecificInventoryOutput;
+        return resultType;
     }
 
     private EmfDataset createEECSDetailedMappingDataset(EmfDataset inventory) throws EmfException {
@@ -247,7 +178,7 @@ public class FastAnalysisTask {
                 inventory.getDescription() + "\nSECTOR_SCENARIO_SECTOR=" + sector);
     }
 
-    private void populateEECSDetailedMapping(FastRunInventory fastRunInventory, FastRunOutput fastRunOutput) throws EmfException {
+    private void populateEECSDetailedMapping(FastRunInventory fastRunInventory, FastAnalysisOutput fastRunOutput) throws EmfException {
         
         EmfDataset inventory = fastRunInventory.getDataset();
         int inventoryVersionNumber = fastRunInventory.getVersion();
@@ -628,7 +559,7 @@ public class FastAnalysisTask {
         
     }
 
-    protected void deleteStrategyOutputs() throws EmfException {
+    private void deleteStrategyOutputs() throws EmfException {
         //get rid of strategy results...
         if (true){
             Session session = sessionFactory.getSession();
@@ -661,23 +592,35 @@ public class FastAnalysisTask {
         }
     }
     
-    protected int getDaysInMonth(int year, int month) {
-        return month != - 1 ? DateUtil.daysInZeroBasedMonth(year, month) : 31;
-    }
+    private FastAnalysisOutput createFastAnalysisOutput(FastAnalysisOutputType fastAnalysisOutputType, EmfDataset outputDataset) throws EmfException {
+        FastAnalysisOutput result = new FastAnalysisOutput();
+        result.setFastAnalysisId(fastAnalysis.getId());
+        result.setOutputDataset(outputDataset);
+//        result.setInventoryDataset(inventory);
+//        result.setInventoryDatasetVersion(inventoryVersion);
+        
+        result.setType(fastAnalysisOutputType);
+        result.setStartDate(new Date());
+        result.setRunStatus("Start processing inventory dataset");
 
-    public void makeSureInventoryDatasetHaveIndexes(FastRunInventory fastRunInventory) {
-        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(fastRunInventory.getDataset()).toLowerCase() + "');analyze " + qualifiedEmissionTableName(fastRunInventory.getDataset()).toLowerCase() + ";";
+        //persist output
+        saveFastAnalysisOutput(result);
+        return result;
+    }
+    
+    private void saveFastAnalysisOutput(FastAnalysisOutput fastAnalysisOutput) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            datasource.query().execute(query);
-        } catch (SQLException e) {
-            //e.printStackTrace();
-            //supress all errors, the indexes might already be on the table...
+            fastRunDAO.updateFastAnalysisOutput(fastAnalysisOutput, session);
+//          runQASteps(fastRunOutput);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not save control strategy results: " + e.getMessage());
         } finally {
-            //
+            session.close();
         }
     }
 
-    protected boolean isRunStatusCancelled() throws EmfException {
+    private boolean isRunStatusCancelled() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             return fastRunDAO.getFastRunRunStatus(fastAnalysis.getId(), session).equals("Cancelled");
@@ -688,7 +631,7 @@ public class FastAnalysisTask {
         }
     }
     
-    protected int getRecordCount(EmfDataset dataset) throws EmfException {
+    private int getRecordCount(EmfDataset dataset) throws EmfException {
         String query = "SELECT count(1) as record_count "
             + " FROM " + qualifiedEmissionTableName(dataset);
         ResultSet rs = null;
@@ -719,11 +662,11 @@ public class FastAnalysisTask {
         return recordCount;
     }
 
-    protected String qualifiedEmissionTableName(Dataset dataset) {
+    private String qualifiedEmissionTableName(Dataset dataset) {
         return qualifiedName(emissionTableName(dataset));
     }
 
-    protected String emissionTableName(Dataset dataset) {
+    private String emissionTableName(Dataset dataset) {
         InternalSource[] internalSources = dataset.getInternalSources();
         return internalSources[0].getTable().toLowerCase();
     }
@@ -748,20 +691,7 @@ public class FastAnalysisTask {
 //        return result;
 //    }
 
-    protected FastRunOutputType getFastRunOutputType(String name) throws EmfException {
-        FastRunOutputType resultType = null;
-        Session session = sessionFactory.getSession();
-        try {
-            resultType = fastRunDAO.getFastRunOutputType(name, session);
-        } catch (RuntimeException e) {
-            throw new EmfException("Could not get detailed strategy result type");
-        } finally {
-            session.close();
-        }
-        return resultType;
-    }
-
-    protected EmfDataset getDataset(int id) {
+    private EmfDataset getDataset(int id) {
         EmfDataset dataset = null;
         Session session = sessionFactory.getSession();
         try {
@@ -772,7 +702,7 @@ public class FastAnalysisTask {
         return dataset;
     }
 
-    protected DatasetType getDatasetType(String name) {
+    private DatasetType getDatasetType(String name) {
         DatasetType datasetType = null;
         Session session = sessionFactory.getSession();
         try {
@@ -783,7 +713,7 @@ public class FastAnalysisTask {
         return datasetType;
     }
 
-    protected FastRunOutput[] getFastRunOutputs() {
+    private FastRunOutput[] getFastRunOutputs() {
         FastRunOutput[] results = new FastRunOutput[] {};
         Session session = sessionFactory.getSession();
         try {
@@ -799,7 +729,7 @@ public class FastAnalysisTask {
 //            "#Implements control strategy: " + fastRun.getName() + "\n#";
 //    }
 
-    protected void saveFastRunOutput(FastRunOutput fastRunOutput) throws EmfException {
+    private void saveFastAnalysisOutput(FastRunOutput fastRunOutput) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             fastRunDAO.updateFastRunOutput(fastRunOutput, session);
@@ -811,7 +741,7 @@ public class FastAnalysisTask {
         }
     }
 
-    protected void saveFastRun(FastRun fastRun) throws EmfException {
+    private void saveFastRun(FastRun fastRun) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             fastRunDAO.updateFastRun(fastRun, session);
@@ -822,7 +752,7 @@ public class FastAnalysisTask {
         }
     }
 
-    protected void saveFastRunSummaryOutput(FastRunOutput fastRunOutput) throws EmfException {
+    private void saveFastRunSummaryOutput(FastRunOutput fastRunOutput) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             fastRunDAO.updateFastRunOutput(fastRunOutput, session);
@@ -833,12 +763,12 @@ public class FastAnalysisTask {
         }
     }
     
-    protected void updateOutputDatasetVersionRecordCount(FastRunOutput fastRunOutput) throws EmfException {
+    private void updateOutputDatasetVersionRecordCount(FastAnalysisOutput fastAnalysisOutput) throws EmfException {
         Session session = sessionFactory.getSession();
         DatasetDAO dao = new DatasetDAO();
         
         try {
-            EmfDataset result = fastRunOutput.getOutputDataset();
+            EmfDataset result = fastAnalysisOutput.getOutputDataset();
             
             if (result != null) {
                 Version version = dao.getVersion(session, result.getId(), result.getDefaultVersion());
@@ -847,7 +777,7 @@ public class FastAnalysisTask {
                     updateVersion(result, version, dbServer, session, dao);
             }
         } catch (Exception e) {
-            throw new EmfException("Cannot update result datasets (strategy id: " + fastRunOutput.getFastRunId() + "). " + e.getMessage());
+            throw new EmfException("Cannot update result datasets (strategy id: " + fastAnalysisOutput.getFastAnalysisId() + "). " + e.getMessage());
         } finally {
             if (session != null && session.isConnected())
                 session.close();
@@ -886,7 +816,7 @@ public class FastAnalysisTask {
         return fastAnalysis;
     }
 
-    protected void runQASteps(FastAnalysisOutput fastAnalysisOutput) {
+    private void runQASteps(FastAnalysisOutput fastAnalysisOutput) {
 //        EmfDataset resultDataset = (EmfDataset)fastRunOutput.getDetailedResultDataset();
         if (recordCount > 0) {
 //            runSummaryQASteps(resultDataset, 0);
@@ -894,7 +824,7 @@ public class FastAnalysisTask {
 //        excuteSetAndRunQASteps(inputDataset, fastRun.getDatasetVersion());
     }
 
-    protected void runSummaryQASteps(EmfDataset dataset, int version) throws EmfException {
+    private void runSummaryQASteps(EmfDataset dataset, int version) throws EmfException {
         QAStepTask qaTask = new QAStepTask(dataset, version, user, sessionFactory, dbServerFactory);
         //11/14/07 DCD instead of running the default qa steps specified in the property table, lets run all qa step templates...
         QAStepTemplate[] qaStepTemplates = dataset.getDatasetType().getQaStepTemplates();
@@ -905,7 +835,7 @@ public class FastAnalysisTask {
         }
     }
 
-    protected void disconnectDbServer() throws EmfException {
+    private void disconnectDbServer() throws EmfException {
         try {
             dbServer.disconnect();
         } catch (Exception e) {
@@ -917,13 +847,13 @@ public class FastAnalysisTask {
         return recordCount;
     }
 
-    protected void addStatus(FastRunInventory fastRunInventory) {
+    private void addStatus(FastRunInventory fastRunInventory) {
         setStatus("Completed processing sector scenario inventory: " 
                 + fastRunInventory.getDataset().getName() 
                 + ".");
     }
 
-    protected void setStatus(String message) {
+    private void setStatus(String message) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
         endStatus.setType("FastRun");
@@ -967,7 +897,6 @@ public class FastAnalysisTask {
 //        boolean hasRpenColumn = hasColName("rpen",mappingDataset.getDatasetType().getFileFormat());
 //        boolean hasMactColumn = hasColName("mact",(FileFormatWithOptionalCols) formatUnit.fileFormat());
 //        boolean hasSicColumn = hasColName("sic",(FileFormatWithOptionalCols) formatUnit.fileFormat());
-//        boolean hasCpriColumn = hasColName("cpri",(FileFormatWithOptionalCols) formatUnit.fileFormat());
 //        boolean hasPrimaryDeviceTypeCodeColumn = hasColName("primary_device_type_code",(FileFormatWithOptionalCols) formatUnit.fileFormat());
         boolean hasSectorColumn = hasColName("sector", mappingDataset.getDatasetType().getFileFormat());
         try {
@@ -988,9 +917,7 @@ public class FastAnalysisTask {
             
             connection = datasource.getConnection();
             statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            System.out.println("start fix check query " + System.currentTimeMillis());
             rs = statement.executeQuery(sql);
-            System.out.println("end fix check query " + System.currentTimeMillis());
             boolean foundNegative9 = false;
             while (rs.next()) {
                 foundNegative9 = true;
@@ -1050,7 +977,7 @@ public class FastAnalysisTask {
 
     }
     
-    protected boolean hasColName(String colName, XFileFormat fileFormat) {
+    private boolean hasColName(String colName, XFileFormat fileFormat) {
         Column[] cols = fileFormat.cols();
         boolean hasIt = false;
         for (int i = 0; i < cols.length; i++)
