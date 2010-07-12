@@ -134,6 +134,4 @@ INSERT INTO emf.fileformat_columns (file_format_id, list_index, name, type, defa
 INSERT INTO emf.fileformat_columns (file_format_id, list_index, name, type, default_value, description, formatter, constraints, mandatory, width, spaces, fix_format_start, fix_format_end) select (select id from emf.file_formats where name = 'FAST Analysis Domain Difference Result') as file_format_id, 16, 'diff_sum_emission', 'double precision', '', 'RealFormatter', '', 'NULL', false, -1, 0, 0, 0;
 
 
-
-INSERT INTO fast.fast_analysis_output_types (name) VALUES ('FAST Gridded Difference');
 INSERT INTO fast.fast_analysis_output_types (name) VALUES ('FAST Domain Difference');
