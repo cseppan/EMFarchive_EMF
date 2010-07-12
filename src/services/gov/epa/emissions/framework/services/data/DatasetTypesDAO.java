@@ -91,14 +91,14 @@ public class DatasetTypesDAO {
         return current(datasetType.getId(), DatasetType.class, session);
     }
 
-    public void validateDatasetTypeIndicesKeyword(DatasetType datasetType) throws EmfException {
+    public void validateDatasetTypeIndicesKeyword(DatasetType datasetType, Column[] cols) throws EmfException {
         //validate INDICES keyword...
         //first validate columns to index actually exist! 
         KeyVal[] keyVal = keyValFound(datasetType, Keyword.INDICES);
         if (keyVal != null && keyVal.length > 0) {
             for (String columnList : keyVal[0].getValue().split("\\|")) {
                 for (String columnName : columnList.split("\\,")) {
-                    if (!hasColName(datasetType, columnName))
+                    if (!hasColName(cols, columnName))
                         throw new EmfException("DatasetType keyword, INDICES, contains an invalid column name, " + columnName + ".");
                 }
             }
@@ -116,8 +116,7 @@ public class DatasetTypesDAO {
         return list.toArray(new KeyVal[0]);
     }
     
-    private boolean hasColName(DatasetType datasetType, String colName) {
-        Column[] cols = datasetType.getFileFormat().cols();
+    private boolean hasColName(Column[] cols, String colName) {
         boolean hasIt = false;
         for (int i = 0; i < cols.length; i++)
             if (colName.equalsIgnoreCase(cols[i].name())) hasIt = true;

@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
+import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -356,8 +357,8 @@ public class DataCommonsDAO {
         return datasetTypesDAO.canUpdate(datasetType, session);
     }
     
-    public void validateDatasetTypeIndicesKeyword(DatasetType datasetType) throws EmfException {
-        datasetTypesDAO.validateDatasetTypeIndicesKeyword(datasetType);
+    public void validateDatasetTypeIndicesKeyword(DatasetType datasetType, Column[] cols) throws EmfException {
+        datasetTypesDAO.validateDatasetTypeIndicesKeyword(datasetType, cols);
     }
     
     public Object load(Class clazz, String name, Session session) {

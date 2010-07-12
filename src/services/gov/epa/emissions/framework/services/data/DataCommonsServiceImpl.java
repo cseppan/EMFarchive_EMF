@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.commons.io.Column;
+import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.io.csv.CSVFileReader;
 import gov.epa.emissions.commons.security.User;
@@ -27,6 +28,7 @@ import gov.epa.emissions.framework.services.basic.EmfServerFileSystemView;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.cost.controlStrategy.FileFormatFactory;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -49,6 +51,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     private HibernateSessionFactory sessionFactory;
 
+    private DbServerFactory dbServerFactory;
+
     private DataCommonsDAO dao;
 
     private EmfFileInfo[] files;
@@ -59,6 +63,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public DataCommonsServiceImpl() {
         this(HibernateSessionFactory.get());
+        this.dbServerFactory = DbServerFactory.get();
     }
 
     public DataCommonsServiceImpl(HibernateSessionFactory sessionFactory) {
@@ -206,22 +211,41 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
 
     public synchronized DatasetType updateDatasetType(DatasetType type) throws EmfException {
+        Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            Session session = sessionFactory.getSession();
 
             if (!dao.canUpdate(type, session))
                 throw new EmfException("DatasetType name already in use");
 
             //validate INDICES keyword...
-            dao.validateDatasetTypeIndicesKeyword(type);
+            XFileFormat xFileFormat = type.getFileFormat();
+            Column[] cols = new Column[] { };
+            if (xFileFormat != null)
+                cols = xFileFormat.cols();
+            else {
+                TableFormat tableFormat = new FileFormatFactory(dbServer).tableFormat(type);
+                cols = tableFormat.cols();
+            }
+            dao.validateDatasetTypeIndicesKeyword(type, cols);
             
             DatasetType locked = dao.updateDatasetType(type, session);
-            session.close();
 
             return locked;
         } catch (RuntimeException e) {
             LOG.error("Could not update DatasetType. Name is already in use: " + type.getName(), e);
             throw new EmfException("DatasetType name already in use");
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+            try {
+                dbServer.disconnect();
+            } catch (Exception e) {
+                // NOTE Auto-generated catch block
+//                e.printStackTrace();
+            }
         }
     }
 
@@ -431,20 +455,39 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
 
     public synchronized void addDatasetType(DatasetType type) throws EmfException {
+        Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            Session session = sessionFactory.getSession();
 
             if (dao.nameUsed(type.getName(), DatasetType.class, session))
                 throw new EmfException("The DatasetType name is already in use");
 
             //validate INDICES keyword...
-            dao.validateDatasetTypeIndicesKeyword(type);
+            XFileFormat xFileFormat = type.getFileFormat();
+            Column[] cols = new Column[] { };
+            if (xFileFormat != null)
+                cols = xFileFormat.cols();
+            else {
+                TableFormat tableFormat = new FileFormatFactory(dbServer).tableFormat(type);
+                cols = tableFormat.cols();
+            }
+            dao.validateDatasetTypeIndicesKeyword(type, cols);
             
             dao.add(type, session);
-            session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add new DatasetType", e);
             throw new EmfException("DatasetType name already in use");
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+            try {
+                dbServer.disconnect();
+            } catch (Exception e) {
+                // NOTE Auto-generated catch block
+//                e.printStackTrace();
+            }
         }
     }
     

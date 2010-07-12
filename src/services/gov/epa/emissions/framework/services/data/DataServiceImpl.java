@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DeepCopy;
+import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.io.VersionedDatasetQuery;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.io.importer.DataTable;
@@ -414,6 +415,24 @@ public class DataServiceImpl implements DataService {
         try {
             return new TableToString(dbServer, qualifiedTableName, ",").toString();
         } catch (RuntimeException e) {
+            LOG.error("Could not retrieve table: " + qualifiedTableName, e);
+            throw new EmfException("Could not retrieve table: " + qualifiedTableName);
+        } catch (ExporterException e) {
+            LOG.error("Could not retrieve table: " + qualifiedTableName, e);
+            throw new EmfException("Could not retrieve table: " + qualifiedTableName);
+        } finally {
+            closeDB(dbServer);
+        }
+    }
+
+    public synchronized String getTableAsString(String qualifiedTableName, long recordLimit, long recordOffset) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        try {
+            return new TableToString(dbServer, qualifiedTableName, ",").toString(recordLimit, recordOffset);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve table: " + qualifiedTableName, e);
+            throw new EmfException("Could not retrieve table: " + qualifiedTableName);
+        } catch (ExporterException e) {
             LOG.error("Could not retrieve table: " + qualifiedTableName, e);
             throw new EmfException("Could not retrieve table: " + qualifiedTableName);
         } finally {
