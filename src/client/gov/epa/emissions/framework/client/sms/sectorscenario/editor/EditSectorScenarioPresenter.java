@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
+import gov.epa.emissions.framework.services.sms.SectorScenarioOutput;
 
 public interface EditSectorScenarioPresenter{
 
@@ -37,5 +38,7 @@ public interface EditSectorScenarioPresenter{
     void stopRunningSectorScenario(int sectorScenarioId) throws EmfException;
     
     EmfDataset getDataset(int id) throws EmfException;
+    
+    SectorScenarioOutput[] getOutputs() throws EmfException;
     
 }

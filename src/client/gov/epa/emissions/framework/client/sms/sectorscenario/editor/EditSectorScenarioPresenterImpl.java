@@ -5,9 +5,10 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.sms.SectorScenarioService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
+import gov.epa.emissions.framework.services.sms.SectorScenarioOutput;
+import gov.epa.emissions.framework.services.sms.SectorScenarioService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -73,6 +74,10 @@ public class EditSectorScenarioPresenterImpl  implements EditSectorScenarioPrese
         view.disposeView();
     }   
 
+    public SectorScenarioOutput[] getOutputs() throws EmfException {
+        return service().getSectorScenarioOutputs(sectorScenario.getId());
+    }
+
     public void set(EditSectorScenarioSummaryTabView view) {
         this.summaryTabView = view;
         this.summaryTabPresenter = new EditSectorScenarioSummaryTabPresenterImpl(session, summaryTabView);
@@ -102,12 +107,15 @@ public class EditSectorScenarioPresenterImpl  implements EditSectorScenarioPrese
     }   
        
     public void doRefresh() throws EmfException {
-          SectorScenario ss = service().getById(sectorScenario.getId());
-          
-          for (Iterator iter = presenters.iterator(); iter.hasNext();) {
-                EditSectorScenarioTabPresenter element = (EditSectorScenarioTabPresenter) iter.next();
-                element.doRefresh(ss);
-          }
+        SectorScenario ss = service().getById(sectorScenario.getId());
+        SectorScenarioOutput[] ssO = service().getSectorScenarioOutputs(ss.getId());
+        
+        view.refresh(ss, ssO);
+        
+        for (Iterator iter = presenters.iterator(); iter.hasNext();) {
+            EditSectorScenarioTabPresenter element = (EditSectorScenarioTabPresenter) iter.next();
+            element.doRefresh(ss, ssO);
+        }
     }
 
     public DatasetType getDatasetType(String name) throws EmfException {

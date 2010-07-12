@@ -50,6 +50,7 @@
 	</array>
 	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
   	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
+	<property name="deleteResults" column="delete_results" type="boolean" not-null="false"/>
 
   </class> 
 </hibernate-mapping>  

@@ -18,7 +18,6 @@ import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
-import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 import gov.epa.emissions.framework.services.sms.SectorScenarioOutput;
@@ -73,7 +72,7 @@ public class EditSectorScenarioOutputsTab extends JPanel implements EditSectorSc
 
     //private boolean creatingControlledInventories;
 
-    public EditSectorScenarioOutputsTab(SectorScenario sectorScenario,
+    public EditSectorScenarioOutputsTab(SectorScenario sectorScenario, 
             MessagePanel messagePanel, EmfConsole parentConsole, 
             EmfSession session, DesktopManager desktopManager) {
         super.setName("outputs");
@@ -85,8 +84,8 @@ public class EditSectorScenarioOutputsTab extends JPanel implements EditSectorSc
 //        setLayout(controlStrategy, controlStrategyResults);
     }
 
-    public void display(SectorScenario sectorScenario) {
-      setLayout(new SectorScenarioOutput[0]);
+    public void display(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) {
+      setLayout(sectorScenarioOutputs);
     }
 
     private void setLayout(SectorScenarioOutput[] sectorScenarioOutputs) {
@@ -346,10 +345,9 @@ public class EditSectorScenarioOutputsTab extends JPanel implements EditSectorSc
         app.display(fileNames);
     }
 
-    public void refresh(SectorScenario sectorScenario) {
-        SectorScenarioOutput[] strategies= new SectorScenarioOutput[0];
-        setLayout(new SectorScenarioOutput[0]);
-        SectorScenarioOutputTableData tableData = new SectorScenarioOutputTableData(strategies);
+    public void refresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) {
+        setLayout(sectorScenarioOutputs);
+        SectorScenarioOutputTableData tableData = new SectorScenarioOutputTableData(sectorScenarioOutputs);
         table.refresh(tableData);
         tablePanel.removeAll();
         tablePanel.add(table);
@@ -428,11 +426,6 @@ public class EditSectorScenarioOutputsTab extends JPanel implements EditSectorSc
         this.messagePanel.clear();
     }
 
-    public void notifyStrategyTypeChange(StrategyType strategyType) {
-        // NOTE Auto-generated method stub
-        
-    }
-    
     private void validateFolder(String folder) throws EmfException {
         if (folder == null || folder.trim().isEmpty())
             throw new EmfException("Please select a valid folder to export.");
@@ -441,11 +434,9 @@ public class EditSectorScenarioOutputsTab extends JPanel implements EditSectorSc
             throw new EmfException("Export data into user's home directory is not allowed.");
     }
 
-    public void notifyStrategyRun(SectorScenario sectorScenario) {
-//        if (sectorScenario.getgetDeleteResults()) {
-//            refresh(controlStrategy, new ControlStrategyResult[] {});
-//        }
+    public void notifyScenarioRun(SectorScenario sectorScenario) {
+        if (sectorScenario.getDeleteResults()) {
+            refresh(sectorScenario, new SectorScenarioOutput[] {});
+        }
     }
-
-
 }

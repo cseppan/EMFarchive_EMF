@@ -243,12 +243,13 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
     public synchronized void runSectorScenario(User user, int sectorScenarioId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            // first see if the strategy has been canceled, is so don't run it...
+            // first see if the strategy has been canceled cor is running, is so don't run it...
             String runStatus = dao.getSectorScenarioRunStatus(sectorScenarioId, session);
-            if (runStatus.equals("Cancelled"))
+            if (runStatus.equals("Cancelled")
+                    || runStatus.equals("Running"))
                 return;
 
-            SectorScenario strategy = getById(sectorScenarioId);
+            SectorScenario sectorScenario = getById(sectorScenarioId);
 //            validateSectors(strategy);
             //get rid of for now, since we don't auto export anything
             //make sure a valid server-side export path was specified
@@ -264,9 +265,9 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             dao.setSectorScenarioRunStatusAndCompletionDate(sectorScenarioId, "Waiting", null, session);
 
 //            validatePath(strategy.getExportDirectory());
-            RunSectorScenario runStrategy = new RunSectorScenario(sessionFactory, dbServerFactory,
+            RunSectorScenario runSectorScenario = new RunSectorScenario(sessionFactory, dbServerFactory,
                     threadPool);
-            runStrategy.run(user, strategy, this);
+            runSectorScenario.run(user, sectorScenario, this);
         } catch (EmfException e) {
             // queue up the strategy to be run, by setting runStatus to Waiting
             dao.setSectorScenarioRunStatusAndCompletionDate(sectorScenarioId, "Failed", null, session);

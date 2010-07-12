@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
+import gov.epa.emissions.framework.services.sms.SectorScenarioOutput;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -58,6 +59,8 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     protected DesktopManager desktopManager;
     
     protected String tabTitle;
+
+    private EditSectorScenarioOutputsTab outputsTabView;
     
     public EditSectorScenarioWindow(String name, DesktopManager desktopManager, EmfSession session, 
             EmfConsole parentConsole) {
@@ -72,7 +75,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
     }
 
-    public void display(SectorScenario sectorScenario) {
+    public void display(SectorScenario sectorScenario) throws EmfException {
         super.setLabel(super.getTitle() + ": " + sectorScenario.getName());
         this.sectorScenario = sectorScenario;
         super.display();
@@ -90,11 +93,11 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         contentPane.add(layout);
     }
 
-    private JTabbedPane createTabbedPane() {
+    private JTabbedPane createTabbedPane() throws EmfException {
         tabbedPane.addTab("Summary", createSummaryTab());       
         tabbedPane.addTab("Inputs", createInputsTab());
         tabbedPane.addTab("Options", createOptionsTab());
-        tabbedPane.addTab("Outputs", createOutputsTab());
+        tabbedPane.addTab("Outputs", createOutputsTab(presenter.getOutputs()));
         
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         return tabbedPane;
@@ -147,12 +150,12 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         //return null; 
     }
     
-    private JPanel createOutputsTab(){
-        EditSectorScenarioOutputsTab outputsTabView = new EditSectorScenarioOutputsTab(sectorScenario, 
+    private JPanel createOutputsTab(SectorScenarioOutput[] outputs){
+        outputsTabView = new EditSectorScenarioOutputsTab(sectorScenario,  
                 messagePanel, parentConsole, 
                 session, desktopManager);      
         this.presenter.set(outputsTabView);
-        outputsTabView.display(sectorScenario);
+        outputsTabView.display(sectorScenario, outputs);
         return outputsTabView;
         //return null; 
     }
@@ -201,6 +204,13 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
         panel.add(container, BorderLayout.CENTER);
 
+        if (sectorScenario.getRunStatus() == null 
+                || sectorScenario.getRunStatus().equalsIgnoreCase("Finished"))
+            enableButtons(true);
+        else
+            enableButtons(false);
+
+        
         return panel;
     }
     
@@ -233,6 +243,11 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         };
     }
 
+    public void refresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) {
+
+        if (sectorScenario.getRunStatus().equalsIgnoreCase("Finished"))
+            enableButtons(true);
+    }
 
     public void enableButtons(boolean enable) {
         saveButton.setEnabled(enable);
@@ -332,10 +347,19 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
                 try {
                     stopButton.setEnabled(true);
+                    //perform a save action first and catch any new changes...
+                    save();
+                    
+                    enableButtons(false);
+                    //now run the scenario
                     presenter.runSectorScenario(sectorScenario.getId());
+                    outputsTabView.notifyScenarioRun(sectorScenario);
+                    messagePanel
+                        .setMessage("Running sector scenario. Monitor the status window for progress, and refresh this window after completion to see outputs");
+
                 } catch (EmfException e1) {
                     stopButton.setEnabled(false);
-                    showError(e1.getMessage());
+                    showError("Error running sector scenario, " + e1.getMessage());
                 }
                 
             }

@@ -42,8 +42,8 @@ public class SectorScenarioOutputTableData extends AbstractTableData {
                 
                 format(result.getStartDate()),
                 format(result.getCompletionDate()),
-                invDataset == null? "":invDataset.getName(),
-                outputDataset == null? "":outputDataset.getName()
+                invDataset == null || invDataset.getSectors() == null  || invDataset.getSectors().length == 0 ? "" : invDataset.getSectors()[0].getName(),
+                invDataset == null? "":invDataset.getName()
                 };
         return values;
     }
@@ -52,19 +52,18 @@ public class SectorScenarioOutputTableData extends AbstractTableData {
         return new String[] { 
                 "Result Type", 
                 //"Record Count", 
-                //"Result", 
+                "Result Dataset", 
                 "Status", 
                 "Start Time", 
                 "Completion Time",
-                "Input", 
-                "Output", 
-                //"Controlled Inventory" 
+                "Input Inventory Sector",
+                "Input Inventory Dataset" 
                 };
     }
 
     public Class getColumnClass(int col) {
-        if ( col == 1)
-            return Integer.class;
+//        if ( col == 1)
+//            return Integer.class;
 
         return String.class;
     }

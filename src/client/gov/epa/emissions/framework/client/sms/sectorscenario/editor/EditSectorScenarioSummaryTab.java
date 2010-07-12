@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
+import gov.epa.emissions.framework.services.sms.SectorScenarioOutput;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
@@ -247,7 +248,7 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
         sectorScenario.setLastModifiedDate(new Date());
     }
 
-    public void refresh(SectorScenario sectorScenario) {
+    public void refresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) {
         this.sectorScenario = sectorScenario;
         updateSummaryResultPanel();
 

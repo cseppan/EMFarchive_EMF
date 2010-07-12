@@ -149,9 +149,9 @@ public class EditSectorScenarioOutputsTabPresenter implements EditSectorScenario
 //            throw new EmfException("Please specify a directory to export");
 //    }
 
-    public void doDisplay(SectorScenario sectorScenario) throws EmfException {
+    public void doDisplay(SectorScenario sectorScenario, SectorScenarioOutput[] outputs) throws EmfException {
         view.observe(this);
-        view.display(sectorScenario);
+        view.display(sectorScenario, outputs);
 //        view.recentExportFolder(folder());
     }
 
@@ -180,8 +180,8 @@ public class EditSectorScenarioOutputsTabPresenter implements EditSectorScenario
         //        controlStrategyResults, namePrefix);
     }
 
-    public void doRefresh(SectorScenario sectorScenario) throws EmfException {
-        view.refresh(sectorScenario);
+    public void doRefresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) throws EmfException {
+        view.refresh(sectorScenario, sectorScenarioOutputs);
     }
     
     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {

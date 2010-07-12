@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 import gov.epa.emissions.framework.services.sms.SectorScenarioInventory;
+import gov.epa.emissions.framework.services.sms.SectorScenarioOutput;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
@@ -491,20 +492,6 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
         }
     }
 
-    public void refresh(SectorScenario sectorScenario) {
-        if (sectorScenario.getInventories()!=null && sectorScenario.getInventories().length > 0)
-            tableData.add(sectorScenario.getInventories());
-        refresh();
-    }
-
-//    public void notifyStrategyTypeChange(StrategyType strategyType) {
-//        
-//        if (strategyType != null && (strategyType.getName().equals(StrategyType.leastCost) || strategyType.getName().equals(StrategyType.leastCostCurve)))
-//            mergeInventories.setVisible(true);
-//        else
-//            mergeInventories.setVisible(false);
-//    }
-
     
 //    private void showDatasetDataViewer(EmfDataset dataset) {
 //        try {
@@ -545,5 +532,12 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
         if (versions.length > 0)
             version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
 
+    }
+
+
+    public void refresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs)
+            throws EmfException {
+        // NOTE Auto-generated method stub
+        
     }   
 }

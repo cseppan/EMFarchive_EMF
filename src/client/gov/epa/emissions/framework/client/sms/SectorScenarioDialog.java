@@ -76,6 +76,7 @@ public class SectorScenarioDialog extends JDialog implements SectorScenarioView 
     }
 
     public void display() throws EmfException {
+        presenter.test();
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout(5, 5));
         JPanel panel = new JPanel(new BorderLayout(10, 10));
@@ -84,7 +85,7 @@ public class SectorScenarioDialog extends JDialog implements SectorScenarioView 
         contentPane.add(panel);
         setTitle("Sector Scenario Analysis");
         this.pack();
-        this.setSize(500, 400);
+        this.setSize(700, 600);
         this.setLocation(ScreenUtils.getPointToCenter(this));
         this.setVisible(true);
     }
@@ -300,11 +301,11 @@ public class SectorScenarioDialog extends JDialog implements SectorScenarioView 
 //                SectorScenarioInventory sectorScenarioInventory = new SectorScenarioInventory((EmfDataset)inventoryDataset.getSelectedItem(), (Integer)inventoryDatasetVersion.getSelectedItem());
                 sectorScenario.setInventories(new SectorScenarioInventory[] { new SectorScenarioInventory((EmfDataset)inventoryDataset.getSelectedItem(), ((Version)inventoryDatasetVersion.getSelectedItem()).getVersion()) });
                 sectorScenario.setSectorMapppingDatasetVersion(0);
-                sectorScenario.setSectors(Arrays.asList(sectorsList.getAllElements()).toArray(new String[0]));
+                sectorScenario.setSectors(Arrays.asList(sectorsList.getSelectedValues()).toArray(new String[0]));
 
                 try {
                     int id = presenter.addSectorScenario(sectorScenario);
-                    presenter.getSectorScenario(session.user(), id);
+                    sectorScenario = presenter.getSectorScenario(session.user(), id);
                     presenter.runSectorScenario(id);
                 } catch (EmfException e1) {
                     // NOTE Auto-generated catch block

@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
+import gov.epa.emissions.framework.services.sms.SectorScenarioOutput;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -33,13 +34,7 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
     
     private JRadioButton fillMissEECS;
     
-    private JRadioButton mappedToOne;
-    
-    private JRadioButton mappedToAll;
-    
     private ButtonGroup buttonGroup;
-    
-    private ButtonGroup doubleButtonGroup;
     
     protected EmfSession session;
     
@@ -66,7 +61,6 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
     public void display() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(getBorderedPanel(createmMainSection(), ""), BorderLayout.NORTH);
-        panel.add(doubleCount());
         
         setLayout(new BorderLayout(5, 5));
         add(panel,BorderLayout.NORTH);
@@ -133,28 +127,6 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
         annoInvEECS = new JCheckBox("", null, sectorScenario.getAnnotateInventoryWithEECS() != null ? sectorScenario.getAnnotateInventoryWithEECS() : true);
         return annoInvEECS;
     } 
-    
-    private JPanel doubleCount() {
-        mappedToOne = new JRadioButton("emissions mapped to one and only one sector");
-        mappedToAll = new JRadioButton("emissions mapped to all matching sectors (double count)");
-        doubleButtonGroup = new ButtonGroup();
-        doubleButtonGroup.add(mappedToOne);     
-        doubleButtonGroup.add(mappedToAll);
-        
-        if (sectorScenario.getShouldDoubleCount())
-            mappedToAll.setSelected(true);
-        else
-            mappedToOne.setSelected(true);
-       
-        JPanel radioPanel = new JPanel();
-        radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.Y_AXIS));
-        radioPanel.add(new JLabel(" "));
-        radioPanel.add(new JLabel("Double count option: "));
-        radioPanel.add(mappedToOne);
-        radioPanel.add(mappedToAll);
-        
-        return radioPanel;
-    } 
 
     private JPanel buildListPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
@@ -172,10 +144,6 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
     
     public void save(SectorScenario sectorScenario){
         sectorScenario.setAnnotateInventoryWithEECS(annoInvEECS.isSelected());
-        if (doubleButtonGroup.getSelection().equals(mappedToOne.getModel()))
-            sectorScenario.setShouldDoubleCount(false);
-        if (doubleButtonGroup.getSelection().equals(mappedToAll.getModel()))
-            sectorScenario.setShouldDoubleCount(true);
         if (buttonGroup.getSelection().equals(addEECSCol.getModel())){
             Short choice = 1; 
             sectorScenario.setAnnotatingEecsOption(choice);
@@ -190,22 +158,19 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
         }
     }
 
-    public void refresh(SectorScenario secSce) {
-        annoInvEECS.setSelected(secSce.getAnnotateInventoryWithEECS());
-        
-        if (secSce.getShouldDoubleCount())
-            mappedToAll.setSelected(true);
-        else
-            mappedToOne.setSelected(true);
-        
-        short annEccsOpt = secSce.getAnnotatingEecsOption();
-        
-        if (annEccsOpt == 1)
-            addEECSCol.setSelected(true);
-        else if (annEccsOpt == 2)
-            useEECSFromInv.setSelected(true);
-        else
-            fillMissEECS.setSelected(true);
+    public void refresh(SectorScenario secSce, SectorScenarioOutput[] sectorScenarioOutputs) {
+
+//DON'T refresh anything from this tab, leave as is...
+//        annoInvEECS.setSelected(secSce.getAnnotateInventoryWithEECS());
+//        
+//        short annEccsOpt = secSce.getAnnotatingEecsOption();
+//        
+//        if (annEccsOpt == 1)
+//            addEECSCol.setSelected(true);
+//        else if (annEccsOpt == 2)
+//            useEECSFromInv.setSelected(true);
+//        else
+//            fillMissEECS.setSelected(true);
     }
 
 

@@ -34,6 +34,7 @@ public class SectorScenario implements Lockable, Serializable {
     private SectorScenarioInventory[] inventories = new SectorScenarioInventory[] {};
     private String[] sectors = new String[] {};
     private Project project;
+    private Boolean deleteResults = true;
 
     public static final short CREATE_SINGLE_INVENTORY = 0;
     public static final short CREATE_N_SECTOR_INVENTORIES = 1;
@@ -285,5 +286,13 @@ public class SectorScenario implements Lockable, Serializable {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public Boolean getDeleteResults() {
+        return this.deleteResults;
+    }
+
+    public void setDeleteResults(Boolean deleteResults) {
+        this.deleteResults = deleteResults;
     }
 }

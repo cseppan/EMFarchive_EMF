@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
+import gov.epa.emissions.framework.services.sms.SectorScenarioOutput;
 
 public class EditSectorScenarioInputsTabPresenterImpl implements EditSectorScenarioInputsTabPresenter{
 
@@ -54,8 +55,8 @@ public class EditSectorScenarioInputsTabPresenterImpl implements EditSectorScena
         return session.dataEditorService().getVersions(dataset.getId());
     }
 
-    public void doRefresh(SectorScenario sectorScenario) throws EmfException {
-        view.refresh(sectorScenario);  
+    public void doRefresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) throws EmfException {
+        view.refresh(sectorScenario, sectorScenarioOutputs);  
         
     }
 }

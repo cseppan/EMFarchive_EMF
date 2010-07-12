@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.sms.sectorscenario.editor.EditSectorScenarioPresenter;
 import gov.epa.emissions.framework.client.sms.sectorscenario.editor.EditSectorScenarioWindow;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 
 public class ViewSectorScenarioWindow extends EditSectorScenarioWindow implements ViewSectorScenarioView {
@@ -19,7 +20,7 @@ public class ViewSectorScenarioWindow extends EditSectorScenarioWindow implement
         presenter.getClass();
     }
 
-    public void display(SectorScenario sectorScenario) {
+    public void display(SectorScenario sectorScenario) throws EmfException {
         super.display(sectorScenario);
     }
 

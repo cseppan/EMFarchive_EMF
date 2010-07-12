@@ -11,6 +11,7 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.io.XFileFormat;
+import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.io.temporal.VersionedTableFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
@@ -103,35 +104,48 @@ public class SectorScenarioTask {
         return result;
     }
     
-    public SectorScenarioOutput createEECSDetailedMappingResultOutput(SectorScenarioInventory sectorScenarioInventory) throws Exception {
-        EmfDataset inventory = sectorScenarioInventory.getDataset();
+    protected SectorScenarioOutput createSectorScenarioOutput(SectorScenarioOutputType sectorScenarioOutputType, EmfDataset outputDataset) throws EmfException {
+        SectorScenarioOutput result = new SectorScenarioOutput();
+        result.setSectorScenarioId(sectorScenario.getId());
+        result.setOutputDataset(outputDataset);
+        
+        result.setType(sectorScenarioOutputType);
+        result.setStartDate(new Date());
+        result.setRunStatus("Start processing inventory dataset");
 
+        //persist output
+        saveSectorScenarioOutput(result);
+        return result;
+    }
+
+    public SectorScenarioOutput createEECSDetailedMappingResultOutput(SectorScenarioInventory[] sectorScenarioInventories) throws Exception {
         //setup result
         SectorScenarioOutput eecsDetailedMappingOutput = null;
         String runStatus = "";
         
         //Create EECS Detailed Mapping Result Output
         try {
-            setStatus("Started creating " + DatasetType.EECS_DETAILED_MAPPING_RESULT + " from the inventory, " 
-                    + sectorScenarioInventory.getDataset().getName() 
-                    + ".");
-            
-            EmfDataset eecsDetailedMapping =  createEECSDetailedMappingDataset(inventory);
-
-            eecsDetailedMappingOutput = createSectorScenarioOutput(getSectorScenarioOutputType(SectorScenarioOutputType.DETAILED_EECS_MAPPING_RESULT), eecsDetailedMapping, inventory, sectorScenarioInventory.getVersion());
-
-            populateEECSDetailedMapping(sectorScenarioInventory, eecsDetailedMappingOutput);
+            setStatus("Started creating " + DatasetType.EECS_DETAILED_MAPPING_RESULT + ".");
+            EmfDataset eecsDetailedMapping =  createEECSDetailedMappingDataset();
+            eecsDetailedMappingOutput = createSectorScenarioOutput(getSectorScenarioOutputType(SectorScenarioOutputType.DETAILED_EECS_MAPPING_RESULT), eecsDetailedMapping);
+            for (SectorScenarioInventory sectorScenarioInventory : sectorScenarioInventories) {
+//                EmfDataset inventory = sectorScenarioInventory.getDataset();
+                setStatus("Started populating " + DatasetType.EECS_DETAILED_MAPPING_RESULT + " from the inventory, " 
+                        + sectorScenarioInventory.getDataset().getName() 
+                        + ".");
+                populateEECSDetailedMapping(sectorScenarioInventory, eecsDetailedMappingOutput);
+                setStatus("Completed populating " + DatasetType.EECS_DETAILED_MAPPING_RESULT + " from the inventory, " 
+                        + sectorScenarioInventory.getDataset().getName() 
+                        + ".");
+            }
             
             updateOutputDatasetVersionRecordCount(eecsDetailedMappingOutput);
+            setStatus("Completed creating " + DatasetType.EECS_DETAILED_MAPPING_RESULT + ".");
 
             runStatus = "Completed.";
 
-            setStatus("Completed creating " + DatasetType.EECS_DETAILED_MAPPING_RESULT + " from the inventory, " 
-                    + sectorScenarioInventory.getDataset().getName() 
-                    + ".");
-
         } catch(EmfException ex) {
-            runStatus = "Failed creating " + DatasetType.EECS_DETAILED_MAPPING_RESULT + ". Error processing inventory, " + sectorScenarioInventory.getDataset().getName() + ". Exception = " + ex.getMessage();
+            runStatus = "Failed creating " + DatasetType.EECS_DETAILED_MAPPING_RESULT + ". Exception = " + ex.getMessage();
             setStatus(runStatus);
             throw ex;
         } finally {
@@ -145,33 +159,37 @@ public class SectorScenarioTask {
         return eecsDetailedMappingOutput;
     }
 
-    public SectorScenarioOutput createSectorDetailedMappingResultOutput(SectorScenarioInventory sectorScenarioInventory) throws Exception {
-        EmfDataset inventory = sectorScenarioInventory.getDataset();
-
+    public SectorScenarioOutput createSectorDetailedMappingResultOutput(EmfDataset eecsDetailedMapping, SectorScenarioInventory[] sectorScenarioInventories) throws Exception {
         //setup result
         SectorScenarioOutput sectorDetailedMappingOutput = null;
         String runStatus = "";
         
         //Create EECS Detailed Mapping Result Output
         try {
-            setStatus("Started creating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the inventory, " 
-                    + sectorScenarioInventory.getDataset().getName() 
-                    + ".");
-            EmfDataset eecsDetailedMapping =  createSectorDetailedMappingDataset(inventory);
+            setStatus("Started creating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + ".");
+            EmfDataset sectorDetailedMapping =  createSectorDetailedMappingDataset();
 
-            sectorDetailedMappingOutput = createSectorScenarioOutput(getSectorScenarioOutputType(SectorScenarioOutputType.DETAILED_SECTOR_MAPPING_RESULT), eecsDetailedMapping, inventory, sectorScenarioInventory.getVersion());
+            sectorDetailedMappingOutput = createSectorScenarioOutput(getSectorScenarioOutputType(SectorScenarioOutputType.DETAILED_SECTOR_MAPPING_RESULT), sectorDetailedMapping);
 
-            populateSectorDetailedMapping(sectorScenarioInventory, sectorDetailedMappingOutput);
-            
+//            for (SectorScenarioInventory sectorScenarioInventory : sectorScenarioInventories) {
+//              EmfDataset inventory = sectorScenarioInventory.getDataset();
+              setStatus("Started populating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the " + DatasetType.EECS_DETAILED_MAPPING_RESULT + ", " 
+                      + eecsDetailedMapping.getName() 
+                      + ".");
+              populateSectorDetailedMapping(eecsDetailedMapping, sectorDetailedMappingOutput);
+              setStatus("Completed populating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the " + DatasetType.EECS_DETAILED_MAPPING_RESULT + ", " 
+                      + eecsDetailedMapping.getName() 
+                      + ".");
+//            }
+
             updateOutputDatasetVersionRecordCount(sectorDetailedMappingOutput);
+
+            setStatus("Completed creating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + ".");
 
             runStatus = "Completed.";
 
-            setStatus("Completed creating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the inventory, " 
-                    + sectorScenarioInventory.getDataset().getName() 
-                    + ".");
         } catch(EmfException ex) {
-            runStatus = "Failed creating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + ". Error processing inventory, " + sectorScenarioInventory.getDataset().getName() + ". Exception = " + ex.getMessage();
+            runStatus = "Failed creating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + ". Exception = " + ex.getMessage();
             setStatus(runStatus);
             throw ex;
         } finally {
@@ -185,7 +203,7 @@ public class SectorScenarioTask {
         return sectorDetailedMappingOutput;
     }
 
-    public SectorScenarioOutput createSectorSpecificInventoryOutput(String sector, SectorScenarioInventory sectorScenarioInventory) throws Exception {
+    public SectorScenarioOutput createSectorSpecificInventoryOutput(EmfDataset sectorDetailedMappingDataset, String sector, SectorScenarioInventory sectorScenarioInventory) throws Exception {
         EmfDataset inventory = sectorScenarioInventory.getDataset();
 
         //setup result
@@ -194,15 +212,15 @@ public class SectorScenarioTask {
         
         //Create EECS Detailed Mapping Result Output
         try {
-            setStatus("Started creating sector (" + sector + ") specific " + inventory.getDatasetType().getName() + " inventory from the inventory, " 
+            setStatus("Started creating " + inventory.getDatasetType().getName() + " inventory from the inventory, " 
                     + sectorScenarioInventory.getDataset().getName() 
                     + ".");
 
             EmfDataset newInventory =  createSectorSpecificInventoryDataset(sector, inventory);
 
-            sectorSpecificInventoryOutput = createSectorScenarioOutput(getSectorScenarioOutputType(SectorScenarioOutputType.SECTOR_SPECIFIC_INVENTORY), newInventory, inventory, sectorScenarioInventory.getVersion());
+            sectorSpecificInventoryOutput = createSectorScenarioOutput(getSectorScenarioOutputType(SectorScenarioOutputType.SECTOR_ANNOTATED_INVENTORY), newInventory, inventory, sectorScenarioInventory.getVersion());
 
-            populateSectorSpecificInventory(sector, sectorScenarioInventory, sectorSpecificInventoryOutput);
+            populateSectorAnnotatedInventory(sectorDetailedMappingDataset, new String[] { sector }, sectorScenarioInventory, sectorSpecificInventoryOutput);
             
             updateOutputDatasetVersionRecordCount(sectorSpecificInventoryOutput);
 
@@ -226,14 +244,96 @@ public class SectorScenarioTask {
         return sectorSpecificInventoryOutput;
     }
 
-    private EmfDataset createEECSDetailedMappingDataset(EmfDataset inventory) throws EmfException {
+    public SectorScenarioOutput createEecsAnnotatedInventoryOutput(EmfDataset eecsDetailedMappingDataset, SectorScenarioInventory sectorScenarioInventory) throws Exception {
+        EmfDataset inventory = sectorScenarioInventory.getDataset();
+
+        //setup result
+        SectorScenarioOutput eecsAnnotatedInventoryOutput = null;
+        String runStatus = "";
+        
+        //Create EECS Detailed Mapping Result Output
+        try {
+            setStatus("Started creating " + SectorScenarioOutputType.annotatedInventoryWithEECS + " from the inventory, " 
+                    + sectorScenarioInventory.getDataset().getName() 
+                    + ".");
+
+            EmfDataset newInventory =  createEecsAnnotatedInventoryDataset(inventory);
+
+            eecsAnnotatedInventoryOutput = createSectorScenarioOutput(getSectorScenarioOutputType(SectorScenarioOutputType.annotatedInventoryWithEECS), newInventory, inventory, sectorScenarioInventory.getVersion());
+
+            populateEecsAnnotatedInventory(eecsDetailedMappingDataset, sectorScenarioInventory, eecsAnnotatedInventoryOutput);
+            
+            updateOutputDatasetVersionRecordCount(eecsAnnotatedInventoryOutput);
+
+            runStatus = "Completed.";
+
+            setStatus("Completed creating " + SectorScenarioOutputType.annotatedInventoryWithEECS + " from the inventory, " 
+                    + sectorScenarioInventory.getDataset().getName() 
+                    + ".");
+        } catch(EmfException ex) {
+            runStatus = "Failed creating " + SectorScenarioOutputType.annotatedInventoryWithEECS + ". Error processing inventory, " + sectorScenarioInventory.getDataset().getName() + ". Exception = " + ex.getMessage();
+            setStatus(runStatus);
+            throw ex;
+        } finally {
+            if (eecsAnnotatedInventoryOutput != null) {
+                eecsAnnotatedInventoryOutput.setCompletionDate(new Date());
+                eecsAnnotatedInventoryOutput.setRunStatus(runStatus);
+                saveSectorScenarioOutput(eecsAnnotatedInventoryOutput);
+            }
+        }
+
+        return eecsAnnotatedInventoryOutput;
+    }
+
+    public SectorScenarioOutput createSectorAnnotatedInventoryOutput(EmfDataset sectorDetailedMappingDataset, String[] sectors, SectorScenarioInventory sectorScenarioInventory) throws Exception {
+        EmfDataset inventory = sectorScenarioInventory.getDataset();
+
+        //setup result
+        SectorScenarioOutput sectorAnnotatedInventoryOutput = null;
+        String runStatus = "";
+        
+        //Create EECS Detailed Mapping Result Output
+        try {
+            setStatus("Started creating " + inventory.getDatasetType().getName() + " inventory from the inventory, " 
+                    + sectorScenarioInventory.getDataset().getName() 
+                    + ".");
+
+            EmfDataset newInventory =  createSectorAnnotatedInventoryDataset(inventory);
+
+            sectorAnnotatedInventoryOutput = createSectorScenarioOutput(getSectorScenarioOutputType(SectorScenarioOutputType.SECTOR_SPECIFIC_INVENTORY), newInventory, inventory, sectorScenarioInventory.getVersion());
+
+            populateSectorAnnotatedInventory(sectorDetailedMappingDataset, sectors, sectorScenarioInventory, sectorAnnotatedInventoryOutput);
+            
+            updateOutputDatasetVersionRecordCount(sectorAnnotatedInventoryOutput);
+
+            runStatus = "Completed.";
+
+            setStatus("Completed creating sector annotated " + inventory.getDatasetType().getName() + " inventory from the inventory, " 
+                    + sectorScenarioInventory.getDataset().getName() 
+                    + ".");
+        } catch(EmfException ex) {
+            runStatus = "Failed creating sector annotated " + inventory.getDatasetType().getName() + ". Error processing inventory, " + sectorScenarioInventory.getDataset().getName() + ". Exception = " + ex.getMessage();
+            setStatus(runStatus);
+            throw ex;
+        } finally {
+            if (sectorAnnotatedInventoryOutput != null) {
+                sectorAnnotatedInventoryOutput.setCompletionDate(new Date());
+                sectorAnnotatedInventoryOutput.setRunStatus(runStatus);
+                saveSectorScenarioOutput(sectorAnnotatedInventoryOutput);
+            }
+        }
+
+        return sectorAnnotatedInventoryOutput;
+    }
+
+    private EmfDataset createEECSDetailedMappingDataset() throws EmfException {
         DatasetType datasetType = getDatasetType(DatasetType.EECS_DETAILED_MAPPING_RESULT);
         return creator.addDataset("ds", sectorScenario.getAbbreviation() + "_" + DatasetType.EECS_DETAILED_MAPPING_RESULT, 
                 datasetType, new VersionedTableFormat(datasetType.getFileFormat(), dbServer.getSqlDataTypes()),
                 "");
     }
 
-    private EmfDataset createSectorDetailedMappingDataset(EmfDataset inventory) throws EmfException {
+    private EmfDataset createSectorDetailedMappingDataset() throws EmfException {
         DatasetType datasetType = getDatasetType(DatasetType.SECTOR_DETAILED_MAPPING_RESULT);
         return creator.addDataset("ds", sectorScenario.getAbbreviation() + "_" + DatasetType.SECTOR_DETAILED_MAPPING_RESULT, 
                 datasetType, new VersionedTableFormat(datasetType.getFileFormat(), dbServer.getSqlDataTypes()),
@@ -241,10 +341,28 @@ public class SectorScenarioTask {
     }
 
     private EmfDataset createSectorSpecificInventoryDataset(String sector, EmfDataset inventory) throws EmfException {
-        DatasetType datasetType = inventory.getDatasetType();
+        //lookup up what the resulting inventory dataset type is...
+        String outputInventoryDatasetType = new SectorScenarioInputToOutputDatasetTypeMap().getOutputDatasetType(inventory.getDatasetType().getName());
+        DatasetType datasetType = getDatasetType(outputInventoryDatasetType);
         return creator.addDataset(sectorScenario.getAbbreviation() + "_" + inventory.getName() + "_" + sector, inventory, 
                 datasetType, new VersionedTableFormat(datasetType.getFileFormat(), dbServer.getSqlDataTypes()),
-                inventory.getDescription() + "\nSECTOR_SCENARIO_SECTOR=" + sector);
+                inventory.getDescription() + "\n#SECTOR_SCENARIO_SECTOR=" + sector);
+    }
+
+    private EmfDataset createSectorAnnotatedInventoryDataset(EmfDataset inventory) throws EmfException {
+        //lookup up what the resulting inventory dataset type is...
+        String outputInventoryDatasetType = new SectorScenarioInputToOutputDatasetTypeMap().getOutputDatasetType(inventory.getDatasetType().getName());
+        DatasetType datasetType = getDatasetType(outputInventoryDatasetType);
+        return creator.addDataset(sectorScenario.getAbbreviation() + "_" + inventory.getName(), inventory, 
+                datasetType, new VersionedTableFormat(datasetType.getFileFormat(), dbServer.getSqlDataTypes()),
+                inventory.getDescription());
+    }
+
+    private EmfDataset createEecsAnnotatedInventoryDataset(EmfDataset inventory) throws EmfException {
+        DatasetType datasetType = inventory.getDatasetType();
+        return creator.addDataset(sectorScenario.getAbbreviation() + "_" + inventory.getName() + "_eecs_annotated", inventory, 
+                datasetType, new VersionedTableFormat(datasetType.getFileFormat(), dbServer.getSqlDataTypes()),
+                inventory.getDescription());
     }
 
     private void populateEECSDetailedMapping(SectorScenarioInventory sectorScenarioInventory, SectorScenarioOutput sectorScenarioOutput) throws EmfException {
@@ -254,6 +372,9 @@ public class SectorScenarioTask {
         Version inventoryVersion = version(inventory.getId(), inventoryVersionNumber);
         VersionedQuery inventoryVersionedQuery = new VersionedQuery(inventoryVersion, "inv");
         String inventoryTableName = qualifiedEmissionTableName(inventory);
+        boolean inventoryHasMactColumn = hasColName("mact", inventory.getDatasetType().getFileFormat());
+        boolean inventoryHasNaicsColumn = hasColName("naics", inventory.getDatasetType().getFileFormat());
+        boolean inventoryHasPointColumns = hasColName("pointid", inventory.getDatasetType().getFileFormat());
 
         EmfDataset eecsMappingDataset = sectorScenario.getEecsMapppingDataset();
         int eecsMappingDatasetVersionNumber = sectorScenario.getEecsMapppingDatasetVersion();
@@ -271,51 +392,39 @@ public class SectorScenarioTask {
         
         //SET work_mem TO '512MB';
         //NOTE:  Still need to  support mobile monthly files
-        String sql = "INSERT INTO " + qualifiedEmissionTableName(sectorScenarioOutput.getOutputDataset()) + " (dataset_id, version, fips, plantid, pointid, stackid, segment, scc, plant, poll, ann_emis, avd_emis, mact, naics, map_mact, map_naics, map_scc, eecs, weight) " 
+        String sql = "INSERT INTO " + qualifiedEmissionTableName(sectorScenarioOutput.getOutputDataset()) + " (dataset_id, version, fips, "
+        + (inventoryHasPointColumns ?
+        "plantid, pointid, stackid, segment, plant, "
+        : "")
+        + "scc, poll, ann_emis, avd_emis, mact, naics, map_mact, map_naics, map_scc, eecs, priority, original_dataset_id, original_record_id) " 
         + "select " + sectorScenarioOutput.getOutputDataset().getId() + " as dataset_id, 0 as version, " 
         + "inv.fips, "
-        + "inv.plantid, inv.pointid, "
+        + (inventoryHasPointColumns ?
+        "inv.plantid, inv.pointid, "
         + "inv.stackid, inv.segment, "
-        + "inv.scc, inv.plant, "
+        + "inv.plant, "
+        : "")
+        + "inv.scc, "
         + "inv.poll, "
         + "inv.ann_emis, "
         + "inv.avd_emis, "
-        + "inv.mact, inv.naics, "
+        + (inventoryHasMactColumn ?
+        "inv.mact, "
+        : "null::varchar(6) as mact, ")
+        + (inventoryHasNaicsColumn ?
+        "inv.naics, "
+        : "null::varchar(6) as naics, ")
         + "map_mact, map_naics, "
         + "map_scc, "
-        + "tblMatch.eecs, weight "
+        + "tblMatch.eecs, priority, "
+        + "inv.dataset_id as original_dataset_id, "
+        + "inv.record_id as original_record_id "
         + "from " + inventoryTableName + " inv "
         + "left outer join ( "
-        + "select inv.record_id, "
-        + "eecs_map.mact as map_mact, eecs_map.naics as map_naics, " 
-        + "eecs_map.scc as map_scc, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.mact = inv.mact "
-        + "where eecs_map.mact is not null "
-        + "and eecs_map.naics is null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
-        + "select inv.record_id,  "
-        + "eecs_map.mact as map_mact, eecs_map.naics as map_naics,  "
-        + "eecs_map.scc as map_scc,  "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.naics = inv.naics "
-        + "where eecs_map.mact is null "
-        + "and eecs_map.naics is not null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
         + "select inv.record_id,  "
         + "eecs_map.mact as map_mact, eecs_map.naics as map_naics, " 
         + "eecs_map.scc as map_scc,  "
-        + "eecs_map.eecs, eecs_map.weight "
+        + "eecs_map.eecs, eecs_map.priority "
         + "from " + inventoryTableName + " inv "
         + "inner join " + eecsMappingDatasetTableName + " eecs_map "
         + "on eecs_map.scc = inv.scc "
@@ -324,6 +433,36 @@ public class SectorScenarioTask {
         + "and eecs_map.scc is not null "
         + "and " + inventoryVersionedQuery.query() + " "
         + "and " + eecsMappingDatasetVersionedQuery.query() + " "
+        + (inventoryHasMactColumn ?
+        "union  "
+        + "select inv.record_id, "
+        + "eecs_map.mact as map_mact, eecs_map.naics as map_naics, " 
+        + "eecs_map.scc as map_scc, "
+        + "eecs_map.eecs, eecs_map.priority "
+        + "from " + inventoryTableName + " inv "
+        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
+        + "on eecs_map.mact = inv.mact "
+        + "where eecs_map.mact is not null "
+        + "and eecs_map.naics is null "
+        + "and eecs_map.scc is null "
+        + "and " + inventoryVersionedQuery.query() + " "
+        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
+        : "" )
+        + (inventoryHasNaicsColumn ?
+        "union  "
+        + "select inv.record_id,  "
+        + "eecs_map.mact as map_mact, eecs_map.naics as map_naics,  "
+        + "eecs_map.scc as map_scc,  "
+        + "eecs_map.eecs, eecs_map.priority "
+        + "from " + inventoryTableName + " inv "
+        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
+        + "on eecs_map.naics = inv.naics "
+        + "where eecs_map.mact is null "
+        + "and eecs_map.naics is not null "
+        + "and eecs_map.scc is null "
+        + "and " + inventoryVersionedQuery.query() + " "
+        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
+        : "" )
         + ") tblMatch "
         + "on tblMatch.record_id = inv.record_id "
         + "where " + inventoryVersionedQuery.query() + " ";
@@ -336,19 +475,23 @@ public class SectorScenarioTask {
         }
     }
 
-    private void populateSectorDetailedMapping(SectorScenarioInventory sectorScenarioInventory, SectorScenarioOutput sectorScenarioOutput) throws EmfException {
-        
-        EmfDataset inventory = sectorScenarioInventory.getDataset();
-        int inventoryVersionNumber = sectorScenarioInventory.getVersion();
-        Version inventoryVersion = version(inventory.getId(), inventoryVersionNumber);
-        VersionedQuery inventoryVersionedQuery = new VersionedQuery(inventoryVersion, "inv");
-        String inventoryTableName = qualifiedEmissionTableName(inventory);
+    private void populateSectorDetailedMapping(EmfDataset eecsDetailedMappingDataset, SectorScenarioOutput sectorScenarioOutput) throws EmfException {
+//        EmfDataset inventory = sectorScenarioInventory.getDataset();
+//        int inventoryVersionNumber = sectorScenarioInventory.getVersion();
+//        Version inventoryVersion = version(inventory.getId(), inventoryVersionNumber);
+//        VersionedQuery inventoryVersionedQuery = new VersionedQuery(inventoryVersion, "inv");
+//        String inventoryTableName = qualifiedEmissionTableName(inventory);
 
-        EmfDataset eecsMappingDataset = sectorScenario.getEecsMapppingDataset();
-        int eecsMappingDatasetVersionNumber = sectorScenario.getEecsMapppingDatasetVersion();
-        Version eecsMappingDatasetVersion = version(eecsMappingDataset.getId(), eecsMappingDatasetVersionNumber);
-        VersionedQuery eecsMappingDatasetVersionedQuery = new VersionedQuery(eecsMappingDatasetVersion, "eecs_map");
-        String eecsMappingDatasetTableName = qualifiedEmissionTableName(eecsMappingDataset);
+//        EmfDataset eecsMappingDataset = sectorScenario.getEecsMapppingDataset();
+//        int eecsMappingDatasetVersionNumber = sectorScenario.getEecsMapppingDatasetVersion();
+//        Version eecsMappingDatasetVersion = version(eecsMappingDataset.getId(), eecsMappingDatasetVersionNumber);
+//        VersionedQuery eecsMappingDatasetVersionedQuery = new VersionedQuery(eecsMappingDatasetVersion, "eecs_map");
+//        String eecsMappingDatasetTableName = qualifiedEmissionTableName(eecsMappingDataset);
+        
+        Version eecsDetailedMappingDatasetVersion = version(eecsDetailedMappingDataset.getId(), 0);
+        VersionedQuery eecsDetailedMappingDatasetVersionedQuery = new VersionedQuery(eecsDetailedMappingDatasetVersion, "inv");
+        String eecsDetailedMappingDatasetTableName = qualifiedEmissionTableName(eecsDetailedMappingDataset);
+        createIndexes(emissionTableName(eecsDetailedMappingDataset));
         
         EmfDataset sectorMappingDataset = sectorScenario.getSectorMapppingDataset();
         int sectorMappingDatasetVersionNumber = sectorScenario.getSectorMapppingDatasetVersion();
@@ -361,8 +504,8 @@ public class SectorScenarioTask {
         
         //SET work_mem TO '512MB';
         //NOTE:  Still need to  support mobile monthly files
-        String sql = "INSERT INTO " + qualifiedEmissionTableName(sectorScenarioOutput.getOutputDataset()) + " (dataset_id, version, fips, plantid, pointid, stackid, segment, scc, plant, poll, ann_emis, avd_emis, eecs, sector, weight) " 
-        + "select " + sectorScenarioOutput.getOutputDataset().getId() + " as dataset_id, 0 as version, " 
+        String sql = "INSERT INTO " + qualifiedEmissionTableName(sectorScenarioOutput.getOutputDataset()) + " (dataset_id, version, fips, plantid, pointid, stackid, segment, scc, plant, poll, ann_emis, avd_emis, eecs, sector, priority, original_dataset_id, original_record_id) " 
+        + "select distinct on (inv.original_dataset_id, inv.original_record_id) " + sectorScenarioOutput.getOutputDataset().getId() + " as dataset_id, 0 as version, " 
         + "inv.fips, "
         + "inv.plantid, inv.pointid, "
         + "inv.stackid, inv.segment, "
@@ -370,58 +513,84 @@ public class SectorScenarioTask {
         + "inv.poll, "
         + "inv.ann_emis, "
         + "inv.avd_emis, "
-        + "tbleecs.eecs, tblsector.sector, "
-        + "tblsector.weight "
-        + "from " + inventoryTableName + " inv "
+        + "inv.eecs, tblsector.sector, "
+        + "tblsector.priority, "
+        + "inv.original_dataset_id, "
+        + "inv.original_record_id "
+        + "from " + eecsDetailedMappingDatasetTableName + " inv "
         + "left outer join ( "
-        + "select distinct on (record_id) "
-        + "record_id, eecs, weight "
-        + "from ( "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.mact = inv.mact "
-        + "where eecs_map.mact is not null "
-        + "and eecs_map.naics is null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.naics = inv.naics "
-        + "where eecs_map.mact is null "
-        + "and eecs_map.naics is not null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.scc = inv.scc "
-        + "where eecs_map.mact is null "
-        + "and eecs_map.naics is null "
-        + "and eecs_map.scc is not null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + ") tbleecs "
-        + "order by record_id, weight, eecs "
-        + ") tbleecs "
-        + "on tbleecs.record_id = inv.record_id "
-        + "left outer join ( "
-        + "select sector, eecs, weight "
+        + "select sector, eecs, priority "
         + "from " + sectorMappingDatasetTableName + " as sector_map "
         + "where sector_map.eecs is not null "
         + "and " + sectorMappingDatasetVersionedQuery.query() + " "
         + ") tblsector "
-        + "on tblsector.eecs = tbleecs.eecs "
-        + "where " + inventoryVersionedQuery.query() + " ";
-            
+        + "on tblsector.eecs = inv.eecs "
+        + "where " + eecsDetailedMappingDatasetVersionedQuery.query() + " "
+        + "order by inv.original_dataset_id, inv.original_record_id, inv.eecs";
+
+//        String sql = "INSERT INTO " + qualifiedEmissionTableName(sectorScenarioOutput.getOutputDataset()) + " (dataset_id, version, fips, plantid, pointid, stackid, segment, scc, plant, poll, ann_emis, avd_emis, eecs, sector, priority, original_dataset_id, original_record_id) " 
+//        + "select " + sectorScenarioOutput.getOutputDataset().getId() + " as dataset_id, 0 as version, " 
+//        + "inv.fips, "
+//        + "inv.plantid, inv.pointid, "
+//        + "inv.stackid, inv.segment, "
+//        + "inv.scc, inv.plant, "
+//        + "inv.poll, "
+//        + "inv.ann_emis, "
+//        + "inv.avd_emis, "
+//        + "tbleecs.eecs, tblsector.sector, "
+//        + "tblsector.priority, "
+//        + "inv.dataset_id as original_dataset_id, "
+//        + "inv.record_id as original_record_id "
+//        + "from " + inventoryTableName + " inv "
+//        + "left outer join ( "
+//        + "select " + (!shouldDoubleCount ? "distinct on (record_id)" : "") + " "
+//        + "record_id, eecs, priority "
+//        + "from ( "
+//        + "select inv.record_id, "
+//        + "eecs_map.eecs, eecs_map.priority "
+//        + "from " + inventoryTableName + " inv "
+//        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
+//        + "on eecs_map.mact = inv.mact "
+//        + "where eecs_map.mact is not null "
+//        + "and eecs_map.naics is null "
+//        + "and eecs_map.scc is null "
+//        + "and " + inventoryVersionedQuery.query() + " "
+//        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
+//        + "union  "
+//        + "select inv.record_id, "
+//        + "eecs_map.eecs, eecs_map.priority "
+//        + "from " + inventoryTableName + " inv "
+//        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
+//        + "on eecs_map.naics = inv.naics "
+//        + "where eecs_map.mact is null "
+//        + "and eecs_map.naics is not null "
+//        + "and eecs_map.scc is null "
+//        + "and " + inventoryVersionedQuery.query() + " "
+//        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
+//        + "union  "
+//        + "select inv.record_id, "
+//        + "eecs_map.eecs, eecs_map.priority "
+//        + "from " + inventoryTableName + " inv "
+//        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
+//        + "on eecs_map.scc = inv.scc "
+//        + "where eecs_map.mact is null "
+//        + "and eecs_map.naics is null "
+//        + "and eecs_map.scc is not null "
+//        + "and " + inventoryVersionedQuery.query() + " "
+//        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
+//        + ") tbleecs "
+//        + "order by record_id, priority, eecs "
+//        + ") tbleecs "
+//        + "on tbleecs.record_id = inv.record_id "
+//        + "left outer join ( "
+//        + "select sector, eecs, priority "
+//        + "from " + sectorMappingDatasetTableName + " as sector_map "
+//        + "where sector_map.eecs is not null "
+//        + "and " + sectorMappingDatasetVersionedQuery.query() + " "
+//        + ") tblsector "
+//        + "on tblsector.eecs = tbleecs.eecs "
+//        + "where " + inventoryVersionedQuery.query() + " ";
+//            
         System.out.println(sql);
         try {
             datasource.query().execute(sql);
@@ -430,7 +599,22 @@ public class SectorScenarioTask {
         }
     }
 
-    private void populateSectorSpecificInventory(String sector, SectorScenarioInventory sectorScenarioInventory, SectorScenarioOutput sectorScenarioOutput) throws EmfException {
+    private void createIndexes(String tableName) {
+        DataTable dataTable = new DataTable(sectorScenario.getEecsMapppingDataset(), this.datasource);
+        tableName = tableName.toLowerCase();
+        dataTable.addIndex(tableName, "record_id", true);
+        dataTable.addIndex(tableName, "dataset_id", false);
+        dataTable.addIndex(tableName, "version", false);
+        dataTable.addIndex(tableName, "delete_versions", false);
+        dataTable.addIndex(tableName, "eecs", false);
+        dataTable.addIndex(tableName, "original_dataset_id", false);
+        dataTable.addIndex(tableName, "original_record_id", false);
+        dataTable.addIndex(tableName, "priority", false);
+        dataTable.analyzeTable(tableName);
+    }
+
+    private void populateSectorAnnotatedInventory(EmfDataset sectorDetailedMappingDataset, String[] sectors, SectorScenarioInventory sectorScenarioInventory, SectorScenarioOutput sectorScenarioOutput) throws EmfException {
+        
         
         EmfDataset inventory = sectorScenarioInventory.getDataset();
         int inventoryVersionNumber = sectorScenarioInventory.getVersion();
@@ -438,86 +622,115 @@ public class SectorScenarioTask {
         VersionedQuery inventoryVersionedQuery = new VersionedQuery(inventoryVersion, "inv");
         String inventoryTableName = qualifiedEmissionTableName(inventory);
 
-        EmfDataset eecsMappingDataset = sectorScenario.getEecsMapppingDataset();
-        int eecsMappingDatasetVersionNumber = sectorScenario.getEecsMapppingDatasetVersion();
-        Version eecsMappingDatasetVersion = version(eecsMappingDataset.getId(), eecsMappingDatasetVersionNumber);
-        VersionedQuery eecsMappingDatasetVersionedQuery = new VersionedQuery(eecsMappingDatasetVersion, "eecs_map");
-        String eecsMappingDatasetTableName = qualifiedEmissionTableName(eecsMappingDataset);
-        
-        EmfDataset sectorMappingDataset = sectorScenario.getSectorMapppingDataset();
-        int sectorMappingDatasetVersionNumber = sectorScenario.getSectorMapppingDatasetVersion();
-        Version sectorMappingDatasetVersion = version(sectorMappingDataset.getId(), sectorMappingDatasetVersionNumber);
-        VersionedQuery sectorMappingDatasetVersionedQuery = new VersionedQuery(sectorMappingDatasetVersion);
-        String sectorMappingDatasetTableName = qualifiedEmissionTableName(sectorMappingDataset);
+//        EmfDataset eecsMappingDataset = sectorScenario.getEecsMapppingDataset();
+//        int eecsMappingDatasetVersionNumber = sectorScenario.getEecsMapppingDatasetVersion();
+//        Version eecsMappingDatasetVersion = version(eecsMappingDataset.getId(), eecsMappingDatasetVersionNumber);
+//        VersionedQuery eecsMappingDatasetVersionedQuery = new VersionedQuery(eecsMappingDatasetVersion, "eecs_map");
+//        String eecsMappingDatasetTableName = qualifiedEmissionTableName(eecsMappingDataset);
 
-        String selectList = "select " + sectorScenarioOutput.getOutputDataset().getId() + " as dataset_id, '' as delete_versions, 0 as version";
+        Version sectorDetailedMappingDatasetVersion = version(sectorDetailedMappingDataset.getId(), 0);
+        VersionedQuery sectorDetailedMappingDatasetVersionedQuery = new VersionedQuery(sectorDetailedMappingDatasetVersion, "sector_map");
+        String sectorDetailedMappingDatasetTableName = qualifiedEmissionTableName(sectorDetailedMappingDataset);
+
+        EmfDataset sectorAnnotatedInventory = sectorScenarioOutput.getOutputDataset();
+        
+        String selectList = "select " + sectorAnnotatedInventory.getId() + " as dataset_id, '' as delete_versions, 0 as version";
         String columnList = "dataset_id, delete_versions, version";
-        Column[] columns = inventory.getDatasetType().getFileFormat().cols();
+        Column[] columns = sectorAnnotatedInventory.getDatasetType().getFileFormat().cols();
         for (int i = 0; i < columns.length; i++) {
             String columnName = columns[i].name();
             if (columnName.equalsIgnoreCase("eecs")) {
-                selectList += ", tbleecs.eecs";
+                selectList += ", sector_map.eecs";
                 columnList += "," + columnName;
+            } else if (columnName.equalsIgnoreCase("sector")) {
+                    selectList += ", sector_map.sector";
+                    columnList += "," + columnName;
             } else {
-                selectList += ", " + columnName;
+                selectList += "," + columnName;
                 columnList += "," + columnName;
             }
         }
-        
+        String sectorList = "";
+        for (String sector : sectors) {
+            sectorList += (sectorList.length() > 0 ? "," : "") + "'" + sector.replace("'", "''") + "'";
+        }
+        selectList = selectList.toLowerCase();
+        for (Column column : sectorDetailedMappingDataset.getDatasetType().getFileFormat().cols()) {
+            String columnName = column.getName().toLowerCase();
+            selectList = selectList.replace("," + columnName, ",inv." + columnName);
+        }
         //SET work_mem TO '512MB';
         //NOTE:  Still need to  support mobile monthly files
         String sql = "INSERT INTO " + qualifiedEmissionTableName(sectorScenarioOutput.getOutputDataset()) + " (" + columnList + ") " 
         + selectList + " "
         + "from " + inventoryTableName + " inv "
-        + "left outer join ( "
-        + "select distinct on (record_id) "
-        + "record_id, eecs, weight "
-        + "from ( "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
+        + "inner join " + sectorDetailedMappingDatasetTableName + " as sector_map "
+        + "on " + sectorDetailedMappingDatasetVersionedQuery.query() + " "
+        + "and sector_map.original_record_id = inv.record_id "
+        + "and sector_map.original_dataset_id = " + inventory.getId() + " "
+        + "and coalesce(sector_map.sector,'') in (" + sectorList + ",'') " //always include missing sectors = ''
+        + "where " + inventoryVersionedQuery.query() + " ";
+            
+        System.out.println(sql);
+        try {
+            datasource.query().execute(sql);
+        } catch (SQLException e) {
+            throw new EmfException("Error occured when inserting data to " + sectorScenarioOutput.getOutputDataset().getName() + " table" + "\n" + e.getMessage());
+        }
+    }
+
+    private void populateEecsAnnotatedInventory(EmfDataset eecsDetailedMappingDataset, SectorScenarioInventory sectorScenarioInventory, SectorScenarioOutput sectorScenarioOutput) throws EmfException {
+        
+        
+        EmfDataset inventory = sectorScenarioInventory.getDataset();
+        int inventoryVersionNumber = sectorScenarioInventory.getVersion();
+        Version inventoryVersion = version(inventory.getId(), inventoryVersionNumber);
+        VersionedQuery inventoryVersionedQuery = new VersionedQuery(inventoryVersion, "inv");
+        String inventoryTableName = qualifiedEmissionTableName(inventory);
+
+//        EmfDataset eecsMappingDataset = sectorScenario.getEecsMapppingDataset();
+//        int eecsMappingDatasetVersionNumber = sectorScenario.getEecsMapppingDatasetVersion();
+//        Version eecsMappingDatasetVersion = version(eecsMappingDataset.getId(), eecsMappingDatasetVersionNumber);
+//        VersionedQuery eecsMappingDatasetVersionedQuery = new VersionedQuery(eecsMappingDatasetVersion, "eecs_map");
+//        String eecsMappingDatasetTableName = qualifiedEmissionTableName(eecsMappingDataset);
+
+        Version eecsDetailedMappingDatasetVersion = version(eecsDetailedMappingDataset.getId(), 0);
+        VersionedQuery eecsDetailedMappingDatasetVersionedQuery = new VersionedQuery(eecsDetailedMappingDatasetVersion, "eecs_map");
+        String eecsDetailedMappingDatasetTableName = qualifiedEmissionTableName(eecsDetailedMappingDataset);
+
+        EmfDataset sectorAnnotatedInventory = sectorScenarioOutput.getOutputDataset();
+        
+        String selectList = "select distinct on (inv.record_id) " + sectorAnnotatedInventory.getId() + " as dataset_id, '' as delete_versions, 0 as version";
+        String columnList = "dataset_id, delete_versions, version";
+        Column[] columns = sectorAnnotatedInventory.getDatasetType().getFileFormat().cols();
+        for (int i = 0; i < columns.length; i++) {
+            String columnName = columns[i].name();
+            if (columnName.equalsIgnoreCase("eecs")) {
+                selectList += ", eecs_map.eecs";
+                columnList += "," + columnName;
+            } else if (columnName.equalsIgnoreCase("sector")) {
+                    selectList += ", case when eecs_map.eecs is not null then null::varchar(255) else sector end as sector";
+                    columnList += "," + columnName;
+            } else {
+                selectList += "," + columnName;
+                columnList += "," + columnName;
+            }
+        }
+        selectList = selectList.toLowerCase();
+        for (Column column : eecsDetailedMappingDataset.getDatasetType().getFileFormat().cols()) {
+            String columnName = column.getName().toLowerCase();
+            selectList = selectList.replace("," + columnName, ",inv." + columnName);
+        }
+        //SET work_mem TO '512MB';
+        //NOTE:  Still need to  support mobile monthly files
+        String sql = "INSERT INTO " + qualifiedEmissionTableName(sectorScenarioOutput.getOutputDataset()) + " (" + columnList + ") " 
+        + selectList + " "
         + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.mact = inv.mact "
-        + "where eecs_map.mact is not null "
-        + "and eecs_map.naics is null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.naics = inv.naics "
-        + "where eecs_map.mact is null "
-        + "and eecs_map.naics is not null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.scc = inv.scc "
-        + "where eecs_map.mact is null "
-        + "and eecs_map.naics is null "
-        + "and eecs_map.scc is not null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + ") tbleecs "
-        + "order by record_id, weight, eecs "
-        + ") tbleecs "
-        + "on tbleecs.record_id = inv.record_id "
-        + "left outer join ( "
-        + "select sector, eecs, weight "
-        + "from " + sectorMappingDatasetTableName + " as sector_map "
-        + "where sector_map.eecs is not null "
-        + "and " + sectorMappingDatasetVersionedQuery.query() + " "
-        + ") tblsector "
-        + "on tblsector.eecs = tbleecs.eecs "
-        + "where " + inventoryVersionedQuery.query() + " "
-        + "and tblsector.sector = '" + sector.replace("'", "''") + "'";
+        + "inner join " + eecsDetailedMappingDatasetTableName + " as eecs_map "
+        + "on " + eecsDetailedMappingDatasetVersionedQuery.query() + " "
+        + "and eecs_map.original_record_id = inv.record_id "
+        + "and eecs_map.original_dataset_id = " + inventory.getId() + " "
+        + "where " + inventoryVersionedQuery.query() + " order by inv.record_id, eecs_map.priority ";
             
         System.out.println(sql);
         try {
@@ -553,26 +766,40 @@ public class SectorScenarioTask {
 
         String status = "";
         try {
-            //process/load each input dataset
+
             SectorScenarioInventory[] sectorScenarioInventories = sectorScenario.getInventories();
+            
+            //create ECCS Detailed Mapping Result, will contain results for all input inventories
+            SectorScenarioOutput eecsDetailedMappingResultOutput = createEECSDetailedMappingResultOutput(sectorScenarioInventories);
+            
+            
+            //create Sector Detailed Mapping Result, will contain results for all input inventories
+            SectorScenarioOutput sectorDetailedMappingResultOutput = createSectorDetailedMappingResultOutput(eecsDetailedMappingResultOutput.getOutputDataset(), sectorScenarioInventories);
+
+            //see if the scenario has sectors specified, if not then lets auto populate what was found during the above
+            //analysis
+
+            if (sectorScenario.getSectors().length == 0) {
+                String[] sectors = getDistinctSectorListFromDataset(sectorDetailedMappingResultOutput.getOutputDataset().getId(), 0);
+                sectorScenario.setSectors(sectors);
+                saveSectorScenario(sectorScenario);
+            }
             
             for (int i = 0; i < sectorScenarioInventories.length; i++) {
                 try {
-                    createEECSDetailedMappingResultOutput(sectorScenarioInventories[i]);
-                    SectorScenarioOutput sectorDetailedMappingResultOutput = createSectorDetailedMappingResultOutput(sectorScenarioInventories[i]);
                     
-                    //see if the scenario has sectors specified, if not then lets auto populate what was found during the above
-                    //analysis
-                    
-                    //TODO:   need to auto populate sector_scenario_sector table
-                    String[] sectors = getDistinctSectorListFromDataset(sectorDetailedMappingResultOutput.getOutputDataset().getId(), 0);
-                    if (sectorScenario.getSectors().length == 0) {
-                        sectorScenario.setSectors(sectors);
-                        saveSectorScenario(sectorScenario);
+                    //create EECS Annotated Inventory
+                    if (true/*sectorScenario.getAnnotateInventoryWithEECS()*/) {
+                        createEecsAnnotatedInventoryOutput(eecsDetailedMappingResultOutput.getOutputDataset(), sectorScenarioInventories[i]);
                     }
                     
-                    for (String sector : sectors) {
-                        createSectorSpecificInventoryOutput(sector, sectorScenarioInventories[i]);
+                    Short createInventoryMethod = SectorScenario.CREATE_SINGLE_INVENTORY;//sectorScenario.getCreateInventoryMethod();
+                    if (createInventoryMethod == SectorScenario.CREATE_SINGLE_INVENTORY) {
+                        createSectorAnnotatedInventoryOutput(sectorDetailedMappingResultOutput.getOutputDataset(), sectorScenario.getSectors(), sectorScenarioInventories[i]);
+                    } else if (createInventoryMethod == SectorScenario.CREATE_N_SECTOR_INVENTORIES) {
+                        for (String sector : sectorScenario.getSectors()) {
+                            createSectorSpecificInventoryOutput(sectorDetailedMappingResultOutput.getOutputDataset(), sector, sectorScenarioInventories[i]);
+                        }
                     }
 
                     recordCount = 0; //loader.getRecordCount();
@@ -997,9 +1224,7 @@ public class SectorScenarioTask {
             
             connection = datasource.getConnection();
             statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            System.out.println("start fix check query " + System.currentTimeMillis());
             rs = statement.executeQuery(sql);
-            System.out.println("end fix check query " + System.currentTimeMillis());
             boolean foundNegative9 = false;
             while (rs.next()) {
                 foundNegative9 = true;

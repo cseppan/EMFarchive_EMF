@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
+import gov.epa.emissions.framework.services.sms.SectorScenarioOutput;
 
 public class EditSectorScenarioSummaryTabPresenterImpl implements EditSectorScenarioSummaryTabPresenter {
     
@@ -24,8 +25,8 @@ public class EditSectorScenarioSummaryTabPresenterImpl implements EditSectorScen
        return session.dataCommonsService().getProjects();
     }
 
-    public void doRefresh(SectorScenario sectorScenario) throws EmfException {
-        view.refresh(sectorScenario);     
+    public void doRefresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) throws EmfException {
+        view.refresh(sectorScenario, null);     
     }
 
 }
