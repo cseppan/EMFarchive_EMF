@@ -112,7 +112,7 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         cols.add(new Column("CM_Id", types.intType(), new IntegerFormatter()));
         cols.add(new Column("equation_type", types.stringType(255), new StringFormatter(255)));
         cols.add(new Column("ORIGINAL_DATASET_ID", types.intType(), new IntegerFormatter()));
-        cols.add(new Column("SECTOR", types.stringType(64), 64, new StringFormatter(64)));
+        cols.add(new Column("SECTOR", types.stringType(255), 255, new StringFormatter(255)));
         cols.add(new Column("Control_Program", types.stringType(255), 255, new StringFormatter(255)));
         cols.add(new Column("XLOC", types.realType(), new RealFormatter()));
         cols.add(new Column("YLOC", types.realType(), new RealFormatter()));
