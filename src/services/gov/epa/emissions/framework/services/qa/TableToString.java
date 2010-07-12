@@ -20,16 +20,29 @@ public class TableToString {
 
     protected String lineFeeder = System.getProperty("line.separator");
 
-    public TableToString(DbServer dbServer, String qualifiedTableName, String delimiter) {
+    private String columnNameList = "";
+
+    public TableToString(DbServer dbServer, String qualifiedTableName, String delimiter) throws ExporterException {
         this.qualifiedTableName = qualifiedTableName;
         this.datasource = dbServer.getEmissionsDatasource();
         this.delimiter = delimiter;
         this.output = new StringBuffer();
+        //get column name list, used for sorting purposes...
+        try {
+            ResultSet rs = datasource.query().executeQuery("select * from " + qualifiedTableName + " where 1 = 0");
+            ResultSetMetaData md = rs.getMetaData();
+            for (int i = 1; i <= md.getColumnCount(); i++) {
+                this.columnNameList += (i > 1 ? "," : "") + md.getColumnName(i).toLowerCase();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ExporterException("could not convert table to string ", e);
+        }
     }
 
-    public String toString() {
+    public String toString(long recordLimit, long recordOffset) {
         try {
-            writeToString();
+            writeToString(recordLimit, recordOffset);
         } catch (Exception e) {
             // NOTE Auto-generated catch block
             e.printStackTrace();
@@ -37,9 +50,19 @@ public class TableToString {
         return output.toString();
     }
 
-    private void writeToString() throws Exception {
+    public String toString() {
         try {
-            ResultSet rs = datasource.query().executeQuery("select * from " + qualifiedTableName);
+            writeToString(0, 0);
+        } catch (Exception e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+        return output.toString();
+    }
+
+    private void writeToString(long recordLimit, long recordOffset) throws Exception {
+        try {
+            ResultSet rs = datasource.query().executeQuery("select * from " + qualifiedTableName + (recordLimit != 0 ? " order by " + this.columnNameList + " LIMIT " + recordLimit + " OFFSET " + recordOffset: ""));
             ResultSetMetaData md = rs.getMetaData();
             int columnCount = md.getColumnCount();
             int startingColumn=1;
@@ -49,7 +72,8 @@ public class TableToString {
                startingColumn=5;
             }
             
-            writeHeaderRow(md, startingColumn, columnCount);
+            if (recordOffset == 0) 
+                writeHeaderRow(md, startingColumn, columnCount);
             String row = "";
             String value = "";
                        

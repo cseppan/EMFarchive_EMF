@@ -143,7 +143,18 @@ public class EditQAStepPresenter {
                 Writer output = new BufferedWriter(new FileWriter(localFile));
                 try {
                     output.write( writeHeader(qaStep, qaResult, dataset.getName()));
-                    output.write( getTableAsString(qaResult) );
+
+                    
+                    long tableRecordCount = getTableRecordCount(qaResult);
+                    long recordOffset = 0;
+                    while (recordOffset <= tableRecordCount) {
+                        output.write( getTableAsString(qaResult, 10000L, recordOffset) );
+                        recordOffset += 10000;
+                    }
+                    
+                    
+                    
+//                    output.write( getTableAsString(qaResult) );
 //                } catch (Exception e)  {
 //                    e.printStackTrace();
 //                    throw e;
@@ -218,6 +229,10 @@ public class EditQAStepPresenter {
 
     public String getTableAsString(QAStepResult stepResult) throws EmfException {
         return session.dataService().getTableAsString("emissions." + stepResult.getTable());
+    }
+
+    public String getTableAsString(QAStepResult stepResult, long recordLimit, long recordOffset) throws EmfException {
+        return session.dataService().getTableAsString("emissions." + stepResult.getTable(), recordLimit, recordOffset);
     }
 
     public long getTableRecordCount(QAStepResult stepResult) throws EmfException {

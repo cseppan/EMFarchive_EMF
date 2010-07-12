@@ -80,7 +80,14 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
                     try {
                         System.out.println("Writing out file...");
                         output.write( writeHeader(datasets[i]));
-                        output.write( getTableAsString(datasets[i]) );
+//                        output.write( getTableAsString(datasets[i]) );
+                        long tableRecordCount = getTableRecordCount(datasets[i]);
+                        long recordOffset = 0;
+                        while (recordOffset <= tableRecordCount) {
+                            output.write( getTableAsString(datasets[i], 10000L, recordOffset) );
+                            recordOffset += 10000;
+                        }
+
                     }
                     finally {
                         output.close();
@@ -136,6 +143,10 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
     
     public String getTableAsString(EmfDataset dataset) throws EmfException {
         return session.dataService().getTableAsString("emissions." + getTableName(dataset));
+    }
+    
+    public String getTableAsString(EmfDataset dataset, long recordLimit, long recordOffset) throws EmfException {
+        return session.dataService().getTableAsString("emissions." + getTableName(dataset), recordLimit, recordOffset);
     }
     
     private String getTableName(Dataset dataset) {

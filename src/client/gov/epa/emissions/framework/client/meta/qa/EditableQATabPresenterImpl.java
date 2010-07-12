@@ -136,7 +136,18 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
             if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
                 Writer output = new BufferedWriter(new FileWriter(localFile));
                 try {
-                    output.write(  writerHeader(qaStep, qaResult, dataset.getName())+ getTableAsString(qaResult) );
+                    output.write(  writerHeader(qaStep, qaResult, dataset.getName()) );
+                    
+                    
+                    long tableRecordCount = getTableRecordCount(qaResult);
+                    long recordOffset = 0;
+                    while (recordOffset <= tableRecordCount) {
+                        output.write( getTableAsString(qaResult, 10000L, recordOffset) );
+                        recordOffset += 10000;
+                    }
+                    
+                    
+                    
                 }
                 finally {
                     output.close();
@@ -196,6 +207,10 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
 
     public String getTableAsString(QAStepResult stepResult) throws EmfException {
         return session.dataService().getTableAsString("emissions." + stepResult.getTable());
+    }
+
+    public String getTableAsString(QAStepResult stepResult, long recordLimit, long recordOffset) throws EmfException {
+        return session.dataService().getTableAsString("emissions." + stepResult.getTable(), recordLimit, recordOffset);
     }
 
 }

@@ -227,6 +227,7 @@ public class DataServiceTransport implements DataService {
     }
 
     public String getTableAsString(String qualifiedTableName) throws EmfException {
+        
         EmfCall call = call();
 
         call.setOperation("getTableAsString");
@@ -236,9 +237,38 @@ public class DataServiceTransport implements DataService {
         return (String) call.requestResponse(new Object[] { qualifiedTableName });
     }
 
-    public long getTableRecordCount(String qualifiedTableName) throws EmfException {
+    public String getTableAsString(String qualifiedTableName, long recordLimit, long recordOffset) throws EmfException {
         EmfCall call = call();
 
+//        call.getCall().setEncodingStyle(null);
+//        call.getCall().getMessageContext().setEncodingStyle(null);
+//        call.getCall().getMessageContext().setProperty(Call.CHARACTER_SET_ENCODING, "ISO-8859-1");
+//        call.getCall().setProperty(Call.CHARACTER_SET_ENCODING, "ISO-8859-1");
+//        try {
+//            call.getCall().getResponseMessage().setProperty(Call.CHARACTER_SET_ENCODING, "ISO-8859-1");
+//        } catch (SOAPException e) {
+//            // NOTE Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        call.getCall().setop
+//        javax.xml.rpc.encoding.TypeMappingRegistry
+        call.setOperation("getTableAsString");
+        call.addStringParam("qualifiedTableName");
+        call.addLongParam("recordLimit");
+        call.addLongParam("recordOffset");
+        call.setStringReturnType();
+//        System.out.println(call.getCall().getMessageContext().getProperty(Call.CHARACTER_SET_ENCODING));
+//        System.out.println(call.getCall().getProperty(Call.CHARACTER_SET_ENCODING));
+//        call.getCall().getMessageContext().setProperty(Call.CHARACTER_SET_ENCODING, "utf-16");
+
+        return (String) call.requestResponse(new Object[] { qualifiedTableName, new Long(recordLimit), new Long(recordOffset) });
+    }
+
+    public long getTableRecordCount(String qualifiedTableName) throws EmfException {
+        EmfCall call = call();
+        //"UTF-16"
+        //call.getCall().setEncodingStyle(org.apache.axis.Constants. "UTF-16");
+        //call.setEncodingStyle(org.apache.axis.Constants.URI_SOAP11_ENC);
         call.setOperation("getTableRecordCount");
         call.addStringParam("qualifiedTableName");
         call.setLongReturnType();
