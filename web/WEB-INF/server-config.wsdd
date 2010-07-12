@@ -1116,4 +1116,13 @@
 		innerType="ns1:FastAnalysisInputSector"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.fast.FastAnalysisRun"
+		qname="ns1:FastAnalysisRun" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<arrayMapping qname="ns1:FastAnalysisRuns" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.fast.FastAnalysisRun[]"
+		innerType="ns1:FastAnalysisRun"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
 </deployment>
