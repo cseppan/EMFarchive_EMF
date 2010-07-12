@@ -69,8 +69,8 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         super.addSeparator();
         super.add(createSectorScenario(parent, messagePanel));
         super.addSeparator();
-//        super.add(createMPSDT(parent, messagePanel));
-//        super.addSeparator();
+        super.add(createMPSDT(parent, messagePanel));
+        super.addSeparator();
 
         manageUsers(session.user(), messagePanel);
         super.add(createMyProfile(session, messagePanel));
