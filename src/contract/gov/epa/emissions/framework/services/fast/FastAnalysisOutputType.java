@@ -8,11 +8,9 @@ public class FastAnalysisOutputType implements Serializable {
 
     private String name;
 
-    public static final String DETAILED_SECTOR_MAPPING_RESULT = "Detailed Sector Mapping Result";
+    public static final String GRIDDED_DIFFERENCE = "FAST Gridded Difference";
 
-    public static final String DETAILED_EECS_MAPPING_RESULT = "Detailed EECS Mapping Result";
-
-    public static final String SECTOR_SPECIFIC_INVENTORY = "Sector Specific Inventory";
+    public static final String DOMAIN_DIFFERENCE = "FAST Domain Difference";
 
     public FastAnalysisOutputType() {
         //

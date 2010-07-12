@@ -384,6 +384,39 @@ public class FastRunTask {
         return recordCount;
     }
 
+    private double getDomainPopulationCount(EmfDataset dataset, Grid grid) throws EmfException {
+        String query = "SELECT sum(totalpop) as totalpop "
+            + " FROM " + qualifiedEmissionTableName(dataset) + " "
+            + " WHERE col between 1 and " + grid.getNcols() + "::integer and row between 1 and " + grid.getNrows() + "::integer "
+            ;
+        ResultSet rs = null;
+        Statement statement = null;
+        double populationCount = 0;
+        try {
+            statement = datasource.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            rs = statement.executeQuery(query);
+            while (rs.next()) {
+                populationCount = rs.getInt(1);
+            }
+            rs.close();
+            rs = null;
+            statement.close();
+            statement = null;
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null) {
+                try { rs.close(); } catch (SQLException e) { /**/ }
+                rs = null;
+            }
+            if (statement != null) {
+                try { statement.close(); } catch (SQLException e) { /**/ }
+                statement = null;
+            }
+        }
+        return populationCount;
+    }
+
     protected String qualifiedEmissionTableName(Dataset dataset) {
         return qualifiedName(emissionTableName(dataset));
     }
@@ -1051,6 +1084,7 @@ long timing = System.currentTimeMillis();
         VersionedQuery domainPopulationVersionedQuery = new VersionedQuery(version(fastRun.getDomainPopulationDataset().getId(), fastRun.getDomainPopulationDatasetVersion()), "grid");
         String domainPopulationTableName = qualifiedEmissionTableName(fastRun.getDomainPopulationDataset());
         
+        double populationCount = getDomainPopulationCount(fastRun.getDomainPopulationDataset(), fastRun.getGrid());
         
         int datasetId = dataset.getId();
         String tableName = qualifiedEmissionTableName(dataset);
@@ -1071,7 +1105,7 @@ long timing = System.currentTimeMillis();
                 for (int x = 1; x <= this.domain.getNcols(); x++) {
                     for (int y = 1; y <= this.domain.getNrows(); y++) {
                         ++counter;
-                        statement.addBatch("INSERT INTO " + tableName + " (dataset_id, delete_versions, version, sector,CMAQ_POLLUTANT,x,y,emission,AIR_QUALITY, POPULATION_WEIGHTED_AIR_QUALITY, CANCER_RISK_PER_PERSON, TOTAL_CANCER_RISK, POPULATION_WEIGHTED_CANCER_RISK, GRID_CELL_POPULATION, PCT_POPULATION_IN_GRID_CELL_TO_MODEL_DOMAIN, URE) \nselect " + datasetId + "::integer as dataset_id, '' as delete_versions, 0 as version,'" + sector + "','" + pollutant + "'," + x + "," + y + "," + emission[x - 1][y - 1] + "," + airQuality[x - 1][y - 1] + ", " + airQuality[x - 1][y - 1] + " * totalpop / 6349855.90000001 as \"Population weighted AQ\", " + airQuality[x - 1][y - 1] + " * cancer_risk_ure as \"cancer risk/person\", " + airQuality[x - 1][y - 1] + " * cancer_risk_ure * totalpop as \"total cancer risk\", " + airQuality[x - 1][y - 1] + " * totalpop / 6349855.90000001 * cancer_risk_ure as \"pop. weighted cancer risk\", totalpop as \"grid cell population\", totalpop / 6349855.90000001 * 100.0 as \"% population in grid cell relative to modeling domain\", cancer_risk_ure as \"URE\" from (select 1) as foo left outer join " + domainPopulationTableName + " grid on grid.row = " + y + " and grid.col = " + x + " and " + domainPopulationVersionedQuery.query() + " left outer join " + cancerRiskTableName + " ure on ure.cmaq_pollutant = '" + pollutant + "' and " + cancerRiskVersionedQuery.query() + ";");
+                        statement.addBatch("INSERT INTO " + tableName + " (dataset_id, delete_versions, version, sector,CMAQ_POLLUTANT,x,y,emission,AIR_QUALITY, POPULATION_WEIGHTED_AIR_QUALITY, CANCER_RISK_PER_PERSON, TOTAL_CANCER_RISK, POPULATION_WEIGHTED_CANCER_RISK, GRID_CELL_POPULATION, PCT_POPULATION_IN_GRID_CELL_TO_MODEL_DOMAIN, URE) \nselect " + datasetId + "::integer as dataset_id, '' as delete_versions, 0 as version,'" + sector + "','" + pollutant + "'," + x + "," + y + "," + emission[x - 1][y - 1] + "," + airQuality[x - 1][y - 1] + ", " + airQuality[x - 1][y - 1] + " * totalpop / " + populationCount + "::double precision as \"Population weighted AQ\", " + airQuality[x - 1][y - 1] + " * cancer_risk_ure as \"cancer risk/person\", " + airQuality[x - 1][y - 1] + " * cancer_risk_ure * totalpop as \"total cancer risk\", " + airQuality[x - 1][y - 1] + " * totalpop / " + populationCount + "::double precision * cancer_risk_ure as \"pop. weighted cancer risk\", totalpop as \"grid cell population\", totalpop / " + populationCount + "::double precision * 100.0 as \"% population in grid cell relative to modeling domain\", cancer_risk_ure as \"URE\" from (select 1) as foo left outer join " + domainPopulationTableName + " grid on grid.row = " + y + " and grid.col = " + x + " and " + domainPopulationVersionedQuery.query() + " left outer join " + cancerRiskTableName + " ure on ure.cmaq_pollutant = '" + pollutant + "' and " + cancerRiskVersionedQuery.query() + ";");
                     }
                 }
                 if (counter > 20000) {

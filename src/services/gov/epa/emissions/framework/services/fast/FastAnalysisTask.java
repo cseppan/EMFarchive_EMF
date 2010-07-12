@@ -8,9 +8,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
-import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.VersionedQuery;
-import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.io.temporal.VersionedTableFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
@@ -25,7 +23,6 @@ import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -86,7 +83,7 @@ public class FastAnalysisTask {
         //
     }
     
-    protected FastAnalysisOutput createFastAnalysisOutput(FastAnalysisOutputType fastRunOutputType, EmfDataset outputDataset, EmfDataset inventory, int inventoryVersion) throws EmfException {
+    protected FastAnalysisOutput createFastAnalysisOutput(FastAnalysisOutputType fastRunOutputType, EmfDataset outputDataset) throws EmfException {
         FastAnalysisOutput result = new FastAnalysisOutput();
         result.setFastAnalysisId(fastAnalysis.getId());
         result.setOutputDataset(outputDataset);
@@ -102,46 +99,78 @@ public class FastAnalysisTask {
         return result;
     }
     
-    public FastAnalysisOutput createEECSDetailedMappingResultOutput(FastRunInventory fastRunInventory) throws Exception {
-        EmfDataset inventory = fastRunInventory.getDataset();
+    public FastAnalysisOutput createAnalysisGriddedDifferenceResultOutput() throws Exception {
 
         //setup result
-        FastAnalysisOutput eecsDetailedMappingOutput = null;
+        FastAnalysisOutput analysisGriddedDifferenceResultOutput = null;
         String runStatus = "";
         
         //Create EECS Detailed Mapping Result Output
         try {
-            setStatus("Started creating " + DatasetType.EECS_DETAILED_MAPPING_RESULT + " from the inventory, " 
-                    + fastRunInventory.getDataset().getName() 
-                    + ".");
+            setStatus("Started creating " + DatasetType.FAST_ANALYSIS_GRIDDED_DIFFERENCE_RESULT + ".");
             
-            EmfDataset eecsDetailedMapping =  createEECSDetailedMappingDataset(inventory);
+            EmfDataset analysisGriddedDifferenceResult =  createAnalysisGriddedDifferenceResultDataset();
 
-            eecsDetailedMappingOutput = createFastAnalysisOutput(getFastAnalysisOutputType(FastRunOutputType.DETAILED_EECS_MAPPING_RESULT), eecsDetailedMapping, inventory, fastRunInventory.getVersion());
+            analysisGriddedDifferenceResultOutput = createFastAnalysisOutput(getFastAnalysisOutputType(FastAnalysisOutputType.GRIDDED_DIFFERENCE), analysisGriddedDifferenceResult);
 
-            populateEECSDetailedMapping(fastRunInventory, eecsDetailedMappingOutput);
+            populateAnalysisGriddedDifferenceResult(analysisGriddedDifferenceResultOutput);
             
-            updateOutputDatasetVersionRecordCount(eecsDetailedMappingOutput);
+            updateOutputDatasetVersionRecordCount(analysisGriddedDifferenceResultOutput);
 
             runStatus = "Completed.";
 
-            setStatus("Completed creating " + DatasetType.EECS_DETAILED_MAPPING_RESULT + " from the inventory, " 
-                    + fastRunInventory.getDataset().getName() 
-                    + ".");
+            setStatus("Completed creating " + DatasetType.FAST_ANALYSIS_GRIDDED_DIFFERENCE_RESULT + ".");
 
         } catch(EmfException ex) {
-            runStatus = "Failed creating " + DatasetType.EECS_DETAILED_MAPPING_RESULT + ". Error processing inventory, " + fastRunInventory.getDataset().getName() + ". Exception = " + ex.getMessage();
+            runStatus = "Failed creating " + DatasetType.FAST_ANALYSIS_GRIDDED_DIFFERENCE_RESULT + ". Exception = " + ex.getMessage();
             setStatus(runStatus);
             throw ex;
         } finally {
-            if (eecsDetailedMappingOutput != null) {
-                eecsDetailedMappingOutput.setCompletionDate(new Date());
-                eecsDetailedMappingOutput.setRunStatus(runStatus);
-                saveFastAnalysisOutput(eecsDetailedMappingOutput);
+            if (analysisGriddedDifferenceResultOutput != null) {
+                analysisGriddedDifferenceResultOutput.setCompletionDate(new Date());
+                analysisGriddedDifferenceResultOutput.setRunStatus(runStatus);
+                saveFastAnalysisOutput(analysisGriddedDifferenceResultOutput);
             }
         }
 
-        return eecsDetailedMappingOutput;
+        return analysisGriddedDifferenceResultOutput;
+    }
+
+    public FastAnalysisOutput createAnalysisDomainDifferenceResultOutput(EmfDataset analysisGriddedDifferenceResult, int analysisGriddedDifferenceResultVersion) throws Exception {
+
+        //setup result
+        FastAnalysisOutput analysisDomainDifferenceResultOutput = null;
+        String runStatus = "";
+        
+        //Create EECS Detailed Mapping Result Output
+        try {
+            setStatus("Started creating " + DatasetType.FAST_ANALYSIS_DOMAIN_DIFFERENCE_RESULT + ".");
+            
+            EmfDataset analysisDomainDifferenceResult =  createAnalysisDomainDifferenceResultDataset();
+
+            analysisDomainDifferenceResultOutput = createFastAnalysisOutput(getFastAnalysisOutputType(FastAnalysisOutputType.DOMAIN_DIFFERENCE), analysisDomainDifferenceResult);
+
+            populateAnalysisDomainDifferenceResult(analysisGriddedDifferenceResult, analysisGriddedDifferenceResultVersion, analysisDomainDifferenceResultOutput);
+            
+            updateOutputDatasetVersionRecordCount(analysisDomainDifferenceResultOutput);
+
+            runStatus = "Completed.";
+
+            setStatus("Completed creating " + DatasetType.FAST_ANALYSIS_DOMAIN_DIFFERENCE_RESULT + ".");
+
+        } catch(EmfException ex) {
+            runStatus = "Failed creating " + DatasetType.FAST_ANALYSIS_DOMAIN_DIFFERENCE_RESULT + ". Exception = " + ex.getMessage();
+            setStatus(runStatus);
+            throw ex;
+        } finally {
+            if (analysisDomainDifferenceResultOutput != null) {
+                analysisDomainDifferenceResultOutput.setCompletionDate(new Date());
+                analysisDomainDifferenceResultOutput.setRunStatus(runStatus);
+                saveFastAnalysisOutput(analysisDomainDifferenceResultOutput);
+            }
+        }
+
+        return analysisDomainDifferenceResultOutput;
     }
 
     private FastAnalysisOutputType getFastAnalysisOutputType(String name) throws EmfException {
@@ -157,304 +186,177 @@ public class FastAnalysisTask {
         return resultType;
     }
 
-    private EmfDataset createEECSDetailedMappingDataset(EmfDataset inventory) throws EmfException {
-        DatasetType datasetType = getDatasetType(DatasetType.EECS_DETAILED_MAPPING_RESULT);
-        return creator.addDataset("ds", fastAnalysis.getName() + "_" + DatasetType.EECS_DETAILED_MAPPING_RESULT, 
+    private EmfDataset createAnalysisGriddedDifferenceResultDataset() throws EmfException {
+        DatasetType datasetType = getDatasetType(DatasetType.FAST_ANALYSIS_GRIDDED_DIFFERENCE_RESULT);
+        return creator.addDataset("ds", fastAnalysis.getName() + "_" + DatasetType.FAST_ANALYSIS_GRIDDED_DIFFERENCE_RESULT, 
+                datasetType, new VersionedTableFormat(datasetType.getFileFormat(), dbServer.getSqlDataTypes()),
+                "");
+        
+        //new VersionedTableFormat(datasetType.getFileFormat(), dbServer.getSqlDataTypes())
+    }
+
+    private EmfDataset createAnalysisDomainDifferenceResultDataset() throws EmfException {
+        DatasetType datasetType = getDatasetType(DatasetType.FAST_ANALYSIS_DOMAIN_DIFFERENCE_RESULT);
+        return creator.addDataset("ds", fastAnalysis.getName() + "_" + DatasetType.FAST_ANALYSIS_DOMAIN_DIFFERENCE_RESULT, 
                 datasetType, new VersionedTableFormat(datasetType.getFileFormat(), dbServer.getSqlDataTypes()),
                 "");
     }
 
-    private EmfDataset createSectorDetailedMappingDataset(EmfDataset inventory) throws EmfException {
-        DatasetType datasetType = getDatasetType(DatasetType.SECTOR_DETAILED_MAPPING_RESULT);
-        return creator.addDataset("ds", fastAnalysis.getName() + "_" + DatasetType.SECTOR_DETAILED_MAPPING_RESULT, 
-                datasetType, new VersionedTableFormat(datasetType.getFileFormat(), dbServer.getSqlDataTypes()),
-                "");
-    }
-
-    private EmfDataset createSectorSpecificInventoryDataset(String sector, EmfDataset inventory) throws EmfException {
-        DatasetType datasetType = inventory.getDatasetType();
-        return creator.addDataset(fastAnalysis.getName() + "_" + inventory.getName() + "_" + sector, inventory, 
-                datasetType, new VersionedTableFormat(datasetType.getFileFormat(), dbServer.getSqlDataTypes()),
-                inventory.getDescription() + "\nSECTOR_SCENARIO_SECTOR=" + sector);
-    }
-
-    private void populateEECSDetailedMapping(FastRunInventory fastRunInventory, FastAnalysisOutput fastRunOutput) throws EmfException {
-        
-        EmfDataset inventory = fastRunInventory.getDataset();
-        int inventoryVersionNumber = fastRunInventory.getVersion();
-        Version inventoryVersion = version(inventory.getId(), inventoryVersionNumber);
-        VersionedQuery inventoryVersionedQuery = new VersionedQuery(inventoryVersion, "inv");
-        String inventoryTableName = qualifiedEmissionTableName(inventory);
-
-        EmfDataset eecsMappingDataset = null;//fastRun.getEecsMapppingDataset();
-        int eecsMappingDatasetVersionNumber = 0;//fastRun.getEecsMapppingDatasetVersion();
-        Version eecsMappingDatasetVersion = version(eecsMappingDataset.getId(), eecsMappingDatasetVersionNumber);
-        VersionedQuery eecsMappingDatasetVersionedQuery = new VersionedQuery(eecsMappingDatasetVersion, "eecs_map");
-        String eecsMappingDatasetTableName = qualifiedEmissionTableName(eecsMappingDataset);
-        
-        cleanMappingDataset(eecsMappingDataset);
-//        EmfDataset sectorMappingDataset = fastRun.getSectorMapppingDataset();
-//        int sectorMappingDatasetVersionNumber = fastRun.getSectorMapppingDatasetVersion();
-//        Version sectorMappingDatasetVersion = version(sectorMappingDataset.getId(), sectorMappingDatasetVersionNumber);
-//        VersionedQuery sectorMappingDatasetVersionedQuery = new VersionedQuery(sectorMappingDatasetVersion);
-//        String sectorMappingDatasetTableName = qualifiedEmissionTableName(sectorMappingDataset);
-
-        
-        //SET work_mem TO '512MB';
-        //NOTE:  Still need to  support mobile monthly files
-        String sql = "INSERT INTO " + qualifiedEmissionTableName(fastRunOutput.getOutputDataset()) + " (dataset_id, version, fips, plantid, pointid, stackid, segment, scc, plant, poll, ann_emis, avd_emis, mact, naics, map_mact, map_naics, map_scc, eecs, weight) " 
-        + "select " + fastRunOutput.getOutputDataset().getId() + " as dataset_id, 0 as version, " 
-        + "inv.fips, "
-        + "inv.plantid, inv.pointid, "
-        + "inv.stackid, inv.segment, "
-        + "inv.scc, inv.plant, "
-        + "inv.poll, "
-        + "inv.ann_emis, "
-        + "inv.avd_emis, "
-        + "inv.mact, inv.naics, "
-        + "map_mact, map_naics, "
-        + "map_scc, "
-        + "tblMatch.eecs, weight "
-        + "from " + inventoryTableName + " inv "
-        + "left outer join ( "
-        + "select inv.record_id, "
-        + "eecs_map.mact as map_mact, eecs_map.naics as map_naics, " 
-        + "eecs_map.scc as map_scc, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.mact = inv.mact "
-        + "where eecs_map.mact is not null "
-        + "and eecs_map.naics is null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
-        + "select inv.record_id,  "
-        + "eecs_map.mact as map_mact, eecs_map.naics as map_naics,  "
-        + "eecs_map.scc as map_scc,  "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.naics = inv.naics "
-        + "where eecs_map.mact is null "
-        + "and eecs_map.naics is not null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
-        + "select inv.record_id,  "
-        + "eecs_map.mact as map_mact, eecs_map.naics as map_naics, " 
-        + "eecs_map.scc as map_scc,  "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.scc = inv.scc "
-        + "where eecs_map.mact is null "
-        + "and eecs_map.naics is null "
-        + "and eecs_map.scc is not null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + ") tblMatch "
-        + "on tblMatch.record_id = inv.record_id "
-        + "where " + inventoryVersionedQuery.query() + " ";
-            
-        System.out.println(sql);
-        try {
-            datasource.query().execute(sql);
-        } catch (SQLException e) {
-            throw new EmfException("Error occured when inserting data to " + DatasetType.EECS_DETAILED_MAPPING_RESULT + " table" + "\n" + e.getMessage());
-        }
-    }
-
-    private void populateSectorDetailedMapping(FastRunInventory fastRunInventory, FastRunOutput fastRunOutput) throws EmfException {
-        
-        EmfDataset inventory = fastRunInventory.getDataset();
-        int inventoryVersionNumber = fastRunInventory.getVersion();
-        Version inventoryVersion = version(inventory.getId(), inventoryVersionNumber);
-        VersionedQuery inventoryVersionedQuery = new VersionedQuery(inventoryVersion, "inv");
-        String inventoryTableName = qualifiedEmissionTableName(inventory);
-
-        EmfDataset eecsMappingDataset = null;//fastRun.getEecsMapppingDataset();
-        int eecsMappingDatasetVersionNumber = 0;//fastRun.getEecsMapppingDatasetVersion();
-        Version eecsMappingDatasetVersion = version(eecsMappingDataset.getId(), eecsMappingDatasetVersionNumber);
-        VersionedQuery eecsMappingDatasetVersionedQuery = new VersionedQuery(eecsMappingDatasetVersion, "eecs_map");
-        String eecsMappingDatasetTableName = qualifiedEmissionTableName(eecsMappingDataset);
-        
-        EmfDataset sectorMappingDataset = null;//fastRun.getSectorMapppingDataset();
-        int sectorMappingDatasetVersionNumber = 0;//fastRun.getSectorMapppingDatasetVersion();
-        Version sectorMappingDatasetVersion = version(sectorMappingDataset.getId(), sectorMappingDatasetVersionNumber);
-        VersionedQuery sectorMappingDatasetVersionedQuery = new VersionedQuery(sectorMappingDatasetVersion);
-        String sectorMappingDatasetTableName = qualifiedEmissionTableName(sectorMappingDataset);
-
-        cleanMappingDataset(sectorMappingDataset);
-
-        
-        //SET work_mem TO '512MB';
-        //NOTE:  Still need to  support mobile monthly files
-        String sql = "INSERT INTO " + qualifiedEmissionTableName(fastRunOutput.getOutputDataset()) + " (dataset_id, version, fips, plantid, pointid, stackid, segment, scc, plant, poll, ann_emis, avd_emis, eecs, sector, weight) " 
-        + "select " + fastRunOutput.getOutputDataset().getId() + " as dataset_id, 0 as version, " 
-        + "inv.fips, "
-        + "inv.plantid, inv.pointid, "
-        + "inv.stackid, inv.segment, "
-        + "inv.scc, inv.plant, "
-        + "inv.poll, "
-        + "inv.ann_emis, "
-        + "inv.avd_emis, "
-        + "tbleecs.eecs, tblsector.sector, "
-        + "tblsector.weight "
-        + "from " + inventoryTableName + " inv "
-        + "left outer join ( "
-        + "select distinct on (record_id) "
-        + "record_id, eecs, weight "
-        + "from ( "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.mact = inv.mact "
-        + "where eecs_map.mact is not null "
-        + "and eecs_map.naics is null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.naics = inv.naics "
-        + "where eecs_map.mact is null "
-        + "and eecs_map.naics is not null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.scc = inv.scc "
-        + "where eecs_map.mact is null "
-        + "and eecs_map.naics is null "
-        + "and eecs_map.scc is not null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + ") tbleecs "
-        + "order by record_id, weight, eecs "
-        + ") tbleecs "
-        + "on tbleecs.record_id = inv.record_id "
-        + "left outer join ( "
-        + "select sector, eecs, weight "
-        + "from " + sectorMappingDatasetTableName + " as sector_map "
-        + "where sector_map.eecs is not null "
-        + "and " + sectorMappingDatasetVersionedQuery.query() + " "
-        + ") tblsector "
-        + "on tblsector.eecs = tbleecs.eecs "
-        + "where " + inventoryVersionedQuery.query() + " ";
-            
-        System.out.println(sql);
-        try {
-            datasource.query().execute(sql);
-        } catch (SQLException e) {
-            throw new EmfException("Error occured when inserting data to " + DatasetType.EECS_DETAILED_MAPPING_RESULT + " table" + "\n" + e.getMessage());
-        }
-    }
-
-    private void populateSectorSpecificInventory(String sector, FastRunInventory fastRunInventory, FastRunOutput fastRunOutput) throws EmfException {
-        
-        EmfDataset inventory = fastRunInventory.getDataset();
-        int inventoryVersionNumber = fastRunInventory.getVersion();
-        Version inventoryVersion = version(inventory.getId(), inventoryVersionNumber);
-        VersionedQuery inventoryVersionedQuery = new VersionedQuery(inventoryVersion, "inv");
-        String inventoryTableName = qualifiedEmissionTableName(inventory);
-
-        EmfDataset eecsMappingDataset = null;//fastRun.getEecsMapppingDataset();
-        int eecsMappingDatasetVersionNumber = 0;//fastRun.getEecsMapppingDatasetVersion();
-        Version eecsMappingDatasetVersion = version(eecsMappingDataset.getId(), eecsMappingDatasetVersionNumber);
-        VersionedQuery eecsMappingDatasetVersionedQuery = new VersionedQuery(eecsMappingDatasetVersion, "eecs_map");
-        String eecsMappingDatasetTableName = qualifiedEmissionTableName(eecsMappingDataset);
-        
-        EmfDataset sectorMappingDataset = null;//fastRun.getSectorMapppingDataset();
-        int sectorMappingDatasetVersionNumber = 0;//fastRun.getSectorMapppingDatasetVersion();
-        Version sectorMappingDatasetVersion = version(sectorMappingDataset.getId(), sectorMappingDatasetVersionNumber);
-        VersionedQuery sectorMappingDatasetVersionedQuery = new VersionedQuery(sectorMappingDatasetVersion);
-        String sectorMappingDatasetTableName = qualifiedEmissionTableName(sectorMappingDataset);
-
-        String selectList = "select " + fastRunOutput.getOutputDataset().getId() + " as dataset_id, '' as delete_versions, 0 as version";
-        String columnList = "dataset_id, delete_versions, version";
-        Column[] columns = inventory.getDatasetType().getFileFormat().cols();
-        for (int i = 0; i < columns.length; i++) {
-            String columnName = columns[i].name();
-            if (columnName.equalsIgnoreCase("eecs")) {
-                selectList += ", tbleecs.eecs";
-                columnList += "," + columnName;
-            } else {
-                selectList += ", " + columnName;
-                columnList += "," + columnName;
+    private EmfDataset getFastRunGriddedSummaryEmissionAirQualityDataset(FastRun fastRun) {
+        EmfDataset dataset = null;
+        for (FastRunOutput output : getFastRunOutputs(fastRun.getId())) {
+            if (output.getOutputDataset().getDatasetType().getName().equals(DatasetType.fastGriddedSummaryEmissionAirQuality)) {
+                dataset = output.getOutputDataset();
             }
         }
+        return dataset;
+    }
+    
+    protected FastRunOutput[] getFastRunOutputs(int fastRunId) {
+        FastRunOutput[] results = new FastRunOutput[] {};
+        Session session = sessionFactory.getSession();
+        try {
+            results = fastRunDAO.getFastRunOutputs(fastRunId, session).toArray(new FastRunOutput[0]);
+        } finally {
+            session.close();
+        }
+        return results;
+    }
+
+    private void populateAnalysisGriddedDifferenceResult(FastAnalysisOutput fastRunOutput) throws EmfException {
+
+        String sql = "INSERT INTO " + qualifiedEmissionTableName(fastRunOutput.getOutputDataset()) + " (dataset_id, version, sector, pollutant, x, y, sum_sens_total_cancer_risk, sum_base_total_cancer_risk, diff_sum_total_cancer_risk, sum_sens_pop_weighted_cancer_risk, sum_base_pop_weighted_cancer_risk, diff_sum_pop_weighted_cancer_risk, sum_sens_pop_weighted_air_quality, sum_base_pop_weighted_air_quality, diff_sum_pop_weighted_air_quality, sum_sens_air_quality, sum_base_air_quality, diff_sum_air_quality, sum_sens_emission, sum_base_emission, diff_sum_emission) " 
+        + "select " + fastRunOutput.getOutputDataset().getId() + " as dataset_id, 0 as version, " 
+            + " coalesce(post.sector, pre.sector) as sector,  "
+            + " coalesce(post.pollutant, pre.pollutant) as pollutant, "
+            + " coalesce(post.x, pre.x) as x, "
+            + " coalesce(post.y, pre.y) as y, "
+            + " sum(post.cancer_risk_per_person) as sum_sens_total_cancer_risk, "
+            + " sum(pre.cancer_risk_per_person) as sum_base_total_cancer_risk, "
+            + " sum(post.cancer_risk_per_person) - sum(pre.cancer_risk_per_person) as diff_sum_total_cancer_risk, "
+            + " sum(post.population_weighted_cancer_risk) as sum_sens_pop_weighted_cancer_risk, "
+            + " sum(pre.population_weighted_cancer_risk) as sum_base_pop_weighted_cancer_risk, "
+            + " sum(post.population_weighted_cancer_risk) - sum(pre.population_weighted_cancer_risk) as diff_sum_pop_weighted_cancer_risk, "
+            + " sum(post.population_weighted_air_quality) as sum_sens_pop_weighted_air_quality, "
+            + " sum(pre.population_weighted_air_quality) as sum_base_pop_weighted_air_quality, "
+            + " sum(post.population_weighted_air_quality) - sum(pre.population_weighted_air_quality) as diff_sum_pop_weighted_air_quality, "
+            + " sum(post.air_quality) as sum_sens_air_quality, "
+            + " sum(pre.air_quality) as sum_base_air_quality, "
+            + " sum(post.air_quality) - sum(pre.air_quality) as diff_sum_air_quality, "
+            + " sum(post.emission) as sum_sens_emission, "
+            + " sum(pre.emission) as sum_base_emission, "
+            + " sum(post.emission) - sum(pre.emission) as diff_sum_emission "
+            + " from ( ";
+            FastAnalysisRun[] fastAnalysisRuns = fastAnalysis.getBaselineRuns();
+            int count = 0;
+            for (FastAnalysisRun fastAnalysisRun : fastAnalysisRuns) {
+                EmfDataset dataset = getFastRunGriddedSummaryEmissionAirQualityDataset(fastAnalysisRun.getFastRun());
+                int versionNumber = 0;
+                Version inventoryVersion = version(dataset.getId(), versionNumber);
+                VersionedQuery datasetVersionedQuery = new VersionedQuery(inventoryVersion, "aq");
+                String datasetTableName = qualifiedEmissionTableName(dataset);
+                sql += (count > 0 ? " union all " : "") + " select "
+                    + "     aq.sector, "
+                    + "     aq.cmaq_pollutant as pollutant, "
+                    + "     aq.x, "
+                    + "     aq.y, "
+                    + "     cancer_risk_per_person, "
+                    + "     total_cancer_risk, "
+                    + "     population_weighted_cancer_risk, "
+                    + "     population_weighted_air_quality, "
+                    + "     aq.emission, "
+                    + "     aq.air_quality "
+                    + " from "  + datasetTableName  + " aq "
+                    + " where " + datasetVersionedQuery.query() + " ";
+                ++count;
+            }
+            sql += " ) as pre "
+            + " "
+            + " full join ( ";
+            fastAnalysisRuns = fastAnalysis.getSensitivityRuns();
+            count = 0;
+            for (FastAnalysisRun fastAnalysisRun : fastAnalysisRuns) {
+                EmfDataset dataset = getFastRunGriddedSummaryEmissionAirQualityDataset(fastAnalysisRun.getFastRun());
+                int versionNumber = 0;
+                Version inventoryVersion = version(dataset.getId(), versionNumber);
+                VersionedQuery datasetVersionedQuery = new VersionedQuery(inventoryVersion, "aq");
+                String datasetTableName = qualifiedEmissionTableName(dataset);
+                sql += (count > 0 ? " union all " : "") + " select "
+                    + "     aq.sector, "
+                    + "     aq.cmaq_pollutant as pollutant, "
+                    + "     aq.x, "
+                    + "     aq.y, "
+                    + "     cancer_risk_per_person, "
+                    + "     total_cancer_risk, "
+                    + "     population_weighted_cancer_risk, "
+                    + "     population_weighted_air_quality, "
+                    + "     aq.emission, "
+                    + "     aq.air_quality "
+                    + " from "  + datasetTableName  + " aq "
+                    + " where " + datasetVersionedQuery.query() + " ";
+                ++count;
+            }
+            sql += " ) as post "
+            + " on post.sector = pre.sector "
+            + " and post.pollutant = pre.pollutant "
+            + " and post.x = pre.x "
+            + " and post.y = pre.y "
+            + " "
+//            + "--where coalesce(post.sector, pre.sector) = 'ptipm'  "
+//            + "--and coalesce(post.pollutant, pre.pollutant) = 'PM2.5' "
+//            + "  "
+            + " group by coalesce(post.sector, pre.sector),  "
+            + " coalesce(post.pollutant, pre.pollutant),  "
+            + " coalesce(post.x, pre.x),  "
+            + " coalesce(post.y, pre.y) "
+            + " order by coalesce(post.sector, pre.sector),  "
+            + " coalesce(post.pollutant, pre.pollutant),  "
+            + " coalesce(post.x, pre.x),  "
+            + " coalesce(post.y, pre.y) "
+            + " ;";
         
-        //SET work_mem TO '512MB';
-        //NOTE:  Still need to  support mobile monthly files
-        String sql = "INSERT INTO " + qualifiedEmissionTableName(fastRunOutput.getOutputDataset()) + " (" + columnList + ") " 
-        + selectList + " "
-        + "from " + inventoryTableName + " inv "
-        + "left outer join ( "
-        + "select distinct on (record_id) "
-        + "record_id, eecs, weight "
-        + "from ( "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.mact = inv.mact "
-        + "where eecs_map.mact is not null "
-        + "and eecs_map.naics is null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.naics = inv.naics "
-        + "where eecs_map.mact is null "
-        + "and eecs_map.naics is not null "
-        + "and eecs_map.scc is null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + "union  "
-        + "select inv.record_id, "
-        + "eecs_map.eecs, eecs_map.weight "
-        + "from " + inventoryTableName + " inv "
-        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
-        + "on eecs_map.scc = inv.scc "
-        + "where eecs_map.mact is null "
-        + "and eecs_map.naics is null "
-        + "and eecs_map.scc is not null "
-        + "and " + inventoryVersionedQuery.query() + " "
-        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
-        + ") tbleecs "
-        + "order by record_id, weight, eecs "
-        + ") tbleecs "
-        + "on tbleecs.record_id = inv.record_id "
-        + "left outer join ( "
-        + "select sector, eecs, weight "
-        + "from " + sectorMappingDatasetTableName + " as sector_map "
-        + "where sector_map.eecs is not null "
-        + "and " + sectorMappingDatasetVersionedQuery.query() + " "
-        + ") tblsector "
-        + "on tblsector.eecs = tbleecs.eecs "
-        + "where " + inventoryVersionedQuery.query() + " "
-        + "and tblsector.sector = '" + sector.replace("'", "''") + "'";
-            
         System.out.println(sql);
         try {
             datasource.query().execute(sql);
         } catch (SQLException e) {
-            throw new EmfException("Error occured when inserting data to " + fastRunOutput.getOutputDataset().getName() + " table" + "\n" + e.getMessage());
+            throw new EmfException("Error occured when inserting data to " + DatasetType.FAST_ANALYSIS_GRIDDED_DIFFERENCE_RESULT + " table" + "\n" + e.getMessage());
+        }
+    }
+
+    private void populateAnalysisDomainDifferenceResult(EmfDataset analysisGriddedDifferenceResult, int analysisGriddedDifferenceResultVersion, FastAnalysisOutput fastRunOutput) throws EmfException {
+
+        Version datasetVersion = version(analysisGriddedDifferenceResult.getId(), analysisGriddedDifferenceResultVersion);
+        VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion, "aq");
+        String datasetTableName = qualifiedEmissionTableName(analysisGriddedDifferenceResult);
+
+        String sql = "INSERT INTO " + qualifiedEmissionTableName(fastRunOutput.getOutputDataset()) + " (dataset_id, version, sector, pollutant, sum_sens_total_cancer_risk, sum_base_total_cancer_risk, diff_sum_total_cancer_risk, sum_sens_pop_weighted_cancer_risk, sum_base_pop_weighted_cancer_risk, diff_sum_pop_weighted_cancer_risk, sum_sens_pop_weighted_air_quality, sum_base_pop_weighted_air_quality, diff_sum_pop_weighted_air_quality, sum_sens_air_quality, sum_base_air_quality, diff_sum_air_quality, sum_sens_emission, sum_base_emission, diff_sum_emission) " 
+        + "select " + fastRunOutput.getOutputDataset().getId() + " as dataset_id, 0 as version, " 
+            + " sector,  "
+            + " pollutant, "
+            + " sum(sum_sens_total_cancer_risk) as sum_sens_total_cancer_risk, "
+            + " sum(sum_base_total_cancer_risk) as sum_base_total_cancer_risk, "
+            + " sum(sum_sens_total_cancer_risk) - sum(sum_base_total_cancer_risk) as diff_sum_total_cancer_risk, "
+            + " sum(sum_sens_pop_weighted_cancer_risk) as sum_sens_pop_weighted_cancer_risk, "
+            + " sum(sum_base_pop_weighted_cancer_risk) as sum_base_pop_weighted_cancer_risk, "
+            + " sum(sum_sens_pop_weighted_cancer_risk) - sum(sum_base_pop_weighted_cancer_risk) as diff_sum_pop_weighted_cancer_risk, "
+            + " sum(sum_sens_pop_weighted_air_quality) as sum_sens_pop_weighted_air_quality, "
+            + " sum(sum_base_pop_weighted_air_quality) as sum_base_pop_weighted_air_quality, "
+            + " sum(sum_sens_pop_weighted_air_quality) - sum(sum_base_pop_weighted_air_quality) as diff_sum_pop_weighted_air_quality, "
+            + " sum(sum_sens_air_quality) as sum_sens_air_quality, "
+            + " sum(sum_base_air_quality) as sum_base_air_quality, "
+            + " sum(sum_sens_air_quality) - sum(sum_base_air_quality) as diff_sum_air_quality, "
+            + " sum(sum_sens_emission) as sum_sens_emission, "
+            + " sum(sum_base_emission) as sum_base_emission, "
+            + " sum(sum_sens_emission) - sum(sum_base_emission) as diff_sum_emission "
+            + " from "  + datasetTableName  + " aq "
+            + " where " + datasetVersionedQuery.query() + " "
+            + " group by sector, pollutant ";
+        
+        System.out.println(sql);
+        try {
+            datasource.query().execute(sql);
+        } catch (SQLException e) {
+            throw new EmfException("Error occured when inserting data to " + DatasetType.FAST_ANALYSIS_DOMAIN_DIFFERENCE_RESULT + " table" + "\n" + e.getMessage());
         }
     }
 
@@ -480,22 +382,9 @@ public class FastAnalysisTask {
 //            
 //            for (int i = 0; i < fastRunInventories.length; i++) {
                 try {
-                    createEECSDetailedMappingResultOutput(new FastRunInventory());
-//                    FastRunOutput sectorDetailedMappingResultOutput = createSectorDetailedMappingResultOutput(fastRunInventories[i]);
-                    
-                    //see if the scenario has sectors specified, if not then lets auto populate what was found during the above
-                    //analysis
-                    
-                    //TODO:   need to auto populate sector_scenario_sector table
-//                    String[] sectors = getDistinctSectorListFromDataset(sectorDetailedMappingResultOutput.getOutputDataset().getId(), 0);
-//                    if (fastRun.getSectors().length == 0) {
-//                        fastRun.setSectors(sectors);
-//                        saveFastRun(fastRun);
-//                    }
-                    
-//                    for (String sector : sectors) {
-//                        createSectorSpecificInventoryOutput(sector, fastRunInventories[i]);
-//                    }
+                    FastAnalysisOutput analysisGriddedDifferenceResultOutput = createAnalysisGriddedDifferenceResultOutput();
+
+                    createAnalysisDomainDifferenceResultOutput(analysisGriddedDifferenceResultOutput.getOutputDataset(), 0);
 
                     recordCount = 0; //loader.getRecordCount();
                     status = "Completed.";
@@ -511,7 +400,7 @@ public class FastAnalysisTask {
                             
                     //make sure somebody hasn't cancelled this run.
                     if (isRunStatusCancelled()) {
-                        status = "Cancelled. Sector scenario run was cancelled: " + fastAnalysis.getName();
+                        status = "Cancelled. FAST Analysis run was cancelled: " + fastAnalysis.getName();
                         setStatus(status);
                         return;
 //                        throw new EmfException("Strategy run was cancelled.");
@@ -529,7 +418,7 @@ public class FastAnalysisTask {
         } catch (Exception e) {
             status = "Failed. Error processing inventory";
             e.printStackTrace();
-            throw new EmfException(e.getMessage());
+            throw new EmfException(e.getMessage(), e);
         } finally {
             //run any post processes
             try {
@@ -592,22 +481,6 @@ public class FastAnalysisTask {
         }
     }
     
-    private FastAnalysisOutput createFastAnalysisOutput(FastAnalysisOutputType fastAnalysisOutputType, EmfDataset outputDataset) throws EmfException {
-        FastAnalysisOutput result = new FastAnalysisOutput();
-        result.setFastAnalysisId(fastAnalysis.getId());
-        result.setOutputDataset(outputDataset);
-//        result.setInventoryDataset(inventory);
-//        result.setInventoryDatasetVersion(inventoryVersion);
-        
-        result.setType(fastAnalysisOutputType);
-        result.setStartDate(new Date());
-        result.setRunStatus("Start processing inventory dataset");
-
-        //persist output
-        saveFastAnalysisOutput(result);
-        return result;
-    }
-    
     private void saveFastAnalysisOutput(FastAnalysisOutput fastAnalysisOutput) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -623,7 +496,7 @@ public class FastAnalysisTask {
     private boolean isRunStatusCancelled() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            return fastRunDAO.getFastRunRunStatus(fastAnalysis.getId(), session).equals("Cancelled");
+            return fastRunDAO.getFastAnalysisRunStatus(fastAnalysis.getId(), session).equals("Cancelled");
         } catch (RuntimeException e) {
             throw new EmfException("Could not check if strategy run was cancelled.");
         } finally {
@@ -675,22 +548,6 @@ public class FastAnalysisTask {
         return datasource.getName() + "." + table;
     }
 
-//    private FastRunOutput createStrategyCountySummaryResult() throws EmfException {
-//        FastRunOutput result = new FastRunOutput();
-//        result.setFastRunId(fastRun.getId());
-//        EmfDataset summaryResultDataset = createCountySummaryDataset();
-//        
-//        result.setOutputDataset(summaryResultDataset);
-//        
-//        result.setType(getFastRunOutputType(FastRunOutputType.detailedEECSMapping));
-//        result.setStartDate(new Date());
-//        result.setRunStatus("Start processing " + FastRunOutputType.detailedEECSMapping);
-//
-//        //persist result
-//        saveFastRunSummaryOutput(result);
-//        return result;
-//    }
-
     private EmfDataset getDataset(int id) {
         EmfDataset dataset = null;
         Session session = sessionFactory.getSession();
@@ -713,11 +570,11 @@ public class FastAnalysisTask {
         return datasetType;
     }
 
-    private FastRunOutput[] getFastRunOutputs() {
-        FastRunOutput[] results = new FastRunOutput[] {};
+    private FastAnalysisOutput[] getFastAnalysisOutputs() {
+        FastAnalysisOutput[] results = new FastAnalysisOutput[] {};
         Session session = sessionFactory.getSession();
         try {
-            results = fastRunDAO.getFastRunOutputs(fastAnalysis.getId(), session).toArray(new FastRunOutput[0]);
+            results = fastRunDAO.getFastAnalysisOutputs(fastAnalysis.getId(), session).toArray(new FastAnalysisOutput[0]);
         } finally {
             session.close();
         }
@@ -752,17 +609,6 @@ public class FastAnalysisTask {
         }
     }
 
-    private void saveFastRunSummaryOutput(FastRunOutput fastRunOutput) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            fastRunDAO.updateFastRunOutput(fastRunOutput, session);
-        } catch (Exception e) {
-            throw new EmfException("Could not save control strategy results: " + e.getMessage());
-        } finally {
-            session.close();
-        }
-    }
-    
     private void updateOutputDatasetVersionRecordCount(FastAnalysisOutput fastAnalysisOutput) throws EmfException {
         Session session = sessionFactory.getSession();
         DatasetDAO dao = new DatasetDAO();
@@ -847,37 +693,16 @@ public class FastAnalysisTask {
         return recordCount;
     }
 
-    private void addStatus(FastRunInventory fastRunInventory) {
-        setStatus("Completed processing sector scenario inventory: " 
-                + fastRunInventory.getDataset().getName() 
-                + ".");
-    }
-
     private void setStatus(String message) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
-        endStatus.setType("FastRun");
+        endStatus.setType("FASTAnalysis");
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 
         statusDAO.add(endStatus);
     }
     
-    public String getFilterForSourceQuery() {
-        String filterForSourceQuery = "";
-        String sqlFilter = "";
-        String filter = "";
-        
-        //get and build strategy filter...
-        if (filter == null || filter.trim().length() == 0)
-            sqlFilter = "";
-        else 
-            sqlFilter = " and (" + filter + ") "; 
-
-        filterForSourceQuery = sqlFilter;
-        return filterForSourceQuery;
-    }
-
     private Version version(int datasetId, int version) {
         Session session = sessionFactory.getSession();
         try {
@@ -888,101 +713,5 @@ public class FastAnalysisTask {
         }
     }
     
-    private void cleanMappingDataset(EmfDataset mappingDataset) throws EmfException {
-        ResultSet rs = null;
-        Connection connection = null;
-        Statement statement = null;
-        String mappingDatasetQualifiedEmissionTableName = qualifiedEmissionTableName(mappingDataset);
-        
-//        boolean hasRpenColumn = hasColName("rpen",mappingDataset.getDatasetType().getFileFormat());
-//        boolean hasMactColumn = hasColName("mact",(FileFormatWithOptionalCols) formatUnit.fileFormat());
-//        boolean hasSicColumn = hasColName("sic",(FileFormatWithOptionalCols) formatUnit.fileFormat());
-//        boolean hasPrimaryDeviceTypeCodeColumn = hasColName("primary_device_type_code",(FileFormatWithOptionalCols) formatUnit.fileFormat());
-        boolean hasSectorColumn = hasColName("sector", mappingDataset.getDatasetType().getFileFormat());
-        try {
-//            first lets clean up "" values and convert them to null values...
-       
 
-            //check to see if -9 even shows for any of the columns in the inventory
-            String sql = "select 1 " 
-                    + " from " + mappingDatasetQualifiedEmissionTableName
-                    + " where dataset_id = " + mappingDataset.getId()
-                    + " and (" 
-                    + " trim(eecs) = '' or strpos(trim(substr(eecs, 1, 1) || substr(eecs, length(eecs), 1)), ' ') > 0"
-                    + " or trim(mact) = '' or strpos(trim(substr(mact, 1, 1) || substr(mact, length(mact), 1)), ' ') > 0"
-                    + " or trim(naics) = '' or strpos(trim(substr(naics, 1, 1) || substr(naics, length(naics), 1)), ' ') > 0"
-                    + " or trim(scc) = '' or strpos(trim(substr(scc, 1, 1) || substr(scc, length(scc), 1)), ' ') > 0"
-                    + (hasSectorColumn ? " or trim(sector) = '' or strpos(trim(substr(sector, 1, 1) || substr(sector, length(sector), 1)), ' ') > 0" : "")
-                    +  ") limit 1;";
-            
-            connection = datasource.getConnection();
-            statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            rs = statement.executeQuery(sql);
-            boolean foundNegative9 = false;
-            while (rs.next()) {
-                foundNegative9 = true;
-            }
-
-            if (foundNegative9) {
-                sql = "update " + mappingDatasetQualifiedEmissionTableName
-                    + " set eecs = case when trim(eecs) = '' then null::character varying(10) when strpos(trim(substr(eecs, 1, 1) || substr(eecs, length(eecs), 1)), ' ') > 0 then trim(eecs) else eecs end "
-                    + "     ,mact = case when trim(mact) = '' then null::character varying(4) when strpos(trim(substr(mact, 1, 1) || substr(mact, length(mact), 1)), ' ') > 0 then trim(mact) else mact end "
-                    + "     ,scc = case when trim(scc) = '' then null::character varying(10) when strpos(trim(substr(scc, 1, 1) || substr(scc, length(scc), 1)), ' ') > 0 then trim(scc) else scc end "
-                    + "     ,naics = case when trim(naics) = '' then null::character varying(6) when strpos(trim(substr(naics, 1, 1) || substr(naics, length(naics), 1)), ' ') > 0 then trim(naics) else naics end "
-                    + (hasSectorColumn ? "     ,sector = case when trim(sector) = '' then null::character varying(64) when strpos(trim(substr(sector, 1, 1) || substr(sector, length(sector), 1)), ' ') > 0 then trim(sector) else sector end " : "")
-                    + " where dataset_id = " + mappingDataset.getId()
-                    + " and (" 
-                    + " trim(eecs) = '' or strpos(trim(substr(eecs, 1, 1) || substr(eecs, length(eecs), 1)), ' ') > 0"
-                    + " or trim(mact) = '' or strpos(trim(substr(mact, 1, 1) || substr(mact, length(mact), 1)), ' ') > 0"
-                    + " or trim(naics) = '' or strpos(trim(substr(naics, 1, 1) || substr(naics, length(naics), 1)), ' ') > 0"
-                    + " or trim(scc) = '' or strpos(trim(substr(scc, 1, 1) || substr(scc, length(scc), 1)), ' ') > 0"
-                    + (hasSectorColumn ? " or trim(sector) = '' or strpos(trim(substr(sector, 1, 1) || substr(sector, length(sector), 1)), ' ') > 0" : "")
-                    +  ");";
-                
-                
-//                sic = case when sic is null or trim(sic) = ''0'' or trim(sic) = ''-9'' or trim(sic) = '''' then null::character varying(4) else sic end 
-                
-                statement.execute(sql);
-                statement.execute("vacuum " + mappingDatasetQualifiedEmissionTableName);
-                statement.close();
-            }
-        } catch (Exception exc) {
-            // NOTE: this closes the db server for other importers
-            // try
-            // {
-            // if ((connection != null) && !connection.isClosed()) connection.close();
-            // }
-            // catch (Exception ex)
-            // {
-            // throw ex;
-            // }
-            // throw exc;
-            throw new EmfException(exc.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) { /**/
-                }
-                rs = null;
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) { /**/
-                }
-                statement = null;
-            }
-        }
-
-    }
-    
-    private boolean hasColName(String colName, XFileFormat fileFormat) {
-        Column[] cols = fileFormat.cols();
-        boolean hasIt = false;
-        for (int i = 0; i < cols.length; i++)
-            if (colName.equalsIgnoreCase(cols[i].name())) hasIt = true;
-
-        return hasIt;
-    }
 }

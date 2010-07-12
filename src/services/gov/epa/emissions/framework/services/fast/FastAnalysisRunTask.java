@@ -61,8 +61,8 @@ public class FastAnalysisRunTask implements Runnable {
                 addCompletedStatus();
             } catch (EmfException e) {
                 completeStatus = "Failed";
-                logError("Failed to run sector scenario : ", e);
-                setStatus("Failed to run sector scenario: " + "Reason: " + e.getMessage());
+                logError("Failed to run FAST Analysis : ", e);
+                setStatus("Failed to run FAST Analysis : " + "Reason: " + e.getMessage());
             } finally {
 //                    closeConnection();
                 
@@ -149,17 +149,17 @@ public class FastAnalysisRunTask implements Runnable {
     }
     
     private void addStartStatus() {
-        setStatus("Started running sector scenario: " + fastAnalysisTask.getFastAnalysis().getName());
+        setStatus("Started running FAST Analysis: " + fastAnalysisTask.getFastAnalysis().getName());
     }
 
     private void addCompletedStatus() {
-        setStatus("Completed running sector scenario: " + fastAnalysisTask.getFastAnalysis().getName() + ".");
+        setStatus("Completed running FAST Analysis: " + fastAnalysisTask.getFastAnalysis().getName() + ".");
     }
 
     private void setStatus(String message) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
-        endStatus.setType("FastRun");
+        endStatus.setType("FASTAnalysis");
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 
