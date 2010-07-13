@@ -11,11 +11,11 @@ BEGIN
 
         --default if not known
         unit_numerator := coalesce(trim(upper(design_capacity_unit_numerator)), '');
-        unit_denominator := coalesce(trim(upper(design_capacity_unit_denominator)), '');
+	unit_denominator := coalesce(trim(upper(design_capacity_unit_denominator)), '');
 
         --if you don't know the units then you can't convert the design capacity
-        IF length(unit_numerator) = 0 THEN
-            return converted_design_capacity;
+	IF length(unit_numerator) = 0 THEN
+		return converted_design_capacity;
 	END IF;
 
 
@@ -35,17 +35,17 @@ BEGIN
 
         --capacity is already in the right units...
         --no conversion is necessary, these are the expected units.
-        IF (unit_numerator = 'MW' and unit_denominator = '') THEN
-            return design_capacity;
+	IF (unit_numerator = 'MW' and unit_denominator = '') THEN
+		return design_capacity;
 	END IF;
 
         IF (unit_numerator = 'MMBTU'
-                or unit_numerator = 'E6BTU'
-                or unit_numerator = 'BTU'
-                or unit_numerator = 'HP'
-                or unit_numerator = 'BLRHP') THEN
+            or unit_numerator = 'E6BTU'
+            or unit_numerator = 'BTU'
+            or unit_numerator = 'HP'
+            or unit_numerator = 'BLRHP') THEN
 
-           --convert numerator unit
+		--convert numerator unit
 		IF (unit_numerator = 'MMBTU'
 		    or unit_numerator = 'E6BTU') THEN
 			converted_design_capacity := design_capacity / 3.412;
@@ -54,7 +54,7 @@ BEGIN
 			converted_design_capacity := design_capacity / 3.412 / 1000000.0;
 		END IF;
 		IF (unit_numerator = 'HP') THEN
-                converted_design_capacity := design_capacity * 0.000746;
+			converted_design_capacity := design_capacity * 0.000746;
 		END IF;
 		IF (unit_numerator = 'BLRHP') THEN
 			converted_design_capacity := design_capacity * 0.000981;
@@ -62,22 +62,22 @@ BEGIN
 --            IF (unit_numerator = 'FT3') THEN
 --                converted_design_capacity := design_capacity * 0.000981;
 
-            --convert denominator unit, if missing ASSUME per hr
-            IF (unit_denominator = '' or unit_denominator = 'HR'
-                    or unit_denominator = 'H') THEN
-                return converted_design_capacity;
- 		END IF;
-           IF (unit_denominator = 'D' or unit_denominator = 'DAY') THEN
-                return converted_design_capacity * 24.0;
+		--convert denominator unit, if missing ASSUME per hr
+		IF (unit_denominator = '' or unit_denominator = 'HR'
+		    or unit_denominator = 'H') THEN
+			return converted_design_capacity;
 		END IF;
-            IF (unit_denominator = 'M' or unit_denominator = 'MIN') THEN
-                return converted_design_capacity / 60.0;
+		IF (unit_denominator = 'D' or unit_denominator = 'DAY') THEN
+			return converted_design_capacity * 24.0;
 		END IF;
-            IF (unit_denominator = 'S' or unit_denominator = 'SEC') THEN
-                return converted_design_capacity / 3600.0;
+		IF (unit_denominator = 'M' or unit_denominator = 'MIN') THEN
+			return converted_design_capacity / 60.0;
 		END IF;
-        END IF;
-        return null;
+		IF (unit_denominator = 'S' or unit_denominator = 'SEC') THEN
+			return converted_design_capacity / 3600.0;
+		END IF;
+	END IF;
+	return null;
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
@@ -162,6 +162,9 @@ DECLARE
 	fixed_operation_maintenance_cost double precision;
 	variable_operation_maintenance_cost double precision;
 BEGIN
+	-- NOTES:
+	-- design capacity must in the units MW
+
 	-- get capital recovery factor, caculate if it wasn't passed in...
         IF coalesce(discount_rate, 0) != 0 and coalesce(equipment_life, 0) != 0 THEN 
              cap_recovery_factor := public.calculate_capital_recovery_factor(discount_rate, equipment_life);
@@ -222,13 +225,16 @@ CREATE OR REPLACE FUNCTION public.get_type2_equation_costs(
 DECLARE
 	cap_recovery_factor double precision := capital_recovery_factor;
 BEGIN
+	-- NOTES:
+	-- design capacity must in the units mmBtu/hr
+
 	-- get capital recovery factor, caculate if it wasn't passed in...
         IF coalesce(discount_rate, 0) != 0 and coalesce(equipment_life, 0) != 0 THEN 
              cap_recovery_factor := public.calculate_capital_recovery_factor(discount_rate, equipment_life);
         END IF;
 
 	-- calculate capital cost
-	capital_cost := capital_cost_multiplier * design_capacity ^ capital_cost_exponent;
+	capital_cost := capital_cost_multiplier * (design_capacity ^ capital_cost_exponent);
 
 	-- calculate annualized capital cost
 	annualized_capital_cost := capital_cost * cap_recovery_factor;
@@ -814,10 +820,11 @@ BEGIN
 			IF equation_type = 'Type 2' THEN
 
 				converted_design_capacity := public.convert_design_capacity_to_mw(design_capacity, design_capacity_unit_numerator, design_capacity_unit_denominator);
-
+				-- convert design capacity to mmBtu/hr
+				converted_design_capacity := 3.412 * converted_design_capacity;
 				IF coalesce(converted_design_capacity, 0) <> 0 THEN
 -- design capacity must be less than or equal to 2000 MMBTU/hr (or 586.1665 MW))
-					IF (converted_design_capacity <= 586.1665) THEN
+					IF (converted_design_capacity <= 2000.0) THEN
 						select costs.annual_cost,
 							costs.capital_cost,
 							costs.operation_maintenance_cost,
