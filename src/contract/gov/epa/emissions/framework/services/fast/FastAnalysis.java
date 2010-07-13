@@ -16,6 +16,8 @@ public class FastAnalysis extends LockableImpl implements Serializable {
 
     private String description = "";
 
+    private String abbreviation;
+
     private Grid grid;
 
     private String runStatus;
@@ -35,12 +37,10 @@ public class FastAnalysis extends LockableImpl implements Serializable {
     private Integer cancerRiskDatasetVersion;
 
     private FastAnalysisRun[] baselineRuns = new FastAnalysisRun[] {};
-    
-    private FastAnalysisRun[] sensitivityRuns = new FastAnalysisRun[] {};
-    
-    private Sector[] outputSectors = new Sector[] {};
 
-    private String abbreviation;
+    private FastAnalysisRun[] sensitivityRuns = new FastAnalysisRun[] {};
+
+    private Sector[] outputSectors = new Sector[] {};
 
     public FastAnalysis() {
         //
@@ -78,6 +78,14 @@ public class FastAnalysis extends LockableImpl implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getAbbreviation() {
+        return abbreviation;
+    }
+
+    public void setAbbreviation(String abbreviation) {
+        this.abbreviation = abbreviation;
     }
 
     public String getRunStatus() {
@@ -189,17 +197,9 @@ public class FastAnalysis extends LockableImpl implements Serializable {
         return sensitivityRuns;
     }
 
-    public String getAbbreviation() {
-        return this.abbreviation;
-    }
-
     @Override
     public String toString() {
         return this.name;
-    }
-
-    public void setAbbreviation(String abbreviation) {
-        this.abbreviation = abbreviation;
     }
 
 }

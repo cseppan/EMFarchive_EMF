@@ -7,19 +7,19 @@ public class Grid implements Serializable, Comparable<Grid> {
     private int id;
 
     private String name;
-    
+
     private String abbreviation;
-    
+
     private String resolution;
-    
+
     private String mapProjection;
-    
+
     private String description;
-    
+
     private float xorig, yorig, xcell, ycell, xcent, ycent;
-    
+
     private int ncols, nrows, nthik;
-    
+
     /*
      * Default constructor needed for hibernate and axis serialization
      */
@@ -31,7 +31,7 @@ public class Grid implements Serializable, Comparable<Grid> {
         this();
         this.name = name;
     }
-    
+
     public Grid(String name, String desc) {
         this();
         this.name = name;
@@ -154,7 +154,8 @@ public class Grid implements Serializable, Comparable<Grid> {
         if (other == null || !(other instanceof Grid))
             return false;
 
-        return this.id == ((Grid) other).getId() || ((Grid) other).name.equals(this.name);
+        Grid that = (Grid) other;
+        return this.id == that.getId() || this.name.equals(that.name);
     }
 
     public int hashCode() {
@@ -163,14 +164,14 @@ public class Grid implements Serializable, Comparable<Grid> {
 
     public String toString() {
         String abbr = (abbreviation == null || abbreviation.trim().isEmpty()) ? "" : " (" + abbreviation.trim() + ")";
-        
+
         return getName() + abbr;
     }
 
     public int compareTo(Grid other) {
         if (other == null)
             return -1;
-        
+
         return name.compareToIgnoreCase(other.getName());
     }
 

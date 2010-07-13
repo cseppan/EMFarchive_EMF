@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.fast.FastAnalysis;
 import java.awt.BorderLayout;
 import java.awt.Container;
 
+import javax.swing.JComponent;
 import javax.swing.JTabbedPane;
 
 @SuppressWarnings("serial")
@@ -32,10 +33,19 @@ public class FastAnalysisEditorWindow extends AbstractFastAnalysisWindow {
 
         final JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        tabbedPane.addTab("Summary", this.createSummaryTab(analysis));
-        tabbedPane.addTab("Inputs", this.createInputsTab(analysis));
-        tabbedPane.addTab("Control Strategies", this.createControlStrategiesTab(analysis));
-        tabbedPane.addTab("Outputs", this.createOutputsTab(analysis));
+
+        JComponent summaryTab = this.createSummaryTab(analysis);
+        tabbedPane.addTab(summaryTab.getName(), summaryTab);
+
+        JComponent configurationTab = this.createConfigurationTab(analysis);
+        tabbedPane.addTab(configurationTab.getName(), configurationTab);
+
+        //        tabbedPane.addTab("Inputs", this.createInputsTab(analysis));
+//        tabbedPane.addTab("Control Strategies", this.createControlStrategiesTab(analysis));
+
+        JComponent outputsTab = this.createOutputsTab(analysis);
+        tabbedPane.addTab(outputsTab.getName(), outputsTab);
+
         return tabbedPane;
     }
 

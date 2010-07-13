@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.fast.analyzer.tabs;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisTabView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
@@ -13,7 +14,7 @@ import java.awt.Cursor;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public abstract class AbstractAnalysisFastTab extends JPanel implements FastAnalysisTabView {
+public abstract class AbstractFastAnalysisTab extends JPanel implements FastAnalysisTabView {
 
     private FastAnalysis analysis;
 
@@ -25,14 +26,17 @@ public abstract class AbstractAnalysisFastTab extends JPanel implements FastAnal
 
     private EmfConsole parentConsole;
 
-    public AbstractAnalysisFastTab(FastAnalysis analysis, EmfSession session, MessagePanel messagePanel,
-            ManageChangeables changeablesList, EmfConsole parentConsole) {
+    private FastAnalysisPresenter presenter;
+
+    public AbstractFastAnalysisTab(FastAnalysis analysis, EmfSession session, MessagePanel messagePanel,
+            ManageChangeables changeablesList, EmfConsole parentConsole, FastAnalysisPresenter presenter) {
 
         this.analysis = analysis;
         this.session = session;
         this.messagePanel = messagePanel;
         this.changeablesList = changeablesList;
         this.parentConsole = parentConsole;
+        this.presenter = presenter;
     }
 
     public FastAnalysis getAnalysis() {
@@ -118,4 +122,7 @@ public abstract class AbstractAnalysisFastTab extends JPanel implements FastAnal
 
     }
 
+    public FastAnalysisPresenter getPresenter() {
+        return presenter;
+    }
 }

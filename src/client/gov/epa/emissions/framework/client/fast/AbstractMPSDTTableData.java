@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.fast;
 
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -73,7 +74,7 @@ public abstract class AbstractMPSDTTableData<T> extends AbstractTableData {
     public void add(T[] sourcesToAdd) {
 
         for (T source : sourcesToAdd) {
-            
+
             Row<T> row = new ViewableRow<T>(source, this.createRowValues(source));
             if (!rows.contains(row)) {
                 rows.add(row);
@@ -109,5 +110,25 @@ public abstract class AbstractMPSDTTableData<T> extends AbstractTableData {
 
     protected String getValueWithDefault(String value) {
         return value == null || value.trim().length() == 0 ? DEFAULT_VALUE : value.trim();
+    }
+
+    protected String getNameWithDefault(EmfDataset dataset) {
+
+        String name = DEFAULT_VALUE;
+        if (dataset != null) {
+            name = this.getValueWithDefault(dataset.getName());
+        }
+
+        return name;
+    }
+
+    protected String getValueWithDefault(Integer value) {
+
+        String name = DEFAULT_VALUE;
+        if (value != null) {
+            name = this.getValueWithDefault(value.toString());
+        }
+
+        return name;
     }
 }

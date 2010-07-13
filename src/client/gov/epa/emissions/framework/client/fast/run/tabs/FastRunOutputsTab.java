@@ -44,32 +44,16 @@ public class FastRunOutputsTab extends AbstractFastRunTab {
         this.clearMessage();
     }
 
-    protected FastRunOutput[] getRunOutputs(int id) throws EmfException {
-        return this.getSession().fastService().getFastRunOutputs(id);
-    }
-
     @Override
     void refreshData() {
 
-        FastRunOutput[] runOutputs = new FastRunOutput[0];
-        try {
-            runOutputs = this.getRunOutputs(this.getRun().getId());
-        } catch (EmfException e) {
-            // NOTE Auto-generated catch block
-            e.printStackTrace();
-        }
+        FastRunOutput[] runOutputs = getFastRunOutputs();
         this.table.refresh(new FastRunOutputTableData(runOutputs));
     }
 
     private JPanel createTablePanel(FastRun run, EmfConsole parentConsole, EmfSession session) {
 
-        FastRunOutput[] runOutputs = new FastRunOutput[0];
-        try {
-            runOutputs = this.getRunOutputs(this.getRun().getId());
-        } catch (EmfException e) {
-            // NOTE Auto-generated catch block
-            e.printStackTrace();
-        }
+        FastRunOutput[] runOutputs = getFastRunOutputs();
 
         JPanel tablePanel = new JPanel(new BorderLayout());
         this.table = new SelectableSortFilterWrapper(parentConsole, new FastRunOutputTableData(runOutputs),
@@ -77,6 +61,23 @@ public class FastRunOutputsTab extends AbstractFastRunTab {
         tablePanel.add(this.table, BorderLayout.CENTER);
 
         return tablePanel;
+    }
+
+    private FastRunOutput[] getFastRunOutputs() {
+
+        FastRunOutput[] runOutputs = new FastRunOutput[0];
+        try {
+            runOutputs = this.getFastRunOutputs(this.getRun().getId());
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return runOutputs;
+    }
+
+    protected FastRunOutput[] getFastRunOutputs(int id) throws EmfException {
+        return this.getSession().fastService().getFastRunOutputs(id);
     }
 
     private SortCriteria sortCriteria() {

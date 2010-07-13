@@ -24,6 +24,8 @@ public interface FastRunManagerPresenter {
 
     void doExecuteRuns(List<FastRun> runs, User creator) throws EmfException;
 
+    void doExportRuns(List<FastRun> runs, User creator) throws EmfException;
+
     void display() throws EmfException;
 
     void loadRuns() throws EmfException;

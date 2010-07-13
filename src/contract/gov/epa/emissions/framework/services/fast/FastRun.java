@@ -52,6 +52,7 @@ public class FastRun extends LockableImpl implements Serializable {
     private Sector[] outputSectors = new Sector[] {};
 
     public FastRun() {
+        // no-op
     }
 
     public FastRun(String name) {

@@ -1,6 +1,9 @@
 package gov.epa.emissions.framework.client.fast.analyzer;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public interface FastAnalysisPresenter {
 
@@ -15,4 +18,12 @@ public interface FastAnalysisPresenter {
     void fireTracking();
 
     boolean hasResults();
+    
+    DatasetType getDatasetType(String dataset) throws EmfException;
+
+    Version[] getVersions(EmfDataset dataset) throws EmfException;
+
+    void doRefresh() throws EmfException;
+
+    void doRun() throws EmfException;
 }

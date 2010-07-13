@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.fast.AbstractFastAction;
+import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -26,16 +27,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-public class FastAnalysisInputsTab extends AbstractAnalysisFastTab {
+public class FastAnalysisInputsTab extends AbstractFastAnalysisTab {
 
     private SelectableSortFilterWrapper table;
 
     private static final String WARNING_MESSAGE = "You have asked to open several windows. Do you want proceed?";;
 
     public FastAnalysisInputsTab(FastAnalysis analysis, EmfSession session, MessagePanel messagePanel,
-            ManageChangeables changeablesList, EmfConsole parentConsole) {
+            ManageChangeables changeablesList, EmfConsole parentConsole, FastAnalysisPresenter presenter) {
 
-        super(analysis, session, messagePanel, changeablesList, parentConsole);
+        super(analysis, session, messagePanel, changeablesList, parentConsole, presenter);
         this.setName("inputs");
     }
 

@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.fast.IdProducer;
+import gov.epa.emissions.framework.services.fast.FastAnalysis;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
@@ -150,7 +150,7 @@ public abstract class AbstractMPSDTManagerTab extends JPanel implements RefreshO
         }
     }
 
-    protected static int[] getIds(List<IdProducer> list) {
+    protected static int[] getIds(List<FastAnalysis> list) {
 
         int size = list.size();
         int[] ids = new int[size];

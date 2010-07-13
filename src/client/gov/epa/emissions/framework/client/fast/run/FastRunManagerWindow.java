@@ -30,316 +30,384 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 @SuppressWarnings("serial")
-public class FastRunManagerWindow extends AbstractMPSDTManagerTab implements FastRunManagerView, Runnable {
+public class FastRunManagerWindow extends AbstractMPSDTManagerTab implements
+		FastRunManagerView, Runnable {
 
-    private FastRunManagerPresenter presenter;
+	private FastRunManagerPresenter presenter;
 
-    private SelectableSortFilterWrapper table;
+	private SelectableSortFilterWrapper table;
 
-    private static final String ROOT_SELECT_PROMPT = "Please select one or more Fast runs to ";
+	private static final String ROOT_SELECT_PROMPT = "Please select one or more Fast runs to ";
 
-    private static final SortCriteria SORT_CRITERIA = new SortCriteria(new String[] { "Start" },
-            new boolean[] { false }, new boolean[] { true });
+	private static final SortCriteria SORT_CRITERIA = new SortCriteria(
+			new String[] { "Start" }, new boolean[] { false },
+			new boolean[] { true });
 
-    public FastRunManagerWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
-        super(session, parentConsole, desktopManager);
-    }
+	public FastRunManagerWindow(EmfConsole parentConsole, EmfSession session,
+			DesktopManager desktopManager) {
+		super(session, parentConsole, desktopManager);
+	}
 
-    public String getTitle() {
-        return "Fast Runs";
-    }
+	public String getTitle() {
+		return "Fast Runs";
+	}
 
-    public void display(FastRun[] runs) throws EmfException {
+	public void display(FastRun[] runs) throws EmfException {
 
-        doLayout(runs, this.getSession());
-        SwingUtilities.invokeLater(this);
-    }
+		doLayout(runs, this.getSession());
+		SwingUtilities.invokeLater(this);
+	}
 
-    public void save(FastRun[] objects) throws EmfException {
-    }
+	public void save(FastRun[] objects) throws EmfException {
+	}
 
-    public void observe(FastRunManagerPresenter presenter) {
-        this.presenter = presenter;
-    }
+	public void observe(FastRunManagerPresenter presenter) {
+		this.presenter = presenter;
+	}
 
-    public void run() {
+	public void run() {
 
-        try {
-            this.presenter.loadRuns();
-        } catch (Exception e) {
-            this.showError("Cannot retrieve all Fast runs.");
-        }
-    }
+		try {
+			this.presenter.loadRuns();
+		} catch (Exception e) {
+			this.showError("Cannot retrieve all Fast runs.");
+		}
+	}
 
-    public void refresh(FastRun[] runs) {
+	public void refresh(FastRun[] runs) {
 
-        try {
-            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		try {
+			this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-            this.clearMessage();
-            this.table.refresh(new FastRunTableData(runs));
-            // this.refreshLayout();
+			this.clearMessage();
+			this.table.refresh(new FastRunTableData(runs));
+			// this.refreshLayout();
 
-            SwingUtilities.invokeLater(this);
-        } finally {
-            setCursor(Cursor.getDefaultCursor());
-        }
-    }
+			SwingUtilities.invokeLater(this);
+		} finally {
+			setCursor(Cursor.getDefaultCursor());
+		}
+	}
 
-    public void doRefresh() throws EmfException {
-        this.presenter.doRefresh();
-    }
+	public void doRefresh() throws EmfException {
+		this.presenter.doRefresh();
+	}
 
-    private void doLayout(FastRun[] runs, EmfSession session) {
+	private void doLayout(FastRun[] runs, EmfSession session) {
 
-        this.removeAll();
-        this.setLayout(new BorderLayout());
+		this.removeAll();
+		this.setLayout(new BorderLayout());
 
-        this.add(createTopPanel(), BorderLayout.NORTH);
-        this.add(tablePanel(runs, getParentConsole(), session), BorderLayout.CENTER);
-        this.add(createControlPanel(), BorderLayout.SOUTH);
-    }
+		this.add(createTopPanel(), BorderLayout.NORTH);
+		this.add(tablePanel(runs, getParentConsole(), session),
+				BorderLayout.CENTER);
+		this.add(createControlPanel(), BorderLayout.SOUTH);
+	}
 
-    private JPanel tablePanel(FastRun[] runs, EmfConsole parentConsole, EmfSession session) {
+	private JPanel tablePanel(FastRun[] runs, EmfConsole parentConsole,
+			EmfSession session) {
 
-        this.table = new SelectableSortFilterWrapper(parentConsole, new FastRunTableData(runs), SORT_CRITERIA);
+		this.table = new SelectableSortFilterWrapper(parentConsole,
+				new FastRunTableData(runs), SORT_CRITERIA);
 
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(this.table, BorderLayout.CENTER);
+		JPanel tablePanel = new JPanel(new BorderLayout());
+		tablePanel.add(this.table, BorderLayout.CENTER);
 
-        return tablePanel;
-    }
+		return tablePanel;
+	}
 
-    protected JPanel createButtonPanel() {
+	protected JPanel createButtonPanel() {
 
-        JPanel crudPanel = new JPanel();
-        crudPanel.setLayout(new FlowLayout());
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new FlowLayout());
 
-        String message = "You have asked to open a lot of windows. Do you want proceed?";
-        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+		String message = "You have asked to open a lot of windows. Do you want proceed?";
+		ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning",
+				this);
 
-        crudPanel.add(viewButton(confirmDialog));
-        crudPanel.add(editButton(confirmDialog));
+		buttonPanel.add(viewButton(confirmDialog));
+		buttonPanel.add(editButton(confirmDialog));
 
-        Button newButton = new NewButton(new AbstractFastAction(this.getMessagePanel(), "Error creating Fast run") {
+		Button newButton = new NewButton(new AbstractFastAction(this
+				.getMessagePanel(), "Error creating Fast run") {
 
-            @Override
-            protected void doActionPerformed(ActionEvent e) throws EmfException {
-                createNewRun();
-            }
-        });
-        crudPanel.add(newButton);
-
-        Button removeButton = new RemoveButton(new AbstractFastAction(this.getMessagePanel(),
-                "Error removing Fast runs") {
-
-            @Override
-            protected void doActionPerformed(ActionEvent e) throws EmfException {
-                removeSelectedRuns();
-            }
-        });
-        crudPanel.add(removeButton);
-
-        Button copyButton = new CopyButton(new AbstractFastAction(this.getMessagePanel(), "Error copying Fast runs") {
-
-            @Override
-            protected void doActionPerformed(ActionEvent e) throws EmfException {
-                copySelectedRuns();
-            }
-        });
-        crudPanel.add(copyButton);
-
-        Button executeButton = new Button("Execute", new AbstractFastAction(this.getMessagePanel(),
-                "Error executing Fast runs") {
-
-            @Override
-            protected void doActionPerformed(ActionEvent e) throws EmfException {
-                executeRuns();
-            }
-        });
-        crudPanel.add(executeButton);
-
-        return crudPanel;
-    }
-
-    private SelectAwareButton editButton(ConfirmDialog confirmDialog) {
-
-        Action editAction = new AbstractFastAction(this.getMessagePanel(), "Error editing Fast runs") {
-
-            @Override
-            protected void doActionPerformed(ActionEvent e) throws EmfException {
-                editRuns();
-            }
-        };
-
-        return new SelectAwareButton("Edit", editAction, table, confirmDialog);
-    }
-
-    private SelectAwareButton viewButton(ConfirmDialog confirmDialog) {
-
-        Action viewAction = new AbstractFastAction(this.getMessagePanel(), "Error viewing Fast runs") {
-
-            @Override
-            protected void doActionPerformed(ActionEvent e) throws EmfException {
-                viewRuns();
-            }
-        };
-
-        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, this.table, confirmDialog);
-        viewButton.setEnabled(false);
-        return viewButton;
-    }
-
-    private void viewRuns() {
-
-        List<FastRun> runs = getSelected();
-        if (runs.isEmpty()) {
-            this.showMessage(ROOT_SELECT_PROMPT + "view.");
-        } else {
-            for (FastRun run : runs) {
-
-                try {
-                    presenter.doView(run);
-                } catch (EmfException e) {
-                    showError("Error viewing Fast runs: " + e.getMessage());
-                }
-            }
-        }
-    }
-
-    private void editRuns() {
-
-        List<FastRun> runs = getSelected();
-        if (runs.isEmpty()) {
-            this.showMessage(ROOT_SELECT_PROMPT + "edit.");
-        } else {
-            for (FastRun run : runs) {
-
-                try {
-                    presenter.doEdit(run);
-                } catch (EmfException e) {
-                    showError("Error editing Fast runs: " + e.getMessage());
-                }
-            }
-        }
-    }
-
-    protected void removeSelectedRuns() throws EmfException {
-
-        if (false) {
-            throw new RuntimeException("sadfasd fasdf");
-        }
-
-        this.clearMessage();
-        final List<FastRun> runs = getSelected();
-
-        if (runs.isEmpty()) {
-            this.showMessage(ROOT_SELECT_PROMPT + "remove.");
-        } else {
-
-            String message = null;
-            int size = runs.size();
-            if (size == 1) {
-                message = "Are you sure you want to remove the selected Fast run?";
-            } else {
-                message = "Are you sure you want to remove the " + size + " selected Fast runs?";
-            }
-
-            int selection = JOptionPane.showConfirmDialog(getParentConsole(), message, "Warning",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-
-            if (selection == JOptionPane.YES_OPTION) {
-
-                ExceptionHandlingCommand removeCommand = new AbstractCommand(this) {
-                    public void execute() throws EmfException {
-                        presenter.doRemove(runs);
-                    }
-                };
-
-                this.executeCommand(removeCommand);
-            }
-        }
-    }
-
-    private void copySelectedRuns() throws EmfException {
-
-        this.clearMessage();
-        final List<FastRun> runs = getSelected();
-
-        if (runs.isEmpty()) {
-            this.showMessage(ROOT_SELECT_PROMPT + "copy.");
-        } else {
-
-            String message = null;
-            int size = runs.size();
-            if (size == 1) {
-                message = "Are you sure you want to copy the selected Fast run?";
-            } else {
-                message = "Are you sure you want to copy the " + size + " selected Fast runs?";
-            }
-
-            int selection = JOptionPane.showConfirmDialog(getParentConsole(), message, "Warning",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-
-            if (selection == JOptionPane.YES_OPTION) {
-
-                ExceptionHandlingCommand copyCommand = new AbstractCommand(this) {
-                    public void execute() throws EmfException {
-
-                        for (FastRun fastRun : runs) {
-                            presenter.doSaveCopiedRun(fastRun, getSession().user());
-                        }
-                    }
-                };
-
-                this.executeCommand(copyCommand);
-            }
-        }
-    }
-
-    private void executeRuns() throws EmfException {
-
-        if (false) {
-            throw new RuntimeException("2dfasdfas");
-        }
-
-        this.clearMessage();
-        final List<FastRun> runs = getSelected();
-
-        if (runs.isEmpty()) {
-            this.showMessage(ROOT_SELECT_PROMPT + "run.");
-        } else {
-
-            String message = null;
-            int size = runs.size();
-            if (size == 1) {
-                message = "Are you sure you want to execute the selected Fast run?";
-            } else {
-                message = "Are you sure you want to execute the " + size + " selected Fast runs?";
-            }
-
-            int selection = JOptionPane.showConfirmDialog(getParentConsole(), message, "Warning",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-
-            if (selection == JOptionPane.YES_OPTION) {
-
-                ExceptionHandlingCommand executeCommand = new AbstractCommand(this) {
-                    public void execute() throws EmfException {
-                        presenter.doExecuteRuns(runs, getSession().user());
-                    }
-                };
-
-                this.executeCommand(executeCommand);
-                showMessage("Executing Fast run(s). Monitor the status window for progress, and refresh this window after completion to see results");
-            }
-        }
-    }
-
-    private List<FastRun> getSelected() {
-        return (List<FastRun>) table.selected();
-    }
-
-    private void createNewRun() throws EmfException {
-        presenter.doNew();
-    }
+			@Override
+			protected void doActionPerformed(ActionEvent e) throws EmfException {
+				createNewRun();
+			}
+		});
+		buttonPanel.add(newButton);
+
+		Button removeButton = new RemoveButton(new AbstractFastAction(this
+				.getMessagePanel(), "Error removing Fast run(s)") {
+
+			@Override
+			protected void doActionPerformed(ActionEvent e) throws EmfException {
+				removeSelectedRuns();
+			}
+		});
+		buttonPanel.add(removeButton);
+
+		Button copyButton = new CopyButton(new AbstractFastAction(this
+				.getMessagePanel(), "Error copying Fast run(s)") {
+
+			@Override
+			protected void doActionPerformed(ActionEvent e) throws EmfException {
+				copySelectedRuns();
+			}
+		});
+		buttonPanel.add(copyButton);
+
+		Button executeButton = new Button("Execute", new AbstractFastAction(
+				this.getMessagePanel(), "Error executing Fast run(s)") {
+
+			@Override
+			protected void doActionPerformed(ActionEvent e) throws EmfException {
+				executeRuns();
+			}
+		});
+		buttonPanel.add(executeButton);
+
+		Button exportButton = new Button("Export", new AbstractFastAction(this
+				.getMessagePanel(), "Error exporting Fast run(s)") {
+
+			@Override
+			protected void doActionPerformed(ActionEvent e) throws EmfException {
+				exportRuns();
+			}
+		});
+		buttonPanel.add(exportButton);
+
+		return buttonPanel;
+	}
+
+	private SelectAwareButton editButton(ConfirmDialog confirmDialog) {
+
+		Action editAction = new AbstractFastAction(this.getMessagePanel(),
+				"Error editing Fast runs") {
+
+			@Override
+			protected void doActionPerformed(ActionEvent e) throws EmfException {
+				editRuns();
+			}
+		};
+
+		return new SelectAwareButton("Edit", editAction, table, confirmDialog);
+	}
+
+	private SelectAwareButton viewButton(ConfirmDialog confirmDialog) {
+
+		Action viewAction = new AbstractFastAction(this.getMessagePanel(),
+				"Error viewing Fast runs") {
+
+			@Override
+			protected void doActionPerformed(ActionEvent e) throws EmfException {
+				viewRuns();
+			}
+		};
+
+		SelectAwareButton viewButton = new SelectAwareButton("View",
+				viewAction, this.table, confirmDialog);
+		viewButton.setEnabled(false);
+		return viewButton;
+	}
+
+	private void viewRuns() {
+
+		List<FastRun> runs = getSelected();
+		if (runs.isEmpty()) {
+			this.showMessage(ROOT_SELECT_PROMPT + "view.");
+		} else {
+			for (FastRun run : runs) {
+
+				try {
+					presenter.doView(run);
+				} catch (EmfException e) {
+					showError("Error viewing Fast runs: " + e.getMessage());
+				}
+			}
+		}
+	}
+
+	private void editRuns() {
+
+		List<FastRun> runs = getSelected();
+		if (runs.isEmpty()) {
+			this.showMessage(ROOT_SELECT_PROMPT + "edit.");
+		} else {
+			for (FastRun run : runs) {
+
+				try {
+					presenter.doEdit(run);
+				} catch (EmfException e) {
+					showError("Error editing Fast runs: " + e.getMessage());
+				}
+			}
+		}
+	}
+
+	protected void removeSelectedRuns() throws EmfException {
+
+		if (false) {
+			throw new RuntimeException("sadfasd fasdf");
+		}
+
+		this.clearMessage();
+		final List<FastRun> runs = getSelected();
+
+		if (runs.isEmpty()) {
+			this.showMessage(ROOT_SELECT_PROMPT + "remove.");
+		} else {
+
+			String message = null;
+			int size = runs.size();
+			if (size == 1) {
+				message = "Are you sure you want to remove the selected Fast run?";
+			} else {
+				message = "Are you sure you want to remove the " + size
+						+ " selected Fast runs?";
+			}
+
+			int selection = JOptionPane.showConfirmDialog(getParentConsole(),
+					message, "Warning", JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE);
+
+			if (selection == JOptionPane.YES_OPTION) {
+
+				ExceptionHandlingCommand removeCommand = new AbstractCommand(
+						this) {
+					public void execute() throws EmfException {
+						presenter.doRemove(runs);
+					}
+				};
+
+				this.executeCommand(removeCommand);
+			}
+		}
+	}
+
+	private void copySelectedRuns() throws EmfException {
+
+		this.clearMessage();
+		final List<FastRun> runs = getSelected();
+
+		if (runs.isEmpty()) {
+			this.showMessage(ROOT_SELECT_PROMPT + "copy.");
+		} else {
+
+			String message = null;
+			int size = runs.size();
+			if (size == 1) {
+				message = "Are you sure you want to copy the selected Fast run?";
+			} else {
+				message = "Are you sure you want to copy the " + size
+						+ " selected Fast runs?";
+			}
+
+			int selection = JOptionPane.showConfirmDialog(getParentConsole(),
+					message, "Warning", JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE);
+
+			if (selection == JOptionPane.YES_OPTION) {
+
+				ExceptionHandlingCommand copyCommand = new AbstractCommand(this) {
+					public void execute() throws EmfException {
+
+						for (FastRun fastRun : runs) {
+							presenter.doSaveCopiedRun(fastRun, getSession()
+									.user());
+						}
+					}
+				};
+
+				this.executeCommand(copyCommand);
+			}
+		}
+	}
+
+	private void executeRuns() throws EmfException {
+
+		if (false) {
+			throw new RuntimeException("2dfasdfas");
+		}
+
+		this.clearMessage();
+		final List<FastRun> runs = getSelected();
+
+		if (runs.isEmpty()) {
+			this.showMessage(ROOT_SELECT_PROMPT + "run.");
+		} else {
+
+			String message = null;
+			int size = runs.size();
+			if (size == 1) {
+				message = "Are you sure you want to execute the selected Fast run?";
+			} else {
+				message = "Are you sure you want to execute the " + size
+						+ " selected Fast runs?";
+			}
+
+			int selection = JOptionPane.showConfirmDialog(getParentConsole(),
+					message, "Warning", JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE);
+
+			if (selection == JOptionPane.YES_OPTION) {
+
+				ExceptionHandlingCommand executeCommand = new AbstractCommand(
+						this) {
+					public void execute() throws EmfException {
+						presenter.doExecuteRuns(runs, getSession().user());
+					}
+				};
+
+				this.executeCommand(executeCommand);
+				showMessage("Executing Fast run(s). Monitor the status window for progress, and refresh this window after completion to see results");
+			}
+		}
+	}
+
+	private void exportRuns() throws EmfException {
+
+		this.clearMessage();
+		final List<FastRun> runs = getSelected();
+
+		if (runs.isEmpty()) {
+			this.showMessage(ROOT_SELECT_PROMPT + "export.");
+		} else {
+
+			String message = null;
+			int size = runs.size();
+			if (size == 1) {
+				message = "Are you sure you want to export the selected Fast run?";
+			} else {
+				message = "Are you sure you want to export the " + size
+						+ " selected Fast runs?";
+			}
+
+			int selection = JOptionPane.showConfirmDialog(getParentConsole(),
+					message, "Warning", JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE);
+
+			if (selection == JOptionPane.YES_OPTION) {
+
+				ExceptionHandlingCommand executeCommand = new AbstractCommand(
+						this) {
+					public void execute() throws EmfException {
+						presenter.doExportRuns(runs, getSession().user());
+					}
+				};
+
+				this.executeCommand(executeCommand);
+				showMessage("Exporting Fast run(s). Monitor the status window for progress, and refresh this window after completion to see results");
+			}
+		}
+	}
+
+	private List<FastRun> getSelected() {
+		return (List<FastRun>) table.selected();
+	}
+
+	private void createNewRun() throws EmfException {
+		presenter.doNew();
+	}
 }

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.fast.analyzer;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -9,6 +10,9 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.fast.AbstractFastAction;
+import gov.epa.emissions.framework.client.fast.analyzer.tabs.FastAnalysisConfigurationTab;
+import gov.epa.emissions.framework.client.fast.analyzer.tabs.FastAnalysisOutputsTab;
+import gov.epa.emissions.framework.client.fast.analyzer.tabs.FastAnalysisSummaryTab;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
 import gov.epa.emissions.framework.ui.InfoDialog;
@@ -26,6 +30,7 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
@@ -40,6 +45,8 @@ public abstract class AbstractFastAnalysisWindow extends DisposableInteralFrame 
     private EmfConsole parentConsole;
 
     private Button saveButton;
+
+    private RunButton runButton;
 
     public AbstractFastAnalysisWindow(String title, DesktopManager desktopManager, EmfSession session,
             EmfConsole parentConsole) {
@@ -70,69 +77,63 @@ public abstract class AbstractFastAnalysisWindow extends DisposableInteralFrame 
 
     protected JComponent createSummaryTab(FastAnalysis analysis) {
 
-        throw new RuntimeException("createSummaryTab not implemented");
-        //
-        // try {
-        // FastAnalysisSummaryTab tab = new FastAnalysisSummaryTab(analysis, session, messagePanel, this,
-        // parentConsole);
-        // this.presenter.addTab(tab);
-        // return tab;
-        // } catch (EmfException e) {
-        //
-        // String message = "Could not create Summary Tab." + e.getMessage();
-        // showError(message);
-        // return createErrorTab(message);
-        // }
+        try {
+            FastAnalysisSummaryTab tab = new FastAnalysisSummaryTab(analysis, session, messagePanel, this,
+                    parentConsole, this.presenter);
+            this.presenter.addTab(tab);
+            return tab;
+        } catch (EmfException e) {
+
+            String message = "Could not create Summary Tab." + e.getMessage();
+            showError(message);
+            return createErrorTab(message);
+        }
     }
 
-    protected JComponent createControlStrategiesTab(FastAnalysis analysis) {
+    protected JComponent createConfigurationTab(FastAnalysis analysis) {
 
-        throw new RuntimeException("createControlStrategiesTab not implemented");
+        try {
+            FastAnalysisConfigurationTab tab = new FastAnalysisConfigurationTab(analysis, session, messagePanel, this,
+                    parentConsole, this.presenter);
+            this.presenter.addTab(tab);
+            return tab;
+        } catch (EmfException e) {
 
-        // try {
-        // FastAnalysisControlStrategiesTab tab = new FastAnalysisControlStrategiesTab(analysis, session, messagePanel,
-        // this, parentConsole);
-        // this.presenter.addTab(tab);
-        // return tab;
-        // } catch (EmfException e) {
-        //
-        // String message = "Could not load Control Strategies Tab." + e.getMessage();
-        // showError(message);
-        // return createErrorTab(message);
-        // }
+            String message = "Could not load Configuration Tab." + e.getMessage();
+            showError(message);
+            return createErrorTab(message);
+        }
     }
 
-    protected JComponent createInputsTab(FastAnalysis analysis) {
-
-        throw new RuntimeException("createInputsTab not implemented");
-
-        // try {
-        // FastAnalysisInputsTab tab = new FastAnalysisInputsTab(analysis, session, messagePanel, this, parentConsole);
-        // this.presenter.addTab(tab);
-        // return tab;
-        // } catch (EmfException e) {
-        //
-        // String message = "Could not load Inputs Tab." + e.getMessage();
-        // showError(message);
-        // return createErrorTab(message);
-        // }
-    }
+    // protected JComponent createInputsTab(FastAnalysis analysis) {
+    //
+    // throw new RuntimeException("createInputsTab not implemented");
+    //
+    // // try {
+    // // FastAnalysisInputsTab tab = new FastAnalysisInputsTab(analysis, session, messagePanel, this, parentConsole);
+    // // this.presenter.addTab(tab);
+    // // return tab;
+    // // } catch (EmfException e) {
+    // //
+    // // String message = "Could not load Inputs Tab." + e.getMessage();
+    // // showError(message);
+    // // return createErrorTab(message);
+    // // }
+    // }
 
     protected JComponent createOutputsTab(FastAnalysis analysis) {
 
-        throw new RuntimeException("createOutputsTab not implemented");
+        try {
+            FastAnalysisOutputsTab tab = new FastAnalysisOutputsTab(analysis, session, messagePanel, this,
+                    parentConsole, this.presenter);
+            this.presenter.addTab(tab);
+            return tab;
+        } catch (EmfException e) {
 
-        // try {
-        // FastAnalysisOutputsTab tab = new FastAnalysisOutputsTab(analysis, session, messagePanel, this,
-        // parentConsole);
-        // this.presenter.addTab(tab);
-        // return tab;
-        // } catch (EmfException e) {
-        //
-        // String message = "Could not load Outputs Tab." + e.getMessage();
-        // showError(message);
-        // return createErrorTab(message);
-        // }
+            String message = "Could not load Outputs Tab." + e.getMessage();
+            showError(message);
+            return createErrorTab(message);
+        }
     }
 
     protected JComponent createErrorTab(String message) {
@@ -160,11 +161,62 @@ public abstract class AbstractFastAnalysisWindow extends DisposableInteralFrame 
         container.add(closeButton);
         getRootPane().setDefaultButton(saveButton);
 
+        runButton = new RunButton("Execute", this.runAction());
+        container.add(runButton);
+
+        Button refreshButton = new Button("Refresh", refreshAction());
+        container.add(refreshButton);
+
         container.add(Box.createHorizontalStrut(20));
 
         panel.add(container, BorderLayout.CENTER);
 
         return panel;
+    }
+
+    protected Action refreshAction() {
+        Action action = new AbstractFastAction(this.getMessagePanel(), "Error refreshing Fast analysis") {
+
+            @Override
+            protected void doActionPerformed(ActionEvent e) throws EmfException {
+                doRefreshRun();
+            }
+        };
+
+        return action;
+    }
+
+    private void doRefreshRun() throws EmfException {
+        presenter.doRefresh();
+    }
+
+    protected Action runAction() {
+        Action action = new AbstractFastAction(this.getMessagePanel(), "Error executing Fast analysis") {
+
+            @Override
+            protected void doActionPerformed(ActionEvent e) throws EmfException {
+                doExecuteRun();
+            }
+        };
+
+        return action;
+    }
+
+    private void doExecuteRun() throws EmfException {
+
+        this.clearMessage();
+
+        String message = "Are you sure you want to execute the Fast analysis?";
+
+        int selection = JOptionPane.showConfirmDialog(this, message, "Warning", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.YES_OPTION) {
+
+            presenter.doRun();
+            this
+                    .showMessage("Executing Fast analysis. Monitor the status window for progress, and refresh this window after completion to see results");
+        }
     }
 
     protected Action closeAction() {

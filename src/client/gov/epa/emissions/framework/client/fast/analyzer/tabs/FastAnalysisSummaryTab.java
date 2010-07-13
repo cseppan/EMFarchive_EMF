@@ -8,8 +8,10 @@ import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
+import gov.epa.emissions.framework.services.fast.FastRun;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
@@ -28,8 +30,11 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 @SuppressWarnings("serial")
-public class FastAnalysisSummaryTab extends AbstractAnalysisFastTab {
+public class FastAnalysisSummaryTab extends AbstractFastAnalysisTab {
+
     private TextField nameField;
+
+    private TextField abbreviationField;
 
     private TextArea descriptionField;
 
@@ -44,10 +49,10 @@ public class FastAnalysisSummaryTab extends AbstractAnalysisFastTab {
     private JLabel lastModifiedByValueLabel;
 
     public FastAnalysisSummaryTab(FastAnalysis analysis, EmfSession session, MessagePanel messagePanel,
-            ManageChangeables changeablesList, EmfConsole parentConsole) {
+            ManageChangeables changeablesList, EmfConsole parentConsole, FastAnalysisPresenter presenter) {
 
-        super(analysis, session, messagePanel, changeablesList, parentConsole);
-        this.setName("summary");
+        super(analysis, session, messagePanel, changeablesList, parentConsole, presenter);
+        this.setName("Summary");
     }
 
     public void display() {
@@ -61,6 +66,7 @@ public class FastAnalysisSummaryTab extends AbstractAnalysisFastTab {
 
         FastAnalysis analysis = this.getAnalysis();
         this.nameField.setText(getNonNullText(analysis.getName()));
+        this.abbreviationField.setText(getNonNullText(analysis.getAbbreviation()));
         this.descriptionField.setText(getNonNullText(analysis.getDescription()));
         this.creatorValueLabel.setText(getNonNullText(analysis.getCreator().getUsername()));
         this.startTimeValueLabel.setText(this.formatDate(analysis.getStartDate()));
@@ -113,7 +119,7 @@ public class FastAnalysisSummaryTab extends AbstractAnalysisFastTab {
         constraints.anchor = GridBagConstraints.WEST;
         constraints.insets = valueInsets;
 
-        this.nameField = new TextField(" Fast Analysis Name", 27);
+        this.nameField = new TextField("Fast Run Name", 27);
         panel.add(this.nameField, constraints);
 
         constraints.gridx = 0;
@@ -122,8 +128,8 @@ public class FastAnalysisSummaryTab extends AbstractAnalysisFastTab {
         constraints.anchor = GridBagConstraints.WEST;
         constraints.insets = labelInsets;
 
-        JLabel descriptionLabel = new JLabel("Description:");
-        panel.add(descriptionLabel, constraints);
+        JLabel abbreviationLabel = new JLabel("Abbreviation:");
+        panel.add(abbreviationLabel, constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 1;
@@ -131,14 +137,32 @@ public class FastAnalysisSummaryTab extends AbstractAnalysisFastTab {
         constraints.anchor = GridBagConstraints.WEST;
         constraints.insets = valueInsets;
 
-        this.descriptionField = new TextArea("Fast Analysis Description", "");
+        this.abbreviationField = new TextField("Fast Run Abbreviation", 27);
+        panel.add(this.abbreviationField, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = labelInsets;
+
+        JLabel descriptionLabel = new JLabel("Description:");
+        panel.add(descriptionLabel, constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 2;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.insets = valueInsets;
+
+        this.descriptionField = new TextArea("Fast Run Description", "");
         ScrollableComponent scrollPane = new ScrollableComponent(this.descriptionField);
         scrollPane.setPreferredSize(new Dimension(300, 86));
 
         panel.add(scrollPane, constraints);
 
         constraints.gridx = 0;
-        constraints.gridy = 2;
+        constraints.gridy = 3;
         constraints.fill = GridBagConstraints.BOTH;
         constraints.anchor = GridBagConstraints.CENTER;
         constraints.weighty = 1;
@@ -148,6 +172,7 @@ public class FastAnalysisSummaryTab extends AbstractAnalysisFastTab {
 
         ManageChangeables changeablesList = this.getChangeablesList();
         changeablesList.addChangeable(this.nameField);
+        changeablesList.addChangeable(this.abbreviationField);
         changeablesList.addChangeable(this.descriptionField);
 
         return panel;
@@ -291,9 +316,23 @@ public class FastAnalysisSummaryTab extends AbstractAnalysisFastTab {
         validateFields();
 
         analysis.setName(this.nameField.getText());
+        analysis.setAbbreviation(this.abbreviationField.getText());
         analysis.setDescription(this.descriptionField.getText());
         analysis.setLastModifiedDate(new Date());
         analysis.setCreator(this.getSession().user());
+    }
+
+    public void save(FastRun run) throws EmfException {
+
+        this.clearMessage();
+
+        validateFields();
+
+        run.setName(this.nameField.getText());
+        run.setAbbreviation(this.abbreviationField.getText());
+        run.setDescription(this.descriptionField.getText());
+        run.setLastModifiedDate(new Date());
+        run.setCreator(this.getSession().user());
     }
 
     private void validateFields() throws EmfException {
@@ -301,7 +340,11 @@ public class FastAnalysisSummaryTab extends AbstractAnalysisFastTab {
         this.clearMessage();
 
         if (this.nameField.getText().trim().length() == 0) {
-            throw new EmfException("Summary tab: A name must be specified");
+            throw new EmfException(this.getName() + " tab: A name must be specified");
+        }
+
+        if (this.abbreviationField.getText().trim().length() == 0) {
+            throw new EmfException(this.getName() + " tab: An abbreviation must be specified");
         }
     }
 

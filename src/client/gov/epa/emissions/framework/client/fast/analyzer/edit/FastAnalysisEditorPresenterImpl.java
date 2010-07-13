@@ -1,12 +1,16 @@
 package gov.epa.emissions.framework.client.fast.analyzer.edit;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisManagerPresenter;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisTabView;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisView;
-import gov.epa.emissions.framework.client.fast.analyzer.tabs.FastAnalysisTabPresenterImpl;
 import gov.epa.emissions.framework.client.fast.analyzer.tabs.FastAnalysisTabPresenter;
+import gov.epa.emissions.framework.client.fast.analyzer.tabs.FastAnalysisTabPresenterImpl;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
 import gov.epa.emissions.framework.services.fast.FastService;
 
@@ -27,12 +31,34 @@ public class FastAnalysisEditorPresenterImpl implements FastAnalysisPresenter {
 
     private boolean hasResults = false;
 
-    public FastAnalysisEditorPresenterImpl(int id, EmfSession session, FastAnalysisView view) {
+    public FastAnalysisEditorPresenterImpl(int id, EmfSession session, FastAnalysisView view,
+            FastAnalysisManagerPresenter fastManagerPresenter) {
 
         this.id = id;
         this.session = session;
         this.view = view;
         this.presenters = new ArrayList<FastAnalysisTabPresenter>();
+    }
+
+    public void doRun() throws EmfException {
+
+        this.doSave();
+        this.getService().runFastAnalysis(this.session.user(), this.analysis.getId());
+    }
+
+    public void doRefresh() throws EmfException {
+        this.refreshTabs();
+    }
+
+    protected void refreshTabs() {
+
+        if (false) {
+            throw new RuntimeException("asdf asdfasdf asdfasdf a");
+        }
+
+        for (FastAnalysisTabPresenter presenter : this.presenters) {
+            presenter.doRefresh(this.analysis);
+        }
     }
 
     public void doDisplay() throws EmfException {
@@ -100,5 +126,20 @@ public class FastAnalysisEditorPresenterImpl implements FastAnalysisPresenter {
 
     public boolean hasResults() {
         return this.hasResults;
+    }
+
+    public DatasetType getDatasetType(String name) throws EmfException {
+        return session.dataCommonsService().getDatasetType(name);
+    }
+
+    public Version[] getVersions(EmfDataset dataset) throws EmfException {
+
+        Version[] versions = new Version[0];
+
+        if (dataset != null) {
+            versions = this.session.dataEditorService().getVersions(dataset.getId());
+        }
+
+        return versions;
     }
 }

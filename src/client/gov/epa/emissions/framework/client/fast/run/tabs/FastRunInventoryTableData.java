@@ -8,8 +8,6 @@ public class FastRunInventoryTableData extends AbstractMPSDTTableData<FastRunInv
 
     private static final String[] COLUMNS = { "Type", "Dataset", "Version" };
 
-    public static final String DEFAULT_TIME = "N/A";
-
     public FastRunInventoryTableData(FastRunInventory[] inventories) {
         super(inventories);
     }
@@ -28,16 +26,6 @@ public class FastRunInventoryTableData extends AbstractMPSDTTableData<FastRunInv
                 Integer.toString(inventory.getVersion()) };
 
         return rowValues;
-    }
-
-    protected String getNameWithDefault(EmfDataset dataset) {
-
-        String name = DEFAULT_VALUE;
-        if (dataset != null) {
-            name = this.getValueWithDefault(dataset.getName());
-        }
-
-        return name;
     }
 
     protected String getTypeWithDefault(EmfDataset dataset) {

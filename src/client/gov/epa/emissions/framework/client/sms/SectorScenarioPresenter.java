@@ -206,11 +206,11 @@ public class SectorScenarioPresenter {
 //            fastAnalysis.setBaselineRuns(new FastAnalysisRun[] {fastAnalysisRun});
 //        }
         FastRun fr = fastService.getFastRun(27);
-        FastAnalysisRun fastAnalysisRun = new FastAnalysisRun(fr, FastAnalysisRun.BASELINE_TYPE);
+        FastAnalysisRun fastAnalysisRun = FastAnalysisRun.createBaselineRun(fr);
         fastAnalysis.setBaselineRuns(new FastAnalysisRun[] {fastAnalysisRun});
 
         fr = fastService.getFastRun(28);
-        fastAnalysisRun = new FastAnalysisRun(fr, FastAnalysisRun.SENSITIVITY_TYPE);
+        fastAnalysisRun = FastAnalysisRun.createSensitivityRun(fr);
         fastAnalysis.setSensitivityRuns(new FastAnalysisRun[] {fastAnalysisRun});
 
         fastAnalysis.setId(fastService.addFastAnalysis(fastAnalysis));
