@@ -568,4 +568,16 @@ public class FastServiceTransport implements FastService {
 
         return (FastRunOutputType[]) call.requestResponse(new Object[] {  });
     }
+
+    public void exportFastAnalysisOutputShapeFile(int fastAnalysisOutputID, String userName, String dirName,
+            String pollutant) throws EmfException {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public void exportFastRunOutputShapeFile(int fastRunOutputID, String userName, String dirName, String pollutant)
+            throws EmfException {
+        // NOTE Auto-generated method stub
+        
+    }
 }
