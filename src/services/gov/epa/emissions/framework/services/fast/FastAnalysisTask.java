@@ -252,7 +252,7 @@ public class FastAnalysisTask {
             for (FastAnalysisRun fastAnalysisRun : fastAnalysisRuns) {
                 EmfDataset dataset = getFastRunGriddedSummaryEmissionAirQualityDataset(fastAnalysisRun.getFastRun());
                 int versionNumber = 0;
-                double adjustmentFactor = 1.0;//fastAnalysisRun.getAdjustmentFactor();
+                double adjustmentFactor = fastAnalysisRun.getAdjustmentFactor();
                 Version inventoryVersion = version(dataset.getId(), versionNumber);
                 VersionedQuery datasetVersionedQuery = new VersionedQuery(inventoryVersion, "aq");
                 String datasetTableName = qualifiedEmissionTableName(dataset);
@@ -279,7 +279,7 @@ public class FastAnalysisTask {
             for (FastAnalysisRun fastAnalysisRun : fastAnalysisRuns) {
                 EmfDataset dataset = getFastRunGriddedSummaryEmissionAirQualityDataset(fastAnalysisRun.getFastRun());
                 int versionNumber = 0;
-                double adjustmentFactor = 1.0;//fastAnalysisRun.getAdjustmentFactor();
+                double adjustmentFactor = fastAnalysisRun.getAdjustmentFactor();
                 Version inventoryVersion = version(dataset.getId(), versionNumber);
                 VersionedQuery datasetVersionedQuery = new VersionedQuery(inventoryVersion, "aq");
                 String datasetTableName = qualifiedEmissionTableName(dataset);
