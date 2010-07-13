@@ -36,6 +36,7 @@
 	       	<many-to-one name="fastRun" class="gov.epa.emissions.framework.services.fast.FastRun" column="fast_run_id" not-null="true" cascade="none"/>
 	       	<many-to-one name="grid" class="gov.epa.emissions.framework.services.fast.Grid" column="grid_id" not-null="true" cascade="none"/>
 			<property name="type" column="baseline_sensitivity" type="string" not-null="true"/>
+			<property name="adjustmentFactor" column="adjustment_factor" type="double" not-null="true"/>
     	</composite-element>
 	</array>
 
@@ -46,6 +47,7 @@
 	       	<many-to-one name="fastRun" class="gov.epa.emissions.framework.services.fast.FastRun" column="fast_run_id" not-null="true" cascade="none"/>
 	       	<many-to-one name="grid" class="gov.epa.emissions.framework.services.fast.Grid" column="grid_id" not-null="true" cascade="none"/>
 			<property name="type" column="baseline_sensitivity" type="string" not-null="true"/>
+			<property name="adjustmentFactor" column="adjustment_factor" type="double" not-null="true"/>
     	</composite-element>
 	</array>
 

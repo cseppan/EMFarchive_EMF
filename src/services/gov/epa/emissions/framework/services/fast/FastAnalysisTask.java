@@ -252,6 +252,7 @@ public class FastAnalysisTask {
             for (FastAnalysisRun fastAnalysisRun : fastAnalysisRuns) {
                 EmfDataset dataset = getFastRunGriddedSummaryEmissionAirQualityDataset(fastAnalysisRun.getFastRun());
                 int versionNumber = 0;
+                double adjustmentFactor = 1.0;//fastAnalysisRun.getAdjustmentFactor();
                 Version inventoryVersion = version(dataset.getId(), versionNumber);
                 VersionedQuery datasetVersionedQuery = new VersionedQuery(inventoryVersion, "aq");
                 String datasetTableName = qualifiedEmissionTableName(dataset);
@@ -260,12 +261,12 @@ public class FastAnalysisTask {
                     + "     aq.cmaq_pollutant as pollutant, "
                     + "     aq.x, "
                     + "     aq.y, "
-                    + "     cancer_risk_per_person, "
-                    + "     total_cancer_risk, "
-                    + "     population_weighted_cancer_risk, "
-                    + "     population_weighted_air_quality, "
-                    + "     aq.emission, "
-                    + "     aq.air_quality "
+                    + "     " + adjustmentFactor + "::double precision * cancer_risk_per_person as cancer_risk_per_person, "
+                    + "     " + adjustmentFactor + "::double precision * total_cancer_risk as total_cancer_risk, "
+                    + "     " + adjustmentFactor + "::double precision * population_weighted_cancer_risk as population_weighted_cancer_risk, "
+                    + "     " + adjustmentFactor + "::double precision * population_weighted_air_quality as population_weighted_air_quality, "
+                    + "     " + adjustmentFactor + "::double precision * aq.emission as emission, "
+                    + "     " + adjustmentFactor + "::double precision * aq.air_quality as air_quality "
                     + " from "  + datasetTableName  + " aq "
                     + " where " + datasetVersionedQuery.query() + " ";
                 ++count;
@@ -278,6 +279,7 @@ public class FastAnalysisTask {
             for (FastAnalysisRun fastAnalysisRun : fastAnalysisRuns) {
                 EmfDataset dataset = getFastRunGriddedSummaryEmissionAirQualityDataset(fastAnalysisRun.getFastRun());
                 int versionNumber = 0;
+                double adjustmentFactor = 1.0;//fastAnalysisRun.getAdjustmentFactor();
                 Version inventoryVersion = version(dataset.getId(), versionNumber);
                 VersionedQuery datasetVersionedQuery = new VersionedQuery(inventoryVersion, "aq");
                 String datasetTableName = qualifiedEmissionTableName(dataset);
@@ -286,12 +288,12 @@ public class FastAnalysisTask {
                     + "     aq.cmaq_pollutant as pollutant, "
                     + "     aq.x, "
                     + "     aq.y, "
-                    + "     cancer_risk_per_person, "
-                    + "     total_cancer_risk, "
-                    + "     population_weighted_cancer_risk, "
-                    + "     population_weighted_air_quality, "
-                    + "     aq.emission, "
-                    + "     aq.air_quality "
+                    + "     " + adjustmentFactor + "::double precision * cancer_risk_per_person as cancer_risk_per_person, "
+                    + "     " + adjustmentFactor + "::double precision * total_cancer_risk as total_cancer_risk, "
+                    + "     " + adjustmentFactor + "::double precision * population_weighted_cancer_risk as population_weighted_cancer_risk, "
+                    + "     " + adjustmentFactor + "::double precision * population_weighted_air_quality as population_weighted_air_quality, "
+                    + "     " + adjustmentFactor + "::double precision * aq.emission as emission, "
+                    + "     " + adjustmentFactor + "::double precision * aq.air_quality as air_quality "
                     + " from "  + datasetTableName  + " aq "
                     + " where " + datasetVersionedQuery.query() + " ";
                 ++count;

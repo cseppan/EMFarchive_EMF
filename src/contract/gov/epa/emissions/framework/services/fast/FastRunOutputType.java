@@ -20,7 +20,7 @@ public class FastRunOutputType implements Serializable, Comparable {
 
     public static final String GRIDDED_SUMMARY_EMISSIONS_AIR_QUALITY = "Gridded Summary Emissions and Air Quality";
 
-    public static final String GRIDDED_DETAILED_EMISSIONS_AIR_QUALITY = "Gridded Summary Emissions and Air Quality";
+    public static final String GRIDDED_DETAILED_EMISSIONS_AIR_QUALITY = "Gridded Detailed Emissions and Air Quality";
 
     public FastRunOutputType() {
         //

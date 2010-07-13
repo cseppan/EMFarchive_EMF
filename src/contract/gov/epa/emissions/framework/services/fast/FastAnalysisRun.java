@@ -7,6 +7,7 @@ public class FastAnalysisRun implements Serializable {
     private FastRun fastRun;
     private Grid grid;
     private String type;
+    private Double adjustmentFactor = 1.0D;
     
     public static final String BASELINE_TYPE = "B";
     
@@ -61,5 +62,13 @@ public class FastAnalysisRun implements Serializable {
 
     public String getType() {
         return type;
+    }
+
+    public void setAdjustmentFactor(Double adjustmentFactor) {
+        this.adjustmentFactor = (adjustmentFactor != null ? adjustmentFactor : 1.0D);
+    }
+
+    public Double getAdjustmentFactor() {
+        return adjustmentFactor;
     }
 }
