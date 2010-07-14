@@ -569,15 +569,19 @@ public class FastServiceTransport implements FastService {
         return (FastRunOutputType[]) call.requestResponse(new Object[] {  });
     }
 
-    public void exportFastAnalysisOutputShapeFile(int fastAnalysisOutputID, String userName, String dirName,
+    public void exportFastOutputToShapeFile(int datasetId, int datasetVersion, int gridId, String userName, String dirName,
             String pollutant) throws EmfException {
-        // NOTE Auto-generated method stub
-        
-    }
+        EmfCall call = call();
 
-    public void exportFastRunOutputShapeFile(int fastRunOutputID, String userName, String dirName, String pollutant)
-            throws EmfException {
-        // NOTE Auto-generated method stub
-        
+        call.setOperation("exportFastOutputToShapeFile");
+        call.addIntegerParam("datasetId");
+        call.addIntegerParam("datasetVersion");
+        call.addIntegerParam("gridId");
+        call.addStringParam("userName");
+        call.addStringParam("dirName");
+        call.addStringParam("pollutant");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { new Integer(datasetId), new Integer(datasetVersion), new Integer(gridId), userName, dirName, pollutant });
     }
 }

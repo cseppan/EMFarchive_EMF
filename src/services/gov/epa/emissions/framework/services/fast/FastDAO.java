@@ -444,6 +444,10 @@ public class FastDAO {
         return (Grid) hibernateFacade.load(Grid.class, Restrictions.eq("name", name), session);
     }
 
+    public Grid getGrid(Session session, int id) {
+        return (Grid) hibernateFacade.load(Grid.class, Restrictions.eq("id", id), session);
+    }
+
 
 
 

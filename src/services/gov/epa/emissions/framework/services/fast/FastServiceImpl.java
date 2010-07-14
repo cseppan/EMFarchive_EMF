@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.fast.shapefile.ExportFastOutputToShapeFile;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
@@ -1327,56 +1328,15 @@ public class FastServiceImpl implements FastService {
         }
     }
 
-    public synchronized void exportFastRunOutputShapeFile(int fastRunOutputID, String userName, 
+    public synchronized void exportFastOutputToShapeFile(int datasetId, int datasetVersion, int gridId, String userName, 
             String dirName, String pollutant) throws EmfException {
-//        DbServer dbServer = dbServerFactory.getDbServer();
-//        try {
-//            PostgresSQLToShapeFile shapeFileGenerator = new PostgresSQLToShapeFile(dbServer);
-//            //shapeFileGenerator.create(postgresBinDir, postgresDB, postgresUser, postgresPassword, filePath, selectQuery, projectionShapeFile)
-//            shapeFileGenerator.create(getProperty("postgres-bin-dir"), getProperty("postgres-db"), 
-//                    getProperty("postgres-user"), getProperty("pgsql2shp-info"), 
-//                    "C:\\temp\\My Documents\\karen\\shape_files\\chaka", 
-//                    "select public.ST_Y(public.ST_Transform(public.GeomFromEWKT('SRID=104307;POINT(' || (1044000.0 + 4000.0 * (aq.x - 0.5)) || ' ' || (252000.0 + 4000.0 * (aq.y - 0.5)) || ')'),104308)) as lat, public.ST_X(public.ST_Transform(public.GeomFromEWKT('SRID=104307;POINT(' || (1044000.0 + 4000.0 * (aq.x - 0.5)) || ' ' || (252000.0 + 4000.0 * (aq.y - 0.5)) || ')'),104308)) as lon, aq.x, aq.y, aq.sector, aq.pollutant, aq.emission as emis, aq.airquality as aq, airquality * totalpop / 6349855.90000001 as pop_wgh_aq, airquality * cancer_risk_ure as cancer_risk, airquality * cancer_risk_ure * totalpop as total_cancer_risk, airquality * totalpop / 6349855.90000001 * cancer_risk_ure as pop_wgh_cancer_risk, totalpop as grid_cell_pop, totalpop / 6349855.90000001 * 100.0 as pct_pop_in_grid_cell, cancer_risk_ure as ure, detroit_4km_grid.the_geom from emissions.DS_airquality_analysis_1493594302 aq left outer join emissions.DS_4km_Detroit_Pop_776499559 grid on grid.row = aq.y and grid.col = aq.x left outer join emissions.DS_fast_cancer_risk_ure_1493480478 ure on ure.cmaq_pollutant = aq.pollutant full join public.detroit_4km_grid on detroit_4km_grid.gridid = (aq.x + (aq.y - 1)* 36) where aq.dataset_id = 5816 and aq.sector ='nonroad' and aq.pollutant = 'NO3' order by aq.sector, aq.pollutant, aq.x, aq.y", 
-//                    null);
-//        } catch (ExporterException e) {
-//            throw new EmfException(e.getMessage());
-//        } finally {
-//            if (dbServer != null) {
-//                try {
-//                    dbServer.disconnect();
-//                } catch (Exception e) {
-//                    // NOTE Auto-generated catch block
-//                    e.printStackTrace();
-//                }
-//                dbServer = null;
-//            }
-//       }
-    }
-    
-
-    public synchronized void exportFastAnalysisOutputShapeFile(int fastRunOutputID, String userName, 
-            String dirName, String pollutant) throws EmfException {
-//        DbServer dbServer = dbServerFactory.getDbServer();
-//        try {
-//            PostgresSQLToShapeFile shapeFileGenerator = new PostgresSQLToShapeFile(dbServer);
-//            //shapeFileGenerator.create(postgresBinDir, postgresDB, postgresUser, postgresPassword, filePath, selectQuery, projectionShapeFile)
-//            shapeFileGenerator.create(getProperty("postgres-bin-dir"), getProperty("postgres-db"), 
-//                    getProperty("postgres-user"), getProperty("pgsql2shp-info"), 
-//                    "C:\\temp\\My Documents\\karen\\shape_files\\chaka", 
-//                    "select public.ST_Y(public.ST_Transform(public.GeomFromEWKT('SRID=104307;POINT(' || (1044000.0 + 4000.0 * (aq.x - 0.5)) || ' ' || (252000.0 + 4000.0 * (aq.y - 0.5)) || ')'),104308)) as lat, public.ST_X(public.ST_Transform(public.GeomFromEWKT('SRID=104307;POINT(' || (1044000.0 + 4000.0 * (aq.x - 0.5)) || ' ' || (252000.0 + 4000.0 * (aq.y - 0.5)) || ')'),104308)) as lon, aq.x, aq.y, aq.sector, aq.pollutant, aq.emission as emis, aq.airquality as aq, airquality * totalpop / 6349855.90000001 as pop_wgh_aq, airquality * cancer_risk_ure as cancer_risk, airquality * cancer_risk_ure * totalpop as total_cancer_risk, airquality * totalpop / 6349855.90000001 * cancer_risk_ure as pop_wgh_cancer_risk, totalpop as grid_cell_pop, totalpop / 6349855.90000001 * 100.0 as pct_pop_in_grid_cell, cancer_risk_ure as ure, detroit_4km_grid.the_geom from emissions.DS_airquality_analysis_1493594302 aq left outer join emissions.DS_4km_Detroit_Pop_776499559 grid on grid.row = aq.y and grid.col = aq.x left outer join emissions.DS_fast_cancer_risk_ure_1493480478 ure on ure.cmaq_pollutant = aq.pollutant full join public.detroit_4km_grid on detroit_4km_grid.gridid = (aq.x + (aq.y - 1)* 36) where aq.dataset_id = 5816 and aq.sector ='nonroad' and aq.pollutant = 'NO3' order by aq.sector, aq.pollutant, aq.x, aq.y", 
-//                    null);
-//        } catch (ExporterException e) {
-//            throw new EmfException(e.getMessage());
-//        } finally {
-//            if (dbServer != null) {
-//                try {
-//                    dbServer.disconnect();
-//                } catch (Exception e) {
-//                    // NOTE Auto-generated catch block
-//                    e.printStackTrace();
-//                }
-//                dbServer = null;
-//            }
-//       }
+        try {
+            ExportFastOutputToShapeFile exportQATask = new ExportFastOutputToShapeFile(datasetId, datasetVersion, gridId, userName, dirName, pollutant, dbServerFactory, sessionFactory,
+                    threadPool);
+            exportQATask.export();
+        } catch (Exception e) {
+            LOG.error("Could not export dataset", e);
+            throw new EmfException("Could not export dataset: " + e.getMessage());
+        }
     }
 }

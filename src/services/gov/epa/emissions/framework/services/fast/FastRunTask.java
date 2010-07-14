@@ -1021,7 +1021,7 @@ public class FastRunTask {
         timing = System.currentTimeMillis();
 
         // store grid info...
-        float xorg = domain.getXorig(), yorg = domain.getYorig(), delx = domain.getXcell(), dely = domain.getYcell();
+        float xcent = domain.getXcent(), ycent = domain.getYcent(), delx = domain.getXcell(), dely = domain.getYcell();
 
         for (FastGriddedCMAQPollutantAirQualityEmissionResult cMAQResult : results) {
             String sector = cMAQResult.getSector();
@@ -1056,10 +1056,10 @@ public class FastRunTask {
                                         + beta1
                                         * emission[xx - 1][yy - 1]
                                         / (1 + Math.exp(Math.pow(Math.pow(Math.pow(Math
-                                                .abs((yy * dely + yorg + 0.5 * dely) / 1000
-                                                        - (y * dely + yorg + 0.5 * dely) / 1000), 2.0)
-                                                + Math.pow(Math.abs((xx * delx + xorg + 0.5 * delx) / 1000
-                                                        - (x * delx + xorg + 0.5 * delx) / 1000), 2.0), 0.5), beta2)));
+                                                .abs((yy * dely + ycent + 0.5 * dely) / 1000
+                                                        - (y * dely + ycent + 0.5 * dely) / 1000), 2.0)
+                                                + Math.pow(Math.abs((xx * delx + xcent + 0.5 * delx) / 1000
+                                                        - (x * delx + xcent + 0.5 * delx) / 1000), 2.0), 0.5), beta2)));
                             }
                         }
                     }
