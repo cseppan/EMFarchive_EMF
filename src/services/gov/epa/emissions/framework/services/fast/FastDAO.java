@@ -2,6 +2,9 @@ package gov.epa.emissions.framework.services.fast;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -20,6 +23,10 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -710,6 +717,10 @@ public class FastDAO {
         return datasetDao.getDataset(session, name);
     }
 
+    private EmfDataset getDataset(int id, Session session) {
+        return datasetDao.getDataset(session, id);
+    }
+
     private DatasetType getDatasetType(String name, Session session) {
         return dataCommonsDao.getDatasetType(name, session);
     }
@@ -771,5 +782,73 @@ public class FastDAO {
         }
     }
 
+    private Version version(int datasetId, int version) {
+        Session session = sessionFactory.getSession();
+        try {
+            Versions versions = new Versions();
+            return versions.get(datasetId, version, session);
+        } finally {
+            session.close();
+        }
+    }
 
+    public String[] getFastRunSpeciesMappingDatasetPollutants(int datasetId, int datasetVersion) throws EmfException {
+        List<String> pollutantsList = new ArrayList<String>();
+        ResultSet rs = null;
+        Statement statement = null;
+        DbServer dbServer = dbServerFactory.getDbServer();
+        Session session = sessionFactory.getSession();
+        Connection con = dbServer.getConnection();
+
+        VersionedQuery versionedQuery = new VersionedQuery(version(datasetId,
+                datasetVersion));
+        String tableName = getDataset(datasetId, session).getInternalSources()[0].getTable();
+
+        String query = "select distinct cmaq_pollutant from emissions." + tableName + " where "
+                + versionedQuery.query() + " order by cmaq_pollutant;";
+        try {
+            statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            rs = statement.executeQuery(query);
+            while (rs.next()) {
+                pollutantsList.add(rs.getString(1));
+            }
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { /**/
+                }
+                rs = null;
+            }
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) { /**/
+                }
+                statement = null;
+            }
+            if (dbServer != null) {
+                try {
+                    dbServer.disconnect();
+                } catch (Exception e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
+                dbServer = null;
+            }
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (Exception e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
+                session = null;
+            }
+            
+        }
+        return pollutantsList.toArray(new String[0]);
+    }
 }

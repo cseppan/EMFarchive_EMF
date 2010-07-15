@@ -886,14 +886,14 @@ public class FastRunTask {
         sql += " and ceiling((public.ST_X(public.ST_Transform(public.GeomFromEWKT('SRID=104308;POINT(' || inv.xloc || ' ' || inv.yloc || ')'),104307)) - "
                 + domain.getXcent() + ") / " + domain.getXcell() + ") between 1 and " + domain.getNcols() + " ";
         sql += " and ceiling((public.ST_Y(public.ST_Transform(public.GeomFromEWKT('SRID=104308;POINT(' || inv.xloc || ' ' || inv.yloc || ')'),104307)) - "
-                + domain.getYcent() + ") / " + domain.getYcent() + ") between 1 and " + domain.getNrows() + " ";
+                + domain.getYcent() + ") / " + domain.getYcell() + ") between 1 and " + domain.getNrows() + " ";
         sql += " group by ceiling((public.ST_X(public.ST_Transform(public.GeomFromEWKT('SRID=104308;POINT(' || inv.xloc || ' ' || inv.yloc || ')'),104307)) - "
                 + domain.getXcent()
                 + ") / "
                 + domain.getXcell()
                 + "), ceiling((public.ST_Y(public.ST_Transform(public.GeomFromEWKT('SRID=104308;POINT(' || inv.xloc || ' ' || inv.yloc || ')'),104307)) - "
                 + domain.getYcent() + ") / " + domain.getYcell() + "), inv.scc, invtable.name \n";
-
+//System.out.println(sql);
         return sql;
     }
 

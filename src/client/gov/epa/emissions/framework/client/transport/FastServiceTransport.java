@@ -584,4 +584,15 @@ public class FastServiceTransport implements FastService {
 
         call.request(new Object[] { new Integer(datasetId), new Integer(datasetVersion), new Integer(gridId), userName, dirName, pollutant });
     }
+
+    public String[] getFastRunSpeciesMappingDatasetPollutants(int datasetId, int datasetVersion) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getFastRunSpeciesMappingDatasetPollutants");
+        call.addIntegerParam("datasetId");
+        call.addIntegerParam("datasetVersion");
+        call.setStringArrayReturnType();
+
+        return (String[])call.requestResponse(new Object[] { new Integer(datasetId), new Integer(datasetVersion) });
+    }
 }

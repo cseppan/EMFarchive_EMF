@@ -122,4 +122,6 @@ public interface FastService extends EMFService {
     void exportFastOutputToShapeFile(int datasetId, int datasetVersion, int gridId, String userName, 
             String dirName, String pollutant) throws EmfException;
 
+    String[] getFastRunSpeciesMappingDatasetPollutants(int datasetId, int datasetVersion) throws EmfException;
+
 }

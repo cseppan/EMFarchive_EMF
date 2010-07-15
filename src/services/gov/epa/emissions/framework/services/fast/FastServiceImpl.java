@@ -1339,4 +1339,8 @@ public class FastServiceImpl implements FastService {
             throw new EmfException("Could not export dataset: " + e.getMessage());
         }
     }
+
+    public String[] getFastRunSpeciesMappingDatasetPollutants(int datasetId, int datasetVersion) throws EmfException {
+        return dao.getFastRunSpeciesMappingDatasetPollutants(datasetId, datasetVersion);
+    }
 }

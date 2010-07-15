@@ -80,13 +80,24 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
         try {
             Version datasetVersion = version(this.datasetId, this.datasetVersion);
             Grid grid = getGrid(gridId);
-            
 
+            //do some basic validation...
+            if (dataset == null)
+                throw new ExporterException("Dataset doesn't exist, dataset id = " + this.datasetId);
+            if (datasetVersion == null)
+                throw new ExporterException("Dataset version doesn't exist, dataset version = " + this.datasetVersion);
+            if (grid == null)
+                throw new ExporterException("Grid doesn't exist, dataset version = " + this.gridId);
+            validateDir(this.dirName);
+            
+            
             PostgresSQLToShapeFile exporter = new PostgresSQLToShapeFile(dbServer);
             // Exporter exporter = new DatabaseTableCSVExporter(result.getTable(), dbServer.getEmissionsDatasource(),
             // batchSize(sessionFactory));
+            
+            //generate a file per sector
             for (String sector : getDatasetSectors(dataset, datasetVersion)) {
-                file = exportFile(dirName, dataset, sector);
+                file = exportFile(this.dirName, dataset, sector);
                 suffix = suffix();
                 prepare(suffix, dataset);
                 String sql = prepareSQLStatement(dataset, datasetVersion, grid, this.pollutant, sector);
@@ -185,6 +196,21 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
         boolean hasCMAQPollutantCol = false;
         // will hold unique list of column names, pqsql2shp doesn't like multiple columns with the same name...
         Map<String, String> cols = new HashMap<String, String>();
+        Map<String, String> colAliases = new HashMap<String, String>();
+        colAliases.put("emission", "ems");
+        colAliases.put("air_quality", "aq");
+        colAliases.put("population_weighted_air_quality", "aqp");
+        colAliases.put("cancer_risk_per_person", "cr");
+        colAliases.put("total_cancer_risk", "tcr");
+        colAliases.put("population_weighted_cancer_risk", "pw");
+        colAliases.put("grid_cell_population", "gcp");
+        colAliases.put("pct_population_in_grid_cell_to_model_domain", "pp");
+        colAliases.put("cmaq_pollutant", "pollutant");
+//        colAliases.put("ure", "ure");
+
+//        EMS AQ  AQP CR  TCR PW  GCP PP  URE
+//        Emissions   AQcon   pop_weighted_AQ cancer_risk/person  total_cancer_risk   pop_weighted_cancer_risk    grid_cell_population    perc_pop_in_grid_cell_relative_to_modeling_domain   URE
+
         String colNames = "";
         String sql = "";
         String tableName = dataset.getInternalSources()[0].getTable();
@@ -206,7 +232,7 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
                     } else if (colName.equals("y")) {
                         colNames += (colNames.length() > 0 ? "," : "") + "i." + colName;
                     } else {
-                        colNames += (colNames.length() > 0 ? "," : "") + colName;
+                        colNames += (colNames.length() > 0 ? "," : "") + colName + (!colAliases.containsKey(colName) ? "" : " as " + colAliases.get(colName));
                     }
                 }
 
@@ -221,6 +247,8 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
                 }
             }
 
+            if (!hasXCol || !hasYCol || (!hasPollutantCol && !hasCMAQPollutantCol)) 
+                throw new ExporterException("Dataset is missing applicable columns; x, y, and pollutant (or cmaq_polluant); needed to generate a shapefile.");
             
         } catch (SQLException e) {
             throw new ExporterException(e.getMessage());
@@ -251,11 +279,11 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
     }
 
     private void prepare(String suffixMsg, EmfDataset dataset) {
-        setStatus("Started exporting QA step '" + dataset.getName() + "'" + suffixMsg);
+        setStatus("Started exporting FAST output '" + dataset.getName() + "'" + suffixMsg);
     }
 
     private void complete(String suffixMsg, EmfDataset dataset) {
-        setStatus("Completed exporting QA step '" + dataset.getName() + "'" + suffixMsg);
+        setStatus("Completed exporting FAST output '" + dataset.getName() + "'" + suffixMsg);
     }
 
     private void logError(String message, Exception e) {
@@ -266,7 +294,7 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
     private void setStatus(String message) {
         Status endStatus = new Status();
         endStatus.setUsername(userName);
-        endStatus.setType("ExportQAStep");
+        endStatus.setType("ExportFASTOutput");
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 
@@ -298,12 +326,19 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
 //        }
 //    }
 
-    private File exportFile(String dirName, EmfDataset dataset, String sector) throws EmfException {
-        return new File(validateDir(dirName), fileName(dataset, sector));
+    private File exportFile(String dirName, EmfDataset dataset, String sector) {
+        return new File(dirName, getFileName(dataset, sector));
     }
 
-    private String fileName(EmfDataset dataset, String sector) {
-        return sector + "_" + dataset.getName();
+    private String getFileName(EmfDataset dataset, String sector) {
+        String fileName = sector + "_" + dataset.getName();
+        for (int i = 0; i < fileName.length(); i++) {
+            if (!Character.isLetterOrDigit(fileName.charAt(i))) {
+                fileName = fileName.replace(fileName.charAt(i), '_');
+            }
+        }
+
+        return fileName;
     }
 
     private File validateDir(String dirName) throws EmfException {
