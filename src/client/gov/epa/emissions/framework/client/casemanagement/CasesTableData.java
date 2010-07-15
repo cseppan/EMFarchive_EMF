@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -17,9 +18,11 @@ public class CasesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Project", "Model to Run", "Modeling Regn.", "Last Modified By", "Category", "Run Status", "Abbrev.",
-                "AQM", "Base Year", "Met. Year", "Future Year", "Num Met Layers",
-                "Start Date", "End Date", "Is Final", "Speciation", "Last Modified Date" };
+        return new String[] { "Name", "Last Modified Date", "Last Modified By", 
+                "Abbrev. ", "Run Status", "Base Year","Future Year",
+                "Start Date", "End Date", "Regions", 
+                "Model to Run", "Downstream", "Speciation", 
+                "Category", "Project", "Is Final"};
     }
 
     public Class<?> getColumnClass(int col) {
@@ -76,24 +79,20 @@ public class CasesTableData extends AbstractTableData {
     }
 
     private Object[] rowValues(Case element) {
-        Object[] values = { element.getName(), project(element), modelToRun(element), region(element), modifiedBy(element),
-                caseCategory(element), element.getRunStatus(), abbreviation(element), airQualityModel(element),
-                emissionsYear(element), meteorlogicalYear(element), futureYear(element), 
-                numMetLayers(element), format(element.getStartDate()), format(element.getEndDate()),
-                isFinal(element), speciation(element), format(element.getLastModifiedDate()) };
+        Object[] values = { element.getName(), format(element.getLastModifiedDate()), modifiedBy(element),
+                abbreviation(element), element.getRunStatus(),emissionsYear(element), futureYear(element),
+                format(element.getStartDate()), format(element.getEndDate()),region(element),
+                modelToRun(element),airQualityModel(element),speciation(element),   
+                caseCategory(element), project(element), isFinal(element),  };
         return values;
     }
 
     private String modelToRun(Case element) {
-        return element.getModel() != null ? element.getModel().getName() : "";
+        return element.getModel() != null ? element.getModel().getName()+" "+element.getModelVersion() : "";
     }
     
     private Boolean isFinal(Case element) {
         return new Boolean(element.getIsFinal());
-    }
-
-    private String numMetLayers(Case element) {
-        return element.getNumMetLayers() != null ? element.getNumMetLayers()+"" : "";
     }
 
     private String futureYear(Case element) {
@@ -110,18 +109,22 @@ public class CasesTableData extends AbstractTableData {
 
     private String speciation(Case element) {
         return element.getSpeciation() != null ? element.getSpeciation().getName() : "";
-    }
 
-    private String meteorlogicalYear(Case element) {
-        return element.getMeteorlogicalYear() != null ? element.getMeteorlogicalYear().getName() : "";
     }
-
     private String emissionsYear(Case element) {
         return element.getEmissionsYear() != null ? element.getEmissionsYear().getName() : "";
     }
 
     private String region(Case element) {
-        return element.getModelingRegion() != null ? element.getModelingRegion().getName() : "";
+        GeoRegion[] regions = element.getRegions();
+        String reg = "";
+        if (regions != null && regions.length > 0)
+            reg = regions[0].getAbbreviation();
+        for (int i= 1; i < regions.length; i++){ 
+            if (regions[i] != null)
+            reg = reg + ", "+ regions[i].getAbbreviation();
+        }
+        return reg;
     }
 
     private String caseCategory(Case element) {
