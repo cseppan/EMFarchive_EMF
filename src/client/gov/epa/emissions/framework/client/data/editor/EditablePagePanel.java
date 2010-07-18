@@ -215,6 +215,12 @@ public class EditablePagePanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 messagePanel.clear();
 
+                if (editableTable.hasChanges()) {
+                    String msg = "You have unsaved changes in the table. \nPlease either save or discard the changes first.";
+                    JOptionPane.showMessageDialog((Component) listOfChangeables, msg, "Save Changes", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                    
                 FindReplaceWindowView dialog = new DataFindReplaceWindow(tableData.getDatasetName(), tableData
                         .getTableMetadata().getTable(), tableData.getVersion(), rowFilter, sortOrder,
                         getDesktopManager(), removeFirstCol(tableData.columns()), listOfChangeables);
