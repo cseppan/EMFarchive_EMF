@@ -96,6 +96,7 @@ public class PaginationPanel extends JPanel implements ObserverPanel {
         this.presenter = presenter;
         try {
             totalRecords = presenter.totalRecords();
+            presenter.setTotalRecords(totalRecords);
             doLayout(totalRecords);
 
             if (totalRecords == 0)
@@ -330,6 +331,7 @@ public class PaginationPanel extends JPanel implements ObserverPanel {
 
     public void update(int number) {
         this.totalRecords = totalRecords + number;
+        presenter.setTotalRecords(totalRecords);
     }
 
     public int getPreviousNumber() {

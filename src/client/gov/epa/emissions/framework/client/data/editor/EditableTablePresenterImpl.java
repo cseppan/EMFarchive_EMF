@@ -20,6 +20,8 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
     private TablePresenterDelegate delegate;
 
     private DataEditorPresenter parentPresenter;
+    
+    private int totalRecs; 
 
     public EditableTablePresenterImpl(DatasetType datasetType, DataAccessToken token, TableMetadata tableMetadata,
             EditorPanelView view, DataEditorService service, DataEditorPresenter parentPresenter) {
@@ -83,6 +85,14 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
         return delegate.totalRecords();
     }
 
+    public void setTotalRecords(int totalRecords){
+        totalRecs = totalRecords;
+    }
+    
+    public int getTotalRecords(){
+        return totalRecs ;
+    }
+    
     public boolean submitChanges() throws EmfException {
         boolean dataWasChanged = false;
         ChangeSet changeset = view.changeset();

@@ -19,6 +19,10 @@ public interface TablePresenter {
     void doDisplayPageWithRecord(int record) throws EmfException;
 
     int totalRecords() throws EmfException;
+    
+    void setTotalRecords(int totalRecords);
+    
+    int getTotalRecords();
 
     void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException;
 

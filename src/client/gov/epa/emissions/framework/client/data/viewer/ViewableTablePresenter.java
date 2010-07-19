@@ -16,7 +16,7 @@ public class ViewableTablePresenter implements TablePresenter {
 
     private TablePresenterDelegate delegate;
     
-    //private String rowFilter=""; 
+    private int totalRecs; 
 
     public ViewableTablePresenter(DatasetType datasetType, DataAccessToken token, TableMetadata tableMetadata,
             ViewerPanelView view, DataAccessService service) {
@@ -64,6 +64,14 @@ public class ViewableTablePresenter implements TablePresenter {
 
     public int totalRecords() throws EmfException {
         return delegate.totalRecords();
+    }
+    
+    public void setTotalRecords(int totalRecords){
+        totalRecs = totalRecords;
+    }
+    
+    public int getTotalRecords(){
+        return totalRecs ;
     }
 
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
