@@ -114,10 +114,6 @@ public class FastRunCreatorPresenterImpl implements FastRunPresenter {
 
     protected void refreshTabs() {
 
-        if (false) {
-            throw new RuntimeException("asdf asdfasdf asdfasdf a");
-        }
-
         for (FastRunTabPresenter presenter : this.presenters) {
             presenter.doRefresh(this.run);
         }

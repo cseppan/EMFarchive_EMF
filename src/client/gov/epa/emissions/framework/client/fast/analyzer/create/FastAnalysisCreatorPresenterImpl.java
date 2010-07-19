@@ -91,10 +91,6 @@ public class FastAnalysisCreatorPresenterImpl implements FastAnalysisPresenter {
 
     protected void refreshTabs() {
 
-        if (false) {
-            throw new RuntimeException("asdf asdfasdf asdfasdf a");
-        }
-
         for (FastAnalysisTabPresenter presenter : this.presenters) {
             presenter.doRefresh(this.analysis);
         }
@@ -140,10 +136,6 @@ public class FastAnalysisCreatorPresenterImpl implements FastAnalysisPresenter {
     }
 
     protected void saveTabs() throws EmfException {
-
-        if (false) {
-            throw new RuntimeException("oiasdf");
-        }
 
         for (FastAnalysisTabPresenter presenter : this.presenters) {
             presenter.doSave(this.analysis);

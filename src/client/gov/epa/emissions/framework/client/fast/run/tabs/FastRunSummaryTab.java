@@ -64,6 +64,14 @@ public class FastRunSummaryTab extends AbstractFastRunTab {
         super.display();
     }
 
+    protected void addChangables() {
+
+        ManageChangeables changeablesList = this.getChangeablesList();
+        changeablesList.addChangeable(this.nameField);
+        changeablesList.addChangeable(this.abbreviationField);
+        changeablesList.addChangeable(this.descriptionField);
+    }
+
     protected void populateFields() {
 
         FastRun run = this.getRun();
@@ -171,11 +179,6 @@ public class FastRunSummaryTab extends AbstractFastRunTab {
 
         JLabel emptyLabel = new JLabel();
         panel.add(emptyLabel, constraints);
-
-        ManageChangeables changeablesList = this.getChangeablesList();
-        changeablesList.addChangeable(this.nameField);
-        changeablesList.addChangeable(this.abbreviationField);
-        changeablesList.addChangeable(this.descriptionField);
 
         return panel;
     }

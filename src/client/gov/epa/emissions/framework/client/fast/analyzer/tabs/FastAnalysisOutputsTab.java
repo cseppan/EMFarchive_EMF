@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -55,6 +56,12 @@ public class FastAnalysisOutputsTab extends AbstractFastAnalysisTab {
         this.add(createTablePanel(this.getAnalysis(), this.getParentConsole(), this.getSession()), BorderLayout.CENTER);
         this.add(createButtonsPanel(), BorderLayout.PAGE_END);
         super.display();
+    }
+
+    protected void addChangables() {
+        /*
+         * no-op
+         */
     }
 
     protected void populateFields() {

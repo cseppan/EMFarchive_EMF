@@ -6,7 +6,9 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class FastRun extends LockableImpl implements Serializable {
 
@@ -43,10 +45,15 @@ public class FastRun extends LockableImpl implements Serializable {
     private EmfDataset transferCoefficientsDataset;
 
     private Integer transferCoefficientsDatasetVersion;
+
     private EmfDataset cancerRiskDataset;
+
     private Integer cancerRiskDatasetVersion;
+
     private EmfDataset domainPopulationDataset;
+
     private Integer domainPopulationDatasetVersion;
+
     private FastRunInventory[] inventories = new FastRunInventory[] {};
 
     private Sector[] outputSectors = new Sector[] {};
@@ -207,6 +214,22 @@ public class FastRun extends LockableImpl implements Serializable {
 
     public void setInventories(FastRunInventory[] inventories) {
         this.inventories = inventories;
+    }
+
+    public void removeInventories(List<FastRunInventory> inventories) {
+
+        if (this.inventories != null) {
+
+            List<FastRunInventory> list = new ArrayList<FastRunInventory>();
+            for (FastRunInventory fastRunInventory : this.inventories) {
+
+                if (!inventories.contains(fastRunInventory)) {
+                    list.add(fastRunInventory);
+                }
+            }
+
+            this.inventories = list.toArray(new FastRunInventory[0]);
+        }
     }
 
     public Sector[] getOutputSectors() {

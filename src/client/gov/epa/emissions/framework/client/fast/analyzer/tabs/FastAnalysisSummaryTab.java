@@ -65,6 +65,14 @@ public class FastAnalysisSummaryTab extends AbstractFastAnalysisTab {
         super.display();
     }
 
+    protected void addChangables() {
+
+        ManageChangeables changeablesList = this.getChangeablesList();
+        changeablesList.addChangeable(this.nameField);
+        changeablesList.addChangeable(this.abbreviationField);
+        changeablesList.addChangeable(this.descriptionField);
+    }
+
     protected void populateFields() {
 
         FastAnalysis analysis = this.getAnalysis();
@@ -172,11 +180,6 @@ public class FastAnalysisSummaryTab extends AbstractFastAnalysisTab {
 
         JLabel emptyLabel = new JLabel();
         panel.add(emptyLabel, constraints);
-
-        ManageChangeables changeablesList = this.getChangeablesList();
-        changeablesList.addChangeable(this.nameField);
-        changeablesList.addChangeable(this.abbreviationField);
-        changeablesList.addChangeable(this.descriptionField);
 
         return panel;
     }

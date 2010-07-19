@@ -117,8 +117,12 @@ public abstract class AbstractFastAnalysisTab extends JPanel implements FastAnal
     }
 
     public void display() {
+
         this.populateFields();
+        this.addChangables();
     }
+
+    abstract void addChangables();
 
     abstract void populateFields();
 

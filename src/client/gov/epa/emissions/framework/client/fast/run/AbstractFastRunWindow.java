@@ -232,6 +232,7 @@ public abstract class AbstractFastRunWindow extends DisposableInteralFrame imple
     }
 
     protected void doClose() {
+
         try {
             if (shouldDiscardChanges()) {
                 presenter.doClose();

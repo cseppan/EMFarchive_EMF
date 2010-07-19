@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.fast.run.tabs;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
@@ -8,6 +9,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.fast.AbstractFastAction;
+import gov.epa.emissions.framework.client.fast.ChangeableImpl;
 import gov.epa.emissions.framework.client.fast.run.FastRunPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -27,12 +29,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class FastRunInventoriesTab extends AbstractFastRunTab {
 
     private SelectableSortFilterWrapper table;
+
+    private FastRunInventoryTableData tableData;
+
+    private ChangeableImpl changeable = new ChangeableImpl();
 
     private static final String WARNING_MESSAGE = "You have asked to open several windows. Do you want proceed?";;
 
@@ -52,6 +59,12 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
         super.display();
     }
 
+    protected void addChangables() {
+
+        ManageChangeables changeablesList = this.getChangeablesList();
+        changeablesList.addChangeable(this.changeable);
+    }
+
     protected void populateFields() {
         /*
          * no-op
@@ -59,10 +72,6 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
     }
 
     public void save(FastRun run) throws EmfException {
-
-        if (false) {
-            throw new RuntimeException("asdf asdf asdfasd asd fasd");
-        }
 
         this.clearMessage();
 
@@ -89,7 +98,8 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
         // FastNonPointDataset[] fastNonPointDatasets = session.fastService().getFastNonPointDatasets();
         // FastDatasetMap.getInstance().initMap(fastDatasets, fastNonPointDatasets);
 
-        this.table.refresh(new FastRunInventoryTableData(this.getRun().getInventories()));
+        this.tableData = new FastRunInventoryTableData(this.getRun().getInventories());
+        this.table.refresh(this.tableData);
     }
 
     private JPanel createCrudPanel() {
@@ -189,16 +199,7 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
 
                 run.setInventories(inputInventories.toArray(new FastRunInventory[0]));
 
-                // Command saveCommand = new AbstractCommand(this) {
-                // public void execute() throws EmfException {
-                //
-                // for (FastDatasetWrapper fastDatasetWrapper : datasetWrappers) {
-                // presenter.doSaveDataset(fastDatasetWrapper);
-                // }
-                // }
-                // };
-                //
-                // this.executeCommand(saveCommand);
+                this.changeable.notifyChanges();
                 this.refresh(run);
             }
         } catch (Exception exp) {
@@ -206,22 +207,41 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
         }
     }
 
-    private void removeSelectedInventories() throws EmfException {
+    private List<FastRunInventory> getSelected() {
+        return (List<FastRunInventory>) this.table.selected();
     }
 
-    private void editSelectedInventories() throws EmfException {
+    private void removeSelectedInventories() throws EmfException {
+
+        this.clearMessage();
+        List<FastRunInventory> selected = this.getSelected();
+
+        if (selected.size() == 0) {
+            this.showError("Please select one or more Fast run inventories to remove");
+        } else {
+
+            String title = "Warning";
+            String message = "Are you sure you want to remove the selected Fast run inventories?";
+            int selection = JOptionPane.showConfirmDialog(this.getParentConsole(), message, title,
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+            if (selection == JOptionPane.YES_OPTION) {
+
+                FastRun run = this.getRun();
+                run.removeInventories(selected);
+                this.getPresenter().fireTracking();
+                this.changeable.notifyChanges();
+                this.refresh(run);
+            }
+        }
     }
 
     private JPanel createTablePanel(FastRun run, EmfConsole parentConsole, EmfSession session) {
 
         JPanel tablePanel = new JPanel(new BorderLayout());
 
-        // FastDataset[] fastDatasets = session.fastService().getFastDatasets();
-        // FastNonPointDataset[] fastNonPointDatasets = session.fastService().getFastNonPointDatasets();
-        // FastDatasetMap.getInstance().initMap(fastDatasets, fastNonPointDatasets);
-
-        this.table = new SelectableSortFilterWrapper(parentConsole,
-                new FastRunInventoryTableData(run.getInventories()), sortCriteria());
+        this.tableData = new FastRunInventoryTableData(run.getInventories());
+        this.table = new SelectableSortFilterWrapper(parentConsole, this.tableData, sortCriteria());
         tablePanel.add(this.table, BorderLayout.CENTER);
 
         return tablePanel;

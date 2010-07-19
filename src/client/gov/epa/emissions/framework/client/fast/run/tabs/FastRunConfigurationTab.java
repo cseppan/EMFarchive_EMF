@@ -3,7 +3,10 @@ package gov.epa.emissions.framework.client.fast.run.tabs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.Changeable;
+import gov.epa.emissions.commons.gui.Changeables;
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -37,7 +40,10 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
 @SuppressWarnings("serial")
 public class FastRunConfigurationTab extends AbstractFastRunTab {
@@ -50,7 +56,7 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
 
     private ComboBox speciesMappingDatasetVersionComboBox;
 
-    private JList pollutantList;
+    private PollutantList pollutantList;
 
     private TextField transferCoeffDatasetField;
 
@@ -79,6 +85,23 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
         this.setLayout(new BorderLayout());
         this.add(this.createMiddlePane(), BorderLayout.CENTER);
         super.display();
+    }
+
+    protected void addChangables() {
+
+        ManageChangeables changeablesList = this.getChangeablesList();
+        changeablesList.addChangeable(this.invTableDatasetField);
+        changeablesList.addChangeable(this.invTableDatasetVersionComboBox);
+        changeablesList.addChangeable(this.speciesMappingDatasetField);
+        changeablesList.addChangeable(this.speciesMappingDatasetVersionComboBox);
+        changeablesList.addChangeable(this.transferCoeffDatasetField);
+        changeablesList.addChangeable(this.transferCoeffDatasetDatasetVersionComboBox);
+        changeablesList.addChangeable(this.gridCombobox);
+        changeablesList.addChangeable(this.domainPopulationDatasetField);
+        changeablesList.addChangeable(this.domainPopulationDatasetVersionComboBox);
+        changeablesList.addChangeable(this.cancerRiskDatasetField);
+        changeablesList.addChangeable(this.cancerRiskDatasetVersionComboBox);
+        changeablesList.addChangeable(this.pollutantList);
     }
 
     protected void populateFields() {
@@ -310,7 +333,7 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
             constraints.anchor = GridBagConstraints.WEST;
             constraints.insets = valueInsets;
 
-            this.pollutantList = new JList();
+            this.pollutantList = new PollutantList();
             this.pollutantList.setVisibleRowCount(5);
             this.pollutantList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
@@ -771,5 +794,50 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
         // this.nameField.setEditable(false);
         // this.abbreviationField.setEditable(false);
         // this.descriptionField.setEditable(false);
+    }
+
+    class PollutantList extends JList implements Changeable {
+
+        private boolean changed;
+
+        private Changeables changeables;
+
+        public void clear() {
+            this.changed = false;
+        }
+
+        public boolean hasChanges() {
+            return this.changed;
+        }
+
+        public void observe(Changeables changeables) {
+            this.changeables = changeables;
+            addListDataListener();
+        }
+
+        private void addListDataListener() {
+            ListModel model = this.getModel();
+            model.addListDataListener(new ListDataListener() {
+                public void contentsChanged(ListDataEvent e) {
+                    notifyChanges();
+                }
+
+                public void intervalAdded(ListDataEvent e) {
+                    notifyChanges();
+                }
+
+                public void intervalRemoved(ListDataEvent e) {
+                    notifyChanges();
+                }
+            });
+        }
+
+        void notifyChanges() {
+
+            this.changed = true;
+            if (this.changeables != null) {
+                this.changeables.onChanges();
+            }
+        }
     }
 }

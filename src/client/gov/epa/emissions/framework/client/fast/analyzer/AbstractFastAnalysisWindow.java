@@ -244,6 +244,7 @@ public abstract class AbstractFastAnalysisWindow extends DisposableInteralFrame 
     }
 
     protected void doClose() {
+        
         try {
             if (shouldDiscardChanges()) {
                 presenter.doClose();

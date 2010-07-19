@@ -74,10 +74,6 @@ public class FastAnalysisEditorPresenterImpl implements FastAnalysisPresenter {
 
     protected void refreshTabs() {
 
-        if (false) {
-            throw new RuntimeException("asdf asdfasdf asdfasdf a");
-        }
-
         for (FastAnalysisTabPresenter presenter : this.presenters) {
             presenter.doRefresh(this.analysis);
         }

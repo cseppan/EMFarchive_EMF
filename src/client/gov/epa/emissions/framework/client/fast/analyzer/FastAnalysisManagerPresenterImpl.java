@@ -57,10 +57,6 @@ public class FastAnalysisManagerPresenterImpl implements RefreshObserver, FastAn
 
     public void doEdit(int id) throws EmfException {
 
-        if (false) {
-            throw new RuntimeException("iasdf");
-        }
-
         FastAnalysisView editorView = new FastAnalysisEditorWindow(this.view.getDesktopManager(), session, this.view
                 .getParentConsole());
         FastAnalysisPresenter presenter = new FastAnalysisEditorPresenterImpl(id, session, editorView, this);

@@ -57,6 +57,12 @@ public class FastRunOutputsTab extends AbstractFastRunTab {
         super.display();
     }
 
+    protected void addChangables() {
+        /*
+         * no-op
+         */
+    }
+
     protected void populateFields() {
         /*
          * no-op
@@ -179,10 +185,6 @@ public class FastRunOutputsTab extends AbstractFastRunTab {
     }
 
     private void doExport() {
-
-        if (false) {
-            throw new RuntimeException("asdfa sdfas asdf");
-        }
 
         List<FastRunOutput> runOutputs = getSelected();
         if (runOutputs.isEmpty()) {

@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -65,6 +66,17 @@ public class FastAnalysisConfigurationTab extends AbstractFastAnalysisTab {
         this.setLayout(new BorderLayout());
         this.add(this.createMiddlePane(), BorderLayout.CENTER);
         super.display();
+    }
+
+    
+    protected void addChangables() {
+
+        ManageChangeables changeablesList = this.getChangeablesList();
+        changeablesList.addChangeable(this.gridCombobox);
+        changeablesList.addChangeable(this.baselineRunCombobox);
+        changeablesList.addChangeable(this.sensitivityRunCombobox);
+        changeablesList.addChangeable(this.cancerRiskDatasetField);
+        changeablesList.addChangeable(this.cancerRiskDatasetVersionComboBox);
     }
 
     protected void populateFields() {

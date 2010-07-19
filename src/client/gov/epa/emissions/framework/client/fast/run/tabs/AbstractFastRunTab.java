@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.fast.run.tabs;
 
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
+import gov.epa.emissions.framework.client.EmfPanel;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -73,6 +74,10 @@ public abstract class AbstractFastRunTab extends JPanel implements FastRunTabVie
         return parentInternalFrame.getDesktopPane();
     }
 
+    public EmfInternalFrame getParenetInternalFrame() {
+        return this.parentInternalFrame;
+    }
+
     public EmfSession getSession() {
         return session;
     }
@@ -120,8 +125,12 @@ public abstract class AbstractFastRunTab extends JPanel implements FastRunTabVie
     }
 
     public void display() {
+
         this.populateFields();
+        this.addChangables();
     }
+
+    abstract void addChangables();
 
     abstract void populateFields();
 
