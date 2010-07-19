@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.fast.analyzer.edit;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.fast.ExportPresenter;
+import gov.epa.emissions.framework.client.fast.ExportView;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisManagerPresenter;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisTabView;
@@ -12,6 +14,7 @@ import gov.epa.emissions.framework.client.fast.analyzer.tabs.FastAnalysisTabPres
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
+import gov.epa.emissions.framework.services.fast.FastOutputExportWrapper;
 import gov.epa.emissions.framework.services.fast.FastService;
 
 import java.util.ArrayList;
@@ -48,6 +51,22 @@ public class FastAnalysisEditorPresenterImpl implements FastAnalysisPresenter {
 
     public void doRefresh() throws EmfException {
         this.refreshTabs();
+    }
+
+    public void doViewData(int id) throws EmfException {
+        throw new EmfException("View data not implemented.");
+    }
+
+    public void doExport(ExportView exportView, ExportPresenter presenter,
+            List<FastOutputExportWrapper> outputExportWrappers) throws EmfException {
+
+        if (outputExportWrappers.size() == 0) {
+            view.showMessage("To Export outputs, you will need to select at least one output");
+        } else {
+
+            view.clearMessage();
+            presenter.display(exportView);
+        }
     }
 
     protected void refreshTabs() {

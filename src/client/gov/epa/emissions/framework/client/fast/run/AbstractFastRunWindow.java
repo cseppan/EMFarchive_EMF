@@ -79,8 +79,8 @@ public abstract class AbstractFastRunWindow extends DisposableInteralFrame imple
     protected JComponent createSummaryTab(FastRun run) {
 
         try {
-            FastRunSummaryTab tab = new FastRunSummaryTab(run, session, messagePanel, this, parentConsole,
-                    this.presenter);
+            FastRunSummaryTab tab = new FastRunSummaryTab(run, session, messagePanel, this, this.desktopManager,
+                    parentConsole, this.presenter);
             this.presenter.addTab(tab);
             return tab;
         } catch (EmfException e) {
@@ -94,8 +94,8 @@ public abstract class AbstractFastRunWindow extends DisposableInteralFrame imple
     protected JComponent createConfigurationTab(FastRun run) {
 
         try {
-            FastRunConfigurationTab tab = new FastRunConfigurationTab(run, session, messagePanel, this, parentConsole,
-                    this.presenter);
+            FastRunConfigurationTab tab = new FastRunConfigurationTab(run, session, messagePanel, this,
+                    this.desktopManager, parentConsole, this.presenter);
             this.presenter.addTab(tab);
             return tab;
         } catch (EmfException e) {
@@ -109,8 +109,8 @@ public abstract class AbstractFastRunWindow extends DisposableInteralFrame imple
     protected JComponent createInventoriesTab(FastRun run) {
 
         try {
-            FastRunInventoriesTab tab = new FastRunInventoriesTab(run, session, messagePanel, this, parentConsole,
-                    this.presenter);
+            FastRunInventoriesTab tab = new FastRunInventoriesTab(run, session, messagePanel, this,
+                    this.desktopManager, parentConsole, this.presenter);
             this.presenter.addTab(tab);
             return tab;
         } catch (EmfException e) {
@@ -124,8 +124,8 @@ public abstract class AbstractFastRunWindow extends DisposableInteralFrame imple
     protected JComponent createOutputsTab(FastRun run) {
 
         try {
-            FastRunOutputsTab tab = new FastRunOutputsTab(run, session, messagePanel, this, parentConsole,
-                    this.presenter);
+            FastRunOutputsTab tab = new FastRunOutputsTab(run, session, messagePanel, this, this.desktopManager,
+                    parentConsole, this.presenter);
             this.presenter.addTab(tab);
             return tab;
         } catch (EmfException e) {

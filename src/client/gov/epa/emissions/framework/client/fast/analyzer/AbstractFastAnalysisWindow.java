@@ -62,8 +62,20 @@ public abstract class AbstractFastAnalysisWindow extends DisposableInteralFrame 
         this.presenter = presenter;
     }
 
+    public EmfSession getSession() {
+        return session;
+    }
+
+    public EmfConsole getParentConsole() {
+        return parentConsole;
+    }
+
     protected MessagePanel getMessagePanel() {
         return this.messagePanel;
+    }
+
+    public FastAnalysisPresenter getPresenter() {
+        return presenter;
     }
 
     public void display(FastAnalysis analysis) {
@@ -79,7 +91,7 @@ public abstract class AbstractFastAnalysisWindow extends DisposableInteralFrame 
 
         try {
             FastAnalysisSummaryTab tab = new FastAnalysisSummaryTab(analysis, session, messagePanel, this,
-                    parentConsole, this.presenter);
+                    this.desktopManager, parentConsole, this.presenter);
             this.presenter.addTab(tab);
             return tab;
         } catch (EmfException e) {
@@ -94,7 +106,7 @@ public abstract class AbstractFastAnalysisWindow extends DisposableInteralFrame 
 
         try {
             FastAnalysisConfigurationTab tab = new FastAnalysisConfigurationTab(analysis, session, messagePanel, this,
-                    parentConsole, this.presenter);
+                    this.desktopManager, parentConsole, this.presenter);
             this.presenter.addTab(tab);
             return tab;
         } catch (EmfException e) {
@@ -125,7 +137,7 @@ public abstract class AbstractFastAnalysisWindow extends DisposableInteralFrame 
 
         try {
             FastAnalysisOutputsTab tab = new FastAnalysisOutputsTab(analysis, session, messagePanel, this,
-                    parentConsole, this.presenter);
+                    this.desktopManager, parentConsole, this.presenter);
             this.presenter.addTab(tab);
             return tab;
         } catch (EmfException e) {

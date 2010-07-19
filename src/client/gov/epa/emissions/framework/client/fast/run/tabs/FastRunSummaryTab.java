@@ -5,8 +5,10 @@ import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.util.CustomDateFormat;
+import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.fast.run.FastRunPresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -48,9 +50,10 @@ public class FastRunSummaryTab extends AbstractFastRunTab {
     private JLabel lastModifiedByValueLabel;
 
     public FastRunSummaryTab(FastRun run, EmfSession session, MessagePanel messagePanel,
-            ManageChangeables changeablesList, EmfConsole parentConsole, FastRunPresenter presenter) {
+            EmfInternalFrame parentInternalFrame, DesktopManager desktopManager, EmfConsole parentConsole,
+            FastRunPresenter presenter) {
 
-        super(run, session, messagePanel, changeablesList, parentConsole, presenter);
+        super(run, session, messagePanel, parentInternalFrame, desktopManager, parentConsole, presenter);
         this.setName("Summary");
     }
 

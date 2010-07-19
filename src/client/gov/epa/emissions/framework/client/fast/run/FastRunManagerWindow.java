@@ -176,6 +176,7 @@ public class FastRunManagerWindow extends AbstractMPSDTManagerTab implements
 				exportRuns();
 			}
 		});
+		exportButton.setEnabled(false);
 		buttonPanel.add(exportButton);
 
 		return buttonPanel;

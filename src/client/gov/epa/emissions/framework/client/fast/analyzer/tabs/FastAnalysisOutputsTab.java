@@ -1,18 +1,30 @@
 package gov.epa.emissions.framework.client.fast.analyzer.tabs;
 
-import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.fast.ExportPresenter;
+import gov.epa.emissions.framework.client.fast.ExportPresenterImpl;
+import gov.epa.emissions.framework.client.fast.ExportWindow;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
 import gov.epa.emissions.framework.services.fast.FastAnalysisOutput;
+import gov.epa.emissions.framework.services.fast.FastOutputExportWrapper;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
@@ -20,10 +32,13 @@ public class FastAnalysisOutputsTab extends AbstractFastAnalysisTab {
 
     private SelectableSortFilterWrapper table;
 
-    public FastAnalysisOutputsTab(FastAnalysis analysis, EmfSession session, MessagePanel messagePanel,
-            ManageChangeables changeablesList, EmfConsole parentConsole, FastAnalysisPresenter presenter) {
+    private static final String ROOT_SELECT_PROMPT = "Please select one or more Fast analysis outputs to ";
 
-        super(analysis, session, messagePanel, changeablesList, parentConsole, presenter);
+    public FastAnalysisOutputsTab(FastAnalysis analysis, EmfSession session, MessagePanel messagePanel,
+            EmfInternalFrame parentInternalFrame, DesktopManager desktopManager, EmfConsole parentConsole,
+            FastAnalysisPresenter presenter) {
+
+        super(analysis, session, messagePanel, parentInternalFrame, desktopManager, parentConsole, presenter);
         this.setName("Outputs");
     }
 
@@ -31,6 +46,7 @@ public class FastAnalysisOutputsTab extends AbstractFastAnalysisTab {
 
         this.setLayout(new BorderLayout());
         this.add(createTablePanel(this.getAnalysis(), this.getParentConsole(), this.getSession()), BorderLayout.CENTER);
+        this.add(createButtonsPanel(), BorderLayout.PAGE_END);
         super.display();
     }
 
@@ -63,6 +79,93 @@ public class FastAnalysisOutputsTab extends AbstractFastAnalysisTab {
         return tablePanel;
     }
 
+    protected JPanel createButtonsPanel() {
+
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JPanel container = new JPanel();
+        FlowLayout layout = new FlowLayout();
+        layout.setHgap(10);
+        layout.setVgap(5);
+        container.setLayout(layout);
+
+        Button viewDataButton = new Button("View Data", getViewDataAction());
+        viewDataButton.setEnabled(false);
+        container.add(viewDataButton);
+
+        Button exportButton = new Button("Export to Shapefile", getExportAction());
+        container.add(exportButton);
+
+        panel.add(container, BorderLayout.LINE_START);
+
+        return panel;
+    }
+
+    private Action getViewDataAction() {
+
+        return new AbstractAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                doViewData();
+            }
+        };
+    }
+
+    private void doViewData() {
+
+        List<FastAnalysisOutput> analysisOutputs = getSelected();
+        if (analysisOutputs.isEmpty()) {
+            this.showMessage(ROOT_SELECT_PROMPT + "edit.");
+        } else {
+            for (FastAnalysisOutput analysisOutput : analysisOutputs) {
+
+                try {
+                    this.getPresenter().doViewData(analysisOutput.getOutputDataset().getId());
+                } catch (EmfException e) {
+                    showError("Error viewing Fast analysis output: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    private Action getExportAction() {
+
+        return new AbstractAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                doExport();
+            }
+        };
+    }
+
+    private void doExport() {
+
+        List<FastAnalysisOutput> analysisOutputs = getSelected();
+        if (analysisOutputs.isEmpty()) {
+            this.showMessage(ROOT_SELECT_PROMPT + "export.");
+        } else {
+
+            List<FastOutputExportWrapper> wrappers = new ArrayList<FastOutputExportWrapper>();
+            FastAnalysis analysis = this.getAnalysis();
+            for (FastAnalysisOutput analysisOutput : analysisOutputs) {
+                wrappers.add(new FastOutputExportWrapper(analysis, analysisOutput));
+            }
+
+            ExportWindow exportView = new ExportWindow(wrappers, this.getDesktopManager(), this.getParentConsole(),
+                    this.getSession());
+            getDesktopPane().add(exportView);
+
+            ExportPresenter exportPresenter = new ExportPresenterImpl(this.getSession());
+
+            try {
+                this.getPresenter().doExport(exportView, exportPresenter, wrappers);
+            } catch (EmfException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
     private FastAnalysisOutput[] getFastAnalysisOutputs() {
 
         FastAnalysisOutput[] analysisOutputs = new FastAnalysisOutput[0];
@@ -85,5 +188,9 @@ public class FastAnalysisOutputsTab extends AbstractFastAnalysisTab {
     }
 
     public void viewOnly() {
+    }
+
+    private List<FastAnalysisOutput> getSelected() {
+        return (List<FastAnalysisOutput>) table.selected();
     }
 }

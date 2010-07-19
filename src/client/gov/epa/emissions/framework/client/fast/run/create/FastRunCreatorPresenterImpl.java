@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.fast.run.create;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.fast.ExportPresenter;
+import gov.epa.emissions.framework.client.fast.ExportView;
 import gov.epa.emissions.framework.client.fast.run.FastRunManagerPresenter;
 import gov.epa.emissions.framework.client.fast.run.FastRunPresenter;
 import gov.epa.emissions.framework.client.fast.run.FastRunView;
@@ -11,6 +13,7 @@ import gov.epa.emissions.framework.client.fast.run.tabs.FastRunTabPresenterImpl;
 import gov.epa.emissions.framework.client.fast.run.tabs.FastRunTabView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.fast.FastOutputExportWrapper;
 import gov.epa.emissions.framework.services.fast.FastRun;
 import gov.epa.emissions.framework.services.fast.FastService;
 
@@ -57,6 +60,22 @@ public class FastRunCreatorPresenterImpl implements FastRunPresenter {
         this.presenters.add(tabPresenter);
     }
 
+    public void doViewData(int id) throws EmfException {
+        throw new EmfException("View data not implemented.");
+    }
+
+    public void doExport(ExportView exportView, ExportPresenter presenter,
+            List<FastOutputExportWrapper> outputExportWrappers) throws EmfException {
+
+        if (outputExportWrappers.size() == 0) {
+            view.showMessage("To Export outputs, you will need to select at least one output");
+        } else {
+
+            view.clearMessage();
+            presenter.display(exportView);
+        }
+    }
+
     public void doDisplay() {
 
         this.view.observe(this);
@@ -81,7 +100,7 @@ public class FastRunCreatorPresenterImpl implements FastRunPresenter {
     }
 
     public void doRun() throws EmfException {
-        
+
         this.doSave();
         this.getService().runFastRun(this.session.user(), this.run.getId());
     }

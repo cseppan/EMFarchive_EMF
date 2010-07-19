@@ -53,6 +53,8 @@ public class FastDatasetSelectionDialog extends JDialog implements FastDatasetSe
 
         this.setIconImage(EmfImageTool.createImage("/logo.JPG"));
         this.setModal(true);
+        
+        this.setTitle("Select FAST Dataset");
     }
 
     public void display() {

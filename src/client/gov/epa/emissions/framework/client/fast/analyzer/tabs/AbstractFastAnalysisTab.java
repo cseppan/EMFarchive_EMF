@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.client.fast.analyzer.tabs;
 
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisTabView;
@@ -11,6 +13,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.Cursor;
 
+import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
@@ -20,23 +23,31 @@ public abstract class AbstractFastAnalysisTab extends JPanel implements FastAnal
 
     private MessagePanel messagePanel;
 
-    private ManageChangeables changeablesList;
+    private EmfInternalFrame parentInternalFrame;
 
     private EmfSession session;
 
     private EmfConsole parentConsole;
 
+    private DesktopManager desktopManager;
+
     private FastAnalysisPresenter presenter;
 
     public AbstractFastAnalysisTab(FastAnalysis analysis, EmfSession session, MessagePanel messagePanel,
-            ManageChangeables changeablesList, EmfConsole parentConsole, FastAnalysisPresenter presenter) {
+            EmfInternalFrame parentInternalFrame, DesktopManager desktopManager, EmfConsole parentConsole,
+            FastAnalysisPresenter presenter) {
 
         this.analysis = analysis;
         this.session = session;
         this.messagePanel = messagePanel;
-        this.changeablesList = changeablesList;
+        this.parentInternalFrame = parentInternalFrame;
         this.parentConsole = parentConsole;
         this.presenter = presenter;
+        this.desktopManager = desktopManager;
+    }
+
+    public DesktopManager getDesktopManager() {
+        return desktopManager;
     }
 
     public FastAnalysis getAnalysis() {
@@ -52,7 +63,11 @@ public abstract class AbstractFastAnalysisTab extends JPanel implements FastAnal
     }
 
     public ManageChangeables getChangeablesList() {
-        return changeablesList;
+        return parentInternalFrame;
+    }
+
+    public JDesktopPane getDesktopPane() {
+        return parentInternalFrame.getDesktopPane();
     }
 
     public EmfSession getSession() {

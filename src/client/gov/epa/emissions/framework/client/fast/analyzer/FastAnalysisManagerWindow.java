@@ -115,15 +115,15 @@ public class FastAnalysisManagerWindow extends AbstractMPSDTManagerTab
 
 	protected JPanel createButtonPanel() {
 
-		JPanel crudPanel = new JPanel();
-		crudPanel.setLayout(new FlowLayout());
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new FlowLayout());
 
 		String message = "You have asked to open a lot of windows. Do you want proceed?";
 		ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning",
 				this);
 
-		crudPanel.add(viewButton(confirmDialog));
-		crudPanel.add(editButton(confirmDialog));
+		buttonPanel.add(viewButton(confirmDialog));
+		buttonPanel.add(editButton(confirmDialog));
 
 		Button newButton = new NewButton(new AbstractFastAction(this
 				.getMessagePanel(), "Error creating Fast analysis") {
@@ -133,7 +133,7 @@ public class FastAnalysisManagerWindow extends AbstractMPSDTManagerTab
 				createNewAnalysis();
 			}
 		});
-		crudPanel.add(newButton);
+		buttonPanel.add(newButton);
 
 		Button removeButton = new RemoveButton(new AbstractFastAction(this
 				.getMessagePanel(), "Error removing Fast analyses") {
@@ -143,7 +143,7 @@ public class FastAnalysisManagerWindow extends AbstractMPSDTManagerTab
 				removeAnalyses();
 			}
 		});
-		crudPanel.add(removeButton);
+		buttonPanel.add(removeButton);
 
 		Button copyButton = new CopyButton(new AbstractFastAction(this
 				.getMessagePanel(), "Error copying Fast analyses") {
@@ -153,7 +153,7 @@ public class FastAnalysisManagerWindow extends AbstractMPSDTManagerTab
 				copyAnalyses();
 			}
 		});
-		crudPanel.add(copyButton);
+		buttonPanel.add(copyButton);
 
 		Button analyzeButton = new Button("Analyze", new AbstractFastAction(
 				this.getMessagePanel(), "Error running Fast analyses") {
@@ -163,7 +163,7 @@ public class FastAnalysisManagerWindow extends AbstractMPSDTManagerTab
 				runAnalyses();
 			}
 		});
-		crudPanel.add(analyzeButton);
+		buttonPanel.add(analyzeButton);
 
 		Button exportButton = new Button("Export", new AbstractFastAction(this
 				.getMessagePanel(), "Error exporting Fast analyses") {
@@ -173,9 +173,11 @@ public class FastAnalysisManagerWindow extends AbstractMPSDTManagerTab
 				exportAnalyses();
 			}
 		});
-		crudPanel.add(exportButton);
+        exportButton.setEnabled(false);
 
-		return crudPanel;
+		buttonPanel.add(exportButton);
+
+		return buttonPanel;
 	}
 
 	private SelectAwareButton editButton(ConfirmDialog confirmDialog) {
@@ -205,6 +207,7 @@ public class FastAnalysisManagerWindow extends AbstractMPSDTManagerTab
 
 		SelectAwareButton viewButton = new SelectAwareButton("View",
 				viewAction, this.table, confirmDialog);
+		viewButton.setEnabled(false);
 		return viewButton;
 	}
 

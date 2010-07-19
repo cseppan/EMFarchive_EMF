@@ -1,10 +1,11 @@
 package gov.epa.emissions.framework.client.fast.run.tabs;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.RemoveButton;
+import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.fast.AbstractFastAction;
 import gov.epa.emissions.framework.client.fast.run.FastRunPresenter;
@@ -36,9 +37,10 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
     private static final String WARNING_MESSAGE = "You have asked to open several windows. Do you want proceed?";;
 
     public FastRunInventoriesTab(FastRun run, EmfSession session, MessagePanel messagePanel,
-            ManageChangeables changeablesList, EmfConsole parentConsole, FastRunPresenter presenter) {
+            EmfInternalFrame parentInternalFrame, DesktopManager desktopManager, EmfConsole parentConsole,
+            FastRunPresenter presenter) {
 
-        super(run, session, messagePanel, changeablesList, parentConsole, presenter);
+        super(run, session, messagePanel, parentInternalFrame, desktopManager, parentConsole, presenter);
         this.setName("Inventories");
     }
 
@@ -61,7 +63,7 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
         if (false) {
             throw new RuntimeException("asdf asdf asdfasd asd fasd");
         }
-        
+
         this.clearMessage();
 
         validateFields();

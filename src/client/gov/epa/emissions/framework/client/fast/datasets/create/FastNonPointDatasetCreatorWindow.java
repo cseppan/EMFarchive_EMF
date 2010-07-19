@@ -128,7 +128,7 @@ public class FastNonPointDatasetCreatorWindow extends AbstractFastDatasetWindow 
             constraints.anchor = GridBagConstraints.WEST;
             constraints.insets = labelInsets;
 
-            JLabel smokeLabel = new JLabel("SMOKE Dataset:");
+            JLabel smokeLabel = new JLabel("SMOKE Report Dataset:");
             panel.add(smokeLabel, constraints);
 
             constraints.gridx = 1;
@@ -137,7 +137,7 @@ public class FastNonPointDatasetCreatorWindow extends AbstractFastDatasetWindow 
             constraints.anchor = GridBagConstraints.WEST;
             constraints.insets = valueInsets;
 
-            this.smokeDatasetField = new TextField("SMOKE Dataset Name", 45);
+            this.smokeDatasetField = new TextField("SMOKE Report Dataset Name", 45);
             this.smokeDatasetField.setPreferredSize(fieldSize);
             this.smokeDatasetField.setEditable(false);
             this.smokeDatasetField.setBackground(Color.WHITE);
@@ -256,7 +256,7 @@ public class FastNonPointDatasetCreatorWindow extends AbstractFastDatasetWindow 
             constraints.anchor = GridBagConstraints.WEST;
             constraints.insets = labelInsets;
 
-            JLabel invTableLabel = new JLabel("Inv Table Dataset:");
+            JLabel invTableLabel = new JLabel("Inventory Table Dataset:");
             panel.add(invTableLabel, constraints);
 
             constraints.gridx = 1;
@@ -265,7 +265,7 @@ public class FastNonPointDatasetCreatorWindow extends AbstractFastDatasetWindow 
             constraints.anchor = GridBagConstraints.WEST;
             constraints.insets = valueInsets;
 
-            this.invTableDatasetField = new TextField("Inv Table Dataset", 45);
+            this.invTableDatasetField = new TextField("Inventory Table Dataset", 45);
             this.invTableDatasetField.setPreferredSize(fieldSize);
             this.invTableDatasetField.setEditable(false);
             this.invTableDatasetField.setBackground(Color.WHITE);
@@ -363,10 +363,16 @@ public class FastNonPointDatasetCreatorWindow extends AbstractFastDatasetWindow 
 
     private void getSmokeDataset() throws EmfException {
 
-        InputDatasetSelectionView view = new InputDatasetSelectionDialog(this.getParentConsole());
-
         // TODO Fix this!
-        DatasetType datasetType = this.getPresenter().getDatasetType(DatasetType.SMOKE_REPORT);
+        final DatasetType datasetType = this.getPresenter().getDatasetType(DatasetType.SMOKE_REPORT);
+        InputDatasetSelectionView view = new InputDatasetSelectionDialog(this.getParentConsole()) {
+            public void setTitle(String title) {
+
+                title = "Select SMOKE Report Dataset";
+                super.setTitle(title);
+            }
+        };
+
         InputDatasetSelectionPresenter inputDatasetPresenter = new InputDatasetSelectionPresenter(view, this
                 .getSession(), new DatasetType[] { datasetType, });
         try {
@@ -396,7 +402,13 @@ public class FastNonPointDatasetCreatorWindow extends AbstractFastDatasetWindow 
 
     private void getNonPointDataset() throws EmfException {
 
-        InputDatasetSelectionView view = new InputDatasetSelectionDialog(this.getParentConsole());
+        InputDatasetSelectionView view = new InputDatasetSelectionDialog(this.getParentConsole()) {
+            public void setTitle(String title) {
+
+                title = "Select Non-Point Dataset";
+                super.setTitle(title);
+            }
+        };
 
         List<DatasetType> datasetTypes = new ArrayList<DatasetType>(3);
         datasetTypes.add(this.getPresenter().getDatasetType(DatasetType.orlNonpointInventory));
@@ -431,7 +443,13 @@ public class FastNonPointDatasetCreatorWindow extends AbstractFastDatasetWindow 
 
     private void getInventoryTable() throws EmfException {
 
-        InputDatasetSelectionView view = new InputDatasetSelectionDialog(this.getParentConsole());
+        InputDatasetSelectionView view = new InputDatasetSelectionDialog(this.getParentConsole()) {
+            public void setTitle(String title) {
+
+                title = "Select Inventory Table Dataset";
+                super.setTitle(title);
+            }
+        };
 
         List<DatasetType> datasetTypes = new ArrayList<DatasetType>(1);
         DatasetType datasetType = this.getPresenter().getDatasetType(DatasetType.invTable);

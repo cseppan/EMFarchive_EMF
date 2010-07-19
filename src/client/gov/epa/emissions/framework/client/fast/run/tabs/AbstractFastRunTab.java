@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.client.fast.run.tabs;
 
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.fast.run.FastRunPresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -10,6 +12,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.Cursor;
 
+import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
@@ -19,7 +22,7 @@ public abstract class AbstractFastRunTab extends JPanel implements FastRunTabVie
 
     private MessagePanel messagePanel;
 
-    private ManageChangeables changeablesList;
+    private EmfInternalFrame parentInternalFrame;
 
     private EmfSession session;
 
@@ -27,15 +30,23 @@ public abstract class AbstractFastRunTab extends JPanel implements FastRunTabVie
 
     private FastRunPresenter presenter;
 
+    private DesktopManager desktopManager;
+
     public AbstractFastRunTab(FastRun run, EmfSession session, MessagePanel messagePanel,
-            ManageChangeables changeablesList, EmfConsole parentConsole, FastRunPresenter presenter) {
+            EmfInternalFrame parentInternalFrame, DesktopManager desktopManager, EmfConsole parentConsole,
+            FastRunPresenter presenter) {
 
         this.run = run;
         this.session = session;
         this.messagePanel = messagePanel;
-        this.changeablesList = changeablesList;
+        this.parentInternalFrame = parentInternalFrame;
         this.parentConsole = parentConsole;
         this.presenter = presenter;
+        this.desktopManager = desktopManager;
+    }
+
+    public DesktopManager getDesktopManager() {
+        return desktopManager;
     }
 
     public FastRunPresenter getPresenter() {
@@ -55,7 +66,11 @@ public abstract class AbstractFastRunTab extends JPanel implements FastRunTabVie
     }
 
     public ManageChangeables getChangeablesList() {
-        return changeablesList;
+        return this.parentInternalFrame;
+    }
+
+    public JDesktopPane getDesktopPane() {
+        return parentInternalFrame.getDesktopPane();
     }
 
     public EmfSession getSession() {

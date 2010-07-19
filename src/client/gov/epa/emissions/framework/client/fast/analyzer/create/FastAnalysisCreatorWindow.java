@@ -4,6 +4,9 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.fast.analyzer.AbstractFastAnalysisWindow;
+import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
+import gov.epa.emissions.framework.client.fast.analyzer.tabs.FastAnalysisConfigurationTab;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
 
 import java.awt.BorderLayout;
@@ -47,6 +50,27 @@ public class FastAnalysisCreatorWindow extends AbstractFastAnalysisWindow {
         tabbedPane.addTab(outputsTab.getName(), outputsTab);
 
         return tabbedPane;
+    }
+
+    protected JComponent createConfigurationTab(FastAnalysis analysis) {
+
+        try {
+            FastAnalysisPresenter presenter = this.getPresenter();
+            FastAnalysisConfigurationTab tab = new FastAnalysisConfigurationTab(analysis, this.getSession(), this
+                    .getMessagePanel(), this, this.desktopManager, this.getParentConsole(), presenter) {
+                protected void populateFields() {
+                    // no-op: don't need to populate anything
+                }
+            };
+
+            presenter.addTab(tab);
+            return tab;
+        } catch (EmfException e) {
+
+            String message = "Could not load Configuration Tab." + e.getMessage();
+            showError(message);
+            return createErrorTab(message);
+        }
     }
 
     public void refresh(FastAnalysis analysis) {

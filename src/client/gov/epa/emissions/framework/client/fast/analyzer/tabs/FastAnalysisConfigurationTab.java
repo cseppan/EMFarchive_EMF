@@ -4,9 +4,10 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
-import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
@@ -52,9 +53,10 @@ public class FastAnalysisConfigurationTab extends AbstractFastAnalysisTab {
     private ComboBox cancerRiskDatasetVersionComboBox;
 
     public FastAnalysisConfigurationTab(FastAnalysis analysis, EmfSession session, MessagePanel messagePanel,
-            ManageChangeables changeablesList, EmfConsole parentConsole, FastAnalysisPresenter presenter) {
+            EmfInternalFrame parentInternalFrame, DesktopManager desktopManager, EmfConsole parentConsole,
+            FastAnalysisPresenter presenter) {
 
-        super(analysis, session, messagePanel, changeablesList, parentConsole, presenter);
+        super(analysis, session, messagePanel, parentInternalFrame, desktopManager, parentConsole, presenter);
         this.setName("Configuration");
     }
 
