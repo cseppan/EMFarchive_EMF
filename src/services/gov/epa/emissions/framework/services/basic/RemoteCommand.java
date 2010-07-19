@@ -193,7 +193,7 @@ public class RemoteCommand {
         }
     }
 
-    private static int processSleep(Process p) throws EmfException {
+    public static int processSleep(Process p) throws EmfException {
         /**
          * Tests the remote process and waits a predetermined amount of time for a return
          * 
@@ -256,29 +256,30 @@ public class RemoteCommand {
 
         int errorLevel = 0;
         String[] cmds = new String[3];
-        String executeCmd = null;
-        executeCmd = sshCmd + " " + sshOptions + " " + username + "@" + hostname + " " + remoteCmd;
+        final String executeCmd = sshCmd + " " + sshOptions + " " + username + "@" + hostname + " " + remoteCmd;
         cmds[0] = unixShell;
         cmds[1] = unixOptions;
         cmds[2] = executeCmd;
 
         try {
-            Process p = Runtime.getRuntime().exec(cmds);
+            final Process p = Runtime.getRuntime().exec(cmds);
+            
+            ProcessThread waitNKill = new ProcessThread(p, executeCmd, 300000);
+            waitNKill.start(); //Starts the tick and ready to kill the process p after 5 minutes
 
-            errorLevel = processSleep(p);
+            errorLevel = p.waitFor(); //If timeout (5 minutes), process has been terminated by now
+            waitNKill.done(); //If not timeout, tell the thread to stop itself
 
             if (errorLevel > 0) {
                 // if have error print remote commands error message to the logs
                 // and throw an exception
-                String errorTitle = "stderr from (" + hostname + "): " + remoteCmd;
-                String errorMsg = logStderr(errorTitle, p.getErrorStream());
+                if (waitNKill.getErrorMsg() != null)
+                    throw new EmfException(waitNKill.getErrorMsg());
                 
-                if (errorMsg == null)
-                    errorMsg = "Error message not readable from remote machine.";
-
-//                throw new EmfException("ERROR executing remote command: " + executeCmd + lineSep + errorMsg);
-                throw new EmfException(errorMsg);
-
+                String errorTitle = "stderr from (" + hostname + "): " + remoteCmd;
+                logStderr(errorTitle, p.getErrorStream());
+                
+                return p.getErrorStream();
             }
 
             return p.getInputStream();
@@ -334,4 +335,59 @@ public class RemoteCommand {
             throw new EmfException("ERROR executing local command: " + e.getMessage());
         }
     }
+    
+    public static void main(String[] args) {
+        //NOTE: test Linux side (EMF server) remote access functions
+        String unixShell = "csh";
+        String unixOptions = "-c";
+        String sshOptions = "sshpass -p '" + args[1] + "' ssh -o PasswordAuthentication=yes ";
+        String[] cmds = new String[3];
+        final String executeCmd = sshOptions + " " + args[0] + "@amber.nesc.epa.gov sleep " + args[2] + ";date";
+        cmds[0] = unixShell;
+        cmds[1] = unixOptions;
+        cmds[2] = executeCmd;
+        
+        Process p = null;
+        
+        try {
+            p =  Runtime.getRuntime().exec(cmds);
+            
+            ProcessThread waitNKill = new ProcessThread(p, executeCmd, (Integer.parseInt(args[2]) - 30)*1000);
+            waitNKill.start(); //Starts the tick and ready to kill the process p after 5 minutes
+
+            int errorLevel = p.waitFor(); //If timeout (5 minutes), process has been terminated by now
+            waitNKill.done(); //If not timeout, tell the thread to stop itself
+            
+            System.out.println("error level: " + errorLevel);
+            
+            //System.out.println("local time: " + new Date());
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+        
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+        if (reader == null)
+            System.exit(1);
+
+        try {
+            String message = reader.readLine();
+            System.out.println("message is null: " + (message == null));
+            
+            while (message != null) {
+                System.out.println(message);
+                message = reader.readLine();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+    
 }
