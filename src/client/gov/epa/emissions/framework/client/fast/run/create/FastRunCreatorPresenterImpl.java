@@ -5,12 +5,15 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.fast.ExportPresenter;
 import gov.epa.emissions.framework.client.fast.ExportView;
+import gov.epa.emissions.framework.client.fast.MPSDTUtils;
 import gov.epa.emissions.framework.client.fast.run.FastRunManagerPresenter;
 import gov.epa.emissions.framework.client.fast.run.FastRunPresenter;
 import gov.epa.emissions.framework.client.fast.run.FastRunView;
 import gov.epa.emissions.framework.client.fast.run.tabs.FastRunTabPresenter;
 import gov.epa.emissions.framework.client.fast.run.tabs.FastRunTabPresenterImpl;
 import gov.epa.emissions.framework.client.fast.run.tabs.FastRunTabView;
+import gov.epa.emissions.framework.client.meta.PropertiesView;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.fast.FastOutputExportWrapper;
@@ -169,17 +172,18 @@ public class FastRunCreatorPresenterImpl implements FastRunPresenter {
     }
 
     public DatasetType getDatasetType(String name) throws EmfException {
-        return session.dataCommonsService().getDatasetType(name);
+        return MPSDTUtils.getDatasetType(this.session, name);
     }
 
     public Version[] getVersions(EmfDataset dataset) throws EmfException {
-
-        Version[] versions = new Version[0];
-
-        if (dataset != null) {
-            versions = this.session.dataEditorService().getVersions(dataset.getId());
-        }
-
-        return versions;
+        return MPSDTUtils.getVersions(this.session, dataset);
     }
+
+    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {
+
+        view.clearMessage();
+        PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
+        presenter.doDisplay(propertiesView);
+    }
+
 }

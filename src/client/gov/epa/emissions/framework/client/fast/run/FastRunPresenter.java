@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.fast.ExportPresenter;
 import gov.epa.emissions.framework.client.fast.ExportView;
 import gov.epa.emissions.framework.client.fast.run.tabs.FastRunTabView;
+import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.fast.FastOutputExportWrapper;
@@ -37,4 +38,6 @@ public interface FastRunPresenter {
 
     void doExport(ExportView exportView, ExportPresenter presenter, List<FastOutputExportWrapper> outputExportWrappers)
             throws EmfException;
+
+    void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException;
 }

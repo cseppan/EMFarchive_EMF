@@ -1,15 +1,22 @@
 package gov.epa.emissions.framework.client.fast.analyzer.tabs;
 
+import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
+import gov.epa.emissions.framework.client.data.viewer.DataViewer;
 import gov.epa.emissions.framework.client.fast.ExportPresenter;
 import gov.epa.emissions.framework.client.fast.ExportPresenterImpl;
 import gov.epa.emissions.framework.client.fast.ExportWindow;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
 import gov.epa.emissions.framework.services.fast.FastAnalysisOutput;
 import gov.epa.emissions.framework.services.fast.FastOutputExportWrapper;
@@ -89,8 +96,7 @@ public class FastAnalysisOutputsTab extends AbstractFastAnalysisTab {
         layout.setVgap(5);
         container.setLayout(layout);
 
-        Button viewDataButton = new Button("View Data", getViewDataAction());
-        viewDataButton.setEnabled(false);
+        Button viewDataButton = new Button("View Output", getViewDataAction());
         container.add(viewDataButton);
 
         Button exportButton = new Button("Export to Shapefile", getExportAction());
@@ -120,12 +126,46 @@ public class FastAnalysisOutputsTab extends AbstractFastAnalysisTab {
             for (FastAnalysisOutput analysisOutput : analysisOutputs) {
 
                 try {
-                    this.getPresenter().doViewData(analysisOutput.getOutputDataset().getId());
+                    showDatasetDataViewer(analysisOutput.getOutputDataset());
                 } catch (EmfException e) {
                     showError("Error viewing Fast analysis output: " + e.getMessage());
                 }
             }
         }
+    }
+
+    private void showDatasetDataViewer(EmfDataset dataset) throws EmfException {
+
+        EmfConsole parentConsole = this.getParentConsole();
+        DesktopManager desktopManager = this.getDesktopManager();
+        EmfSession session = this.getSession();
+        FastAnalysisPresenter presenter = this.getPresenter();
+
+        Version[] versions = presenter.getVersions(dataset);
+        if (versions.length == 1) {
+
+            DataViewer dataViewerView = new DataViewer(dataset, parentConsole, desktopManager);
+            DataViewPresenter dataViewPresenter = new DataViewPresenter(dataset, versions[0], getTableName(dataset),
+                    dataViewerView, session);
+            dataViewPresenter.display();
+        } else {
+
+            DatasetPropertiesViewer datasetPropertiesViewerView = new DatasetPropertiesViewer(session, parentConsole,
+                    desktopManager);
+            presenter.doDisplayPropertiesView(datasetPropertiesViewerView, dataset);
+            datasetPropertiesViewerView.setDefaultTab(1);
+        }
+    }
+
+    protected String getTableName(Dataset dataset) {
+
+        InternalSource[] internalSources = dataset.getInternalSources();
+        String tableName = "";
+        if (internalSources.length > 0) {
+            tableName = internalSources[0].getTable();
+        }
+
+        return tableName;
     }
 
     private Action getExportAction() {

@@ -5,12 +5,15 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.fast.ExportPresenter;
 import gov.epa.emissions.framework.client.fast.ExportView;
+import gov.epa.emissions.framework.client.fast.MPSDTUtils;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisManagerPresenter;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisTabView;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisView;
 import gov.epa.emissions.framework.client.fast.analyzer.tabs.FastAnalysisTabPresenter;
 import gov.epa.emissions.framework.client.fast.analyzer.tabs.FastAnalysisTabPresenterImpl;
+import gov.epa.emissions.framework.client.meta.PropertiesView;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
@@ -160,17 +163,17 @@ public class FastAnalysisCreatorPresenterImpl implements FastAnalysisPresenter {
     }
 
     public DatasetType getDatasetType(String name) throws EmfException {
-        return session.dataCommonsService().getDatasetType(name);
+        return MPSDTUtils.getDatasetType(this.session, name);
     }
 
     public Version[] getVersions(EmfDataset dataset) throws EmfException {
+        return MPSDTUtils.getVersions(this.session, dataset);
+    }
 
-        Version[] versions = new Version[0];
+    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) throws EmfException {
 
-        if (dataset != null) {
-            versions = this.session.dataEditorService().getVersions(dataset.getId());
-        }
-
-        return versions;
+        view.clearMessage();
+        PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
+        presenter.doDisplay(propertiesView);
     }
 }
