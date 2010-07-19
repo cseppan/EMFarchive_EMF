@@ -295,6 +295,7 @@ public class EditablePagePanel extends JPanel {
         if (regularDel == JOptionPane.YES_OPTION) {
             tableData.removeSelected();
             this.observer.update(-selected);
+            observer.refresh(rowFilter.getText(), sortOrder.getText());
             refresh();
         }
     }
@@ -334,6 +335,7 @@ public class EditablePagePanel extends JPanel {
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     tableData.removeSelected();
                     deleteAllRecords(tableData);
+                    this.observer.update(-rowCount);
                     refresh();
                     observer.refresh(rowFilter.getText(), sortOrder.getText());
                 } catch (RuntimeException e) {
