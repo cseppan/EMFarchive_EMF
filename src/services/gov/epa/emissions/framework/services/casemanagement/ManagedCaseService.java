@@ -5211,16 +5211,22 @@ public class ManagedCaseService {
         GeoRegion region = templateparam.getRegion();
         
         CaseParameter matchedParameter = null;
+        CaseJob refJob = new CaseJob();
         
         //NOTE: if templateJob is NOT null it means that this template parameter is job specific
         CaseJob templateJob = dao.getCaseJob(templateparam.getJobId(), session);
         
+        if (templateJob != null) {
+            refJob.setName(templateJob.getName());
+            refJob.setSector(templateJob.getSector());
+        }
+        
         //NOTE: if template input is job specific, this job's region (usually a generic region)
         // has to be reset to the selected region before it is used to search the relavant job
         // from the parent case
-        if (templateJob != null && templateJob.getRegion() != null) templateJob.setRegion(selectedRegion);
+        if (templateJob != null && templateJob.getRegion() != null) refJob.setRegion(selectedRegion);
         
-        CaseJob parentJob = (templateJob == null) ? null : dao.getCaseJob(parentcaseId, templateJob, session);
+        CaseJob parentJob = (templateJob == null) ? null : dao.getCaseJob(parentcaseId, refJob, session);
         
         //NOTE: if template parameter is job specific and this job doesn't exist in parent case, then there is definitely no matches
         if (templateJob != null && parentJob == null) return null;
@@ -5324,18 +5330,24 @@ public class ManagedCaseService {
             return null; // NOTE: input's got to have an environment variable.
         
         CaseInput matchedInput = null;
+        CaseJob refJob = new CaseJob();
         GeoRegion region = templateinput.getRegion();
         Sector sector = templateinput.getSector();
         
         //NOTE: if templateJob is NOT null it means that this template input is job specific
         CaseJob templateJob = dao.getCaseJob(templateinput.getCaseJobID(), session);
         
+        if (templateJob != null) {
+            refJob.setName(templateJob.getName());
+            refJob.setSector(templateJob.getSector());
+        }
+        
         //NOTE: if template input is job specific, this job's region (usually a generic region)
         // has to be reset to the selected region before it is used to search the relavant job
         // from the parent case
-        if (templateJob != null && templateJob.getRegion() != null) templateJob.setRegion(selectedRegion);
+        if (templateJob != null && templateJob.getRegion() != null) refJob.setRegion(selectedRegion);
         
-        CaseJob parentJob = (templateJob == null) ? null : dao.getCaseJob(parentcaseId, templateJob, session);
+        CaseJob parentJob = (templateJob == null) ? null : dao.getCaseJob(parentcaseId, refJob, session);
         
         //NOTE: if template input is job specific and this job doesn't exist in parent case, then there is definitely no matches
         if (templateJob != null && parentJob == null) return null;
