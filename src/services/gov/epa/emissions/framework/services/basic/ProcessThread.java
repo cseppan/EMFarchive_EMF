@@ -46,7 +46,7 @@ public class ProcessThread extends Thread {
             end = new Date().getTime();
         }
         
-        p.destroy();
+        if (!threadDone) p.destroy();
         
         if (end - start >= sleep) {
             errorMsg = "There has been no response for " + (sleep/60000) + " minutes since the command was submitted.\n" + cmd;
