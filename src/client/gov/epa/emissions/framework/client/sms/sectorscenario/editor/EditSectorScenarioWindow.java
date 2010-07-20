@@ -205,7 +205,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         panel.add(container, BorderLayout.CENTER);
 
         if (sectorScenario.getRunStatus() == null 
-                || sectorScenario.getRunStatus().equalsIgnoreCase("Finished"))
+                || !sectorScenario.getRunStatus().equalsIgnoreCase("Running"))
             enableButtons(true);
         else
             enableButtons(false);
