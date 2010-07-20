@@ -73,7 +73,7 @@ public class FastGriddedCMAQPollutantAirQualityEmissionResult {
     }
 
     public double[][] getAirQuality() {
-        double[][] airQuality = new double[][] {};
+        double[][] airQuality = null;
         for (FastGriddedInventoryPollutantAirQualityEmissionResult result : inventoryPollutantResults) {
             double[][] resultAirQuality = result.getAirQuality();
             if (resultAirQuality != null) {
@@ -86,8 +86,11 @@ public class FastGriddedCMAQPollutantAirQualityEmissionResult {
                         airQuality[x - 1][y - 1] += adjustmentFactor * resultAirQuality[x - 1][y - 1];
                     }
                 }
-            }
+            //if any of the air quality numbers are null, than set to unkown since not all info is available...
+            } else {
+                return null;
           
+            }
         }
         return airQuality;
     }

@@ -18,7 +18,7 @@ public class FastGriddedInventoryPollutantAirQualityEmissionResult {
         this.adjustmentFactor = adjustmentFactor;
         this.tranferCoefficient = tranferCoefficient;
         this.emission = new double[nCols][nRows];
-        this.airQuality = new double[nCols][nRows];
+        this.airQuality = null;//new double[nCols][nRows];
     }
 
     public void setPollutant(String inventoryPollutant) {

@@ -1221,3 +1221,54 @@ and dataset_type_id in
 from emf.dataset_types dt
 where name in ('Control Strategy Detailed Result'));
 
+-- 07/19/10 adding some drop cost equation function calls, since new version exist
+-- this must be run for the cost_equations.sql file changes.
+
+drop FUNCTION public.get_type3_equation_costs(
+	control_measure_id integer, 
+	discount_rate double precision, 
+	equipment_life double precision, 
+	capital_recovery_factor double precision, 
+	emis_reduction double precision, 
+	stack_flow_rate double precision, 
+	OUT annual_cost double precision, 
+	OUT capital_cost double precision, 
+	OUT operation_maintenance_cost double precision, 
+	OUT annualized_capital_cost double precision, 
+	OUT computed_cost_per_ton double precision);
+drop  FUNCTION public.get_type4_equation_costs(
+	control_measure_id integer, 
+	discount_rate double precision, 
+	equipment_life double precision, 
+	capital_recovery_factor double precision, 
+	emis_reduction double precision, 
+	stack_flow_rate double precision, 
+	OUT annual_cost double precision, 
+	OUT capital_cost double precision, 
+	OUT operation_maintenance_cost double precision, 
+	OUT annualized_capital_cost double precision, 
+	OUT computed_cost_per_ton double precision);
+drop FUNCTION public.get_type5_equation_costs(
+	control_measure_id integer, 
+	discount_rate double precision, 
+	equipment_life double precision, 
+	capital_recovery_factor double precision, 
+	emis_reduction double precision, 
+	stack_flow_rate double precision, 
+	OUT annual_cost double precision, 
+	OUT capital_cost double precision, 
+	OUT operation_maintenance_cost double precision, 
+	OUT annualized_capital_cost double precision, 
+	OUT computed_cost_per_ton double precision);
+drop FUNCTION public.get_type6_equation_costs(
+	control_measure_id integer, 
+	discount_rate double precision, 
+	equipment_life double precision, 
+	capital_recovery_factor double precision, 
+	emis_reduction double precision, 
+	stack_flow_rate double precision, 
+	OUT annual_cost double precision, 
+	OUT capital_cost double precision, 
+	OUT operation_maintenance_cost double precision, 
+	OUT annualized_capital_cost double precision, 
+	OUT computed_cost_per_ton double precision);

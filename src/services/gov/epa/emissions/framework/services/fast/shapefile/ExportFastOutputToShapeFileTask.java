@@ -197,6 +197,7 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
         // will hold unique list of column names, pqsql2shp doesn't like multiple columns with the same name...
         Map<String, String> cols = new HashMap<String, String>();
         Map<String, String> colAliases = new HashMap<String, String>();
+        //fast run output columns to encounter
         colAliases.put("emission", "ems");
         colAliases.put("air_quality", "aq");
         colAliases.put("population_weighted_air_quality", "aqp");
@@ -206,7 +207,23 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
         colAliases.put("grid_cell_population", "gcp");
         colAliases.put("pct_population_in_grid_cell_to_model_domain", "pp");
         colAliases.put("cmaq_pollutant", "pollutant");
-//        colAliases.put("ure", "ure");
+        
+        //fast analysis output columns to encounter
+        colAliases.put("sum_sens_emission", "ssems");
+        colAliases.put("sum_base_emission", "sbems");
+        colAliases.put("diff_sum_emission", "dsems");
+        colAliases.put("sum_sens_air_quality", "ssaq");
+        colAliases.put("sum_base_air_quality", "sbaq");
+        colAliases.put("diff_sum_air_quality", "dsaq");
+        colAliases.put("sum_sens_pop_weighted_air_quality", "ssaqp");
+        colAliases.put("sum_base_pop_weighted_air_quality", "sbaqp");
+        colAliases.put("diff_sum_pop_weighted_air_quality", "dsaqp");
+        colAliases.put("sum_sens_pop_total_cancer_risk", "sstcr");
+        colAliases.put("sum_base_pop_total_cancer_risk", "sbtcr");
+        colAliases.put("diff_sum_pop_total_cancer_risk", "dstcr");
+        colAliases.put("sum_sens_pop_weighted_cancer_risk", "sspw");
+        colAliases.put("sum_base_pop_weighted_cancer_risk", "sbpw");
+        colAliases.put("diff_sum_pop_weighted_cancer_risk", "dspw");
 
 //        EMS AQ  AQP CR  TCR PW  GCP PP  URE
 //        Emissions   AQcon   pop_weighted_AQ cancer_risk/person  total_cancer_risk   pop_weighted_cancer_risk    grid_cell_population    perc_pop_in_grid_cell_relative_to_modeling_domain   URE
@@ -227,12 +244,17 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
                 colName = md.getColumnName(i).toLowerCase();
                 if (!cols.containsKey(colName)) {
                     cols.put(colName, colName);
+                    colNames += (colNames.length() > 0 ? "," : "");
                     if (colName.equals("x")) {
-                        colNames += (colNames.length() > 0 ? "," : "") + "i." + colName;
+                        colNames += "i." + colName;
                     } else if (colName.equals("y")) {
-                        colNames += (colNames.length() > 0 ? "," : "") + "i." + colName;
+                        colNames += "i." + colName;
+                    } else if (colName.equals("sector")) {
+                        colNames += "'" + sector + "'::varchar(64) as sector";
+                    } else if (colName.equals("pollutant") || colName.equals("cmaq_pollutant")) {
+                        colNames += "'" + pollutant + "'::varchar(64) as pollutant";
                     } else {
-                        colNames += (colNames.length() > 0 ? "," : "") + colName + (!colAliases.containsKey(colName) ? "" : " as " + colAliases.get(colName));
+                        colNames += colName + (!colAliases.containsKey(colName) ? "" : " as " + colAliases.get(colName));
                     }
                 }
 

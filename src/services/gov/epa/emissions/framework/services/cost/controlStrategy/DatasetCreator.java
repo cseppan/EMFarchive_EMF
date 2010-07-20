@@ -252,6 +252,9 @@ public class DatasetCreator {
         dataset.setRegion(inputDataset.getRegion());
         dataset.setCountry(inputDataset.getCountry());
         
+        //Add keywords to the dataset specific to the input dataset
+        addKeyVals(dataset, inputDataset);
+        
         return dataset;
     }
     
@@ -274,11 +277,16 @@ public class DatasetCreator {
         dataset.setRegion(controlStrategy.getRegion());
 
         //Add keywords to the dataset
-        //addKeyVals(dataset);
+        addKeyVals(dataset);
         
         return dataset;
     }
     
+    protected void addKeyVals(EmfDataset dataset, EmfDataset inputDataset) {
+        addKeyVal(dataset, "STRATEGY_INVENTORY_NAME", inputDataset.getName());
+        addKeyVal(dataset, "STRATEGY_INVENTORY_VERSION", inputDataset.getDefaultVersion()+"");
+    }
+        
     protected void addKeyVals(EmfDataset dataset) {
         if (controlStrategy == null) return;
         //Add keywords to the dataset

@@ -45,6 +45,8 @@ public class StrategyLoader extends AbstractStrategyLoader {
         //is no point and keeping it around.
         if (strategyMessagesResult.getRecordCount() == 0) {
             deleteStrategyMessageResult(strategyMessagesResult);
+            //set it null, so it referenced later it will be known that it doesn't exist...
+            strategyMessagesResult = null;
         } else {
             strategyMessagesResult.setCompletionTime(new Date());
             strategyMessagesResult.setRunStatus("Completed.");

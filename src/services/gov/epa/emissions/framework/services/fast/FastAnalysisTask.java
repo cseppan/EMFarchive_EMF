@@ -217,7 +217,7 @@ public class FastAnalysisTask {
         EmfDataset dataset = null;
         for (FastRunOutput output : getFastRunOutputs(fastRun.getId())) {
             if (output.getOutputDataset().getDatasetType().getName().equals(
-                    DatasetType.fastGriddedSummaryEmissionAirQuality)) {
+                    DatasetType.FAST_RUN_INTERMEDIATE_AIR_QUALITY)) {
                 dataset = output.getOutputDataset();
             }
         }

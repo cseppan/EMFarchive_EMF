@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.qa;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
@@ -89,6 +90,18 @@ public class SQLECControlScenarioQuery {
 //        return value;
 //    }
 
+
+    private  KeyVal[] keyValFound(EmfDataset dataset, String keyword) {
+        KeyVal[] keys = dataset.getKeyVals();
+        List<KeyVal> list = new ArrayList<KeyVal>();
+        
+        for (KeyVal key : keys)
+            if (key.getName().equalsIgnoreCase(keyword)) 
+                list.add(key);
+        
+        return list.toArray(new KeyVal[0]);
+    }
+
     public String createCompareQuery() throws EmfException {
         String sql = "";
         String programArguments = qaStep.getProgramArguments();
@@ -134,12 +147,12 @@ public class SQLECControlScenarioQuery {
         if (gsrefNames == null) {
             errors += "Missing " + DatasetType.chemicalSpeciationCrossReferenceGSREF + " dataset(s). ";
         }
-        if (inventoryName == null || inventoryName.length() == 0) {
-            errors += "Missing inventory dataset. ";
-        }
-        if (detailedResultName == null || detailedResultName.length() == 0) {
-            errors += "Missing " + DatasetType.strategyDetailedResult + " dataset. ";
-        }
+//        if (inventoryName == null || inventoryName.length() == 0) {
+//            errors += "Missing inventory dataset. ";
+//        }
+//        if (detailedResultName == null || detailedResultName.length() == 0) {
+//            errors += "Missing " + DatasetType.strategyDetailedResult + " dataset. ";
+//        }
 
         //make sure the all the datasets actually exist
         EmfDataset[] gspros  = new EmfDataset[] {};
@@ -163,34 +176,66 @@ public class SQLECControlScenarioQuery {
             }
         }
         
-        EmfDataset inventory = null;
-        inventory = getDataset(inventoryName);
-        String inventoryTableName = qualifiedEmissionTableName(inventory);
-        String inventoryVersion = new VersionedQuery(version(inventory.getId(), inventory.getDefaultVersion()), "inv").query();
-        if (inventory == null) {
-            errors += "Uknown inventory dataset, " + inventoryName + ". ";
-        }
-        boolean isPointInventory = inventory.getDatasetType().getName().equals(DatasetType.orlPointInventory);
-        boolean isNonPointInventory = inventory.getDatasetType().getName().equals(DatasetType.orlNonpointInventory);
-        
-        //make sure tolerance dataset exists
+        //make sure detailed result dataset exists
+        //1st:  look in the arguments for it being explicitly set
+        //2nd:  if blank OR $DATASET then use the current dataset this qa program is assigned to
         EmfDataset detailedResult = null;
-        detailedResult = getDataset(detailedResultName);
-        String detailedResultTableName = qualifiedEmissionTableName(detailedResult);
-        String detailedResultVersion = new VersionedQuery(version(detailedResult.getId(), detailedResult.getDefaultVersion()), "dr").query();
+        if (detailedResultName == null || detailedResultName.length() == 0 || detailedResultName.equalsIgnoreCase("$DATASET")) {
+            detailedResult = getDataset(this.qaStep.getDatasetId());
+        } else {
+            detailedResult = getDataset(detailedResultName);
+        }
         if (detailedResult == null) {
             errors += "Uknown " + DatasetType.strategyDetailedResult + " dataset, " + detailedResultName + ". ";
+        }
+        String detailedResultTableName = qualifiedEmissionTableName(detailedResult);
+        String detailedResultVersion = new VersionedQuery(version(detailedResult.getId(), detailedResult.getDefaultVersion()), "dr").query();
+
+        EmfDataset inventory = null;
+        Integer inventoryVersionNumber = null;
+        //now lets determine the inventory
+        //1st:  look in the arguments for it being explicitly set
+        //2nd:  look in the keywords of the detailed result for the inventory name ("STRATEGY_INVENTORY_NAME") and version ("STRATEGY_INVENTORY_VERSION")
+        if (inventoryName == null || inventoryName.length() == 0) {
+            KeyVal[] keyVals = keyValFound(detailedResult, "STRATEGY_INVENTORY_NAME");
+            if (keyVals.length > 0) {
+                inventoryName = keyVals[0].getValue();
+                //also get version number...
+                keyVals = keyValFound(detailedResult, "STRATEGY_INVENTORY_VERSION");
+                if (keyVals.length > 0) {
+                    inventoryVersionNumber = new Integer(keyVals[0].getValue());
+                }
+            }
+        }
+        if (inventoryName == null || inventoryName.length() == 0) {
+            errors += "Missing inventory dataset. ";
         }
 
         //go ahead and throw error from here, no need to validate anymore if the above is not there...
         if (errors.length() > 0) {
             throw new EmfException(errors);
         }
-        
+
+        inventory = getDataset(inventoryName);
+        if (inventory == null) {
+            //then lets 
+            errors += "Uknown inventory dataset, " + inventoryName + ". ";
+        }
+
         //go ahead and throw errors from here, if there are some...
         if (errors.length() > 0) {
             throw new EmfException(errors);
         }
+        
+        //use the inventory default version if one can't be found
+        if (inventoryVersionNumber == null) 
+            inventoryVersionNumber = inventory.getDefaultVersion();
+        String inventoryTableName = qualifiedEmissionTableName(inventory);
+        String inventoryVersion = new VersionedQuery(version(inventory.getId(), inventoryVersionNumber), "inv").query();
+        boolean isPointInventory = inventory.getDatasetType().getName().equals(DatasetType.orlPointInventory);
+        boolean isMergedInventory = inventory.getDatasetType().getName().equals(DatasetType.orlMergedInventory);
+        boolean isNonPointInventory = inventory.getDatasetType().getName().equals(DatasetType.orlNonpointInventory);
+        
         
 //        capIsPoint = checkTableForColumns(emissionTableName(dataset), "plantid,pointid,stackid,segment");
 
@@ -203,7 +248,7 @@ public class SQLECControlScenarioQuery {
         
         //Outer SELECT clause
         sql = "select inv.fips,\n"
-                + (isPointInventory ?
+                + (isPointInventory || isMergedInventory ?
                         "inv.plantid,\n"
                         + "inv.pointid,\n"
                         + "inv.stackid,\n"
@@ -214,21 +259,26 @@ public class SQLECControlScenarioQuery {
                 + "inv.scc,\n"
                 + "gspro.species as poll,\n"
                 + "scc.scc_description,\n"
-                + (isPointInventory ?
+                + (isPointInventory || isMergedInventory ?
                         "inv.plant,\n"
-                        + "inv.nei_unique_id,\n"
                         : 
                         ""
                         )
-                + "coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) * gspro.massfrac as inv_ann_emis,\n"
-                + "coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * gspro.massfrac as strat_ann_emis,\n"
-                + "coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) * gspro.massfrac - coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * gspro.massfrac as inv_minus_strat_emis,\n"
-                + "case when coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) is not null and coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) != 0.0 then (coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) - coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis))) / (coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * 100.0 else null end as pct_diff_inv_minus_strat,\n"
+                + (isPointInventory ?
+                        "inv.nei_unique_id,\n"
+                        : 
+                        ""
+                        )
+                + "sum(coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * gspro.massfrac) as inv_ann_emis,\n"
+                + "sum(coalesce(dr.output_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * gspro.massfrac) as strat_ann_emis,\n"
+                + "sum(coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * gspro.massfrac) - sum(coalesce(dr.output_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * gspro.massfrac) as inv_minus_strat_emis,\n"
+                + "case when sum(coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis))) is not null and sum(coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis))) != 0.0 then (sum(coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis))) - sum(coalesce(dr.output_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)))) / (sum(coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)))) * 100.0 else null end as pct_diff_inv_minus_strat,\n"
                 + "dr.cm_abbrev,\n"
+                + "dr.apply_order,\n"
                 + "ct.name as control_technology,\n"
                 + "sg.name as source_group,\n"
-                + "dr.annual_cost\n"
-                + (isPointInventory ?
+                + "sum(dr.annual_cost) as annual_cost\n"
+                + (isPointInventory || isMergedInventory ?
                 ",inv.design_capacity,\n"
                 + "inv.design_capacity_unit_numerator,\n"
                 + "inv.design_capacity_unit_denominator\n"
@@ -240,14 +290,22 @@ public class SQLECControlScenarioQuery {
                 + "inv.ANNUAL_AVG_WEEKS_PER_YEAR,\n"
                 + "inv.ANNUAL_AVG_HOURS_PER_DAY,\n"
                 + "inv.ANNUAL_AVG_HOURS_PER_YEAR\n"
-                : 
-                ""
+                    : 
+                    (isMergedInventory ?
+                            ",inv.ANNUAL_AVG_HOURS_PER_YEAR\n\n"
+                            : 
+                            ""
+                            )
                 );
 
         sql += "from " + inventoryTableName + " inv\n"
             + "left outer join " + detailedResultTableName + " dr\n"
-            + "on dr.source_id = inv.record_id\n"
-            + "and coalesce(dr.original_dataset_id, inv.dataset_id) = inv.dataset_id\n"
+            + (isMergedInventory ?
+                    "on dr.source_id = inv.original_record_id\n"
+                    + "and dr.original_dataset_id = inv.original_dataset_id\n"
+                    : 
+                    "on dr.source_id = inv.record_id\n"
+                    )
             + "and " + detailedResultVersion + " \n"
             + "left outer join emf.control_measures cm\n"
             + "on cm.abbreviation = dr.cm_abbrev\n"
@@ -260,7 +318,10 @@ public class SQLECControlScenarioQuery {
             ;
 
         //union together all ...
-        sql += "inner join ( \n";
+        //make sure an only get one of the GSREF records, choose randomly, it should be same code, so it shouldn't matter.
+        sql += "inner join ( \n"
+        + "select distinct on (scc, code, pollutant) scc, code, pollutant\n"
+        + "from (\n";
 
         int i = 0;
         for (EmfDataset dataset : gsrefs) {
@@ -276,11 +337,12 @@ public class SQLECControlScenarioQuery {
         }
 
         sql += ") gsref\n" 
+            + ") gsref\n" 
             + "on gsref.scc = inv.scc\n"
             + "and gsref.pollutant = inv.poll\n";
 
         //union together all ...
-        //make sure an only get one of the GSPRO records, the onw with the greatest massfrac
+        //make sure an only get one of the GSPRO records, the one with the greatest massfrac
         sql += "inner join ( \n"
             + "select distinct on (code, pollutant, species) code, pollutant, species, massfrac\n"
             + "from (\n";
@@ -303,15 +365,61 @@ public class SQLECControlScenarioQuery {
         sql += ") gspro\n" 
             + "order by code, pollutant, species, massfrac desc\n"
             + ") gspro\n" 
-            + "on gsref.code = gspro.code\n";
+            + "on gspro.code = gsref.code\n"
+            + "and gspro.pollutant = 'PM2_5'\n";
         
-        sql += "where inv.poll = 'PM2_5'\n"
-            + "and " + inventoryVersion + "\n";
-
+        //added 'BRK__PM2_5','EXH__PM2_5','TIR__PM2_5' see bug 3396
+        sql += "where inv.poll in ('PM2_5','BRK__PM2_5','EXH__PM2_5','TIR__PM2_5')\n"
+            + "and " + inventoryVersion + "\n"
+            + "group by inv.fips,\n"
+            + (isPointInventory || isMergedInventory ?
+                    "inv.plantid,\n"
+                    + "inv.pointid,\n"
+                    + "inv.stackid,\n"
+                    + "inv.segment,\n"
+                    : 
+                    ""
+                    )
+            + "inv.scc,\n"
+            + "gspro.species,\n"
+            + "scc.scc_description,\n"
+            + (isPointInventory || isMergedInventory ?
+                    "inv.plant,\n"
+                    : 
+                    ""
+                    )
+            + (isPointInventory ?
+                    "inv.nei_unique_id,\n"
+                    : 
+                    ""
+                    )
+            + "dr.cm_abbrev,\n"
+            + "dr.apply_order,\n"
+            + "ct.name,\n"
+            + "sg.name\n"
+            + (isPointInventory || isMergedInventory ?
+                ",inv.design_capacity,\n"
+                + "inv.design_capacity_unit_numerator,\n"
+                + "inv.design_capacity_unit_denominator\n"
+                : 
+                ""
+                )
+                + (isPointInventory || isNonPointInventory ?
+                ",inv.ANNUAL_AVG_DAYS_PER_WEEK,\n"
+                + "inv.ANNUAL_AVG_WEEKS_PER_YEAR,\n"
+                + "inv.ANNUAL_AVG_HOURS_PER_DAY,\n"
+                + "inv.ANNUAL_AVG_HOURS_PER_YEAR\n"
+                    : 
+                    (isMergedInventory ?
+                            ",inv.ANNUAL_AVG_HOURS_PER_YEAR\n\n"
+                            : 
+                            ""
+                            )
+                );
         //add PM2_5 records
         sql += "union all\n"
             + "select inv.fips,\n"
-            + (isPointInventory ?
+            + (isPointInventory || isMergedInventory ?
                     "inv.plantid,\n"
                     + "inv.pointid,\n"
                     + "inv.stackid,\n"
@@ -322,40 +430,54 @@ public class SQLECControlScenarioQuery {
             + "inv.scc,\n"
             + "inv.poll,\n"
             + "scc.scc_description,\n"
-            + (isPointInventory ?
+            + (isPointInventory || isMergedInventory ?
                     "inv.plant,\n"
-                    + "inv.nei_unique_id,\n"
                     : 
                     ""
                     )
-            + "coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) as inv_ann_emis,\n"
-            + "coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) as strat_ann_emis,\n"
-            + "coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) - coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) as inv_minus_strat_emis,\n"
-            + "case when coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) is not null and coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) != 0.0 then (coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis) - coalesce(dr.final_emissions, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis))) / (coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) * 100.0 else null end as pct_diff_inv_minus_strat,\n"
+            + (isPointInventory ?
+                    "inv.nei_unique_id,\n"
+                    : 
+                    ""
+                    )
+            + "coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) as inv_ann_emis,\n"
+            + "coalesce(dr.output_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) as strat_ann_emis,\n"
+            + "coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) - coalesce(dr.output_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) as inv_minus_strat_emis,\n"
+            + "case when coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) is not null and coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) != 0.0 then (coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis)) - coalesce(dr.output_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis))) / (coalesce(dr.input_emis, coalesce(inv.avd_emis * " + (month != -1 ? noOfDaysInMonth : "365") + ", inv.ann_emis))) * 100.0 else null end as pct_diff_inv_minus_strat,\n"
             + "dr.cm_abbrev,\n"
+            + "dr.apply_order,\n"
             + "ct.name as control_technology,\n"
             + "sg.name as source_group,\n"
             + "dr.annual_cost\n"
-            + (isPointInventory ?
+            + (isPointInventory || isMergedInventory ?
                     ",inv.design_capacity,\n"
                     + "inv.design_capacity_unit_numerator,\n"
                     + "inv.design_capacity_unit_denominator\n"
                     : 
                     ""
                     )
-                    + (isPointInventory || isNonPointInventory ?
-                    ",inv.ANNUAL_AVG_DAYS_PER_WEEK,\n"
-                    + "inv.ANNUAL_AVG_WEEKS_PER_YEAR,\n"
-                    + "inv.ANNUAL_AVG_HOURS_PER_DAY,\n"
-                    + "inv.ANNUAL_AVG_HOURS_PER_YEAR\n"
+                + (isPointInventory || isNonPointInventory ?
+                ",inv.ANNUAL_AVG_DAYS_PER_WEEK,\n"
+                + "inv.ANNUAL_AVG_WEEKS_PER_YEAR,\n"
+                + "inv.ANNUAL_AVG_HOURS_PER_DAY,\n"
+                + "inv.ANNUAL_AVG_HOURS_PER_YEAR\n"
                     : 
-                    ""
-                    );
+                    (isMergedInventory ?
+                            ",inv.ANNUAL_AVG_HOURS_PER_YEAR\n\n"
+                            : 
+                            ""
+                            )
+                );
 
         sql += "from " + inventoryTableName + " inv\n"
             + "left outer join " + detailedResultTableName + " dr\n"
-            + "on dr.source_id = inv.record_id\n"
-            + "and coalesce(dr.original_dataset_id, inv.dataset_id) = inv.dataset_id\n"
+            + (isMergedInventory ?
+                    "on dr.source_id = inv.original_record_id\n"
+                    + "and dr.original_dataset_id = inv.original_dataset_id\n"
+                    : 
+                    "on dr.source_id = inv.record_id\n"
+                    )
+//            + "and coalesce(dr.original_dataset_id, inv.dataset_id) = inv.dataset_id\n"
             + "and " + detailedResultVersion + " \n"
             + "left outer join emf.control_measures cm\n"
             + "on cm.abbreviation = dr.cm_abbrev\n"
@@ -367,7 +489,7 @@ public class SQLECControlScenarioQuery {
             + "on scc.scc = inv.scc\n"
             ;
     
-        sql += "where inv.poll = 'PM2_5'\n"
+        sql += "where inv.poll in ('PM2_5','BRK__PM2_5','EXH__PM2_5','TIR__PM2_5')\n"
             + "and " + inventoryVersion + "\n";
 
         sql += "order by fips"
@@ -376,7 +498,7 @@ public class SQLECControlScenarioQuery {
                     : 
                     ""
                     )
-            +", scc, poll\n";
+            +", scc, cm_abbrev, poll\n";
         
 //        sql = query(sql, true);
         sql = "CREATE TABLE " + emissionDatasourceName + "." + tableName + " AS " + sql;
@@ -398,6 +520,18 @@ public class SQLECControlScenarioQuery {
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new EmfException("The dataset name " + dsName + " is not valid");
+        } finally {
+            session.close();
+        }
+    }
+
+    private EmfDataset getDataset(int dsId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getDataset(session, dsId);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new EmfException("The dataset id " + dsId + " is not valid");
         } finally {
             session.close();
         }

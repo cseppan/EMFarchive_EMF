@@ -32,6 +32,8 @@ public abstract class AbstractCheckMessagesStrategyTask extends AbstractStrategy
         List<StatusMessage> messages = new ArrayList<StatusMessage>();
 
         ControlStrategyResult strategyMessagesResult = this.getLoader().getStrategyMessagesResult();
+        //check nothing if no result exists
+        if (strategyMessagesResult == null) return;
         InternalSource[] internalSources = strategyMessagesResult.getDetailedResultDataset().getInternalSources();
         if (internalSources.length > 0) {
 

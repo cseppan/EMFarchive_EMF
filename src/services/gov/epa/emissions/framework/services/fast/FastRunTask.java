@@ -121,7 +121,7 @@ public class FastRunTask {
         return result;
     }
 
-    public FastRunOutput createGriddedEmissionOutput() throws Exception {
+    public FastRunOutput createIntermediateInventoryOutput() throws Exception {
 
         // setup result
         FastRunOutput griddedSectorSCCPollOutput = null;
@@ -129,16 +129,15 @@ public class FastRunTask {
 
         // Create EECS Detailed Mapping Result Output
         try {
-            setStatus("Started creating " + DatasetType.fastGriddedSectorCMAQInventoryPollutantEmission
+            setStatus("Started creating " + DatasetType.FAST_RUN_INTERMEDIATE_INVENTORY
                     + " dataset output.");
-
+            DatasetType datasetType = getDatasetType(DatasetType.FAST_RUN_INTERMEDIATE_INVENTORY);
             EmfDataset griddedSectorSCCPollDataset = creator.addDataset("ds", fastRun.getAbbreviation() + "_"
-                    + DatasetType.fastGriddedSectorCMAQInventoryPollutantEmission,
-                    getDatasetType(DatasetType.fastGriddedSectorCMAQInventoryPollutantEmission),
-                    new VersionedTableFormat(new GriddedSectorCMAQInventoryPollutantEmissionFileFormat(dbServer
-                            .getSqlDataTypes()), dbServer.getSqlDataTypes()), "");
+                    + DatasetType.FAST_RUN_INTERMEDIATE_INVENTORY,
+                    datasetType,
+                    new VersionedTableFormat(datasetType.getFileFormat(), dbServer.getSqlDataTypes()), "");
 
-            griddedSectorSCCPollOutput = createFastRunOutput(getFastRunOutputType(FastRunOutputType.GRIDDED_EMISSIONS),
+            griddedSectorSCCPollOutput = createFastRunOutput(getFastRunOutputType(FastRunOutputType.INTERMEDIATE_INVENTORY),
                     griddedSectorSCCPollDataset);
 
             populateGriddedEmissionOutput(griddedSectorSCCPollDataset, new String[] {});
@@ -147,11 +146,11 @@ public class FastRunTask {
 
             runStatus = "Completed.";
 
-            setStatus("Completed creating " + DatasetType.fastGriddedSectorCMAQInventoryPollutantEmission
+            setStatus("Completed creating " + DatasetType.FAST_RUN_INTERMEDIATE_INVENTORY
                     + " dataset output.");
 
         } catch (EmfException ex) {
-            runStatus = "Failed creating " + DatasetType.fastGriddedSectorCMAQInventoryPollutantEmission
+            runStatus = "Failed creating " + DatasetType.FAST_RUN_INTERMEDIATE_INVENTORY
                     + ". Exception = " + ex.getMessage();
             setStatus(runStatus);
             throw ex;
@@ -166,85 +165,86 @@ public class FastRunTask {
         return griddedSectorSCCPollOutput;
     }
 
-    public FastRunOutput createGriddedSummaryEmissionAQOutput(FastGriddedCMAQPollutantAirQualityEmissionResult[] results)
+    public FastRunOutput createIntermediateAirQualityOutput(FastGriddedCMAQPollutantAirQualityEmissionResult[] results)
             throws Exception {
         // setup result
-        FastRunOutput griddedGriddedSummaryEmissionAQOutput = null;
+        FastRunOutput intermediateAirQualityOutput = null;
         String runStatus = "";
 
         // Create EECS Detailed Mapping Result Output
         try {
-            setStatus("Started creating " + DatasetType.fastGriddedSummaryEmissionAirQuality + " dataset output.");
+            setStatus("Started creating " + DatasetType.FAST_RUN_INTERMEDIATE_AIR_QUALITY + " dataset output.");
 
-            EmfDataset griddedSummaryEmissionAQDataset = createGriddedSummaryEmissionAQDataset(results);
+            EmfDataset intermediateAirQualityDataset = createIntermediateAirQualityDataset(results);
 
-            griddedGriddedSummaryEmissionAQOutput = createFastRunOutput(
-                    getFastRunOutputType(FastRunOutputType.GRIDDED_SUMMARY_EMISSIONS_AIR_QUALITY),
-                    griddedSummaryEmissionAQDataset);
+            intermediateAirQualityOutput = createFastRunOutput(
+                    getFastRunOutputType(FastRunOutputType.INTERMEDIATE_AIR_QUALITY),
+                    intermediateAirQualityDataset);
 
             // populateGriddedEmissionOutput(griddedSummaryEmissionAQDataset, new String[] {});
 
-            updateOutputDatasetVersionRecordCount(griddedGriddedSummaryEmissionAQOutput);
+            updateOutputDatasetVersionRecordCount(intermediateAirQualityOutput);
 
             runStatus = "Completed.";
 
-            setStatus("Completed creating " + DatasetType.fastGriddedSummaryEmissionAirQuality + " dataset output.");
+            setStatus("Completed creating " + DatasetType.FAST_RUN_INTERMEDIATE_AIR_QUALITY + " dataset output.");
 
         } catch (EmfException ex) {
-            runStatus = "Failed creating " + DatasetType.fastGriddedSummaryEmissionAirQuality + ". Exception = "
+            runStatus = "Failed creating " + DatasetType.FAST_RUN_INTERMEDIATE_AIR_QUALITY + ". Exception = "
                     + ex.getMessage();
             setStatus(runStatus);
             throw ex;
         } finally {
-            if (griddedGriddedSummaryEmissionAQOutput != null) {
-                griddedGriddedSummaryEmissionAQOutput.setCompletionDate(new Date());
-                griddedGriddedSummaryEmissionAQOutput.setRunStatus(runStatus);
-                saveFastRunOutput(griddedGriddedSummaryEmissionAQOutput);
+            if (intermediateAirQualityOutput != null) {
+                intermediateAirQualityOutput.setCompletionDate(new Date());
+                intermediateAirQualityOutput.setRunStatus(runStatus);
+                saveFastRunOutput(intermediateAirQualityOutput);
             }
         }
 
-        return griddedGriddedSummaryEmissionAQOutput;
+        return intermediateAirQualityOutput;
     }
 
-    public FastRunOutput createGriddedDetailedEmissionAQOutput(
+    public FastRunOutput createGriddedOutput(
             FastGriddedCMAQPollutantAirQualityEmissionResult[] results) throws Exception {
 
         // setup result
-        FastRunOutput griddedGriddedDetailedEmissionAQOutput = null;
+        FastRunOutput griddedOutput = null;
         String runStatus = "";
 
         // Create EECS Detailed Mapping Result Output
         try {
-            setStatus("Started creating " + DatasetType.fastGriddedDetailedEmissionAirQuality + " dataset output.");
+            setStatus("Started creating " + DatasetType.FAST_RUN_GRIDDED_OUTPUT + " dataset output.");
 
-            EmfDataset griddedDetailedEmissionAQDataset = createGriddedDetailedEmissionAQDataset(results);
+            EmfDataset griddedOutputDataset = createGriddedOutputDataset(results);
 
-            griddedGriddedDetailedEmissionAQOutput = createFastRunOutput(
-                    getFastRunOutputType(FastRunOutputType.GRIDDED_DETAILED_EMISSIONS_AIR_QUALITY),
-                    griddedDetailedEmissionAQDataset);
+            griddedOutput = createFastRunOutput(
+                    getFastRunOutputType(FastRunOutputType.GRIDDED_OUTPUT),
+                    griddedOutputDataset);
 
             // populateGriddedEmissionOutput(griddedDetailedEmissionAQDataset, new String[] {});
 
-            updateOutputDatasetVersionRecordCount(griddedGriddedDetailedEmissionAQOutput);
+            updateOutputDatasetVersionRecordCount(griddedOutput);
 
             runStatus = "Completed.";
 
-            setStatus("Completed creating " + DatasetType.fastGriddedDetailedEmissionAirQuality + " dataset output.");
+            setStatus("Completed creating " + DatasetType.FAST_RUN_GRIDDED_OUTPUT + " dataset output.");
 
         } catch (EmfException ex) {
-            runStatus = "Failed creating " + DatasetType.fastGriddedDetailedEmissionAirQuality + ". Exception = "
+            ex.printStackTrace();
+            runStatus = "Failed creating " + DatasetType.FAST_RUN_GRIDDED_OUTPUT + ". Exception = "
                     + ex.getMessage();
             setStatus(runStatus);
             throw ex;
         } finally {
-            if (griddedGriddedDetailedEmissionAQOutput != null) {
-                griddedGriddedDetailedEmissionAQOutput.setCompletionDate(new Date());
-                griddedGriddedDetailedEmissionAQOutput.setRunStatus(runStatus);
-                saveFastRunOutput(griddedGriddedDetailedEmissionAQOutput);
+            if (griddedOutput != null) {
+                griddedOutput.setCompletionDate(new Date());
+                griddedOutput.setRunStatus(runStatus);
+                saveFastRunOutput(griddedOutput);
             }
         }
 
-        return griddedGriddedDetailedEmissionAQOutput;
+        return griddedOutput;
     }
 
     public void run() throws EmfException {
@@ -265,9 +265,9 @@ public class FastRunTask {
         // String status = "";
         try {
 
-            FastRunOutput griddedEmissionOutput = createGriddedEmissionOutput();
+            FastRunOutput intermediateInventoryOutput = createIntermediateInventoryOutput();
 
-            calculateAQ(griddedEmissionOutput.getOutputDataset());
+            calculateAQ(intermediateInventoryOutput.getOutputDataset());
 
             // now create the measure summary result based on the results from the strategy run...
             // generateStrategyMeasureSummaryResult();
@@ -897,7 +897,7 @@ public class FastRunTask {
         return sql;
     }
 
-    private void calculateAQ(EmfDataset griddedSectorSCCPollDataset) throws Exception {
+    private void calculateAQ(EmfDataset intermediateInventory) throws Exception {
         // get transfer coefficients and put into a HashMap for later use.
         Map<String, AQTransferCoefficient> transferCoefficientMap = getTransferCoefficients();
 
@@ -905,14 +905,14 @@ public class FastRunTask {
         List<FastGriddedCMAQPollutantAirQualityEmissionResult> results = new ArrayList<FastGriddedCMAQPollutantAirQualityEmissionResult>();
         long timing = System.currentTimeMillis();
         System.out.println("load up conc values for grid " + timing);
-        String griddedSectorCMAQInventoryPollTableName = qualifiedEmissionTableName(griddedSectorSCCPollDataset);
-        VersionedQuery griddedSectorCMAQInventoryPollVersionedQuery = new VersionedQuery(version(
-                griddedSectorSCCPollDataset.getId(), 0), "fo");
+        String intermediateInventoryTableName = qualifiedEmissionTableName(intermediateInventory);
+        VersionedQuery intermediateInventoryVersionedQuery = new VersionedQuery(version(
+                intermediateInventory.getId(), 0), "fo");
         String query = "select fo.sector, fo.cmaq_pollutant, fo.inventory_pollutant, fo.x, fo.y, fo.factor, fo.emission, fo.transfer_coefficient from "
-                + griddedSectorCMAQInventoryPollTableName
+                + intermediateInventoryTableName
                 + " as fo where "
-                + griddedSectorCMAQInventoryPollVersionedQuery.query()
-                + " /*and fo.sector in ('ptipm','ptnonipm','onroad','nonroad')*/ order by fo.sector, fo.cmaq_pollutant, fo.inventory_pollutant;";
+                + intermediateInventoryVersionedQuery.query()
+                + " order by fo.sector, fo.cmaq_pollutant, fo.inventory_pollutant;";
         DbServer dbServer = dbServerFactory.getDbServer();
         Connection con = dbServer.getConnection();
         ResultSet rs = null;
@@ -1029,7 +1029,7 @@ public class FastRunTask {
             for (FastGriddedInventoryPollutantAirQualityEmissionResult result : cMAQResult
                     .getCmaqInventoryPollutantResults()) {
                 double[][] emission = result.getEmission();
-                double[][] airQuality = new double[noCols][noRows];
+                double[][] airQuality = null;//new double[noCols][noRows];
 
                 if (sector.equals("ptnonipm") || sector.equals("ptipm") || sector.equals("point")
                         || sector.equals("othpt"))
@@ -1042,6 +1042,10 @@ public class FastRunTask {
 
                 AQTransferCoefficient transferCoefficient = transferCoefficientMap.get(sector.toLowerCase() + "_"
                         + result.getTranferCoefficient().toLowerCase());
+                if (transferCoefficient == null) 
+                    break;
+                //this can now be defined since there is a transfer coefficient to use...
+                airQuality = new double[noCols][noRows];
                 double beta1 = transferCoefficient.getBeta1();
                 double beta2 = transferCoefficient.getBeta2();
 
@@ -1070,9 +1074,9 @@ public class FastRunTask {
         }
         System.out.println("time to calculate aq concentrations = " + (System.currentTimeMillis() - timing));
 
-        createGriddedSummaryEmissionAQOutput(results.toArray(new FastGriddedCMAQPollutantAirQualityEmissionResult[0]));
+        createIntermediateAirQualityOutput(results.toArray(new FastGriddedCMAQPollutantAirQualityEmissionResult[0]));
 
-        createGriddedDetailedEmissionAQOutput(results.toArray(new FastGriddedCMAQPollutantAirQualityEmissionResult[0]));
+        createGriddedOutput(results.toArray(new FastGriddedCMAQPollutantAirQualityEmissionResult[0]));
 
     }
 
@@ -1090,15 +1094,15 @@ public class FastRunTask {
         String transferCoefficientsTableName = qualifiedEmissionTableName(transferCoefficients);
 
         System.out.println("load up transfer coefficients into a HashMap " + System.currentTimeMillis());
-        String query = "select sector, variable, b1, b2 from " + transferCoefficientsTableName + " where "
+        String query = "select sector, type, b1, b2 from " + transferCoefficientsTableName + " where "
                 + transferCoefficientsVersionedQuery.query() + ";";
         try {
             statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             rs = statement.executeQuery(query);
             while (rs.next()) {
                 String sector = rs.getString(1).toLowerCase();
-                String pollutant = rs.getString(2).toLowerCase();
-                transferCoefficientMap.put(sector + "_" + pollutant, new AQTransferCoefficient(sector, pollutant, rs
+                String type = rs.getString(2).toLowerCase();
+                transferCoefficientMap.put(sector + "_" + type, new AQTransferCoefficient(sector, type, rs
                         .getDouble(3), rs.getDouble(4)));
             }
         } catch (SQLException e) {
@@ -1132,19 +1136,22 @@ public class FastRunTask {
         return transferCoefficientMap;
     }
 
-    private EmfDataset createGriddedSummaryEmissionAQDataset(FastGriddedCMAQPollutantAirQualityEmissionResult[] results)
+    private EmfDataset createGriddedOutputDataset(FastGriddedCMAQPollutantAirQualityEmissionResult[] results)
             throws Exception {
         DbServer dbServer = dbServerFactory.getDbServer();
+        DatasetType datasetType = getDatasetType(DatasetType.FAST_RUN_GRIDDED_OUTPUT);
         EmfDataset dataset = creator.addDataset("ds", fastRun.getAbbreviation() + "_"
-                + DatasetType.fastGriddedSummaryEmissionAirQuality,
-                getDatasetType(DatasetType.fastGriddedSummaryEmissionAirQuality), new VersionedTableFormat(
-                        new GriddedSummaryEmissionAirQualityResultFileFormat(dbServer.getSqlDataTypes()), dbServer
-                                .getSqlDataTypes()), "");
+                + DatasetType.FAST_RUN_GRIDDED_OUTPUT,
+                datasetType, new VersionedTableFormat(
+                        datasetType.getFileFormat(), dbServer.getSqlDataTypes()), "");
         // EmfDataset dataset = addDataset(datasetName,
         // getDatasetType(DatasetType.fastGriddedSummaryEmissionAirQuality),
         // new VersionedTableFormat(new GriddedSummaryEmissionAirQualityResultFileFormat(dbServer.getSqlDataTypes()),
         // dbServer.getSqlDataTypes()), "");
-
+        String colNameList = "dataset_id, delete_versions, version";
+        for (Column column : datasetType.getFileFormat().getColumns()) {
+            colNameList += ", " + column.getName();
+        }
         VersionedQuery cancerRiskVersionedQuery = new VersionedQuery(version(fastRun.getCancerRiskDataset().getId(),
                 fastRun.getCancerRiskDatasetVersion()), "ure");
         String cancerRiskTableName = qualifiedEmissionTableName(fastRun.getCancerRiskDataset());
@@ -1170,13 +1177,14 @@ public class FastRunTask {
                 // System.out.println("result sector = " + cmaqResult.getSector() + ", pollutant = " + pollutant);
                 double[][] emission = cmaqResult.getEmission();
                 double[][] airQuality = cmaqResult.getAirQuality();
+                
                 for (int x = 1; x <= this.domain.getNcols(); x++) {
                     for (int y = 1; y <= this.domain.getNrows(); y++) {
                         ++counter;
                         statement
                                 .addBatch("INSERT INTO "
                                         + tableName
-                                        + " (dataset_id, delete_versions, version, sector,CMAQ_POLLUTANT,x,y,emission,AIR_QUALITY, POPULATION_WEIGHTED_AIR_QUALITY, CANCER_RISK_PER_PERSON, TOTAL_CANCER_RISK, POPULATION_WEIGHTED_CANCER_RISK, GRID_CELL_POPULATION, PCT_POPULATION_IN_GRID_CELL_TO_MODEL_DOMAIN, URE) \nselect "
+                                        + " (" + colNameList + ") \nselect "
                                         + datasetId
                                         + "::integer as dataset_id, '' as delete_versions, 0 as version,'"
                                         + sector
@@ -1189,22 +1197,22 @@ public class FastRunTask {
                                         + ","
                                         + emission[x - 1][y - 1]
                                         + ","
-                                        + airQuality[x - 1][y - 1]
+                                        + (airQuality != null ? airQuality[x - 1][y - 1] : "null") + "::double precision"
                                         + ", "
-                                        + airQuality[x - 1][y - 1]
+                                        + (airQuality != null ? airQuality[x - 1][y - 1] : "null") + "::double precision"
                                         + " * totalpop / "
                                         + populationCount
-                                        + "::double precision as \"Population weighted AQ\", "
-                                        + airQuality[x - 1][y - 1]
-                                        + " * cancer_risk_ure as \"cancer risk/person\", "
-                                        + airQuality[x - 1][y - 1]
-                                        + " * cancer_risk_ure * totalpop as \"total cancer risk\", "
-                                        + airQuality[x - 1][y - 1]
+                                        + "::double precision as pop_weighted_aq, "
+                                        + (airQuality != null ? airQuality[x - 1][y - 1] : "null") + "::double precision"
+                                        + " * cancer_risk_ure as cancer_risk_per_person, "
+                                        + (airQuality != null ? airQuality[x - 1][y - 1] : "null") + "::double precision"
+                                        + " * cancer_risk_ure * totalpop as total_cancer_risk, "
+                                        + (airQuality != null ? airQuality[x - 1][y - 1] : "null") + "::double precision"
                                         + " * totalpop / "
                                         + populationCount
-                                        + "::double precision * cancer_risk_ure as \"pop. weighted cancer risk\", totalpop as \"grid cell population\", totalpop / "
+                                        + "::double precision * cancer_risk_ure as pop_weighted_cancer_risk, totalpop as grid_cell_population, totalpop / "
                                         + populationCount
-                                        + "::double precision * 100.0 as \"% population in grid cell relative to modeling domain\", cancer_risk_ure as \"URE\" from (select 1) as foo left outer join "
+                                        + "::double precision * 100.0 as pct_population_in_grid_cell_to_model_domain, cancer_risk_ure as ure from (select 1) as foo left outer join "
                                         + domainPopulationTableName + " grid on grid.row = " + y + " and grid.col = "
                                         + x + " and " + domainPopulationVersionedQuery.query() + " left outer join "
                                         + cancerRiskTableName + " ure on ure.cmaq_pollutant = '" + pollutant + "' and "
@@ -1272,14 +1280,19 @@ public class FastRunTask {
         return dataset;
     }
 
-    private EmfDataset createGriddedDetailedEmissionAQDataset(FastGriddedCMAQPollutantAirQualityEmissionResult[] results)
+    private EmfDataset createIntermediateAirQualityDataset(FastGriddedCMAQPollutantAirQualityEmissionResult[] results)
             throws Exception {
         DbServer dbServer = dbServerFactory.getDbServer();
+        DatasetType datasetType = getDatasetType(DatasetType.FAST_RUN_INTERMEDIATE_AIR_QUALITY);
         EmfDataset dataset = creator.addDataset("ds", fastRun.getAbbreviation() + "_"
-                + DatasetType.fastGriddedDetailedEmissionAirQuality,
-                getDatasetType(DatasetType.fastGriddedDetailedEmissionAirQuality), new VersionedTableFormat(
-                        new GriddedDetailedEmissionAirQualityResultFileFormat(dbServer.getSqlDataTypes()), dbServer
+                + DatasetType.FAST_RUN_INTERMEDIATE_AIR_QUALITY,
+                datasetType, new VersionedTableFormat(
+                        datasetType.getFileFormat(), dbServer
                                 .getSqlDataTypes()), "");
+        String colNameList = "dataset_id, delete_versions, version";
+        for (Column column : datasetType.getFileFormat().getColumns()) {
+            colNameList += ", " + column.getName();
+        }
         int datasetId = dataset.getId();
         String tableName = qualifiedEmissionTableName(dataset);
         Connection con = dbServer.getConnection();
@@ -1306,12 +1319,12 @@ public class FastRunTask {
                             statement
                                     .addBatch("INSERT INTO "
                                             + tableName
-                                            + " (dataset_id, delete_versions, version, sector,CMAQ_POLLUTANT,INVENTORY_POLLUTANT,x,y,factor,TRANSFER_COEFF,emission,AIR_QUALITY) \nselect "
+                                            + " (" + colNameList + ") \nselect "
                                             + datasetId
                                             + "::integer as dataset_id, '' as delete_versions, 0 as version,'" + sector
                                             + "','" + pollutant + "','" + inventoryPollutant + "'," + x + "," + y + ","
                                             + result.getAdjustmentFactor() + ",'" + result.getTranferCoefficient()
-                                            + "'," + emission[x - 1][y - 1] + "," + airQuality[x - 1][y - 1] + ";");
+                                            + "'," + emission[x - 1][y - 1] + "," + (airQuality != null ? airQuality[x - 1][y - 1] : "null::double precision") + ";");
                         }
                     }
                     if (counter > 20000) {

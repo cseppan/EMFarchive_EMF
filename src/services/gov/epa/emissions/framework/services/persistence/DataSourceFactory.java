@@ -21,6 +21,19 @@ public class DataSourceFactory {
         return ds;
     }
 
+    public DataSource getEISDataSource() throws InfrastructureException {
+        DataSource ds = null;
+        try {
+            Context ctx = new InitialContext();
+            ds = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB2");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new InfrastructureException("Unable to lookup Datasource using JNDI");
+        }
+
+        return ds;
+    }
+
 
 //    private static Log log = LogFactory.getLog(DataSource.class);
 //

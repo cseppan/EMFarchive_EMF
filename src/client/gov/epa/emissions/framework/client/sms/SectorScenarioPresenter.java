@@ -8,13 +8,8 @@ import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.fast.FastAnalysis;
-import gov.epa.emissions.framework.services.fast.FastAnalysisRun;
 import gov.epa.emissions.framework.services.fast.FastDataset;
-import gov.epa.emissions.framework.services.fast.FastRun;
-import gov.epa.emissions.framework.services.fast.FastRunInventory;
 import gov.epa.emissions.framework.services.fast.FastService;
-import gov.epa.emissions.framework.services.fast.Grid;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 
 import java.util.Calendar;
@@ -153,69 +148,69 @@ public class SectorScenarioPresenter {
         
         
         
-        FastRun fastRun = new FastRun();
-        fastRun.setName("test " + Calendar.getInstance().getTime().toString());
-        fastRun.setAbbreviation(Calendar.getInstance().getTimeInMillis() + "");
-        fastRun.setDescription("test");
-        fastRun.setRunStatus("Not started");
-        fastRun.setLastModifiedDate(Calendar.getInstance().getTime());
-        fastRun.setCreator(session.user());
-
-        fastRun.setGrid(fastService.getGrid("Detroit_36_45_4km"));
-        
-        fastRun.setInvTableDataset(getDataset("invtable_cap_hg"));
-        fastRun.setInvTableDatasetVersion(4);
-        fastRun.setSpeciesMapppingDataset(getDataset("fast_species_mapping"));
-        fastRun.setSpeciesMapppingDatasetVersion(0);
-        fastRun.setTransferCoefficientsDataset(getDataset("transfer_coefficients"));
-        fastRun.setTransferCoefficientsDatasetVersion(0);
-        fastRun.setCancerRiskDataset(getDataset("fast_cancer_risk"));
-        fastRun.setCancerRiskDatasetVersion(0);
-        fastRun.setDomainPopulationDataset(getDataset("4km_Detroit_Pop_24nov2009"));
-        fastRun.setDomainPopulationDatasetVersion(0);
-
-        FastDataset[] fastDatasets = fastService.getFastDatasets();
-        
-        for (FastDataset fd : fastDatasets) {
-            FastRunInventory fastRunInventory = new FastRunInventory(fd.getDataset(), 0);
-            fastRun.setInventories(new FastRunInventory[] {fastRunInventory});
-        }
-        
-
-        fastRun.setId(fastService.addFastRun(fastRun));
-        
-        Grid grid = fastService.getGrid("Detroit_36_45_4km");
-        
-//        fastService.runFastRun(session.user(), fastRun.getId());
-
-        FastAnalysis fastAnalysis = new FastAnalysis();
-        fastAnalysis.setName("test " + now.toString());
-        fastAnalysis.setAbbreviation(Calendar.getInstance().getTimeInMillis() + "");
-        fastAnalysis.setDescription("test");
-        fastAnalysis.setRunStatus("Not started");
-        fastAnalysis.setLastModifiedDate(Calendar.getInstance().getTime());
-        fastAnalysis.setCreator(session.user());
-        fastAnalysis.setGrid(grid);
-
-        FastRun[] fastRuns = fastService.getFastRuns(grid.getId());
-        
-//        for (FastRun fr : fastRuns) {
-//            FastAnalysisRun fastAnalysisRun = new FastAnalysisRun();
-//            fastAnalysisRun.setFastRunId(fr.getId());
-//            fastAnalysisRun.setGridId(fr.getGrid().getId());
-//            fastAnalysis.setBaselineRuns(new FastAnalysisRun[] {fastAnalysisRun});
+//        FastRun fastRun = new FastRun();
+//        fastRun.setName("test " + Calendar.getInstance().getTime().toString());
+//        fastRun.setAbbreviation(Calendar.getInstance().getTimeInMillis() + "");
+//        fastRun.setDescription("test");
+//        fastRun.setRunStatus("Not started");
+//        fastRun.setLastModifiedDate(Calendar.getInstance().getTime());
+//        fastRun.setCreator(session.user());
+//
+//        fastRun.setGrid(fastService.getGrid("Detroit_36_45_4km"));
+//        
+//        fastRun.setInvTableDataset(getDataset("invtable_cap_hg"));
+//        fastRun.setInvTableDatasetVersion(4);
+//        fastRun.setSpeciesMapppingDataset(getDataset("fast_species_mapping"));
+//        fastRun.setSpeciesMapppingDatasetVersion(0);
+//        fastRun.setTransferCoefficientsDataset(getDataset("transfer_coefficients"));
+//        fastRun.setTransferCoefficientsDatasetVersion(0);
+//        fastRun.setCancerRiskDataset(getDataset("fast_cancer_risk"));
+//        fastRun.setCancerRiskDatasetVersion(0);
+//        fastRun.setDomainPopulationDataset(getDataset("4km_Detroit_Pop_24nov2009"));
+//        fastRun.setDomainPopulationDatasetVersion(0);
+//
+//        FastDataset[] fastDatasets = fastService.getFastDatasets();
+//        
+//        for (FastDataset fd : fastDatasets) {
+//            FastRunInventory fastRunInventory = new FastRunInventory(fd.getDataset(), 0);
+//            fastRun.setInventories(new FastRunInventory[] {fastRunInventory});
 //        }
-        FastRun fr = fastService.getFastRun(27);
-        FastAnalysisRun fastAnalysisRun = FastAnalysisRun.createBaselineRun(fr);
-        fastAnalysis.setBaselineRuns(new FastAnalysisRun[] {fastAnalysisRun});
-
-        fr = fastService.getFastRun(28);
-        fastAnalysisRun = FastAnalysisRun.createSensitivityRun(fr);
-        fastAnalysis.setSensitivityRuns(new FastAnalysisRun[] {fastAnalysisRun});
-
-        fastAnalysis.setId(fastService.addFastAnalysis(fastAnalysis));
-        
-        fastService.runFastAnalysis(session.user(), fastAnalysis.getId());
+//        
+//
+//        fastRun.setId(fastService.addFastRun(fastRun));
+//        
+//        Grid grid = fastService.getGrid("Detroit_36_45_4km");
+//        
+////        fastService.runFastRun(session.user(), fastRun.getId());
+//
+//        FastAnalysis fastAnalysis = new FastAnalysis();
+//        fastAnalysis.setName("test " + now.toString());
+//        fastAnalysis.setAbbreviation(Calendar.getInstance().getTimeInMillis() + "");
+//        fastAnalysis.setDescription("test");
+//        fastAnalysis.setRunStatus("Not started");
+//        fastAnalysis.setLastModifiedDate(Calendar.getInstance().getTime());
+//        fastAnalysis.setCreator(session.user());
+//        fastAnalysis.setGrid(grid);
+//
+//        FastRun[] fastRuns = fastService.getFastRuns(grid.getId());
+//        
+////        for (FastRun fr : fastRuns) {
+////            FastAnalysisRun fastAnalysisRun = new FastAnalysisRun();
+////            fastAnalysisRun.setFastRunId(fr.getId());
+////            fastAnalysisRun.setGridId(fr.getGrid().getId());
+////            fastAnalysis.setBaselineRuns(new FastAnalysisRun[] {fastAnalysisRun});
+////        }
+//        FastRun fr = fastService.getFastRun(27);
+//        FastAnalysisRun fastAnalysisRun = FastAnalysisRun.createBaselineRun(fr);
+//        fastAnalysis.setBaselineRuns(new FastAnalysisRun[] {fastAnalysisRun});
+//
+//        fr = fastService.getFastRun(28);
+//        fastAnalysisRun = FastAnalysisRun.createSensitivityRun(fr);
+//        fastAnalysis.setSensitivityRuns(new FastAnalysisRun[] {fastAnalysisRun});
+//
+//        fastAnalysis.setId(fastService.addFastAnalysis(fastAnalysis));
+//        
+//        fastService.runFastAnalysis(session.user(), fastAnalysis.getId());
         
 //        fastAnalysis = fastService.obtainLockedFastAnalysis(session.user(), fastAnalysis.getId());
 //        
@@ -230,7 +225,8 @@ public class SectorScenarioPresenter {
 //        fastService.getFastAnalysisOutputs(fastAnalysis.getId());
         
 //        
-        
+        String[] pollutants = fastService.getFastRunSpeciesMappingDatasetPollutants(getDataset("fast_species_mapping").getId(), 0);
+        fastService.exportFastOutputToShapeFile(fastService.getFastRunOutputs(27)[1].getOutputDataset().getId(), 0, 1, "delvecch", "C:\\temp\\temp", "NO3");
         
     }
 

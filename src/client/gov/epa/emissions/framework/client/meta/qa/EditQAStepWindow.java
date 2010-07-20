@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
@@ -1402,7 +1403,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             }
             if (detailedResultIndex != -1) {
                 //check for the $TABLE[1] tag in the detailed_result tag
-                String programSwitches2 = programSwitches.replace("$TABLE[1]", origDataset.getName());
+                String programSwitches2 = programSwitches.replace("$DATASET", origDataset.getName());
                 datasets = getDatasets(programSwitches2, detailedResultIndex, programSwitches2.indexOf("\n-", detailedResultIndex) != -1 ? programSwitches2.indexOf("\n-", detailedResultIndex) : programSwitches2.length()).toArray(new EmfDataset[0]);
                 if (datasets != null && datasets.length > 0) detailedResultDataset = datasets[0];
             }
@@ -1414,6 +1415,16 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                 datasets = getDatasets(programSwitches, gsrefIndex, programSwitches.indexOf("\n-", gsrefIndex) != -1 ? programSwitches.indexOf("\n-", gsrefIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
                 if (datasets != null && datasets.length > 0) gsrefDatasets = datasets;
             }
+
+            
+            if (invDataset == null) {
+                KeyVal[] keyVals = keyValFound(detailedResultDataset, "STRATEGY_INVENTORY_NAME");
+                if (keyVals.length > 0) {
+                    invDataset = presenter.getDataset(keyVals[0].getValue());
+                }
+            }
+
+            
             QAECControlScenarioWindow view = new QAECControlScenarioWindow(desktopManager, 
                 programVal, 
                 session, 
@@ -1426,6 +1437,17 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+    }
+
+    private  KeyVal[] keyValFound(EmfDataset dataset, String keyword) {
+        KeyVal[] keys = dataset.getKeyVals();
+        List<KeyVal> list = new ArrayList<KeyVal>();
+        
+        for (KeyVal key : keys)
+            if (key.getName().equalsIgnoreCase(keyword)) 
+                list.add(key);
+        
+        return list.toArray(new KeyVal[0]);
     }
 
     private void showAnnualStateSummariesCrosstabWindow() {

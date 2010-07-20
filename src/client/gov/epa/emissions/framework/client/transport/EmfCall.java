@@ -154,4 +154,8 @@ public class EmfCall {
     public void setTimeOut(int milliseconds) {
         call.setTimeout(new Integer(milliseconds));
     }
+
+    public Call getCall() {
+        return call;
+    }
 }
