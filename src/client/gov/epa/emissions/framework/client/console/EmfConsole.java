@@ -171,13 +171,13 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         });
         menu.add(about);
 
-        JMenuItem sms = new JMenuItem("Sector Scenarios");
-        sms.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-            	loadSectorScenarioWindow();
-            }
-        });
-        menu.add(sms);
+//        JMenuItem sms = new JMenuItem("Sector Scenarios");
+//        sms.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent event) {
+//            	loadSectorScenarioWindow();
+//            }
+//        });
+//        menu.add(sms);
         return menu; 
     }
 
