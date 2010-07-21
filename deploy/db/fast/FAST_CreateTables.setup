@@ -65,6 +65,8 @@ cancer_risk_dataset_id int4 REFERENCES emf.datasets(id),
 cancer_risk_dataset_version int4,
 grid_population_dataset_id int4 REFERENCES emf.datasets(id),
 grid_population_dataset_version int4,
+domain_population_dataset_id int4 REFERENCES emf.datasets(id),
+domain_population_dataset_version integer,
 CONSTRAINT uq_fast_runs_name UNIQUE (name),
 CONSTRAINT uq_fast_runs_abbreviation UNIQUE (abbreviation),
 CONSTRAINT uq_fast_runs_grid UNIQUE (id, grid_id)

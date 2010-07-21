@@ -725,17 +725,14 @@ public class FastDAO {
         return dataCommonsDao.getDatasetType(name, session);
     }
 
-    private User getUser(String name, Session session) {
-        return new UserDAO().get(name, session);
-    }
+//    private User getUser(String name, Session session) {
+//        return new UserDAO().get(name, session);
+//    }
 
-    public int addFastNonPointDataset(String newInventoryDatasetName, String baseNonPointDatasetName,
-            int baseNonPointDatasetVersion, String griddedSMKDatasetName, int griddedSMKDatasetVersion,
-            String invTableDatasetName, int invTableDatasetVersion,
-            String gridName, String userName, 
+    public int addFastNonPointDataset(FastNonPointDataset fastNonPointDataset, User user, 
             Session session, DbServer dbServer) throws EmfException {
         
-        EmfDataset dataset = createFastQuasiPointDataset(newInventoryDatasetName, userName, session, dbServer);
+        EmfDataset dataset = createFastQuasiPointDataset(fastNonPointDataset.getBaseNonPointDataset(), fastNonPointDataset.getName(), user, session, dbServer);
 //            getDataset("ptnonipm_xportfrac_cap2005v2_20nov2008_revised_20jan2009_v0", session);
 
         FastDataset fastDataset = new FastDataset();
@@ -743,19 +740,6 @@ public class FastDAO {
         fastDataset.setAddedDate(Calendar.getInstance().getTime());
 //        fastService.addFastDataset(fastDataset);
         
-        
-
-        EmfDataset baseNonPointDataset = getDataset(baseNonPointDatasetName, session);
-        EmfDataset griddedSMKDataset = getDataset(griddedSMKDatasetName, session);
-        EmfDataset invTableDataset = getDataset(invTableDatasetName, session);
-        FastNonPointDataset fastNonPointDataset = new FastNonPointDataset();
-        fastNonPointDataset.setBaseNonPointDataset(baseNonPointDataset);
-        fastNonPointDataset.setBaseNonPointDatasetVersion(baseNonPointDatasetVersion);
-        fastNonPointDataset.setGriddedSMKDataset(griddedSMKDataset);
-        fastNonPointDataset.setGriddedSMKDatasetVersion(griddedSMKDatasetVersion);
-        fastNonPointDataset.setInvTableDataset(invTableDataset);
-        fastNonPointDataset.setInvTableDatasetVersion(invTableDatasetVersion);
-        fastNonPointDataset.setGrid(getGrid(session, gridName));
         fastNonPointDataset.setFastDataset(fastDataset);
 //        fastNonPointDataset.setId(fastService.addFastNonPointDataset(fastNonPointDataset));
         fastDataset.setFastNonPointDataset(fastNonPointDataset);
@@ -763,19 +747,20 @@ public class FastDAO {
         return dataset.getId();
     }
     
-    private EmfDataset createFastQuasiPointDataset(String newInventoryDatasetName, String userName, Session session, DbServer dbServer) throws EmfException {
+    private EmfDataset createFastQuasiPointDataset(EmfDataset base, String newInventoryDatasetName, User user, Session session, DbServer dbServer) throws EmfException {
         DatasetType datasetType = getDatasetType(DatasetType.orlPointInventory, session);
         Keywords keywords = new Keywords(new DataCommonsServiceImpl(sessionFactory).getKeywords());
-        DatasetCreator creator = new DatasetCreator(null, getUser(userName, session), 
+        DatasetCreator creator = new DatasetCreator(null, user, 
                 sessionFactory, dbServerFactory,
                 dbServer.getEmissionsDatasource(), keywords);
         if (creator.isDatasetNameUsed(newInventoryDatasetName))
             throw new EmfException("Dataset name is already used, " + newInventoryDatasetName);
         try {
-            return creator.addDataset("ds", newInventoryDatasetName, 
-                    datasetType, new FileFormatFactory(dbServer).tableFormat(datasetType),
-                    "");
+            return creator.addDataset(newInventoryDatasetName, "ds", 
+                    base, datasetType, 
+                    new FileFormatFactory(dbServer).tableFormat(datasetType), "");
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException(e.getMessage());
             // NOTE Auto-generated catch block
         //    e.printStackTrace();

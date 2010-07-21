@@ -246,7 +246,7 @@ public class PopulateFastQuasiPointDatasetTask implements Runnable {
                 + " on 1 = 0"
                 + " WHERE " + baseVersionedQuery.query();
             sql = "INSERT INTO " + qualifiedTable(newInvTableName, datasource) + " (" + columnList + ") \n" + sql;
-            System.out.println(sql);
+//            System.out.println(sql);
             statement = con.createStatement();
             statement.execute(sql);
         } catch (SQLException e) {

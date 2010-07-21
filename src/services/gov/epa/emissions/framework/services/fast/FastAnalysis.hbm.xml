@@ -26,8 +26,6 @@
 	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
   	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
 	<property name="copiedFrom" column="copied_from" type="java.lang.String" not-null="false"/>
-	<many-to-one name="cancerRiskDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="cancer_risk_dataset_id"/>
-    <property name="cancerRiskDatasetVersion" column="cancer_risk_dataset_version" type="integer"/>
 
 	<array name="baselineRuns" table="fast_analysis_runs" schema="fast" where="baseline_sensitivity = 'B'">
     	<key column="fast_analysis_id" not-null="true"/>

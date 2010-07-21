@@ -5,8 +5,7 @@ import gov.epa.emissions.framework.services.fast.FastAnalysis;
 
 public class FastAnalysisTableData extends AbstractMPSDTTableData<FastAnalysis> {
 
-    private static final String[] COLUMNS = { "Name", "Description", "Start Time", "End Time", "Status", "Cancer Risk",
-            "Cancer Risk Version" };
+    private static final String[] COLUMNS = { "Name", "Description", "Start Time", "End Time", "Status" };
 
     public static final String DEFAULT_TIME = "N/A";
 
@@ -22,8 +21,6 @@ public class FastAnalysisTableData extends AbstractMPSDTTableData<FastAnalysis> 
     protected String[] createRowValues(FastAnalysis analysis) {
         return new String[] { this.getValueWithDefault(analysis.getName()),
                 this.getValueWithDefault(analysis.getDescription()), this.format(analysis.getStartDate()),
-                this.format(analysis.getCompletionDate()), this.getValueWithDefault(analysis.getRunStatus()),
-                this.getNameWithDefault(analysis.getCancerRiskDataset()),
-                this.getValueWithDefault(analysis.getCancerRiskDatasetVersion()) };
+                this.format(analysis.getCompletionDate()), this.getValueWithDefault(analysis.getRunStatus()) };
     }
 }

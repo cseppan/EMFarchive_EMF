@@ -49,10 +49,6 @@ public class FastAnalysisConfigurationTab extends AbstractFastAnalysisTab {
 
     private ComboBox sensitivityRunCombobox;
 
-    private TextField cancerRiskDatasetField;
-
-    private ComboBox cancerRiskDatasetVersionComboBox;
-
     public FastAnalysisConfigurationTab(FastAnalysis analysis, EmfSession session, MessagePanel messagePanel,
             EmfInternalFrame parentInternalFrame, DesktopManager desktopManager, EmfConsole parentConsole,
             FastAnalysisPresenter presenter) {
@@ -75,8 +71,6 @@ public class FastAnalysisConfigurationTab extends AbstractFastAnalysisTab {
         changeablesList.addChangeable(this.gridCombobox);
         changeablesList.addChangeable(this.baselineRunCombobox);
         changeablesList.addChangeable(this.sensitivityRunCombobox);
-        changeablesList.addChangeable(this.cancerRiskDatasetField);
-        changeablesList.addChangeable(this.cancerRiskDatasetVersionComboBox);
     }
 
     protected void populateFields() {
@@ -115,15 +109,6 @@ public class FastAnalysisConfigurationTab extends AbstractFastAnalysisTab {
             this.sensitivityRunCombobox.setSelectedItem(sensitivityRuns[0]);
         }
 
-        EmfDataset dataset = analysis.getCancerRiskDataset();
-        if (dataset != null) {
-
-            this.cancerRiskDatasetField.setText(dataset.getName());
-
-            this.updateVersions(dataset, this.cancerRiskDatasetVersionComboBox);
-            this.cancerRiskDatasetVersionComboBox.setSelectedIndex(getVersionIndex(dataset, analysis
-                    .getCancerRiskDatasetVersion()));
-        }
     }
 
     private JPanel createMiddlePane() {
@@ -208,75 +193,6 @@ public class FastAnalysisConfigurationTab extends AbstractFastAnalysisTab {
                     .getSelectedItem()));
             this.sensitivityRunCombobox.setPreferredSize(fieldSize);
             panel.add(this.sensitivityRunCombobox, constraints);
-
-            constraints.gridx = 0;
-            constraints.gridy += 1;
-            constraints.weightx = 0;
-            constraints.fill = GridBagConstraints.HORIZONTAL;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = labelInsets;
-
-            JLabel cancerRiskLabel = new JLabel("Cancer Risk Dataset:");
-            panel.add(cancerRiskLabel, constraints);
-
-            constraints.gridx = 1;
-            constraints.weightx = 1;
-            constraints.fill = GridBagConstraints.BOTH;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = valueInsets;
-
-            this.cancerRiskDatasetField = new TextField("Cancer Risk Dataset", 45);
-            this.cancerRiskDatasetField.setPreferredSize(fieldSize);
-            this.cancerRiskDatasetField.setEditable(false);
-            this.cancerRiskDatasetField.setBackground(Color.WHITE);
-            panel.add(this.cancerRiskDatasetField, constraints);
-
-            constraints.gridx = 2;
-            constraints.weightx = 0;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = buttonInsets;
-
-            Button cancerRiskDatasetButton = new Button("Browse", new AbstractFastAction(this.getMessagePanel(),
-                    "Error adding cancer risk dataset") {
-                @Override
-                protected void doActionPerformed(ActionEvent e) throws EmfException {
-
-                    DatasetCommand command = new DatasetCommand() {
-                        public void execute() throws EmfException {
-                            FastAnalysis analysis = getAnalysis();
-                            analysis.setCancerRiskDataset(this.getDataset());
-                        }
-                    };
-
-                    getDataset(getPresenter().getDatasetType(DatasetType.FAST_CANCER_RISK), cancerRiskDatasetField,
-                            cancerRiskDatasetVersionComboBox, command);
-                }
-            });
-
-            panel.add(cancerRiskDatasetButton, constraints);
-
-            constraints.gridx = 0;
-            constraints.gridy += 1;
-            constraints.weightx = 0;
-            constraints.fill = GridBagConstraints.HORIZONTAL;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = labelInsets;
-
-            JLabel cancerRiskDatasetVersionLabel = new JLabel("Cancer Risk Dataset Version:");
-            panel.add(cancerRiskDatasetVersionLabel, constraints);
-
-            constraints.gridx = 1;
-            constraints.weightx = 0;
-            constraints.fill = GridBagConstraints.BOTH;
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.insets = valueInsets;
-
-            this.cancerRiskDatasetVersionComboBox = new ComboBox();
-            this.cancerRiskDatasetVersionComboBox.setPreferredSize(comboBoxSize);
-            this.cancerRiskDatasetVersionComboBox.setEditable(false);
-            this.cancerRiskDatasetVersionComboBox.setEnabled(false);
-            panel.add(this.cancerRiskDatasetVersionComboBox, constraints);
 
             constraints.gridx = 0;
             constraints.gridy += 1;
@@ -492,24 +408,12 @@ public class FastAnalysisConfigurationTab extends AbstractFastAnalysisTab {
 
         analysis.setSensitivityRuns(sensitivityRuns);
 
-        analysis.setCancerRiskDataset(this.getAnalysis().getCancerRiskDataset());
         analysis.setGrid((Grid) this.gridCombobox.getSelectedItem());
-
-        Object selectedItem = this.cancerRiskDatasetVersionComboBox.getSelectedItem();
-        if (selectedItem != null) {
-
-            Version version = (Version) selectedItem;
-            analysis.setCancerRiskDatasetVersion(version.getVersion());
-        }
     }
 
-    private void validateFields() throws EmfException {
+    private void validateFields() {
 
         this.clearMessage();
-
-        if (this.cancerRiskDatasetField.getText().trim().length() == 0) {
-            throw new EmfException(this.getName() + " tab: A cancer risk dataset must be specified");
-        }
     }
 
     public void refresh(FastAnalysis analysis) {

@@ -78,7 +78,7 @@ where "name" = 'FAST Domain Population';
 
 
 -- Add new projections
-INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) VALUES (104307, 'WRF', 104307, 'PROJCS["Lambert_Conformal_Conic", 
+INSERT INTO public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) VALUES (104307, 'WRF', 104307, 'PROJCS["Lambert_Conformal_Conic", 
   GEOGCS["unnamed ellipse", 
     DATUM["D_unknown", 
       SPHEROID["Unknown", 6370000.0, 0.0]], 
@@ -97,13 +97,13 @@ INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) VALU
   UNIT["m", 1.0], 
   AXIS["x", EAST], 
   AXIS["y", NORTH]]', '+proj=lcc +a=6370000.0 +b=6370000.0 +lat_1=33 +lat_2=45 +lat_0=40.0 +lon_0=-97.0');
-INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) VALUES (104308, 'WRF', 104308, NULL, '+proj=latlong +a=6370000.0 +b=6370000.0');
+INSERT INTO public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) VALUES (104308, 'WRF', 104308, NULL, '+proj=latlong +a=6370000.0 +b=6370000.0');
 
 -- 7/8/2010
 -- DS Type that was missed
 
 -- FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission
-INSERT INTO dataset_types (name, description, min_files, max_files, external, default_sortorder, importer_classname, exporter_classname, lock_owner, lock_date, table_per_dataset, creation_date, last_mod_date, creator, file_format) VALUES ('FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission', 'FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission', 1, 1, false, '', 'gov.epa.emissions.commons.io.other.SMKReportImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter', NULL, NULL, 1, NULL, NULL, NULL, NULL);
+INSERT INTO emf.dataset_types (name, description, min_files, max_files, external, default_sortorder, importer_classname, exporter_classname, lock_owner, lock_date, table_per_dataset, creation_date, last_mod_date, creator, file_format) VALUES ('FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission', 'FAST Gridded Sector-CMAQ-Inventory-Pollutant Emission', 1, 1, false, '', 'gov.epa.emissions.commons.io.other.SMKReportImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter', NULL, NULL, 1, NULL, NULL, NULL, NULL);
 insert into emf.dataset_types_keywords (dataset_type_id, list_index, keyword_id, "value", kwname)
 select dt.id as dataset_type_id,
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = dt.id) as list_index,
@@ -170,3 +170,5 @@ INSERT INTO emf.fileformat_columns (file_format_id, list_index, name, type, defa
 
 INSERT INTO fast.fast_analysis_output_types (name) VALUES ('FAST Gridded Difference');
 INSERT INTO fast.fast_analysis_output_types (name) VALUES ('FAST Domain Difference');
+
+INSERT INTO fast.grids (name, description, abbreviation, resltn, map_projtn, xorig, yorig, xcell, ycell, ncols, nrows, nthik, xcent, ycent) VALUES ('Detroit_36_45_4km', 'Detroit_36_45_4km', 'Detroit_36_45_4km', '1', '+proj=lcc +a=6370000.0 +b=6370000.0 +lat_1=33 +lat_2=45 +lat_0=40.0 +lon_0=-97.0', -97, 40, 4000, 4000, 36, 45, 1, 1044000, 252000);

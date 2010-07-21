@@ -32,10 +32,6 @@ public class FastAnalysis extends LockableImpl implements Serializable {
 
     private String copiedFrom;
 
-    private EmfDataset cancerRiskDataset;
-
-    private Integer cancerRiskDatasetVersion;
-
     private FastAnalysisRun[] baselineRuns = new FastAnalysisRun[] {};
 
     private FastAnalysisRun[] sensitivityRuns = new FastAnalysisRun[] {};
@@ -142,22 +138,6 @@ public class FastAnalysis extends LockableImpl implements Serializable {
 
     public void setCopiedFrom(String copiedFrom) {
         this.copiedFrom = copiedFrom;
-    }
-
-    public Integer getCancerRiskDatasetVersion() {
-        return cancerRiskDatasetVersion;
-    }
-
-    public void setCancerRiskDatasetVersion(Integer cancerRiskDatasetVersion) {
-        this.cancerRiskDatasetVersion = cancerRiskDatasetVersion;
-    }
-
-    public EmfDataset getCancerRiskDataset() {
-        return cancerRiskDataset;
-    }
-
-    public void setCancerRiskDataset(EmfDataset cancerRiskDataset) {
-        this.cancerRiskDataset = cancerRiskDataset;
     }
 
     public Sector[] getOutputSectors() {

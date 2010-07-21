@@ -776,14 +776,10 @@ public class FastServiceImpl implements FastService {
 
                 DbServer dbServer = dbServerFactory.getDbServer();
 
-                int fastDatasetId = dao.addFastNonPointDataset(fastNonPointDataset.getName(), fastNonPointDataset
-                        .getBaseNonPointDataset().getName(), fastNonPointDataset.getBaseNonPointDatasetVersion(),
-                        fastNonPointDataset.getGriddedSMKDataset().getName(), fastNonPointDataset
-                                .getGriddedSMKDatasetVersion(), fastNonPointDataset.getInvTableDataset().getName(),
-                        fastNonPointDataset.getInvTableDatasetVersion(), fastNonPointDataset.getGrid().getName(), user
-                                .getName(), session, dbServer);
+                int fastDatasetId = dao.addFastNonPointDataset(fastNonPointDataset, user, 
+                        session, dbServer);
 
-                populateFastQuasiPointDataset((new UserDAO()).get(user.getName(), session), fastDatasetId);
+                populateFastQuasiPointDataset(user, fastDatasetId);
 
                 this.setReturnValue(fastDatasetId);
             }
@@ -1316,16 +1312,6 @@ public class FastServiceImpl implements FastService {
                 return "Could not retrieve Fast analysis output types";
             }
         });
-    }
-
-    private String getProperty(String propertyName) {
-        Session session = sessionFactory.getSession();
-        try {
-            EmfProperty property = new EmfPropertiesDAO().getProperty(propertyName, session);
-            return property.getValue();
-        } finally {
-            session.close();
-        }
     }
 
     public synchronized void exportFastOutputToShapeFile(int datasetId, int datasetVersion, int gridId, String userName, 

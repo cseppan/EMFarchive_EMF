@@ -309,3 +309,9 @@ select (select id from emf.dataset_types where "name" = 'FAST Transfer Coefficie
   (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_keywords where dataset_type_id = (select id from emf.dataset_types where "name" = 'FAST Transfer Coefficients')) as list_index,
   (select id from emf.keywords where "name" = 'INDICES') as keyword_id,
   'sector|pollutant|type' as "value", 'INDICES' as kwname;
+
+-- add domain ds relatrionship to fast runs relationship  
+alter table fast.fast_runs 
+add column domain_population_dataset_id integer,
+add column   domain_population_dataset_version integer;
+  

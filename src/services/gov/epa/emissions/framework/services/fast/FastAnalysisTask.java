@@ -213,11 +213,11 @@ public class FastAnalysisTask {
                 .getFileFormat(), dbServer.getSqlDataTypes()), "");
     }
 
-    private EmfDataset getFastRunGriddedSummaryEmissionAirQualityDataset(FastRun fastRun) {
+    private EmfDataset getFastRunGriddedOutputDataset(FastRun fastRun) {
         EmfDataset dataset = null;
         for (FastRunOutput output : getFastRunOutputs(fastRun.getId())) {
             if (output.getOutputDataset().getDatasetType().getName().equals(
-                    DatasetType.FAST_RUN_INTERMEDIATE_AIR_QUALITY)) {
+                    DatasetType.FAST_RUN_GRIDDED_OUTPUT)) {
                 dataset = output.getOutputDataset();
             }
         }
@@ -264,7 +264,7 @@ public class FastAnalysisTask {
         FastAnalysisRun[] fastAnalysisRuns = fastAnalysis.getBaselineRuns();
         int count = 0;
         for (FastAnalysisRun fastAnalysisRun : fastAnalysisRuns) {
-            EmfDataset dataset = getFastRunGriddedSummaryEmissionAirQualityDataset(fastAnalysisRun.getFastRun());
+            EmfDataset dataset = getFastRunGriddedOutputDataset(fastAnalysisRun.getFastRun());
             int versionNumber = 0;
             double adjustmentFactor = fastAnalysisRun.getAdjustmentFactor();
             Version inventoryVersion = version(dataset.getId(), versionNumber);
@@ -287,7 +287,7 @@ public class FastAnalysisTask {
         fastAnalysisRuns = fastAnalysis.getSensitivityRuns();
         count = 0;
         for (FastAnalysisRun fastAnalysisRun : fastAnalysisRuns) {
-            EmfDataset dataset = getFastRunGriddedSummaryEmissionAirQualityDataset(fastAnalysisRun.getFastRun());
+            EmfDataset dataset = getFastRunGriddedOutputDataset(fastAnalysisRun.getFastRun());
             int versionNumber = 0;
             double adjustmentFactor = fastAnalysisRun.getAdjustmentFactor();
             Version inventoryVersion = version(dataset.getId(), versionNumber);
