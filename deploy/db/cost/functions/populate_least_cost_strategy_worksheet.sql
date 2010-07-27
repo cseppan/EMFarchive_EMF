@@ -413,7 +413,7 @@ BEGIN
 			null, null, 
 			null'
 			end
-			|| '))';
+			|| ',inv.ceff, ' || ref_cost_year_chained_gdp || '::double precision / gdplev_incr.chained_gdp::double precision * er.incremental_cost_per_ton))';
 	get_strategt_cost_inner_sql := replace(get_strategt_cost_sql,'m.control_measures_id','m.id');
 
 
@@ -628,6 +628,9 @@ BEGIN
 
 			)
 
+			left outer join reference.gdplev gdplev_incr
+			on gdplev_incr.annual = er.cost_year
+
 			inner join emf.control_measure_months ms
 			on ms.control_measure_id = m.id
 			and ms.month in (0::integer' || case when dataset_month != 0 then ',' || dataset_month || '::integer' else '' end || ')
@@ -710,7 +713,7 @@ BEGIN
 			)' else '' end || '
 
 			' || case when include_unspecified_costs = true then '' else '
-			and (select sum(' || replace(replace(replace(replace(replace(get_strategt_cost_inner_sql,'inv.','inv2.'),'er.','er2.'),'et.','et2.'),'eq.','eq2.'),'gdplev.','gdplev2.') || '.annual_cost) as annual_cost
+			and (select sum(' || replace(replace(replace(replace(replace(replace(get_strategt_cost_inner_sql,'inv.','inv2.'),'er.','er2.'),'et.','et2.'),'eq.','eq2.'),'gdplev.','gdplev2.'),'gdplev_incr.','gdplev_incr2.') || '.annual_cost) as annual_cost
 
 			FROM emissions.' || inv_table_name || ' inv2
 
@@ -760,6 +763,8 @@ BEGIN
 
 				)
 
+				left outer join reference.gdplev gdplev_incr2
+				on gdplev_incr2.annual = er2.cost_year
 
 			where 	' || replace(inv_filter,'inv.','inv2.') || coalesce(replace(county_dataset_filter_sql,'inv.','inv2.'), '') || '
 
@@ -939,6 +944,9 @@ BEGIN
 			)
 
 		)
+
+		left outer join reference.gdplev gdplev_incr
+		on gdplev_incr.annual = er.cost_year
 
 		inner join emf.control_measure_months ms
 		on ms.control_measure_id = m.id

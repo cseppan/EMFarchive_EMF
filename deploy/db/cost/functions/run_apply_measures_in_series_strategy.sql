@@ -212,7 +212,7 @@ BEGIN
 			abbreviation, ' || discount_rate|| ', 
 			m.equipment_life, er.cap_ann_ratio, 
 			er.cap_rec_factor, er.ref_yr_cost_per_ton, 
-			' || emis_sql || ' * ' || percent_reduction_sql || ' / 100, ' || ref_cost_year_chained_gdp || ' / cast(chained_gdp as double precision), 
+			' || emis_sql || ' * ' || percent_reduction_sql || ' / 100, ' || ref_cost_year_chained_gdp || ' / cast(gdplev.chained_gdp as double precision), 
 			' || case when use_cost_equations then 
 			'et.name, 
 			eq.value1, eq.value2, 
@@ -232,7 +232,7 @@ BEGIN
 			null, null, 
 			null, null'
 			end
-			|| '))';
+			|| ',inv.ceff, ' || ref_cost_year_chained_gdp || '::double precision / gdplev_incr.chained_gdp::double precision * er.incremental_cost_per_ton))';
 	get_strategt_cost_inner_sql := replace(get_strategt_cost_sql,'m.control_measures_id','m.id');
 
 
@@ -394,6 +394,9 @@ BEGIN
 			and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
 			-- effecive date filter
 			and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)
+
+			left outer join reference.gdplev gdplev_incr
+			on gdplev_incr.annual = er.cost_year
 
 			' || case when measures_count = 0 and measure_classes_count > 0 then '
 			inner join emf.control_strategy_classes csc

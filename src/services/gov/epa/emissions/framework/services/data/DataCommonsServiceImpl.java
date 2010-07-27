@@ -221,13 +221,14 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             //validate INDICES keyword...
             XFileFormat xFileFormat = type.getFileFormat();
             Column[] cols = new Column[] { };
-            if (xFileFormat != null)
+            if (xFileFormat != null) {
                 cols = xFileFormat.cols();
-            else {
-                TableFormat tableFormat = new FileFormatFactory(dbServer).tableFormat(type);
-                cols = tableFormat.cols();
+            } else {
+                TableFormat tableFormat = new FileFormatFactory(dbServer).tableFormat(type, true);
+                if (tableFormat != null) cols = tableFormat.cols();
             }
-            dao.validateDatasetTypeIndicesKeyword(type, cols);
+            if (cols != null) 
+                dao.validateDatasetTypeIndicesKeyword(type, cols);
             
             DatasetType locked = dao.updateDatasetType(type, session);
 

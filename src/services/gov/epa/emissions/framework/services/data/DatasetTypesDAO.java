@@ -95,7 +95,7 @@ public class DatasetTypesDAO {
         //validate INDICES keyword...
         //first validate columns to index actually exist! 
         KeyVal[] keyVal = keyValFound(datasetType, Keyword.INDICES);
-        if (keyVal != null && keyVal.length > 0) {
+        if (cols != null && keyVal != null && keyVal.length > 0) {
             for (String columnList : keyVal[0].getValue().split("\\|")) {
                 for (String columnName : columnList.split("\\,")) {
                     if (!hasColName(cols, columnName))

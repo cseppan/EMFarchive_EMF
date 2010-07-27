@@ -14,6 +14,8 @@ public class FastRunOutputType implements Serializable, Comparable {
 
     public static final String GRIDDED_OUTPUT = "Gridded Output";
 
+    public static final String DOMAIN_OUTPUT = "Domain Output";
+
     public FastRunOutputType() {
         //
     }

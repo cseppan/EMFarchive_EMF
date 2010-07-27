@@ -702,7 +702,7 @@ BEGIN
 					when cont.replacement = ''R'' then ' || uncontrolled_emis_sql || ' * ' || cont_packet_percent_reduction_sql || ' / 100.0
 					when cont.replacement = ''A'' then ' || emis_sql || ' * ' || cont_packet_percent_reduction_sql || ' / 100.0
 				end
-				, ' || ref_cost_year_chained_gdp || ' / cast(chained_gdp as double precision), 
+				, ' || ref_cost_year_chained_gdp || ' / cast(gdplev.chained_gdp as double precision), 
 				' || case when use_cost_equations then 
 				'et.name, 
 				eq.value1, eq.value2, 
@@ -722,7 +722,7 @@ BEGIN
 				null, null, 
 				null, null'
 				end
-				|| '))';
+				|| ',inv.ceff, ' || ref_cost_year_chained_gdp || '::double precision / gdplev_incr.chained_gdp::double precision * er.incremental_cost_per_ton))';
 
 
 		-- make sure the apply order is 1, this should be the first thing happening to a source....this is important when the controlled inventpory is created.
@@ -874,6 +874,9 @@ BEGIN
 			and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0
 --			and ' || cont_packet_percent_reduction_sql || ' <> 0.0
 			
+			left outer join reference.gdplev gdplev_incr
+			on gdplev_incr.annual = er.cost_year
+
 			left outer join emf.control_measures m
 			on m.id = er.control_measures_id
 			-- control program measure and technology filter

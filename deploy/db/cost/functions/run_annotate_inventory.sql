@@ -282,7 +282,7 @@ BEGIN
 			null, null, 
 			null, null'
 			end
-			|| '))';
+			|| ',inv.ceff, ' || ref_cost_year_chained_gdp || '::double precision / gdplev_incr.chained_gdp::double precision * er.incremental_cost_per_ton))';
 	get_strategt_cost_inner_sql := replace(get_strategt_cost_sql,'m.control_measures_id','m.id');
 
 	-- build insert column list and select column list
@@ -405,6 +405,9 @@ BEGIN
 				and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
 				-- effecive date filter
 				and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)		
+
+				left outer join reference.gdplev gdplev_incr
+				on gdplev_incr.annual = er.cost_year
 
 				' || case when measures_count = 0 and measure_classes_count > 0 then '
 				inner join emf.control_strategy_classes csc

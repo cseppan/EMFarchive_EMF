@@ -1,11 +1,13 @@
 package gov.epa.emissions.framework.services.fast.shapefile;
 
 import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresSQLToShapeFile;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -97,13 +99,15 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
             
             //generate a file per sector
             for (String sector : getDatasetSectors(dataset, datasetVersion)) {
-                file = exportFile(this.dirName, dataset, sector);
-                suffix = suffix();
-                prepare(suffix, dataset);
-                String sql = prepareSQLStatement(dataset, datasetVersion, grid, this.pollutant, sector);
-                exporter.create(getProperty("postgres-bin-dir"), getProperty("postgres-db"), getProperty("postgres-user"),
-                        getProperty("pgsql2shp-info"), file.getAbsolutePath(), sql, null);
-                complete(suffix, dataset);
+                for (String pollutant : getDatasetPollutants(dataset, datasetVersion, sector)) {
+                    file = exportFile(this.dirName, dataset, sector, pollutant);
+                    suffix = suffix();
+                    prepare(suffix, dataset);
+                    String sql = prepareSQLStatement(dataset, datasetVersion, grid, pollutant, sector);
+                    exporter.create(getProperty("postgres-bin-dir"), getProperty("postgres-db"), getProperty("postgres-user"),
+                            getProperty("pgsql2shp-info"), file.getAbsolutePath(), sql, null);
+                    complete(suffix, dataset);
+                }
             }
         } catch (Exception e) {
             logError("Failed to export dataset : " + dataset.getName() + suffix, e);
@@ -169,8 +173,9 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
             dbServer = dbServerFactory.getDbServer();
             VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion, "i");
             ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
-                    "select distinct coalesce(sector, '') as sector from emissions." + emissionTableName(dataset) + " as i where " + datasetVersionedQuery.query() + " order by sector ");
-            
+                    "select distinct coalesce(sector, '') as sector from emissions." + emissionTableName(dataset)
+                            + " as i where " + datasetVersionedQuery.query() + " order by sector ");
+
             while (rs.next()) {
                 sectorList.add(rs.getString(1));
             }
@@ -185,7 +190,43 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
                     e.printStackTrace();
                 }
         }
-        return sectorList.toArray(new String[0]);    }
+        return sectorList.toArray(new String[0]);
+    }
+
+    private String[] getDatasetPollutants(EmfDataset dataset, Version datasetVersion, String sector) throws EmfException {
+        DbServer dbServer = null;
+        DatasetType datasetType = dataset.getDatasetType();
+        boolean hasCmaqPollutantColumn = false;
+        boolean hasPollutantColumn = false;
+        for (Column column : datasetType.getFileFormat().getColumns()) {
+            if (column.getName().equalsIgnoreCase("cmaq_pollutant")) hasCmaqPollutantColumn = true;
+            if (column.getName().equalsIgnoreCase("pollutant")) hasPollutantColumn = true;
+        }
+        List<String> pollutantList = new ArrayList<String>();
+        if (!hasCmaqPollutantColumn && !hasPollutantColumn) return new String[0];
+        try {
+            dbServer = dbServerFactory.getDbServer();
+            VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion, "i");
+            ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
+                    "select distinct coalesce(" + (hasCmaqPollutantColumn ? "cmaq_pollutant" : "pollutant") + ", '') as " + (hasCmaqPollutantColumn ? "cmaq_pollutant" : "pollutant") + " from emissions." + emissionTableName(dataset)
+                            + " as i where " + datasetVersionedQuery.query() + " and sector = '" + sector.replace("'","''") + "' order by " + (hasCmaqPollutantColumn ? "cmaq_pollutant" : "pollutant") + " ");
+
+            while (rs.next()) {
+                pollutantList.add(rs.getString(1));
+            }
+        } catch (SQLException e) {
+            throw new EmfException(e.getMessage(), e);
+        } finally {
+            if (dbServer != null)
+                try {
+                    dbServer.disconnect();
+                } catch (Exception e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
+        }
+        return pollutantList.toArray(new String[0]);
+    }
 
     private String prepareSQLStatement(EmfDataset dataset, Version datasetVersion, Grid grid, String pollutant, String sector) throws ExporterException {
 
@@ -246,13 +287,15 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
                     cols.put(colName, colName);
                     colNames += (colNames.length() > 0 ? "," : "");
                     if (colName.equals("x")) {
-                        colNames += "i." + colName;
+                        colNames += "hor.x";
                     } else if (colName.equals("y")) {
-                        colNames += "i." + colName;
+                        colNames += "vert.y";
                     } else if (colName.equals("sector")) {
                         colNames += "'" + sector + "'::varchar(64) as sector";
-                    } else if (colName.equals("pollutant") || colName.equals("cmaq_pollutant")) {
-                        colNames += "'" + pollutant + "'::varchar(64) as pollutant";
+                    } else if (colName.equals("pollutant")) {
+                        colNames += "pollutant";
+                    } else if (colName.equals("cmaq_pollutant")) {
+                        colNames += "cmaq_pollutant";
                     } else {
                         colNames += colName + (!colAliases.containsKey(colName) ? "" : " as " + colAliases.get(colName));
                     }
@@ -348,12 +391,12 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
 //        }
 //    }
 
-    private File exportFile(String dirName, EmfDataset dataset, String sector) {
-        return new File(dirName, getFileName(dataset, sector));
+    private File exportFile(String dirName, EmfDataset dataset, String sector, String pollutant) {
+        return new File(dirName, getFileName(dataset, sector, pollutant));
     }
 
-    private String getFileName(EmfDataset dataset, String sector) {
-        String fileName = sector + "_" + dataset.getName();
+    private String getFileName(EmfDataset dataset, String sector, String pollutant) {
+        String fileName = sector + "_" + pollutant + "_" + dataset.getName();
         for (int i = 0; i < fileName.length(); i++) {
             if (!Character.isLetterOrDigit(fileName.charAt(i))) {
                 fileName = fileName.replace(fileName.charAt(i), '_');

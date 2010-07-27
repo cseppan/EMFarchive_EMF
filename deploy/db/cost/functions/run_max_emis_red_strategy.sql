@@ -358,7 +358,7 @@ end
 			null, null, 
 			null'
 			end
-			|| '))';
+			|| ',inv.ceff, ' || ref_cost_year_chained_gdp || '::double precision / gdplev_incr.chained_gdp::double precision * er.incremental_cost_per_ton))';
 
 	--select strpos('abc,def,ght','ght')
 	get_strategt_cost_inner_sql := replace(replace(get_strategt_cost_sql,'tpm.control_measures_id','m.id'),'tpm.equipment_life','m.equipment_life');
@@ -529,7 +529,7 @@ end
 					er.control_measures_id,
 					' || remaining_emis_sql || ' as remaining_emis,
 					' || percent_reduction_sql || ' as percent_reduction,
-					(select sum(' || replace(replace(replace(replace(replace(replace(get_strategt_cost_inner_sql,'inv.','inv2.'),'er.','er2.'),'et.','et2.'),'eq.','eq2.'),'gdplev.','gdplev2.'),'invpm25or10.','invpm25or10_2.') || '.annual_cost) as annual_cost
+					(select sum(' || replace(replace(replace(replace(replace(replace(replace(get_strategt_cost_inner_sql,'inv.','inv2.'),'er.','er2.'),'et.','et2.'),'eq.','eq2.'),'gdplev.','gdplev2.'),'gdplev_incr.','gdplev_incr2.'),'invpm25or10.','invpm25or10_2.') || '.annual_cost) as annual_cost
 
 					FROM emissions.' || inv_table_name || ' inv2
 
@@ -613,6 +613,9 @@ end
 
 						)
 		
+						left outer join reference.gdplev gdplev_incr2
+						on gdplev_incr2.annual = er2.cost_year
+
 					where 	' || replace(inv_filter,'inv.','inv2.') || coalesce(replace(county_dataset_filter_sql,'inv.','inv2.'), '') || '
 
 						-- limit to specific source
@@ -738,6 +741,9 @@ end
 
 					)
 
+					left outer join reference.gdplev gdplev_incr
+					on gdplev_incr.annual = er.cost_year
+
 					' || case when measures_count = 0 and measure_classes_count > 0 then '
 					inner join emf.control_strategy_classes csc
 					on csc.control_measure_class_id = m.cm_class_id
@@ -822,7 +828,7 @@ end
 					)' else '' end || '
 
 					' || case when include_unspecified_costs = true then '' else '
-					and (select sum(' || replace(replace(replace(replace(replace(replace(get_strategt_cost_inner_sql,'inv.','inv2.'),'er.','er2.'),'et.','et2.'),'eq.','eq2.'),'gdplev.','gdplev2.'),'invpm25or10.','invpm25or10_2.') || '.annual_cost) as annual_cost
+					and (select sum(' || replace(replace(replace(replace(replace(replace(replace(get_strategt_cost_inner_sql,'inv.','inv2.'),'er.','er2.'),'et.','et2.'),'eq.','eq2.'),'gdplev.','gdplev2.'),'gdplev_incr.','gdplev_incr2.'),'invpm25or10.','invpm25or10_2.') || '.annual_cost) as annual_cost
 
 					FROM emissions.' || inv_table_name || ' inv2
 
@@ -903,6 +909,9 @@ end
 							)
 
 						)
+
+						left outer join reference.gdplev gdplev_incr2
+						on gdplev_incr2.annual = er2.cost_year
 
 					where 	' || replace(inv_filter,'inv.','inv2.') || coalesce(replace(county_dataset_filter_sql,'inv.','inv2.'), '') || '
 
@@ -996,6 +1005,9 @@ end
 			)
 
 		)
+
+		left outer join reference.gdplev gdplev_incr
+		on gdplev_incr.annual = er.cost_year
 
 	where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 		-- dont include sources that have no emissions...

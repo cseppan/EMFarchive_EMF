@@ -230,7 +230,7 @@ public class ControlMeasuresImporter implements Importer {
         }
     }
 
-    private void runSummary(Map controlMeasures) throws ImporterException {
+    private void runSummary(Map controlMeasures) throws ImporterException, FileNotFoundException {
         setStatus("Started reading summary file");
         CMSummaryImporter summary = cmImporters.summaryImporter();
         summary.run(controlMeasures);

@@ -247,6 +247,47 @@ public class FastRunTask {
         return griddedOutput;
     }
 
+    public FastRunOutput createDomainOutput(EmfDataset griddedOutputDataset) throws Exception {
+
+        // setup result
+        FastRunOutput domainOutput = null;
+        String runStatus = "";
+
+        // Create EECS Detailed Mapping Result Output
+        try {
+            setStatus("Started creating " + DatasetType.FAST_RUN_DOMAIN_OUTPUT + " dataset output.");
+
+            EmfDataset domainOutputDataset = createDomainOutputDataset();
+
+            domainOutput = createFastRunOutput(
+                    getFastRunOutputType(FastRunOutputType.DOMAIN_OUTPUT),
+                    domainOutputDataset);
+
+            populateDomainOutput(domainOutputDataset, griddedOutputDataset);
+
+            updateOutputDatasetVersionRecordCount(domainOutput);
+
+            runStatus = "Completed.";
+
+            setStatus("Completed creating " + DatasetType.FAST_RUN_DOMAIN_OUTPUT + " dataset output.");
+
+        } catch (EmfException ex) {
+            ex.printStackTrace();
+            runStatus = "Failed creating " + DatasetType.FAST_RUN_DOMAIN_OUTPUT + ". Exception = "
+                    + ex.getMessage();
+            setStatus(runStatus);
+            throw ex;
+        } finally {
+            if (domainOutput != null) {
+                domainOutput.setCompletionDate(new Date());
+                domainOutput.setRunStatus(runStatus);
+                saveFastRunOutput(domainOutput);
+            }
+        }
+
+        return domainOutput;
+    }
+
     public void run() throws EmfException {
 
         // get rid of run outputs
@@ -859,6 +900,66 @@ public class FastRunTask {
         return griddedSectorSCCPollDataset;
     }
 
+    private void populateDomainOutput(EmfDataset domainOutputDataset, EmfDataset griddedOutputDataset) throws EmfException {
+        String sql2 = "";
+        
+        DbServer dbServer = dbServerFactory.getDbServer();
+        Connection con = dbServer.getConnection();
+        Statement statement = null;
+        try {
+        
+            String colNameList = "dataset_id, delete_versions, version";
+            for (Column column : domainOutputDataset.getDatasetType().getFileFormat().getColumns()) {
+                colNameList += ", " + column.getName();
+            }
+        
+            VersionedQuery griddedOutputVersionedQuery = new VersionedQuery(version(griddedOutputDataset.getId(), 0));
+            String griddedOutputTableName = qualifiedEmissionTableName(griddedOutputDataset);
+        
+            String domainOutputTableName = qualifiedEmissionTableName(domainOutputDataset);
+        
+            sql2 = "INSERT INTO "
+            + domainOutputTableName
+            + " (" + colNameList + ") \nselect "
+            + domainOutputDataset.getId()
+            + "::integer as dataset_id, '' as delete_versions, 0 as version,"
+            + "sector,cmaq_pollutant,sum(emission) as emission, sum(population_weighted_cancer_risk) as population_weighted_cancer_risk,sum(population_weighted_air_quality) as population_weighted_air_quality "
+            + " from " + griddedOutputTableName + " "
+            + " where " + griddedOutputVersionedQuery.query() 
+            + " group by sector, cmaq_pollutant "
+            + " order by sector, cmaq_pollutant;";
+            
+            statement = con.createStatement();
+            statement.execute(sql2);
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query \n" + e.getMessage(), e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) { /**/
+                }
+                statement = null;
+            }
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException e) { /**/
+                }
+                con = null;
+            }
+            if (dbServer != null) {
+                try {
+                    dbServer.disconnect();
+                } catch (Exception e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
+                dbServer = null;
+            }
+        }
+    }
+
     private String buildSQLSelectForORLPointDataset(EmfDataset orlPointDataset, int versionNumber) throws EmfException {
         // Sector sector = griddedSCCDataset.getSectors()[0];
         // String tableName = griddedSCCDataset.getInternalSources()[0].getTable();
@@ -1076,7 +1177,9 @@ public class FastRunTask {
 
         createIntermediateAirQualityOutput(results.toArray(new FastGriddedCMAQPollutantAirQualityEmissionResult[0]));
 
-        createGriddedOutput(results.toArray(new FastGriddedCMAQPollutantAirQualityEmissionResult[0]));
+        FastRunOutput griddedOutput = createGriddedOutput(results.toArray(new FastGriddedCMAQPollutantAirQualityEmissionResult[0]));
+
+        createDomainOutput(griddedOutput.getOutputDataset());
 
     }
 
@@ -1136,6 +1239,13 @@ public class FastRunTask {
         return transferCoefficientMap;
     }
 
+    private EmfDataset createDomainOutputDataset() throws Exception {
+        DatasetType datasetType = getDatasetType(DatasetType.FAST_RUN_DOMAIN_OUTPUT);
+        return creator.addDataset("ds", fastRun.getName() + "_"
+                + DatasetType.FAST_RUN_DOMAIN_OUTPUT, datasetType, new VersionedTableFormat(datasetType
+                .getFileFormat(), dbServer.getSqlDataTypes()), "");
+    }
+    
     private EmfDataset createGriddedOutputDataset(FastGriddedCMAQPollutantAirQualityEmissionResult[] results)
             throws Exception {
         DbServer dbServer = dbServerFactory.getDbServer();

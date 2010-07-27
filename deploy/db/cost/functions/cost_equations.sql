@@ -804,6 +804,8 @@ CREATE OR REPLACE FUNCTION public.get_strategy_costs(
 	design_capacity double precision, 
 	design_capacity_unit_numerator character varying, 
 	design_capacity_unit_denominator character varying, 
+	ceff double precision, 
+	ref_yr_incremental_cost_per_ton double precision,  
 	OUT annual_cost double precision, 
 	OUT capital_cost double precision, 
 	OUT operation_maintenance_cost double precision, 
@@ -880,7 +882,9 @@ BEGIN
 				-- convert design capacity to mmBtu/hr
 				converted_design_capacity := 3.412 * converted_design_capacity;
 				IF coalesce(converted_design_capacity, 0) <> 0 THEN
+-- NOTES
 -- design capacity must be less than or equal to 2000 MMBTU/hr (or 586.1665 MW))
+-- use incremental variables if appropriate already controlled
 					IF (converted_design_capacity <= 2000.0) THEN
 						select costs.annual_cost,
 							costs.capital_cost,
@@ -893,10 +897,10 @@ BEGIN
 							capital_recovery_factor, 
 							emis_reduction, 
 							converted_design_capacity, 
-							variable_coefficient1, 
-							variable_coefficient2, 
-							variable_coefficient3, 
-							variable_coefficient4) as costs
+							case when coalesce(ceff, 0.0) = 0.0 then variable_coefficient1 else variable_coefficient5 end,
+							case when coalesce(ceff, 0.0) = 0.0 then variable_coefficient2 else variable_coefficient6 end,
+							case when coalesce(ceff, 0.0) = 0.0 then variable_coefficient3 else variable_coefficient7 end,
+							case when coalesce(ceff, 0.0) = 0.0 then variable_coefficient4 else variable_coefficient8 end) as costs
 						into annual_cost,
 							capital_cost,
 							operation_maintenance_cost,
@@ -1112,7 +1116,7 @@ BEGIN
 		equipment_life, 
 		capital_annualized_ratio, 
 		capital_recovery_factor, 
-		ref_yr_cost_per_ton, 
+		case when coalesce(ceff, 0.0) <> 0.0 and coalesce(ref_yr_incremental_cost_per_ton, 0.0) <> 0.0 then ref_yr_incremental_cost_per_ton else ref_yr_cost_per_ton end, 
 		emis_reduction) as costs
 	into annual_cost,
 		capital_cost,
@@ -1156,6 +1160,8 @@ CREATE OR REPLACE FUNCTION public.get_strategy_costs(
 	design_capacity_unit_numerator character varying, 
 	design_capacity_unit_denominator character varying, 
 	annual_avg_hours_per_year double precision, 
+	ceff double precision, 
+	ref_yr_incremental_cost_per_ton double precision,  
 	OUT annual_cost double precision, 
 	OUT capital_cost double precision, 
 	OUT variable_operation_maintenance_cost double precision, 
@@ -1457,7 +1463,9 @@ BEGIN
 					stack_flow_rate, 
 					design_capacity, 
 					design_capacity_unit_numerator, 
-					design_capacity_unit_denominator) as costs
+					design_capacity_unit_denominator,
+					ceff,
+					ref_yr_incremental_cost_per_ton) as costs
 				into annual_cost,
 					capital_cost,
 					operation_maintenance_cost,
@@ -1480,7 +1488,7 @@ BEGIN
 		equipment_life, 
 		capital_annualized_ratio, 
 		capital_recovery_factor, 
-		ref_yr_cost_per_ton, 
+		case when coalesce(ceff, 0.0) <> 0.0 and coalesce(ref_yr_incremental_cost_per_ton, 0.0) <> 0.0 then ref_yr_incremental_cost_per_ton else ref_yr_cost_per_ton end, 
 		emis_reduction) as costs
 	into annual_cost,
 		capital_cost,
@@ -1564,5 +1572,26 @@ cross join  public.get_strategy_costs(true, 1,
 	2000, 45.5, 
 	null, null, 
 	null, null) costs) costs3;
+
+
+select *
+from emf.control_measures 
+where id in 
+(
+select control_measure_id 
+from emf.control_measure_equations 
+where equation_type_id = (select id from emf.equation_types where name = 'Type 2') 
+)
+order by abbreviation
+
+select *
+from emf.control_measures 
+where id in 
+(
+select control_measures_id 
+from emf.control_measure_Efficiencyrecords 
+where incremental_cost_per_ton is not null and incremental_cost_per_ton <> cost_per_ton 
+)
+order by abbreviation
 */
 

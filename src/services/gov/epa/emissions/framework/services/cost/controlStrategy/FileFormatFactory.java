@@ -20,6 +20,10 @@ public class FileFormatFactory {
     }
 
     public TableFormat tableFormat(DatasetType type) throws Exception {
+        return tableFormat(type, false);
+    }
+
+    public TableFormat tableFormat(DatasetType type, boolean suppressException) throws Exception {
         if (type.getName().equals(DatasetType.orlNonpointInventory))
             return new VersionedTableFormat(new ORLNonPointFileFormat(types), types);
 
@@ -35,7 +39,9 @@ public class FileFormatFactory {
         if (type.getName().equals(DatasetType.orlMergedInventory))
             return new VersionedTableFormat(new ORLMergedFileFormat(types), types);
 
-        throw new Exception("The dataset type '" + type.getName() + "' is not supported for inventory output");
+        if (!suppressException)
+            throw new Exception("The dataset type '" + type.getName() + "' is not supported for inventory output");
+        
+        return null;
     }
-
 }
