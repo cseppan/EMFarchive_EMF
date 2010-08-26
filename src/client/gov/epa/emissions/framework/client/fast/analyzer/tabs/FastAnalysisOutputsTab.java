@@ -13,6 +13,8 @@ import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
 import gov.epa.emissions.framework.client.data.viewer.DataViewer;
 import gov.epa.emissions.framework.client.fast.ExportPresenter;
 import gov.epa.emissions.framework.client.fast.ExportPresenterImpl;
+import gov.epa.emissions.framework.client.fast.ExportToNetCDFPresenterImpl;
+import gov.epa.emissions.framework.client.fast.ExportToNetCDFWindow;
 import gov.epa.emissions.framework.client.fast.ExportWindow;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
@@ -109,6 +111,9 @@ public class FastAnalysisOutputsTab extends AbstractFastAnalysisTab {
         Button exportButton = new Button("Export to Shapefile", getExportAction());
         container.add(exportButton);
 
+        Button exportToNetCDFButton = new Button("Export to NetCDF", getExportToNetCDFAction());
+        container.add(exportToNetCDFButton);
+
         panel.add(container, BorderLayout.LINE_START);
 
         return panel;
@@ -185,6 +190,16 @@ public class FastAnalysisOutputsTab extends AbstractFastAnalysisTab {
         };
     }
 
+    private Action getExportToNetCDFAction() {
+
+        return new AbstractAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                doExportToNetCDF();
+            }
+        };
+    }
+
     private void doExport() {
 
         List<FastAnalysisOutput> analysisOutputs = getSelected();
@@ -203,6 +218,34 @@ public class FastAnalysisOutputsTab extends AbstractFastAnalysisTab {
             getDesktopPane().add(exportView);
 
             ExportPresenter exportPresenter = new ExportPresenterImpl(this.getSession());
+
+            try {
+                this.getPresenter().doExport(exportView, exportPresenter, wrappers);
+            } catch (EmfException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void doExportToNetCDF() {
+
+        List<FastAnalysisOutput> analysisOutputs = getSelected();
+        if (analysisOutputs.isEmpty()) {
+            this.showMessage(ROOT_SELECT_PROMPT + "export.");
+        } else {
+
+            List<FastOutputExportWrapper> wrappers = new ArrayList<FastOutputExportWrapper>();
+            FastAnalysis analysis = this.getAnalysis();
+            for (FastAnalysisOutput analysisOutput : analysisOutputs) {
+                wrappers.add(new FastOutputExportWrapper(analysis, analysisOutput));
+            }
+
+            ExportToNetCDFWindow exportView = new ExportToNetCDFWindow(wrappers, this.getDesktopManager(), this.getParentConsole(),
+                    this.getSession());
+            getDesktopPane().add(exportView);
+
+            ExportPresenter exportPresenter = new ExportToNetCDFPresenterImpl(this.getSession());
 
             try {
                 this.getPresenter().doExport(exportView, exportPresenter, wrappers);

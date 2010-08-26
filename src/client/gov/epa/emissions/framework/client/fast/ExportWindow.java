@@ -290,7 +290,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         }
     }
 
-    private void validateFolder(String folder) throws EmfException {
+    protected void validateFolder(String folder) throws EmfException {
         if (folder == null || folder.trim().isEmpty())
             throw new EmfException("Please specify a valid export folder.");
 

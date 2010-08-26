@@ -72,11 +72,11 @@ public class DatasetCreator {
     public EmfDataset addDataset(String datasetNamePrefix, String tablePrefix, 
             EmfDataset inputDataset, DatasetType type, 
             TableFormat tableFormat, String description) throws EmfException {
-        String outputDatasetName = createResultDatasetName(datasetNamePrefix, inputDataset);
-        String outputTableName = createTableName(tablePrefix, inputDataset);
+//        String outputDatasetName = createResultDatasetName(datasetNamePrefix, inputDataset);
+        String outputTableName = createTableName(tablePrefix, datasetNamePrefix);
         
         //create dataset
-        EmfDataset dataset = createDataset(outputDatasetName, description, type, inputDataset);
+        EmfDataset dataset = createDataset(datasetNamePrefix, description, type, inputDataset);
 
         setDatasetInternalSource(dataset, outputTableName, 
                 tableFormat, inputDataset.getName());

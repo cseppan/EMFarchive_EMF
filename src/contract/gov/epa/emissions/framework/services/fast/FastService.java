@@ -119,6 +119,9 @@ public interface FastService extends EMFService {
 
     FastRunOutputType getFastRunOutputType(String name) throws EmfException;
 
+    void exportFastOutputToNetCDFFile(int datasetId, int datasetVersion, int gridId, String userName, 
+            String dirName, String pollutant) throws EmfException;
+
     void exportFastOutputToShapeFile(int datasetId, int datasetVersion, int gridId, String userName, 
             String dirName, String pollutant) throws EmfException;
 

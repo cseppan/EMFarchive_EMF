@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.fast;
 
+import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
@@ -8,6 +10,7 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.VersionedQuery;
+import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -70,6 +73,8 @@ public class PopulateFastQuasiPointDatasetTask implements Runnable {
             
             updateDatasetVersionRecordCount(fastDataset.getDataset());
 
+            createIndexes(fastDataset.getDataset());
+            
             setStatus("Finished populating FAST quasi point inventory, '" + fastDataset.getDataset().getName() + "'");
 
         
@@ -79,6 +84,45 @@ public class PopulateFastQuasiPointDatasetTask implements Runnable {
         } 
     }
     
+    private void createIndexes(EmfDataset dataset) {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        try {
+            
+            DataTable dataTable = new DataTable(dataset, dbServer.getEmissionsDatasource());
+            String table = dataset.getInternalSources()[0].getTable();
+
+            //ALWAYS create indexes for these core columns...
+            dataTable.addIndex(table, "record_id", true);
+            dataTable.addIndex(table, "dataset_id", false);
+            dataTable.addIndex(table, "version", false);
+            dataTable.addIndex(table, "delete_versions", false);
+
+            dataTable.addIndex(table, "fips", false);
+            dataTable.addIndex(table, "poll", false);
+            dataTable.addIndex(table, "scc", false);
+            dataTable.addIndex(table, "plantid", false);
+            dataTable.addIndex(table, "pointid", false);
+            dataTable.addIndex(table, "stackid", false);
+            dataTable.addIndex(table, "segment", false);
+            dataTable.addIndex(table, "mact", false);
+            dataTable.addIndex(table, "sic", false);
+
+            //finally analyze the table, so the indexes take affect immediately, 
+            //NOT when the SQL engine gets around to analyzing eventually
+            dataTable.analyzeTable(table);
+        } catch (Exception e) {
+            //suppress all errors
+            e.printStackTrace();
+        } finally {
+            try {
+                dbServer.disconnect();
+            } catch (Exception e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
     protected void updateDatasetVersionRecordCount(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
         DbServer dbServer = dbServerFactory.getDbServer();

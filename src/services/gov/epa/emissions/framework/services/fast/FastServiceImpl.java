@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.fast.netCDF.ExportFastOutputToNetCDFFile;
 import gov.epa.emissions.framework.services.fast.shapefile.ExportFastOutputToShapeFile;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -1318,6 +1319,18 @@ public class FastServiceImpl implements FastService {
             String dirName, String pollutant) throws EmfException {
         try {
             ExportFastOutputToShapeFile exportQATask = new ExportFastOutputToShapeFile(datasetId, datasetVersion, gridId, userName, dirName, pollutant, dbServerFactory, sessionFactory,
+                    threadPool);
+            exportQATask.export();
+        } catch (Exception e) {
+            LOG.error("Could not export dataset", e);
+            throw new EmfException("Could not export dataset: " + e.getMessage());
+        }
+    }
+
+    public synchronized void exportFastOutputToNetCDFFile(int datasetId, int datasetVersion, int gridId, String userName, 
+            String dirName, String pollutant) throws EmfException {
+        try {
+            ExportFastOutputToNetCDFFile exportQATask = new ExportFastOutputToNetCDFFile(datasetId, datasetVersion, gridId, userName, dirName, pollutant, dbServerFactory, sessionFactory,
                     threadPool);
             exportQATask.export();
         } catch (Exception e) {

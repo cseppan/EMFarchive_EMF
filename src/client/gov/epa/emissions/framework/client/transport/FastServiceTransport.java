@@ -585,6 +585,22 @@ public class FastServiceTransport implements FastService {
         call.request(new Object[] { new Integer(datasetId), new Integer(datasetVersion), new Integer(gridId), userName, dirName, pollutant });
     }
 
+    public void exportFastOutputToNetCDFFile(int datasetId, int datasetVersion, int gridId, String userName, String dirName,
+            String pollutant) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("exportFastOutputToNetCDFFile");
+        call.addIntegerParam("datasetId");
+        call.addIntegerParam("datasetVersion");
+        call.addIntegerParam("gridId");
+        call.addStringParam("userName");
+        call.addStringParam("dirName");
+        call.addStringParam("pollutant");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { new Integer(datasetId), new Integer(datasetVersion), new Integer(gridId), userName, dirName, pollutant });
+    }
+
     public String[] getFastRunSpeciesMappingDatasetPollutants(int datasetId, int datasetVersion) throws EmfException {
         EmfCall call = call();
 
