@@ -24,10 +24,6 @@ import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerVi
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerWindow;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerView;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerWindow;
-import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerView;
-import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerWindow;
-import gov.epa.emissions.framework.client.fast.MPSDTManagerView;
-import gov.epa.emissions.framework.client.fast.MPSDTManagerWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -67,10 +63,10 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         super.add(createControlStrategies(parent, messagePanel));
         super.add(createControlPrograms(parent, messagePanel));
         super.addSeparator();
-        super.add(createSectorScenario(parent, messagePanel));
-        super.addSeparator();
-        super.add(createMPSDT(parent, messagePanel));
-        super.addSeparator();
+        //super.add(createSectorScenario(parent, messagePanel));
+//        super.addSeparator();
+//        super.add(createMPSDT(parent, messagePanel));
+//        super.addSeparator();
 
         manageUsers(session.user(), messagePanel);
         super.add(createMyProfile(session, messagePanel));
@@ -194,29 +190,29 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         return menuItem;
     }
 
-    private JMenuItem createSectorScenario(final EmfConsole parent, final MessagePanel messagePanel) {
-        JMenuItem menuItem = new JMenuItem("Sector Scenario");
-        menuItem.setName("SectorScenario");
-        menuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                doManageSectorScenario(parent, messagePanel);
-            }
-        });
+//    private JMenuItem createSectorScenario(final EmfConsole parent, final MessagePanel messagePanel) {
+//        JMenuItem menuItem = new JMenuItem("Sector Scenario");
+//        menuItem.setName("SectorScenario");
+//        menuItem.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent event) {
+//                doManageSectorScenario(parent, messagePanel);
+//            }
+//        });
+//
+//        return menuItem;
+//    }
 
-        return menuItem;
-    }
-
-    private JMenuItem createMPSDT(final EmfConsole parent, final MessagePanel messagePanel) {
-        JMenuItem menuItem = new JMenuItem("MP-SDT");
-        menuItem.setName("mp_sdt");
-        menuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                doManageMPSDT(parent, messagePanel);
-            }
-        });
-
-        return menuItem;
-    }
+//    private JMenuItem createMPSDT(final EmfConsole parent, final MessagePanel messagePanel) {
+//        JMenuItem menuItem = new JMenuItem("MP-SDT");
+//        menuItem.setName("mp_sdt");
+//        menuItem.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent event) {
+//                doManageMPSDT(parent, messagePanel);
+//            }
+//        });
+//
+//        return menuItem;
+//    }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
         UpdateUserWindow updatable = new UpdateUserWindow(new AddAdminOption(false), desktopManager);
@@ -307,23 +303,23 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         }
     }
 
-    private void doManageSectorScenario(final EmfConsole parent, final MessagePanel messagePanel) {
-        SectorScenarioManagerView view = new SectorScenarioManagerWindow(parent, session, desktopManager);
-        try {
-            presenter.doDisplaySectorScenarios(view);
-        } catch (EmfException e) {
-            e.printStackTrace();
-            messagePanel.setError("Problem in showing all sector scenario: " +e.getMessage());
-        }
-    }
+//    private void doManageSectorScenario(final EmfConsole parent, final MessagePanel messagePanel) {
+//        SectorScenarioManagerView view = new SectorScenarioManagerWindow(parent, session, desktopManager);
+//        try {
+//            presenter.doDisplaySectorScenarios(view);
+//        } catch (EmfException e) {
+//            e.printStackTrace();
+//            messagePanel.setError("Problem in showing all sector scenario: " +e.getMessage());
+//        }
+//    }
      
-    private void doManageMPSDT(final EmfConsole parent, final MessagePanel messagePanel) {
-        MPSDTManagerView view = new MPSDTManagerWindow(parent, session, desktopManager);
-        try {
-            presenter.doDisplayFast(view);
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
-    }
+//    private void doManageMPSDT(final EmfConsole parent, final MessagePanel messagePanel) {
+//        MPSDTManagerView view = new MPSDTManagerWindow(parent, session, desktopManager);
+//        try {
+//            presenter.doDisplayFast(view);
+//        } catch (EmfException e) {
+//            messagePanel.setError(e.getMessage());
+//        }
+//    }
 
 }
