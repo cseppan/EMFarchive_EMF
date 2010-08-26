@@ -13,17 +13,17 @@ BEGIN
 	--get version path
 	select versions.path
 	from emissions.versions
-	where versions.dataset_id = dataset_id
-		and versions.version = version
+	where versions.dataset_id = $1
+		and versions.version = $2
 	into path;
 
 	-- build path into where clause
 	IF path is null or length(path) = 0 THEN
-		versions_path := version;
+		versions_path := $2;
 	ELSE
-		versions_path := path || ',' || version;
+		versions_path := path || ',' || $2;
 	END IF;
-	where_filter := 'version IN (' || versions_path || ') and dataset_id = ' || dataset_id;
+	where_filter := 'version IN (' || versions_path || ') and dataset_id = ' || $1;
 
 	version_part := split_part(versions_path, ',', counter);
 	WHILE length(version_part) > 0 LOOP
@@ -63,17 +63,17 @@ BEGIN
 	--get version path
 	select versions.path
 	from emissions.versions
-	where versions.dataset_id = dataset_id
-		and versions.version = version
+	where versions.dataset_id = $1
+		and versions.version = $2
 	into path;
 
 	-- build path into where clause
 	IF path is null or length(path) = 0 THEN
-		versions_path := version;
+		versions_path := $2;
 	ELSE
-		versions_path := path || ',' || version;
+		versions_path := path || ',' || $2;
 	END IF;
-	where_filter := '' || table_alias || '.version IN (' || versions_path || ') and ' || table_alias || '.dataset_id = ' || dataset_id;
+	where_filter := '' || table_alias || '.version IN (' || versions_path || ') and ' || table_alias || '.dataset_id = ' || $1;
 
 	version_part := split_part(versions_path, ',', counter);
 	WHILE length(version_part) > 0 LOOP

@@ -1,5 +1,7 @@
-CREATE OR REPLACE FUNCTION public.run_max_emis_red_strategy(control_strategy_id integer, input_dataset_id integer, 
-	input_dataset_version integer, strategy_result_id int) RETURNS void AS $$
+DROP FUNCTION run_max_emis_red_strategy(integer, integer, integer, integer);
+
+CREATE OR REPLACE FUNCTION public.run_max_emis_red_strategy(intControlStrategyId integer, intInputDatasetId integer, 
+	intInputDatasetVersion integer, intStrategyResultId int) RETURNS void AS $$
 DECLARE
 	strategy_name varchar(255) := '';
 	inv_table_name varchar(64) := '';
@@ -58,7 +60,7 @@ BEGIN
 	-- get the input dataset info
 	select lower(i.table_name)
 	from emf.internal_sources i
-	where i.dataset_id = input_dataset_id
+	where i.dataset_id = intInputDatasetId
 	into inv_table_name;
 
 	-- get the detailed result dataset info
@@ -67,7 +69,7 @@ BEGIN
 	from emf.strategy_results sr
 		inner join emf.internal_sources i
 		on i.dataset_id = sr.detailed_result_dataset_id
-	where sr.id = strategy_result_id
+	where sr.id = intStrategyResultId
 	into detailed_result_dataset_id,
 		detailed_result_table_name;
 
@@ -76,14 +78,14 @@ BEGIN
 	from emf.sectors s
 		inner join emf.datasets_sectors ds
 		on ds.sector_id = s.id
-	where ds.dataset_id = input_dataset_id
+	where ds.dataset_id = intInputDatasetId
 	into inventory_sectors;
 
 	-- see if control strategy has only certain measures specified
 	SELECT count(id), 
 		count(case when region_dataset_id is not null then 1 else null end)
 	FROM emf.control_strategy_measures 
-	where control_strategy_measures.control_strategy_id = control_strategy_id 
+	where control_strategy_measures.control_strategy_id = intControlStrategyId 
 	INTO measures_count, 
 		measure_with_region_count;
 
@@ -91,7 +93,7 @@ BEGIN
 	IF measures_count = 0 THEN
 		SELECT count(1)
 		FROM emf.control_strategy_classes 
-		where control_strategy_classes.control_strategy_id = control_strategy_id
+		where control_strategy_classes.control_strategy_id = intControlStrategyId
 		INTO measure_classes_count;
 	END IF;
 
@@ -110,7 +112,7 @@ BEGIN
 	FROM emf.control_strategies cs
 		inner join emf.pollutants p
 		on p.id = cs.pollutant_id
-	where cs.id = control_strategy_id
+	where cs.id = intControlStrategyId
 	INTO strategy_name,
 		target_pollutant_id,
 		inv_filter,
@@ -160,7 +162,7 @@ BEGIN
 		csc.min_ann_cost,
 		csc.replacement_control_min_eff_diff
 	FROM emf.control_strategy_constraints csc
-	where csc.control_strategy_id = control_strategy_id
+	where csc.control_strategy_id = intControlStrategyId
 	INTO min_emis_reduction_constraint,
 		min_control_efficiency_constraint,
 		max_cost_per_ton_constraint,
@@ -174,7 +176,7 @@ BEGIN
 	into has_constraints;
 
 	-- get month of the dataset, 0 (Zero) indicates an annual inventory
-	select public.get_dataset_month(input_dataset_id)
+	select public.get_dataset_month(intInputDatasetId)
 	into dataset_month;
 
 	IF dataset_month = 1 THEN
@@ -234,7 +236,7 @@ BEGIN
 			FROM emf.control_strategy_measures m
 				inner join emf.internal_sources i
 				on m.region_dataset_id = i.dataset_id
-			where m.control_strategy_id = ' || control_strategy_id || '
+			where m.control_strategy_id = ' || intControlStrategyId || '
 				and m.region_dataset_id is not null'
 		LOOP
 			EXECUTE 'insert into measures (control_measure_id, region_id, region_version)
@@ -262,7 +264,7 @@ BEGIN
 			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
 	END IF;
 	-- build version info into where clause filter
-	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
+	inv_filter := '(' || public.build_version_where_filter(intInputDatasetId, intInputDatasetVersion, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
 
 /*	EXECUTE '
 		SELECT DISTINCT ON (poll) 1::integer as Found 
@@ -447,8 +449,8 @@ end
 		' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
 		' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 		inv.record_id::integer as source_id,
-		' || input_dataset_id || '::integer,
-		' || control_strategy_id || '::integer,
+		' || intInputDatasetId || '::integer,
+		' || intControlStrategyId || '::integer,
 		er.control_measures_id,
 		' || get_strategt_cost_sql || '.actual_equation_type as equation_type,
 		' || quote_literal(inventory_sectors) || ' as sector,
@@ -493,7 +495,7 @@ end
 			--and inv.ceff is null
 			)
 		)
-		and (' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'invpm25or10') || ')' 
+		and (' || public.build_version_where_filter(intInputDatasetId, intInputDatasetVersion, 'invpm25or10') || ')' 
 			else 
 		'' 
 		end || '
@@ -563,7 +565,7 @@ end
 							--and inv2.ceff is null
 							)
 						)
-						and (' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'invpm25or10_2') || ')' 
+						and (' || public.build_version_where_filter(intInputDatasetId, intInputDatasetVersion, 'invpm25or10_2') || ')' 
 							else 
 						'' 
 						end || '
@@ -673,7 +675,7 @@ end
 						--and inv.ceff is null
 						)
 					)
-					and (' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'invpm25or10') || ')' 
+					and (' || public.build_version_where_filter(intInputDatasetId, intInputDatasetVersion, 'invpm25or10') || ')' 
 						else 
 					'' 
 					end || '
@@ -684,7 +686,7 @@ end
 					' || case when measures_count > 0 then '
 					inner join emf.control_strategy_measures csm
 					on csm.control_measure_id = scc.control_measures_id
-					and csm.control_strategy_id = ' || control_strategy_id || '
+					and csm.control_strategy_id = ' || intControlStrategyId || '
 					' else '' end || '
 
 					--this part will get applicable measure based on the target pollutant, 
@@ -747,13 +749,13 @@ end
 					' || case when measures_count = 0 and measure_classes_count > 0 then '
 					inner join emf.control_strategy_classes csc
 					on csc.control_measure_class_id = m.cm_class_id
-					and csc.control_strategy_id = ' || control_strategy_id || '
+					and csc.control_strategy_id = ' || intControlStrategyId || '
 					' else '' end || '
 
 					-- target pollutant filter
 --					inner join emf.control_strategy_target_pollutants cstp
 --					on cstp.pollutant_id = p.id
---					and cstp.control_strategy_id = ' || control_strategy_id || '
+--					and cstp.control_strategy_id = ' || intControlStrategyId || '
 
 				where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 					and p.id = ' ||  target_pollutant_id || '
@@ -862,7 +864,7 @@ end
 							--and inv2.ceff is null
 							)
 						)
-						and (' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'invpm25or10_2') || ')' 
+						and (' || public.build_version_where_filter(intInputDatasetId, intInputDatasetVersion, 'invpm25or10_2') || ')' 
 							else 
 						'' 
 						end || '
@@ -956,7 +958,7 @@ end
 		' || case when measures_count > 0 then '
 		inner join emf.control_strategy_measures csm
 		on csm.control_measure_id = tpm.control_measures_id
-		and csm.control_strategy_id = ' || control_strategy_id || '
+		and csm.control_strategy_id = ' || intControlStrategyId || '
 		' else '' end || '
 
 		left outer join emf.control_measure_equations eq

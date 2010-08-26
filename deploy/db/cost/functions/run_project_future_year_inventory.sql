@@ -1,5 +1,7 @@
+DROP FUNCTION run_project_future_year_inventory(integer, integer, integer, integer);
+
 CREATE OR REPLACE FUNCTION public.run_project_future_year_inventory(
-	control_strategy_id integer, 
+	int_control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer, 
 	strategy_result_id integer
@@ -87,7 +89,7 @@ BEGIN
 	SELECT count(id), 
 		count(case when region_dataset_id is not null then 1 else null end)
 	FROM emf.control_strategy_measures 
-	where control_strategy_measures.control_strategy_id = control_strategy_id 
+	where control_strategy_measures.control_strategy_id = int_control_strategy_id 
 	INTO measures_count, 
 		measure_with_region_count;
 
@@ -95,7 +97,7 @@ BEGIN
 	IF measures_count = 0 THEN
 		SELECT count(1)
 		FROM emf.control_strategy_classes 
-		where control_strategy_classes.control_strategy_id = control_strategy_id
+		where control_strategy_classes.control_strategy_id = int_control_strategy_id
 		INTO measure_classes_count;
 	END IF;
 
@@ -109,7 +111,7 @@ BEGIN
 		cs.use_cost_equations,
 		cs.discount_rate / 100
 	FROM emf.control_strategies cs
-	where cs.id = control_strategy_id
+	where cs.id = int_control_strategy_id
 	INTO target_pollutant_id,
 		inv_filter,
 		cost_year,
@@ -158,7 +160,7 @@ BEGIN
 		replacement_control_min_eff_diff,
 		control_program_measure_min_pct_red_diff
 	FROM emf.control_strategy_constraints csc
-	where csc.control_strategy_id = control_strategy_id
+	where csc.control_strategy_id = int_control_strategy_id
 	INTO min_emis_reduction_constraint,
 		min_control_efficiency_constraint,
 		max_cost_per_ton_constraint,
@@ -271,7 +273,7 @@ BEGIN
 
 			inner join emf.internal_sources i
 			on i.dataset_id = cp.dataset_id
-		where csp.control_strategy_id = ' || control_strategy_id || '
+		where csp.control_strategy_id = ' || int_control_strategy_id || '
 			and cpt."name" = ''Plant Closure''
 			and ''12/31/' || inventory_year || '''::timestamp without time zone between cp.start_date and coalesce(cp.end_date, ''12/31/' || inventory_year || '''::timestamp without time zone)
 		order by processing_order'
@@ -353,7 +355,7 @@ BEGIN
 				' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 				inv.record_id::integer as source_id,
 				' || input_dataset_id || '::integer,
-				' || control_strategy_id || '::integer,
+				' || int_control_strategy_id || '::integer,
 				null::integer as control_measures_id,
 				null::varchar(255) as equation_type,
 				' || quote_literal(control_program.control_program_name) || ',
@@ -416,7 +418,7 @@ BEGIN
 
 			inner join emf.dataset_types dt
 			on dt.id = d.dataset_type
-		where csp.control_strategy_id = ' || control_strategy_id || '
+		where csp.control_strategy_id = ' || int_control_strategy_id || '
 			and cpt."name" = ''Projection''
 			and ''12/31/' || inventory_year || '''::timestamp without time zone between cp.start_date and coalesce(cp.end_date, ''12/31/' || inventory_year || '''::timestamp without time zone)
 		order by processing_order'
@@ -554,7 +556,7 @@ BEGIN
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 			inv.record_id::integer as source_id,
 			' || input_dataset_id || '::integer,
-			' || control_strategy_id || '::integer,
+			' || int_control_strategy_id || '::integer,
 			null::integer as control_measures_id,
 			null::varchar(255) as equation_type,
 			proj.control_program_name,
@@ -592,7 +594,7 @@ BEGIN
 		left outer join emf.control_program_measures cpm
 		on cpm.control_program_id = cp.id
 		
-	where csp.control_strategy_id = control_strategy_id
+	where csp.control_strategy_id = int_control_strategy_id
 		and cpt."name" = 'Control'
 	into control_program_technologies_count, 
 		control_program_measures_count;
@@ -619,7 +621,7 @@ BEGIN
 			inner join emf.dataset_types dt
 			on dt.id = d.dataset_type
 
-		where csp.control_strategy_id = ' || control_strategy_id || '
+		where csp.control_strategy_id = ' || int_control_strategy_id || '
 			and cpt."name" = ''Control''
 			and ''12/31/' || inventory_year || '''::timestamp without time zone between cp.start_date and coalesce(cp.end_date, ''12/31/' || inventory_year || '''::timestamp without time zone)
 		order by processing_order'
@@ -830,7 +832,7 @@ BEGIN
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 			inv.record_id::integer as source_id,
 			' || input_dataset_id || '::integer,
-			' || control_strategy_id || '::integer,
+			' || int_control_strategy_id || '::integer,
 			null::integer as control_measures_id,
 			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0  then ' || get_strategt_cost_sql || '.actual_equation_type else null::varchar(255) end as equation_type,
 			cont.control_program_name,
@@ -957,7 +959,7 @@ BEGIN
 		left outer join emf.control_program_measures cpm
 		on cpm.control_program_id = cp.id
 		
-	where csp.control_strategy_id = control_strategy_id
+	where csp.control_strategy_id = int_control_strategy_id
 		and cpt."name" = 'Allowable'
 	into control_program_technologies_count, 
 		control_program_measures_count;
@@ -984,7 +986,7 @@ BEGIN
 			inner join emf.dataset_types dt
 			on dt.id = d.dataset_type
 
-		where csp.control_strategy_id = ' || control_strategy_id || '
+		where csp.control_strategy_id = ' || int_control_strategy_id || '
 			and cpt."name" = ''Allowable''
 			and ''12/31/' || inventory_year || '''::timestamp without time zone between cp.start_date and coalesce(cp.end_date, ''12/31/' || inventory_year || '''::timestamp without time zone)
 		order by processing_order'
@@ -1133,7 +1135,7 @@ BEGIN
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 			inv.record_id::integer as source_id,
 			' || input_dataset_id || '::integer,
-			' || control_strategy_id || '::integer,
+			' || int_control_strategy_id || '::integer,
 			null::integer as control_measures_id,
 			null::varchar(255) as equation_type,
 			cont.control_program_name,

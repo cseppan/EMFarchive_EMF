@@ -1,7 +1,7 @@
-
+DROP FUNCTION populate_max_emis_red_strategy_messages(integer, integer, integer, integer, integer);
 
 CREATE OR REPLACE FUNCTION public.populate_max_emis_red_strategy_messages(
-	control_strategy_id integer, 
+	intControlStrategyId integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer, 
 	message_strategy_result_id integer, 
@@ -89,7 +89,7 @@ BEGIN
 	SELECT count(id), 
 		count(case when region_dataset_id is not null then 1 else null end)
 	FROM emf.control_strategy_measures 
-	where control_strategy_measures.control_strategy_id = control_strategy_id 
+	where control_strategy_measures.control_strategy_id = intControlStrategyId 
 	INTO measures_count, 
 		measure_with_region_count;
 
@@ -97,7 +97,7 @@ BEGIN
 	IF measures_count = 0 THEN
 		SELECT count(1)
 		FROM emf.control_strategy_classes 
-		where control_strategy_classes.control_strategy_id = control_strategy_id
+		where control_strategy_classes.control_strategy_id = intControlStrategyId
 		INTO measure_classes_count;
 	END IF;
 
@@ -111,7 +111,7 @@ BEGIN
 		cs.use_cost_equations,
 		cs.discount_rate / 100
 	FROM emf.control_strategies cs
-	where cs.id = control_strategy_id
+	where cs.id = intControlStrategyId
 	INTO target_pollutant_id,
 		inv_filter,
 		cost_year,
@@ -157,7 +157,7 @@ BEGIN
 		min_cost_per_ton,
 		min_ann_cost
 	FROM emf.control_strategy_constraints csc
-	where csc.control_strategy_id = control_strategy_id
+	where csc.control_strategy_id = intControlStrategyId
 	INTO min_emis_reduction_constraint,
 		min_control_efficiency_constraint,
 		max_cost_per_ton_constraint,

@@ -16,6 +16,10 @@ BEGIN
 	where control_measures_id 
 	in (cm_id);
 
+	delete from emf.control_measure_references
+	where control_measure_id 
+	in (cm_id);
+
 	delete from emf.control_measure_sectors
 	where control_measure_id 
 	in (cm_id);

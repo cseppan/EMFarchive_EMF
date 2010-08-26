@@ -1,5 +1,7 @@
+DROP FUNCTION run_annotate_inventory(integer, integer, integer, integer);
+
 CREATE OR REPLACE FUNCTION public.run_annotate_inventory(
-	control_strategy_id integer, 
+	int_control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer, 
 	strategy_result_id integer
@@ -76,7 +78,7 @@ BEGIN
 	SELECT count(id), 
 		count(case when region_dataset_id is not null then 1 else null end)
 	FROM emf.control_strategy_measures 
-	where control_strategy_measures.control_strategy_id = control_strategy_id 
+	where control_strategy_measures.control_strategy_id = int_control_strategy_id 
 	INTO measures_count, 
 		measure_with_region_count;
 
@@ -84,7 +86,7 @@ BEGIN
 	IF measures_count = 0 THEN
 		SELECT count(1)
 		FROM emf.control_strategy_classes 
-		where control_strategy_classes.control_strategy_id = control_strategy_id
+		where control_strategy_classes.control_strategy_id = int_control_strategy_id
 		INTO measure_classes_count;
 	END IF;
 
@@ -98,7 +100,7 @@ BEGIN
 		cs.use_cost_equations,
 		cs.discount_rate / 100
 	FROM emf.control_strategies cs
-	where cs.id = control_strategy_id
+	where cs.id = int_control_strategy_id
 	INTO target_pollutant_id,
 		inv_filter,
 		cost_year,
@@ -136,7 +138,7 @@ BEGIN
 		min_cost_per_ton,
 		min_ann_cost
 	FROM emf.control_strategy_constraints csc
-	where csc.control_strategy_id = control_strategy_id
+	where csc.control_strategy_id = int_control_strategy_id
 	INTO min_emis_reduction_constraint,
 		min_control_efficiency_constraint,
 		max_cost_per_ton_constraint,
@@ -209,7 +211,7 @@ BEGIN
 			FROM emf.control_strategy_measures m
 				inner join emf.internal_sources i
 				on m.region_dataset_id = i.dataset_id
-			where m.control_strategy_id = ' || control_strategy_id || '
+			where m.control_strategy_id = ' || int_control_strategy_id || '
 				and m.region_dataset_id is not null'
 		LOOP
 			EXECUTE 'insert into measures (control_measure_id, region_id, region_version)
@@ -363,7 +365,7 @@ BEGIN
 				' || case when measures_count > 0 then '
 				inner join emf.control_strategy_measures csm
 				on csm.control_measure_id = scc.control_measures_id
-				and csm.control_strategy_id = ' || control_strategy_id || '
+				and csm.control_strategy_id = ' || int_control_strategy_id || '
 				' else '' end || '
 
 				inner join emf.control_measures m
@@ -412,7 +414,7 @@ BEGIN
 				' || case when measures_count = 0 and measure_classes_count > 0 then '
 				inner join emf.control_strategy_classes csc
 				on csc.control_measure_class_id = m.cm_class_id
-				and csc.control_strategy_id = ' || control_strategy_id || '
+				and csc.control_strategy_id = ' || int_control_strategy_id || '
 				' else '' end || '
 
 			where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '

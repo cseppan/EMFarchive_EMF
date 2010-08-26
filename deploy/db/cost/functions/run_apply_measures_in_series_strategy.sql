@@ -1,4 +1,8 @@
-CREATE OR REPLACE FUNCTION public.run_apply_measures_in_series_strategy(control_strategy_id integer, 
+DROP FUNCTION public.run_apply_measures_in_series_strategy(integer, integer, integer, integer);
+DROP FUNCTION public.run_apply_measures_in_series_strategy_finalize(integer, integer, integer, integer);
+
+
+CREATE OR REPLACE FUNCTION public.run_apply_measures_in_series_strategy(int_control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer, 
 	strategy_result_id int) RETURNS integer AS $$
@@ -72,14 +76,14 @@ BEGIN
 	-- see if control strategy has only certain measures specified
 	SELECT count(id)
 	FROM emf.control_strategy_measures 
-	where control_strategy_measures.control_strategy_id = control_strategy_id 
+	where control_strategy_measures.control_strategy_id = int_control_strategy_id 
 	INTO measures_count;
 
 	-- see if measure classes were specified
 	IF measures_count = 0 THEN
 		SELECT count(1)
 		FROM emf.control_strategy_classes 
-		where control_strategy_classes.control_strategy_id = control_strategy_id
+		where control_strategy_classes.control_strategy_id = int_control_strategy_id
 		INTO measure_classes_count;
 	END IF;
 
@@ -93,7 +97,7 @@ BEGIN
 		cs.use_cost_equations,
 		cs.discount_rate / 100
 	FROM emf.control_strategies cs
-	where cs.id = control_strategy_id
+	where cs.id = int_control_strategy_id
 	INTO target_pollutant_id,
 		inv_filter,
 		cost_year,
@@ -307,7 +311,7 @@ BEGIN
 		naics,
 		source_id,
 		' || input_dataset_id || '::integer,
-		' || control_strategy_id || '::integer,
+		' || int_control_strategy_id || '::integer,
 		cm_id,
 		xloc,
 		yloc,
@@ -364,7 +368,7 @@ BEGIN
 			' || case when measures_count > 0 then '
 			inner join emf.control_strategy_measures csm
 			on csm.control_measure_id = scc.control_measures_id
-			and csm.control_strategy_id = ' || control_strategy_id || '
+			and csm.control_strategy_id = ' || int_control_strategy_id || '
 			' else '' end || '
 
 			inner join emf.control_measures m
@@ -401,7 +405,7 @@ BEGIN
 			' || case when measures_count = 0 and measure_classes_count > 0 then '
 			inner join emf.control_strategy_classes csc
 			on csc.control_measure_class_id = m.cm_class_id
-			and csc.control_strategy_id = ' || control_strategy_id || '
+			and csc.control_strategy_id = ' || int_control_strategy_id || '
 			' else '' end || '
 
 		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
@@ -423,7 +427,7 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION public.run_apply_measures_in_series_strategy_finalize(control_strategy_id integer, input_dataset_id integer, 
+CREATE OR REPLACE FUNCTION public.run_apply_measures_in_series_strategy_finalize(int_control_strategy_id integer, input_dataset_id integer, 
 	input_dataset_version integer, strategy_result_id int) RETURNS integer AS $$
 DECLARE
 	inv_table_name varchar(64) := '';
@@ -466,7 +470,7 @@ BEGIN
 	-- see if control strategy has only certain measures specified
 	SELECT count(1)
 	FROM emf.control_strategy_measures 
-	where control_strategy_measures.control_strategy_id = control_strategy_id 
+	where control_strategy_measures.control_strategy_id = int_control_strategy_id 
 		and control_strategy_measures.region_dataset_id is not null
 	INTO measure_with_region_count;
 
@@ -474,7 +478,7 @@ BEGIN
 	SELECT cs.pollutant_id,
 		cs.cost_year
 	FROM emf.control_strategies cs
-	where cs.id = control_strategy_id
+	where cs.id = int_control_strategy_id
 	INTO target_pollutant_id,
 		cost_year;
 	
@@ -499,7 +503,7 @@ BEGIN
 		min_cost_per_ton,
 		min_ann_cost
 	FROM emf.control_strategy_constraints csc
-	where csc.control_strategy_id = control_strategy_id
+	where csc.control_strategy_id = int_control_strategy_id
 	INTO min_emis_reduction_constraint,
 		min_control_efficiency_constraint,
 		max_cost_per_ton_constraint,
@@ -539,7 +543,7 @@ BEGIN
 			FROM emf.control_strategy_measures m
 				inner join emf.internal_sources i
 				on m.region_dataset_id = i.dataset_id
-			where m.control_strategy_id = ' || control_strategy_id || '
+			where m.control_strategy_id = ' || int_control_strategy_id || '
 				and m.region_dataset_id is not null'
 		LOOP
 			EXECUTE 'insert into measures (control_measure_id, region_id, region_version)
@@ -623,7 +627,7 @@ BEGIN
 						on mr.control_measure_id = inv.cm_id
 						and mr.fips = inv.fips
 					where mr.fips is null
-						and csm.control_strategy_id = ' || control_strategy_id || ')
+						and csm.control_strategy_id = ' || int_control_strategy_id || ')
 		';
 
 		EXECUTE	'delete from only emissions.' || detailed_result_table_name || ' as inv2
