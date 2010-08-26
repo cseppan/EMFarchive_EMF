@@ -207,7 +207,7 @@ public class SectorScenarioManagerWindow extends ReusableInteralFrame implements
             }
         });
         crudPanel.add(copyButton);
-        copyButton.setEnabled(false);
+//        copyButton.setEnabled(false);
 
         return crudPanel;
     }
@@ -231,7 +231,7 @@ public class SectorScenarioManagerWindow extends ReusableInteralFrame implements
         };
 
         SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, table, confirmDialog);
-        viewButton.setEnabled(false);
+//        viewButton.setEnabled(false);
         return viewButton;
     }
 

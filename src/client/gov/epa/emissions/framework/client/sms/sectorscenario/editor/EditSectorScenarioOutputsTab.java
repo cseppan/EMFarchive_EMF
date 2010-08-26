@@ -439,4 +439,9 @@ public class EditSectorScenarioOutputsTab extends JPanel implements EditSectorSc
             refresh(sectorScenario, new SectorScenarioOutput[] {});
         }
     }
+
+    public void viewOnly() {
+        // NOTE Auto-generated method stub
+        
+    }
 }

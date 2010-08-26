@@ -239,8 +239,15 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
         return panel;
     }
 
-    public void save(SectorScenario sectorScenario) {
+    public void save(SectorScenario sectorScenario) throws EmfException {
         messagePanel.clear();
+        
+        //perform some basic validation...
+        if (name.getText().trim().length() == 0)
+            throw new EmfException("Summary Tab: Missing name.");
+        if (abbrev.getText().trim().length() == 0)
+            throw new EmfException("Summary Tab: Missing abbreviation.");
+        
         sectorScenario.setName(name.getText());
         sectorScenario.setAbbreviation(abbrev.getText());
         sectorScenario.setDescription(description.getText());
@@ -316,6 +323,11 @@ public class EditSectorScenarioSummaryTab extends JPanel implements EditSectorSc
 //        setLayout();
 //        super.validate();
 //        changeablesList.resetChanges();
+    }
+
+    public void viewOnly() {
+        // NOTE Auto-generated method stub
+        
     }
 
 }

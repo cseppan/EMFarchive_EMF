@@ -36,13 +36,15 @@ import javax.swing.JTabbedPane;
 
 public class EditSectorScenarioWindow extends DisposableInteralFrame implements EditSectorScenarioView {
 
-    private EditSectorScenarioPresenter presenter;
+    protected EditSectorScenarioPresenter presenter;
 
     protected Button saveButton;
 
     protected Button runButton;
 
     protected Button stopButton;
+    
+    protected Button refreshButton;
     
     final protected JTabbedPane tabbedPane = new JTabbedPane();
     
@@ -105,7 +107,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
     
     private JPanel createSummaryTab() {
 
-        EditSectorScenarioSummaryTab summaryTabView = new EditSectorScenarioSummaryTab(sectorScenario,session, this, messagePanel, parentConsole);
+        EditSectorScenarioSummaryTab summaryTabView = new EditSectorScenarioSummaryTab(sectorScenario, session, this, messagePanel, parentConsole);
         
         presenter.set(summaryTabView);
         summaryTabView.display();
@@ -173,10 +175,6 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         saveButton = new SaveButton(saveAction());
         container.add(saveButton);
 
-        Button copyButton = new CopyButton(null);
-        copyButton.setEnabled(false);
-        container.add(copyButton);
-
         Button closeButton = new CloseButton(closeAction());
         container.add(closeButton);
         getRootPane().setDefaultButton(saveButton);
@@ -186,7 +184,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         runButton = new RunButton(runAction());
         container.add(runButton);
 
-        Button refreshButton = new Button("Refresh", new AbstractAction(){
+        refreshButton = new Button("Refresh", new AbstractAction(){
             public void actionPerformed(ActionEvent event) {
                 try {
                     presenter.doRefresh();

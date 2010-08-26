@@ -21,7 +21,7 @@ public class EditSectorScenarioInputsTabPresenterImpl implements EditSectorScena
         this.view = view;
     }
     
-    public void doSave(SectorScenario sectorScenario){
+    public void doSave(SectorScenario sectorScenario) throws EmfException{
         view.save(sectorScenario);
     }   
 
@@ -58,5 +58,9 @@ public class EditSectorScenarioInputsTabPresenterImpl implements EditSectorScena
     public void doRefresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) throws EmfException {
         view.refresh(sectorScenario, sectorScenarioOutputs);  
         
+    }
+
+    public void doViewOnly() {
+        view.viewOnly();  
     }
 }

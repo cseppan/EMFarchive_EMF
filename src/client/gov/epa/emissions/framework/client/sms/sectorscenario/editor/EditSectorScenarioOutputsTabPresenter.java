@@ -37,7 +37,7 @@ public class EditSectorScenarioOutputsTabPresenter implements EditSectorScenario
         this.view = view;
     }
 
-    public void doSave(SectorScenario sectorScenario) {
+    public void doSave(SectorScenario sectorScenario) throws EmfException {
         view.save(sectorScenario);
     }
 
@@ -230,5 +230,7 @@ public class EditSectorScenarioOutputsTabPresenter implements EditSectorScenario
         }
     }
 
- 
+    public void doViewOnly() {
+        view.viewOnly();  
+    }
 }

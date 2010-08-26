@@ -25,18 +25,27 @@ public class ViewSectorScenarioWindow extends EditSectorScenarioWindow implement
     }
 
     public void viewOnly() {
-        saveButton.setEnabled(false);
-        //runButton.setEnabled(false);
+        saveButton.setVisible(false);
+        runButton.setVisible(false);
+        refreshButton.setVisible(false);
+        stopButton.setVisible(false);
     }
 
-    public void observe(EditSectorScenarioPresenter editPresenter) {
-        // NOTE Auto-generated method stub
-        
+    public void observe(EditSectorScenarioPresenter presenter) {
+        this.presenter = presenter;
     }
 
     public void run(SectorScenario sectorScenario) {
         // NOTE Auto-generated method stub
         
+    }
+
+    public void windowClosing() {
+        try {
+            presenter.doClose();
+        } catch (EmfException e) {
+            showError("Could not close: " + e.getMessage());
+        }
     }
 
 

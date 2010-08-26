@@ -75,6 +75,14 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
     private ComboBox sectorMappingDataset;
 
     private ComboBox sectorMappingDatasetVersion;
+
+    private BorderlessButton addButton;
+
+    private BorderlessButton editButton;
+
+    private BorderlessButton removeButton;
+
+    private BorderlessButton viewButton;
     
     public EditSectorScenarioInputsTab(SectorScenario sectorScenario, ManageChangeables changeablesList, 
             MessagePanel messagePanel, EmfConsole parentConsole, 
@@ -130,7 +138,7 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
 
     private JPanel buttonPanel() {
         JPanel panel = new JPanel();
-        Button addButton = new BorderlessButton("Add", new AbstractAction() {
+        addButton = new BorderlessButton("Add", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     addAction();
@@ -141,19 +149,19 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
             }
         });
         panel.add(addButton);
-        Button editButton = new BorderlessButton("Set Version", new AbstractAction() {
+        editButton = new BorderlessButton("Set Version", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                     setVersionAction();
             }
         });
         panel.add(editButton);
-        Button removeButton = new BorderlessButton("Remove", new AbstractAction() {
+        removeButton = new BorderlessButton("Remove", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {           
                     removeAction();
             }
         });
         panel.add(removeButton);
-        Button viewButton = new BorderlessButton("View", new AbstractAction() {
+        viewButton = new BorderlessButton("View", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     viewAction();
@@ -462,21 +470,21 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
 //        };
 //    }
     
-    public void save(SectorScenario sectorScenario){
+    public void save(SectorScenario sectorScenario) throws EmfException{
+        
+        //perform some basic validation...
         
         EmfDataset ds =(EmfDataset) eecsMappingDataset.getSelectedItem();
-//        if (ds == null) {
-//            ds = null;
-//        }
+        if (ds == null)
+            throw new EmfException("Inputs Tab: Missing " + DatasetType.EECS_MAPPING + " dataset.");
         sectorScenario.setEecsMapppingDataset(ds);
         Version ver = (ds !=null ? (Version) eecsMappingDatasetVersion.getSelectedItem(): null);
         Integer verValue = (ver !=null? ver.getVersion(): null);
         sectorScenario.setEecsMapppingDatasetVersion(verValue);
         
         EmfDataset sectorDS =(EmfDataset) sectorMappingDataset.getSelectedItem();
-//        if (sectorDS == null) {
-//            sectorDS = null;
-//        }
+        if (sectorDS == null)
+            throw new EmfException("Inputs Tab: Missing " + DatasetType.SECTOR_MAPPING + " dataset.");
         sectorScenario.setSectorMapppingDataset(sectorDS);
         Version sectorVer = (sectorDS !=null ? (Version) sectorMappingDatasetVersion.getSelectedItem(): null);
         Integer sectorVerValue = (sectorVer !=null? sectorVer.getVersion(): null);
@@ -539,5 +547,11 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
             throws EmfException {
         // NOTE Auto-generated method stub
         
+    }
+
+    public void viewOnly() {
+        editButton.setVisible(false);
+        addButton.setVisible(false);
+        removeButton.setVisible(false);
     }   
 }

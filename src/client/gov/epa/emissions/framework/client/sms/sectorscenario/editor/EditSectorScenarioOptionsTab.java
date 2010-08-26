@@ -174,4 +174,10 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
     }
 
 
+    public void viewOnly() {
+        // NOTE Auto-generated method stub
+        
+    }
+
+
 }

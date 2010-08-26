@@ -8,4 +8,6 @@ public interface EditSectorScenarioTabPresenter {
     void doSave(SectorScenario sectorScenario) throws EmfException;
     
     void doRefresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) throws EmfException;
+    
+    void doViewOnly();
 }
