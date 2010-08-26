@@ -341,7 +341,7 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
   //add invremental CPT      
         incrementalCPT = new TextField("Incremental CPT", 10);
         this.addChangeable(incrementalCPT);
-        layoutGenerator.addLabelWidgetPair("Incremental CPT:", incrementalCPT, panel);
+        layoutGenerator.addLabelWidgetPair("<html>Incremental CPT (Based on<br/>specified cost year dollars):</html>", incrementalCPT, panel);
 
 
         lastModifiedBy = new TextField("Last Modified By", 10);
