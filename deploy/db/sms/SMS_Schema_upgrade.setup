@@ -107,3 +107,8 @@ ALTER TABLE sms.sector_scenario ADD COLUMN project_id int REFERENCES emf.project
 
 -- 7/3/10 add delete_results column to the sector_scenario table
 ALTER TABLE sms.sector_scenario ADD COLUMN delete_results boolean DEFAULT true;
+
+-- 07/29/2010 add new ds type column to Sector Detailed Mapping Result and EECS Detailed Mapping Result DS Types
+INSERT INTO emf.fileformat_columns (file_format_id, list_index, name, type, default_value, description, formatter, constraints, mandatory, width, spaces, fix_format_start, fix_format_end) select (select id from emf.file_formats where name = 'EECS Detailed Mapping Result') as file_format_id, 19, 'DATASET_TYPE', 'VARCHAR(255)', '', 'StringFormatter', '', 'NULL', false, 255, 0, 0, 0;
+
+INSERT INTO emf.fileformat_columns (file_format_id, list_index, name, type, default_value, description, formatter, constraints, mandatory, width, spaces, fix_format_start, fix_format_end) select (select id from emf.file_formats where name = 'Sector Detailed Mapping Result') as file_format_id, 15, 'DATASET_TYPE', 'VARCHAR(255)', '', 'StringFormatter', '', 'NULL', false, 255, 0, 0, 0;

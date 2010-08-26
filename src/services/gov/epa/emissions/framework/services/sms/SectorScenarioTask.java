@@ -396,7 +396,7 @@ public class SectorScenarioTask {
         + (inventoryHasPointColumns ?
         "plantid, pointid, stackid, segment, plant, "
         : "")
-        + "scc, poll, ann_emis, avd_emis, mact, naics, map_mact, map_naics, map_scc, eecs, priority, original_dataset_id, original_record_id) " 
+        + "scc, poll, ann_emis, avd_emis, mact, naics, map_mact, map_naics, map_scc, eecs, priority, original_dataset_id, original_record_id, dataset_type) " 
         + "select " + sectorScenarioOutput.getOutputDataset().getId() + " as dataset_id, 0 as version, " 
         + "inv.fips, "
         + (inventoryHasPointColumns ?
@@ -418,7 +418,8 @@ public class SectorScenarioTask {
         + "map_scc, "
         + "tblMatch.eecs, priority, "
         + "inv.dataset_id as original_dataset_id, "
-        + "inv.record_id as original_record_id "
+        + "inv.record_id as original_record_id, "
+        + "'" + inventory.getDatasetType().getName().replaceAll("'", "''") + "'::varchar(255) as dataset_type "
         + "from " + inventoryTableName + " inv "
         + "left outer join ( "
         + "select inv.record_id,  "
@@ -504,7 +505,7 @@ public class SectorScenarioTask {
         
         //SET work_mem TO '512MB';
         //NOTE:  Still need to  support mobile monthly files
-        String sql = "INSERT INTO " + qualifiedEmissionTableName(sectorScenarioOutput.getOutputDataset()) + " (dataset_id, version, fips, plantid, pointid, stackid, segment, scc, plant, poll, ann_emis, avd_emis, eecs, sector, priority, original_dataset_id, original_record_id) " 
+        String sql = "INSERT INTO " + qualifiedEmissionTableName(sectorScenarioOutput.getOutputDataset()) + " (dataset_id, version, fips, plantid, pointid, stackid, segment, scc, plant, poll, ann_emis, avd_emis, eecs, sector, priority, original_dataset_id, original_record_id, dataset_type) " 
         + "select distinct on (inv.original_dataset_id, inv.original_record_id) " + sectorScenarioOutput.getOutputDataset().getId() + " as dataset_id, 0 as version, " 
         + "inv.fips, "
         + "inv.plantid, inv.pointid, "
@@ -516,7 +517,8 @@ public class SectorScenarioTask {
         + "inv.eecs, tblsector.sector, "
         + "tblsector.priority, "
         + "inv.original_dataset_id, "
-        + "inv.original_record_id "
+        + "inv.original_record_id, "
+        + "inv.dataset_type "
         + "from " + eecsDetailedMappingDatasetTableName + " inv "
         + "left outer join ( "
         + "select sector, eecs, priority "
@@ -633,6 +635,8 @@ public class SectorScenarioTask {
         String sectorDetailedMappingDatasetTableName = qualifiedEmissionTableName(sectorDetailedMappingDataset);
 
         EmfDataset sectorAnnotatedInventory = sectorScenarioOutput.getOutputDataset();
+
+        short annotateEecsOption = sectorScenario.getAnnotatingEecsOption();
         
         String selectList = "select " + sectorAnnotatedInventory.getId() + " as dataset_id, '' as delete_versions, 0 as version";
         String columnList = "dataset_id, delete_versions, version";
@@ -640,10 +644,30 @@ public class SectorScenarioTask {
         for (int i = 0; i < columns.length; i++) {
             String columnName = columns[i].name();
             if (columnName.equalsIgnoreCase("eecs")) {
-                selectList += ", sector_map.eecs";
+                //addEECSCol
+                if (annotateEecsOption == 1) {
+                    selectList += ", sector_map.eecs";
+                //useEECSFromInv
+                } else if (annotateEecsOption == 2) {
+                    selectList += ", inv.eecs";
+                //fillMissEECS
+                } else if (annotateEecsOption == 3) {
+                    selectList += ", coalesce(inv.eecs, sector_map.eecs) as eecs";
+                }
+//                selectList += ", sector_map.eecs";
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("sector")) {
+                //addEECSCol
+                if (annotateEecsOption == 1) {
                     selectList += ", sector_map.sector";
+                //useEECSFromInv
+                } else if (annotateEecsOption == 2) {
+                    selectList += ", inv.sector";
+                //fillMissEECS
+                } else if (annotateEecsOption == 3) {
+                    selectList += ", case when inv.eecs is not null then inv.sector else sector_map.sector end as sector";
+                }
+//                    selectList += ", sector_map.sector";
                     columnList += "," + columnName;
             } else {
                 selectList += "," + columnName;
@@ -699,6 +723,8 @@ public class SectorScenarioTask {
         String eecsDetailedMappingDatasetTableName = qualifiedEmissionTableName(eecsDetailedMappingDataset);
 
         EmfDataset sectorAnnotatedInventory = sectorScenarioOutput.getOutputDataset();
+
+        short annotateEecsOption = sectorScenario.getAnnotatingEecsOption();
         
         String selectList = "select distinct on (inv.record_id) " + sectorAnnotatedInventory.getId() + " as dataset_id, '' as delete_versions, 0 as version";
         String columnList = "dataset_id, delete_versions, version";
@@ -706,11 +732,29 @@ public class SectorScenarioTask {
         for (int i = 0; i < columns.length; i++) {
             String columnName = columns[i].name();
             if (columnName.equalsIgnoreCase("eecs")) {
-                selectList += ", eecs_map.eecs";
+                //addEECSCol
+                if (annotateEecsOption == 1) {
+                    selectList += ", eecs_map.eecs";
+                //useEECSFromInv
+                } else if (annotateEecsOption == 2) {
+                    selectList += ", inv.eecs";
+                //fillMissEECS
+                } else if (annotateEecsOption == 3) {
+                    selectList += ", coalesce(inv.eecs, eecs_map.eecs) as eecs";
+                }
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("sector")) {
-                    selectList += ", case when eecs_map.eecs is not null then null::varchar(255) else sector end as sector";
-                    columnList += "," + columnName;
+                //addEECSCol
+                if (annotateEecsOption == 1) {
+                    selectList += ", null::varchar(255) as sector";
+                //useEECSFromInv
+                } else if (annotateEecsOption == 2) {
+                    selectList += ", inv.sector";
+                //fillMissEECS
+                } else if (annotateEecsOption == 3) {
+                    selectList += ", case when inv.eecs is not null then inv.sector else null::varchar(255) end as sector";
+                }
+                columnList += "," + columnName;
             } else {
                 selectList += "," + columnName;
                 columnList += "," + columnName;
@@ -789,7 +833,7 @@ public class SectorScenarioTask {
                 try {
                     
                     //create EECS Annotated Inventory
-                    if (true/*sectorScenario.getAnnotateInventoryWithEECS()*/) {
+                    if (sectorScenario.getAnnotateInventoryWithEECS()) {
                         createEecsAnnotatedInventoryOutput(eecsDetailedMappingResultOutput.getOutputDataset(), sectorScenarioInventories[i]);
                     }
                     
