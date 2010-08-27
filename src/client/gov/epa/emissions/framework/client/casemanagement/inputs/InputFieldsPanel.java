@@ -273,15 +273,16 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
     private void setDatasets(EmfDataset[] datasets) {
         if (datasets == null || datasets.length == 0) {
-            dataset.setText("");
-            updateDataset(null);
-            fillVersions(null);
+//            dataset.setText("");
+//            updateDataset(null);
+//            fillVersions(null);
             return;
         }
-
-        dataset.setText(datasets[0].getName());
-        updateDataset(datasets[0]);
-        fillVersions(datasets[0]);
+        if (datasets != null || datasets.length > 0) {
+            dataset.setText(datasets[0].getName());
+            updateDataset(datasets[0]);
+            fillVersions(datasets[0]);
+        }
     }
 
     private void addPopupMenuListener(final JComboBox box, final String toget) {
