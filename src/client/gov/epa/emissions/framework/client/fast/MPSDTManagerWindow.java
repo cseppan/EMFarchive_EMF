@@ -45,7 +45,7 @@ public class MPSDTManagerWindow extends ReusableInteralFrame implements MPSDTMan
 
     private EmfSession session;
 
-    private static final String ROOT_SELECT_PROMPT = "Please select one or more Fast entities to ";
+//    private static final String ROOT_SELECT_PROMPT = "Please select one or more Fast entities to ";
 
     public MPSDTManagerWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
 

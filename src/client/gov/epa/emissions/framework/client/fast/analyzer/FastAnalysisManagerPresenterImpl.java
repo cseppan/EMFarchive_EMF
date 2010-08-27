@@ -40,6 +40,7 @@ public class FastAnalysisManagerPresenterImpl implements RefreshObserver, FastAn
     }
 
     public void doClose() {
+        //
     }
 
     public void doNew() throws EmfException {

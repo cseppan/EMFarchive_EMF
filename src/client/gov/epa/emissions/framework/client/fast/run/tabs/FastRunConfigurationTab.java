@@ -10,7 +10,6 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
@@ -211,7 +210,7 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
 
                     DatasetCommand command = new DatasetCommand() {
 
-                        public void execute() throws EmfException {
+                        public void execute() {
                             FastRun run = getRun();
                             run.setInvTableDataset(this.getDataset());
                         }
@@ -280,7 +279,7 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
                 protected void doActionPerformed(ActionEvent e) throws EmfException {
 
                     DatasetCommand command = new DatasetCommand() {
-                        public void execute() throws EmfException {
+                        public void execute() {
                             FastRun run = getRun();
                             run.setSpeciesMapppingDataset(this.getDataset());
                         }
@@ -376,7 +375,7 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
                 protected void doActionPerformed(ActionEvent e) throws EmfException {
 
                     DatasetCommand command = new DatasetCommand() {
-                        public void execute() throws EmfException {
+                        public void execute() {
                             FastRun run = getRun();
                             run.setTransferCoefficientsDataset(this.getDataset());
                         }
@@ -445,7 +444,7 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
                 protected void doActionPerformed(ActionEvent e) throws EmfException {
 
                     DatasetCommand command = new DatasetCommand() {
-                        public void execute() throws EmfException {
+                        public void execute() {
                             FastRun run = getRun();
                             run.setDomainPopulationDataset(this.getDataset());
                         }
@@ -514,7 +513,7 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
                 protected void doActionPerformed(ActionEvent e) throws EmfException {
 
                     DatasetCommand command = new DatasetCommand() {
-                        public void execute() throws EmfException {
+                        public void execute() {
                             FastRun run = getRun();
                             run.setCancerRiskDataset(this.getDataset());
                         }
@@ -687,24 +686,28 @@ public class FastRunConfigurationTab extends AbstractFastRunTab {
         return retVal;
     }
 
-    private void widgetLayout(int rows, int cols, int initX, int initY, int xPad, int yPad,
-            SpringLayoutGenerator layoutGenerator, JPanel panel) {
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, rows, cols, // rows, cols
-                initX, initY, // initialX, initialY
-                xPad, yPad);// xPad, yPad
-    }
+//    private void widgetLayout(int rows, int cols, int initX, int initY, int xPad, int yPad,
+//            SpringLayoutGenerator layoutGenerator, JPanel panel) {
+//        // Lay out the panel.
+//        layoutGenerator.makeCompactGrid(panel, rows, cols, // rows, cols
+//                initX, initY, // initialX, initialY
+//                xPad, yPad);// xPad, yPad
+//    }
 
     @Override
     void refreshData() {
         this.populateFields();
     }
 
-    public void save(FastRun run) throws EmfException {
+    public void save(FastRun run) {
 
         this.clearMessage();
-
-        validateFields();
+        try {
+            validateFields();
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
 
         run.setInvTableDataset(this.getRun().getInvTableDataset());
         run.setSpeciesMapppingDataset(this.getRun().getSpeciesMapppingDataset());

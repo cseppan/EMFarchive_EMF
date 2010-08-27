@@ -21,8 +21,6 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class FastNonPointDatasetViewWindow extends AbstractFastDatasetWindow {
 
-    private FastDatasetWrapper wrapper;
-
     public FastNonPointDatasetViewWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
 
         super("View Fast Non-Point Dataset", desktopManager, session, parentConsole);
@@ -33,8 +31,6 @@ public class FastNonPointDatasetViewWindow extends AbstractFastDatasetWindow {
 
     protected void doLayout(FastDatasetWrapper wrapper) {
 
-        this.wrapper = wrapper;
-
         Container contentPane = getContentPane();
         contentPane.removeAll();
         contentPane.setLayout(new BorderLayout());
@@ -44,9 +40,9 @@ public class FastNonPointDatasetViewWindow extends AbstractFastDatasetWindow {
     }
 
     public void refresh(FastDatasetWrapper wrapper) {
-        this.wrapper = wrapper;
+        //
     }
-
+    
     private JPanel createMiddlePane(FastDatasetWrapper wrapper) {
 
         JPanel panel = new JPanel(new GridBagLayout());

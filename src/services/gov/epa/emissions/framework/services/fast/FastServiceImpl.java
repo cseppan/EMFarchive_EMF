@@ -6,14 +6,11 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
-import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.fast.netCDF.ExportFastOutputToNetCDFFile;
 import gov.epa.emissions.framework.services.fast.shapefile.ExportFastOutputToShapeFile;
-import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
@@ -72,7 +69,7 @@ public class FastServiceImpl implements FastService {
 
         daoCommand.setSessionFactory(this.sessionFactory);
         daoCommand.setLog(LOG);
-        return (T) daoCommand.execute().getReturnValue();
+        return daoCommand.execute().getReturnValue();
     }
 
     public synchronized FastRun[] getFastRuns() throws EmfException {
@@ -704,23 +701,6 @@ public class FastServiceImpl implements FastService {
         });
     }
 
-    private synchronized void close(final DbServer dbServer) throws EmfException {
-
-        this.executeDaoCommand(new AbstractDaoCommand<Void>() {
-            @Override
-            protected void doExecute(Session session) throws Exception {
-                if (dbServer != null) {
-                    dbServer.disconnect();
-                }
-            }
-
-            @Override
-            protected String getErrorMessage() {
-                return "Could not close database server";
-            }
-        });
-    }
-
     public FastNonPointDataset[] getFastNonPointDatasets() throws EmfException {
 
         return this.executeDaoCommand(new AbstractDaoCommand<FastNonPointDataset[]>() {
@@ -1061,12 +1041,7 @@ public class FastServiceImpl implements FastService {
             protected void doExecute(Session session) throws Exception {
 
                 try {
-                    // first see if the strategy has been canceled, is so don't
-                    // run it...
-                    String runStatus = dao.getFastAnalysisRunStatus(fastAnalysisId, session);
-                    // if (runStatus.equals("Cancelled")) {
-                    // return;
-                    // }
+                    dao.getFastAnalysisRunStatus(fastAnalysisId, session);
 
                     FastAnalysis strategy = getFastAnalysis(fastAnalysisId);
                     // validateSectors(strategy);

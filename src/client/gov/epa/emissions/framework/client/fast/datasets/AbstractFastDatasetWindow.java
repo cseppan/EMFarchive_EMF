@@ -98,7 +98,7 @@ public abstract class AbstractFastDatasetWindow extends DisposableInteralFrame i
         Action action = new AbstractFastAction(this.getMessagePanel(), "Error closing window") {
 
             @Override
-            protected void doActionPerformed(ActionEvent e) throws EmfException {
+            protected void doActionPerformed(ActionEvent e){
                 doClose();
             }
         };

@@ -235,7 +235,7 @@ public abstract class AbstractFastAnalysisWindow extends DisposableInteralFrame 
         Action action = new AbstractFastAction(this.getMessagePanel(), "Error editing Fast runs") {
 
             @Override
-            protected void doActionPerformed(ActionEvent e) throws EmfException {
+            protected void doActionPerformed(ActionEvent e) {
                 doClose();
             }
         };

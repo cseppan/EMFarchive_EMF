@@ -2,12 +2,10 @@ package gov.epa.emissions.framework.client.fast.run.tabs;
 
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
-import gov.epa.emissions.framework.client.EmfPanel;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.fast.run.FastRunPresenter;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.fast.FastRun;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -139,7 +137,7 @@ public abstract class AbstractFastRunTab extends JPanel implements FastRunTabVie
 
     }
 
-    public void save(FastRun run) throws EmfException {
+    public void save(FastRun run) {
         // NOTE Auto-generated method stub
 
     }

@@ -13,7 +13,6 @@ import gov.epa.emissions.framework.services.fast.FastService;
 import gov.epa.emissions.framework.services.sms.SectorScenario;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class SectorScenarioPresenter {
 
@@ -80,7 +79,6 @@ public class SectorScenarioPresenter {
     }
 
     public void test() throws EmfException {
-        Date now = Calendar.getInstance().getTime();
         FastService fastService = session.fastService();
         
 
@@ -225,7 +223,7 @@ public class SectorScenarioPresenter {
 //        fastService.getFastAnalysisOutputs(fastAnalysis.getId());
         
 //        
-        String[] pollutants = fastService.getFastRunSpeciesMappingDatasetPollutants(getDataset("fast_species_mapping").getId(), 0);
+//        String[] pollutants = fastService.getFastRunSpeciesMappingDatasetPollutants(getDataset("fast_species_mapping").getId(), 0);
         fastService.exportFastOutputToShapeFile(fastService.getFastRunOutputs(27)[1].getOutputDataset().getId(), 0, 1, "delvecch", "C:\\temp\\temp", "NO3");
         
     }

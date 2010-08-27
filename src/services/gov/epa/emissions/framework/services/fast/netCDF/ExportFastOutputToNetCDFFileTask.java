@@ -1,19 +1,14 @@
 package gov.epa.emissions.framework.services.fast.netCDF;
 
 import gov.epa.emissions.commons.data.Dataset;
-import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.commons.db.postgres.PostgresSQLToShapeFile;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.CustomCharSetOutputStreamWriter;
 import gov.epa.emissions.commons.io.ExporterException;
-import gov.epa.emissions.commons.io.VersionedQuery;
-import gov.epa.emissions.commons.io.generic.GenericExporter;
-import gov.epa.emissions.commons.io.importer.NonVersionedDataFormatFactory;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
@@ -35,13 +30,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +41,7 @@ import org.hibernate.Session;
 
 public class ExportFastOutputToNetCDFFileTask implements Runnable {
 
-    private String user;
+//    private String user;
 
     private StatusDAO statusDao;
 
@@ -63,8 +55,6 @@ public class ExportFastOutputToNetCDFFileTask implements Runnable {
 
     private DbServerFactory dbServerFactory;
 
-    private String pollutant;
-
     private String userName;
 
     private int datasetId;
@@ -75,8 +65,6 @@ public class ExportFastOutputToNetCDFFileTask implements Runnable {
 
     private boolean windowsOS;
 
-    private long exportedLinesCount;
-    
     public ExportFastOutputToNetCDFFileTask(int datasetId, int datasetVersion, int gridId, String userName, String dirName,
             String pollutant, DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
 //        super(getDataset(datasetId), dbServerFactory.getDbServer(), getDataset(datasetId).getDatasetType().getFileFormat(), new NonVersionedDataFormatFactory(), 0);
@@ -89,7 +77,6 @@ public class ExportFastOutputToNetCDFFileTask implements Runnable {
         this.sessionFactory = sessionFactory;
         this.statusDao = new StatusDAO(sessionFactory);
         this.dbServerFactory = dbServerFactory;
-        this.pollutant = pollutant;
         if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS"))
             this.windowsOS = true;
     }
@@ -150,15 +137,15 @@ public class ExportFastOutputToNetCDFFileTask implements Runnable {
         }
     }
 
-    private String getProperty(String propertyName) {
-        Session session = sessionFactory.getSession();
-        try {
-            EmfProperty property = new EmfPropertiesDAO().getProperty(propertyName, session);
-            return property.getValue();
-        } finally {
-            session.close();
-        }
-    }
+//    private String getProperty(String propertyName) {
+//        Session session = sessionFactory.getSession();
+//        try {
+//            EmfProperty property = new EmfPropertiesDAO().getProperty(propertyName, session);
+//            return property.getValue();
+//        } finally {
+//            session.close();
+//        }
+//    }
 
     private EmfDataset getDataset(int datasetId) {
         Session session = sessionFactory.getSession();
@@ -188,72 +175,72 @@ public class ExportFastOutputToNetCDFFileTask implements Runnable {
         }
     }
 
-    private String emissionTableName(Dataset dataset) {
-        InternalSource[] internalSources = dataset.getInternalSources();
-        return internalSources[0].getTable().toLowerCase();
-    }
+//    private String emissionTableName(Dataset dataset) {
+//        InternalSource[] internalSources = dataset.getInternalSources();
+//        return internalSources[0].getTable().toLowerCase();
+//    }
 
-    private String[] getDatasetSectors(EmfDataset dataset, Version datasetVersion) throws EmfException {
-        DbServer dbServer = null;
-        List<String> sectorList = new ArrayList<String>();
-        try {
-            dbServer = dbServerFactory.getDbServer();
-            VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion, "i");
-            ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
-                    "select distinct coalesce(sector, '') as sector from emissions." + emissionTableName(dataset)
-                            + " as i where " + datasetVersionedQuery.query() + " order by sector ");
+//    private String[] getDatasetSectors(EmfDataset dataset, Version datasetVersion) throws EmfException {
+//        DbServer dbServer = null;
+//        List<String> sectorList = new ArrayList<String>();
+//        try {
+//            dbServer = dbServerFactory.getDbServer();
+//            VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion, "i");
+//            ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
+//                    "select distinct coalesce(sector, '') as sector from emissions." + emissionTableName(dataset)
+//                            + " as i where " + datasetVersionedQuery.query() + " order by sector ");
+//
+//            while (rs.next()) {
+//                sectorList.add(rs.getString(1));
+//            }
+//        } catch (SQLException e) {
+//            throw new EmfException(e.getMessage(), e);
+//        } finally {
+//            if (dbServer != null)
+//                try {
+//                    dbServer.disconnect();
+//                } catch (Exception e) {
+//                    // NOTE Auto-generated catch block
+//                    e.printStackTrace();
+//                }
+//        }
+//        return sectorList.toArray(new String[0]);
+//    }
 
-            while (rs.next()) {
-                sectorList.add(rs.getString(1));
-            }
-        } catch (SQLException e) {
-            throw new EmfException(e.getMessage(), e);
-        } finally {
-            if (dbServer != null)
-                try {
-                    dbServer.disconnect();
-                } catch (Exception e) {
-                    // NOTE Auto-generated catch block
-                    e.printStackTrace();
-                }
-        }
-        return sectorList.toArray(new String[0]);
-    }
-
-    private String[] getDatasetPollutants(EmfDataset dataset, Version datasetVersion, String sector) throws EmfException {
-        DbServer dbServer = null;
-        DatasetType datasetType = dataset.getDatasetType();
-        boolean hasCmaqPollutantColumn = false;
-        boolean hasPollutantColumn = false;
-        for (Column column : datasetType.getFileFormat().getColumns()) {
-            if (column.getName().equalsIgnoreCase("cmaq_pollutant")) hasCmaqPollutantColumn = true;
-            if (column.getName().equalsIgnoreCase("pollutant")) hasPollutantColumn = true;
-        }
-        List<String> pollutantList = new ArrayList<String>();
-        if (!hasCmaqPollutantColumn && !hasPollutantColumn) return new String[0];
-        try {
-            dbServer = dbServerFactory.getDbServer();
-            VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion, "i");
-            ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
-                    "select distinct coalesce(" + (hasCmaqPollutantColumn ? "cmaq_pollutant" : "pollutant") + ", '') as " + (hasCmaqPollutantColumn ? "cmaq_pollutant" : "pollutant") + " from emissions." + emissionTableName(dataset)
-                            + " as i where " + datasetVersionedQuery.query() + " and sector = '" + sector.replace("'","''") + "' order by " + (hasCmaqPollutantColumn ? "cmaq_pollutant" : "pollutant") + " ");
-
-            while (rs.next()) {
-                pollutantList.add(rs.getString(1));
-            }
-        } catch (SQLException e) {
-            throw new EmfException(e.getMessage(), e);
-        } finally {
-            if (dbServer != null)
-                try {
-                    dbServer.disconnect();
-                } catch (Exception e) {
-                    // NOTE Auto-generated catch block
-                    e.printStackTrace();
-                }
-        }
-        return pollutantList.toArray(new String[0]);
-    }
+//    private String[] getDatasetPollutants(EmfDataset dataset, Version datasetVersion, String sector) throws EmfException {
+//        DbServer dbServer = null;
+//        DatasetType datasetType = dataset.getDatasetType();
+//        boolean hasCmaqPollutantColumn = false;
+//        boolean hasPollutantColumn = false;
+//        for (Column column : datasetType.getFileFormat().getColumns()) {
+//            if (column.getName().equalsIgnoreCase("cmaq_pollutant")) hasCmaqPollutantColumn = true;
+//            if (column.getName().equalsIgnoreCase("pollutant")) hasPollutantColumn = true;
+//        }
+//        List<String> pollutantList = new ArrayList<String>();
+//        if (!hasCmaqPollutantColumn && !hasPollutantColumn) return new String[0];
+//        try {
+//            dbServer = dbServerFactory.getDbServer();
+//            VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion, "i");
+//            ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
+//                    "select distinct coalesce(" + (hasCmaqPollutantColumn ? "cmaq_pollutant" : "pollutant") + ", '') as " + (hasCmaqPollutantColumn ? "cmaq_pollutant" : "pollutant") + " from emissions." + emissionTableName(dataset)
+//                            + " as i where " + datasetVersionedQuery.query() + " and sector = '" + sector.replace("'","''") + "' order by " + (hasCmaqPollutantColumn ? "cmaq_pollutant" : "pollutant") + " ");
+//
+//            while (rs.next()) {
+//                pollutantList.add(rs.getString(1));
+//            }
+//        } catch (SQLException e) {
+//            throw new EmfException(e.getMessage(), e);
+//        } finally {
+//            if (dbServer != null)
+//                try {
+//                    dbServer.disconnect();
+//                } catch (Exception e) {
+//                    // NOTE Auto-generated catch block
+//                    e.printStackTrace();
+//                }
+//        }
+//        return pollutantList.toArray(new String[0]);
+//    }
 
     class HeaderColumnItem {
         public HeaderColumnItem(String columnName, String columnUnits, String columnAbbreviation,
@@ -276,130 +263,130 @@ public class ExportFastOutputToNetCDFFileTask implements Runnable {
         return new HeaderColumnItem(columnName, columnUnits, columnAbbreviation,
                 columnDescription);
     }
-    private String prepareSQLStatement(EmfDataset dataset, Version datasetVersion, Grid grid, String pollutant, String sector) throws ExporterException {
-
-        DbServer dbServer = null;
-        boolean hasXCol = false;
-        boolean hasYCol = false;
-        boolean hasPollutantCol = false;
-        boolean hasCMAQPollutantCol = false;
-        // will hold unique list of column names, pqsql2shp doesn't like multiple columns with the same name...
-        Map<String, String> cols = new HashMap<String, String>();
-        Map<String, HeaderColumnItem> headerColumnItems = new HashMap<String, HeaderColumnItem>();
-        
-        //common to Fast Runs and Analyses
-        headerColumnItems.put("x", createHeaderColumnItem("x", "UNITS", "POLID", "DESC"));
-        headerColumnItems.put("y", createHeaderColumnItem("y", "NA", "NA", "NA"));
-        headerColumnItems.put("sector", createHeaderColumnItem("sector", "NA", "NA", "NA"));
-        headerColumnItems.put("cmaq_pollutant", createHeaderColumnItem("pollutant", "NA", "NA", "NA"));
-        headerColumnItems.put("pollutant", createHeaderColumnItem("pollutant", "NA", "NA", "NA"));
-        headerColumnItems.put("emission", createHeaderColumnItem("Emission (ton/yr)", "ton/yr", "EMS", "Emissions"));
-        headerColumnItems.put("air_quality", createHeaderColumnItem("AQ conc (ug/m3)", "ug/m3", "AQ", "AQcon"));
-
-        //fast run output columns to encounter
-        headerColumnItems.put("population_weighted_air_quality", createHeaderColumnItem("Population weighted AQ", "mg/m3", "aqp", "pop_weighted_AQ"));
-        headerColumnItems.put("cancer_risk_per_person", createHeaderColumnItem("cancer risk/person", "NA", "cr", "cancer_risk/person"));
-        headerColumnItems.put("total_cancer_risk", createHeaderColumnItem("total cancer risk", "NA", "tcr", "total_cancer_risk"));
-        headerColumnItems.put("population_weighted_cancer_risk", createHeaderColumnItem("pop. weighted cancer risk", "NA", "pw", "pop_weighted_cancer_risk"));
-        headerColumnItems.put("grid_cell_population", createHeaderColumnItem("grid cell population", "NA", "gcp", "grid_cell_population"));
-        headerColumnItems.put("pct_population_in_grid_cell_to_model_domain", createHeaderColumnItem("% population in grid cell relative to modeling domain", "Percent", "pp", "perc_pop_in_grid_cell_relative_to_modeling_domain"));
-        headerColumnItems.put("ure", createHeaderColumnItem("URE", "NA", "ure", "URE"));
-        
-        //fast analysis output columns to encounter
-        headerColumnItems.put("sum_sens_emission", createHeaderColumnItem("Sum Sensitivity Emission (ton/yr)", "ton/yr", "ssems", "Sum Sensitivity Emissions"));
-        headerColumnItems.put("sum_base_emission", createHeaderColumnItem("Sum Baseline Emission (ton/yr)", "ton/yr", "sbems", "Sum Baseline Emissions"));
-        headerColumnItems.put("diff_sum_emission", createHeaderColumnItem("Difference Sum Emission (ton/yr)", "ton/yr", "dsems", "Difference Sum Emissions"));
-        headerColumnItems.put("sum_sens_air_quality", createHeaderColumnItem("Sum Sensitivity AQ conc (ug/m3)", "ug/m3", "ssaq", "Sum Sensitivity AQcon"));
-        headerColumnItems.put("sum_base_air_quality", createHeaderColumnItem("Sum Baseline AQ conc (ug/m3)", "ug/m3", "sbaq", "Sum Baseline AQcon"));
-        headerColumnItems.put("diff_sum_air_quality", createHeaderColumnItem("Difference Sum AQ conc (ug/m3)", "ug/m3", "dsaq", "Difference Sum AQcon"));
-        headerColumnItems.put("sum_sens_pop_weighted_air_quality", createHeaderColumnItem("Sum Sensitivity Population weighted AQ", "mg/m3", "ssaqp", "sum_sensitivity_pop_weighted_AQ"));
-        headerColumnItems.put("sum_base_pop_weighted_air_quality", createHeaderColumnItem("Sum Baseline Population weighted AQ", "mg/m3", "sbaqp", "sum_baseline_pop_weighted_AQ"));
-        headerColumnItems.put("diff_sum_pop_weighted_air_quality", createHeaderColumnItem("Difference Sum Population weighted AQ", "mg/m3", "dsaqp", "difference_sum_pop_weighted_AQ"));
-        headerColumnItems.put("sum_sens_pop_total_cancer_risk", createHeaderColumnItem("Sum Sensitivity total cancer risk", "NA", "sstcr", "sum_sensitivity_total_cancer_risk"));
-        headerColumnItems.put("sum_base_pop_total_cancer_risk", createHeaderColumnItem("Sum Baseline total cancer risk", "NA", "sbtcr", "sum_baseline_total_cancer_risk"));
-        headerColumnItems.put("sum_sens_pop_total_cancer_risk", createHeaderColumnItem("Difference Sum total cancer risk", "NA", "dstcr", "difference_sum_total_cancer_risk"));
-
-        headerColumnItems.put("sum_sens_pop_weighted_cancer_risk", createHeaderColumnItem("Sum Sensitivity pop. weighted cancer risk", "NA", "sspw", "sum_sensitivity_pop_weighted_cancer_risk"));
-        headerColumnItems.put("sum_sens_pop_weighted_cancer_risk", createHeaderColumnItem("Sum Baseline pop. weighted cancer risk", "NA", "sbpw", "sum_baseline_pop_weighted_cancer_risk"));
-        headerColumnItems.put("sum_sens_pop_weighted_cancer_risk", createHeaderColumnItem("Difference Sum pop. weighted cancer risk", "NA", "dspw", "difference_sum_pop_weighted_cancer_risk"));
-
-//        EMS AQ  AQP CR  TCR PW  GCP PP  URE
-//        Emissions   AQcon   pop_weighted_AQ cancer_risk/person  total_cancer_risk   pop_weighted_cancer_risk    grid_cell_population    perc_pop_in_grid_cell_relative_to_modeling_domain   URE
-
-        String colNames = "";
-        String sql = "";
-        String tableName = dataset.getInternalSources()[0].getTable();
-        VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion, "i");
-
-        try {
-            dbServer = dbServerFactory.getDbServer();
-            ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
-                    "select * from emissions." + tableName + " where 1 = 0");
-            ResultSetMetaData md = rs.getMetaData();
-            int columnCount = md.getColumnCount();
-            String colName = "";
-            for (int i = 1; i <= columnCount; i++) {
-                colName = md.getColumnName(i).toLowerCase();
-                if (!cols.containsKey(colName)) {
-                    cols.put(colName, colName);
-                    colNames += (colNames.length() > 0 ? "," : "");
-                    if (colName.equals("x")) {
-                        colNames += "hor.x";
-                    } else if (colName.equals("y")) {
-                        colNames += "vert.y";
-                    } else if (colName.equals("sector")) {
-                        colNames += "'" + sector + "'::varchar(64) as sector";
-                    } else if (colName.equals("pollutant")) {
-                        colNames += "pollutant";
-                    } else if (colName.equals("cmaq_pollutant")) {
-                        colNames += "cmaq_pollutant";
-                    } else {
-                        colNames += colName + (!headerColumnItems.containsKey(colName) ? "" : " as " + headerColumnItems.get(colName));
-                    }
-                }
-
-                if (colName.equals("x")) {
-                    hasXCol = true;
-                } else if (colName.equals("y")) {
-                    hasYCol = true;
-                } else if (colName.equals("pollutant")) {
-                    hasPollutantCol = true;
-                } else if (colName.equals("cmaq_pollutant")) {
-                    hasCMAQPollutantCol = true;
-                }
-            }
-
-            if (!hasXCol || !hasYCol || (!hasPollutantCol && !hasCMAQPollutantCol)) 
-                throw new ExporterException("Dataset is missing applicable columns; x, y, and pollutant (or cmaq_polluant); needed to generate a shapefile.");
-            
-        } catch (SQLException e) {
-            throw new ExporterException(e.getMessage());
-        } finally {
-            if (dbServer != null)
-                try {
-                    dbServer.disconnect();
-                } catch (Exception e) {
-                    // NOTE Auto-generated catch block
-                    e.printStackTrace();
-                }
-        }
-        sql = "select " + colNames + ", ST_translate(origin_grid.boxrep, hor.x * " + grid.getXcell() + ", vert.y * " + grid.getYcell() + ") As the_geom "
-            + " from generate_series(0," + (grid.getNcols() - 1) + ") as hor(x) "
-            + " cross join generate_series(0," + (grid.getNrows() - 1) + ") as vert(y) "
-            + " cross join (SELECT ST_SetSRID(CAST('BOX(" + grid.getXcent() + " " + grid.getYcent() + "," + (grid.getXcent() + grid.getXcell()) + " " + (grid.getYcent() + grid.getYcell()) + ")' as box2d), 104307) as boxrep) as origin_grid "
-            + " left outer join emissions." + tableName + " i "
-            + " on i.x = hor.x + 1 "
-            + " and i.y = vert.y + 1 "
-            + " and " + datasetVersionedQuery.query() + " "
-            + " and " + (hasPollutantCol ? "i.pollutant" : "i.cmaq_pollutant") + "='" + pollutant + "'"
-            + " and i.sector='" + sector + "'"
-            + " order by hor.x, vert.y ";
-        
-        System.out.println(sql);
-    
-        return sql;
-    }
-    
+//    private String prepareSQLStatement(EmfDataset dataset, Version datasetVersion, Grid grid, String pollutant, String sector) throws ExporterException {
+//
+//        DbServer dbServer = null;
+//        boolean hasXCol = false;
+//        boolean hasYCol = false;
+//        boolean hasPollutantCol = false;
+//        boolean hasCMAQPollutantCol = false;
+//        // will hold unique list of column names, pqsql2shp doesn't like multiple columns with the same name...
+//        Map<String, String> cols = new HashMap<String, String>();
+//        Map<String, HeaderColumnItem> headerColumnItems = new HashMap<String, HeaderColumnItem>();
+//        
+//        //common to Fast Runs and Analyses
+//        headerColumnItems.put("x", createHeaderColumnItem("x", "UNITS", "POLID", "DESC"));
+//        headerColumnItems.put("y", createHeaderColumnItem("y", "NA", "NA", "NA"));
+//        headerColumnItems.put("sector", createHeaderColumnItem("sector", "NA", "NA", "NA"));
+//        headerColumnItems.put("cmaq_pollutant", createHeaderColumnItem("pollutant", "NA", "NA", "NA"));
+//        headerColumnItems.put("pollutant", createHeaderColumnItem("pollutant", "NA", "NA", "NA"));
+//        headerColumnItems.put("emission", createHeaderColumnItem("Emission (ton/yr)", "ton/yr", "EMS", "Emissions"));
+//        headerColumnItems.put("air_quality", createHeaderColumnItem("AQ conc (ug/m3)", "ug/m3", "AQ", "AQcon"));
+//
+//        //fast run output columns to encounter
+//        headerColumnItems.put("population_weighted_air_quality", createHeaderColumnItem("Population weighted AQ", "mg/m3", "aqp", "pop_weighted_AQ"));
+//        headerColumnItems.put("cancer_risk_per_person", createHeaderColumnItem("cancer risk/person", "NA", "cr", "cancer_risk/person"));
+//        headerColumnItems.put("total_cancer_risk", createHeaderColumnItem("total cancer risk", "NA", "tcr", "total_cancer_risk"));
+//        headerColumnItems.put("population_weighted_cancer_risk", createHeaderColumnItem("pop. weighted cancer risk", "NA", "pw", "pop_weighted_cancer_risk"));
+//        headerColumnItems.put("grid_cell_population", createHeaderColumnItem("grid cell population", "NA", "gcp", "grid_cell_population"));
+//        headerColumnItems.put("pct_population_in_grid_cell_to_model_domain", createHeaderColumnItem("% population in grid cell relative to modeling domain", "Percent", "pp", "perc_pop_in_grid_cell_relative_to_modeling_domain"));
+//        headerColumnItems.put("ure", createHeaderColumnItem("URE", "NA", "ure", "URE"));
+//        
+//        //fast analysis output columns to encounter
+//        headerColumnItems.put("sum_sens_emission", createHeaderColumnItem("Sum Sensitivity Emission (ton/yr)", "ton/yr", "ssems", "Sum Sensitivity Emissions"));
+//        headerColumnItems.put("sum_base_emission", createHeaderColumnItem("Sum Baseline Emission (ton/yr)", "ton/yr", "sbems", "Sum Baseline Emissions"));
+//        headerColumnItems.put("diff_sum_emission", createHeaderColumnItem("Difference Sum Emission (ton/yr)", "ton/yr", "dsems", "Difference Sum Emissions"));
+//        headerColumnItems.put("sum_sens_air_quality", createHeaderColumnItem("Sum Sensitivity AQ conc (ug/m3)", "ug/m3", "ssaq", "Sum Sensitivity AQcon"));
+//        headerColumnItems.put("sum_base_air_quality", createHeaderColumnItem("Sum Baseline AQ conc (ug/m3)", "ug/m3", "sbaq", "Sum Baseline AQcon"));
+//        headerColumnItems.put("diff_sum_air_quality", createHeaderColumnItem("Difference Sum AQ conc (ug/m3)", "ug/m3", "dsaq", "Difference Sum AQcon"));
+//        headerColumnItems.put("sum_sens_pop_weighted_air_quality", createHeaderColumnItem("Sum Sensitivity Population weighted AQ", "mg/m3", "ssaqp", "sum_sensitivity_pop_weighted_AQ"));
+//        headerColumnItems.put("sum_base_pop_weighted_air_quality", createHeaderColumnItem("Sum Baseline Population weighted AQ", "mg/m3", "sbaqp", "sum_baseline_pop_weighted_AQ"));
+//        headerColumnItems.put("diff_sum_pop_weighted_air_quality", createHeaderColumnItem("Difference Sum Population weighted AQ", "mg/m3", "dsaqp", "difference_sum_pop_weighted_AQ"));
+//        headerColumnItems.put("sum_sens_pop_total_cancer_risk", createHeaderColumnItem("Sum Sensitivity total cancer risk", "NA", "sstcr", "sum_sensitivity_total_cancer_risk"));
+//        headerColumnItems.put("sum_base_pop_total_cancer_risk", createHeaderColumnItem("Sum Baseline total cancer risk", "NA", "sbtcr", "sum_baseline_total_cancer_risk"));
+//        headerColumnItems.put("sum_sens_pop_total_cancer_risk", createHeaderColumnItem("Difference Sum total cancer risk", "NA", "dstcr", "difference_sum_total_cancer_risk"));
+//
+//        headerColumnItems.put("sum_sens_pop_weighted_cancer_risk", createHeaderColumnItem("Sum Sensitivity pop. weighted cancer risk", "NA", "sspw", "sum_sensitivity_pop_weighted_cancer_risk"));
+//        headerColumnItems.put("sum_sens_pop_weighted_cancer_risk", createHeaderColumnItem("Sum Baseline pop. weighted cancer risk", "NA", "sbpw", "sum_baseline_pop_weighted_cancer_risk"));
+//        headerColumnItems.put("sum_sens_pop_weighted_cancer_risk", createHeaderColumnItem("Difference Sum pop. weighted cancer risk", "NA", "dspw", "difference_sum_pop_weighted_cancer_risk"));
+//
+////        EMS AQ  AQP CR  TCR PW  GCP PP  URE
+////        Emissions   AQcon   pop_weighted_AQ cancer_risk/person  total_cancer_risk   pop_weighted_cancer_risk    grid_cell_population    perc_pop_in_grid_cell_relative_to_modeling_domain   URE
+//
+//        String colNames = "";
+//        String sql = "";
+//        String tableName = dataset.getInternalSources()[0].getTable();
+//        VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion, "i");
+//
+//        try {
+//            dbServer = dbServerFactory.getDbServer();
+//            ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
+//                    "select * from emissions." + tableName + " where 1 = 0");
+//            ResultSetMetaData md = rs.getMetaData();
+//            int columnCount = md.getColumnCount();
+//            String colName = "";
+//            for (int i = 1; i <= columnCount; i++) {
+//                colName = md.getColumnName(i).toLowerCase();
+//                if (!cols.containsKey(colName)) {
+//                    cols.put(colName, colName);
+//                    colNames += (colNames.length() > 0 ? "," : "");
+//                    if (colName.equals("x")) {
+//                        colNames += "hor.x";
+//                    } else if (colName.equals("y")) {
+//                        colNames += "vert.y";
+//                    } else if (colName.equals("sector")) {
+//                        colNames += "'" + sector + "'::varchar(64) as sector";
+//                    } else if (colName.equals("pollutant")) {
+//                        colNames += "pollutant";
+//                    } else if (colName.equals("cmaq_pollutant")) {
+//                        colNames += "cmaq_pollutant";
+//                    } else {
+//                        colNames += colName + (!headerColumnItems.containsKey(colName) ? "" : " as " + headerColumnItems.get(colName));
+//                    }
+//                }
+//
+//                if (colName.equals("x")) {
+//                    hasXCol = true;
+//                } else if (colName.equals("y")) {
+//                    hasYCol = true;
+//                } else if (colName.equals("pollutant")) {
+//                    hasPollutantCol = true;
+//                } else if (colName.equals("cmaq_pollutant")) {
+//                    hasCMAQPollutantCol = true;
+//                }
+//            }
+//
+//            if (!hasXCol || !hasYCol || (!hasPollutantCol && !hasCMAQPollutantCol)) 
+//                throw new ExporterException("Dataset is missing applicable columns; x, y, and pollutant (or cmaq_polluant); needed to generate a shapefile.");
+//            
+//        } catch (SQLException e) {
+//            throw new ExporterException(e.getMessage());
+//        } finally {
+//            if (dbServer != null)
+//                try {
+//                    dbServer.disconnect();
+//                } catch (Exception e) {
+//                    // NOTE Auto-generated catch block
+//                    e.printStackTrace();
+//                }
+//        }
+//        sql = "select " + colNames + ", ST_translate(origin_grid.boxrep, hor.x * " + grid.getXcell() + ", vert.y * " + grid.getYcell() + ") As the_geom "
+//            + " from generate_series(0," + (grid.getNcols() - 1) + ") as hor(x) "
+//            + " cross join generate_series(0," + (grid.getNrows() - 1) + ") as vert(y) "
+//            + " cross join (SELECT ST_SetSRID(CAST('BOX(" + grid.getXcent() + " " + grid.getYcent() + "," + (grid.getXcent() + grid.getXcell()) + " " + (grid.getYcent() + grid.getYcell()) + ")' as box2d), 104307) as boxrep) as origin_grid "
+//            + " left outer join emissions." + tableName + " i "
+//            + " on i.x = hor.x + 1 "
+//            + " and i.y = vert.y + 1 "
+//            + " and " + datasetVersionedQuery.query() + " "
+//            + " and " + (hasPollutantCol ? "i.pollutant" : "i.cmaq_pollutant") + "='" + pollutant + "'"
+//            + " and i.sector='" + sector + "'"
+//            + " order by hor.x, vert.y ";
+//        
+//        System.out.println(sql);
+//    
+//        return sql;
+//    }
+//    
     private void validateDatasetCanBeConverted(EmfDataset dataset) throws ExporterException {
 
         DbServer dbServer = null;
@@ -665,9 +652,9 @@ public class ExportFastOutputToNetCDFFileTask implements Runnable {
         }
     }
 
-    protected void writeHeaders(PrintWriter writer, Dataset dataset) throws SQLException {
-        String header = "";//dataset.getDescription();
-        String cr = System.getProperty("line.separator");
+    protected void writeHeaders(PrintWriter writer, Dataset dataset) {
+//        String header = "";//dataset.getDescription();
+//        String cr = System.getProperty("line.separator");
 
         final String headerColumnGridIdentifier = "GRID";
         final String headerColumnNameIdentifier = "DATA";
@@ -834,7 +821,7 @@ public class ExportFastOutputToNetCDFFileTask implements Runnable {
         String queryCount = "SELECT COUNT(\"dataset_id\") " + getSubString(fromClause, "ORDER BY", true);
         ResultSet rs = statement.executeQuery(queryCount);
         rs.next();
-        this.exportedLinesCount = rs.getLong(1);
+        rs.getLong(1);
         statement.close();
 
         Date ended = new Date();

@@ -19,8 +19,6 @@ import gov.epa.emissions.framework.client.fast.run.FastRunPresenter;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesViewer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.fast.FastAnalysis;
-import gov.epa.emissions.framework.services.fast.FastAnalysisOutput;
 import gov.epa.emissions.framework.services.fast.FastOutputExportWrapper;
 import gov.epa.emissions.framework.services.fast.FastRun;
 import gov.epa.emissions.framework.services.fast.FastRunOutput;
@@ -277,6 +275,7 @@ public class FastRunOutputsTab extends AbstractFastRunTab {
     }
 
     public void viewOnly() {
+        //
     }
 
     private List<FastRunOutput> getSelected() {

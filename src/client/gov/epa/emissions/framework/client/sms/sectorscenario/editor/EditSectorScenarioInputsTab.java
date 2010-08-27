@@ -543,8 +543,7 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
     }
 
 
-    public void refresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs)
-            throws EmfException {
+    public void refresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) {
         // NOTE Auto-generated method stub
         
     }

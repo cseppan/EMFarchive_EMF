@@ -35,7 +35,7 @@ public abstract class AbstractFastNonPointDatasetPresenterImpl implements FastDa
         this.view = view;
     }
 
-    public void doClose() throws EmfException {
+    public void doClose() {
         this.closeView();
     }
 

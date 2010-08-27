@@ -41,7 +41,7 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
 
     private ChangeableImpl changeable = new ChangeableImpl();
 
-    private static final String WARNING_MESSAGE = "You have asked to open several windows. Do you want proceed?";;
+//    private static final String WARNING_MESSAGE = "You have asked to open several windows. Do you want proceed?";
 
     public FastRunInventoriesTab(FastRun run, EmfSession session, MessagePanel messagePanel,
             EmfInternalFrame parentInternalFrame, DesktopManager desktopManager, EmfConsole parentConsole,
@@ -71,11 +71,16 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
          */
     }
 
-    public void save(FastRun run) throws EmfException {
+    public void save(FastRun run) {
 
         this.clearMessage();
 
-        validateFields();
+        try {
+            validateFields();
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
 
         run.setInventories(this.getRun().getInventories());
     }
@@ -137,7 +142,7 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
                 new AbstractFastAction(this.getMessagePanel(), "Error adding Fast inventories") {
 
                     @Override
-                    protected void doActionPerformed(ActionEvent e) throws EmfException {
+                    protected void doActionPerformed(ActionEvent e) {
                         addInventories();
                     }
                 });
@@ -164,7 +169,7 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
                 "Error removing Fast inventories") {
 
             @Override
-            protected void doActionPerformed(ActionEvent e) throws EmfException {
+            protected void doActionPerformed(ActionEvent e) {
                 removeSelectedInventories();
             }
         });
@@ -172,7 +177,7 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
         return removeButton;
     }
 
-    private void addInventories() throws EmfException {
+    private void addInventories() {
 
         FastDatasetSelectionView datasetSelectionDialog = new FastDatasetSelectionDialog(this.getParentConsole());
         FastDatasetSelectionPresenter datasetSelectionPresenter = new FastDatasetSelectionPresenter(
@@ -211,7 +216,7 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
         return (List<FastRunInventory>) this.table.selected();
     }
 
-    private void removeSelectedInventories() throws EmfException {
+    private void removeSelectedInventories() {
 
         this.clearMessage();
         List<FastRunInventory> selected = this.getSelected();
@@ -252,5 +257,6 @@ public class FastRunInventoriesTab extends AbstractFastRunTab {
     }
 
     public void viewOnly() {
+        //
     }
 }

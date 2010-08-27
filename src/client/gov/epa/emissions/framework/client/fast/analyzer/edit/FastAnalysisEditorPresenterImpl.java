@@ -52,7 +52,7 @@ public class FastAnalysisEditorPresenterImpl implements FastAnalysisPresenter {
         this.getService().runFastAnalysis(this.session.user(), this.analysis.getId());
     }
 
-    public void doRefresh() throws EmfException {
+    public void doRefresh() {
         this.refreshTabs();
     }
 
@@ -61,7 +61,7 @@ public class FastAnalysisEditorPresenterImpl implements FastAnalysisPresenter {
     }
 
     public void doExport(ExportView exportView, ExportPresenter presenter,
-            List<FastOutputExportWrapper> outputExportWrappers) throws EmfException {
+            List<FastOutputExportWrapper> outputExportWrappers) {
 
         if (outputExportWrappers.size() == 0) {
             view.showMessage("To Export outputs, you will need to select at least one output");

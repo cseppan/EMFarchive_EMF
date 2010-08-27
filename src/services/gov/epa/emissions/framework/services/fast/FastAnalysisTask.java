@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.fast;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
-import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
@@ -14,7 +13,6 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.QAStepTask;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
@@ -23,9 +21,7 @@ import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -516,43 +512,6 @@ public class FastAnalysisTask {
         }
     }
 
-    private int getRecordCount(EmfDataset dataset) throws EmfException {
-        String query = "SELECT count(1) as record_count " + " FROM " + qualifiedEmissionTableName(dataset);
-        ResultSet rs = null;
-        Statement statement = null;
-        int recordCount = 0;
-        try {
-            statement = datasource.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY);
-            rs = statement.executeQuery(query);
-            while (rs.next()) {
-                recordCount = rs.getInt(1);
-            }
-            rs.close();
-            rs = null;
-            statement.close();
-            statement = null;
-        } catch (SQLException e) {
-            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) { /**/
-                }
-                rs = null;
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) { /**/
-                }
-                statement = null;
-            }
-        }
-        return recordCount;
-    }
-
     private String qualifiedEmissionTableName(Dataset dataset) {
         return qualifiedName(emissionTableName(dataset));
     }
@@ -566,17 +525,6 @@ public class FastAnalysisTask {
         return datasource.getName() + "." + table;
     }
 
-    private EmfDataset getDataset(int id) {
-        EmfDataset dataset = null;
-        Session session = sessionFactory.getSession();
-        try {
-            dataset = new DatasetDAO().getDataset(session, id);
-        } finally {
-            session.close();
-        }
-        return dataset;
-    }
-
     private DatasetType getDatasetType(String name) {
         DatasetType datasetType = null;
         Session session = sessionFactory.getSession();
@@ -586,46 +534,6 @@ public class FastAnalysisTask {
             session.close();
         }
         return datasetType;
-    }
-
-    private FastAnalysisOutput[] getFastAnalysisOutputs() {
-        FastAnalysisOutput[] results = new FastAnalysisOutput[] {};
-        Session session = sessionFactory.getSession();
-        try {
-            results = fastAnalysisDAO.getFastAnalysisOutputs(fastAnalysis.getId(), session).toArray(
-                    new FastAnalysisOutput[0]);
-        } finally {
-            session.close();
-        }
-        return results;
-    }
-
-    // private String summaryResultDatasetDescription(String datasetTypeName) {
-    // return "#" + datasetTypeName + " result\n" +
-    // "#Implements control strategy: " + fastRun.getName() + "\n#";
-    // }
-
-    private void saveFastAnalysisOutput(FastRunOutput fastRunOutput) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            fastAnalysisDAO.updateFastRunOutput(fastRunOutput, session);
-            // runQASteps(fastRunOutput);
-        } catch (RuntimeException e) {
-            throw new EmfException("Could not save control strategy results: " + e.getMessage());
-        } finally {
-            session.close();
-        }
-    }
-
-    private void saveFastRun(FastRun fastRun) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            fastAnalysisDAO.updateFastRun(fastRun, session);
-        } catch (RuntimeException e) {
-            throw new EmfException("Could not save sector scenario: " + e.getMessage());
-        } finally {
-            session.close();
-        }
     }
 
     private void updateOutputDatasetVersionRecordCount(FastAnalysisOutput fastAnalysisOutput) throws EmfException {
@@ -681,27 +589,6 @@ public class FastAnalysisTask {
 
     public FastAnalysis getFastAnalysis() {
         return fastAnalysis;
-    }
-
-    private void runQASteps(FastAnalysisOutput fastAnalysisOutput) {
-        // EmfDataset resultDataset = (EmfDataset)fastRunOutput.getDetailedResultDataset();
-        if (recordCount > 0) {
-            // runSummaryQASteps(resultDataset, 0);
-        }
-        // excuteSetAndRunQASteps(inputDataset, fastRun.getDatasetVersion());
-    }
-
-    private void runSummaryQASteps(EmfDataset dataset, int version) throws EmfException {
-        QAStepTask qaTask = new QAStepTask(dataset, version, user, sessionFactory, dbServerFactory);
-        // 11/14/07 DCD instead of running the default qa steps specified in the property table, lets run all qa step
-        // templates...
-        QAStepTemplate[] qaStepTemplates = dataset.getDatasetType().getQaStepTemplates();
-        if (qaStepTemplates != null) {
-            String[] qaStepTemplateNames = new String[qaStepTemplates.length];
-            for (int i = 0; i < qaStepTemplates.length; i++)
-                qaStepTemplateNames[i] = qaStepTemplates[i].getName();
-            qaTask.runSummaryQAStepsAndExport(qaStepTemplateNames, ""/* fastRun.getExportDirectory() */);
-        }
     }
 
     private void disconnectDbServer() throws EmfException {

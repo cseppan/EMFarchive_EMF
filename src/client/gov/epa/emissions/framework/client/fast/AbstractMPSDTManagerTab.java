@@ -65,9 +65,11 @@ public abstract class AbstractMPSDTManagerTab extends JPanel implements RefreshO
     }
 
     public void populateFields() {
+        //
     }
 
     public void refreshData() {
+        //
     }
 
     public void showError(String message) {

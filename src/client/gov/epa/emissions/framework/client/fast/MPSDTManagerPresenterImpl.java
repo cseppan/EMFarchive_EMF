@@ -17,7 +17,7 @@ public class MPSDTManagerPresenterImpl implements MPSDTManagerPresenter {
         this.view = view;
     }
 
-    public void doDisplay() throws EmfException {
+    public void doDisplay() {
 
         view.observe(this);
         view.display();

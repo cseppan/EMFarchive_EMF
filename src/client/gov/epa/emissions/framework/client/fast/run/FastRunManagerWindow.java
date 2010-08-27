@@ -49,13 +49,14 @@ public class FastRunManagerWindow extends AbstractMPSDTManagerTab implements Fas
         return "Fast Runs";
     }
 
-    public void display(FastRun[] runs) throws EmfException {
+    public void display(FastRun[] runs) {
 
         doLayout(runs, this.getSession());
         SwingUtilities.invokeLater(this);
     }
 
-    public void save(FastRun[] objects) throws EmfException {
+    public void save(FastRun[] objects) {
+        //
     }
 
     public void observe(FastRunManagerPresenter presenter) {
@@ -178,7 +179,7 @@ public class FastRunManagerWindow extends AbstractMPSDTManagerTab implements Fas
         Action editAction = new AbstractFastAction(this.getMessagePanel(), "Error editing Fast runs") {
 
             @Override
-            protected void doActionPerformed(ActionEvent e) throws EmfException {
+            protected void doActionPerformed(ActionEvent e) {
                 editRuns();
             }
         };
@@ -191,7 +192,7 @@ public class FastRunManagerWindow extends AbstractMPSDTManagerTab implements Fas
         Action viewAction = new AbstractFastAction(this.getMessagePanel(), "Error viewing Fast runs") {
 
             @Override
-            protected void doActionPerformed(ActionEvent e) throws EmfException {
+            protected void doActionPerformed(ActionEvent e) {
                 viewRuns();
             }
         };

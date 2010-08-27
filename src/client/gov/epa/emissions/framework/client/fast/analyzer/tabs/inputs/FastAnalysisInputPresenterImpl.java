@@ -14,18 +14,15 @@ public class FastAnalysisInputPresenterImpl implements FastAnalysisInputPresente
 
     private FastAnalysisInput input;
 
-    private int id;
-
     private boolean hasResults = false;
 
     public FastAnalysisInputPresenterImpl(int id, EmfSession session, FastAnalysisInputView view) {
 
-        this.id = id;
         this.session = session;
         this.view = view;
     }
 
-    public void doDisplay() throws EmfException {
+    public void doDisplay() {
 
         // this.view.observe(this);
         //
@@ -48,7 +45,7 @@ public class FastAnalysisInputPresenterImpl implements FastAnalysisInputPresente
         return this.getService().getFastAnalysis(id);
     }
 
-    public void doClose() throws EmfException {
+    public void doClose() {
 
         // /*
         // * only release if its an existing program
@@ -60,17 +57,18 @@ public class FastAnalysisInputPresenterImpl implements FastAnalysisInputPresente
         // this.closeView();
     }
 
-    private void closeView() {
-        this.view.disposeView();
-    }
+//    private void closeView() {
+//        this.view.disposeView();
+//    }
 
-    public void doSave() throws EmfException {
+    public void doSave() {
         //
         // this.saveInput();
         // this.input = getService().updateInputWithLock(this.session.user(), this.input);
     }
 
-    protected void saveInput() throws EmfException {
+    protected void saveInput() {
+        //
     }
 
     private FastService getService() {

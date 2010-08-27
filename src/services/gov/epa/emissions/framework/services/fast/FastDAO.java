@@ -10,7 +10,6 @@ import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
-import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.cost.controlStrategy.FileFormatFactory;
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
@@ -713,9 +712,9 @@ public class FastDAO {
                 "from FastAnalysis cS where cS.id = " + id).uniqueResult();
     }
 
-    private EmfDataset getDataset(String name, Session session) {
-        return datasetDao.getDataset(session, name);
-    }
+//    private EmfDataset getDataset(String name, Session session) {
+//        return datasetDao.getDataset(session, name);
+//    }
 
     private EmfDataset getDataset(int id, Session session) {
         return datasetDao.getDataset(session, id);

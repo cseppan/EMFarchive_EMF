@@ -194,14 +194,8 @@ public class FastDatasetManagerWindow extends AbstractMPSDTManagerTab implements
 			}
 
 			public void actionPerformed(ActionEvent e) {
-				try {
-
-					clearMessage();
-					controlInventories();
-				} catch (EmfException ex) {
-					showError("Error running contols on Fast datasets: "
-							+ ex.getMessage());
-				}
+				clearMessage();
+                controlInventories();
 			}
 		});
 		controlButton.setEnabled(false);
@@ -216,7 +210,7 @@ public class FastDatasetManagerWindow extends AbstractMPSDTManagerTab implements
 				"Error editing Fast datasets") {
 
 			@Override
-			protected void doActionPerformed(ActionEvent e) throws EmfException {
+			protected void doActionPerformed(ActionEvent e){
 				editInventories();
 			}
 		};
@@ -233,7 +227,7 @@ public class FastDatasetManagerWindow extends AbstractMPSDTManagerTab implements
 				"Error viewing Fast datasets") {
 
 			@Override
-			protected void doActionPerformed(ActionEvent e) throws EmfException {
+			protected void doActionPerformed(ActionEvent e){
 				viewDatasets();
 			}
 		};
@@ -426,7 +420,7 @@ public class FastDatasetManagerWindow extends AbstractMPSDTManagerTab implements
 		}
 	}
 
-	private void controlInventories() throws EmfException {
+	private void controlInventories() {
 
 		List<FastDatasetWrapper> datasets = getSelected();
 		if (datasets.isEmpty()) {

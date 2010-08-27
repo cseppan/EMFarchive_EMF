@@ -346,11 +346,6 @@ public class DatasetCreator {
         return (String[]) names.toArray(new String[0]);
     }
 
-    private String createResultDatasetName(String datasetNamePrefix, EmfDataset inputDataset) {
-        return createDatasetName(datasetNamePrefix+ "_" + inputDataset.getId() 
-                + "_V" + inputDataset.getDefaultVersion());
-    }
-        
     //for testing...
     public static void main(String[] args) {
         //
@@ -447,13 +442,6 @@ public class DatasetCreator {
         return name.trim().replaceAll(" ", "_") + "_" + CustomDateFormat.format_HHMMSSSS(new Date());
     }
 
-    private String createTableName(String tablePrefix, EmfDataset inputDataset) {
-        String prefix = tablePrefix + "_" + inputDataset.getId() 
-            + "_V" + inputDataset.getDefaultVersion();
-        String name = inputDataset.getName();
-        return createTableName(prefix, name);
-    }
-    
     private String createTableName(String tablePrefix, String name) {
         return createTableName(tablePrefix + "_" + name);
     }

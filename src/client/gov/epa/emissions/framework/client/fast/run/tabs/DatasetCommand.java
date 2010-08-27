@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.fast.run.tabs;
 
 import gov.epa.emissions.framework.client.fast.Command;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public abstract class DatasetCommand implements Command {
@@ -16,7 +15,7 @@ public abstract class DatasetCommand implements Command {
         this.dataset = dataset;
     }
 
-    public void postExecute() throws EmfException {
+    public void postExecute() {
         /*
          * no-op
          */

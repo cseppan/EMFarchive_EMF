@@ -186,7 +186,7 @@ public class FastAnalysisManagerWindow extends AbstractMPSDTManagerTab
 				"Error editing Fast analyses") {
 
 			@Override
-			protected void doActionPerformed(ActionEvent e) throws EmfException {
+			protected void doActionPerformed(ActionEvent e) {
 				editAnalyses();
 			}
 		};
@@ -200,7 +200,7 @@ public class FastAnalysisManagerWindow extends AbstractMPSDTManagerTab
 				"Error viewing Fast analyses") {
 
 			@Override
-			protected void doActionPerformed(ActionEvent e) throws EmfException {
+			protected void doActionPerformed(ActionEvent e) {
 				viewAnalyses();
 			}
 		};

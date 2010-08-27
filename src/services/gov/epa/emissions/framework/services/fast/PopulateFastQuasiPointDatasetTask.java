@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.services.fast;
 
-import gov.epa.emissions.commons.data.KeyVal;
-import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;

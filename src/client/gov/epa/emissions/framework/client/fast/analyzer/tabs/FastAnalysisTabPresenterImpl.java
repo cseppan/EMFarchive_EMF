@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.fast.analyzer.tabs;
 
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisTabView;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
 
 public class FastAnalysisTabPresenterImpl implements FastAnalysisTabPresenter {
@@ -12,7 +11,7 @@ public class FastAnalysisTabPresenterImpl implements FastAnalysisTabPresenter {
         this.view = view;
     }
 
-    public void doSave(FastAnalysis analysis) throws EmfException {
+    public void doSave(FastAnalysis analysis) {
         view.save(analysis);
     }
 

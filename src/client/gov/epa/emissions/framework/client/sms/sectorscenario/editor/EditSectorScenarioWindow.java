@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.sms.sectorscenario.editor;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
-import gov.epa.emissions.commons.gui.buttons.CopyButton;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.gui.buttons.StopButton;

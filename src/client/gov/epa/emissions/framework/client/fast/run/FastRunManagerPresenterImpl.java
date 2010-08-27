@@ -44,6 +44,7 @@ public class FastRunManagerPresenterImpl implements RefreshObserver,
 	}
 
 	public void doClose() {
+	    //
 	}
 
 	public void doNew() throws EmfException {

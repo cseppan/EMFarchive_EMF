@@ -7,7 +7,6 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisPresenter;
 import gov.epa.emissions.framework.client.fast.analyzer.FastAnalysisTabView;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.fast.FastAnalysis;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -131,7 +130,7 @@ public abstract class AbstractFastAnalysisTab extends JPanel implements FastAnal
 
     }
 
-    public void save(FastAnalysis analysis) throws EmfException {
+    public void save(FastAnalysis analysis) {
         // NOTE Auto-generated method stub
 
     }

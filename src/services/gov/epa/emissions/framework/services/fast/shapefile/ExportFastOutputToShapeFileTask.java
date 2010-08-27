@@ -38,7 +38,7 @@ import org.hibernate.Session;
 
 public class ExportFastOutputToShapeFileTask implements Runnable {
 
-    private String user;
+//    private String user;
 
     private StatusDAO statusDao;
 
@@ -51,8 +51,6 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
     private String dirName;
 
     private DbServerFactory dbServerFactory;
-
-    private String pollutant;
 
     private String userName;
 
@@ -72,7 +70,6 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
         this.sessionFactory = sessionFactory;
         this.statusDao = new StatusDAO(sessionFactory);
         this.dbServerFactory = dbServerFactory;
-        this.pollutant = pollutant;
     }
 
     public void run() {

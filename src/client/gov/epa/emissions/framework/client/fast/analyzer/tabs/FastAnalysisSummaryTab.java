@@ -315,11 +315,16 @@ public class FastAnalysisSummaryTab extends AbstractFastAnalysisTab {
         this.populateFields();
     }
 
-    public void save(FastAnalysis analysis) throws EmfException {
+    public void save(FastAnalysis analysis) {
 
         this.clearMessage();
 
-        validateFields();
+        try {
+            validateFields();
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
 
         analysis.setName(this.nameField.getText());
         analysis.setAbbreviation(this.abbreviationField.getText());

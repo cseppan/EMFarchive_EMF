@@ -4,7 +4,6 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.fast.MPSDTManagerPresenter;
 import gov.epa.emissions.framework.client.fast.datasets.AbstractFastNonPointDatasetPresenterImpl;
 import gov.epa.emissions.framework.client.fast.datasets.FastDatasetView;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.fast.FastDatasetWrapper;
 
 public class FastNonPointDatasetViewPresenterImpl extends AbstractFastNonPointDatasetPresenterImpl {
@@ -29,7 +28,7 @@ public class FastNonPointDatasetViewPresenterImpl extends AbstractFastNonPointDa
         this.getView().display(this.getWrapper());
     }
 
-    public void doSave() throws EmfException {
+    public void doSave() {
         /*
          * no-op
          */

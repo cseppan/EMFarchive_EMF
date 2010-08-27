@@ -314,11 +314,16 @@ public class FastRunSummaryTab extends AbstractFastRunTab {
         this.populateFields();
     }
 
-    public void save(FastRun run) throws EmfException {
+    public void save(FastRun run) {
 
         this.clearMessage();
 
-        validateFields();
+        try {
+            validateFields();
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
 
         run.setName(this.nameField.getText());
         run.setAbbreviation(this.abbreviationField.getText());

@@ -4,4 +4,5 @@ import javax.swing.JTabbedPane;
 
 @SuppressWarnings("serial")
 public class MPSDTTabManager extends JTabbedPane {
+    //
 }

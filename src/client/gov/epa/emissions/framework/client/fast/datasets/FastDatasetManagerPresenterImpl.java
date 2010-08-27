@@ -18,7 +18,7 @@ public class FastDatasetManagerPresenterImpl implements RefreshObserver, FastDat
 
     private EmfSession session;
 
-    private List<FastDatasetWrapper> datasetWrappers;
+    //private List<FastDatasetWrapper> datasetWrappers;
 
     public FastDatasetManagerPresenterImpl(EmfSession session, FastDatasetManagerView view) {
 
@@ -56,7 +56,8 @@ public class FastDatasetManagerPresenterImpl implements RefreshObserver, FastDat
     }
 
     public void doClose() {
-    }
+        //
+    }   
 
     public void doNew() throws EmfException {
 
@@ -107,10 +108,10 @@ public class FastDatasetManagerPresenterImpl implements RefreshObserver, FastDat
         throw new EmfException("Control not implemented.");
     }
 
-    public void loadDatasets() throws EmfException {
+    public void loadDatasets() {
 
-        FastDataset[] fastDatasets = service().getFastDatasets();
-        this.datasetWrappers = this.createFastDatasetWrappers(fastDatasets);
+//        FastDataset[] fastDatasets = service().getFastDatasets();
+//        this.datasetWrappers = this.createFastDatasetWrappers(fastDatasets);
     }
 
     public DatasetType getDatasetType(String name) throws EmfException {

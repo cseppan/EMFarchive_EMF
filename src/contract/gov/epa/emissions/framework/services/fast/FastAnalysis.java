@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.fast;
 import gov.epa.emissions.commons.data.LockableImpl;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.Serializable;
 import java.util.Date;

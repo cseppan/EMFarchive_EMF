@@ -68,7 +68,7 @@ public class FastRunCreatorPresenterImpl implements FastRunPresenter {
     }
 
     public void doExport(ExportView exportView, ExportPresenter presenter,
-            List<FastOutputExportWrapper> outputExportWrappers) throws EmfException {
+            List<FastOutputExportWrapper> outputExportWrappers) {
 
         if (outputExportWrappers.size() == 0) {
             view.showMessage("To Export outputs, you will need to select at least one output");
@@ -108,7 +108,7 @@ public class FastRunCreatorPresenterImpl implements FastRunPresenter {
         this.getService().runFastRun(this.session.user(), this.run.getId());
     }
 
-    public void doRefresh() throws EmfException {
+    public void doRefresh() {
         this.refreshTabs();
     }
 
