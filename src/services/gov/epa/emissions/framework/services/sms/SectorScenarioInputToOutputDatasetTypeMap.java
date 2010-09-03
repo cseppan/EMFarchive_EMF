@@ -11,8 +11,10 @@ public class SectorScenarioInputToOutputDatasetTypeMap {
     public SectorScenarioInputToOutputDatasetTypeMap() {
         map.put(DatasetType.ORL_POINT_NATA, DatasetType.ORL_POINT_NATA_SECTOR_ANNOTATED);
         map.put(DatasetType.ORL_POINT_NATA_SECTOR_ANNOTATED, DatasetType.ORL_POINT_NATA_SECTOR_ANNOTATED);
-        map.put(DatasetType.ORL_NONPOINT_NATA, DatasetType.ORL_NONPOINT_NATA_SECTOR_ANNOTATED);
-        map.put(DatasetType.ORL_NONPOINT_NATA_SECTOR_ANNOTATED, DatasetType.ORL_NONPOINT_NATA_SECTOR_ANNOTATED);
+//        map.put(DatasetType.ORL_NONPOINT_NATA, DatasetType.ORL_NONPOINT_NATA_SECTOR_ANNOTATED);
+//        map.put(DatasetType.ORL_NONPOINT_NATA_SECTOR_ANNOTATED, DatasetType.ORL_NONPOINT_NATA_SECTOR_ANNOTATED);
+        map.put(DatasetType.ORL_POINT_NOF, DatasetType.ORL_POINT_NOF);
+        map.put(DatasetType.ORL_NONPOINT_NOF, DatasetType.ORL_NONPOINT_NOF);
     }
 
     public String getOutputDatasetType(String inputDatasetType) {
@@ -24,8 +26,8 @@ public class SectorScenarioInputToOutputDatasetTypeMap {
         SectorScenarioInputToOutputDatasetTypeMap map = new SectorScenarioInputToOutputDatasetTypeMap();
         System.out.println(map.getOutputDatasetType(DatasetType.ORL_POINT_NATA));
         System.out.println(map.getOutputDatasetType(DatasetType.ORL_POINT_NATA_SECTOR_ANNOTATED));
-        System.out.println(map.getOutputDatasetType(DatasetType.ORL_NONPOINT_NATA));
-        System.out.println(map.getOutputDatasetType(DatasetType.ORL_NONPOINT_NATA_SECTOR_ANNOTATED));
+//        System.out.println(map.getOutputDatasetType(DatasetType.ORL_NONPOINT_NATA));
+//        System.out.println(map.getOutputDatasetType(DatasetType.ORL_NONPOINT_NATA_SECTOR_ANNOTATED));
         System.out.println(map.getOutputDatasetType("SDSADSADASDSADSAD"));
     }
 }
