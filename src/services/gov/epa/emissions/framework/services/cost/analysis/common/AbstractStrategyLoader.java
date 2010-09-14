@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.services.cost.analysis.common;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.OptimizedTableModifier;
@@ -10,6 +12,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.VersionedQuery;
+import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.io.other.StrategyMessagesFileFormat;
 import gov.epa.emissions.commons.io.temporal.VersionedTableFormat;
 import gov.epa.emissions.commons.security.User;
@@ -265,15 +268,32 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     public void makeSureInventoryDatasetHasIndexes(ControlStrategyInputDataset controlStrategyInputDataset) {
-        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + "');analyze " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + ";";
-        try {
-            datasource.query().execute(query);
-        } catch (SQLException e) {
-            //e.printStackTrace();
-            //supress all errors, the indexes might already be on the table...
-        } finally {
-            //
-        }
+        createIndexes(controlStrategyInputDataset);
+    }
+
+    private void createIndexes(ControlStrategyInputDataset controlStrategyInputDataset) {
+        DataTable dataTable = new DataTable(controlStrategyInputDataset.getInputDataset(), datasource);
+        String table = emissionTableName(controlStrategyInputDataset.getInputDataset());
+
+        //ALWAYS create indexes for these core columns...
+        dataTable.addIndex(table, "record_id", true);
+        dataTable.addIndex(table, "dataset_id", false);
+        dataTable.addIndex(table, "version", false);
+        dataTable.addIndex(table, "delete_versions", false);
+
+        dataTable.addIndex(table, "fips", false);
+        dataTable.addIndex(table, "poll", false);
+        dataTable.addIndex(table, "scc", false);
+        dataTable.addIndex(table, "plantid", false);
+        dataTable.addIndex(table, "pointid", false);
+        dataTable.addIndex(table, "stackid", false);
+        dataTable.addIndex(table, "segment", false);
+        dataTable.addIndex(table, "mact", false);
+        dataTable.addIndex(table, "sic", false);
+
+        //finally analyze the table, so the indexes take affect immediately, 
+        //NOT when the SQL engine gets around to analyzing eventually
+        dataTable.analyzeTable(table);
     }
 
     private String getFilterFromRegionDataset() {

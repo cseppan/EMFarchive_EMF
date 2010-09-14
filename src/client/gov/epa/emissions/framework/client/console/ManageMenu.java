@@ -24,10 +24,10 @@ import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerVi
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerWindow;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerView;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerWindow;
-import gov.epa.emissions.framework.client.fast.MPSDTManagerView;
-import gov.epa.emissions.framework.client.fast.MPSDTManagerWindow;
 import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerView;
 import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerWindow;
+import gov.epa.emissions.framework.client.fast.MPSDTManagerView;
+import gov.epa.emissions.framework.client.fast.MPSDTManagerWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.MessagePanel;
 

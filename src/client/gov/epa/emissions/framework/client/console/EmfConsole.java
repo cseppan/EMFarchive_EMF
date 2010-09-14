@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.gui.Confirm;
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.sms.SectorScenarioDialog;
+import gov.epa.emissions.framework.client.sms.SectorScenarioPresenter;
 import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.services.EmfException;
@@ -198,16 +200,16 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         return menu;
     }
 
-//    private void loadSectorScenarioWindow() {
-//        SectorScenarioDialog dialog = new SectorScenarioDialog(EmfConsole.this, session);
-//        SectorScenarioPresenter presenter = new SectorScenarioPresenter(dialog, session);
-//        try {
-//            presenter.display();
-//        } catch (Exception e) {
-//            // NOTE Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//    	
+    private void loadSectorScenarioWindow() {
+        SectorScenarioDialog dialog = new SectorScenarioDialog(EmfConsole.this, session);
+        SectorScenarioPresenter presenter = new SectorScenarioPresenter(dialog, session);
+        try {
+            presenter.display();
+        } catch (Exception e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+    	
     	
 //        InputDatasetSelectionView view = new InputDatasetSelectionDialog(parentConsole);
 //        InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session,
@@ -221,7 +223,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 //            presenter.display(null, false);
 
     	//
-//    }
+    }
     
     public void observe(EmfConsolePresenter presenter) {
         manageMenu.observe(presenter);

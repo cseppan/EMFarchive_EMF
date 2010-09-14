@@ -1,6 +1,6 @@
 --SELECT public.populate_project_future_year_inventory_strategy_messages(89, 952, 0, 3135)
 
-DROP FUNCTION populate_project_future_year_inventory_strategy_messages(integer, integer, integer, integer);
+DROP FUNCTION public.populate_project_future_year_inventory_strategy_messages(integer, integer, integer, integer);
 
 CREATE OR REPLACE FUNCTION public.populate_project_future_year_inventory_strategy_messages(
 	int_control_strategy_id integer, 

@@ -314,7 +314,6 @@ add column   domain_population_dataset_version integer;
 
 --07/26/2010
 
--- 7/16/2010 -- change ds type names
 --change ds type 'FAST Gridded Detailed Emission and Air Quality' to 'FAST Run Domain Output' and add fileformatcolumns
 INSERT INTO emf.file_formats (name, description, delimiter, fixed_format, date_added, last_modified_date, creator) select 'FAST Run Domain Output', '', '          ,          ', false, '2010-07-09 00:41:24.708', '2010-07-09 00:41:24.708', (select id from emf.users where username = 'admin') as creator;
 

@@ -25,7 +25,6 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
 public class ImportTask extends Task {
@@ -100,7 +99,6 @@ public class ImportTask extends Task {
             Importer importer = importerFactory.createVersioned(dataset, path, files);
             long startTime = System.currentTimeMillis();
             session = sessionFactory.getSession();
-            session.setFlushMode(FlushMode.NEVER);
             
             prepare(session);
             importer.run();

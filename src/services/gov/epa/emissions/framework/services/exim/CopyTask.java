@@ -28,7 +28,6 @@ import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
 public class CopyTask extends Task {
@@ -101,7 +100,6 @@ public class CopyTask extends Task {
             
             long startTime = System.currentTimeMillis();
             session = sessionFactory.getSession();
-            session.setFlushMode(FlushMode.NEVER);
             
             addStartStatus();
             copySingleCaseObj(copyToCase, user);

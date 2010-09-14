@@ -5,10 +5,12 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.VersionedQuery;
+import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -38,6 +40,8 @@ public class AnnotatedControlStrategyInventoryOutput extends AbstractControlStra
             String outputInventoryTableName = getDatasetTableName(dataset);
             
             ControlStrategyResult result = getControlStrategyResult(controlStrategyResult.getId());
+            //make sure annotated inventory has been indexed...
+            createIndexes(result.getDetailedResultDataset());
             try {
                 createControlledInventory(dataset.getId(), inputTable, detailDatasetTable(result),
                         outputInventoryTableName, version(inputDataset, controlStrategyResult.getInputDatasetVersion()),
@@ -58,6 +62,31 @@ public class AnnotatedControlStrategyInventoryOutput extends AbstractControlStra
 //            setandRunQASteps();
         }
         dbServer.disconnect();
+    }
+
+    private void createIndexes(Dataset dataset) throws EmfException {
+        DataTable dataTable = new DataTable(dataset, datasource);
+        String table = getDatasetTableName(dataset);
+
+        //ALWAYS create indexes for these core columns...
+        dataTable.addIndex(table, "record_id", true);
+        dataTable.addIndex(table, "dataset_id", false);
+        dataTable.addIndex(table, "version", false);
+        dataTable.addIndex(table, "delete_versions", false);
+
+        dataTable.addIndex(table, "fips", false);
+        dataTable.addIndex(table, "poll", false);
+        dataTable.addIndex(table, "scc", false);
+        dataTable.addIndex(table, "plantid", false);
+        dataTable.addIndex(table, "pointid", false);
+        dataTable.addIndex(table, "stackid", false);
+        dataTable.addIndex(table, "segment", false);
+        dataTable.addIndex(table, "mact", false);
+        dataTable.addIndex(table, "sic", false);
+
+        //finally analyze the table, so the indexes take affect immediately, 
+        //NOT when the SQL engine gets around to analyzing eventually
+        dataTable.analyzeTable(table);
     }
 
     private void createControlledInventory(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
@@ -123,7 +152,7 @@ public class AnnotatedControlStrategyInventoryOutput extends AbstractControlStra
         + ") as b "
         + "on inv.record_id = b.record_id"
         + " WHERE " + versionedQuery.query();
-        sql = "SET work_mem TO '256MB';INSERT INTO " + qualifiedTable(outputTable, datasource) + " (" + columnList + ") " + sql;
+        sql = "INSERT INTO " + qualifiedTable(outputTable, datasource) + " (" + columnList + ") " + sql;
         System.out.println(sql);
         return sql;
     }

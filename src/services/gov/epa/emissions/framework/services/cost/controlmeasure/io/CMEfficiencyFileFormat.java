@@ -11,7 +11,7 @@ public class CMEfficiencyFileFormat implements CMFileFormat {
     private String[] createCols() {
         String[] cols = { "CMAbbreviation", "Pollutant", "Locale", "Effective Date", "ExistingMeasureAbbr",
                 "NEIExistingDevCode", "ControlEfficiency", "CostYear", "CostPerTon", "RuleEff", "RulePen",
-                "EquationType", "CapRecFactor", "DiscountRate", "Details" };
+                "EquationType", "CapRecFactor", "DiscountRate", "Details", "RefYrCostPerTon" };
         return cols;
     }
 

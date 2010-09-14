@@ -482,6 +482,16 @@
 			<fileset dir="${lib.dir}">
 				<exclude name="dev/**" />
 				<exclude name="tomcat/**" />
+				<exclude name="axis-1.4/**" />
+				<exclude name="xerces-2.10.0/**" />
+			</fileset>
+		</copy>
+		<copy todir="${build.web-inf.dir}/lib">
+			<fileset dir="${lib.dir}/axis-1.4">
+			</fileset>
+		</copy>
+		<copy todir="${build.web-inf.dir}/lib">
+			<fileset dir="${lib.dir}/xerces-2.10.0">
 			</fileset>
 		</copy>
 	</target>

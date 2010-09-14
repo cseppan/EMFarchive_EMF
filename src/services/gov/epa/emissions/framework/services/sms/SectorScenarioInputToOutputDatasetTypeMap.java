@@ -13,8 +13,8 @@ public class SectorScenarioInputToOutputDatasetTypeMap {
         map.put(DatasetType.ORL_POINT_NATA_SECTOR_ANNOTATED, DatasetType.ORL_POINT_NATA_SECTOR_ANNOTATED);
 //        map.put(DatasetType.ORL_NONPOINT_NATA, DatasetType.ORL_NONPOINT_NATA_SECTOR_ANNOTATED);
 //        map.put(DatasetType.ORL_NONPOINT_NATA_SECTOR_ANNOTATED, DatasetType.ORL_NONPOINT_NATA_SECTOR_ANNOTATED);
-        map.put(DatasetType.ORL_POINT_NOF, DatasetType.ORL_POINT_NOF);
-        map.put(DatasetType.ORL_NONPOINT_NOF, DatasetType.ORL_NONPOINT_NOF);
+        map.put(DatasetType.NOF_POINT, DatasetType.NOF_POINT);
+        map.put(DatasetType.NOF_NONPOINT, DatasetType.NOF_NONPOINT);
     }
 
     public String getOutputDatasetType(String inputDatasetType) {

@@ -307,7 +307,7 @@ BEGIN
 
 	-- calculate operation maintenance cost
 	-- operation_maintenance_cost := (3.35 + (0.000729 * 8736)) * stack_flow_rate * 0.9383; (previous equation)
-	operation_maintenance_cost := (fixed_operation_maintenance_cost + variable_operation_maintenance_cost) * 0.9383;
+	operation_maintenance_cost := fixed_operation_maintenance_cost + variable_operation_maintenance_cost;
 
 	-- calculate annual cost
 	annual_cost := annualized_capital_cost + operation_maintenance_cost;

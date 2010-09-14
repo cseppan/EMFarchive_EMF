@@ -1,4 +1,8 @@
-CREATE OR REPLACE FUNCTION public.populate_least_cost_strategy_worksheet(control_strategy_id integer, 
+drop FUNCTION public.populate_least_cost_strategy_worksheet(integer, 
+	integer, 
+	integer);
+
+CREATE OR REPLACE FUNCTION public.populate_least_cost_strategy_worksheet(int_control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer) RETURNS void AS $$
 DECLARE
@@ -89,7 +93,7 @@ BEGIN
 		on i.dataset_id = sr.detailed_result_dataset_id
 		inner join emf.strategy_result_types srt
 		on srt.id = sr.strategy_result_type_id
-	where sr.control_strategy_id = control_strategy_id 
+	where sr.control_strategy_id = int_control_strategy_id 
 		and srt.name = 'Least Cost Control Measure Worksheet'
 	into worksheet_dataset_id,
 		worksheet_table_name;
@@ -98,7 +102,7 @@ BEGIN
 	SELECT count(id), 
 		count(case when region_dataset_id is not null then 1 else null end)
 	FROM emf.control_strategy_measures 
-	where control_strategy_measures.control_strategy_id = control_strategy_id 
+	where control_strategy_measures.control_strategy_id = int_control_strategy_id 
 	INTO measures_count, 
 		measure_with_region_count;
 
@@ -106,7 +110,7 @@ BEGIN
 	IF measures_count = 0 THEN
 		SELECT count(1)
 		FROM emf.control_strategy_classes 
-		where control_strategy_classes.control_strategy_id = control_strategy_id
+		where control_strategy_classes.control_strategy_id = int_control_strategy_id
 		INTO measure_classes_count;
 	END IF;
 
@@ -125,7 +129,7 @@ BEGIN
 	FROM emf.control_strategies cs
 		inner join emf.strategy_types st
 		on st.id = cs.strategy_type_id
-	where cs.id = control_strategy_id
+	where cs.id = int_control_strategy_id
 	INTO strategy_name,
 		target_pollutant_id,
 		inv_filter,
@@ -196,7 +200,7 @@ BEGIN
 		csc.domain_wide_pct_reduction_start,
 		csc.domain_wide_pct_reduction_end*/
 	FROM emf.control_strategy_constraints csc
-	where csc.control_strategy_id = control_strategy_id
+	where csc.control_strategy_id = int_control_strategy_id
 	INTO min_emis_reduction_constraint,
 		min_control_efficiency_constraint,
 		max_cost_per_ton_constraint,
@@ -268,7 +272,7 @@ BEGIN
 			FROM emf.control_strategy_measures m
 				inner join emf.internal_sources i
 				on m.region_dataset_id = i.dataset_id
-			where m.control_strategy_id = ' || control_strategy_id || '
+			where m.control_strategy_id = ' || int_control_strategy_id || '
 				and m.region_dataset_id is not null'
 		LOOP
 			EXECUTE 'insert into measures (control_measure_id, region_id, region_version)
@@ -304,7 +308,7 @@ BEGIN
 		SELECT csc.domain_wide_emis_reduction,
 			csc.domain_wide_pct_reduction
 		FROM emf.control_strategy_constraints csc
-		where csc.control_strategy_id = control_strategy_id
+		where csc.control_strategy_id = int_control_strategy_id
 		INTO domain_wide_emis_reduction,
 		domain_wide_pct_reduction;
 
@@ -322,8 +326,8 @@ BEGIN
 
 			-- update so its viewable for client, via the constraints tab
 			execute 'update emf.control_strategy_constraints 
-			set domain_wide_emis_reduction = ' || domain_wide_emis_reduction || '
-			where control_strategy_id = ' || control_strategy_id;
+			set domain_wide_emis_reduction = ' || coalesce(domain_wide_emis_reduction || '', 'null::double precision') || '
+			where control_strategy_id = ' || int_control_strategy_id;
 		ELSE
 			execute 'select ' || domain_wide_emis_reduction || ' / sum(' || case when dataset_month != 0 then 'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' else 'inv.ann_emis' end || ') * 100.0 
 			FROM emissions.' || inv_table_name || ' as inv
@@ -333,8 +337,8 @@ BEGIN
 
 			-- update so its viewable for client, via the constraints tab
 			execute 'update emf.control_strategy_constraints 
-			set domain_wide_pct_reduction = ' || domain_wide_pct_reduction || '
-			where control_strategy_id = ' || control_strategy_id;
+			set domain_wide_pct_reduction = ' || coalesce(domain_wide_pct_reduction || '', 'null::double precision') || '
+			where control_strategy_id = ' || int_control_strategy_id;
 		END IF;
 	END IF;
 
@@ -582,13 +586,13 @@ BEGIN
 			' || case when measures_count > 0 then '
 			inner join emf.control_strategy_measures csm
 			on csm.control_measure_id = m.id
-			and csm.control_strategy_id = ' || control_strategy_id || '::integer
+			and csm.control_strategy_id = ' || int_control_strategy_id || '::integer
 			' else '' end || '
 
 			' || case when measures_count = 0 and measure_classes_count > 0 then '
 			inner join emf.control_strategy_classes csc
 			on csc.control_measure_class_id = m.cm_class_id
-			and csc.control_strategy_id = ' || control_strategy_id || '::integer
+			and csc.control_strategy_id = ' || int_control_strategy_id || '::integer
 			' else '' end || '
 
 			inner join emf.pollutants p
@@ -911,7 +915,7 @@ BEGIN
 		' || case when measures_count > 0 then '
 		inner join emf.control_strategy_measures csm
 		on csm.control_measure_id = m.id
-		and csm.control_strategy_id = ' || control_strategy_id || '
+		and csm.control_strategy_id = ' || int_control_strategy_id || '
 		' else '' end || '
 
 		inner join emf.pollutants p

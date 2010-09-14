@@ -12,7 +12,7 @@ public class CMEfficiencyFileFormatv2 implements CMFileFormat {
         String[] cols = { "CMAbbreviation", "Pollutant", "Locale", "Effective Date", "ExistingMeasureAbbr",
                 "NEIExistingDevCode", "MinEmissions", "MaxEmissions", "ControlEfficiency", "CostYear", 
                 "CostPerTon", "RuleEff", "RulePen", "EquationType", "CapRecFactor", 
-                "DiscountRate", "Details" };
+                "DiscountRate", "Details", "RefYrCostPerTon" };
         return cols;
     }
 

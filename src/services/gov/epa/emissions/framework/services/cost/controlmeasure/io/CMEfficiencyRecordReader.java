@@ -108,7 +108,7 @@ public class CMEfficiencyRecordReader {
             existingMeasureAbbrev(efficiencyRecord, tokens[4]);
             existingDevCode(efficiencyRecord, tokens[5], sb);
             //original file format
-            if (this.colCount == 15) {
+            if (this.colCount == 16) {
                 controlEfficiency(efficiencyRecord, tokens[6], sb);
                 costYear(efficiencyRecord, tokens[7], sb);
                 costPerTon(efficiencyRecord, tokens[0], controlMeasures, 
@@ -124,7 +124,7 @@ public class CMEfficiencyRecordReader {
                 discountFactor(efficiencyRecord, tokens[13], sb);
                 details(efficiencyRecord, tokens[14]);
             //v2 file format
-            } else if (this.colCount == 17) {
+            } else if (this.colCount == 18) {
                 minEmis(efficiencyRecord, tokens[6], sb);
                 maxEmis(efficiencyRecord, tokens[7], sb);
                 controlEfficiency(efficiencyRecord, tokens[8], sb);
@@ -141,7 +141,7 @@ public class CMEfficiencyRecordReader {
                 details(efficiencyRecord, tokens[16]);
             }
             //v3 file format
-            else if (this.colCount ==19 ){
+            else if (this.colCount == 20){
                 minEmis(efficiencyRecord, tokens[6], sb);
                 maxEmis(efficiencyRecord, tokens[7], sb);
                 controlEfficiency(efficiencyRecord, tokens[8], sb);

@@ -207,7 +207,10 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
         InputDatasetSelectionView view = new InputDatasetSelectionDialog(parentConsole);
         InputDatasetSelectionPresenter selPresenter = new InputDatasetSelectionPresenter(view, session,
                 new DatasetType[] { 
-                    presenter.getDatasetType(DatasetType.ORL_POINT_NATA)
+                    presenter.getDatasetType(DatasetType.ORL_POINT_NATA),
+                    presenter.getDatasetType(DatasetType.ORL_POINT_NATA_SECTOR_ANNOTATED),
+                    presenter.getDatasetType(DatasetType.NOF_POINT),
+                    presenter.getDatasetType(DatasetType.NOF_NONPOINT)
                 });
         try {
             selPresenter.display(null, false);

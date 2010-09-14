@@ -17,7 +17,7 @@ BEGIN
 
 	-- create apply_order btree index
 	IF length('apply_order_' || table_name) >= 63 - 12 THEN	-- n + 1
-		index_name := 'apply_order_' || substr(table_name, 13, 63); -- n + 2
+		index_name := 'apply_order_' || substr(table_name, 14, 63); -- n + 2
 	ELSE
 		index_name := 'apply_order_' || table_name;
 	END IF;
@@ -28,7 +28,7 @@ BEGIN
 
 	-- create source btree index
 	IF length('source_' || table_name) >= 63 - 7 THEN
-		index_name := 'source_' || substr(table_name, 8, 63);
+		index_name := 'source_' || substr(table_name, 9, 63);
 	ELSE
 		index_name := 'source_' || table_name;
 	END IF;
@@ -39,7 +39,7 @@ BEGIN
 
 	-- create emis_reduction btree index
 	IF length('emis_reduction_' || table_name) >= 63 - 15 THEN
-		index_name := 'emis_reduction_' || substr(table_name, 16, 63);
+		index_name := 'emis_reduction_' || substr(table_name, 17, 63);
 	ELSE
 		index_name := 'emis_reduction_' || table_name;
 	END IF;
@@ -50,7 +50,7 @@ BEGIN
 
 	-- create marginal btree index
 	IF length('marginal_' || table_name) >= 63 - 9 THEN
-		index_name := 'marginal_' || substr(table_name, 10, 63);
+		index_name := 'marginal_' || substr(table_name, 11, 63);
 	ELSE
 		index_name := 'marginal_' || table_name;
 	END IF;
@@ -61,7 +61,7 @@ BEGIN
 
 	-- create apply_order2 btree index
 	IF length('apply_order2_' || table_name) >= 63 - 13 THEN	-- n + 1
-		index_name := 'apply_order2_' || substr(table_name, 14, 63); -- n + 2
+		index_name := 'apply_order2_' || substr(table_name, 15, 63); -- n + 2
 	ELSE
 		index_name := 'apply_order2_' || table_name;
 	END IF;
@@ -72,7 +72,7 @@ BEGIN
 
 	-- create record_id btree index
 	IF length('record_id_' || table_name) >= 63 - 10 THEN
-		index_name := 'record_id_' || substr(table_name, 11, 63);
+		index_name := 'record_id_' || substr(table_name, 12, 63);
 	ELSE
 		index_name := 'record_id_' || table_name;
 	END IF;
@@ -83,7 +83,7 @@ BEGIN
 
 	-- create source_id btree index
 	IF length('source_id_' || table_name) >= 63 - 10 THEN
-		index_name := 'source_id_' || substr(table_name, 11, 63);
+		index_name := 'source_id_' || substr(table_name, 12, 63);
 	ELSE
 		index_name := 'source_id_' || table_name;
 	END IF;
@@ -96,7 +96,7 @@ BEGIN
 
 	-- create cm_id btree index
 	IF length('cm_id_' || table_name) >= 63 - 6 THEN
-		index_name := 'cm_id_' || substr(table_name, 7, 63);
+		index_name := 'cm_id_' || substr(table_name, 8, 63);
 	ELSE
 		index_name := 'cm_id_' || table_name;
 	END IF;

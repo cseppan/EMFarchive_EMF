@@ -113,17 +113,16 @@ public class ControlStrategyDAO {
 //        element.getCreator().getName()
         return session.createQuery("select new ControlStrategy(cS.id, cS.name, " +
                 "cS.lastModifiedDate, cS.runStatus, " +
-                "cS.region, cS.targetPollutant, " +
-                "cS.project, cS.strategyType, " +
+                "R, TP, " +
+                "P, ST, " +
                 "cS.costYear, cS.inventoryYear, " +
 //                "cS.creator, (select sum(sR.totalCost) from ControlStrategyResult sR where sR.controlStrategyId = cS.id), (select sum(sR.totalReduction) from ControlStrategyResult sR where sR.controlStrategyId = cS.id)) " +
                 "cS.creator, cS.totalCost, cS.totalReduction) " +
-                "from ControlStrategy cS " +
-                "left join cS.targetPollutant " +
-                "left join cS.strategyType " +
-                "left join cS.region " +
-                "left join cS.project " +
-                "left join cS.region " +
+                "from ControlStrategy as cS " +
+                "left join cS.targetPollutant as TP " +
+                "left join cS.strategyType as ST " +
+                "left join cS.region as R " +
+                "left join cS.project as P " +
                 "order by cS.name").list();
         //return hibernateFacade.getAll(ControlStrategy.class, Order.asc("name"), session);
     }
