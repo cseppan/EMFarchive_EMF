@@ -45,8 +45,6 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private Pollutant targetPollutant;
 
-    private Pollutant[] targetPollutants = new Pollutant[] {};
-
     private String runStatus;
 
     private StrategyType strategyType;
@@ -439,13 +437,4 @@ public class ControlStrategy implements Lockable, Serializable {
     public void setCopiedFrom(String copiedFrom) {
         this.copiedFrom = copiedFrom;
     }
-    
-    public void setTargetPollutants(Pollutant[] targetPollutants) {
-        this.targetPollutants = targetPollutants;
-    }
-
-    public Pollutant[] getTargetPollutants() {
-        return targetPollutants;
-    }
-
 }

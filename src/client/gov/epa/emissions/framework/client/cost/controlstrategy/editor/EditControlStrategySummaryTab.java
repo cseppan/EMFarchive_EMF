@@ -3,19 +3,16 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
-import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
-import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.client.cost.controlstrategy.TargetPollutantListWidget;
 import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.region.Regions;
 import gov.epa.emissions.framework.services.EmfException;
@@ -35,14 +32,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.Date;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -76,7 +70,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private IntTextField inventoryYear;
 
-    private TargetPollutantListWidget majorPollutantList;
+    private ComboBox majorPollutant;
 
 //    private Region[] allRegions;
 
@@ -223,111 +217,43 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         
         JPanel panel = new JPanel(new SpringLayout());
         JPanel panelBottom = new JPanel(new BorderLayout());
-        JPanel panelTop = new JPanel(new BorderLayout());
         // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        JPanel middleLeftPanel1 = new JPanel(new SpringLayout());
-
-        SpringLayoutGenerator middleLeftLayoutGenerator1 = new SpringLayoutGenerator();
-        middleLeftLayoutGenerator1.addLabelWidgetPair("Cost Year:", costYearTextField(), middleLeftPanel1);
-        middleLeftLayoutGenerator1.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), middleLeftPanel1);
-        middleLeftLayoutGenerator1.makeCompactGrid(middleLeftPanel1, 2, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
-
-        JPanel middleRightPanel1 = new JPanel(new SpringLayout());
-
-        SpringLayoutGenerator middleRightLayoutGenerator1 = new SpringLayoutGenerator();
-        middleRightLayoutGenerator1.addLabelWidgetPair("Target Year:", inventoryYearTextField(), middleRightPanel1);
-        middleRightLayoutGenerator1.addLabelWidgetPair("<html>Include Measures<br/>with No Cost Data:</html>",
-                includeUnspecifiedCostsCheckBox(), middleRightPanel1);
-        middleRightLayoutGenerator1.makeCompactGrid(middleRightPanel1, 2, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
-
-        panelTop.add(middleLeftPanel1, BorderLayout.WEST);
-        panelTop.add(middleRightPanel1, BorderLayout.EAST);
-
+        // layoutGenerator.addLabelWidgetPair("Discount Rate:", discountRateTextField(), panel);
+        layoutGenerator.addLabelWidgetPair("Cost Year:", costYearTextField(), panel);
+        layoutGenerator.addLabelWidgetPair("Target Year:", inventoryYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Region:", regions(), panel);
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate(), panel);
 
-        
-        
-        
-//        JPanel leftListButtonPanel = new JPanel();
-//        leftListButtonPanel.setLayout(new BoxLayout(leftListButtonPanel, BoxLayout.Y_AXIS));
-//        Button addPollButton = new AddButton("<<Add", addPollAction());
-//        addPollButton.setMargin(new Insets(1, 2, 1, 2));
-//        Button upPollButton = new AddButton("Up", upPollAction());
-//        upPollButton.setMargin(new Insets(1, 2, 1, 2));
-//        Button downPollButton = new AddButton("Down", downPollAction());
-//        downPollButton.setMargin(new Insets(1, 2, 1, 2));
-//        Button excludePollButton = new AddButton("Exclude>>", addExcludedPollAction());
-//        excludePollButton.setMargin(new Insets(1, 2, 1, 2));
-//        leftListButtonPanel.add(upPollButton);
-//        leftListButtonPanel.add(downPollButton);
-        
-        
-        
-        
-        
-//        JPanel middleLeftPanel = new JPanel(new SpringLayout());
-//        // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
-//        SpringLayoutGenerator middleLeftLayoutGenerator = new SpringLayoutGenerator();
-//        middleLeftLayoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), middleLeftPanel);
-//        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 1, 2, // rows, cols
-//                5, 5, // initialX, initialY
-//                10, 10);// xPad, yPad
-//
-//        JPanel middleRightPanel = new JPanel(new SpringLayout());
-//        // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
-//        SpringLayoutGenerator middleRightLayoutGenerator = new SpringLayoutGenerator();
-//        middleRightLayoutGenerator.addLabelWidgetPair("<html>Include Measures<br/>with No Cost Data:</html>", includeUnspecifiedCostsCheckBox(), middleRightPanel);
-//        middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 1, 2, // rows, cols
-//                5, 5, // initialX, initialY
-//                10, 10);// xPad, yPad
-//
-//        panelBottom.add(middleLeftPanel, BorderLayout.WEST);
-//        panelBottom.add(middleRightPanel, BorderLayout.EAST);
-//        
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
+        JPanel middleLeftPanel = new JPanel(new SpringLayout());
+        // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        SpringLayoutGenerator middleLeftLayoutGenerator = new SpringLayoutGenerator();
+        middleLeftLayoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), middleLeftPanel);
+        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
-        mainPanel.add(panelTop);
+
+        JPanel middleRightPanel = new JPanel(new SpringLayout());
+        // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        SpringLayoutGenerator middleRightLayoutGenerator = new SpringLayoutGenerator();
+        middleRightLayoutGenerator.addLabelWidgetPair("<html>Include Measures<br/>with No Cost Data:</html>", includeUnspecifiedCostsCheckBox(), middleRightPanel);
+        middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 1, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
+
+        panelBottom.add(middleLeftPanel, BorderLayout.WEST);
+        panelBottom.add(middleRightPanel, BorderLayout.EAST);
+        
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
         mainPanel.add(panel);
-//        mainPanel.add(panelBottom);
+        mainPanel.add(panelBottom);
         return mainPanel;
     }
-
-//    private Action upPollAction() {
-//        return new AbstractAction() {
-//            public void actionPerformed(ActionEvent e) {
-//                for (int position : majorPollutant.getSelectedIndices()) {
-//                    if (position > 0) 
-//                        majorPollutant.swap(position, position - 1);
-//                    majorPollutant.setSelectedIndex(position - 1);
-//                    majorPollutant.ensureIndexIsVisible(position - 1);
-//                }
-//            }
-//        };
-//    }
-//    
-//    private Action downPollAction() {
-//        return new AbstractAction() {
-//            public void actionPerformed(ActionEvent e) {
-//                for (int position : majorPollutant.getSelectedIndices()) {
-//                    if (position < majorPollutant.getModel().getSize() - 1) { 
-//                        majorPollutant.swap(position, position + 1);
-//                        majorPollutant.setSelectedIndex(position + 1);
-//                        majorPollutant.ensureIndexIsVisible(position + 1);
-//                    }
-//                }
-//            }
-//        };
-//    }
 
     private DoubleTextField discountRate() {
         discountRate = new DoubleTextField("discount rate", 1, 20, 10);
@@ -415,16 +341,15 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return regionsCombo;
     }
 
-    private TargetPollutantListWidget majorPollutants() throws EmfException {
+    private ComboBox majorPollutants() throws EmfException {
         Pollutant[] pollutants = getAllPollutants(this.session);
-        majorPollutantList = new TargetPollutantListWidget(pollutants, this.changeablesList, this.parentConsole);
-        majorPollutantList.setPreferredSize(new Dimension(200, 100));
-        majorPollutantList.setPollutants(controlStrategy.getTargetPollutants());
-//        majorPollutantList.setPreferredSize(comboSize);
+        majorPollutant = new ComboBox(pollutants);
+        majorPollutant.setSelectedItem(controlStrategy.getTargetPollutant());
+        majorPollutant.setPreferredSize(comboSize);
 
-//        changeablesList.addChangeable(majorPollutantList);
+        changeablesList.addChangeable(majorPollutant);
 
-        return majorPollutantList;
+        return majorPollutant;
     }
 
     private Pollutant[] getAllPollutants(EmfSession session) throws EmfException {
@@ -489,7 +414,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setDiscountRate(checkDiscountRate());
         StrategyType strategyType = checkStrategyType();
         controlStrategy.setStrategyType(strategyType);
-        controlStrategy.setTargetPollutants(checkMajorPollutants(!strategyType.getName().equals(StrategyType.projectFutureYearInventory)));
+        controlStrategy.setTargetPollutant(checkMajorPollutant(!strategyType.getName().equals(StrategyType.projectFutureYearInventory)));
         controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
         controlStrategy.setIncludeUnspecifiedCosts(includeUnspecifiedCostsCheck.isSelected());
     }
@@ -516,12 +441,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return strategyType;
     }
 
-    private Pollutant[] checkMajorPollutants(boolean required) throws EmfException {
-        Pollutant[] pollutants = majorPollutantList.getPollutants();
-        if (pollutants == null && required) {
+    private Pollutant checkMajorPollutant(boolean required) throws EmfException {
+        Pollutant pollutant = (Pollutant) majorPollutant.getSelectedItem();
+        if (pollutant == null && required) {
             throw new EmfException("Please select a target pollutant");
         }
-        return pollutants;
+        return pollutant;
     }
 
     // private void isDatasetSelected(ControlStrategy controlStrategy) throws EmfException {

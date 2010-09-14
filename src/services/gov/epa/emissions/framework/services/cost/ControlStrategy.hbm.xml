@@ -118,11 +118,5 @@
     	<many-to-many class="gov.epa.emissions.framework.services.cost.ControlProgram" column="control_program_id" />
 	</array>
 
-	<array name="targetPollutants" table="control_strategy_target_pollutants">
-    	<key column="control_strategy_id" not-null="true"/>
-    	<list-index column="list_index"/>
-    	<many-to-many class="gov.epa.emissions.commons.data.Pollutant" column="pollutant_id"/>
-	</array>
-
   </class> 
 </hibernate-mapping>  

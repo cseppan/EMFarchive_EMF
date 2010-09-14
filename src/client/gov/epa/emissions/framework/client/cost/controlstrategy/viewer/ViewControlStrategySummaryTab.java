@@ -213,68 +213,41 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
 
         JPanel panel = new JPanel(new SpringLayout());
         JPanel panelBottom = new JPanel(new BorderLayout());
-        JPanel panelTop = new JPanel(new BorderLayout());
 
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-//        layoutGenerator.addLabelWidgetPair("Cost Year:", costYearTextField(), panel);
-//        layoutGenerator.addLabelWidgetPair("Target Year:", inventoryYearTextField(), panel);
-
-        JPanel middleLeftPanel1 = new JPanel(new SpringLayout());
-
-        SpringLayoutGenerator middleLeftLayoutGenerator1 = new SpringLayoutGenerator();
-        middleLeftLayoutGenerator1.addLabelWidgetPair("Cost Year:", costYearTextField(), middleLeftPanel1);
-        middleLeftLayoutGenerator1.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), middleLeftPanel1);
-        middleLeftLayoutGenerator1.makeCompactGrid(middleLeftPanel1, 2, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
-
-        JPanel middleRightPanel1 = new JPanel(new SpringLayout());
-
-        SpringLayoutGenerator middleRightLayoutGenerator1 = new SpringLayoutGenerator();
-        middleRightLayoutGenerator1.addLabelWidgetPair("Target Year:", inventoryYearTextField(), middleRightPanel1);
-        middleRightLayoutGenerator1.addLabelWidgetPair("<html>Include Measures<br/>with No Cost Data:</html>",
-                includeUnspecifiedCostsCheckBox(), middleRightPanel1);
-        middleRightLayoutGenerator1.makeCompactGrid(middleRightPanel1, 2, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
-
-        panelTop.add(middleLeftPanel1, BorderLayout.WEST);
-        panelTop.add(middleRightPanel1, BorderLayout.EAST);
-
-        
-        
+        layoutGenerator.addLabelWidgetPair("Cost Year:", costYearTextField(), panel);
+        layoutGenerator.addLabelWidgetPair("Target Year:", inventoryYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Region:", regions(), panel);
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate(), panel);
 
-//        JPanel middleLeftPanel = new JPanel(new SpringLayout());
-//
-//        SpringLayoutGenerator middleLeftLayoutGenerator = new SpringLayoutGenerator();
-//        middleLeftLayoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), middleLeftPanel);
-//        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 1, 2, // rows, cols
-//                5, 5, // initialX, initialY
-//                10, 10);// xPad, yPad
-//
-//        JPanel middleRightPanel = new JPanel(new SpringLayout());
-//
-//        SpringLayoutGenerator middleRightLayoutGenerator = new SpringLayoutGenerator();
-//        middleRightLayoutGenerator.addLabelWidgetPair("<html>Include Measures<br/>with No Cost Data:</html>",
-//                includeUnspecifiedCostsCheckBox(), middleRightPanel);
-//        middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 1, 2, // rows, cols
-//                5, 5, // initialX, initialY
-//                10, 10);// xPad, yPad
-//
-//        panelBottom.add(middleLeftPanel, BorderLayout.WEST);
-//        panelBottom.add(middleRightPanel, BorderLayout.EAST);
+        JPanel middleLeftPanel = new JPanel(new SpringLayout());
 
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
+        SpringLayoutGenerator middleLeftLayoutGenerator = new SpringLayoutGenerator();
+        middleLeftLayoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), middleLeftPanel);
+        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 1, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
-        mainPanel.add(panelTop);
+
+        JPanel middleRightPanel = new JPanel(new SpringLayout());
+
+        SpringLayoutGenerator middleRightLayoutGenerator = new SpringLayoutGenerator();
+        middleRightLayoutGenerator.addLabelWidgetPair("<html>Include Measures<br/>with No Cost Data:</html>",
+                includeUnspecifiedCostsCheckBox(), middleRightPanel);
+        middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 1, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
+
+        panelBottom.add(middleLeftPanel, BorderLayout.WEST);
+        panelBottom.add(middleRightPanel, BorderLayout.EAST);
+
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
         mainPanel.add(panel);
-//        mainPanel.add(panelBottom);
+        mainPanel.add(panelBottom);
         return mainPanel;
     }
 
@@ -310,7 +283,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
 
     private JComponent costYearTextField() {
 
-        this.costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 4);
+        this.costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 10);
         this.costYear.setValue(controlStrategy.getCostYear() != 0 ? controlStrategy.getCostYear()
                 : CostYearTable.REFERENCE_COST_YEAR);
         this.costYear.setEditable(false);
@@ -320,7 +293,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
 
     private JComponent inventoryYearTextField() {
 
-        this.inventoryYear = new IntTextField("Target year", 0, Integer.MAX_VALUE, 4);
+        this.inventoryYear = new IntTextField("Target year", 0, Integer.MAX_VALUE, 10);
         this.inventoryYear
                 .setToolTipText("This is the target year for the strategy run, often this is the year of the inventory.");
 
