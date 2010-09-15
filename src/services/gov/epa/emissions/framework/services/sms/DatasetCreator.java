@@ -271,7 +271,7 @@ public class DatasetCreator {
     
     private void addVersionZeroEntryToVersionsTable(Dataset dataset) throws Exception {
         TableModifier modifier = new TableModifier(datasource, "versions");
-        String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null };
+        String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null, null, null, this.user.getId() + "" };
         modifier.insertOneRow(data);
     }
 
