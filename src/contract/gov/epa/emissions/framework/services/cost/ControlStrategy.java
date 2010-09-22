@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyTargetPollutant;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.Serializable;
@@ -44,6 +45,8 @@ public class ControlStrategy implements Lockable, Serializable {
     private ControlStrategyInputDataset[] controlStrategyInputDatasets = new ControlStrategyInputDataset[] {};
 
     private Pollutant targetPollutant;
+
+    private ControlStrategyTargetPollutant[] targetPollutants = new ControlStrategyTargetPollutant[] {};
 
     private String runStatus;
 
@@ -436,5 +439,13 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public void setCopiedFrom(String copiedFrom) {
         this.copiedFrom = copiedFrom;
+    }
+    
+    public void setTargetPollutants(ControlStrategyTargetPollutant[] targetPollutants) {
+        this.targetPollutants = targetPollutants;
+    }
+
+    public ControlStrategyTargetPollutant[] getTargetPollutants() {
+        return targetPollutants;
     }
 }

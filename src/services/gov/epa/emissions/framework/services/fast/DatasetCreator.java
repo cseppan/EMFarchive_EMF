@@ -9,7 +9,6 @@ import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
-import gov.epa.emissions.commons.db.TableModifier;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
@@ -31,8 +30,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Session;
-
-import com.sun.xml.internal.ws.developer.UsesJAXBContextFeature;
 
 public class DatasetCreator {
 
@@ -272,9 +269,30 @@ public class DatasetCreator {
     }
     
     private void addVersionZeroEntryToVersionsTable(Dataset dataset) throws Exception {
-        TableModifier modifier = new TableModifier(datasource, "versions");
-        String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null, null, null, this.user.getId() + "" };
-        modifier.insertOneRow(data);
+//        TableModifier modifier = new TableModifier(datasource, "versions");
+//        String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null, null, null, this.user.getId() + "" };
+//        modifier.insertOneRow(data);
+//
+//    
+        Version defaultZeroVersion = new Version(0);
+        defaultZeroVersion.setName("Initial Version");
+        defaultZeroVersion.setPath("");
+        defaultZeroVersion.setCreator(user);
+        defaultZeroVersion.setDatasetId(dataset.getId());
+        defaultZeroVersion.setLastModifiedDate(new Date());
+//        defaultZeroVersion.setNumberRecords(version.getNumberRecords());
+        defaultZeroVersion.setFinalVersion(true);
+        defaultZeroVersion.setDescription("");
+        Session session = sessionFactory.getSession();
+
+        try {
+            new DatasetDAO().add(defaultZeroVersion, session);
+        } catch (Exception e) {
+            throw new EmfException("Could not add default zero version: " + e.getMessage());
+        } finally {
+            session.close();
+        }
+    
     }
 
     public void updateVersionZeroRecordCount(EmfDataset dataset) throws EmfException {

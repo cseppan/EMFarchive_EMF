@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.sms;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.sms.SectorScenarioService;
@@ -371,6 +372,8 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             SectorScenario copied = (SectorScenario) DeepCopy.copy(cs);
             // change to applicable values
             copied.setName(name);
+            //make up the abbreviation for now...
+            copied.setAbbreviation(CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date()));
             copied.setCreator(creator);
             copied.setLastModifiedDate(new Date());
             copied.setRunStatus("Not started");

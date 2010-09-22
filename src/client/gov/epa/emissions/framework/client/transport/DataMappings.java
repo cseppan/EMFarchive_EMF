@@ -47,6 +47,7 @@ import gov.epa.emissions.framework.services.cost.LightControlMeasure;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyTargetPollutant;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
@@ -186,6 +187,7 @@ public class DataMappings extends Mappings {
         bean(call, CostYearTable.class, costYearTable());
         bean(call, ControlMeasureClass.class, controlMeasureClass());
         bean(call, ControlStrategyConstraint.class, controlStrategyConstraint());
+        bean(call, ControlStrategyTargetPollutant.class, controlStrategyTargetPollutant());
         bean(call, EquationType.class, equationType());
         bean(call, EquationTypeVariable.class, equationTypeVariable());
         bean(call, ControlMeasureEquation.class, controlMeasureEquation());
@@ -248,6 +250,7 @@ public class DataMappings extends Mappings {
         array(call, ControlProgramType[].class, controlProgramTypes());
         array(call, ControlStrategy[].class, controlStrategies());
         array(call, ControlStrategyInputDataset[].class, controlStrategyInputDatasets());
+        array(call, ControlStrategyTargetPollutant[].class, controlStrategyTargetPollutants());
         array(call, StrategyType[].class, strategyTypes());
         array(call, ControlStrategyResult[].class, controlStrategyResults());
         array(call, EfficiencyRecord[].class, efficiencyRecords());
@@ -644,6 +647,14 @@ public class DataMappings extends Mappings {
 
     public QName controlStrategyConstraint() {
         return qname("ControlStrategyConstraint");
+    }
+
+    public QName controlStrategyTargetPollutant() {
+        return qname("ControlStrategyTargetPollutant");
+    }
+
+    public QName controlStrategyTargetPollutants() {
+        return qname("ControlStrategyTargetPollutants");
     }
 
     public QName controlStrategyResults() {

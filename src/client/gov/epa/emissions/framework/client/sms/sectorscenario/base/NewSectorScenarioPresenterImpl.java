@@ -40,7 +40,9 @@ public class NewSectorScenarioPresenterImpl implements NewSectorScenarioPresente
     public void addSectorScenario(SectorScenario sectorScenario) throws EmfException {
         validateNameAndAbbre(sectorScenario);
         sectorScenario.setLastModifiedDate(new Date());
-        service().addSectorScenario(sectorScenario);
+        //make sure an set Id, this is needed for the manager, so we know which one to edit or view
+        sectorScenario.setId(service().addSectorScenario(sectorScenario));
+        
         //SectorScenario loaded = service().getById(id);
         managerPresenter.addNewSSToTableData(sectorScenario);
     }

@@ -1241,7 +1241,7 @@ public class FastRunTask {
 
     private EmfDataset createDomainOutputDataset() throws Exception {
         DatasetType datasetType = getDatasetType(DatasetType.FAST_RUN_DOMAIN_OUTPUT);
-        return creator.addDataset("ds", fastRun.getName() + "_"
+        return creator.addDataset("ds", fastRun.getAbbreviation() + "_"
                 + DatasetType.FAST_RUN_DOMAIN_OUTPUT, datasetType, new VersionedTableFormat(datasetType
                 .getFileFormat(), dbServer.getSqlDataTypes()), "");
     }

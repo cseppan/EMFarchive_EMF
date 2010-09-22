@@ -20,6 +20,8 @@ public class StrategyType implements Serializable, Comparable {
 
     public static final String maxEmissionsReduction = "Max Emissions Reduction";
 
+    public static final String MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION = "Multi-Pollutant Max Emissions Reduction";
+
     public static final String applyMeasuresInSeries = "Apply Measures In Series";
 
     public static final String projectFutureYearInventory = "Project Future Year Inventory";

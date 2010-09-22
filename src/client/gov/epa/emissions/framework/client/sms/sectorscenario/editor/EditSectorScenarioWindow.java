@@ -181,6 +181,10 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         container.add(Box.createHorizontalStrut(20));
 
         runButton = new RunButton(runAction());
+        if (sectorScenario.getRunStatus().equals("Not started")) 
+            runButton.setEnabled(true);
+        else
+            runButton.setEnabled(false);
         container.add(runButton);
 
         refreshButton = new Button("Refresh", new AbstractAction(){
@@ -248,7 +252,10 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
     public void enableButtons(boolean enable) {
         saveButton.setEnabled(enable);
-        runButton.setEnabled(enable);
+        if (sectorScenario.getRunStatus().equals("Not started")) 
+            runButton.setEnabled(true);
+        else
+            runButton.setEnabled(false);
         stopButton.setEnabled(!enable);
     }
 

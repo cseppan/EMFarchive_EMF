@@ -62,7 +62,7 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
 
     private Column[] baseCols() {
         
-        System.out.println("###############################################This is test output from baseCols...###############################################");
+//        System.out.println("###############################################This is test output from baseCols...###############################################");
         List<Column> cols = new ArrayList<Column>();
 
         cols.add(new Column("Disable", types.booleanType(), new StringFormatter(5)));
