@@ -109,6 +109,10 @@ public class Download extends Thread {
             setErrMsg("Windows runtime error while creating EMF client shortcut.");
         }
     }
+    
+    public String getInstallHome() {
+        return this.installhome;
+    }
 
     private void createShortcutBatchFile(File bat, File inf) {
         String separator = Constants.SEPARATOR;
@@ -229,7 +233,6 @@ public class Download extends Thread {
             is.close();
             fos.close();
         }
-        
         conn.disconnect();
     }
 

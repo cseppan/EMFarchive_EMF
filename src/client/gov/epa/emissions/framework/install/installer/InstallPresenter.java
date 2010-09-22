@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.install.installer;
 import java.awt.Cursor;
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 
 public class InstallPresenter {
     private InstallView view;
@@ -41,9 +42,22 @@ public class InstallPresenter {
     public String[] checkUpdates() {
         return checkUpdates.getNewFilesName();
     }
+    
+    public int getNumOfOutDateFiles() {
+        return checkUpdates.getNumOfOutDateFiles();
+    }
+    
+    public List<String> getOutDateFiles() {
+        return checkUpdates.getOutDateFiles();
+    }    
 
     public void downloadUpdates() {
         checkUpdates.download();
+        //checkUpdates.deleteOutOfDateFiles();
+    }
+    
+    public void deleteOutOfDateFiles() {
+        checkUpdates.deleteOutOfDateFiles();
     }
 
     public void stopDownload() {

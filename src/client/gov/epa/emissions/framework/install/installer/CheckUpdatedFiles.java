@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 
 public class CheckUpdatedFiles {
     private File2Download[] oldFiles, newFiles;
+    List<String> localFilesToBeDeleted;
 
     private File storedInfoFile;
 
@@ -22,11 +23,14 @@ public class CheckUpdatedFiles {
     public void initialize(String installhome, Download delegate) {
         this.delegate = delegate;
         storedInfoFile = new File(installhome, Constants.UPDATE_FILE);
+        localFilesToBeDeleted = new ArrayList<String>();
         if (storedInfoFile.exists()) {
             getOldFilesInfo();
+            getOutOfDateFiles(); // TODO: purge local out of date files first
             getFile2Download();
         }
     }
+    
 
     public void download() {
         delegate.setFile2Download(newFiles);
@@ -40,11 +44,56 @@ public class CheckUpdatedFiles {
 
         return (String[]) list.toArray(new String[0]);
     }
+    
+    public void deleteOutOfDateFiles() {
+        File f;
+        String installHome = delegate.getInstallHome();
+        for ( String path : localFilesToBeDeleted){
+          f = new File( installHome, path);
+          boolean ok = f.delete();
+          if ( !ok){
+              // report error here
+              setErrMsg("Deleting file "+installHome+path+" failed.");
+          } else {
+              System.out.println("Deleted file "+installHome+path);
+          }            
+        }
+    }
+    
+    public int getNumOfOutDateFiles() {
+        return localFilesToBeDeleted.size();
+    }
+    
+    public List<String> getOutDateFiles() {
+        return localFilesToBeDeleted;
+    }
 
+    // TODO: check out of date files first at here, if out of date, delete from here
+    private void getOutOfDateFiles() {
+        
+        File2Download[] curFiles = delegate.getFiles2Download();
+                
+        for (int i = 0; i < oldFiles.length; i++) {
+            String path = oldFiles[i].getPath(); //TODO: path is name with full path or only path???
+            boolean delete = true;
+            for (int j = 0; j < curFiles.length; j++) {
+                if (curFiles[j].getPath().equalsIgnoreCase(path)){ //path??
+                    delete = false;
+                    break;
+                }
+            }
+            if ( delete){
+                // delete the file from disk
+                localFilesToBeDeleted.add(path);
+                //setErrMsg(localFilesToBeDeleted.get(localFilesToBeDeleted.size()-1));
+                System.out.println("To delete: " + localFilesToBeDeleted.get(localFilesToBeDeleted.size()-1));
+            }
+        }        
+    }
     private void getFile2Download() {
         File2Download[] curFiles = delegate.getFiles2Download();
         List list = new ArrayList();
-
+        
         for (int i = 0; i < curFiles.length; i++) {
             String oldDate = getOldDate(curFiles[i], oldFiles);
             

@@ -12,6 +12,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -464,6 +465,8 @@ public class InstallWindow extends JFrame implements InstallView {
     }
 
     public void setFinish() {
+        
+        presenter.deleteOutOfDateFiles();
         rewriteBatchFile();
 
         if (INSTALL_MODE == INSTALL) {
@@ -539,6 +542,7 @@ public class InstallWindow extends JFrame implements InstallView {
             writePreferences();
             startUpdates();
         }
+        
     }
 
     private void writePreferences() {
@@ -567,12 +571,19 @@ public class InstallWindow extends JFrame implements InstallView {
         String separator = Constants.SEPARATOR;
         String text = "Files to update:" + separator + separator;
         String[] files = presenter.checkUpdates();
-
         for (int i = 0; i < files.length; i++)
             text += files[i] + separator;
+        text += separator;
+        
+        int numOfOutOfDateFiles = presenter.getNumOfOutDateFiles();
+        List<String> filesToBeDeleted = presenter.getOutDateFiles();
+        text += "Files to delete:" + separator + separator;
+        for ( String file : filesToBeDeleted) {
+            text += file + separator;
+        }
 
-        text += separator + "Total: " + files.length + " files.";
-        if (files.length > 0)
+        text += separator + "Total: " + (files.length + numOfOutOfDateFiles) + " files.";
+        if (files.length + numOfOutOfDateFiles > 0)
             ((UpdateFilesPage) updatePage).enableUpdate();
 
         return text;
