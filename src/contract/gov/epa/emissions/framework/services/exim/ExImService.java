@@ -17,11 +17,12 @@ public interface ExImService extends EMFService {
     void importDataset(User user, String folderPath, String[] filenames, DatasetType datasetType, String datasetName)
             throws EmfException;
 
-    void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String folder, String purpose)
+    void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String folder, 
+            boolean overwrite, String rowFilters, String colOrders,String purpose)
             throws EmfException;
 
-    void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, Version[] versions, String folder, String purpose)
-            throws EmfException;
+    //void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, Version[] versions, String folder, String purpose)
+    //        throws EmfException;
 
     Version getVersion(Dataset dataset, int version) throws EmfException;
 
@@ -29,16 +30,10 @@ public interface ExImService extends EMFService {
     // export datasets from the client with only
     //dataset ids
 
-    void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, String purpose)
+    void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, 
+            boolean overwrite, String rowFilters, String colOrders,String purpose)
             throws EmfException;
 
-    void exportDatasetids(User user, Integer[] datasetIds, String folder, String purpose) throws EmfException;
-    
-    void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, Version[] versions, String folder, String purpose)
-            throws EmfException;
-
-    void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, String folder, String purpose) throws EmfException;
-    
     String printStatusExportTaskManager() throws EmfException;
     
     String printStatusImportTaskManager() throws EmfException;

@@ -1,12 +1,14 @@
 package gov.epa.emissions.framework.services.exim;
 
 import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DataFormatFactory;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
+import gov.epa.emissions.commons.io.orl.FlexibleDBExporter;
 import gov.epa.emissions.framework.services.EmfException;
 
 import java.lang.reflect.Constructor;
@@ -29,7 +31,7 @@ public class VersionedExporterFactory {
         this.batchSize = batchSize;
     }
 
-    public Exporter create(Dataset dataset, Version version) throws EmfException {
+    public Exporter create(Dataset dataset, Version version, String rowFilters, String colOrders) throws EmfException {
         try {
             String exporterName = dataset.getDatasetType().getExporterClassName();
             Class[] classParams;
@@ -39,9 +41,14 @@ public class VersionedExporterFactory {
                 throw new Exception("Exporter class name not specified with this dataset type.");
 
             Class exporterClass = Class.forName(exporterName);
-            classParams = new Class[] { Dataset.class, DbServer.class, SqlDataTypes.class,
+//            if (exporterName.equals(DatasetType.FLEXIBLE_EXPORTER)){
+//                Exporter exporter = new FlexibleDBExporter(dataset, dbServer,rowFilters, colOrders, 
+//                        new VersionedDataFormatFactory(version, dataset), new Integer(batchSize));
+//                return exporter;
+//            }
+            classParams = new Class[] { Dataset.class, String.class, DbServer.class,
                     DataFormatFactory.class, Integer.class };
-            params = new Object[] { dataset, dbServer, sqlDataTypes, new VersionedDataFormatFactory(version, dataset),
+            params = new Object[] { dataset, rowFilters, dbServer, new VersionedDataFormatFactory(version, dataset),
                     new Integer(batchSize) };
 
             Constructor exporterConstructor = exporterClass.getDeclaredConstructor(classParams);
@@ -52,7 +59,7 @@ public class VersionedExporterFactory {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("Could not create Exporter", e);
-            throw new EmfException("Could not create Exporter for Dataset Type: " + dataset.getDatasetTypeName());
+            throw new EmfException("Could not create Exporter for Dataset Type: " + dataset.getDatasetTypeName() +"  "+ dataset.getDatasetType().getExporterClassName());
         }
     }
 

@@ -67,6 +67,10 @@ public class ExportTask extends Task {
     private DbServerFactory dbFactory;
 
     private int sleepAfterExport = 0;
+    
+    private String colOrders="";
+     
+    private String rowFilters="";
 
     private DatasetDAO datasetDao;
 
@@ -88,6 +92,14 @@ public class ExportTask extends Task {
         this.version = version;
         this.datasetDao = new DatasetDAO();
     }
+    
+    protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
+            String rowFilters, String colOrders,
+            DbServerFactory dbFactory, HibernateSessionFactory sessionFactory, Version version) {
+        this(user, file, dataset, services, accesslog, dbFactory, sessionFactory, version);
+        this.rowFilters = rowFilters;
+        this.colOrders = colOrders;
+    } 
 
     public void run() {
         DbServer dbServer = null;
@@ -120,7 +132,7 @@ public class ExportTask extends Task {
                 dbServer = this.dbFactory.getDbServer();
                 VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer
                         .getSqlDataTypes(), batchSize(session));
-                Exporter exporter = exporterFactory.create(dataset, version);
+                Exporter exporter = exporterFactory.create(dataset, version, rowFilters, colOrders);
 
                 if (exporter instanceof ExternalFilesExporter)
                     ((ExternalFilesExporter) exporter).setExternalSources(extSrcs);
@@ -131,9 +143,7 @@ public class ExportTask extends Task {
                 if (DebugLevels.DEBUG_1)
                     printLogInfo(accesslog);
 
-                if (!compareDatasetRecordsNumbers(exportedLineCount, session, dbServer))
-                    return;
-                // updateDataset(dataset); //Disabled because of nothing updated during exporting
+                String lineCompare=compareDatasetRecordsNumbers(exportedLineCount, session, dbServer);
 
                 accesslog.setEnddate(new Date());
                 accesslog.setLinesExported(exportedLineCount);
@@ -145,7 +155,7 @@ public class ExportTask extends Task {
                     setStatus("completed", msghead + msgend);
                     accesslog.setFolderPath("");
                 } else
-                    setStatus("completed", msghead + " to " + file.getAbsolutePath() + msgend);
+                    setStatus("completed", msghead + " to " + file.getAbsolutePath() + msgend + "\n"+ lineCompare );
 
             } // if file exists
             // NOTE: want to check if accesslog exists for the same dataset, version, and description.
@@ -215,7 +225,7 @@ public class ExportTask extends Task {
             dbServer = this.dbFactory.getDbServer();
             VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer
                     .getSqlDataTypes(), batchSize(session));
-            Exporter exporter = exporterFactory.create(dataset, version);
+            Exporter exporter = exporterFactory.create(dataset, version, "", "");
 
             if (exporter instanceof ExternalFilesExporter)
                 ((ExternalFilesExporter) exporter).setExternalSources(extSrcs);
@@ -297,7 +307,7 @@ public class ExportTask extends Task {
         // setStatus(info);
     }
 
-    private boolean compareDatasetRecordsNumbers(long linesExported, Session session, DbServer dbServer)
+    private String compareDatasetRecordsNumbers(long linesExported, Session session, DbServer dbServer)
             throws Exception {
         DatasetType type = dataset.getDatasetType();
         String importerclass = (type == null ? "" : type.getImporterClassName());
@@ -305,7 +315,7 @@ public class ExportTask extends Task {
 
         if (importerclass.equals("gov.epa.emissions.commons.io.temporal.TemporalProfileImporter")
                 || importerclass.equals("gov.epa.emissions.commons.io.other.CountryStateCountyDataImporter"))
-            return true;
+            return "";
 
         long records = 0;
 
@@ -317,12 +327,13 @@ public class ExportTask extends Task {
         }
 
         if (records != linesExported) {
-            setErrorStatus(null, "No. of records in database: " + records + ", but" + " exported " + linesExported
-                    + " lines");
-            return false;
+//            setErrorStatus(null, "No. of records in database: " + records + ", but" + " exported " + linesExported
+//                    + " lines");
+            return "No. of records in database: " + records + ", " + " exported " + linesExported ;
+            //return false;
         }
 
-        return true;
+        return "";
     }
 
     private void setErrorStatus(Exception e, String message) {

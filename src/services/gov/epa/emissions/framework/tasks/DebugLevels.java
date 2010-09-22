@@ -6,7 +6,7 @@ public class DebugLevels {
 	public static final boolean DEBUG_1 = false;
 	public static final boolean DEBUG_2 = false;
 	public static final boolean DEBUG_3 = false;
-	public static final boolean DEBUG_4 = false;
+	public static final boolean DEBUG_4 = false; 
     public static final boolean DEBUG_5 = false;
     public static final boolean DEBUG_6 = false;
     public static final boolean DEBUG_7 = false;
@@ -22,4 +22,5 @@ public class DebugLevels {
     public static final boolean DEBUG_18 = false; //to trace timing in various functions
     public static final boolean DEBUG_19 = false; //to trace get page issues
     public static final boolean DEBUG_20 = false; //to trace case ModelToRun issues
+    public static final boolean DEBUG_21 = true;
 }

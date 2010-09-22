@@ -77,30 +77,22 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         }
     }
 
-    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose)
+    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String dirName, 
+            boolean overwrite, String rowFilters, String colOrders, String purpose)
             throws EmfException {
         if (DebugLevels.DEBUG_4)
             System.out.println(">>## calling export datasets in eximSvcImp: " + myTag() + " for datasets: "
                     + datasets.toString());
-        String submitterId = exportService.exportForClient(user, datasets, versions, dirName, purpose, false);
+        String submitterId;
+//        if (rowFilters.isEmpty() && colOrders.isEmpty())
+//            submitterId = exportService.exportForClient(user, datasets, versions, dirName, purpose, overwrite);
+//        else
+        submitterId = exportService.exportForClient(user, datasets, versions, dirName, 
+                    rowFilters, colOrders, purpose, overwrite);
         if (DebugLevels.DEBUG_4)
             System.out.println("In ExImServiceImpl:exportDatasets() SUBMITTERID= " + submitterId);
-    }
-
-    public void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, Version[] versions, String dirName,
-            String purpose) throws EmfException {
-        try {
-            if (DebugLevels.DEBUG_4)
-                System.out.println(">>## calling export datasets with overwrite in eximSvcImp: " + myTag()
-                        + " for datasets: " + datasets.toString());
-            String submitterId = exportService.exportForClient(user, datasets, versions, dirName, purpose, true);
-            if (DebugLevels.DEBUG_4)
-                System.out.println("In ExImServiceImpl:exportDatasetsWithOverwrite() SUBMITTERID= " + submitterId);
-        } catch (RuntimeException e) {
-            // NOTE Auto-generated catch block
-            e.printStackTrace();
-            throw new EmfException("Error exporting datasets. " + e.getMessage());
-        }
+        if (DebugLevels.DEBUG_21)
+            System.out.println("rowFilters: "+rowFilters+" colOrders: "+colOrders);
     }
 
     public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType) throws EmfException {
@@ -132,7 +124,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return exportService.getVersion(dataset, version);
     }
 
-    public void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, String purpose)
+    public void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, 
+            boolean overwrite, String rowFilters, String colOrders, String purpose)
             throws EmfException {
         int numOfDS = datasetIds.length;
         EmfDataset[] datasets = new EmfDataset[numOfDS];
@@ -159,129 +152,35 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 for (int j = 0; j < numOfDS; j++)
                     defaultVersions[j] = getVersion(datasets[j], datasets[j].getDefaultVersion());
 
-                exportDatasets(user, datasets, defaultVersions, folder, purpose);
+                exportDatasets(user, datasets, defaultVersions, folder,overwrite, rowFilters,colOrders, purpose);
                 return;
             }
 
             // Invoke the local method that uses the datasets
-            exportDatasets(user, datasets, versions, folder, purpose);
+            exportDatasets(user, datasets, versions, folder, overwrite, rowFilters,colOrders,purpose);
         } catch (RuntimeException e) {
             // NOTE Auto-generated catch block
-            e.printStackTrace();
+            //e.printStackTrace();
             throw new EmfException("Error exporting dataset. " + e.getMessage());
         }
     }
 
-    // FIXME: DELETE AFTER MERGED CHANGES HAVE BEEN TESTED AND VERIFIED
-    // public void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, String purpose)
-    // throws EmfException {
-    // EmfDataset[] datasets = null;
-    //
-    // // Using paramterized generic ArrayList
-    // ArrayList<EmfDataset> ar = new ArrayList<EmfDataset>();
-    // EmfDataset[] rawDatasets = null;
-    // List<Integer> dsetIds = Arrays.asList(datasetIds);
-    //
-    // // get all the datasets from the dataservice.
-    // DataServiceImpl ds = new DataServiceImpl();
-    // rawDatasets = ds.getDatasets();
-    //
-    // // Sift through and choose only those whose id matches
-    // // one of the list of dataset ids in the array.
-    //
-    // for (int i = 0; i < rawDatasets.length; i++) {
-    // if (dsetIds.contains(new Integer(rawDatasets[i].getId()))) {
-    // rawDatasets[i].setAccessedDateTime(new Date());
-    // ar.add(rawDatasets[i]);
-    // }
-    // }
-    //
-    // datasets = ar.toArray(new EmfDataset[0]);
-    // // Invoke the local method that uses the datasets
-    // exportDatasets(user, datasets, versions, folder, purpose);
-    //
-    // }
-
-    public void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, Version[] versions, String folder,
-            String purpose) throws EmfException {
-
-        int numOfDS = datasetIds.length;
-        EmfDataset[] datasets = new EmfDataset[numOfDS];
-        DataServiceImpl ds = new DataServiceImpl();
-
-        // Sift through and choose only those whose id matches
-        // one of the list of dataset ids in the array.
-        /** * this has caused the sequence of the retrieved datasets is different from the original one in datasetIds ** */
-
-        // for (int i=0; i<rawDatasets.length;i++){
-        // if (dsetIds.contains(new Integer (rawDatasets[i].getId()))){
-        // rawDatasets[i].setAccessedDateTime(new Date());
-        // ar.add(rawDatasets[i]);
-        // }
-
-        for (int i = 0; i < numOfDS; i++)
-            datasets[i] = ds.getDataset(new Integer(datasetIds[i]));
-
-        // if Vservion[] is not specified, get the default versions from datasets themselves
-        if (versions == null) {
-            Version[] defaultVersions = new Version[numOfDS];
-
-            for (int j = 0; j < numOfDS; j++)
-                defaultVersions[j] = getVersion(datasets[j], datasets[j].getDefaultVersion());
-
-            exportDatasetsWithOverwrite(user, datasets, defaultVersions, folder, purpose);
-            return;
-        }
-
-        // Invoke the local method that uses the datasets
-        exportDatasetsWithOverwrite(user, datasets, versions, folder, purpose);
-    }
-
-    // FIXME: DELETE AFTER MERGED CHANGES HAVE BEEN TESTED AND VERIFIED
-    // public void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, Version[] versions, String folder,
-    // String purpose) throws EmfException {
-    // EmfDataset[] datasets = null;
-    //
-    // // Using paramterized generic ArrayList
-    // ArrayList<EmfDataset> ar = new ArrayList<EmfDataset>();
-    // EmfDataset[] rawDatasets = null;
-    // List<Integer> dsetIds = Arrays.asList(datasetIds);
-    //
-    // // get all the datasets from the dataservice.
-    // DataServiceImpl ds = new DataServiceImpl();
-    // rawDatasets = ds.getDatasets();
-    //
-    // // Sift through and choose only those whose id matches
-    // // one of the list of dataset ids in the array.
-    //
-    // for (int i = 0; i < rawDatasets.length; i++) {
-    // if (dsetIds.contains(new Integer(rawDatasets[i].getId()))) {
-    // rawDatasets[i].setAccessedDateTime(new Date());
-    // ar.add(rawDatasets[i]);
-    // }
-    // }
-    // datasets = ar.toArray(new EmfDataset[0]);
-    //
-    // // Invoke the local method that uses the datasets
-    // exportDatasetsWithOverwrite(user, datasets, versions, folder, purpose);
-    // }
-
-    // Export NO overwrite using default dataset version
-    public void exportDatasetids(User user, Integer[] datasetIds, String folder, String purpose) throws EmfException {
+    public void exportDatasetids(User user, Integer[] datasetIds, String folder, 
+            boolean overwrite, String rowFilters, String colOrders, String purpose) throws EmfException {
         // if Vservion[] is not specified, get the default versions from datasets themselves
         if (DebugLevels.DEBUG_4)
             System.out.println("ExImService:exportDatasetids() called.");
-        exportDatasetids(user, datasetIds, null, folder, purpose);
+        exportDatasetids(user, datasetIds, null, folder, overwrite, rowFilters, colOrders, purpose);
         if (DebugLevels.DEBUG_4)
             System.out.println("ExImService:exportDatasetids() exited.");
     }
 
     // Export with overwrite using default dataset version
 
-    public void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, String folder, String purpose)
-            throws EmfException {
-        exportDatasetidsWithOverwrite(user, datasetIds, null, folder, purpose);
-    }
+//    public void exportDatasetidsWithOverwrite(User user, Integer[] datasetIds, String folder, String purpose)
+//            throws EmfException {
+//        exportDatasetidsWithOverwrite(user, datasetIds, null, folder, purpose);
+//    }
 
     public String printStatusExportTaskManager() throws EmfException {
         return exportService.printStatusExportTaskManager() ;

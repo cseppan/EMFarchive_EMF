@@ -324,11 +324,104 @@ public class ManagedExportService {
     }
 
     public synchronized String exportForClient(User user, EmfDataset[] datasets, Version[] versions, String dirName,
+            String rowFilters, String colOrders, String purpose, boolean overwrite) throws EmfException {
+
+        // FIXME: always overwrite
+        // FIXME: hardcode overwite=true until verified with Alison
+        //overwrite = true;
+        if (DebugLevels.DEBUG_9)
+            System.out.println("ManagedExportService:export() called at: " + new Date());
+
+        if (DebugLevels.DEBUG_9)
+            System.out.println(">>## In export service:export() " + myTag() + " for datasets: " + datasets.toString());
+
+        // The service instance (one per session) will have only one submitter for the type of service
+        // Here the TaskManagerExportService has one reference to the ExportClientSubmitter
+        if (exportTaskSubmitter == null) {
+            exportTaskSubmitter = new ExportClientSubmitter();
+            // exportTaskSubmitter.registerTaskManager();
+            TaskManagerFactory.getExportTaskManager().registerTaskSubmitter(exportTaskSubmitter);
+        }
+
+        // FIXME: Verify at team meeting Test if subpath exists. If not create subpath
+        // File toSubDir = null;
+        if (DebugLevels.DEBUG_9)
+            System.out.println("FULL PATH= " + dirName);
+
+        // toSubDir = new File(dirName);
+        // if (!toSubDir.exists()) {
+        // toSubDir.mkdirs();
+        // }
+
+        File path = validatePath(dirName);
+
+        if (datasets.length != versions.length) {
+            log.error("Export failed: version numbers do not match those for specified datasets.");
+            throw new EmfException("Export failed: version numbers do not match " + "those for specified datasets.");
+        }
+
+        if (DebugLevels.DEBUG_9)
+            System.out.println("# of datasets= " + datasets.length);
+
+        // FIXME: Moved here to see if session problem is solved.
+        Services services = services();
+
+        try {
+            for (int i = 0; i < datasets.length; i++) {
+                // Services services = services();
+                EmfDataset dataset = datasets[i];
+                Version version = versions[i];
+
+                // FIXME: Investigate if services reference needs to be unique for each dataset in this call
+                if (isExportable(dataset, version, services, user)) {
+                    ExportTask tsk = createExportTask(user, purpose, overwrite,rowFilters, colOrders,path, dataset, version);
+
+                    eximTasks.add(tsk);
+
+                }
+            }
+
+            if (DebugLevels.DEBUG_9)
+                System.out.println("Before exportTaskSubmitter.addTasksToSubmitter # of elements in eximTasks array= "
+                        + eximTasks.size());
+
+            // All eximTasks have been created...so add to the submitter
+            exportTaskSubmitter.addTasksToSubmitter(eximTasks);
+
+            // now that all tasks have been submitted remove them from from eximTasks
+            eximTasks.removeAll(eximTasks);
+            if (DebugLevels.DEBUG_9)
+                System.out
+                        .println("After exportTaskSubmitter.addTasksToSubmitter and eximTasks cleanout # of elements in eximTasks array= "
+                                + eximTasks.size());
+
+            if (DebugLevels.DEBUG_9)
+                System.out.println("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: "
+                        + exportTaskSubmitter.getTaskCount());
+
+            log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportTaskSubmitter.getTaskCount());
+            log.info("ManagedExportService:export() submitted all exportTasks dropping out of loop");
+
+            if (DebugLevels.DEBUG_9)
+                System.out.println("ManagedExportService:export() exiting at: " + new Date());
+
+        } catch (Exception e) {
+            // don't need to log messages about exporting to existing file
+            if (e.getMessage() != null && e.getMessage().indexOf("existing file") < 0)
+                log.error("ERROR starting to export to folder: " + dirName, e);
+            e.printStackTrace();
+            throw new EmfException("Export failed: " + e.getMessage());
+        }
+
+        return exportTaskSubmitter.getSubmitterId();
+    }
+    
+    public synchronized String exportForClient(User user, EmfDataset[] datasets, Version[] versions, String dirName,
             String purpose, boolean overwrite) throws EmfException {
 
         // FIXME: always overwrite
         // FIXME: hardcode overwite=true until verified with Alison
-        overwrite = true;
+        //overwrite = true;
         if (DebugLevels.DEBUG_9)
             System.out.println("ManagedExportService:export() called at: " + new Date());
 
@@ -438,6 +531,34 @@ public class ManagedExportService {
                     + (dbFactory == null) + " dataset: " + dataset.getName());
         ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, dbFactory, sessionFactory,
                 version);
+        // eximTask.setSubmitterId(exportTaskSubmitter.getSubmitterId());
+
+        return eximTask;
+    }
+    
+    private synchronized ExportTask createExportTask(User user, String purpose, boolean overwrite, 
+            String rowFilters, String colOrders, File path,
+            EmfDataset dataset, Version version) throws Exception {
+        if (DebugLevels.DEBUG_9)
+            System.out.println(">>## In export service:doExport() " + myTag() + " for datasetId: " + dataset.getId());
+
+        // Match version in dataset
+        if (dataset.getId() != version.getDatasetId())
+            throw new EmfException("Dataset doesn't match version (dataset id=" + dataset.getId()
+                    + " but version shows dataset id=" + version.getDatasetId() + ")");
+
+        Services services = services();
+        File file = validateExportFile(path, getCleanDatasetName(dataset, version), overwrite);
+
+        AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset.getAccessedDateTime(),
+                "Version " + version.getVersion(), purpose, file.getAbsolutePath());
+        accesslog.setDatasetname(dataset.getName());
+
+        if (DebugLevels.DEBUG_9)
+            System.out.println("ManagedExportService: right before creating export task: dbFactory null? "
+                    + (dbFactory == null) + " dataset: " + dataset.getName());
+        ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, 
+                rowFilters, colOrders,dbFactory, sessionFactory, version);
         // eximTask.setSubmitterId(exportTaskSubmitter.getSubmitterId());
 
         return eximTask;

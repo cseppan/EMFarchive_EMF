@@ -1,12 +1,15 @@
 package gov.epa.emissions.framework.client.exim;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -19,21 +22,21 @@ import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SpringLayout;
 
 public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
@@ -48,6 +51,11 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private JCheckBox overwrite;
 
     private TextArea purpose;
+    private TextArea colOrder;
+    private TextArea rowFilter;   
+    private String colOrders;
+    private String rowFilters;
+    private ComboBox version;
 
     private JButton exportButton;
 
@@ -56,13 +64,15 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private DataCommonsService service;
 
     public ExportWindow(EmfDataset[] datasets, DesktopManager desktopManager, EmfConsole parentConsole,
-            EmfSession session) {
+            EmfSession session, String colOrders, String rowFilters) {
         super(title(datasets), desktopManager);
         super.setName("exportWindow:" + hashCode());
 
         this.datasets = datasets;
         this.parentConsole = parentConsole;
         this.service = session.dataCommonsService();
+        this.colOrders = colOrders;
+        this.rowFilters = rowFilters;
 
         this.getContentPane().add(createLayout());
         this.pack();
@@ -95,36 +105,53 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     }
 
     private JPanel createExportPanel() {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new SpringLayout());
         int width = 40;
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // datasets
-        JPanel datasetNamesPanel = new JPanel(new BorderLayout(4,10));
-        
-        TextArea datasetNames = new TextArea("datasets", getDatasetsLabel(datasets), width, 6);
+        TextArea datasetNames = new TextArea("datasets", getDatasetsLabel(datasets), width+10, 6);
         datasetNames.setEditable(false);
         JScrollPane dsArea = new JScrollPane(datasetNames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        datasetNamesPanel.add(new JLabel("Datasets  "),BorderLayout.WEST);
-        datasetNamesPanel.add(dsArea);
+        layoutGenerator.addLabelWidgetPair("Datasets  ", dsArea, panel);
 
         // folder
         JPanel chooser = new JPanel(new BorderLayout(10, 10));
         folder = new TextField("folder", width);
-        chooser.add(new JLabel("Folder     "),BorderLayout.WEST);
         chooser.add(folder);
         chooser.add(browseFileButton(), BorderLayout.EAST);
+        layoutGenerator.addLabelWidgetPair("Folder  ",chooser, panel);
+        
+        //Sort Order
+        colOrder = new TextArea("colOrder", colOrders, width+10, 2);
+        colOrder.setToolTipText(colOrder.getText());
+        JScrollPane colArea = new JScrollPane(colOrder, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        //layoutGenerator.addLabelWidgetPair("Col filter", colArea, panel);
+        
+        //version
+        if (datasets.length == 1) {
+            version = new ComboBox();
+            version.setPreferredSize(new Dimension(445, 20));
+            
+            layoutGenerator.addLabelWidgetPair("Version  ", version, panel);
+        }
+        // Row Filter
+        rowFilter = new TextArea("rowFilter", rowFilters, width+10, 2);
+        rowFilter.setToolTipText(rowFilter.getText());
+        JScrollPane rowArea = new JScrollPane(rowFilter, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        layoutGenerator.addLabelWidgetPair("Row Filter ", rowArea, panel);
         
         // purpose
-        JPanel purposePanel = new JPanel(new BorderLayout(4,10));
-        purpose = new TextArea("purpose", "", width, 6);
+        //JPanel purposePanel = new JPanel(new BorderLayout(4,10));
+        purpose = new TextArea("purpose", "", width+10, 4);
         JScrollPane purposeArea = new JScrollPane(purpose, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        purposePanel.add(new JLabel("Purpose   "),BorderLayout.WEST);
-        purposePanel.add(purposeArea);
+        layoutGenerator.addLabelWidgetPair("Purpose  ",purposeArea, panel);
+        //purposePanel.add(purposeArea);
  
         // overwrite
         JPanel overwritePanel = new JPanel(new BorderLayout());
@@ -134,18 +161,16 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         //overwrite.setVisible(false);
         overwritePanel.add(overwrite, BorderLayout.LINE_START);
         overwritePanel.setVisible(false);
-        
-        mainPanel.add(datasetNamesPanel);
-        mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(chooser);
-        mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(purposePanel);
-        mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(overwritePanel);
-        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,20));
-        panel.setLayout(new BorderLayout(10,10));
-        panel.add(mainPanel,BorderLayout.NORTH);       
- 
+        layoutGenerator.addLabelWidgetPair(" ",overwritePanel, panel);
+        if (datasets.length == 1)    
+            layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
+                    10, 10, // initialX, initialY
+                    5, 10);// xPad, yPad
+        else
+            layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+                    10, 10, // initialX, initialY
+                    5, 10);// xPad, yPad
+
         return panel;
     }
     
@@ -207,19 +232,30 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private void doExport() {
         try {
+            clearMessagePanel();          
             validateFolder(folder.getText());
             
+            String rowFiltersvalues= rowFilter.getText().trim();
+            String colOrdersvalues = colOrder.getText().trim();
+            validateRowFilterFormat(rowFiltersvalues);
+            //validateCols(colOrdersvalues);
+            setRowAndColFilter(rowFiltersvalues, colOrdersvalues);
+            
+            Version[] versions=null;
+            if (datasets.length ==1)
+                versions=new Version[]{(Version) version.getSelectedItem()};
+            
             if (!overwrite.isSelected())
-                presenter.doExport(datasets, folder.getText(), purpose.getText());
+                presenter.doExport(datasets, versions, folder.getText(), rowFilters, colOrders, purpose.getText(), false);
             else
-                presenter.doExportWithOverwrite(datasets, folder.getText(), purpose.getText());
+                presenter.doExport(datasets, versions, folder.getText(), rowFilters, colOrders, purpose.getText(), true);
 
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
 
             exportButton.setEnabled(false);
         } catch (EmfException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             messagePanel.setError(e.getMessage());
         }
     }
@@ -228,8 +264,21 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         messagePanel.clear();
         refresh();
     }
+    
+    private void validateRowFilterFormat(String rowFilter) throws EmfException {
+        if (rowFilter != null && rowFilter.contains("\""))
+            throw new EmfException("Invalid Row Filter: Please use single quotes instead of double quotes.");
+    }
+
+    public void setRowAndColFilter(String rowFilters, String colOrders) {
+        this.rowFilters = rowFilters;
+        this.colOrders = colOrders;
+    }
+
 
     public void setMostRecentUsedFolder(String mostRecentUsedFolder) {
+        if (datasets.length== 1) 
+            fillVersions(datasets[0]);
         if (mostRecentUsedFolder != null)
             folder.setText(mostRecentUsedFolder);
     }
@@ -259,5 +308,30 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
             throw new EmfException("Export data into user's home directory is not allowed.");
         }
     }
+    
+    private void fillVersions(EmfDataset dataset) {
+        version.setEnabled(true);
+        
+        try {
+            Version[] versions = presenter.getVersions(dataset);
+            version.removeAllItems();
+            version.setModel(new DefaultComboBoxModel(versions));
+            version.revalidate();
+            version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));           
+        } catch (EmfException e) {
+            e.printStackTrace();
+            messagePanel.setError(e.getMessage());
+        }
+    }
+    
+    private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
+        int defaultversion = dataset.getDefaultVersion();
+
+        for (int i = 0; i < versions.length; i++)
+            if (defaultversion == versions[i].getVersion())
+                return i;
+
+        return 0;
+    } 
 
 }

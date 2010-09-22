@@ -268,7 +268,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     private void exportDataset(EmfDataset dataset) {
         EmfDataset[] emfDatasets = {dataset};
 
-        ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager, parentConsole, session);
+        ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager, parentConsole, session, "", "");
         getDesktopPane().add(exportView);
 
         ExportPresenter exportPresenter = new ExportPresenterImpl(this.session);

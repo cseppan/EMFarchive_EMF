@@ -3660,7 +3660,7 @@ public class ManagedCaseService {
 
         // create an exporter to get the string
         DbServer dbServer = this.dbFactory.getDbServer();
-        GenericExporterToString exporter = new GenericExporterToString(dataset, dbServer, dbServer.getSqlDataTypes(),
+        GenericExporterToString exporter = new GenericExporterToString(dataset, "", dbServer,
                 new VersionedDataFormatFactory(version, dataset), null);
 
         // Get the string from the exporter

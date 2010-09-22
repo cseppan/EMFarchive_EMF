@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -26,29 +27,18 @@ public class ExportPresenterImpl implements ExportPresenter {
     public void display(ExportView view) {
         this.view = view;
         view.observe(this);
-        view.setMostRecentUsedFolder(getFolder());
+        view.setMostRecentUsedFolder(getLastFolder());
 
         view.display();
     }
 
-    private String getFolder() {
+    public String getLastFolder() {
         return (lastFolder != null) ? lastFolder : getDefaultFolder();
     }
 
-    public void doExportWithOverwrite(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
-        doExportInvoke(datasets, folder, true, purpose);
-    }
-
-    public void doExport(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
-        doExportInvoke(datasets, folder, false, purpose);
-    }
-
-    /**
-     * This method was modified on 07/13/2007 to convert the calls to use datasetIds instead of
-     * sending the selected datasets back as a collection for export.
-     * Original code is preserved as comments in the method.
-     */
-    private void doExportInvoke(EmfDataset[] datasets, String folder, boolean overwrite, String purpose) throws EmfException {
+    public void doExport(EmfDataset[] datasets, Version[] versions, String folder, String rowFilters, 
+            String colOrders, String purpose, boolean overwrite) throws EmfException {
+      
         ExImService services;
         try {
             services = session.eximService();
@@ -63,14 +53,13 @@ public class ExportPresenterImpl implements ExportPresenter {
             if (dir.isDirectory())
                 lastFolder = folder;
 
-            if (overwrite)
-                services.exportDatasetidsWithOverwrite(session.user(), datasetIds, folder, purpose);
-            else
-                services.exportDatasetids(session.user(), datasetIds, folder, purpose);
+           services.exportDatasetids(session.user(), datasetIds, versions, folder, overwrite, 
+                   rowFilters, colOrders, purpose);
+           
         } catch (Exception e) {
             // NOTE Auto-generated catch block
-            e.printStackTrace();
-            System.out.println("Exporting datasets failed.");
+            //e.printStackTrace();
+            //System.out.println("Exporting datasets failed.");
             throw new EmfException(e.getMessage());
         }
         
@@ -89,4 +78,12 @@ public class ExportPresenterImpl implements ExportPresenter {
 
         return folder;
     }
+
+    public Version[] getVersions(EmfDataset dataset) throws EmfException {
+        if (dataset == null) {
+            return new Version[0];
+        }
+        return session.dataEditorService().getVersions(dataset.getId());
+    }
+
 }

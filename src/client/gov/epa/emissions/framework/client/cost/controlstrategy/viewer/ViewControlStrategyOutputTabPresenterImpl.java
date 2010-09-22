@@ -56,7 +56,8 @@ public class ViewControlStrategyOutputTabPresenterImpl implements ViewControlStr
             versions[i] = service.getVersion(datasets[i], datasets[i].getDefaultVersion());
         }
 
-        service.exportDatasetsWithOverwrite(session.user(), datasets, versions, folder, "Exporting datasets");
+        service.exportDatasets(session.user(), datasets, versions, folder, 
+                true, "", "", "Exporting datasets");
     }
 
     public void doAnalyze(String controlStrategyName, EmfDataset[] datasets) throws EmfException {
