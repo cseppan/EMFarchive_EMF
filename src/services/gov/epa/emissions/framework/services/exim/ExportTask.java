@@ -145,9 +145,7 @@ public class ExportTask extends Task {
 
                 String lineCompare=compareDatasetRecordsNumbers(exportedLineCount, session, dbServer);
                 if (lineCompare.trim().length()> 0 && exportedLineCount == 0){
-                    setErrorStatus(null, lineCompare);
-                    file.delete();
-                    return; 
+                    throw new Exception(lineCompare);
                 }
                 accesslog.setEnddate(new Date());
                 accesslog.setLinesExported(exportedLineCount);
@@ -179,6 +177,8 @@ public class ExportTask extends Task {
                         + " has completed processing making the callback to ExportTaskManager THREAD ID: "
                         + Thread.currentThread().getId());
         } catch (Exception e) {
+            if (file.exists())
+                file.delete();
             setErrorStatus(e, "");
         } finally {
             try {
