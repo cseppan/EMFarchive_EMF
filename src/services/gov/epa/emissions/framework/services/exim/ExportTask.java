@@ -144,13 +144,17 @@ public class ExportTask extends Task {
                     printLogInfo(accesslog);
 
                 String lineCompare=compareDatasetRecordsNumbers(exportedLineCount, session, dbServer);
-
+                if (lineCompare.trim().length()> 0 && exportedLineCount == 0){
+                    setErrorStatus(null, lineCompare);
+                    file.delete();
+                    return; 
+                }
                 accesslog.setEnddate(new Date());
                 accesslog.setLinesExported(exportedLineCount);
 
                 String msghead = "Completed export of " + dataset.getName();
                 String msgend = " in " + accesslog.getTimereqrd() + " seconds.";
-
+ 
                 if (type.getExporterClassName().endsWith("ExternalFilesExporter")) {
                     setStatus("completed", msghead + msgend);
                     accesslog.setFolderPath("");
@@ -327,10 +331,7 @@ public class ExportTask extends Task {
         }
 
         if (records != linesExported) {
-//            setErrorStatus(null, "No. of records in database: " + records + ", but" + " exported " + linesExported
-//                    + " lines");
-            return "No. of records in database: " + records + ", " + " exported " + linesExported ;
-            //return false;
+            return "No. of records in database: " + records + "; " + "Exported: " +linesExported;
         }
 
         return "";

@@ -160,7 +160,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         overwrite.setName("overwrite");
         //overwrite.setVisible(false);
         overwritePanel.add(overwrite, BorderLayout.LINE_START);
-        overwritePanel.setVisible(false);
+        //overwritePanel.setVisible(false);
         layoutGenerator.addLabelWidgetPair(" ",overwritePanel, panel);
         if (datasets.length == 1)    
             layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
