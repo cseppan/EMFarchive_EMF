@@ -15,10 +15,12 @@ import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.EmfArrays;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.AccessLog;
+import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
@@ -60,7 +62,7 @@ public class DatasetDAO {
     private HibernateFacade hibernateFacade;
 
     private DbServerFactory dbServerFactory;
-
+    
     private List strategyList = null;
 
     private List controlProgList = null;
@@ -663,16 +665,17 @@ public class DatasetDAO {
 
     public void deleteDatasets(EmfDataset[] datasets, DbServer dbServer, Session session) throws EmfException {
 
-        EmfDataset[] deletableDatasets = getCaseFreeDatasets(datasets, session);
+        // The following line is commented out because the necessary check has been done
+        // EmfDataset[] deletableDatasets = getCaseFreeDatasets(datasets, session);
         // NOTE: wait till decided by EPA OAQPS
         // checkIfUsedByStrategies(datasetIDs, session);
         // EmfDataset[] deletableDatasets = getControlStrateyFreeDatasets(datasets, session);
 
-        if (deletableDatasets == null || deletableDatasets.length == 0)
+        if (datasets == null || datasets.length == 0)
             return;
 
         Exception exception = null;
-        int[] ids = getIDs(deletableDatasets);
+        int[] ids = getIDs(datasets);
         Datasource datasource = dbServer.getEmissionsDatasource();
         TableCreator emissionTableTool = new TableCreator(datasource);
 
@@ -712,14 +715,14 @@ public class DatasetDAO {
             try {
                 session.clear();
                 session.flush();
-                hibernateFacade.remove(deletableDatasets, session);
+                hibernateFacade.remove(datasets, session);
             } catch (Exception e) {
                 LOG.error(e);
                 exception = e;
             }
 
             try {
-                dropDataTables(deletableDatasets, emissionTableTool);
+                dropDataTables(datasets, emissionTableTool, session);
             } catch (Exception e) {
                 LOG.error(e);
                 exception = e;
@@ -727,7 +730,7 @@ public class DatasetDAO {
         }
 
         if (exception != null) {
-            LOG.error("Error deleting datasets.", exception);
+            LOG.error("Error purging datasets.", exception);
             throw new EmfException(exception.getMessage());
         }
     }
@@ -745,6 +748,25 @@ public class DatasetDAO {
             Case usedCase = (Case) hibernateFacade.get(Case.class, criterion, session).get(0);
             throw new EmfException("Dataset used by case " + usedCase.getName() + ".");
         }
+    }
+    
+    public List<Integer> notUsedByCases(int[] datasetIDs, User user, Session session) throws Exception{
+        // check if dataset is an input dataset for some cases (via the cases.cases_caseinputs table)
+        @SuppressWarnings("unchecked")
+        List<Object[]> list = session.createQuery(
+                "select CI.dataset, c.name from CaseInput as CI, Case as c " + "where (CI.caseID = c.id AND CI.dataset.id = "
+                        + getAndOrClause(datasetIDs, "CI.dataset.id") + ")").list();
+
+        List<Integer> all = EmfArrays.convert(datasetIDs);
+        
+        if (list == null || list.size() == 0)
+            return all;
+        
+        String usedby = "used by case";
+        List<Integer> ids = getUsedDatasetIds(user, session, list, usedby);
+        all.removeAll(ids);
+        
+        return all;
     }
 
     public void checkIfUsedByStrategies(int[] datasetIDs, Session session) throws EmfException {
@@ -767,24 +789,6 @@ public class DatasetDAO {
         if (strategyList != null && strategyList.size() > 0)
             throw new EmfException("Error: dataset used by control strategy " + strategyList.get(0) + ".");
 
-        // // check if dataset is a detailed result dataset for some strategy
-        // list = session.createQuery(
-        // "select cS.name from ControlStrategyResult sR, ControlStrategy cS where sR.controlStrategyId = cS.id "
-        // + "and (sR.detailedResultDataset.id = "
-        // + getAndOrClause(datasetIDs, "sR.detailedResultDataset.id") + ")").list();
-        //
-        // if (list != null && list.size() > 0)
-        // throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
-        //
-        // // check if dataset is a controlled inventory for some strategy
-        // list = session.createQuery(
-        // "select cS.name from ControlStrategyResult sR, ControlStrategy cS where sR.controlStrategyId = cS.id "
-        // + "and (sR.controlledInventoryDataset.id = "
-        // + getAndOrClause(datasetIDs, "sR.controlledInventoryDataset.id") + ")").list();
-        //
-        // if (list != null && list.size() > 0)
-        // throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
-
         // check if dataset is used as a region/county dataset for specific strategy measures
         strategyList = session.createQuery(
                 "select cS.name from ControlStrategy as cS inner join cS.controlMeasures as cM inner join "
@@ -801,6 +805,63 @@ public class DatasetDAO {
         if (strategyList != null && strategyList.size() > 0)
             throw new EmfException("Dataset used by control strategy " + strategyList.get(0) + ".");
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Integer> notUsedByStrategies(int[] datasetIDs, User user, Session session) throws Exception {
+        // check if dataset is an input inventory for some strategy (via the StrategyInputDataset table)
+        List<Object[]> list = session.createQuery(
+                "select iDs.inputDataset, cS.name from ControlStrategy as cS inner join cS.controlStrategyInputDatasets "
+                        + "as iDs inner join iDs.inputDataset as iD with (iD.id = "
+                        + getAndOrClause(datasetIDs, "iD.id") + ")").list();
+
+        List<Integer> all = EmfArrays.convert(datasetIDs);
+        String usedby = "used by control strategy";
+        
+        List<Integer> ids = getUsedDatasetIds(user, session, list, usedby);
+        all.removeAll(ids);
+        
+        // check if dataset is an input inventory for some strategy (via the StrategyResult table, could be here for
+        // historical reasons)
+        list = session.createQuery(
+                "select sR.inputDataset, cS.name from ControlStrategyResult sR, ControlStrategy cS where "
+                        + "sR.controlStrategyId = cS.id and (sR.inputDataset.id = "
+                        + getAndOrClause(EmfArrays.convert(all), "sR.inputDataset.id") + ")").list();
+
+        ids = getUsedDatasetIds(user, session, list, usedby);
+        all.removeAll(ids);
+
+        // check if dataset is used as a region/county dataset for specific strategy measures
+        list = session.createQuery(
+                "select cM.regionDataset, cS.name from ControlStrategy as cS inner join cS.controlMeasures as cM inner join "
+                        + "cM.regionDataset as rD with (rD.id = " + getAndOrClause(EmfArrays.convert(all), "rD.id") + ")").list();
+
+        ids = getUsedDatasetIds(user, session, list, usedby);
+        all.removeAll(ids);
+        
+        // check if dataset is used as a region/county dataset for specific strategy
+        list = session.createQuery(
+                "select cS.countyDataset, cS.name from ControlStrategy cS where (cS.countyDataset.id = "
+                        + getAndOrClause(EmfArrays.convert(all), "cS.countyDataset.id") + ")").list();
+
+        ids = getUsedDatasetIds(user, session, list, usedby);
+        all.removeAll(ids);
+        
+        return all;
+    }
+
+    private List<Integer> getUsedDatasetIds(User user, Session session, List<Object[]> list, String usedby) {
+        List<Integer> ids = new ArrayList<Integer>();
+        
+        if (list != null && list.size() != 0) {
+            for (int i = 0; i < list.size(); i++) {
+                EmfDataset ds = (EmfDataset)list.get(i)[0];
+                ids.add(ds.getId());
+                setStatus(user.getUsername(), "Dataset " + ds.getName() + " " + usedby + ": " + list.get(i)[1] + ".", "Delete Dataset", session);
+            }
+        }
+        
+        return ids;
+    }
 
     public void checkIfUsedByControlPrograms(int[] datasetIDs, Session session) throws EmfException {
         // check if dataset is an input inventory for some control program (via the control_programs table)
@@ -812,10 +873,171 @@ public class DatasetDAO {
             throw new EmfException("Error: dataset used by control program " + controlProgList.get(0) + ".");
 
     }
+    
+    public List<Integer> notUsedByControlPrograms(int[] datasetIDs, User user, Session session) throws Exception {
+        // check if dataset is an input inventory for some control program (via the control_programs table)
+        @SuppressWarnings("unchecked")
+        List<Object[]> list = session.createQuery(
+                "select cP.dataset, cP.name from ControlProgram as cP inner join cP.dataset as d with (d.id = "
+                        + getAndOrClause(datasetIDs, "d.id") + ")").list();
 
-    private void deleteFromEmfTables(int[] datasetIDs, TableCreator tableTool, Session session) throws EmfException {
-        Exception exception = null;
+        List<Integer> all = EmfArrays.convert(datasetIDs);
+        
+        if (list == null || list.size() == 0)
+            return all;
+        
+        List<Integer> ids = getUsedDatasetIds(user, session, list, "used by control program");
+        all.removeAll(ids);
+        
+        return all;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Integer> notUsedBySectorScnarios(int[] datasetIDs, User user, Session session) throws Exception {
+        // check if dataset is an eecsMapppingDataset in SectorScenarion table
+        List<Object[]> list = session.createQuery(
+                "select SS.eecsMapppingDataset, SS.name from SectorScenario as SS inner join SS.eecsMapppingDataset "
+                        + "as eMD with (eMD.id = "
+                        + getAndOrClause(datasetIDs, "eMD.id") + ")").list();
 
+        List<Integer> all = EmfArrays.convert(datasetIDs);
+        String usedby = "used by SectorScenario";
+        
+        List<Integer> ids = getUsedDatasetIds(user, session, list, usedby);
+        all.removeAll(ids);
+        
+        // check if dataset is an sectorMapppingDataset in SectorScenario table
+        list = session.createQuery(
+                "select SS.sectorMapppingDataset, SS.name from SectorScenario as SS inner join SS.sectorMapppingDataset "
+                        + "as sMD with (sMD.id = "
+                        + getAndOrClause(EmfArrays.convert(all), "sMD.id") + ")").list();
+
+        ids = getUsedDatasetIds(user, session, list, usedby);
+        all.removeAll(ids);
+
+        // check if dataset is used as inputDataset for specific SectorScenarioInventory
+        list = session.createQuery(
+                "select invs.dataset, SS.name from SectorScenario as SS inner join SS.inventories "
+                        + "as invs inner join invs.dataset as ds with (ds.id = "
+                        + getAndOrClause(EmfArrays.convert(all), "ds.id") + ")").list();
+
+        ids = getUsedDatasetIds(user, session, list, usedby);
+        all.removeAll(ids);
+        
+        // check if dataset is used as an inventory dataset for specific SectorScenarioOutput
+        list = session.createQuery(
+                "select SSO.inventoryDataset, SS.name from SectorScenario SS, SectorScenarioOutput SSO where "
+                + "(SS.id = SSO.sectorScenarioId AND SSO.inventoryDataset.id = "
+                + getAndOrClause(EmfArrays.convert(all), "SSO.inventoryDataset.id") + ")").list();
+
+        ids = getUsedDatasetIds(user, session, list, usedby);
+        all.removeAll(ids);
+        
+        // check if dataset is used as an output dataset for specific SectorScenarioOutput
+        list = session.createQuery(
+                "select SSO.outputDataset, SS.name from SectorScenario SS, SectorScenarioOutput SSO where "
+                + "(SS.id = SSO.sectorScenarioId AND SSO.outputDataset.id = "
+                + getAndOrClause(EmfArrays.convert(all), "SSO.outputDataset.id") + ")").list();
+
+        ids = getUsedDatasetIds(user, session, list, usedby);
+        all.removeAll(ids);
+        
+        return all;
+    }
+    
+    public List<Integer> notUsedByFast(int[] datasetIDs, User user, DbServer dbServer, Session session) throws Exception {
+        Datasource fast = dbServer.getFastDatasource();
+        DataQuery dataQuery = fast.query();
+        List<Integer> all = EmfArrays.convert(datasetIDs);
+        List<Integer> ids = new ArrayList<Integer>();
+        
+        if (datasetIDs.length == 0) return all;
+        
+        //Check if dataset is in fast.fast_analyses table, 'cancer_risk_dataset_id' column
+        String query = "SELECT fa.cancer_risk_dataset_id, ds.name from fast.fast_analyses as fa, emf.datasets as ds "
+        		+ "where fa.cancer_risk_dataset_id = ds.id AND fa.cancer_risk_dataset_id="
+        		+ getAndOrClause(datasetIDs, "fa.cancer_risk_dataset_id");
+        ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "cancer_risk_dataset_id", session);
+        all.removeAll(ids);
+        
+        //Check if dataset is in fast.fast_analysis_outputs table, 'output_dataset_id' column
+        query = "SELECT fao.output_dataset_id, ds.name from fast.fast_analysis_outputs as fao, emf.datasets as ds "
+            + "where fao.output_dataset_id = ds.id AND fao.output_dataset_id="
+            + getAndOrClause(EmfArrays.convert(all), "fao.output_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "output_dataset_id", session);
+        all.removeAll(ids);
+        
+        //Check if dataset is in fast.fast_datasets table, 'dataset_id' column
+        query = "SELECT fd.dataset_id, ds.name from fast.fast_datasets as fd, emf.datasets as ds "
+            + "where fd.dataset_id = ds.id AND fd.dataset_id="
+            + getAndOrClause(EmfArrays.convert(all), "fd.dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "dataset_id", session);
+        all.removeAll(ids);
+        
+        //Check if dataset is in fast.fast_nonpoint_datasets table, 
+        //'gridded_smk_dataset_id', 'base_nonpoint_dataset_id', 'invtable_dataset_id' column
+        query = "SELECT fnpd.gridded_smk_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd, emf.datasets as ds "
+            + "where fnpd.gridded_smk_dataset_id = ds.id AND fnpd.gridded_smk_dataset_id="
+            + getAndOrClause(EmfArrays.convert(all), "fnpd.gridded_smk_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "gridded_smk_dataset_id", session);
+        all.removeAll(ids);
+        
+        query = "SELECT fnpd.base_nonpoint_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd, emf.datasets as ds "
+            + "where fnpd.base_nonpoint_dataset_id = ds.id AND fnpd.base_nonpoint_dataset_id="
+            + getAndOrClause(EmfArrays.convert(all), "fnpd.base_nonpoint_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "base_nonpoint_dataset_id", session);
+        all.removeAll(ids);
+        
+        query = "SELECT fnpd.invtable_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd, emf.datasets as ds "
+            + "where fnpd.invtable_dataset_id = ds.id AND fnpd.invtable_dataset_id="
+            + getAndOrClause(EmfArrays.convert(all), "fnpd.invtable_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "invtable_dataset_id", session);
+        all.removeAll(ids);
+        
+        //Check if dataset is in fast.fast_run_inventories table, 'inventory_dataset_id' column
+        query = "SELECT fri.inventory_dataset_id, ds.name from fast.fast_run_inventories as fri, emf.datasets as ds "
+            + "where fri.inventory_dataset_id = ds.id AND fri.inventory_dataset_id="
+            + getAndOrClause(EmfArrays.convert(all), "fri.inventory_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "inventory_dataset_id", session);
+        all.removeAll(ids);
+        
+        //Check if dataset is in fast.fast_run_outputs table, 'output_dataset_id' column
+        query = "SELECT fro.output_dataset_id, ds.name from fast.fast_run_outputs as fro, emf.datasets as ds "
+            + "where fro.output_dataset_id = ds.id AND fro.output_dataset_id="
+            + getAndOrClause(EmfArrays.convert(all), "fro.output_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "output_dataset_id", session);
+        all.removeAll(ids);
+        
+        return all;
+    }
+
+    private List<Integer> getRefdDatasetIds(User user, int[] idArray, DataQuery dataQuery, String query, String dsId, Session session)
+            throws SQLException {
+        ResultSet resultSet = null;
+        List<Integer> ids = null;
+        
+        try {
+            ids = EmfArrays.convert(idArray);
+            List<Integer> temp = new ArrayList<Integer>();
+            resultSet = dataQuery.executeQuery(query);
+
+            while (resultSet.next()) {
+                temp.add(resultSet.getInt(dsId));
+                setStatus(user.getUsername(), "Dataset \"" + resultSet.getString("name") + "\" is used by fast ananlysis.", "Delete Dataset", session);
+            }
+            
+            ids = temp;
+        } catch (Exception e) {
+            LOG.error(e);
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+        }
+        
+        return ids;
+    }
+
+    private void deleteFromEmfTables(int[] datasetIDs, TableCreator tableTool, Session session) {
         deleteFromObjectTable(datasetIDs, Version.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, AccessLog.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, DatasetNote.class, "datasetId", session);
@@ -826,16 +1048,12 @@ public class DatasetDAO {
             dropQAStepResultTable(datasetIDs, tableTool, session);
         } catch (Exception e) {
             LOG.error(e);
-            exception = e;
         }
 
         deleteFromObjectTable(datasetIDs, QAStepResult.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, QAStep.class, "datasetId", session);
         deleteFromObjectTable(datasetIDs, ControlStrategyResult.class, "detailedResultDataset.id", session);
         deleteFromObjectTable(datasetIDs, ControlStrategyResult.class, "controlledInventoryDataset.id", session);
-
-        if (exception != null)
-            throw new EmfException(exception.getMessage());
     }
 
     int deleteFromObjectTable(int[] datasetIDs, Class<?> clazz, String attrName, Session session) {
@@ -890,47 +1108,37 @@ public class DatasetDAO {
         }
     }
 
-    private void dropDataTables(EmfDataset[] datasets, TableCreator tableTool) throws EmfException {
-        int problemCount = 0;
-
+    private void dropDataTables(EmfDataset[] datasets, TableCreator tableTool, Session session) {
         for (int i = 0; i < datasets.length; i++) {
             try {
-                dropDataTables(tableTool, datasets[i]);
+                dropDataTables(tableTool, datasets[i], session);
             } catch (Exception exc) {
                 LOG.error(exc);
-                problemCount++;
+                setStatus(datasets[0].getCreator(), exc.getMessage(), "Delete Dataset", session);
             }
         }
-
-        if (problemCount > 0)
-            throw new EmfException("There were problems dropping tables for " + problemCount + " datasets");
     }
 
-    private void dropDataTables(TableCreator tableTool, EmfDataset dataset) throws EmfException {
+    private void dropDataTables(TableCreator tableTool, EmfDataset dataset, Session session) {
         DatasetType type = dataset.getDatasetType();
 
         if (type != null && type.isExternal())
             return;
 
         InternalSource[] sources = dataset.getInternalSources();
-        int problemCount = 0;
 
         for (int i = 0; i < sources.length; i++) {
             try {
-                dropIndividualTable(tableTool, sources[i], type, dataset.getId());
+                dropIndividualTable(tableTool, sources[i], type, dataset.getId(), dataset.getCreator(), session);
             } catch (Exception exc) { // if there is a problem with one table, keep going
-                problemCount++;
                 LOG.error(exc);
+                setStatus(dataset.getCreator(), exc.getMessage(), "Delete Dataset", session);
             }
         }
-
-        if (problemCount > 0)
-            throw new EmfException("There were problems deleting/removing records from " + problemCount
-                    + " tables for dataset " + dataset.getName());
     }
 
-    private void dropIndividualTable(TableCreator tableTool, InternalSource source, DatasetType type, int dsID)
-            throws EmfException {
+    private void dropIndividualTable(TableCreator tableTool, InternalSource source, DatasetType type, 
+            int dsID, String user, Session session) {
         String table = source.getTable();
         String importerclass = (type == null ? "" : type.getImporterClassName());
         importerclass = (importerclass == null ? "" : importerclass.trim());
@@ -952,7 +1160,7 @@ public class DatasetDAO {
                     System.out.println("Data table  " + table + " dropped.");
             }
         } catch (Exception e) {
-            throw new EmfException(e.getMessage());
+            setStatus(user, "Error deleting emission table: " + table + ".", "Delete Dataset", session);
         }
     }
 
@@ -974,11 +1182,14 @@ public class DatasetDAO {
                     System.out.println("QA step result table " + table + " dropped.");
             } catch (Exception e) {
                 LOG.error(e);
+                setStatus("", "Error deleting emission table: " + table + ".", "Delete Dataset", session);
             }
         }
     }
 
     private String getAndOrClause(int[] datasetIDs, String attrName) {
+        if (datasetIDs == null || datasetIDs.length == 0) return "";
+        
         StringBuffer sb = new StringBuffer();
         int numIDs = datasetIDs.length;
 
@@ -1352,5 +1563,16 @@ public class DatasetDAO {
 
         return str.replaceAll("\\\\", "\\\\\\\\");
     }
+    
+    public synchronized void setStatus(String username, String message, String msgType, Session session) {
+        Status endStatus = new Status();
+        endStatus.setUsername(username);
+        endStatus.setType(msgType);
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
+
+        hibernateFacade.add(endStatus, session);
+    }
+
 
 }

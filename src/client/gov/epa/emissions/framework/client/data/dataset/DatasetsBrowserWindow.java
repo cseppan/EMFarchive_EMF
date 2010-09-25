@@ -29,8 +29,8 @@ import gov.epa.emissions.framework.ui.EmfDatasetTableData;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
-import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
@@ -525,10 +525,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         if (selection == JOptionPane.YES_OPTION) {
             try {
                 presenter.doDeleteDataset(datasets.toArray(new EmfDataset[0]));
-                messagePanel.setMessage(datasets.size()
-                        + " datasets have been removed. Please Refresh to see the revised list of Datasets.");
             } catch (EmfException e) {
-                messagePanel.setError(e.getMessage());
+                messagePanel.setMessage(e.getMessage());
             }
         }
     }

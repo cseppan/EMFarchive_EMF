@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.io.VersionedDatasetQuery;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.util.EmfArrays;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.DoubleValue;
@@ -32,6 +33,7 @@ import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class DataServiceImpl implements DataService {
@@ -42,7 +44,7 @@ public class DataServiceImpl implements DataService {
     private DbServerFactory dbServerFactory;
 
     private DatasetDAO dao;
-
+    
     public DataServiceImpl() {
         this(DbServerFactory.get(), HibernateSessionFactory.get());
     }
@@ -235,39 +237,106 @@ public class DataServiceImpl implements DataService {
 
     public synchronized void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
         String prefix = "DELETED_" + new Date().getTime() + "_";
+        int count = 0;
 
         try {
-            if (isRemovable(datasets, owner)) {
-                for (int i = 0; i < datasets.length; i++) {
-                    if (datasets[i].getStatus().equalsIgnoreCase("Deleted"))
-                        continue;
-                    datasets[i].setName(prefix + datasets[i].getName());
-                    datasets[i].setStatus("Deleted");
-                    updateDataset(datasets[i]);
+            EmfDataset[] removables = getRemovableDatasets(datasets, owner);
+                
+            for (EmfDataset ds : removables) {
+                if (ds.getStatus().equalsIgnoreCase("Deleted"))
+                    continue;
+                    
+                try {
+                    ds.setName(prefix + ds.getName());
+                    ds.setStatus("Deleted");
+                    updateDataset(ds);
+                    count++;
+                } catch (Exception e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
         } catch (Exception e) {
             LOG.error("Could not delete datasets: ", e);
             throw new EmfException(e.getMessage());
         }
+        
+        String msg = count + " dataset" + (count > 1 ? "s" : "") + " deleted.";
+        
+        if (count != datasets.length) msg += " Please check status window for details.";
+            
+        throw new EmfException(msg);
     }
 
-    private synchronized boolean isRemovable(EmfDataset[] datasets, User owner) throws EmfException {
+    private EmfDataset[] getRemovableDatasets(EmfDataset[] datasets, User owner) {
+        Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
+        List<EmfDataset> removables = new ArrayList<EmfDataset>();
+        String nonRemovables = "";
         int len = datasets.length;
-        int[] dsIDs = new int[len];
 
         for (int i = 0; i < len; i++) {
-            checkUser(datasets[i], owner);
-            dsIDs[i] = datasets[i].getId();
+            try {
+                checkUser(datasets[i], owner);
+                removables.add(datasets[i]);
+            } catch (EmfException e) {
+                nonRemovables += datasets[i] + ";";
+            }
+        }
+        
+        if (removables.size() < len) {
+            String errMsg = "You are not the creator of dataset(s): " + nonRemovables;
+            dao.setStatus(owner.getUsername(), errMsg, "Delete Dataset", session);
+        }
+        
+        if (removables.size() == 0) return new EmfDataset[0];
+        
+        int[] dsIDs = new int[removables.size()];
+        
+        for (int i = 0; i < dsIDs.length; i++) {
+            dsIDs[i] = removables.get(i).getId();
         }
 
-        checkCase(dsIDs);
-        checkControlStrategy(dsIDs);
-        checkControlProgram(dsIDs);
+        List<Integer> ids = new ArrayList<Integer>();
+        
+        try {
+            ids = getNotRefdDatasetIds(owner, session, dbServer, dsIDs);
+        } catch (Exception e) {
+            LOG.error("Error checking dataset usage: ", e);
+        } 
+            
+        try {
+            if (session != null && session.isConnected())
+                session.close();
+            closeDB(dbServer);
+        } catch (EmfException e) {
+            LOG.error("Could not close db server: ", e);
+        } catch (HibernateException e) {
+            LOG.error("Could not close hibernate session: ", e);
+        }
+        
+        if (ids == null || ids.size() == 0)
+            return new EmfDataset[0];
 
-        return true;
+        List<EmfDataset> list = new ArrayList<EmfDataset>();
+        
+        for (EmfDataset ds : removables)
+            if (ids.contains(new Integer(ds.getId())))
+                list.add(ds);
+                
+        return list.toArray(new EmfDataset[0]);
     }
 
+    private List<Integer> getNotRefdDatasetIds(User owner, Session session, DbServer dbServer, int[] dsIDs) throws Exception {
+        List<Integer> ids;
+        ids = dao.notUsedByCases(dsIDs, owner, session);
+        ids = dao.notUsedByStrategies(EmfArrays.convert(ids), owner, session);
+        ids = dao.notUsedByControlPrograms(EmfArrays.convert(ids), owner, session);
+        ids = dao.notUsedBySectorScnarios(EmfArrays.convert(ids), owner, session);
+        ids = dao.notUsedByFast(EmfArrays.convert(ids), owner, dbServer, session);
+        return ids;
+    }
+    
     private synchronized void checkUser(EmfDataset dataset, User owner) throws EmfException {
         if (!owner.isAdmin() && !dataset.getCreator().equalsIgnoreCase(owner.getUsername())) {
             releaseLockedDataset(owner, dataset);
@@ -374,7 +443,8 @@ public class DataServiceImpl implements DataService {
                 dao.removeEmptyDatasets(user, dbServer, session);
 
             List<EmfDataset> list = dao.deletedDatasets(user, session);
-            dao.deleteDatasets(list.toArray(new EmfDataset[0]), dbServer, session);
+            EmfDataset[] toDelete = getRemovableDatasets(list.toArray(new EmfDataset[0]), user);
+            dao.deleteDatasets(toDelete, dbServer, session);
         } catch (Exception e) {
             LOG.error("Error purging deleted datasets.", e);
             throw new EmfException(e.getMessage());
@@ -1261,193 +1331,6 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-//    public synchronized void importRemoteEMFDataset(int externalDatasetAccessId, User user) throws EmfException {
-//        Connection connection = null;
-//        Statement st = null;
-//        ResultSet rs = null;
-//        Connection connection2 = null;
-//        Statement st2 = null;
-//        String datasetName = "";
-//        String tableName = "";
-//        String newDatasetName = "";
-//        String datasetTypeName = "";
-//        String datasetDescription = "";
-//        Date time = new Date();
-//        Session session = sessionFactory.getSession();
-//        DbServer dbServer = dbServerFactory.getDbServer();
-//        
-//        //testing something here...
-//        try {
-//            connection = new DataSourceFactory().getEISDataSource().getConnection();
-//            System.out.println(new Date());
-//            System.out.println(System.currentTimeMillis());
-//            st = connection.createStatement();
-//            //lets get the remote dataset name and dataset type...
-//            rs = st.executeQuery("select * from emf.get_external_datasets where external_dataset_access_id = " + externalDatasetAccessId + ";");
-//            while (rs.next())
-//            {
-//                datasetName = rs.getString("dataset_name");
-//                datasetTypeName = rs.getString("dataset_type_name");
-//                datasetDescription = rs.getString("dataset_description");
-//                
-//            }
-//
-//
-//            DatasetType datasetType = new DataCommonsDAO().getDatasetType(datasetTypeName, session);
-//            if (datasetType == null) 
-//                throw new EmfException("Unknown dataset type from the remote EMF database.");
-//            System.out.println(new Date());
-//            System.out.println(System.currentTimeMillis());
-//            EmfDataset copied = new EmfDataset();
-//            newDatasetName = getUniqueNewName(datasetName);
-//            copied.setName(newDatasetName);
-//            copied.setDatasetType(datasetType);
-//            copied.setStatus("Started import");
-//            copied.setDescription(datasetDescription);
-//            copied.setCreator(user.getUsername());
-//            copied.setDefaultVersion(0);
-//            copied.setInternalSources(null);
-//
-//            copied.setCreatedDateTime(time);
-//            copied.setAccessedDateTime(time);
-//            copied.setModifiedDateTime(time);
-//
-//            tableName = createTableName(newDatasetName);
-//            TableFormat tableFormat = (new FileFormatFactory(dbServer)).tableFormat(datasetType);
-//            TableCreator creator = new TableCreator(dbServer.getEmissionsDatasource());
-//            try {
-//                if (creator.exists(tableName))
-//                    throw new EmfException("Dataset table '" + tableName + "' already exists.");
-//
-//                creator.create(tableName, tableFormat);
-//            } catch (Exception e) {
-//                throw new EmfException("Could not create table '" + tableName + "'+\n" + e.getMessage());
-//            }
-//
-//            InternalSource internalSource = new InternalSource();
-//            internalSource.setTable(tableName);
-//            internalSource.setType(tableFormat.identify());
-//            internalSource.setCols(colNames(tableFormat.cols()));
-//            internalSource.setSource(copied.getName());
-//            copied.setInternalSources(new InternalSource[] { internalSource });
-//
-////            session.clear();
-//            System.out.println(new Date());
-//            System.out.println(System.currentTimeMillis());
-//            dao.add(copied, session);
-//            System.out.println(new Date());
-//            System.out.println(System.currentTimeMillis());
-//            EmfDataset loaded = dao.getDataset(session, copied.getName());
-//            EmfDataset locked = dao.obtainLocked(user, loaded, session);
-//
-//            System.out.println(new Date());
-//            System.out.println(System.currentTimeMillis());
-//            if (locked == null)
-//                throw new EmfException("Errror importing dataset: can't obtain lock to update dataset.");
-//
-////            try {
-////                if (st != null) {
-////                    if (!st.isClosed()) st.close();
-////                    st = null;
-////                }
-////                if (connection != null) {
-////                    if (!connection.isClosed()) connection.close();
-////                    connection = null;
-////                }
-////            } catch (RuntimeException e) {
-////                // NOTE Auto-generated catch block
-////                e.printStackTrace();
-////            }
-//            
-////            copyDatasetTable(dataset, version, loaded, user, session);
-//            System.out.println(new Date());
-//            System.out.println(System.currentTimeMillis());
-//
-//            Version defaultVersion = new Version(0);
-//            defaultVersion.setName("Initial Version");
-//            defaultVersion.setPath("");
-//            defaultVersion.setCreator(user);
-//            defaultVersion.setDatasetId(locked.getId());
-//            defaultVersion.setLastModifiedDate(time);
-//            defaultVersion.setNumberRecords(0);
-//            defaultVersion.setFinalVersion(true);
-//            dao.add(defaultVersion, session);
-//            session.flush();
-//            
-//            connection2 = new DataSourceFactory().get().getConnection();
-//            System.out.println(new Date());
-//            System.out.println(System.currentTimeMillis());
-//            st2 = connection2.createStatement();
-//            st2.execute("select public.populate_external_dataset(" + externalDatasetAccessId + "::integer, " + locked.getId() + "::integer);");
-//            System.out.println(new Date());
-//            System.out.println(System.currentTimeMillis());
-//        } catch (SQLException e) {
-//            // NOTE Auto-generated catch block
-//            e.printStackTrace();
-//            throw new EmfException(e.getMessage());
-//        } catch (Exception e) {
-//            // NOTE Auto-generated catch block
-//            e.printStackTrace();
-//            throw new EmfException(e.getMessage());
-//        } finally {
-//            session.close();
-//            try {
-//                dbServer.disconnect();
-//                if (rs != null) {
-//                    if (!rs.isClosed()) rs.close();
-//                    rs = null;
-//                }
-//                if (st != null) {
-//                    if (!st.isClosed()) st.close();
-//                    st = null;
-//                }
-//                if (connection != null) {
-//                    if (!connection.isClosed()) connection.close();
-//                    connection = null;
-//                }
-//                if (st2 != null) {
-//                    if (!st2.isClosed()) st2.close();
-//                    st2 = null;
-//                }
-//                if (connection2 != null) {
-//                    if (!connection2.isClosed()) connection2.close();
-//                    connection2 = null;
-//                }
-//            } catch (SQLException e) {
-//                // NOTE Auto-generated catch block
-//                e.printStackTrace();
-//            } catch (Exception e) {
-//                // NOTE Auto-generated catch block
-//                e.printStackTrace();
-//            }
-//                
-//        }
-//      }
-
-//    private String[] colNames(Column[] cols) {
-//        List names = new ArrayList();
-//        for (int i = 0; i < cols.length; i++)
-//            names.add(cols[i].name());
-//
-//        return (String[]) names.toArray(new String[0]);
-//    }
-//    private String createTableName(String name) {
-//        String table = name;
-//        //truncate if necessary so a unique timestamp can be added to ensure uniqueness
-//        if (table.length() > 46) {     //postgresql table name max length is 64
-//            table = table.substring(0, 45);
-//        }
-//
-//        for (int i = 0; i < table.length(); i++) {
-//            if (!Character.isLetterOrDigit(table.charAt(i))) {
-//                table = table.replace(table.charAt(i), '_');
-//            }
-//        }
-//
-//        //add unique timestamp to ensure uniqueness
-//        return table.trim().replaceAll(" ", "_") + "_" + CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date());
-//    }
-
     public String[] getTableColumnDistinctValues(int datasetId, int datasetVersion, String columnName, String whereFilter,
             String sortOrder) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
@@ -1479,4 +1362,5 @@ public class DataServiceImpl implements DataService {
             session.close();
         }
     }
+    
 }

@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.services;
 
-import java.sql.Connection;
-
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.framework.services.persistence.DataSourceFactory;
+
+import java.sql.Connection;
 
 import javax.sql.DataSource;
 
@@ -19,7 +19,7 @@ public class EmfDbServer implements DbServer {
     public static final String EMF_EMF_SCHEMA = "emf";
 
     public static final String EMF_CASE_SCHEMA = "cases";
-
+    
     private DbServer dbServer;
 
     public EmfDbServer() throws Exception {
@@ -69,5 +69,15 @@ public class EmfDbServer implements DbServer {
 
     public Connection getConnection() {
         return dbServer.getConnection();
+    }
+
+    public Datasource getSmsDatasource() {
+        // NOTE Auto-generated method stub
+        return dbServer.getSmsDatasource();
+    }
+
+    public Datasource getFastDatasource() {
+        // NOTE Auto-generated method stub
+        return dbServer.getFastDatasource();
     }
 }
