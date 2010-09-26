@@ -954,56 +954,56 @@ public class DatasetDAO {
         if (datasetIDs.length == 0) return all;
         
         //Check if dataset is in fast.fast_analyses table, 'cancer_risk_dataset_id' column
-        String query = "SELECT fa.cancer_risk_dataset_id, ds.name from fast.fast_analyses as fa, emf.datasets as ds "
-        		+ "where fa.cancer_risk_dataset_id = ds.id AND fa.cancer_risk_dataset_id="
+        String query = "SELECT fa.cancer_risk_dataset_id, ds.name from fast.fast_analyses as fa INNER JOIN emf.datasets as ds "
+        		+ "ON fa.cancer_risk_dataset_id = ds.id WHERE fa.cancer_risk_dataset_id="
         		+ getAndOrClause(datasetIDs, "fa.cancer_risk_dataset_id");
         ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "cancer_risk_dataset_id", session);
         all.removeAll(ids);
         
         //Check if dataset is in fast.fast_analysis_outputs table, 'output_dataset_id' column
-        query = "SELECT fao.output_dataset_id, ds.name from fast.fast_analysis_outputs as fao, emf.datasets as ds "
-            + "where fao.output_dataset_id = ds.id AND fao.output_dataset_id="
+        query = "SELECT fao.output_dataset_id, ds.name from fast.fast_analysis_outputs as fao INNER JOIN emf.datasets as ds "
+            + "ON fao.output_dataset_id = ds.id WHERE fao.output_dataset_id="
             + getAndOrClause(EmfArrays.convert(all), "fao.output_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "output_dataset_id", session);
         all.removeAll(ids);
         
         //Check if dataset is in fast.fast_datasets table, 'dataset_id' column
-        query = "SELECT fd.dataset_id, ds.name from fast.fast_datasets as fd, emf.datasets as ds "
-            + "where fd.dataset_id = ds.id AND fd.dataset_id="
+        query = "SELECT fd.dataset_id, ds.name from fast.fast_datasets as fd INNER JOIN emf.datasets as ds "
+            + "ON fd.dataset_id = ds.id WHERE fd.dataset_id="
             + getAndOrClause(EmfArrays.convert(all), "fd.dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "dataset_id", session);
         all.removeAll(ids);
         
         //Check if dataset is in fast.fast_nonpoint_datasets table, 
         //'gridded_smk_dataset_id', 'base_nonpoint_dataset_id', 'invtable_dataset_id' column
-        query = "SELECT fnpd.gridded_smk_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd, emf.datasets as ds "
-            + "where fnpd.gridded_smk_dataset_id = ds.id AND fnpd.gridded_smk_dataset_id="
+        query = "SELECT fnpd.gridded_smk_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd INNER JOIN emf.datasets as ds "
+            + "ON fnpd.gridded_smk_dataset_id = ds.id WHERE fnpd.gridded_smk_dataset_id="
             + getAndOrClause(EmfArrays.convert(all), "fnpd.gridded_smk_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "gridded_smk_dataset_id", session);
         all.removeAll(ids);
         
-        query = "SELECT fnpd.base_nonpoint_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd, emf.datasets as ds "
-            + "where fnpd.base_nonpoint_dataset_id = ds.id AND fnpd.base_nonpoint_dataset_id="
+        query = "SELECT fnpd.base_nonpoint_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd INNER JOIN emf.datasets as ds "
+            + "ON fnpd.base_nonpoint_dataset_id = ds.id WHERE fnpd.base_nonpoint_dataset_id="
             + getAndOrClause(EmfArrays.convert(all), "fnpd.base_nonpoint_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "base_nonpoint_dataset_id", session);
         all.removeAll(ids);
         
-        query = "SELECT fnpd.invtable_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd, emf.datasets as ds "
-            + "where fnpd.invtable_dataset_id = ds.id AND fnpd.invtable_dataset_id="
+        query = "SELECT fnpd.invtable_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd INNER JOIN emf.datasets as ds "
+            + "ON fnpd.invtable_dataset_id = ds.id WHERE fnpd.invtable_dataset_id="
             + getAndOrClause(EmfArrays.convert(all), "fnpd.invtable_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "invtable_dataset_id", session);
         all.removeAll(ids);
         
         //Check if dataset is in fast.fast_run_inventories table, 'inventory_dataset_id' column
-        query = "SELECT fri.inventory_dataset_id, ds.name from fast.fast_run_inventories as fri, emf.datasets as ds "
-            + "where fri.inventory_dataset_id = ds.id AND fri.inventory_dataset_id="
+        query = "SELECT fri.inventory_dataset_id, ds.name from fast.fast_run_inventories as fri INNER JOIN emf.datasets as ds "
+            + "ON fri.inventory_dataset_id = ds.id WHERE fri.inventory_dataset_id="
             + getAndOrClause(EmfArrays.convert(all), "fri.inventory_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "inventory_dataset_id", session);
         all.removeAll(ids);
         
         //Check if dataset is in fast.fast_run_outputs table, 'output_dataset_id' column
-        query = "SELECT fro.output_dataset_id, ds.name from fast.fast_run_outputs as fro, emf.datasets as ds "
-            + "where fro.output_dataset_id = ds.id AND fro.output_dataset_id="
+        query = "SELECT fro.output_dataset_id, ds.name from fast.fast_run_outputs as fro INNER JOIN emf.datasets as ds "
+            + "ON fro.output_dataset_id = ds.id WHERE fro.output_dataset_id="
             + getAndOrClause(EmfArrays.convert(all), "fro.output_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "output_dataset_id", session);
         all.removeAll(ids);
