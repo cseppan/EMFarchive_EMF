@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -240,5 +241,10 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         } finally {
             //
         }
+    }
+
+    public void doSetTargetPollutants(Pollutant[] pollutants) {
+        // NOTE Auto-generated method stub
+        
     }
 }

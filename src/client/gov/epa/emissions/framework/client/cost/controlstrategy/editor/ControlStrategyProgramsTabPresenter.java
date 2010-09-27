@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.cost.controlprogram.editor.ControlProgramPresenter;
 import gov.epa.emissions.framework.client.cost.controlprogram.editor.ControlProgramPresenterImpl;
@@ -56,6 +57,11 @@ public class ControlStrategyProgramsTabPresenter implements EditControlStrategyT
     public void doEdit(ControlProgramView view, ControlProgram controlProgram) throws EmfException {
         ControlProgramPresenter presenter = new ControlProgramPresenterImpl(controlProgram, session, view);
         presenter.doDisplay();
+    }
+
+    public void doSetTargetPollutants(Pollutant[] pollutants) {
+        // NOTE Auto-generated method stub
+        
     }
     
 }

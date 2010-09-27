@@ -15,6 +15,9 @@ import java.util.Arrays;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -56,18 +59,21 @@ public class TargetPollutantListWidget extends JPanel {
         JPanel buttonPanel = addRemoveButtonPanel();
 
         this.setLayout(new BorderLayout(1, 1));
-        this.add(pane, BorderLayout.WEST);
+        this.add(pane, BorderLayout.CENTER);
         this.add(buttonPanel, BorderLayout.EAST);
     }
 
     private JPanel addRemoveButtonPanel() {
-        JPanel panel = new JPanel(new BorderLayout(1, 1));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         addButton = new AddButton("Add", addAction());
         removeButton = new RemoveButton("Remove", removeAction());
-        addButton.setMargin(new Insets(1, 2, 1, 2));      
-        removeButton.setMargin(new Insets(1, 2, 1, 2));
-        panel.add(addButton, BorderLayout.NORTH);
-        panel.add(removeButton, BorderLayout.SOUTH);
+        addButton.setMargin(new Insets(1, 10, 1, 10));      
+        removeButton.setMargin(new Insets(4, 2, 1, 2));
+        panel.add(addButton);
+        panel.add(new JLabel(" "));
+        panel.add(removeButton);
+        panel.setBorder(BorderFactory.createEmptyBorder(50, 5, 50, 5));
 
         return panel;
     }

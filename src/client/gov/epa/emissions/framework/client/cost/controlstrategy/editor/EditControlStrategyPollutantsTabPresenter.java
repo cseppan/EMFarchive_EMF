@@ -52,4 +52,9 @@ public class EditControlStrategyPollutantsTabPresenter  implements EditControlSt
         // NOTE Auto-generated method stub
         
     }
+
+    public void doSetTargetPollutants(Pollutant[] pollutants) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

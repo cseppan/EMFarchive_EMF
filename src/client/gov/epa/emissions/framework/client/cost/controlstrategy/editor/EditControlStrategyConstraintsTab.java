@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -386,6 +387,11 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     }
 
     public void notifyStrategyRun(ControlStrategy controlStrategy) {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public void setTargetPollutants(Pollutant[] pollutants) {
         // NOTE Auto-generated method stub
         
     }

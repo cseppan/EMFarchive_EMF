@@ -162,6 +162,10 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         this.summaryTabPresenter = new EditControlStrategySummaryTabPresenterImpl(this, controlStrategy, view);
         presenters.add(summaryTabPresenter);
     }
+    
+    public EditControlStrategySummaryTabPresenter getSummaryPresenter() {
+        return this.summaryTabPresenter;
+    }
 
     public void set(EditControlStrategyOutputTabView view) throws EmfException {
         EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(session, view);

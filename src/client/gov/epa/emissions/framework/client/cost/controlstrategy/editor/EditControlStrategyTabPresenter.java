@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
@@ -14,4 +15,6 @@ public interface EditControlStrategyTabPresenter {
     void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults);
 
     void doChangeStrategyType(StrategyType strategyType);
+    
+    void doSetTargetPollutants(Pollutant[] pollutants);
 }

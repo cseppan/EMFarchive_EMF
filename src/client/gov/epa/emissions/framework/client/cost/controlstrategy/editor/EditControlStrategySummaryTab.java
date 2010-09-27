@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -13,12 +14,14 @@ import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlstrategy.TargetPollutantListWidget;
 import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.region.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyTargetPollutant;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.YearValidation;
 import gov.epa.emissions.framework.ui.Border;
@@ -35,13 +38,18 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 public class EditControlStrategySummaryTab extends JPanel implements EditControlStrategySummaryTabView {
@@ -51,6 +59,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private ManageChangeables changeablesList;
 
     private TextField name;
+    
+    private TextField multiPollField;
 
     private TextArea description;
 
@@ -71,10 +81,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private IntTextField inventoryYear;
 
     private ComboBox majorPollutant;
-
-//    private Region[] allRegions;
-
-//    private Project[] allProjects;
+    
+    private JPanel pollutantsPanel;
+    
+    private Pollutant[] targetPollutants;
 
     protected EmfConsole parentConsole;
 
@@ -111,6 +121,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         this.costYearTable = costYearTable;
         this.verifier = new NumberFieldVerifier("Summary tab: ");
         this.presenter = presenter;
+        this.pollutantsPanel = new JPanel(new BorderLayout());
         setLayout();
     }
 
@@ -188,6 +199,14 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
             public void actionPerformed(ActionEvent event) {
                 StrategyType strategyType = (StrategyType)strategyTypeCombo.getSelectedItem();
                 presenter.doChangeStrategyType(strategyType);
+                
+                try {
+                    updatePollutantsPanel(strategyType);
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+                
+                EditControlStrategySummaryTab.this.revalidate();
             }
         });
         strategyTypeCombo.setSelectedItem(controlStrategy.getStrategyType());
@@ -219,12 +238,14 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         JPanel panelBottom = new JPanel(new BorderLayout());
         // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        
+        updatePollutantsPanel(controlStrategy.getStrategyType());
 
         // layoutGenerator.addLabelWidgetPair("Discount Rate:", discountRateTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Cost Year:", costYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Target Year:", inventoryYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Region:", regions(), panel);
-        layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
+        layoutGenerator.addLabelWidgetPair("Target Pollutant:", pollutantsPanel, panel);
         layoutGenerator.addLabelWidgetPair("Discount Rate (%):", discountRate(), panel);
 
         JPanel middleLeftPanel = new JPanel(new SpringLayout());
@@ -256,7 +277,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private DoubleTextField discountRate() {
-        discountRate = new DoubleTextField("discount rate", 1, 20, 10);
+        discountRate = new DoubleTextField("discount rate", 1, 20, 12);
         discountRate.setValue(controlStrategy.getDiscountRate() != null ? controlStrategy.getDiscountRate() : 7.0);
         discountRate.setToolTipText("This value is only used for point sources");
         changeablesList.addChangeable(discountRate);
@@ -276,13 +297,13 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private IntTextField costYearTextField() {
-        costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 10);
+        costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 12);
         costYear.setValue(controlStrategy.getCostYear() != 0 ? controlStrategy.getCostYear() : CostYearTable.REFERENCE_COST_YEAR);
         return costYear;
     }
 
     private IntTextField inventoryYearTextField() {
-        inventoryYear = new IntTextField("Target year", 0, Integer.MAX_VALUE, 10);
+        inventoryYear = new IntTextField("Target year", 0, Integer.MAX_VALUE, 12);
         inventoryYear.setToolTipText("This is the target year for the strategy run, often this is the year of the inventory.");
         if (controlStrategy.getInventoryYear() != 0)
             inventoryYear.setValue(controlStrategy.getInventoryYear());
@@ -341,6 +362,17 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return regionsCombo;
     }
 
+    private void updatePollutantsPanel(StrategyType type) throws EmfException {
+        pollutantsPanel.removeAll();
+        
+        if (type == null || !type.getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION))
+            pollutantsPanel.add(majorPollutants(), BorderLayout.LINE_START);
+        else
+            pollutantsPanel.add(createMultiPollutants(), BorderLayout.LINE_START);
+        
+        pollutantsPanel.validate();
+    }
+    
     private ComboBox majorPollutants() throws EmfException {
         Pollutant[] pollutants = getAllPollutants(this.session);
         majorPollutant = new ComboBox(pollutants);
@@ -350,6 +382,37 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         changeablesList.addChangeable(majorPollutant);
 
         return majorPollutant;
+    }
+    
+    private JPanel createMultiPollutants() {
+        JPanel panel = new JPanel(new BorderLayout());
+        multiPollField = new TextField("multipollfiels", 12);
+        multiPollField.setText(getPollutantsString(controlStrategy.getTargetPollutants()));
+        multiPollField.setEditable(false);
+        
+        Button set = new Button("Set", new AbstractAction(){
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    Pollutant[] pollutants = getAllPollutants(session);
+                    TargetPollutantListWidget pollSetter = new TargetPollutantListWidget(pollutants, changeablesList, parentConsole);
+                    pollSetter.setPollutants(targetPollutants);
+                    pollSetter.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
+                    PollutantsSelectionDialog selectionDialog = new PollutantsSelectionDialog(pollSetter, parentConsole);
+                    selectionDialog.observe(presenter.getSummaryPresenter());
+                    selectionDialog.display();
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+            
+        });
+        
+        panel.add(multiPollField, BorderLayout.LINE_START);
+        panel.add(set, BorderLayout.LINE_END);
+        changeablesList.addChangeable(multiPollField);
+        panel.setPreferredSize(comboSize);
+        
+        return panel;
     }
 
     private Pollutant[] getAllPollutants(EmfSession session) throws EmfException {
@@ -417,6 +480,26 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setTargetPollutant(checkMajorPollutant(!strategyType.getName().equals(StrategyType.projectFutureYearInventory)));
         controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
         controlStrategy.setIncludeUnspecifiedCosts(includeUnspecifiedCostsCheck.isSelected());
+        updateMultiTargetPolls();
+    }
+
+    private void updateMultiTargetPolls() {
+        List<ControlStrategyTargetPollutant> list = new ArrayList<ControlStrategyTargetPollutant>();
+        list.addAll(Arrays.asList(controlStrategy.getTargetPollutants()));
+        List<Pollutant> polTemp = new ArrayList<Pollutant>();
+        
+        for (ControlStrategyTargetPollutant pol : list)
+            polTemp.add(pol.getPollutant());
+        
+        for (Pollutant pol : targetPollutants) {
+            if (!polTemp.contains(pol)) {
+                ControlStrategyTargetPollutant target = new ControlStrategyTargetPollutant();
+                target.setPollutant(pol);
+                list.add(target);
+            }
+        }
+        
+        controlStrategy.setTargetPollutants(list.toArray(new ControlStrategyTargetPollutant[0]));
     }
 
     private double checkDiscountRate() throws EmfException {
@@ -442,6 +525,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private Pollutant checkMajorPollutant(boolean required) throws EmfException {
+        if (majorPollutant == null) return null;
+        
         Pollutant pollutant = (Pollutant) majorPollutant.getSelectedItem();
         if (pollutant == null && required) {
             throw new EmfException("Please select a target pollutant");
@@ -571,5 +656,37 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     public void run(ControlStrategy controlStrategy) {
         // NOTE Auto-generated method stub
         
+    }
+
+    public void setTargetPollutants(Pollutant[] pollutants) {
+        targetPollutants = pollutants;
+        multiPollField.setText(getPollutantsString(pollutants));
+    }
+
+    private String getPollutantsString(Pollutant[] pollutants) {
+        String text = "";
+        
+        for (Pollutant pol : pollutants) {
+            text += pol.getName() + "; ";
+        }
+        
+        return text;
+    }
+    
+    private String getPollutantsString(ControlStrategyTargetPollutant[] polls) {
+        String text = "";
+        
+        if (polls == null || polls.length == 0)
+            return text;
+        
+        targetPollutants = new Pollutant[polls.length];
+        int i = 0;
+        
+        for (ControlStrategyTargetPollutant pol : polls) {
+            text += pol.getPollutant().getName() + "; ";
+            targetPollutants[i++] = pol.getPollutant();
+        }
+        
+        return text;
     }
 }

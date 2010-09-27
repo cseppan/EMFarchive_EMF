@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -263,5 +264,10 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
             if (tableData.rows().size() == 0) 
                 throw new EmfException("Control Programs Tab: The strategy must have at least one control program specified for the run.");
         }
+    }
+
+    public void setTargetPollutants(Pollutant[] pollutants) {
+        // NOTE Auto-generated method stub
+        
     }
 }

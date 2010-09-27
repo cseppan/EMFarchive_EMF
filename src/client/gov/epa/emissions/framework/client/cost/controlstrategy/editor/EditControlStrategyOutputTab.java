@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.InternalSource;
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextField;
@@ -778,6 +779,11 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     public void run(ControlStrategy controlStrategy) {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public void setTargetPollutants(Pollutant[] pollutants) {
         // NOTE Auto-generated method stub
         
     }
