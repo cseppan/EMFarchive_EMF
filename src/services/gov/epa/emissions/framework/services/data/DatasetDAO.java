@@ -927,7 +927,7 @@ public class DatasetDAO {
         // check if dataset is used as an inventory dataset for specific SectorScenarioOutput
         list = session.createQuery(
                 "select SSO.inventoryDataset, SS.name from SectorScenario SS, SectorScenarioOutput SSO where "
-                + "(SS.id = SSO.sectorScenarioId AND SSO.inventoryDataset.id = "
+                + "SS.id = SSO.sectorScenarioId AND (SSO.inventoryDataset.id = "
                 + getAndOrClause(EmfArrays.convert(all), "SSO.inventoryDataset.id") + ")").list();
 
         ids = getUsedDatasetIds(user, session, list, usedby);
@@ -936,7 +936,7 @@ public class DatasetDAO {
         // check if dataset is used as an output dataset for specific SectorScenarioOutput
         list = session.createQuery(
                 "select SSO.outputDataset, SS.name from SectorScenario SS, SectorScenarioOutput SSO where "
-                + "(SS.id = SSO.sectorScenarioId AND SSO.outputDataset.id = "
+                + "SS.id = SSO.sectorScenarioId AND (SSO.outputDataset.id = "
                 + getAndOrClause(EmfArrays.convert(all), "SSO.outputDataset.id") + ")").list();
 
         ids = getUsedDatasetIds(user, session, list, usedby);
