@@ -27,7 +27,7 @@ public class EditControlStrategyTabPresenterImpl implements EditControlStrategyT
     }
     
     public void doChangeStrategyType(StrategyType strategyType) {
-        view.notifyStrategyTypeChange(strategyType);
+        view.fireStrategyTypeChanges(strategyType);
     }
 
     public void doSetTargetPollutants(Pollutant[] pollutants) {

@@ -540,4 +540,9 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         // NOTE Auto-generated method stub
         
     }
+
+    public void fireStrategyTypeChanges(StrategyType strategyType) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

@@ -1,27 +1,33 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.viewer;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfPanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlstrategy.editor.TargetPollutantTableData;
+import gov.epa.emissions.framework.client.cost.controlstrategy.editor.TargetPollutantsPanel;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyTargetPollutant;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.EfficiencyRecordValidation;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class ViewControlStrategyConstraintsTab extends EmfPanel implements ViewControlStrategyConstraintsTabView {
 
@@ -48,6 +54,10 @@ public class ViewControlStrategyConstraintsTab extends EmfPanel implements ViewC
     private TextField controlProgramMeasureMinPctRedDiff;
 
     private ViewControlStrategyConstraintsTabPresenter presenter;
+    
+    private TargetPollutantTableData pollutantsTableData;
+    
+    private TargetPollutantsPanel pollutantsPanel;
 
     private ControlStrategy controlStrategy;
 
@@ -60,6 +70,8 @@ public class ViewControlStrategyConstraintsTab extends EmfPanel implements ViewC
     private JPanel leastCostPanelContainer;
 
     private DecimalFormat decFormat;
+    
+    private EmfConsole parentConsole;
 
     public ViewControlStrategyConstraintsTab(ControlStrategy controlStrategy, MessagePanel messagePanel,
             EmfConsole parentConsole, DesktopManager desktopManager) {
@@ -68,12 +80,25 @@ public class ViewControlStrategyConstraintsTab extends EmfPanel implements ViewC
 
         this.controlStrategy = controlStrategy;
         this.decFormat = new DecimalFormat("###0.0#");
+        this.parentConsole = parentConsole;
     }
 
     private void setupLayout() {
 
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
+        if (controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
+            try {
+                add(getBorderedPanel(createMultiPollutantsPanel(controlStrategy.getTargetPollutants(), 
+                        presenter.getAllPollutants()), "Multi-Pollutant Max Emis Reducation"), BorderLayout.NORTH);
+            } catch (EmfException e) {
+                e.printStackTrace();
+            }
+            
+            return;
+        }
+        
         this.add(getBorderedPanel(createAllStrategiesPanel(), "All Strategy Types"), BorderLayout.NORTH);
 
         leastCostPanelContainer = new JPanel(new BorderLayout());
@@ -105,6 +130,15 @@ public class ViewControlStrategyConstraintsTab extends EmfPanel implements ViewC
 
         return panel;
     }
+    
+    private JPanel createMultiPollutantsPanel(ControlStrategyTargetPollutant[] targets, Pollutant[] all) {
+        pollutantsTableData = new TargetPollutantTableData(targets, all);
+        pollutantsPanel = new TargetPollutantsPanel("Multi-Pollutants", pollutantsTableData, null, parentConsole);
+        pollutantsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        pollutantsPanel.setMinimumSize(new Dimension(80, 100));
+        return pollutantsPanel;
+    }
+
 
     private JPanel createAllStrategiesPanel() {
         ControlStrategyConstraint constraint = presenter.getConstraint();

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.viewer;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -11,11 +12,14 @@ public class ViewControlStrategyConstraintsTabPresenterImpl implements ViewContr
     private ViewControlStrategyConstraintsTabView view;
 
     private ControlStrategy strategy;
+    
+    private EmfSession session;
 
     public ViewControlStrategyConstraintsTabPresenterImpl(ViewControlStrategyConstraintsTabView view,
             ControlStrategy strategy, EmfSession session) {
         this.strategy = strategy;
         this.view = view;
+        this.session = session;
     }
 
     public void doDisplay() {
@@ -44,5 +48,9 @@ public class ViewControlStrategyConstraintsTabPresenterImpl implements ViewContr
     public void doChangeStrategyType(StrategyType strategyType) {
         if (view != null)
             view.notifyStrategyTypeChange(strategyType);
+    }
+
+    public Pollutant[] getAllPollutants() throws EmfException {
+        return session.dataCommonsService().getPollutants();
     }
 }

@@ -270,4 +270,9 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
         // NOTE Auto-generated method stub
         
     }
+
+    public void fireStrategyTypeChanges(StrategyType strategyType) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

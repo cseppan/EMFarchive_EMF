@@ -11,18 +11,21 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyTargetPollutant;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.EfficiencyRecordValidation;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class EditControlStrategyConstraintsTab extends JPanel implements ControlStrategyConstraintsTabView {
 
@@ -44,25 +47,48 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     
     private ControlStrategy controlStrategy;
     
+    private TargetPollutantTableData pollutantsTableData;
+    
     private JPanel leastCostPanel;
 
     private JPanel leastCostCurvePanel;
 
     private JPanel controlProgramPanel;
     
+    private EmfConsole parentConsole;
+    
+    private TargetPollutantsPanel pollutantsPanel;
+    
     private JPanel leastCostPanelContainer;
+    
     private DecimalFormat decFormat;
+    
+    private EmfSession session;
 
     public EditControlStrategyConstraintsTab(ControlStrategy controlStrategy, ManageChangeables changeablesList,
             SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) {
         this.changeablesList = changeablesList;
         this.controlStrategy = controlStrategy;
         this.decFormat = new DecimalFormat("###0.0#");
+        this.parentConsole = parentConsole;
+        this.session = session;
     }
     
     private void setupLayout(ManageChangeables changeables) {
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5)); 
+        
+        if (controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
+            try {
+                add(getBorderedPanel(createMultiPollutantsPanel(controlStrategy.getTargetPollutants(), 
+                        getAllPollutants()), "Multi-Pollutant Max Emis Reducation"), BorderLayout.NORTH);
+            } catch (EmfException e) {
+                e.printStackTrace();
+            }
+            
+            return;
+        }
+        
         this.add(getBorderedPanel(createAllStrategiesPanel(changeables), "All Strategy Types"), BorderLayout.NORTH);
         leastCostPanelContainer = new JPanel(new BorderLayout());
         leastCostPanel = getBorderedPanel(createLeastCostPanel(changeables), "Least Cost");
@@ -81,12 +107,24 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         notifyStrategyTypeChange(controlStrategy.getStrategyType());
     }
 
+    private Pollutant[] getAllPollutants() throws EmfException {
+        return session.dataCommonsService().getPollutants();
+    }
+
     private JPanel getBorderedPanel(JPanel component, String border) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(new Border(border));
         panel.add(component);
 
         return panel;
+    }
+    
+    private JPanel createMultiPollutantsPanel(ControlStrategyTargetPollutant[] targets, Pollutant[] all) {
+        pollutantsTableData = new TargetPollutantTableData(targets, all);
+        pollutantsPanel = new TargetPollutantsPanel("Multi-Pollutants", pollutantsTableData, changeablesList, parentConsole);
+        pollutantsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        pollutantsPanel.setMinimumSize(new Dimension(80, 100));
+        return pollutantsPanel;
     }
 
     private JPanel createAllStrategiesPanel(ManageChangeables changeables) {
@@ -280,6 +318,13 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         ControlStrategyConstraint constraint = null;
         constraint = new ControlStrategyConstraint();
         constraint.setControlStrategyId(controlStrategy.getId());
+        
+        if (controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
+            updateMultiTargetPollConstraints();
+            presenter.setConstraint(constraint);
+            return;
+        }
+
         EfficiencyRecordValidation erValidation = new EfficiencyRecordValidation();
         //make sure constraints are in the correct numerical format... validation will happen in the run method.
         if (contrlEff.getText().trim().length() > 0) constraint.setMaxControlEfficiency(erValidation.parseDouble("maximum control efficieny", contrlEff.getText()));
@@ -324,6 +369,11 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         presenter.setConstraint(constraint);
     }
 
+    private void updateMultiTargetPollConstraints() {
+        ControlStrategyTargetPollutant[] targets = pollutantsTableData.sources();
+        controlStrategy.setTargetPollutants(targets);
+    }
+
     public void refresh(ControlStrategy strategy, ControlStrategyResult[] controlStrategyResults) {
         ControlStrategyConstraint constraint = strategy.getConstraint();
         if (constraint != null) {
@@ -339,9 +389,17 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     public void observe(EditControlStrategyConstraintsTabPresenter presenter) {
         this.presenter = presenter;
     }
+    
+    public void fireStrategyTypeChanges(StrategyType type) {
+        removeAll();
+        controlStrategy.setStrategyType(type);
+        setupLayout(changeablesList);
+        revalidate();
+    }
 
     public void notifyStrategyTypeChange(StrategyType strategyType) {
         leastCostPanelContainer.removeAll();
+        
         if (strategyType != null) {
             if (strategyType.getName().equals(StrategyType.leastCost)) {
                 leastCostPanelContainer.add(leastCostPanel, BorderLayout.NORTH);
@@ -384,6 +442,7 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
             costPerTon.setEnabled(true);
             annCost.setEnabled(true);
         }
+        
     }
 
     public void notifyStrategyRun(ControlStrategy controlStrategy) {

@@ -12,11 +12,14 @@ public class EditControlStrategyConstraintsTabPresenter  implements EditControlS
     private ControlStrategyConstraintsTabView view;
     
     private ControlStrategy strategy;
+    
+    private EmfSession session;
 
     public EditControlStrategyConstraintsTabPresenter(ControlStrategyConstraintsTabView view, 
             ControlStrategy strategy, EmfSession session) {
         this.strategy = strategy;
         this.view = view;
+        this.session = session;
     }
     
     public void doDisplay() {
@@ -49,11 +52,15 @@ public class EditControlStrategyConstraintsTabPresenter  implements EditControlS
 
     public void doChangeStrategyType(StrategyType strategyType) {
         if (view != null)
-            view.notifyStrategyTypeChange(strategyType);
+            view.fireStrategyTypeChanges(strategyType);
     }
 
     public void doSetTargetPollutants(Pollutant[] pollutants) {
         // NOTE Auto-generated method stub
         
+    }
+    
+    public Pollutant[] getAllPollutants() throws EmfException {
+        return session.dataCommonsService().getPollutants();
     }
 }

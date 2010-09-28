@@ -787,4 +787,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         // NOTE Auto-generated method stub
         
     }
+
+    public void fireStrategyTypeChanges(StrategyType strategyType) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

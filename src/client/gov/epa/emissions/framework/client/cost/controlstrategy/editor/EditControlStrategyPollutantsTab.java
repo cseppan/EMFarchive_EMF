@@ -219,4 +219,9 @@ public class EditControlStrategyPollutantsTab extends JPanel implements ControlS
         // NOTE Auto-generated method stub
         
     }
+
+    public void fireStrategyTypeChanges(StrategyType strategyType) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

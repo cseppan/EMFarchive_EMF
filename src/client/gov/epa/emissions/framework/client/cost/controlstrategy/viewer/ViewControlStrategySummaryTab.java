@@ -272,7 +272,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
     
     private JComponent discountRate() {
 
-        this.discountRate = new DoubleTextField("discount rate", 1, 20, 10);
+        this.discountRate = new DoubleTextField("discount rate", 1, 20, 16);
         this.discountRate.setValue(this.controlStrategy.getDiscountRate() != null ? controlStrategy.getDiscountRate()
                 : 7.0);
         this.discountRate.setToolTipText("This value is only used for point sources");
@@ -302,7 +302,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
 
     private JComponent costYearTextField() {
 
-        this.costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 10);
+        this.costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 16);
         this.costYear.setValue(controlStrategy.getCostYear() != 0 ? controlStrategy.getCostYear()
                 : CostYearTable.REFERENCE_COST_YEAR);
         this.costYear.setEditable(false);
@@ -312,7 +312,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
 
     private JComponent inventoryYearTextField() {
 
-        this.inventoryYear = new IntTextField("Target year", 0, Integer.MAX_VALUE, 10);
+        this.inventoryYear = new IntTextField("Target year", 0, Integer.MAX_VALUE, 16);
         this.inventoryYear
                 .setToolTipText("This is the target year for the strategy run, often this is the year of the inventory.");
 
@@ -385,7 +385,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
     
     private JPanel createMultiPollutants() {
         JPanel panel = new JPanel(new BorderLayout());
-        multiPollField = new TextField("multipollfiels", 10);
+        multiPollField = new TextField("multipollfiels", 16);
         multiPollField.setText(getPollutantsString(controlStrategy.getTargetPollutants()));
         multiPollField.setEditable(false);
         panel.add(multiPollField, BorderLayout.LINE_START);

@@ -70,7 +70,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private StrategyType lastStrategyType;
     
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
-        super("Edit Control Strategy", new Dimension(780, 570), desktopManager);
+        super("Edit Control Strategy", new Dimension(780, 600), desktopManager);
 //        this.setMinimumSize(new Dimension(700, 300));
         this.session = session;
         this.desktopManager = desktopManager;

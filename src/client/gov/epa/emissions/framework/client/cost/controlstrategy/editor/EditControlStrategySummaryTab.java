@@ -481,9 +481,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setTargetPollutant(checkMajorPollutant(!strategyType.getName().equals(StrategyType.projectFutureYearInventory)));
         controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
         controlStrategy.setIncludeUnspecifiedCosts(includeUnspecifiedCostsCheck.isSelected());
-        
-        if (strategyType.getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION))
-            updateMultiTargetPolls();
     }
 
     private void updateMultiTargetPolls() {
@@ -665,6 +662,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     public void setTargetPollutants(Pollutant[] pollutants) {
         targetPollutants = pollutants;
         multiPollField.setText(getPollutantsString(pollutants));
+        StrategyType strategyType = (StrategyType)strategyTypeCombo.getSelectedItem();
+        
+        if (strategyType.getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION))
+            updateMultiTargetPolls();
+        
+        presenter.doChangeStrategyType(strategyType); //To notify constraints tab to change accordingly
     }
 
     private String getPollutantsString(Pollutant[] pollutants) {
@@ -692,5 +695,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         }
         
         return text;
+    }
+
+    public void fireStrategyTypeChanges(StrategyType strategyType) {
+        // NOTE Auto-generated method stub
+        
     }
 }
