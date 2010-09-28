@@ -238,7 +238,6 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
             String rowFiltersvalues= rowFilter.getText().trim();
             String colOrdersvalues = colOrder.getText().trim();
             validateRowFilterFormat(rowFiltersvalues);
-            //validateCols(colOrdersvalues);
             setRowAndColFilter(rowFiltersvalues, colOrdersvalues);
             
             Version[] versions=null;

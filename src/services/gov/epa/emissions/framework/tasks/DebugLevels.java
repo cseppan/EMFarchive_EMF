@@ -22,5 +22,5 @@ public class DebugLevels {
     public static final boolean DEBUG_18 = false; //to trace timing in various functions
     public static final boolean DEBUG_19 = false; //to trace get page issues
     public static final boolean DEBUG_20 = false; //to trace case ModelToRun issues
-    public static final boolean DEBUG_21 = true;
+    public static final boolean DEBUG_21 = false;
 }

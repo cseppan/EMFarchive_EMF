@@ -229,7 +229,7 @@ public class ExportTask extends Task {
             dbServer = this.dbFactory.getDbServer();
             VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer
                     .getSqlDataTypes(), batchSize(session));
-            Exporter exporter = exporterFactory.create(dataset, version, "", "");
+            Exporter exporter = exporterFactory.create(dataset, version, rowFilters, colOrders);
 
             if (exporter instanceof ExternalFilesExporter)
                 ((ExternalFilesExporter) exporter).setExternalSources(extSrcs);

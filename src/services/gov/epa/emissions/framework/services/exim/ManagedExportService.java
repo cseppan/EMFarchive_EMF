@@ -409,7 +409,7 @@ public class ManagedExportService {
             // don't need to log messages about exporting to existing file
             if (e.getMessage() != null && e.getMessage().indexOf("existing file") < 0)
                 log.error("ERROR starting to export to folder: " + dirName, e);
-            e.printStackTrace();
+            //e.printStackTrace();
             throw new EmfException("Export failed: " + e.getMessage());
         }
 
