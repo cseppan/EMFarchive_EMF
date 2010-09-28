@@ -74,7 +74,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     }
 
     public void display(EmfDataset dataset, Version version) {
-        super.setTitle("Dataset Properties View: " + dataset.getName());
+        super.setTitle("Dataset Properties View: " + dataset.getName()+ " (ID = "+dataset.getId() + ")");
         super.setName("datasetPropertiesView:" + dataset.getId());
         this.version=version; 
         this.dataset=dataset; 
