@@ -481,7 +481,9 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setTargetPollutant(checkMajorPollutant(!strategyType.getName().equals(StrategyType.projectFutureYearInventory)));
         controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
         controlStrategy.setIncludeUnspecifiedCosts(includeUnspecifiedCostsCheck.isSelected());
-        updateMultiTargetPolls();
+        
+        if (strategyType.getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION))
+            updateMultiTargetPolls();
     }
 
     private void updateMultiTargetPolls() {
