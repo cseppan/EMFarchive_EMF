@@ -136,7 +136,9 @@ public class SummaryTab extends JPanel implements SummaryTabView, RefreshObserve
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // name
-        layoutGenerator.addLabelWidgetPair("Name:", new JLabel(dataset.getName()), panel);
+//      layoutGenerator.addLabelWidgetPair("Name:", new JLabel(dataset.getName()), panel);
+        layoutGenerator.addLabelWidgetPair("Name:", new JLabel(dataset.getName() + " (ID = " + dataset.getId() + ")"), panel);
+
 
         // description
         TextArea description = new TextArea("description", dataset.getDescription());
@@ -144,7 +146,7 @@ public class SummaryTab extends JPanel implements SummaryTabView, RefreshObserve
         ScrollableComponent viewableTextArea = new ScrollableComponent(description);
         viewableTextArea.setPreferredSize(new Dimension(575,100));
         layoutGenerator.addLabelWidgetPair("Description:", viewableTextArea, panel);
-        
+
         //old version of command before changes
         //layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
 
