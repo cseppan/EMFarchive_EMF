@@ -41,6 +41,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -485,18 +486,19 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private void updateMultiTargetPolls() {
         List<ControlStrategyTargetPollutant> list = new ArrayList<ControlStrategyTargetPollutant>();
-        list.addAll(Arrays.asList(controlStrategy.getTargetPollutants()));
-        List<Pollutant> polTemp = new ArrayList<Pollutant>();
+        ControlStrategyTargetPollutant[] exists = controlStrategy.getTargetPollutants();
+        HashMap<Pollutant, ControlStrategyTargetPollutant> map = new HashMap<Pollutant, ControlStrategyTargetPollutant>();
         
-        for (ControlStrategyTargetPollutant pol : list)
-            polTemp.add(pol.getPollutant());
+        for (ControlStrategyTargetPollutant pol : exists)
+            map.put(pol.getPollutant(), pol);
         
         for (Pollutant pol : targetPollutants) {
-            if (!polTemp.contains(pol)) {
+            if (!map.containsKey(pol)) {
                 ControlStrategyTargetPollutant target = new ControlStrategyTargetPollutant();
                 target.setPollutant(pol);
                 list.add(target);
-            }
+            } else
+                list.add(map.get(pol));
         }
         
         controlStrategy.setTargetPollutants(list.toArray(new ControlStrategyTargetPollutant[0]));
