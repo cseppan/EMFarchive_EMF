@@ -144,7 +144,7 @@ public class ExportTask extends Task {
                     printLogInfo(accesslog);
 
                 String lineCompare=compareDatasetRecordsNumbers(exportedLineCount, session, dbServer);
-                if (lineCompare.trim().length()> 0 && exportedLineCount == 0){
+                if (exportedLineCount == 0){
                     throw new Exception(lineCompare);
                 }
                 accesslog.setEnddate(new Date());
@@ -154,11 +154,13 @@ public class ExportTask extends Task {
                 String msgend = " in " + accesslog.getTimereqrd() + " seconds.";
  
                 if (type.getExporterClassName().endsWith("ExternalFilesExporter")) {
+                    System.out.println(msghead + msgend);
                     setStatus("completed", msghead + msgend);
                     accesslog.setFolderPath("");
-                } else
+                } else{
+                    System.out.println(msghead + " to " + file.getAbsolutePath() + msgend + "\n"+ lineCompare );
                     setStatus("completed", msghead + " to " + file.getAbsolutePath() + msgend + "\n"+ lineCompare );
-
+                }
             } // if file exists
             // NOTE: want to check if accesslog exists for the same dataset, version, and description.
             // If it is there, don't set accesslog.
