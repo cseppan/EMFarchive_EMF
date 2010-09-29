@@ -140,13 +140,14 @@ public class ExportTask extends Task {
                 exporter.export(file);
 
                 exportedLineCount = exporter.getExportedLinesCount();
+                String lineCompare=compareDatasetRecordsNumbers(exportedLineCount, session, dbServer);
                 if (DebugLevels.DEBUG_1)
                     printLogInfo(accesslog);               
                 if (exportedLineCount == 0){
                     throw new Exception("ERROR: <"+dataset.getName()+
                             "> will not be exported because no records satisfied the filter. " );
                 }
-                String lineCompare=compareDatasetRecordsNumbers(exportedLineCount, session, dbServer);
+                
                 accesslog.setEnddate(new Date());
                 accesslog.setLinesExported(exportedLineCount);
 
@@ -332,11 +333,10 @@ public class ExportTask extends Task {
             throw new Exception("Error determining number of records: " + e.getMessage());
         }
 
-        if (records != linesExported) {
+        if (records != linesExported)
             return "No. of records in database: " + records + "; " + "Exported: " +linesExported;
-        }
 
-        return "";
+        return "No. of records exported: " + linesExported;
     }
 
     private void setErrorStatus(Exception e, String message) {
