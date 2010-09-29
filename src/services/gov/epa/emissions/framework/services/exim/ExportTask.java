@@ -143,9 +143,8 @@ public class ExportTask extends Task {
                 if (DebugLevels.DEBUG_1)
                     printLogInfo(accesslog);               
                 if (exportedLineCount == 0){
-                    throw new Exception("ERROR:"+dataset.getName()+
-                            " will not be exported because no records satisfied the filter \n" 
-                            +"Criteria: "+rowFilters);
+                    throw new Exception("ERROR: <"+dataset.getName()+
+                            "> will not be exported because no records satisfied the filter. " );
                 }
                 String lineCompare=compareDatasetRecordsNumbers(exportedLineCount, session, dbServer);
                 accesslog.setEnddate(new Date());
@@ -342,13 +341,13 @@ public class ExportTask extends Task {
 
     private void setErrorStatus(Exception e, String message) {
         if (log != null && file != null && e != null) {
-            log.error("Problem attempting to export file : " + file + " " + message, e);
+            log.error("Problem attempting to export file : " + file + " " + message+ " Criteria: <"+rowFilters +">", e);
         } else if (e != null) {
             if (message != null)
                 System.out.println("Message = " + message);
             e.printStackTrace();
         }
-        setStatus("failed", "Export failure. " + message + ((e == null) ? "" : e.getMessage()));
+        setStatus("failed", "Export failure. " + message + ((e == null) ? "" : e.getMessage()) + "\nCriteria: <"+rowFilters +">");
     }
 
     private void setStartStatus() {
