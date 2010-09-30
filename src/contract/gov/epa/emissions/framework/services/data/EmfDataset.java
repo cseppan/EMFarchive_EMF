@@ -89,7 +89,7 @@ public class EmfDataset implements Dataset, Lockable, Comparable<EmfDataset> {
 
     //constructor is really only useful for reporting purposes, the datasettype should be a
     //heavyweight object, not a light object like this...
-    public EmfDataset(int id, String name, 
+    public EmfDataset(int id, String name, int defaultVersion, 
             Date modifiedDateTime, int datasetTypeId, 
             String datasetTypeName, String status,
             String creator, String creatorFullName, String intendedUse, 
@@ -99,6 +99,7 @@ public class EmfDataset implements Dataset, Lockable, Comparable<EmfDataset> {
         this();
         this.id = id;
         this.name = name;
+        this.defaultVersion = defaultVersion;
         this.modifiedDateTime = modifiedDateTime;
         this.datasetType = new DatasetType(datasetTypeId, datasetTypeName);
         this.status = status;

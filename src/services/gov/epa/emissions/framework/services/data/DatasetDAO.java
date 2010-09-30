@@ -152,7 +152,7 @@ public class DatasetDAO {
     public List allNonDeleted(Session session) {
         return session
                 .createQuery(
-                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
+                        "select new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse as IU left join DS.project as P left join DS.region as R "
                                 + " where DS.status <> 'Deleted' order by DS.name").list();
     }
@@ -161,7 +161,7 @@ public class DatasetDAO {
         String ns = getPattern(nameContains.toLowerCase().trim());
         return session
                 .createQuery(
-                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
+                        "select new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse as IU left join DS.project as P left join DS.region as R "
                                 + " where lower(DS.name) like "
                                 + ns
@@ -346,7 +346,7 @@ public class DatasetDAO {
     public List getDatasets(Session session, int datasetTypeId) {
         return session
                 .createQuery(
-                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime,DS.stopDateTime, DS.temporalResolution) "
+                        "select new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime,DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse as IU left join DS.project as P left join DS.region as R "
                                 + " where DS.datasetType.id = "
                                 + datasetTypeId
@@ -357,7 +357,7 @@ public class DatasetDAO {
         String ns = getPattern(nameContains.toLowerCase().trim());
         return session
                 .createQuery(
-                        "select new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
+                        "select new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse as IU left join DS.project as P left join DS.region as R "
                                 + " where DS.datasetType.id = "
                                 + datasetTypeId
@@ -1498,7 +1498,7 @@ public class DatasetDAO {
         String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE "
                 + getPattern(desc.toLowerCase().trim()));
         String dsProjStr = (ds.getProject() == null ? "" : " AND DS.project.id = " + ds.getProject().getId());
-        String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
+        String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
                 + " DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
                 + " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse as IU LEFT JOIN DS.project as P LEFT JOIN DS.region as R "
                 + dsKeyStr
@@ -1512,7 +1512,7 @@ public class DatasetDAO {
         List<EmfDataset> ds1 = session.createQuery(dsquery).list();
 
         String dsTypeKeyStr = getDSTypeKeyStr(ds.getKeyVals());
-        String dstypequery = "SELECT new EmfDataset(DS.id, DS.name, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
+        String dstypequery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
                 + " DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
                 + " FROM EmfDataset AS DS"
                 + (dsTypeKeyStr.isEmpty() ? "" : ", DatasetType AS TYPE")

@@ -326,10 +326,10 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
         int defaultversion = dataset.getDefaultVersion();
 
-        for (int i = 0; i < versions.length; i++)
+        for (int i = 0; i < versions.length; i++){
             if (defaultversion == versions[i].getVersion())
                 return i;
-
+        }
         return 0;
     } 
 
