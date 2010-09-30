@@ -2,7 +2,7 @@
 --select public.create_projected_future_year_inventory(81, 399, 0, 2750, 2822)
 
 CREATE OR REPLACE FUNCTION public.create_projected_future_year_inventory(
-	control_strategy_id integer, 
+	int_control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer, 
 	strategy_result_id integer, 
@@ -78,7 +78,7 @@ BEGIN
 		cs.use_cost_equations,
 		cs.discount_rate / 100
 	FROM emf.control_strategies cs
-	where cs.id = control_strategy_id
+	where cs.id = int_control_strategy_id
 	INTO target_pollutant_id,
 		inv_filter,
 		cost_year,

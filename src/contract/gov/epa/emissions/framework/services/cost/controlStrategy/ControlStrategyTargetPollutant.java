@@ -24,6 +24,10 @@ public class ControlStrategyTargetPollutant implements Serializable {
         //
     }
     
+    public ControlStrategyTargetPollutant(Pollutant pollutant) {
+        this.pollutant = pollutant;
+    }
+
     public int getId() {
         return id;
     }

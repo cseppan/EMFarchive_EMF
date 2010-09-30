@@ -18,9 +18,14 @@ public class ViewSectorScenarioPresenterImpl  extends EditSectorScenarioPresente
     }
 
     public void doDisplay() throws EmfException {
-        super.doDisplay();
-        ((ViewSectorScenarioView)view).viewOnly();
+        view.observe(this);
+
+        sectorScenario = session.sectorScenarioService().getById(sectorScenario.getId());
         
+        view.display(sectorScenario);
+        
+        //make all things non-editable
+        ((ViewSectorScenarioView)view).viewOnly();
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {
             EditSectorScenarioTabPresenter element = (EditSectorScenarioTabPresenter) iter.next();
             element.doViewOnly();

@@ -292,7 +292,7 @@ CREATE TABLE emf.internal_sources
   table_name varchar(255) NOT NULL,
   table_type varchar(255) NOT NULL,
   table_columns text NOT NULL,
-  file_size int4 NOT NULL, 
+  file_size int8 NOT NULL, 
   UNIQUE (dataset_id, datasource,table_name)
 ) 
 WITHOUT OIDS;

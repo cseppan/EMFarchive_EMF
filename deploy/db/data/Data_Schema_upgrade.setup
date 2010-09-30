@@ -1059,3 +1059,5 @@ insert into emf.keywords ("name") values('REQUIRED_HEADER');
 insert into emf.keywords ("name") values('INDICES');
 
 
+-- 09/24/2010 -- file_size should be a bigint not an int -- too small for large datasets
+ALTER TABLE internal_sources ALTER file_size TYPE bigint;

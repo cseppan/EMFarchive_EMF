@@ -953,10 +953,45 @@ public class DatasetDAO {
         
         if (datasetIDs.length == 0) return all;
         
+        //Check if dataset is in fast.fast_runs table, 'cancer_risk_dataset_id' column
+        String query = "SELECT fr.cancer_risk_dataset_id, ds.name from fast.fast_runs as fr INNER JOIN emf.datasets as ds "
+                + "ON fr.cancer_risk_dataset_id = ds.id WHERE fr.cancer_risk_dataset_id="
+                + getAndOrClause(datasetIDs, "fr.cancer_risk_dataset_id");
+        ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "cancer_risk_dataset_id", session);
+        all.removeAll(ids);
+        
+        //Check if dataset is in fast.fast_runs table, 'species_mapping_dataset_id' column
+        query = "SELECT fr.species_mapping_dataset_id, ds.name from fast.fast_runs as fr INNER JOIN emf.datasets as ds "
+                + "ON fr.species_mapping_dataset_id = ds.id WHERE fr.species_mapping_dataset_id="
+                + getAndOrClause(datasetIDs, "fr.species_mapping_dataset_id");
+        ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "species_mapping_dataset_id", session);
+        all.removeAll(ids);
+        
+        //Check if dataset is in fast.fast_runs table, 'transfer_coefficients_dataset_id' column
+        query = "SELECT fr.transfer_coefficients_dataset_id, ds.name from fast.fast_runs as fr INNER JOIN emf.datasets as ds "
+                + "ON fr.transfer_coefficients_dataset_id = ds.id WHERE fr.transfer_coefficients_dataset_id="
+                + getAndOrClause(datasetIDs, "fr.transfer_coefficients_dataset_id");
+        ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "transfer_coefficients_dataset_id", session);
+        all.removeAll(ids);
+        
+        //Check if dataset is in fast.fast_runs table, 'domain_population_dataset_id' column
+        query = "SELECT fr.domain_population_dataset_id, ds.name from fast.fast_runs as fr INNER JOIN emf.datasets as ds "
+                + "ON fr.domain_population_dataset_id = ds.id WHERE fr.domain_population_dataset_id="
+                + getAndOrClause(datasetIDs, "fr.domain_population_dataset_id");
+        ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "domain_population_dataset_id", session);
+        all.removeAll(ids);
+        
+        //Check if dataset is in fast.fast_runs table, 'invtable_dataset_id' column
+        query = "SELECT fr.invtable_dataset_id, ds.name from fast.fast_runs as fr INNER JOIN emf.datasets as ds "
+            + "ON fr.invtable_dataset_id = ds.id WHERE fr.invtable_dataset_id="
+            + getAndOrClause(EmfArrays.convert(all), "fr.invtable_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "invtable_dataset_id", session);
+        all.removeAll(ids);
+        
         //Check if dataset is in fast.fast_analyses table, 'cancer_risk_dataset_id' column
-        String query = "SELECT fa.cancer_risk_dataset_id, ds.name from fast.fast_analyses as fa INNER JOIN emf.datasets as ds "
-        		+ "ON fa.cancer_risk_dataset_id = ds.id WHERE fa.cancer_risk_dataset_id="
-        		+ getAndOrClause(datasetIDs, "fa.cancer_risk_dataset_id");
+        query = "SELECT fa.cancer_risk_dataset_id, ds.name from fast.fast_analyses as fa INNER JOIN emf.datasets as ds "
+                + "ON fa.cancer_risk_dataset_id = ds.id WHERE fa.cancer_risk_dataset_id="
+                + getAndOrClause(datasetIDs, "fa.cancer_risk_dataset_id");
         ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "cancer_risk_dataset_id", session);
         all.removeAll(ids);
         
@@ -1023,7 +1058,7 @@ public class DatasetDAO {
 
             while (resultSet.next()) {
                 temp.add(resultSet.getInt(dsId));
-                setStatus(user.getUsername(), "Dataset \"" + resultSet.getString("name") + "\" is used by fast ananlysis.", "Delete Dataset", session);
+                setStatus(user.getUsername(), "Dataset \"" + resultSet.getString("name") + "\" is used by either a FAST run or analysis.", "Delete Dataset", session);
             }
             
             ids = temp;

@@ -73,7 +73,7 @@ public class DatasetCreator {
             EmfDataset inputDataset, DatasetType type, 
             TableFormat tableFormat, String description) throws EmfException {
         String outputDatasetName = createResultDatasetName(datasetNamePrefix, inputDataset);
-        String outputTableName = createTableName(tablePrefix, inputDataset);
+        String outputTableName = createTableName(tablePrefix, datasetNamePrefix);
         
         //create dataset
         EmfDataset dataset = createDataset(outputDatasetName, description, type, inputDataset);

@@ -78,16 +78,16 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5)); 
         
-        if (controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
-            try {
-                add(getBorderedPanel(createMultiPollutantsPanel(controlStrategy.getTargetPollutants(), 
-                        getAllPollutants()), "Multi-Pollutant Max Emis Reducation"), BorderLayout.NORTH);
-            } catch (EmfException e) {
-                e.printStackTrace();
-            }
-            
-            return;
-        }
+//        if (controlStrategy.getStrategyType() != null && controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
+//            try {
+//                add(getBorderedPanel(createMultiPollutantsPanel(controlStrategy.getTargetPollutants(), 
+//                        getAllPollutants()), "Multi-Pollutant Max Emis Reducation"), BorderLayout.NORTH);
+//            } catch (EmfException e) {
+//                e.printStackTrace();
+//            }
+//            
+//            return;
+//        }
         
         this.add(getBorderedPanel(createAllStrategiesPanel(changeables), "All Strategy Types"), BorderLayout.NORTH);
         leastCostPanelContainer = new JPanel(new BorderLayout());
@@ -319,11 +319,11 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         constraint = new ControlStrategyConstraint();
         constraint.setControlStrategyId(controlStrategy.getId());
         
-        if (controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
-            updateMultiTargetPollConstraints();
-            presenter.setConstraint(constraint);
-            return;
-        }
+//        if (controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
+//            updateMultiTargetPollConstraints();
+//            presenter.setConstraint(constraint);
+//            return;
+//        }
 
         EfficiencyRecordValidation erValidation = new EfficiencyRecordValidation();
         //make sure constraints are in the correct numerical format... validation will happen in the run method.

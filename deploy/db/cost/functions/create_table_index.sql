@@ -7,6 +7,8 @@ DECLARE
 	already_has_index boolean := false;
 BEGIN
 
+	table_name := lower(table_name);
+	table_col_list := lower(table_col_list);
 
 	-- first lets see if there is already an index on the table with the same columns
 	-- specified...
@@ -62,7 +64,8 @@ DECLARE
 	has_columns boolean := false;
 	already_has_index boolean := false;
 BEGIN
-
+	table_name := lower(table_name);
+	table_col_list := lower(table_col_list);
 
 	-- first lets see if there is already an index on the table with the same columns
 	-- specified...
@@ -112,3 +115,4 @@ END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE;
 ALTER FUNCTION public.create_table_index(table_name character varying, table_col_list character varying, index_name_prefix character varying, clustered boolean) OWNER TO emf;
+

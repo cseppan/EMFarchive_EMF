@@ -243,8 +243,11 @@ public class DataServiceImpl implements DataService {
             EmfDataset[] removables = getRemovableDatasets(datasets, owner);
                 
             for (EmfDataset ds : removables) {
-                if (ds.getStatus().equalsIgnoreCase("Deleted"))
+                if (ds.getStatus().equalsIgnoreCase("Deleted")) {
+                    //update count, useful for strategy runs...
+                    count++;
                     continue;
+                }
                     
                 try {
                     ds.setName(prefix + ds.getName());

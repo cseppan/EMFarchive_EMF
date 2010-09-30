@@ -478,7 +478,18 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setDiscountRate(checkDiscountRate());
         StrategyType strategyType = checkStrategyType();
         controlStrategy.setStrategyType(strategyType);
-        controlStrategy.setTargetPollutant(checkMajorPollutant(!strategyType.getName().equals(StrategyType.projectFutureYearInventory)));
+        if (!strategyType.getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
+            controlStrategy.setTargetPollutant(checkMajorPollutant(!strategyType.getName().equals(StrategyType.projectFutureYearInventory)));
+        } else {
+            List<ControlStrategyTargetPollutant> list = new ArrayList<ControlStrategyTargetPollutant>();
+            for (String targetPollutantName : multiPollField.getText().split("; ")) {
+                for (Pollutant pollutant : getAllPollutants(this.session)) {
+                    if (pollutant.getName().equals(targetPollutantName))
+                        list.add(new ControlStrategyTargetPollutant(pollutant));
+                }
+            }
+            controlStrategy.setTargetPollutants(list.toArray(new ControlStrategyTargetPollutant[0]));
+        }
         controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
         controlStrategy.setIncludeUnspecifiedCosts(includeUnspecifiedCostsCheck.isSelected());
     }

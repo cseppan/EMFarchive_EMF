@@ -1400,6 +1400,6 @@ ALTER TABLE emf.control_strategy_target_pollutants
   ADD min_ann_cost double precision,
   ADD replacement_control_min_eff_diff double precision;
   
-  insert into emf.strategy_types values(DEFAULT,'Multi-Pollutant Max Emissions Reduction','Multi-Pollutant Max Emissions Reduction', '', 'gov.epa.emissions.framework.services.cost.analysis.multiPollutantMaxEmisRed.StrategyTask');
+insert into emf.strategy_types values(DEFAULT,'Multi-Pollutant Max Emissions Reduction','Multi-Pollutant Max Emissions Reduction', '', 'gov.epa.emissions.framework.services.cost.analysis.multiPollutantMaxEmisRed.StrategyTask');
 
 
