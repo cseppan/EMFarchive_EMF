@@ -347,7 +347,7 @@ public class ExportTask extends Task {
                 System.out.println("Message = " + message);
             e.printStackTrace();
         }
-        setStatus("failed", "Export failure. " + message + ((e == null) ? "" : e.getMessage()) + (rowFilters.length()>0? " Criteria: "+rowFilters :""));
+        setStatus("failed", "Export failure. " + message + ((e == null) ? "" : e.getMessage()) + (rowFilters.length()>0? "\nCriteria: "+rowFilters :""));
     }
 
     private void setStartStatus() {
