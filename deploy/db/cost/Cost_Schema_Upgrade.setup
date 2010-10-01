@@ -1392,7 +1392,7 @@ ALTER FUNCTION public.run_sum(numeric, numeric, text) OWNER TO emf;
 
 
 
--- 09/12/2010 -- add new constraint columns to the control strategy target pollutant table 
+-- 09/20/2010 -- add new constraint columns to the control strategy target pollutant table 
 ALTER TABLE emf.control_strategy_target_pollutants 
   ADD max_emis_reduction double precision,
   ADD max_control_efficiency double precision,
@@ -1400,6 +1400,7 @@ ALTER TABLE emf.control_strategy_target_pollutants
   ADD min_ann_cost double precision,
   ADD replacement_control_min_eff_diff double precision;
   
-insert into emf.strategy_types values(DEFAULT,'Multi-Pollutant Max Emissions Reduction','Multi-Pollutant Max Emissions Reduction', '', 'gov.epa.emissions.framework.services.cost.analysis.multiPollutantMaxEmisRed.StrategyTask');
+-- 09/25/2010 -- add new constraint columns to the control strategy target pollutant table 
+insert into emf.strategy_types values(DEFAULT,'Multi-Pollutant Max Emissions Reduction','Multi-Pollutant Max Emissions Reduction', '', 'gov.epa.emissions.framework.services.cost.analysis.multiPollutantMaxReduction.StrategyTask');
 
 
