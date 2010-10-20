@@ -987,7 +987,7 @@ public class DatasetDAO {
         if (datasetIDs.length == 0) return all;
         
         //Check if dataset is in fast.fast_runs table, 'cancer_risk_dataset_id' column
-        String query = "SELECT DISTINCT fr.cancer_risk_dataset_id, ds.name, fa.name AS analname from fast.fast_runs as fr "
+        String query = "SELECT DISTINCT fr.cancer_risk_dataset_id, ds.name, fa.name AS analname, fr.name AS runname from fast.fast_runs as fr "
                 + "JOIN emf.datasets as ds ON fr.cancer_risk_dataset_id = ds.id " 
                 + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id " 
                 + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
@@ -1000,7 +1000,7 @@ public class DatasetDAO {
             return all;
         
         //Check if dataset is in fast.fast_runs table, 'species_mapping_dataset_id' column
-        query = "SELECT DISTINCT fr.species_mapping_dataset_id, ds.name, fa.name AS analname from fast.fast_runs as fr "
+        query = "SELECT DISTINCT fr.species_mapping_dataset_id, ds.name, fa.name AS analname, fr.name AS runname from fast.fast_runs as fr "
         		+ "JOIN emf.datasets as ds ON fr.species_mapping_dataset_id = ds.id "
                 + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id " 
                 + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
@@ -1013,7 +1013,7 @@ public class DatasetDAO {
             return all;
         
         //Check if dataset is in fast.fast_runs table, 'transfer_coefficients_dataset_id' column
-        query = "SELECT DISTINCT fr.transfer_coefficients_dataset_id, ds.name, fa.name AS analname from fast.fast_runs as fr "
+        query = "SELECT DISTINCT fr.transfer_coefficients_dataset_id, ds.name, fa.name AS analname, fr.name AS runname from fast.fast_runs as fr "
         		+ "JOIN emf.datasets as ds ON fr.transfer_coefficients_dataset_id = ds.id "
                 + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id " 
                 + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
@@ -1026,7 +1026,7 @@ public class DatasetDAO {
             return all;
         
         //Check if dataset is in fast.fast_runs table, 'domain_population_dataset_id' column
-        query = "SELECT DISTINCT fr.domain_population_dataset_id, ds.name, fa.name AS analname from fast.fast_runs as fr "
+        query = "SELECT DISTINCT fr.domain_population_dataset_id, ds.name, fa.name AS analname, fr.name AS runname from fast.fast_runs as fr "
         		+ "JOIN emf.datasets as ds ON fr.domain_population_dataset_id = ds.id " 
                 + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id " 
                 + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
@@ -1039,7 +1039,7 @@ public class DatasetDAO {
             return all;
         
         //Check if dataset is in fast.fast_runs table, 'invtable_dataset_id' column
-        query = "SELECT DISTINCT fr.invtable_dataset_id, ds.name, fa.name AS analname from fast.fast_runs as fr "
+        query = "SELECT DISTINCT fr.invtable_dataset_id, ds.name, fa.name AS analname, fr.name AS runname from fast.fast_runs as fr "
         		+ "JOIN emf.datasets as ds ON fr.invtable_dataset_id = ds.id " 
                 + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id " 
                 + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
@@ -1052,7 +1052,7 @@ public class DatasetDAO {
             return all;
         
         //Check if dataset is in fast.fast_analyses table, 'cancer_risk_dataset_id' column
-        query = "SELECT DISTINCT fa.cancer_risk_dataset_id, ds.name, fa.name AS analname from fast.fast_analyses as fa "
+        query = "SELECT DISTINCT fa.cancer_risk_dataset_id, ds.name, fa.name AS analname, '' AS runname from fast.fast_analyses as fa "
         		+ "JOIN emf.datasets as ds ON fa.cancer_risk_dataset_id = ds.id " 
                 + "WHERE fa.cancer_risk_dataset_id="
                 + getAndOrClause(EmfArrays.convert(all), "fa.cancer_risk_dataset_id");
@@ -1063,7 +1063,7 @@ public class DatasetDAO {
             return all;
         
         //Check if dataset is in fast.fast_analysis_outputs table, 'output_dataset_id' column
-        query = "SELECT DISTINCT fao.output_dataset_id, ds.name, fa.name AS analname from fast.fast_analysis_outputs as fao "
+        query = "SELECT DISTINCT fao.output_dataset_id, ds.name, fa.name AS analname, '' AS runname from fast.fast_analysis_outputs as fao "
         		+ "JOIN emf.datasets as ds ON fao.output_dataset_id = ds.id "
                 + "JOIN fast.fast_analyses as fa ON fao.fast_analysis_id = fa.id "
         		+ "WHERE fao.output_dataset_id="
@@ -1075,7 +1075,7 @@ public class DatasetDAO {
             return all;
         
         //Check if dataset is in fast.fast_datasets table, 'dataset_id' column
-        query = "SELECT DISTINCT fd.dataset_id, ds.name, fa.name AS analname from fast.fast_datasets as fd "
+        query = "SELECT DISTINCT fd.dataset_id, ds.name, fa.name AS analname, fr.name AS runname from fast.fast_datasets as fd "
         		+ "JOIN emf.datasets as ds ON fd.dataset_id = ds.id " 
         		+ "LEFT JOIN fast.fast_run_inventories as fri ON fri.inventory_dataset_id = fd.dataset_id "
         		+ "LEFT JOIN fast.fast_runs as fr ON fr.id = fri.fast_run_id "
@@ -1091,7 +1091,7 @@ public class DatasetDAO {
         
         //Check if dataset is in fast.fast_nonpoint_datasets table, 
         //'gridded_smk_dataset_id', 'base_nonpoint_dataset_id', 'invtable_dataset_id' column
-        query = "SELECT DISTINCT fnpd.gridded_smk_dataset_id, ds.name, fa.name AS analname from fast.fast_nonpoint_datasets as fnpd "
+        query = "SELECT DISTINCT fnpd.gridded_smk_dataset_id, ds.name, fa.name AS analname, fr.name AS runname from fast.fast_nonpoint_datasets as fnpd "
         		+ "JOIN emf.datasets as ds ON fnpd.gridded_smk_dataset_id = ds.id "
         		+ "LEFT JOIN fast.fast_run_inventories as fri ON fri.inventory_dataset_id = fnpd.quasi_point_dataset_id "
                 + "LEFT JOIN fast.fast_runs as fr ON fr.id = fri.fast_run_id "
@@ -1105,7 +1105,7 @@ public class DatasetDAO {
         if (all.size() == 0)
             return all;
         
-        query = "SELECT DISTINCT fnpd.base_nonpoint_dataset_id, ds.name, fa.name AS analname from fast.fast_nonpoint_datasets as fnpd "
+        query = "SELECT DISTINCT fnpd.base_nonpoint_dataset_id, ds.name, fa.name AS analname, fr.name AS runname from fast.fast_nonpoint_datasets as fnpd "
         		+ "JOIN emf.datasets as ds ON fnpd.base_nonpoint_dataset_id = ds.id "
                 + "LEFT JOIN fast.fast_run_inventories as fri ON fri.inventory_dataset_id = fnpd.quasi_point_dataset_id "
                 + "LEFT JOIN fast.fast_runs as fr ON fr.id = fri.fast_run_id "
@@ -1119,7 +1119,7 @@ public class DatasetDAO {
         if (all.size() == 0)
             return all;
         
-        query = "SELECT DISTINCT fnpd.invtable_dataset_id, ds.name, fa.name AS analname from fast.fast_nonpoint_datasets as fnpd " 
+        query = "SELECT DISTINCT fnpd.invtable_dataset_id, ds.name, fa.name AS analname, fr.name AS runname from fast.fast_nonpoint_datasets as fnpd " 
         		+ "JOIN emf.datasets as ds ON fnpd.invtable_dataset_id = ds.id "
                 + "LEFT JOIN fast.fast_run_inventories as fri ON fri.inventory_dataset_id = fnpd.quasi_point_dataset_id "
                 + "LEFT JOIN fast.fast_runs as fr ON fr.id = fri.fast_run_id "
@@ -1134,8 +1134,9 @@ public class DatasetDAO {
             return all;
         
         //Check if dataset is in fast.fast_run_inventories table, 'inventory_dataset_id' column
-        query = "SELECT DISTINCT fri.inventory_dataset_id, ds.name, fa.name AS analname from fast.fast_run_inventories as fri "
+        query = "SELECT DISTINCT fri.inventory_dataset_id, ds.name, fa.name AS analname, fr.name AS runname from fast.fast_run_inventories as fri "
         		+ "JOIN emf.datasets as ds ON fri.inventory_dataset_id = ds.id "
+        		+ "LEFT JOIN fast.fast_runs as fr ON fr.id = fri.fast_run_id "
                 + "LEFT JOIN fast.fast_analysis_runs as far ON fri.fast_run_id = far.fast_run_id "
                 + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
         		+ "WHERE fri.inventory_dataset_id="
@@ -1147,8 +1148,9 @@ public class DatasetDAO {
             return all;
         
         //Check if dataset is in fast.fast_run_outputs table, 'output_dataset_id' column
-        query = "SELECT DISTINCT fro.output_dataset_id, ds.name, fa.name AS analname from fast.fast_run_outputs as fro "
+        query = "SELECT DISTINCT fro.output_dataset_id, ds.name, fa.name AS analname, fr.name AS runname from fast.fast_run_outputs as fro "
         		+ "JOIN emf.datasets as ds ON fro.output_dataset_id = ds.id "
+        		+ "LEFT JOIN fast.fast_runs as fr ON fr.id = fro.fast_run_id "
                 + "LEFT JOIN fast.fast_analysis_runs as far ON fro.fast_run_id = far.fast_run_id "
                 + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
         		+ "WHERE fro.output_dataset_id="
@@ -1174,9 +1176,15 @@ public class DatasetDAO {
 
             while (resultSet.next()) {
                 temp.add(resultSet.getInt(dsId));
+                String fastRunName = resultSet.getString("runname");
                 String fastAnalName = resultSet.getString("analname");
-                String msg = (fastAnalName == null || fastAnalName.trim().isEmpty()) ? 
-                        "fast dataset queue" : "fast analysis " + fastAnalName;
+                String msg = "fast dataset queue";
+                
+                if (fastAnalName != null && !fastAnalName.trim().isEmpty())
+                    msg = "fast analysis \"" + fastAnalName + "\"";
+                else if (fastRunName != null && !fastRunName.trim().isEmpty())
+                    msg = "fast run \"" + fastRunName + "\"";
+                
                 setStatus(user.getUsername(), "Dataset \"" + resultSet.getString("name") + "\" is used by "
                         + msg + ".", "Delete Dataset", session);
             }
