@@ -7,7 +7,6 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.XFileFormat;
@@ -18,7 +17,6 @@ import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -170,21 +168,12 @@ public class DataCommonsDAO {
     }
 
     public void removeDatasetTypes(DatasetType type, Session session) {
-        session.delete(type);
-        session.flush();
+        hibernateFacade.remove(type, session);
     }
     
     public void removeXFileFormat(XFileFormat fileFormat, Session session) {
-        String hqlDelete = "delete XFileFormat f where f.id = :id ";
-        session.createQuery(hqlDelete).setInteger("id", fileFormat.getId()).executeUpdate();
-        //session.delete(fileFormat);
-        session.flush();
+        hibernateFacade.remove(fileFormat, session);
     }
-    
-    public void removeXFileFormatColumns(XFileFormat fileFormat, DbServer dbServer) throws SQLException {
-        String query = "delete from emf.fileformat_columns where file_format_id= " +fileFormat.getId() ;
-        dbServer.getEmfDatasource().query().execute(query);       
-    } 
     
     public void removeStatuses(String username, String type, Session session) {
         String hqlDelete = "delete Status s where s.username = :username and s.type = :type";

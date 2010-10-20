@@ -581,7 +581,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         
         call.setOperation("deleteDatasetTypes");
         call.addParam("owner", mappings.user());
-        call.addParam("type", mappings.datasetTypes());
+        call.addParam("types", mappings.datasetTypes());
         call.setVoidReturnType();
         
         call.request(new Object[]{owner, types}); 

@@ -198,15 +198,17 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
 
     public synchronized DatasetType obtainLockedDatasetType(User user, DatasetType type) throws EmfException {
+        Session session = sessionFactory.getSession();
+        
         try {
-            Session session = sessionFactory.getSession();
             DatasetType locked = dao.obtainLockedDatasetType(user, type, session);
-            session.close();
 
             return locked;
         } catch (RuntimeException e) {
             LOG.error("Could not obtain lock for DatasetType: " + type.getName(), e);
             throw new EmfException("Could not obtain lock for DatasetType: " + type.getName());
+        } finally {
+            session.close();
         }
     }
 
@@ -264,14 +266,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
     
     public void deleteDatasetTypes(User owner, DatasetType[] types) throws EmfException {
-
         Session session = this.sessionFactory.getSession();
-        DbServer dbServer;
-        try {
-            dbServer = new EmfDbServer();
-        } catch (Exception e1) {
-            throw new EmfException(e1.getMessage());
-        }
         
         try {
             if (owner.isAdmin()){
@@ -280,17 +275,15 @@ public class DataCommonsServiceImpl implements DataCommonsService {
                     checkIfUsedByDeletedDS(types[i], session);
                     checkIfUsedByDatasets(types[i], session); 
                     dao.removeDatasetTypes(types[i], session);
-                    if (types[i].getFileFormat()!=null ){
-                        dao.removeXFileFormatColumns(types[i].getFileFormat(), dbServer);
+                    
+                    if (types[i].getFileFormat()!= null )
                         dao.removeXFileFormat(types[i].getFileFormat(), session);
-                    }
                 }
             }
-            dbServer.disconnect();
         } catch (Exception e) {          
             LOG.error("Error deleting dataset types. " , e);
             throw new EmfException("Error deleting dataset types. \n" + e.getMessage());
-        } finally{
+        } finally {
             session.close(); 
         }
     }
