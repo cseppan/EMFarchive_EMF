@@ -751,10 +751,13 @@ public class DatasetDAO {
     }
     
     public List<Integer> notUsedByCases(int[] datasetIDs, User user, Session session) throws Exception{
+        if (datasetIDs == null || datasetIDs.length == 0)
+            return new ArrayList<Integer>();
+        
         // check if dataset is an input dataset for some cases (via the cases.cases_caseinputs table)
         @SuppressWarnings("unchecked")
         List<Object[]> list = session.createQuery(
-                "select CI.dataset, c.name from CaseInput as CI, Case as c " + "where (CI.caseID = c.id AND CI.dataset.id = "
+                "select DISTINCT CI.dataset, c.name from CaseInput as CI, Case as c " + "where CI.caseID = c.id AND (CI.dataset.id = "
                         + getAndOrClause(datasetIDs, "CI.dataset.id") + ")").list();
 
         List<Integer> all = EmfArrays.convert(datasetIDs);
@@ -808,9 +811,12 @@ public class DatasetDAO {
     
     @SuppressWarnings("unchecked")
     public List<Integer> notUsedByStrategies(int[] datasetIDs, User user, Session session) throws Exception {
+        if (datasetIDs == null || datasetIDs.length == 0)
+            return new ArrayList<Integer>();
+        
         // check if dataset is an input inventory for some strategy (via the StrategyInputDataset table)
         List<Object[]> list = session.createQuery(
-                "select iDs.inputDataset, cS.name from ControlStrategy as cS inner join cS.controlStrategyInputDatasets "
+                "select DISTINCT iDs.inputDataset, cS.name from ControlStrategy as cS inner join cS.controlStrategyInputDatasets "
                         + "as iDs inner join iDs.inputDataset as iD with (iD.id = "
                         + getAndOrClause(datasetIDs, "iD.id") + ")").list();
 
@@ -820,27 +826,36 @@ public class DatasetDAO {
         List<Integer> ids = getUsedDatasetIds(user, session, list, usedby);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         // check if dataset is an input inventory for some strategy (via the StrategyResult table, could be here for
         // historical reasons)
         list = session.createQuery(
-                "select sR.inputDataset, cS.name from ControlStrategyResult sR, ControlStrategy cS where "
+                "select DISTINCT sR.inputDataset, cS.name from ControlStrategyResult sR, ControlStrategy cS where "
                         + "sR.controlStrategyId = cS.id and (sR.inputDataset.id = "
                         + getAndOrClause(EmfArrays.convert(all), "sR.inputDataset.id") + ")").list();
 
         ids = getUsedDatasetIds(user, session, list, usedby);
         all.removeAll(ids);
 
+        if (all.size() == 0)
+            return all;
+        
         // check if dataset is used as a region/county dataset for specific strategy measures
         list = session.createQuery(
-                "select cM.regionDataset, cS.name from ControlStrategy as cS inner join cS.controlMeasures as cM inner join "
+                "select DISTINCT cM.regionDataset, cS.name from ControlStrategy as cS inner join cS.controlMeasures as cM inner join "
                         + "cM.regionDataset as rD with (rD.id = " + getAndOrClause(EmfArrays.convert(all), "rD.id") + ")").list();
 
         ids = getUsedDatasetIds(user, session, list, usedby);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         // check if dataset is used as a region/county dataset for specific strategy
         list = session.createQuery(
-                "select cS.countyDataset, cS.name from ControlStrategy cS where (cS.countyDataset.id = "
+                "select DISTINCT cS.countyDataset, cS.name from ControlStrategy cS where (cS.countyDataset.id = "
                         + getAndOrClause(EmfArrays.convert(all), "cS.countyDataset.id") + ")").list();
 
         ids = getUsedDatasetIds(user, session, list, usedby);
@@ -856,7 +871,7 @@ public class DatasetDAO {
             for (int i = 0; i < list.size(); i++) {
                 EmfDataset ds = (EmfDataset)list.get(i)[0];
                 ids.add(ds.getId());
-                setStatus(user.getUsername(), "Dataset " + ds.getName() + " " + usedby + ": " + list.get(i)[1] + ".", "Delete Dataset", session);
+                setStatus(user.getUsername(), "Dataset \"" + ds.getName() + "\" " + usedby + ": " + list.get(i)[1] + ".", "Delete Dataset", session);
             }
         }
         
@@ -876,9 +891,12 @@ public class DatasetDAO {
     
     public List<Integer> notUsedByControlPrograms(int[] datasetIDs, User user, Session session) throws Exception {
         // check if dataset is an input inventory for some control program (via the control_programs table)
+        if (datasetIDs == null || datasetIDs.length == 0)
+            return new ArrayList<Integer>();
+        
         @SuppressWarnings("unchecked")
         List<Object[]> list = session.createQuery(
-                "select cP.dataset, cP.name from ControlProgram as cP inner join cP.dataset as d with (d.id = "
+                "select DISTINCT cP.dataset, cP.name from ControlProgram as cP inner join cP.dataset as d with (d.id = "
                         + getAndOrClause(datasetIDs, "d.id") + ")").list();
 
         List<Integer> all = EmfArrays.convert(datasetIDs);
@@ -894,9 +912,12 @@ public class DatasetDAO {
     
     @SuppressWarnings("unchecked")
     public List<Integer> notUsedBySectorScnarios(int[] datasetIDs, User user, Session session) throws Exception {
+        if (datasetIDs == null || datasetIDs.length == 0)
+            return new ArrayList<Integer>();
+        
         // check if dataset is an eecsMapppingDataset in SectorScenarion table
         List<Object[]> list = session.createQuery(
-                "select SS.eecsMapppingDataset, SS.name from SectorScenario as SS inner join SS.eecsMapppingDataset "
+                "select DISTINCT SS.eecsMapppingDataset, SS.name from SectorScenario as SS inner join SS.eecsMapppingDataset "
                         + "as eMD with (eMD.id = "
                         + getAndOrClause(datasetIDs, "eMD.id") + ")").list();
 
@@ -906,36 +927,48 @@ public class DatasetDAO {
         List<Integer> ids = getUsedDatasetIds(user, session, list, usedby);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         // check if dataset is an sectorMapppingDataset in SectorScenario table
         list = session.createQuery(
-                "select SS.sectorMapppingDataset, SS.name from SectorScenario as SS inner join SS.sectorMapppingDataset "
+                "select DISTINCT SS.sectorMapppingDataset, SS.name from SectorScenario as SS inner join SS.sectorMapppingDataset "
                         + "as sMD with (sMD.id = "
                         + getAndOrClause(EmfArrays.convert(all), "sMD.id") + ")").list();
 
         ids = getUsedDatasetIds(user, session, list, usedby);
         all.removeAll(ids);
 
+        if (all.size() == 0)
+            return all;
+        
         // check if dataset is used as inputDataset for specific SectorScenarioInventory
         list = session.createQuery(
-                "select invs.dataset, SS.name from SectorScenario as SS inner join SS.inventories "
+                "select DISTINCT invs.dataset, SS.name from SectorScenario as SS inner join SS.inventories "
                         + "as invs inner join invs.dataset as ds with (ds.id = "
                         + getAndOrClause(EmfArrays.convert(all), "ds.id") + ")").list();
 
         ids = getUsedDatasetIds(user, session, list, usedby);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         // check if dataset is used as an inventory dataset for specific SectorScenarioOutput
         list = session.createQuery(
-                "select SSO.inventoryDataset, SS.name from SectorScenario SS, SectorScenarioOutput SSO where "
+                "select DISTINCT SSO.inventoryDataset, SS.name from SectorScenario SS, SectorScenarioOutput SSO where "
                 + "SS.id = SSO.sectorScenarioId AND (SSO.inventoryDataset.id = "
                 + getAndOrClause(EmfArrays.convert(all), "SSO.inventoryDataset.id") + ")").list();
 
         ids = getUsedDatasetIds(user, session, list, usedby);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         // check if dataset is used as an output dataset for specific SectorScenarioOutput
         list = session.createQuery(
-                "select SSO.outputDataset, SS.name from SectorScenario SS, SectorScenarioOutput SSO where "
+                "select DISTINCT SSO.outputDataset, SS.name from SectorScenario SS, SectorScenarioOutput SSO where "
                 + "SS.id = SSO.sectorScenarioId AND (SSO.outputDataset.id = "
                 + getAndOrClause(EmfArrays.convert(all), "SSO.outputDataset.id") + ")").list();
 
@@ -954,92 +987,172 @@ public class DatasetDAO {
         if (datasetIDs.length == 0) return all;
         
         //Check if dataset is in fast.fast_runs table, 'cancer_risk_dataset_id' column
-        String query = "SELECT fr.cancer_risk_dataset_id, ds.name from fast.fast_runs as fr INNER JOIN emf.datasets as ds "
-                + "ON fr.cancer_risk_dataset_id = ds.id WHERE fr.cancer_risk_dataset_id="
-                + getAndOrClause(datasetIDs, "fr.cancer_risk_dataset_id");
-        ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "cancer_risk_dataset_id", session);
+        String query = "SELECT DISTINCT fr.cancer_risk_dataset_id, ds.name, fa.name AS analname from fast.fast_runs as fr "
+                + "JOIN emf.datasets as ds ON fr.cancer_risk_dataset_id = ds.id " 
+                + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id " 
+                + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
+                + "WHERE fr.cancer_risk_dataset_id="
+                + getAndOrClause(EmfArrays.convert(all), "fr.cancer_risk_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "cancer_risk_dataset_id", session);
         all.removeAll(ids);
+        
+        if (all.size() == 0)
+            return all;
         
         //Check if dataset is in fast.fast_runs table, 'species_mapping_dataset_id' column
-        query = "SELECT fr.species_mapping_dataset_id, ds.name from fast.fast_runs as fr INNER JOIN emf.datasets as ds "
-                + "ON fr.species_mapping_dataset_id = ds.id WHERE fr.species_mapping_dataset_id="
-                + getAndOrClause(datasetIDs, "fr.species_mapping_dataset_id");
-        ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "species_mapping_dataset_id", session);
+        query = "SELECT DISTINCT fr.species_mapping_dataset_id, ds.name, fa.name AS analname from fast.fast_runs as fr "
+        		+ "JOIN emf.datasets as ds ON fr.species_mapping_dataset_id = ds.id "
+                + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id " 
+                + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
+                + "WHERE fr.species_mapping_dataset_id="
+                + getAndOrClause(EmfArrays.convert(all), "fr.species_mapping_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "species_mapping_dataset_id", session);
         all.removeAll(ids);
+        
+        if (all.size() == 0)
+            return all;
         
         //Check if dataset is in fast.fast_runs table, 'transfer_coefficients_dataset_id' column
-        query = "SELECT fr.transfer_coefficients_dataset_id, ds.name from fast.fast_runs as fr INNER JOIN emf.datasets as ds "
-                + "ON fr.transfer_coefficients_dataset_id = ds.id WHERE fr.transfer_coefficients_dataset_id="
-                + getAndOrClause(datasetIDs, "fr.transfer_coefficients_dataset_id");
-        ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "transfer_coefficients_dataset_id", session);
+        query = "SELECT DISTINCT fr.transfer_coefficients_dataset_id, ds.name, fa.name AS analname from fast.fast_runs as fr "
+        		+ "JOIN emf.datasets as ds ON fr.transfer_coefficients_dataset_id = ds.id "
+                + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id " 
+                + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
+                + "WHERE fr.transfer_coefficients_dataset_id="
+                + getAndOrClause(EmfArrays.convert(all), "fr.transfer_coefficients_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "transfer_coefficients_dataset_id", session);
         all.removeAll(ids);
+        
+        if (all.size() == 0)
+            return all;
         
         //Check if dataset is in fast.fast_runs table, 'domain_population_dataset_id' column
-        query = "SELECT fr.domain_population_dataset_id, ds.name from fast.fast_runs as fr INNER JOIN emf.datasets as ds "
-                + "ON fr.domain_population_dataset_id = ds.id WHERE fr.domain_population_dataset_id="
-                + getAndOrClause(datasetIDs, "fr.domain_population_dataset_id");
-        ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "domain_population_dataset_id", session);
+        query = "SELECT DISTINCT fr.domain_population_dataset_id, ds.name, fa.name AS analname from fast.fast_runs as fr "
+        		+ "JOIN emf.datasets as ds ON fr.domain_population_dataset_id = ds.id " 
+                + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id " 
+                + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
+                + "WHERE fr.domain_population_dataset_id="
+                + getAndOrClause(EmfArrays.convert(all), "fr.domain_population_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "domain_population_dataset_id", session);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         //Check if dataset is in fast.fast_runs table, 'invtable_dataset_id' column
-        query = "SELECT fr.invtable_dataset_id, ds.name from fast.fast_runs as fr INNER JOIN emf.datasets as ds "
-            + "ON fr.invtable_dataset_id = ds.id WHERE fr.invtable_dataset_id="
-            + getAndOrClause(EmfArrays.convert(all), "fr.invtable_dataset_id");
+        query = "SELECT DISTINCT fr.invtable_dataset_id, ds.name, fa.name AS analname from fast.fast_runs as fr "
+        		+ "JOIN emf.datasets as ds ON fr.invtable_dataset_id = ds.id " 
+                + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id " 
+                + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
+        		+ "WHERE fr.invtable_dataset_id="
+                + getAndOrClause(EmfArrays.convert(all), "fr.invtable_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "invtable_dataset_id", session);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         //Check if dataset is in fast.fast_analyses table, 'cancer_risk_dataset_id' column
-        query = "SELECT fa.cancer_risk_dataset_id, ds.name from fast.fast_analyses as fa INNER JOIN emf.datasets as ds "
-                + "ON fa.cancer_risk_dataset_id = ds.id WHERE fa.cancer_risk_dataset_id="
-                + getAndOrClause(datasetIDs, "fa.cancer_risk_dataset_id");
-        ids = getRefdDatasetIds(user, datasetIDs, dataQuery, query, "cancer_risk_dataset_id", session);
+        query = "SELECT DISTINCT fa.cancer_risk_dataset_id, ds.name, fa.name AS analname from fast.fast_analyses as fa "
+        		+ "JOIN emf.datasets as ds ON fa.cancer_risk_dataset_id = ds.id " 
+                + "WHERE fa.cancer_risk_dataset_id="
+                + getAndOrClause(EmfArrays.convert(all), "fa.cancer_risk_dataset_id");
+        ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "cancer_risk_dataset_id", session);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         //Check if dataset is in fast.fast_analysis_outputs table, 'output_dataset_id' column
-        query = "SELECT fao.output_dataset_id, ds.name from fast.fast_analysis_outputs as fao INNER JOIN emf.datasets as ds "
-            + "ON fao.output_dataset_id = ds.id WHERE fao.output_dataset_id="
-            + getAndOrClause(EmfArrays.convert(all), "fao.output_dataset_id");
+        query = "SELECT DISTINCT fao.output_dataset_id, ds.name, fa.name AS analname from fast.fast_analysis_outputs as fao "
+        		+ "JOIN emf.datasets as ds ON fao.output_dataset_id = ds.id "
+                + "JOIN fast.fast_analyses as fa ON fao.fast_analysis_id = fa.id "
+        		+ "WHERE fao.output_dataset_id="
+        		+ getAndOrClause(EmfArrays.convert(all), "fao.output_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "output_dataset_id", session);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         //Check if dataset is in fast.fast_datasets table, 'dataset_id' column
-        query = "SELECT fd.dataset_id, ds.name from fast.fast_datasets as fd INNER JOIN emf.datasets as ds "
-            + "ON fd.dataset_id = ds.id WHERE fd.dataset_id="
-            + getAndOrClause(EmfArrays.convert(all), "fd.dataset_id");
+        query = "SELECT DISTINCT fd.dataset_id, ds.name, fa.name AS analname from fast.fast_datasets as fd "
+        		+ "JOIN emf.datasets as ds ON fd.dataset_id = ds.id " 
+        		+ "LEFT JOIN fast.fast_run_inventories as fri ON fri.inventory_dataset_id = fd.dataset_id "
+        		+ "LEFT JOIN fast.fast_runs as fr ON fr.id = fri.fast_run_id "
+                + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id "
+                + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
+        		+ "WHERE fd.dataset_id="
+        		+ getAndOrClause(EmfArrays.convert(all), "fd.dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "dataset_id", session);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         //Check if dataset is in fast.fast_nonpoint_datasets table, 
         //'gridded_smk_dataset_id', 'base_nonpoint_dataset_id', 'invtable_dataset_id' column
-        query = "SELECT fnpd.gridded_smk_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd INNER JOIN emf.datasets as ds "
-            + "ON fnpd.gridded_smk_dataset_id = ds.id WHERE fnpd.gridded_smk_dataset_id="
-            + getAndOrClause(EmfArrays.convert(all), "fnpd.gridded_smk_dataset_id");
+        query = "SELECT DISTINCT fnpd.gridded_smk_dataset_id, ds.name, fa.name AS analname from fast.fast_nonpoint_datasets as fnpd "
+        		+ "JOIN emf.datasets as ds ON fnpd.gridded_smk_dataset_id = ds.id "
+        		+ "LEFT JOIN fast.fast_run_inventories as fri ON fri.inventory_dataset_id = fnpd.quasi_point_dataset_id "
+                + "LEFT JOIN fast.fast_runs as fr ON fr.id = fri.fast_run_id "
+                + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id "
+                + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
+        		+ "WHERE fnpd.gridded_smk_dataset_id="
+        		+ getAndOrClause(EmfArrays.convert(all), "fnpd.gridded_smk_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "gridded_smk_dataset_id", session);
         all.removeAll(ids);
         
-        query = "SELECT fnpd.base_nonpoint_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd INNER JOIN emf.datasets as ds "
-            + "ON fnpd.base_nonpoint_dataset_id = ds.id WHERE fnpd.base_nonpoint_dataset_id="
-            + getAndOrClause(EmfArrays.convert(all), "fnpd.base_nonpoint_dataset_id");
+        if (all.size() == 0)
+            return all;
+        
+        query = "SELECT DISTINCT fnpd.base_nonpoint_dataset_id, ds.name, fa.name AS analname from fast.fast_nonpoint_datasets as fnpd "
+        		+ "JOIN emf.datasets as ds ON fnpd.base_nonpoint_dataset_id = ds.id "
+                + "LEFT JOIN fast.fast_run_inventories as fri ON fri.inventory_dataset_id = fnpd.quasi_point_dataset_id "
+                + "LEFT JOIN fast.fast_runs as fr ON fr.id = fri.fast_run_id "
+                + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id "
+                + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
+        		+ "WHERE fnpd.base_nonpoint_dataset_id="
+        		+ getAndOrClause(EmfArrays.convert(all), "fnpd.base_nonpoint_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "base_nonpoint_dataset_id", session);
         all.removeAll(ids);
         
-        query = "SELECT fnpd.invtable_dataset_id, ds.name from fast.fast_nonpoint_datasets as fnpd INNER JOIN emf.datasets as ds "
-            + "ON fnpd.invtable_dataset_id = ds.id WHERE fnpd.invtable_dataset_id="
+        if (all.size() == 0)
+            return all;
+        
+        query = "SELECT DISTINCT fnpd.invtable_dataset_id, ds.name, fa.name AS analname from fast.fast_nonpoint_datasets as fnpd " 
+        		+ "JOIN emf.datasets as ds ON fnpd.invtable_dataset_id = ds.id "
+                + "LEFT JOIN fast.fast_run_inventories as fri ON fri.inventory_dataset_id = fnpd.quasi_point_dataset_id "
+                + "LEFT JOIN fast.fast_runs as fr ON fr.id = fri.fast_run_id "
+                + "LEFT JOIN fast.fast_analysis_runs as far ON fr.id = far.fast_run_id "
+                + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
+        		+ "WHERE fnpd.invtable_dataset_id="
             + getAndOrClause(EmfArrays.convert(all), "fnpd.invtable_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "invtable_dataset_id", session);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         //Check if dataset is in fast.fast_run_inventories table, 'inventory_dataset_id' column
-        query = "SELECT fri.inventory_dataset_id, ds.name from fast.fast_run_inventories as fri INNER JOIN emf.datasets as ds "
-            + "ON fri.inventory_dataset_id = ds.id WHERE fri.inventory_dataset_id="
-            + getAndOrClause(EmfArrays.convert(all), "fri.inventory_dataset_id");
+        query = "SELECT DISTINCT fri.inventory_dataset_id, ds.name, fa.name AS analname from fast.fast_run_inventories as fri "
+        		+ "JOIN emf.datasets as ds ON fri.inventory_dataset_id = ds.id "
+                + "LEFT JOIN fast.fast_analysis_runs as far ON fri.fast_run_id = far.fast_run_id "
+                + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
+        		+ "WHERE fri.inventory_dataset_id="
+        		+ getAndOrClause(EmfArrays.convert(all), "fri.inventory_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "inventory_dataset_id", session);
         all.removeAll(ids);
         
+        if (all.size() == 0)
+            return all;
+        
         //Check if dataset is in fast.fast_run_outputs table, 'output_dataset_id' column
-        query = "SELECT fro.output_dataset_id, ds.name from fast.fast_run_outputs as fro INNER JOIN emf.datasets as ds "
-            + "ON fro.output_dataset_id = ds.id WHERE fro.output_dataset_id="
-            + getAndOrClause(EmfArrays.convert(all), "fro.output_dataset_id");
+        query = "SELECT DISTINCT fro.output_dataset_id, ds.name, fa.name AS analname from fast.fast_run_outputs as fro "
+        		+ "JOIN emf.datasets as ds ON fro.output_dataset_id = ds.id "
+                + "LEFT JOIN fast.fast_analysis_runs as far ON fro.fast_run_id = far.fast_run_id "
+                + "LEFT JOIN fast.fast_analyses as fa ON far.fast_analysis_id = fa.id "
+        		+ "WHERE fro.output_dataset_id="
+        		+ getAndOrClause(EmfArrays.convert(all), "fro.output_dataset_id");
         ids = getRefdDatasetIds(user, EmfArrays.convert(all), dataQuery, query, "output_dataset_id", session);
         all.removeAll(ids);
         
@@ -1051,6 +1164,9 @@ public class DatasetDAO {
         ResultSet resultSet = null;
         List<Integer> ids = null;
         
+        if (idArray == null || idArray.length == 0)
+            return new ArrayList<Integer>();
+        
         try {
             ids = EmfArrays.convert(idArray);
             List<Integer> temp = new ArrayList<Integer>();
@@ -1058,7 +1174,11 @@ public class DatasetDAO {
 
             while (resultSet.next()) {
                 temp.add(resultSet.getInt(dsId));
-                setStatus(user.getUsername(), "Dataset \"" + resultSet.getString("name") + "\" is used by either a FAST run or analysis.", "Delete Dataset", session);
+                String fastAnalName = resultSet.getString("analname");
+                String msg = (fastAnalName == null || fastAnalName.trim().isEmpty()) ? 
+                        "fast dataset queue" : "fast analysis " + fastAnalName;
+                setStatus(user.getUsername(), "Dataset \"" + resultSet.getString("name") + "\" is used by "
+                        + msg + ".", "Delete Dataset", session);
             }
             
             ids = temp;
