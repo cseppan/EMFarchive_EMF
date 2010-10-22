@@ -129,8 +129,10 @@ public class PopulateFastQuasiPointDatasetTask implements Runnable {
             if (dataset != null) {
                 Version version = datasetDAO.getVersion(session, dataset.getId(), dataset.getDefaultVersion());
                 
-                if (version != null)
+                if (version != null) {
+                    version.setCreator(user);
                     updateVersion(dataset, version, dbServer, session);
+                }
             }
         } catch (Exception e) {
             throw new EmfException("Cannot update dataset (dataset id: " + dataset.getId() + "). " + e.getMessage());

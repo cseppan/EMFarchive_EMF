@@ -1,7 +1,10 @@
 package gov.epa.emissions.framework.tasks;
 
 import gov.epa.emissions.commons.data.ExternalSource;
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.external.AbstractExternalFilesImporter;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
@@ -12,6 +15,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
+import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ImporterFactory;
@@ -112,6 +116,14 @@ public class ImportCaseOutputTask extends Task {
                 Importer extImporter = ((VersionedImporter) importer).getWrappedImporter();
                 extSrcs = ((AbstractExternalFilesImporter) extImporter).getExternalSources();
             }
+            
+            //update dataset version record count (only for internal sources) and creator, 
+            Version version = version(dataset.getId(), dataset.getDefaultVersion());
+            if (!dataset.isExternal()) {
+                version.setNumberRecords(getNumOfRecords(dataset, version));
+            }
+            version.setCreator(user);
+            updateVersionNReleaseLock(version);
 
             numSeconds = (System.currentTimeMillis() - startTime) / 1000;
             complete("Imported");
@@ -309,6 +321,45 @@ public class ImportCaseOutputTask extends Task {
         if (this.useTaskManager)
             ImportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(),
                     message);
+    }
+    
+    private Version version(int datasetId, int versionNumber) throws EmfException {
+        DataServiceImpl dataServiceImpl = new DataServiceImpl(dbServerFactory, sessionFactory);
+        Session session = sessionFactory.getSession();
+        try {
+            Versions versions = new Versions();
+            Version version = versions.get(datasetId, versionNumber, session);
+            version = dataServiceImpl.obtainedLockOnVersion(user, version.getId());
+            return version;
+
+        } finally {
+            session.close();
+        }
+    }
+
+    private void updateVersionNReleaseLock(Version locked) throws EmfException {
+        DataServiceImpl dataServiceImpl = new DataServiceImpl(dbServerFactory, sessionFactory);
+        try {
+            dataServiceImpl.updateVersionNReleaseLock(locked);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            //
+        }
+    }
+    
+    public synchronized int getNumOfRecords(EmfDataset dataset, Version version) throws EmfException {
+        DataServiceImpl dataServiceImpl = new DataServiceImpl(dbServerFactory, sessionFactory);
+        try {
+            InternalSource[] internalSources = dataset.getInternalSources();
+            
+            return dataServiceImpl.getNumOfRecords("emissions." + internalSources[0].getTable(), version, "");
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            //
+        }
+
     }
 
     protected void logError(String messge, Exception e) {

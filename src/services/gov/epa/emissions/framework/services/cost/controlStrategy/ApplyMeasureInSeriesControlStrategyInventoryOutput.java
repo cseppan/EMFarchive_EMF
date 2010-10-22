@@ -118,6 +118,7 @@ public class ApplyMeasureInSeriesControlStrategyInventoryOutput implements Contr
         DatasetDAO dao = new DatasetDAO();
         version = dao.obtainLockOnVersion(usr, version.getId(), session);
         version.setNumberRecords((int)dao.getDatasetRecordsNumber(dbsrv, session, dataset, version));
+        version.setCreator(usr);
         dao.updateVersionNReleaseLock(version, session);
     }
 

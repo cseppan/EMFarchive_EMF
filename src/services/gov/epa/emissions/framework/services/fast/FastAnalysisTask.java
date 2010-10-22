@@ -546,8 +546,10 @@ public class FastAnalysisTask {
             if (result != null) {
                 Version version = dao.getVersion(session, result.getId(), result.getDefaultVersion());
 
-                if (version != null)
+                if (version != null) {
+                    version.setCreator(user);
                     updateVersion(result, version, dbServer, session, dao);
+                }
             }
         } catch (Exception e) {
             throw new EmfException("Cannot update result datasets (strategy id: "

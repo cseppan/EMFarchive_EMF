@@ -828,16 +828,20 @@ public abstract class AbstractStrategyTask implements Strategy {
             if (result != null) {
                 Version version = dao.getVersion(session, result.getId(), result.getDefaultVersion());
                 
-                if (version != null)
+                if (version != null) {
+                    version.setCreator(user);
                     updateVersion(result, version, dbServer, session, dao);
+                }
             }
             
             if (contldInv != null) {
                 Version version = dao.getVersion(session, contldInv.getId(), contldInv.getDefaultVersion());
 
 
-                if (version != null)
+                if (version != null) {
+                    version.setCreator(user);
                     updateVersion(contldInv, version, dbServer, session, dao);
+                }
             }
         } catch (Exception e) {
             throw new EmfException("Cannot update result datasets (strategy id: " + strategyResult.getControlStrategyId() + "). " + e.getMessage());
