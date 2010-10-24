@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
+import gov.epa.emissions.framework.services.data.DataServiceImpl.DeleteType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
@@ -295,10 +296,12 @@ public class SectorScenarioDAO {
             return;
         
         try {
-            new DataServiceImpl(dbServerFactory, sessionFactory).deleteDatasets(user, datasets);
+            new DataServiceImpl(dbServerFactory, sessionFactory).deleteDatasets(user, datasets, DeleteType.SECTOR_SCENARIO);
         } catch (EmfException e) {
+            if (!e.getType().equals(EmfException.MSG_TYPE))
+                throw new EmfException(e.getMessage());
+        } finally {
             releaseLocked(lockedDatasets, user, session);
-            throw new EmfException(e.getMessage());
         }
     }
     

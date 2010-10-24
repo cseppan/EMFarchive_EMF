@@ -45,6 +45,10 @@ public class DataServiceImpl implements DataService {
 
     private DatasetDAO dao;
     
+    public enum DeleteType {
+        GENERAL, FAST, SECTOR_SCENARIO, CONTROL_STRATEGY, CONTROL_PROGRAM
+    }
+    
     public DataServiceImpl() {
         this(DbServerFactory.get(), HibernateSessionFactory.get());
     }
@@ -236,11 +240,15 @@ public class DataServiceImpl implements DataService {
     }
 
     public synchronized void deleteDatasets(User owner, EmfDataset[] datasets) throws EmfException {
+        deleteDatasets(owner, datasets, DeleteType.GENERAL);
+    }
+    
+    public synchronized void deleteDatasets(User owner, EmfDataset[] datasets, DeleteType delType) throws EmfException {
         String prefix = "DELETED_" + new Date().getTime() + "_";
         int count = 0;
 
         try {
-            EmfDataset[] removables = getRemovableDatasets(datasets, owner);
+            EmfDataset[] removables = getRemovableDatasets(datasets, owner, delType);
                 
             for (EmfDataset ds : removables) {
                 if (ds.getStatus().equalsIgnoreCase("Deleted")) {
@@ -268,10 +276,10 @@ public class DataServiceImpl implements DataService {
         
         if (count != datasets.length) msg += " Please check status window for details.";
             
-        throw new EmfException(msg);
+        throw new EmfException(msg, EmfException.MSG_TYPE);
     }
 
-    private EmfDataset[] getRemovableDatasets(EmfDataset[] datasets, User owner) {
+    private EmfDataset[] getRemovableDatasets(EmfDataset[] datasets, User owner, DeleteType delType) {
         Session session = sessionFactory.getSession();
         DbServer dbServer = dbServerFactory.getDbServer();
         List<EmfDataset> removables = new ArrayList<EmfDataset>();
@@ -303,7 +311,7 @@ public class DataServiceImpl implements DataService {
         List<Integer> ids = new ArrayList<Integer>();
         
         try {
-            ids = getNotRefdDatasetIds(owner, session, dbServer, dsIDs);
+            ids = getNotRefdDatasetIds(owner, session, dbServer, dsIDs, delType);
         } catch (Exception e) {
             LOG.error("Error checking dataset usage: ", e);
         } 
@@ -330,13 +338,23 @@ public class DataServiceImpl implements DataService {
         return list.toArray(new EmfDataset[0]);
     }
 
-    private List<Integer> getNotRefdDatasetIds(User owner, Session session, DbServer dbServer, int[] dsIDs) throws Exception {
+    private List<Integer> getNotRefdDatasetIds(User owner, Session session, DbServer dbServer, int[] dsIDs, 
+            DeleteType delType) throws Exception {
         List<Integer> ids;
         ids = dao.notUsedByCases(dsIDs, owner, session);
-        ids = dao.notUsedByStrategies(EmfArrays.convert(ids), owner, session);
-        ids = dao.notUsedByControlPrograms(EmfArrays.convert(ids), owner, session);
-        ids = dao.notUsedBySectorScnarios(EmfArrays.convert(ids), owner, session);
-        ids = dao.notUsedByFast(EmfArrays.convert(ids), owner, dbServer, session);
+        
+        if (delType != DeleteType.CONTROL_STRATEGY)
+            ids = dao.notUsedByStrategies(EmfArrays.convert(ids), owner, session);
+        
+        if (delType != DeleteType.CONTROL_PROGRAM)
+            ids = dao.notUsedByControlPrograms(EmfArrays.convert(ids), owner, session);
+        
+        if (delType != DeleteType.SECTOR_SCENARIO)
+            ids = dao.notUsedBySectorScnarios(EmfArrays.convert(ids), owner, session);
+        
+        if (delType != DeleteType.FAST)
+            ids = dao.notUsedByFast(EmfArrays.convert(ids), owner, dbServer, session);
+        
         return ids;
     }
     
@@ -438,6 +456,10 @@ public class DataServiceImpl implements DataService {
     }
 
     public void purgeDeletedDatasets(User user) throws EmfException {
+        purgeDeletedDatasets(user, DeleteType.GENERAL);
+    }
+    
+    public void purgeDeletedDatasets(User user, DeleteType delType) throws EmfException {
         Session session = this.sessionFactory.getSession();
         DbServer dbServer = DbServerFactory.get().getDbServer();
 
@@ -446,7 +468,7 @@ public class DataServiceImpl implements DataService {
                 dao.removeEmptyDatasets(user, dbServer, session);
 
             List<EmfDataset> list = dao.deletedDatasets(user, session);
-            EmfDataset[] toDelete = getRemovableDatasets(list.toArray(new EmfDataset[0]), user);
+            EmfDataset[] toDelete = getRemovableDatasets(list.toArray(new EmfDataset[0]), user, delType);
             dao.deleteDatasets(toDelete, dbServer, session);
         } catch (Exception e) {
             LOG.error("Error purging deleted datasets.", e);

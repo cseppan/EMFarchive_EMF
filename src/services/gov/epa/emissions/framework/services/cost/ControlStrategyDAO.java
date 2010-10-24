@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
+import gov.epa.emissions.framework.services.data.DataServiceImpl.DeleteType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
@@ -330,10 +331,14 @@ public class ControlStrategyDAO {
             return;
         
         try {
-            new DataServiceImpl(dbServerFactory, sessionFactory).deleteDatasets(user, datasets);
+            new DataServiceImpl(dbServerFactory, sessionFactory).deleteDatasets(user, datasets, DeleteType.CONTROL_STRATEGY);
         } catch (EmfException e) {
 //            releaseLocked(lockedDatasets, user, session);
 //            throw new EmfException(e.getMessage());
+            if (!e.getType().equals(EmfException.MSG_TYPE))
+                throw new EmfException(e.getMessage());
+        } finally {
+            releaseLocked(lockedDatasets, user, session);
         }
     }
     

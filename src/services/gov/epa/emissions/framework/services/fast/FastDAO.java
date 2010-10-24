@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.FileFormatFacto
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
+import gov.epa.emissions.framework.services.data.DataServiceImpl.DeleteType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
@@ -246,11 +247,13 @@ public class FastDAO {
 //    }
 
     public void removeFastRunResults(int fastRunId, Session session) {
-        String hqlDelete = "delete FastRunOutput sr where sr.fastRunId = :fastRunId";
-        session.createQuery( hqlDelete )
-             .setInteger("fastRunId", fastRunId)
-             .executeUpdate();
-        session.flush();
+//        String hqlDelete = "delete FastRunOutput sr where sr.fastRunId = :fastRunId";
+//        session.createQuery( hqlDelete )
+//             .setInteger("fastRunId", fastRunId)
+//             .executeUpdate();
+//        session.flush();
+        List<?> outputs = hibernateFacade.get(FastRunOutput.class, Restrictions.eq("fastRunId", new Integer(fastRunId)), session);
+        hibernateFacade.remove(outputs.toArray(), session);
     }
 
     public FastRun getFastRun(String name, Session session) {
@@ -288,10 +291,12 @@ public class FastDAO {
             return;
         
         try {
-            new DataServiceImpl(dbServerFactory, sessionFactory).deleteDatasets(user, datasets);
+            new DataServiceImpl(dbServerFactory, sessionFactory).deleteDatasets(user, datasets, DeleteType.FAST);
         } catch (EmfException e) {
+            if (!e.getType().equals(EmfException.MSG_TYPE))
+                throw new EmfException(e.getMessage());
+        } finally {
             releaseLocked(lockedDatasets, user, session);
-            throw new EmfException(e.getMessage());
         }
     }
     
@@ -620,11 +625,14 @@ public class FastDAO {
 //    }
 
     public void removeFastAnalysisOutputs(int fastAnalysisId, Session session) {
-        String hqlDelete = "delete FastAnalysisOutput sr where sr.fastAnalysisId = :fastAnalysisId";
-        session.createQuery( hqlDelete )
-             .setInteger("fastAnalysisId", fastAnalysisId)
-             .executeUpdate();
-        session.flush();
+//        String hqlDelete = "delete FastAnalysisOutput sr where sr.fastAnalysisId = :fastAnalysisId";
+//        session.createQuery( hqlDelete )
+//             .setInteger("fastAnalysisId", fastAnalysisId)
+//             .executeUpdate();
+//        session.flush();
+        
+        List<?> outputs = hibernateFacade.get(FastAnalysisOutput.class, Restrictions.eq("fastAnalysisId", new Integer(fastAnalysisId)), session);
+        hibernateFacade.remove(outputs.toArray(), session);
     }
 
     public FastAnalysis getFastAnalysis(String name, Session session) {
