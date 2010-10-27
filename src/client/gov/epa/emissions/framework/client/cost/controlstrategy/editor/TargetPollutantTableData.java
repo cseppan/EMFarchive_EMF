@@ -36,7 +36,14 @@ public class TargetPollutantTableData extends AbstractEditableTableData implemen
     }
     
     public String[] columns() {
-        return new String[] { "Pollutant", "MaxEmisReduction", "MaxControlEfficiency", "MinCostPerTon", "MinAnnCost", "ReplacementControlMinEfficiencyDiff" };
+        return new String[] { "Select"
+                            , "Pollutant"
+                            , "MaxEmisReduction"
+                            , "MaxControlEfficiency"
+                            , "MinCostPerTon"
+                            , "MinAnnCost"
+                            //, "ReplacementControlMinEfficiencyDiff" 
+                            };
     }
 
     public Class<?> getColumnClass(int col) {
