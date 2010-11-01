@@ -2166,3 +2166,60 @@ and dataset_type_id in
 (select id 
 from emf.dataset_types dt
 where name in ('Smkmerge report state annual summary (CSV)'));
+
+-- Detect null xloc or yloc for point inventories - 11/01/2010
+delete 
+from 
+  emf.dataset_types_qa_step_templates 
+where 
+  name = 'Detect null xloc or yloc for point inventories'
+  and 
+  dataset_type_id in 
+    (select id 
+     from emf.dataset_types
+     where name like '%Point%');
+
+insert into emf.dataset_types_qa_step_templates 
+  (
+    dataset_type_id
+  , list_index
+  , name
+  , qa_program_id
+  , program_arguments
+  , required
+  , order_no
+  , description
+  )
+  select 
+    dt.id, 
+    (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
+    'Detect null xloc or yloc for point inventories', 
+    1, 
+    'select
+       e.fips, e.plantid, e.pointid, e.stackid, e.segment, e.plant, e.scc, e.xloc, e.yloc
+       from $TABLE[1] e 
+       where    xloc is null 
+             or yloc is null',
+    false,
+    1,
+    ''
+  from emf.dataset_types dt
+  where name in --('ORL Point Inventory (PTINV)');  
+    (select name 
+     from emf.dataset_types
+     where name like '%Point%'); 
+
+update emf.dataset_types_qa_step_templates
+  set program_arguments = 'select
+       e.fips, e.plantid, e.pointid, e.stackid, e.segment, e.plant, e.scc, e.xloc, e.yloc
+       from $TABLE[1] e 
+       where    xloc is null 
+             or yloc is null'
+    where name = 'Detect null xloc or yloc for point inventories'
+    and dataset_type_id in
+    (select id
+     from emf.dataset_types dt
+     where name in --('ORL Point Inventory (PTINV)');  
+      (select name 
+       from emf.dataset_types
+       where name like '%Point%')); 
