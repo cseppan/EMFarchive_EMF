@@ -2198,12 +2198,14 @@ insert into emf.dataset_types_qa_step_templates
     'Detect null xloc or yloc for point inventories', 
     1, 
     'select
-       e.fips, e.plantid, e.pointid, e.stackid, e.segment, e.plant, e.scc, e.xloc, e.yloc
+       fips, plantid, pointid, scc, xloc, yloc
        from $TABLE[1] e 
        where    xloc is null 
              or yloc is null
              or xloc = 0
-             or yloc = 0',
+             or yloc = 0
+       group by fips, plantid, pointid, scc, xloc, yloc
+       order by fips, plantid, pointid, scc, xloc, yloc',
     false,
     1,
     ''
@@ -2216,12 +2218,14 @@ insert into emf.dataset_types_qa_step_templates
 
 update emf.dataset_types_qa_step_templates
   set program_arguments = 'select
-       e.fips, e.plantid, e.pointid, e.stackid, e.segment, e.plant, e.scc, e.xloc, e.yloc
+       fips, plantid, pointid, scc, xloc, yloc
        from $TABLE[1] e 
        where    xloc is null 
              or yloc is null
              or xloc = 0
-             or yloc = 0'
+             or yloc = 0
+       group by fips, plantid, pointid, scc, xloc, yloc
+       order by fips, plantid, pointid, scc, xloc, yloc'
     where name = 'Detect null xloc or yloc for point inventories'
     and dataset_type_id in
     (select id
