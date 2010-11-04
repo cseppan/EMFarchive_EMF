@@ -43,6 +43,9 @@ public class TargetPollutantTableData extends AbstractEditableTableData implemen
                             , "MinCostPerTon"
                             , "MinAnnCost"
                             //, "ReplacementControlMinEfficiencyDiff" 
+                            //, "InventoryFilter"
+                            //, "CountyDataset"
+                            //, "CountyDatasetVersion"
                             };
     }
 
