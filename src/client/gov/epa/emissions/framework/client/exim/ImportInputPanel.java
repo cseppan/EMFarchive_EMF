@@ -237,6 +237,7 @@ public class ImportInputPanel extends JPanel {
     private EmfFileInfo[] getSelectedFiles() {
         EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
 
+        // TODO: bugz 3536 add refresh button on file browser, start here - 2010/11/01 - Jason
         EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(service));
         chooser.setTitle("Select the " + datasetTypesComboBox.getSelectedItem() + " files to import into Datasets");
         chooser.setDirectoryAndFileMode();

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.ui;
 
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -181,6 +182,21 @@ public class EmfFileChooser extends JComponent {
         // panel.add(approveButton);
         panel.add(new OKButton(selectAction()));
         panel.add(new CancelButton(cancelAction()));
+        
+        Button refresh = new Button("Refresh", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    //chooserPanel.setSelectionCurrentDir();
+                    //LAST_SELECTED_DIR = chooserPanel.selectedDirectory();
+                    chooserPanel.refresh();
+                } catch (Exception e) {
+                    //showError(e.getMessage());
+                }
+            }
+        });
+        refresh.setToolTipText("Refresh the content of the dir");
+        refresh.setMnemonic('R');
+        panel.add(refresh); 
 
         JPanel container = new JPanel(new BorderLayout(0, 20));
         container.add(panel, BorderLayout.CENTER);
@@ -196,7 +212,7 @@ public class EmfFileChooser extends JComponent {
             }
         };
     }
-
+    
     private Action selectAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -207,6 +223,16 @@ public class EmfFileChooser extends JComponent {
             }
         };
     }
+    
+    private Action refreshAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                chooserPanel.setSelectionCurrentDir();
+                LAST_SELECTED_DIR = chooserPanel.selectedDirectory();
+                // TODO: refresh related action
+            }
+        };
+    }    
 
     private void closeDialog() {
         dialog.setVisible(false);

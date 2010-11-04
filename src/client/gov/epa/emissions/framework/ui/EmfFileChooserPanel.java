@@ -499,5 +499,15 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
                     .setError("Connection to server timed out: " + ((e.getMessage() == null) ? "" : e.getMessage()));
         }
     }
+    
+    public void refresh()
+    {
+        //EmfFileInfo fi = this.currentDir;
+        //EmfFileInfo fi2 = new EmfFileInfo("C:\\", true);
+        updateDirSelections( this.currentDir);
+        //updateDirSelections( fi2); // TODO: seems like the service do not update the dir content if currentDir not changed
+        //updateDirSelections( fi );
+    }
+    
 
 }
