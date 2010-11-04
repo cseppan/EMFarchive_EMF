@@ -1079,9 +1079,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public synchronized EmfFileInfo[] getEmfFileInfos(EmfFileInfo dir, String filter) throws EmfException {
         try {
             EmfFileInfo gooddir = correctEmptyDir(dir);
-            if (currentDirectory != null && gooddir.getAbsolutePath().equals(currentDirectory.getAbsolutePath())) {
-                return this.files == null ? new EmfFileInfo[0] : this.files;
-            }
+            //if (currentDirectory != null && gooddir.getAbsolutePath().equals(currentDirectory.getAbsolutePath())) {
+            //    return this.files == null ? new EmfFileInfo[0] : this.files;
+            //}
 
             currentDirectory = gooddir;
             File currentdirFile = new File(currentDirectory.getAbsolutePath());
