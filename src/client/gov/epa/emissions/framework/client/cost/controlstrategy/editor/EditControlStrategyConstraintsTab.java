@@ -1,38 +1,27 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
-import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Pollutant;
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
-import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.EditButton;
-import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.client.cost.controlstrategy.TableComboBox;
-import gov.epa.emissions.framework.client.cost.controlstrategy.TargetPollutantListWidget;
-import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyTargetPollutant;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.EfficiencyRecordValidation;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
 import java.util.Map;
@@ -41,15 +30,9 @@ import java.util.TreeMap;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.border.EtchedBorder;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
 
 public class EditControlStrategyConstraintsTab extends JPanel implements ControlStrategyConstraintsTabView {
 
@@ -257,88 +240,88 @@ for (ControlStrategyTargetPollutant selectedTargetPollutant : selectedTargetPoll
 //        pollutantsPanel.setMinimumSize(new Dimension(80, 100));
 //        return table;
     }
-
-    private TableCellEditor countyDatasetColumnEditor(TableCellEditor countyDatasetVersionTableCellEditor) throws EmfException {
-        ComboBox comboBox = new ComboBox("None selected", editControlStrategyPresenter.getDatasets(editControlStrategyPresenter.getDatasetType(DatasetType.LIST_OF_COUNTIES)));
-        comboBox.setEditable(false);
-//        for (EmfDataset dataset : )
-//            comboBox.addItem(dataset);
-//        AbstractAction action = new AbstractAction() {
-//            {
-////                putValue(Action.NAME, "Previous match");
-////                putValue(Action.SMALL_ICON, getIcon("go-up-search.png"));
-////                putValue(Action.SHORT_DESCRIPTION, "Go to previous match Ctrl-P");
-////                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control P"));
-//                }
 //
-//                public void actionPerformed(ActionEvent e) {
-//                try {
-//                    
-//                    fillVersions((ComboBox)((DefaultCellEditor)countyDatasetVersionTableCellEditor).getComponent(), (EmfDataset) comboBox.getSelectedItem());
-//                } catch (EmfException e1) {
-//                    // NOTE Auto-generated catch block
-//                    e1.printStackTrace();
-//                }
+//    private TableCellEditor countyDatasetColumnEditor(TableCellEditor countyDatasetVersionTableCellEditor) throws EmfException {
+//        ComboBox comboBox = new ComboBox("None selected", editControlStrategyPresenter.getDatasets(editControlStrategyPresenter.getDatasetType(DatasetType.LIST_OF_COUNTIES)));
+//        comboBox.setEditable(false);
+////        for (EmfDataset dataset : )
+////            comboBox.addItem(dataset);
+////        AbstractAction action = new AbstractAction() {
+////            {
+//////                putValue(Action.NAME, "Previous match");
+//////                putValue(Action.SMALL_ICON, getIcon("go-up-search.png"));
+//////                putValue(Action.SHORT_DESCRIPTION, "Go to previous match Ctrl-P");
+//////                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control P"));
+////                }
+////
+////                public void actionPerformed(ActionEvent e) {
+////                try {
+////                    
+////                    fillVersions((ComboBox)((DefaultCellEditor)countyDatasetVersionTableCellEditor).getComponent(), (EmfDataset) comboBox.getSelectedItem());
+////                } catch (EmfException e1) {
+////                    // NOTE Auto-generated catch block
+////                    e1.printStackTrace();
+////                }
+////            }
+////        };
+//        comboBox.addActionListener(new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) {
+////                try {
+////                    fillVersions((ComboBox)((DefaultCellEditor)countyDatasetVersionTableCellEditor).getComponent(), (EmfDataset) comboBox.getSelectedItem());
+////                } catch (EmfException e1) {
+////                    // NOTE Auto-generated catch block
+////                    e1.printStackTrace();
+////                }
 //            }
-//        };
-        comboBox.addActionListener(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-//                try {
-//                    fillVersions((ComboBox)((DefaultCellEditor)countyDatasetVersionTableCellEditor).getComponent(), (EmfDataset) comboBox.getSelectedItem());
-//                } catch (EmfException e1) {
-//                    // NOTE Auto-generated catch block
-//                    e1.printStackTrace();
-//                }
-            }
-        });
-
-        return new DefaultCellEditor(comboBox);
-    }
-    
-    private void fillVersions(JComboBox version, EmfDataset dataset) throws EmfException{
-        version.setEnabled(true);
-
-        if (dataset != null && dataset.getName().equals("None")) dataset = null;
-        Version[] versions = editControlStrategyPresenter.getVersions(dataset);
-        version.removeAllItems();
-        version.setModel(new DefaultComboBoxModel(versions));
-        version.revalidate();
-        if (versions.length > 0)
-            version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
-
-    }
-    
-    private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
-        int defaultversion = dataset.getDefaultVersion();
-
-        for (int i = 0; i < versions.length; i++)
-            if (defaultversion == versions[i].getVersion())
-                return i;
-
-        return 0;
-    }
- 
-    private TableCellEditor countyDatasetVersionColumnEditor(EmfDataset dataset) throws EmfException {
-        ComboBox comboBox = new ComboBox("None selected", editControlStrategyPresenter.getVersions(dataset));
-        comboBox.setEditable(false);
-//        for (EmfDataset dataset : )
-//            comboBox.addItem(dataset);
-        
-        comboBox.addActionListener(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-//                try {
-//                    
-//                    
-//                    fillVersions((ComboBox)((DefaultCellEditor)countyDatasetVersionTableCellEditor).getComponent(), (EmfDataset) comboBox.getSelectedItem());
-//                } catch (EmfException e1) {
-//                    // NOTE Auto-generated catch block
-//                    e1.printStackTrace();
-//                }
-            }
-        });
-        return new DefaultCellEditor(comboBox);
-    }
-    
+//        });
+//
+//        return new DefaultCellEditor(comboBox);
+//    }
+//    
+//    private void fillVersions(JComboBox version, EmfDataset dataset) throws EmfException{
+//        version.setEnabled(true);
+//
+//        if (dataset != null && dataset.getName().equals("None")) dataset = null;
+//        Version[] versions = editControlStrategyPresenter.getVersions(dataset);
+//        version.removeAllItems();
+//        version.setModel(new DefaultComboBoxModel(versions));
+//        version.revalidate();
+//        if (versions.length > 0)
+//            version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
+//
+//    }
+//    
+//    private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
+//        int defaultversion = dataset.getDefaultVersion();
+//
+//        for (int i = 0; i < versions.length; i++)
+//            if (defaultversion == versions[i].getVersion())
+//                return i;
+//
+//        return 0;
+//    }
+// 
+//    private TableCellEditor countyDatasetVersionColumnEditor(EmfDataset dataset) throws EmfException {
+//        ComboBox comboBox = new ComboBox("None selected", editControlStrategyPresenter.getVersions(dataset));
+//        comboBox.setEditable(false);
+////        for (EmfDataset dataset : )
+////            comboBox.addItem(dataset);
+//        
+//        comboBox.addActionListener(new AbstractAction() {
+//            public void actionPerformed(ActionEvent e) {
+////                try {
+////                    
+////                    
+////                    fillVersions((ComboBox)((DefaultCellEditor)countyDatasetVersionTableCellEditor).getComponent(), (EmfDataset) comboBox.getSelectedItem());
+////                } catch (EmfException e1) {
+////                    // NOTE Auto-generated catch block
+////                    e1.printStackTrace();
+////                }
+//            }
+//        });
+//        return new DefaultCellEditor(comboBox);
+//    }
+//    
     private JPanel createAllStrategiesPanel(ManageChangeables changeables) {
         ControlStrategyConstraint constraint = presenter.getConstraint();
         JPanel panel = new JPanel(new SpringLayout());

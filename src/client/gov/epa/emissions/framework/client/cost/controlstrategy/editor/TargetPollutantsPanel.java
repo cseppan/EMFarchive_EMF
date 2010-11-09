@@ -1,11 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
-import gov.epa.emissions.commons.gui.EditableTable;
-import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.client.cost.controlstrategy.TableComboBox;
-import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.InlineEditableTableData;
 
@@ -15,8 +11,6 @@ import java.awt.event.KeyListener;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
@@ -62,23 +56,23 @@ public class TargetPollutantsPanel extends JPanel {
         col.setMaxWidth(250);
     }
 
-    public void setTableColumn(TableComboBox comboBox, int column) {
-        TableColumn tableColumn = table.getColumnModel().getColumn(column);
-
-        tableColumn.setCellRenderer(comboBox);
-        tableColumn.setCellEditor(comboBox);
-    
-    }
-
-    public void setColumnEditor(TableCellEditor editor, int columnIndex, String toolTip) {
-        TableColumnModel colModel = table.getColumnModel();
-        TableColumn col = colModel.getColumn(columnIndex);
-        col.setCellEditor(editor);
-
-        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-        renderer.setToolTipText(toolTip);
-        col.setCellRenderer(renderer);
-    }
+//    public void setTableColumn(TableComboBox comboBox, int column) {
+//        TableColumn tableColumn = table.getColumnModel().getColumn(column);
+//
+//        tableColumn.setCellRenderer(comboBox);
+//        tableColumn.setCellEditor(comboBox);
+//    
+//    }
+//
+//    public void setColumnEditor(TableCellEditor editor, int columnIndex, String toolTip) {
+//        TableColumnModel colModel = table.getColumnModel();
+//        TableColumn col = colModel.getColumn(columnIndex);
+//        col.setCellEditor(editor);
+//
+//        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+//        renderer.setToolTipText(toolTip);
+//        col.setCellRenderer(renderer);
+//    }
 
     public void invalidate() {
         setColumnWidths(table.getColumnModel());
