@@ -182,7 +182,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private JPanel createAppliedMeasuresTab(ControlStrategy controlStrategy) {
         ControlStrategyConstraintsTabView view = null;
-        view = new EditControlStrategyConstraintsTab(controlStrategy, this,  messagePanel, parentConsole, session);
+        view = new EditControlStrategyConstraintsTab(controlStrategy, this,  messagePanel, parentConsole, session, presenter);
         this.presenter.set(view);
         return (JPanel) view;
     }

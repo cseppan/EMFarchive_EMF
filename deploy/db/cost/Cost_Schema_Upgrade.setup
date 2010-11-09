@@ -1404,3 +1404,8 @@ ALTER TABLE emf.control_strategy_target_pollutants
 insert into emf.strategy_types values(DEFAULT,'Multi-Pollutant Max Emissions Reduction','Multi-Pollutant Max Emissions Reduction', '', 'gov.epa.emissions.framework.services.cost.analysis.multiPollutantMaxReduction.StrategyTask');
 
 
+-- 10/21/2010 -- add new columns to control_strategy_target_pollutants table
+alter table emf.control_strategy_target_pollutants
+add column inv_filter text,
+add column county_dataset_id integer,
+add column county_dataset_version integer;

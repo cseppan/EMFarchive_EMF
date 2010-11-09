@@ -39,13 +39,13 @@ public class SccFileReader {
         validate(list);
         String[] values = (String[]) list.toArray(new String[0]);
 
-        return new Scc(values[0], values[1]);
+        return new Scc(values[0], values[14]);
     }
 
     private void validate(List list) throws Exception {
-        if (list.size() > 2 || list.size() == 0) {
+        if (list.size() > 15 || list.size() == 0) {
             throw new Exception("The SCC file name '" + fileName
-                    + "' has more than two tokens(code + description) in line " + reader.lineNumber());
+                    + "' has more than fifteen tokens in line " + reader.lineNumber());
         }
         
         if (list.size() == 1)

@@ -2,17 +2,20 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyTargetPollutant;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;
+import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.InlineEditableTableData;
 import gov.epa.emissions.framework.ui.RowSource;
+import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TargetPollutantTableData extends AbstractEditableTableData implements InlineEditableTableData {
+public class TargetPollutantTableData extends AbstractTableData {
 
-    private List<EditableRow> rows;
+    private List<ViewableRow> rows;
     
     private Pollutant[] pollutants;
 
@@ -21,8 +24,8 @@ public class TargetPollutantTableData extends AbstractEditableTableData implemen
         rows = createRows(targets);
     }
 
-    private List<EditableRow> createRows(ControlStrategyTargetPollutant[] targets) {
-        List<EditableRow> rows = new ArrayList<EditableRow>();
+    private List<ViewableRow> createRows(ControlStrategyTargetPollutant[] targets) {
+        List<ViewableRow> rows = new ArrayList<ViewableRow>();
        
         for (int i = 0; i < targets.length; i++)
             rows.add(row(targets[i], pollutants));
@@ -30,51 +33,47 @@ public class TargetPollutantTableData extends AbstractEditableTableData implemen
         return rows;
     }
     
-    private EditableRow row(ControlStrategyTargetPollutant target, Pollutant[] polls) {
+    private ViewableRow row(ControlStrategyTargetPollutant target, Pollutant[] polls) {
         RowSource<ControlStrategyTargetPollutant> source = new TargetPollutantRowSource(target, polls);
-        return new EditableRow(source);
+        return new ViewableRow(source);
     }
     
     public String[] columns() {
-        return new String[] { "Select"
-                            , "Pollutant"
+        return new String[] { "Pollutant"
                             , "MaxEmisReduction"
                             , "MaxControlEfficiency"
                             , "MinCostPerTon"
                             , "MinAnnCost"
-                            //, "ReplacementControlMinEfficiencyDiff" 
-                            //, "InventoryFilter"
-                            //, "CountyDataset"
-                            //, "CountyDatasetVersion"
+                            , "ReplacementControlMinEfficiencyDiff" 
+                            , "Inventory Filter" 
+                            , "County Dataset" 
+                            , "County Dataset Version" 
                             };
     }
 
     public Class<?> getColumnClass(int col) {
-        if (col == 0)
-            return Boolean.class;
-        
-        if (col == 1)
+        if (col == 0
+                || col == 6
+//                || col == 7
+//                || col == 8
+                )
             return String.class;
-        
+                
+        if (col == 7)
+            return EmfDataset.class;
+
+        if (col == 8)
+            return Integer.class;
+
         return Double.class;
     }
 
-    public List<EditableRow> rows() {
+    public List<ViewableRow> rows() {
         return this.rows;
     }
 
     public boolean isEditable(int col) {
-        if (col == 1)
-            return false;
-        
-        return true;
-    }
-    
-    public boolean isEditable(@SuppressWarnings("unused") int row, int col) {
-        if (col == 0 || col == 1)
-            return false;
-        
-        return true;
+        return false;
     }
     
     public void refresh() {
@@ -87,12 +86,24 @@ public class TargetPollutantTableData extends AbstractEditableTableData implemen
 
     private List<ControlStrategyTargetPollutant> sourcesList() {
         List<ControlStrategyTargetPollutant> sources = new ArrayList<ControlStrategyTargetPollutant>();        
-        for (EditableRow row : this.rows) {
+        for (ViewableRow row : this.rows) {
             sources.add((ControlStrategyTargetPollutant)row.source());
         }
 
         return sources;
     }
+
+//    private List<ControlStrategyTargetPollutant> selected() {
+//        List<ControlStrategyTargetPollutant> sources = new ArrayList<ControlStrategyTargetPollutant>();        
+//        for (ViewableRow row : this.rows) {
+//            if (row.)
+//            ControlStrategyTargetPollutant controlStrategyTargetPollutant = (ControlStrategyTargetPollutant)row.source();
+//            if (controlStrategyTargetPollutant)
+//            sources.add(controlStrategyTargetPollutant);
+//        }
+//
+//        return sources;
+//    }
 
     public boolean contains(ControlStrategyTargetPollutant reference) {
         return this.sourcesList().contains(reference);
@@ -103,7 +114,7 @@ public class TargetPollutantTableData extends AbstractEditableTableData implemen
     }
 
     private void remove(ControlStrategyTargetPollutant target) {
-        for (EditableRow row : this.rows) {
+        for (ViewableRow row : this.rows) {
             ControlStrategyTargetPollutant source = (ControlStrategyTargetPollutant)row.source();
             
             if (source.equals(target)) {
@@ -118,15 +129,4 @@ public class TargetPollutantTableData extends AbstractEditableTableData implemen
             this.remove(reference);
         }
     }
-
-    public void addBlankRow() {
-        // NOTE Auto-generated method stub
-        
-    }
-
-    public void removeSelected() {
-        // NOTE Auto-generated method stub
-        
-    }
-
 }

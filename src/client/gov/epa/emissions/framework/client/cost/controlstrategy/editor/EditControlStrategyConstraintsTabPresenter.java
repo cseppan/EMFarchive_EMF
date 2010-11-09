@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -7,6 +8,8 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyTargetPollutant;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class EditControlStrategyConstraintsTabPresenter  implements EditControlStrategyTabPresenter {
     private ControlStrategyConstraintsTabView view;
@@ -60,7 +63,15 @@ public class EditControlStrategyConstraintsTabPresenter  implements EditControlS
         
     }
     
+    public void doSetTargetPollutant(ControlStrategyTargetPollutant controlStrategyTargetPollutant) {
+        view.setTargetPollutant(controlStrategyTargetPollutant);
+    }
+
     public Pollutant[] getAllPollutants() throws EmfException {
         return session.dataCommonsService().getPollutants();
+    }
+
+    public void setTargetPollutants(ControlStrategyTargetPollutant[] targets) {
+        strategy.setTargetPollutants(targets);
     }
 }

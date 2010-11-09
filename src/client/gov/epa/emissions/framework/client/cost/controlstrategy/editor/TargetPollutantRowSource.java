@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyTargetPollutant;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.HashMap;
@@ -11,14 +12,11 @@ public class TargetPollutantRowSource implements RowSource<ControlStrategyTarget
 
     private ControlStrategyTargetPollutant source;
 
-    private Boolean selected;
-    
     private HashMap<String, Pollutant> pollutants;
 
     public TargetPollutantRowSource(ControlStrategyTargetPollutant source, 
             Pollutant[] allPollutants) {
         this.source = source;
-        this.selected = Boolean.FALSE;
         this.pollutants = new HashMap<String, Pollutant>();
         
         for (Pollutant pol : allPollutants)
@@ -26,13 +24,17 @@ public class TargetPollutantRowSource implements RowSource<ControlStrategyTarget
     }
 
     public Object[] values() {
-        Object[] values = { selected,
+        Object[] values = { 
                 source.getPollutant().getName(), 
                 source.getMaxEmisReduction(),
                 source.getMaxControlEfficiency(),
                 source.getMinCostPerTon(),
                 source.getMinAnnCost(),
-                source.getReplacementControlMinEfficiencyDiff()};
+                source.getReplacementControlMinEfficiencyDiff() == null ? new Double(10.0) : source.getReplacementControlMinEfficiencyDiff(),
+                source.getInvFilter(),
+                source.getCountyDataset(),
+                source.getCountyDatasetVersion()
+                };
         
         return values;
     }
@@ -40,25 +42,31 @@ public class TargetPollutantRowSource implements RowSource<ControlStrategyTarget
     public void setValueAt(int column, Object val) {
         switch (column) {
         case 0:
-            selected = (Boolean) val;
-            break;
-        case 1:
             source.setPollutant(pollutants.get(val));
             break;
-        case 2:
+        case 1:
             source.setMaxEmisReduction((Double) val);
             break;
-        case 3:
+        case 2:
             source.setMaxControlEfficiency((Double) val);
             break;
-        case 4:
+        case 3:
             source.setMinCostPerTon((Double) val);
             break;
-        case 5:
+        case 4:
             source.setMinAnnCost((Double) val);
             break;
-        case 6:
+        case 5:
             source.setReplacementControlMinEfficiencyDiff((Double) val);
+            break;
+        case 6:
+            source.setInvFilter((String) val);
+            break;
+        case 7:
+            source.setCountyDataset((EmfDataset) val);
+            break;
+        case 8:
+            source.setCountyDatasetVersion((Integer) val);
             break;
         default:
             throw new RuntimeException("invalid column - " + column);
@@ -67,10 +75,6 @@ public class TargetPollutantRowSource implements RowSource<ControlStrategyTarget
 
     public ControlStrategyTargetPollutant source() {
         return source;
-    }
-
-    public boolean isSelected() {
-        return selected.booleanValue();
     }
 
     public void validate(int rowNumber) throws EmfException {

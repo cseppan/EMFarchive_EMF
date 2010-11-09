@@ -1,31 +1,55 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.CancelButton;
+import gov.epa.emissions.commons.gui.buttons.EditButton;
+import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlstrategy.TableComboBox;
+import gov.epa.emissions.framework.client.cost.controlstrategy.TargetPollutantListWidget;
+import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyTargetPollutant;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.EfficiencyRecordValidation;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.TreeMap;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
 
 public class EditControlStrategyConstraintsTab extends JPanel implements ControlStrategyConstraintsTabView {
 
@@ -65,29 +89,45 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     
     private EmfSession session;
 
+    private Map<String, ComboBox> countyDatasetComboBoxes;
+
+    private Map<String, ComboBox> countyDatasetVersionComboBoxes;
+
+    private EditControlStrategyPresenter editControlStrategyPresenter;
+    private SelectableSortFilterWrapper table;
+    
     public EditControlStrategyConstraintsTab(ControlStrategy controlStrategy, ManageChangeables changeablesList,
-            SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session) {
+            SingleLineMessagePanel messagePanel, EmfConsole parentConsole, EmfSession session,
+            EditControlStrategyPresenter editControlStrategyPresenter) {
         this.changeablesList = changeablesList;
         this.controlStrategy = controlStrategy;
         this.decFormat = new DecimalFormat("###0.0#");
         this.parentConsole = parentConsole;
+        this.editControlStrategyPresenter = editControlStrategyPresenter;
         this.session = session;
+        this.countyDatasetComboBoxes = new TreeMap<String, ComboBox>();
+        this.countyDatasetVersionComboBoxes = new TreeMap<String, ComboBox>();
     }
     
     private void setupLayout(ManageChangeables changeables) {
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5)); 
         
-//        if (controlStrategy.getStrategyType() != null && controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
-//            try {
-//                add(getBorderedPanel(createMultiPollutantsPanel(controlStrategy.getTargetPollutants(), 
-//                        getAllPollutants()), "Multi-Pollutant Max Emis Reducation"), BorderLayout.NORTH);
-//            } catch (EmfException e) {
-//                e.printStackTrace();
-//            }
-//            
-//            return;
-//        }
+        if (controlStrategy.getStrategyType() != null && controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
+            try {
+                JPanel container = new JPanel(new BorderLayout());
+                container.add(createMultiPollutantsPanel(controlStrategy.getTargetPollutants(), 
+                        getAllPollutants()), BorderLayout.CENTER);
+                container.add(buttonPanel(), BorderLayout.SOUTH);
+                add(getBorderedPanel(
+                        container
+                        , "Multi-Pollutant Max Emis Reduction"));
+            } catch (EmfException e) {
+                e.printStackTrace();
+            }
+            
+            return;
+        }
         
         this.add(getBorderedPanel(createAllStrategiesPanel(changeables), "All Strategy Types"), BorderLayout.NORTH);
         leastCostPanelContainer = new JPanel(new BorderLayout());
@@ -107,6 +147,30 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         notifyStrategyTypeChange(controlStrategy.getStrategyType());
     }
 
+    private JPanel buttonPanel() {
+        JPanel panel = new JPanel();
+        panel.add(new EditButton(editAction()));
+        return panel;
+    }
+
+    private Action editAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+//                messagePanel.clear();
+                //get selected items
+                
+                ControlStrategyTargetPollutant[] selectedTargetPollutants = (table.selected()).toArray(new ControlStrategyTargetPollutant[0]);
+                //get all measures
+for (ControlStrategyTargetPollutant selectedTargetPollutant : selectedTargetPollutants) {
+    TargetPollutantEditorDialog selectionDialog = new TargetPollutantEditorDialog(parentConsole, changeablesList, selectedTargetPollutant);
+    TargetPollutantEditorPresenter selectionPresenter = new TargetPollutantEditorPresenter(presenter, selectionDialog, session, editControlStrategyPresenter);
+    selectionDialog.observe(selectionPresenter, editControlStrategyPresenter);
+    selectionDialog.display();
+}
+            }
+        };
+    }
+
     private Pollutant[] getAllPollutants() throws EmfException {
         return session.dataCommonsService().getPollutants();
     }
@@ -118,15 +182,163 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
 
         return panel;
     }
-    // TODO:
-    private JPanel createMultiPollutantsPanel(ControlStrategyTargetPollutant[] targets, Pollutant[] all) {
-        pollutantsTableData = new TargetPollutantTableData(targets, all);
-        pollutantsPanel = new TargetPollutantsPanel("Multi-Pollutants", pollutantsTableData, changeablesList, parentConsole);
-        pollutantsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        pollutantsPanel.setMinimumSize(new Dimension(80, 100));
-        return pollutantsPanel;
+    
+    private SortCriteria sortCriteria() {
+        String[] columnNames = {"Pollutant" };
+        return new SortCriteria(columnNames, new boolean[] {true}, new boolean[] { true });
     }
 
+    private JPanel createMultiPollutantsPanel(ControlStrategyTargetPollutant[] targets, Pollutant[] all) throws EmfException {
+
+
+        pollutantsTableData = new TargetPollutantTableData(targets, all);
+
+        table = new SelectableSortFilterWrapper(parentConsole, pollutantsTableData, sortCriteria());
+
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.add(table);
+        return tablePanel;
+//        pollutantsPanel = new TargetPollutantsPanel("Multi-Pollutants", pollutantsTableData, changeablesList, parentConsole);
+//        TableCellEditor countyDatasetVersionTableCellEditor = countyDatasetVersionColumnEditor(null);
+//        TableCellEditor countyDatasetTableCellEditor = countyDatasetColumnEditor(countyDatasetVersionTableCellEditor);
+//        pollutantsPanel.setColumnEditor(countyDatasetTableCellEditor, 8, "Select from the list");
+//        pollutantsPanel.setColumnEditor(countyDatasetVersionTableCellEditor, 9, "Select from the list");
+//        
+
+//        final TableComboBox countyDatasetVersionTableComboBox = new TableComboBox(editControlStrategyPresenter.getVersions(null));
+//        countyDatasetVersionTableComboBox.addHandler(new TableComboBox.TableComboBoxPressedHandler() {
+//            
+//            public void onButtonPress(int row, int column) {
+//                //
+//            }
+//        });
+//        
+//        pollutantsPanel.setTableColumn(countyDatasetVersionTableComboBox, 9);
+//        
+//        final TableComboBox countyDatasetTableComboBox = new TableComboBox(editControlStrategyPresenter.getDatasets(editControlStrategyPresenter.getDatasetType(DatasetType.LIST_OF_COUNTIES)));
+//        countyDatasetTableComboBox.addHandler(new TableComboBox.TableComboBoxPressedHandler() {
+//
+//            public void onButtonPress(int row, int column) {
+//                JComboBox comboBox = countyDatasetVersionTableComboBox.getComboBox(row);
+////              System.out.println(comboBox);
+////              comboBox.removeAll();
+////              comboBox.addItem("test4");
+////              comboBox.addItem("test5");
+////              comboBox.addItem("test6");
+////              comboBox.addItem("test7");
+//                try {
+//                    fillVersions(comboBox, (EmfDataset) countyDatasetTableComboBox.getComboBox(row).getSelectedItem());
+//                    pollutantsPanel.setRowSelectionInterval(0,0);
+//                    pollutantsPanel.setRowSelectionInterval(row, row);
+//                } catch (EmfException e) {
+//                    // NOTE Auto-generated catch block
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        
+//        pollutantsPanel.setTableColumn(countyDatasetTableComboBox, 8);
+//
+//        //populate existing strategy's data
+//        for (ControlStrategyTargetPollutant controlStrategyTargetPollutant : targets) {
+//            int index = -1;
+//            for (ControlStrategyTargetPollutant controlStrategyTargetPollutantInTable : pollutantsTableData.sources()) {
+//                if (controlStrategyTargetPollutantInTable.getPollutant().equals(controlStrategyTargetPollutant.getPollutant())) break;
+//                index = (index == -1) ? 0 : ++index;
+//            }
+//            if (index != -1 && controlStrategyTargetPollutant.getCountyDataset() != null) {
+//                countyDatasetTableComboBox.getComboBox(index).setSelectedItem(controlStrategyTargetPollutant.getCountyDataset());
+//                countyDatasetVersionTableComboBox.getComboBox(index).setSelectedItem(controlStrategyTargetPollutant.getCountyDatasetVersion());
+//            }
+//            
+//        }
+        
+//        pollutantsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+//        pollutantsPanel.setMinimumSize(new Dimension(80, 100));
+//        return table;
+    }
+
+    private TableCellEditor countyDatasetColumnEditor(TableCellEditor countyDatasetVersionTableCellEditor) throws EmfException {
+        ComboBox comboBox = new ComboBox("None selected", editControlStrategyPresenter.getDatasets(editControlStrategyPresenter.getDatasetType(DatasetType.LIST_OF_COUNTIES)));
+        comboBox.setEditable(false);
+//        for (EmfDataset dataset : )
+//            comboBox.addItem(dataset);
+//        AbstractAction action = new AbstractAction() {
+//            {
+////                putValue(Action.NAME, "Previous match");
+////                putValue(Action.SMALL_ICON, getIcon("go-up-search.png"));
+////                putValue(Action.SHORT_DESCRIPTION, "Go to previous match Ctrl-P");
+////                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control P"));
+//                }
+//
+//                public void actionPerformed(ActionEvent e) {
+//                try {
+//                    
+//                    fillVersions((ComboBox)((DefaultCellEditor)countyDatasetVersionTableCellEditor).getComponent(), (EmfDataset) comboBox.getSelectedItem());
+//                } catch (EmfException e1) {
+//                    // NOTE Auto-generated catch block
+//                    e1.printStackTrace();
+//                }
+//            }
+//        };
+        comboBox.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+//                try {
+//                    fillVersions((ComboBox)((DefaultCellEditor)countyDatasetVersionTableCellEditor).getComponent(), (EmfDataset) comboBox.getSelectedItem());
+//                } catch (EmfException e1) {
+//                    // NOTE Auto-generated catch block
+//                    e1.printStackTrace();
+//                }
+            }
+        });
+
+        return new DefaultCellEditor(comboBox);
+    }
+    
+    private void fillVersions(JComboBox version, EmfDataset dataset) throws EmfException{
+        version.setEnabled(true);
+
+        if (dataset != null && dataset.getName().equals("None")) dataset = null;
+        Version[] versions = editControlStrategyPresenter.getVersions(dataset);
+        version.removeAllItems();
+        version.setModel(new DefaultComboBoxModel(versions));
+        version.revalidate();
+        if (versions.length > 0)
+            version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
+
+    }
+    
+    private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
+        int defaultversion = dataset.getDefaultVersion();
+
+        for (int i = 0; i < versions.length; i++)
+            if (defaultversion == versions[i].getVersion())
+                return i;
+
+        return 0;
+    }
+ 
+    private TableCellEditor countyDatasetVersionColumnEditor(EmfDataset dataset) throws EmfException {
+        ComboBox comboBox = new ComboBox("None selected", editControlStrategyPresenter.getVersions(dataset));
+        comboBox.setEditable(false);
+//        for (EmfDataset dataset : )
+//            comboBox.addItem(dataset);
+        
+        comboBox.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+//                try {
+//                    
+//                    
+//                    fillVersions((ComboBox)((DefaultCellEditor)countyDatasetVersionTableCellEditor).getComponent(), (EmfDataset) comboBox.getSelectedItem());
+//                } catch (EmfException e1) {
+//                    // NOTE Auto-generated catch block
+//                    e1.printStackTrace();
+//                }
+            }
+        });
+        return new DefaultCellEditor(comboBox);
+    }
+    
     private JPanel createAllStrategiesPanel(ManageChangeables changeables) {
         ControlStrategyConstraint constraint = presenter.getConstraint();
         JPanel panel = new JPanel(new SpringLayout());
@@ -273,17 +485,19 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         constraint.setControlStrategyId(controlStrategy.getId());
         EfficiencyRecordValidation erValidation = new EfficiencyRecordValidation();
         //make sure constraints are in the correct numerical format... validation will happen in the run method.
-        if (contrlEff.getText().trim().length() > 0) constraint.setMaxControlEfficiency(erValidation.parseDouble("maximum control efficieny", contrlEff.getText()));
-        if (emisReduction.getText().trim().length() > 0) constraint.setMaxEmisReduction(erValidation.parseDouble("maximum emission reduction", emisReduction.getText()));
-        if (costPerTon.getText().trim().length() > 0) constraint.setMinCostPerTon(erValidation.parseDouble("minimum cost per ton", costPerTon.getText()));
-        if (annCost.getText().trim().length() > 0) constraint.setMinAnnCost(erValidation.parseDouble("minimum annualized cost", annCost.getText()));
-        if (domainWideEmisReduction.getText().trim().length() > 0) constraint.setDomainWideEmisReduction(erValidation.parseDouble("domain wide emission reduction", domainWideEmisReduction.getText()));
-        if (domainWidePctReduction.getText().trim().length() > 0) constraint.setDomainWidePctReduction(erValidation.parseDouble("domain wide percent reduction", domainWidePctReduction.getText()));
-        if (domainWidePctReductionIncrement.getText().trim().length() > 0) constraint.setDomainWidePctReductionIncrement(erValidation.parseDouble("domain wide percent reduction increment", domainWidePctReductionIncrement.getText()));
-        if (domainWidePctReductionStart.getText().trim().length() > 0) constraint.setDomainWidePctReductionStart(erValidation.parseDouble("domain wide percent reduction start", domainWidePctReductionStart.getText()));
-        if (domainWidePctReductionEnd.getText().trim().length() > 0) constraint.setDomainWidePctReductionEnd(erValidation.parseDouble("domain wide percent reduction end", domainWidePctReductionEnd.getText()));
-        if (replacementControlMinEfficiencyDiff.getText().trim().length() > 0) constraint.setReplacementControlMinEfficiencyDiff(erValidation.parseDouble("replacement control minimum control efficiency difference", replacementControlMinEfficiencyDiff.getText()));
-        if (controlProgramMeasureMinPctRedDiff.getText().trim().length() > 0) constraint.setControlProgramMeasureMinPctRedDiff(erValidation.parseDouble("control program minimum percent reduction difference", controlProgramMeasureMinPctRedDiff.getText()));
+        if (!controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
+            if (contrlEff.getText().trim().length() > 0) constraint.setMaxControlEfficiency(erValidation.parseDouble("maximum control efficieny", contrlEff.getText()));
+            if (emisReduction.getText().trim().length() > 0) constraint.setMaxEmisReduction(erValidation.parseDouble("maximum emission reduction", emisReduction.getText()));
+            if (costPerTon.getText().trim().length() > 0) constraint.setMinCostPerTon(erValidation.parseDouble("minimum cost per ton", costPerTon.getText()));
+            if (annCost.getText().trim().length() > 0) constraint.setMinAnnCost(erValidation.parseDouble("minimum annualized cost", annCost.getText()));
+            if (domainWideEmisReduction.getText().trim().length() > 0) constraint.setDomainWideEmisReduction(erValidation.parseDouble("domain wide emission reduction", domainWideEmisReduction.getText()));
+            if (domainWidePctReduction.getText().trim().length() > 0) constraint.setDomainWidePctReduction(erValidation.parseDouble("domain wide percent reduction", domainWidePctReduction.getText()));
+            if (domainWidePctReductionIncrement.getText().trim().length() > 0) constraint.setDomainWidePctReductionIncrement(erValidation.parseDouble("domain wide percent reduction increment", domainWidePctReductionIncrement.getText()));
+            if (domainWidePctReductionStart.getText().trim().length() > 0) constraint.setDomainWidePctReductionStart(erValidation.parseDouble("domain wide percent reduction start", domainWidePctReductionStart.getText()));
+            if (domainWidePctReductionEnd.getText().trim().length() > 0) constraint.setDomainWidePctReductionEnd(erValidation.parseDouble("domain wide percent reduction end", domainWidePctReductionEnd.getText()));
+            if (replacementControlMinEfficiencyDiff.getText().trim().length() > 0) constraint.setReplacementControlMinEfficiencyDiff(erValidation.parseDouble("replacement control minimum control efficiency difference", replacementControlMinEfficiencyDiff.getText()));
+            if (controlProgramMeasureMinPctRedDiff.getText().trim().length() > 0) constraint.setControlProgramMeasureMinPctRedDiff(erValidation.parseDouble("control program minimum percent reduction difference", controlProgramMeasureMinPctRedDiff.getText()));
+       }
         if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.leastCost)) {
             //make sure that either Emis OR Pct Reduction was specified for the Least Cost.  This is needed for the run.
             if (constraint.getReplacementControlMinEfficiencyDiff() == null || constraint.getReplacementControlMinEfficiencyDiff() <= 0.0D) 
@@ -319,11 +533,11 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
         constraint = new ControlStrategyConstraint();
         constraint.setControlStrategyId(controlStrategy.getId());
         
-//        if (controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
-//            updateMultiTargetPollConstraints();
-//            presenter.setConstraint(constraint);
-//            return;
-//        }
+        if (controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
+            updateMultiTargetPollConstraints();
+            presenter.setConstraint(constraint);
+            return;
+        }
 
         EfficiencyRecordValidation erValidation = new EfficiencyRecordValidation();
         //make sure constraints are in the correct numerical format... validation will happen in the run method.
@@ -371,14 +585,17 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
 
     private void updateMultiTargetPollConstraints() {
         ControlStrategyTargetPollutant[] targets = pollutantsTableData.sources();
-        controlStrategy.setTargetPollutants(targets);
+//        controlStrategy.setTargetPollutants(targets);
+        presenter.setTargetPollutants(targets);
     }
 
     public void refresh(ControlStrategy strategy, ControlStrategyResult[] controlStrategyResults) {
-        ControlStrategyConstraint constraint = strategy.getConstraint();
-        if (constraint != null) {
-            domainWideEmisReduction.setText(constraint.getDomainWideEmisReduction() != null ? decFormat.format(constraint.getDomainWideEmisReduction()) + "" : "");
-            domainWidePctReduction.setText(constraint.getDomainWidePctReduction() != null ? decFormat.format(constraint.getDomainWidePctReduction()) + "" : "");
+        if (controlStrategy.getStrategyType().getName().equalsIgnoreCase(StrategyType.leastCost)) {
+            ControlStrategyConstraint constraint = strategy.getConstraint();
+            if (constraint != null) {
+                domainWideEmisReduction.setText(constraint.getDomainWideEmisReduction() != null ? decFormat.format(constraint.getDomainWideEmisReduction()) + "" : "");
+                domainWidePctReduction.setText(constraint.getDomainWidePctReduction() != null ? decFormat.format(constraint.getDomainWidePctReduction()) + "" : "");
+            }
         }
     }
 
@@ -453,5 +670,25 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
     public void setTargetPollutants(Pollutant[] pollutants) {
         // NOTE Auto-generated method stub
         
+    }
+
+    public void edit(ControlStrategyTargetPollutant controlStrategyTargetPollutant) {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public void setTargetPollutant(ControlStrategyTargetPollutant controlStrategyTargetPollutant) {
+//        pollutantsTableData.add(controlStrategyTargetPollutant);
+        ControlStrategyTargetPollutant[] targets = pollutantsTableData.sources();
+        //replace changed item
+        for (int i = 0; i < targets.length; ++i) {
+            if (targets[i].getPollutant().equals(controlStrategyTargetPollutant.getPollutant()))
+                targets[i] = controlStrategyTargetPollutant;
+                
+        }
+//      controlStrategy.setTargetPollutants(targets);
+      presenter.setTargetPollutants(targets);
+      pollutantsTableData.refresh();
+      table.refresh(pollutantsTableData);
     }
 }

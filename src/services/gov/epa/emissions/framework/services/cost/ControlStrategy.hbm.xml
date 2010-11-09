@@ -131,7 +131,9 @@
 			<property name="minCostPerTon" column="min_cost_per_ton" type="double"  not-null="false" />
 			<property name="minAnnCost" column="min_ann_cost" type="double"  not-null="false" />
 			<property name="replacementControlMinEfficiencyDiff" column="replacement_control_min_eff_diff" type="double"  not-null="false" />
-
+			<property name="invFilter" column="inv_filter" type="string" not-null="false"/>
+			<many-to-one name="countyDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="county_dataset_id" not-null="false"/>
+		    <property name="countyDatasetVersion" column="county_dataset_version" type="integer" not-null="false"/>
     	</composite-element>
 	</array>
 

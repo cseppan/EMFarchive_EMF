@@ -94,7 +94,7 @@ BEGIN
 
 		-- create pointid btree index
 		IF length('pointid_' || table_name) >= 63 - 8 THEN
-			index_name := 'pointid_' || substr(table_name, 11, 63);
+			index_name := 'pointid_' || substr(table_name, 10, 63);
 		ELSE
 			index_name := 'pointid_' || table_name;
 		END IF;

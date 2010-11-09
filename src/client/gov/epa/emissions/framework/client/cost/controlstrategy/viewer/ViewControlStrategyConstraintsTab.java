@@ -18,6 +18,8 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlmeasure.EfficiencyRecordValidation;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
+import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -73,6 +75,8 @@ public class ViewControlStrategyConstraintsTab extends EmfPanel implements ViewC
     
     private EmfConsole parentConsole;
 
+    private SelectableSortFilterWrapper table;
+
     public ViewControlStrategyConstraintsTab(ControlStrategy controlStrategy, MessagePanel messagePanel,
             EmfConsole parentConsole, DesktopManager desktopManager) {
 
@@ -91,7 +95,7 @@ public class ViewControlStrategyConstraintsTab extends EmfPanel implements ViewC
         if (controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
             try {
                 add(getBorderedPanel(createMultiPollutantsPanel(controlStrategy.getTargetPollutants(), 
-                        presenter.getAllPollutants()), "Multi-Pollutant Max Emis Reducation"), BorderLayout.NORTH);
+                        presenter.getAllPollutants()), "Multi-Pollutant Max Emis Reducation"), BorderLayout.CENTER);
             } catch (EmfException e) {
                 e.printStackTrace();
             }
@@ -131,12 +135,18 @@ public class ViewControlStrategyConstraintsTab extends EmfPanel implements ViewC
         return panel;
     }
     
+    private SortCriteria sortCriteria() {
+        String[] columnNames = {"Pollutant" };
+        return new SortCriteria(columnNames, new boolean[] {true}, new boolean[] { true });
+    }
+
     private JPanel createMultiPollutantsPanel(ControlStrategyTargetPollutant[] targets, Pollutant[] all) {
         pollutantsTableData = new TargetPollutantTableData(targets, all);
-        pollutantsPanel = new TargetPollutantsPanel("Multi-Pollutants", pollutantsTableData, null, parentConsole);
-        pollutantsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        pollutantsPanel.setMinimumSize(new Dimension(80, 100));
-        return pollutantsPanel;
+        table = new SelectableSortFilterWrapper(parentConsole, pollutantsTableData, sortCriteria());
+//        pollutantsPanel = new TargetPollutantsPanel("Multi-Pollutants", pollutantsTableData, null, parentConsole);
+        table.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        table.setMinimumSize(new Dimension(80, 100));
+        return table;
     }
 
 

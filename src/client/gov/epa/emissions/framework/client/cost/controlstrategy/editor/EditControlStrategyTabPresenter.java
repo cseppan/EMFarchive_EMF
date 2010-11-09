@@ -17,4 +17,5 @@ public interface EditControlStrategyTabPresenter {
     void doChangeStrategyType(StrategyType strategyType);
     
     void doSetTargetPollutants(Pollutant[] pollutants);
+    
 }

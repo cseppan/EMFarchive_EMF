@@ -179,9 +179,9 @@ public abstract class AbstractStrategyTask implements Strategy {
     }
 
     protected void updateVersionInfo() throws EmfException {
-        ControlStrategyResult[] results = getControlStrategyResults();
+//        ControlStrategyResult[] results = results;//getControlStrategyResults();
         
-        for (ControlStrategyResult result : results)
+        for (ControlStrategyResult result : strategyResultList)
             updateResultDataset(result);
     }
     
@@ -292,6 +292,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             measureSummaryResult.setRunStatus("Completed.");
             setSummaryResultCount(measureSummaryResult);
             saveControlStrategySummaryResult(measureSummaryResult);
+            strategyResultList.add(measureSummaryResult);
 //            runSummaryQASteps((EmfDataset)measureSummaryResult.getDetailedResultDataset(), 0);
         }
     }
@@ -309,6 +310,7 @@ public abstract class AbstractStrategyTask implements Strategy {
             countySummaryResult.setRunStatus("Completed.");
             setSummaryResultCount(countySummaryResult);
             saveControlStrategySummaryResult(countySummaryResult);
+            strategyResultList.add(countySummaryResult);
 //            runSummaryQASteps((EmfDataset)countySummaryResult.getDetailedResultDataset(), 0);
         }
     }
@@ -826,24 +828,31 @@ public abstract class AbstractStrategyTask implements Strategy {
             EmfDataset contldInv = (EmfDataset) strategyResult.getControlledInventoryDataset();
             
             if (result != null) {
-                Version version = dao.getVersion(session, result.getId(), result.getDefaultVersion());
+System.out.println(result.getName());
+
+//                Version version = dao.getVersion(session, result.getId(), result.getDefaultVersion());
+System.out.println(result.getName());
                 
-                if (version != null) {
-                    version.setCreator(user);
-                    updateVersion(result, version, dbServer, session, dao);
-                }
+//                if (version != null) {
+//                    version.setCreator(user);
+                    System.out.println(result.getName());
+                    updateVersion(result, null, dbServer, session, dao);
+                    System.out.println(result.getName());
+//                }
             }
             
             if (contldInv != null) {
-                Version version = dao.getVersion(session, contldInv.getId(), contldInv.getDefaultVersion());
+                System.out.println(result.getName());
+//                Version version = dao.getVersion(session, contldInv.getId(), contldInv.getDefaultVersion());
 
 
-                if (version != null) {
-                    version.setCreator(user);
-                    updateVersion(contldInv, version, dbServer, session, dao);
-                }
+//                if (version != null) {
+//                    version.setCreator(user);
+                    updateVersion(contldInv, null, dbServer, session, dao);
+//                }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException("Cannot update result datasets (strategy id: " + strategyResult.getControlStrategyId() + "). " + e.getMessage());
         } finally {
             if (session != null && session.isConnected())
@@ -852,9 +861,11 @@ public abstract class AbstractStrategyTask implements Strategy {
     }
     
     private void updateVersion(EmfDataset dataset, Version version, DbServer dbServer, Session session, DatasetDAO dao) throws Exception {
-        version = dao.obtainLockOnVersion(user, version.getId(), session);
-        version.setNumberRecords((int)dao.getDatasetRecordsNumber(dbServer, session, dataset, version));
-        dao.updateVersionNReleaseLock(version, session);
+        creator.updateVersionZeroRecordCount(dataset);
+        
+//        version = dao.obtainLockOnVersion(user, version.getId(), session);
+//        version.setNumberRecords((int)dao.getDatasetRecordsNumber(dbServer, session, dataset, version));
+//        dao.updateVersionNReleaseLock(version, session);
     }
 
     private void removeControlStrategyResults() throws EmfException {

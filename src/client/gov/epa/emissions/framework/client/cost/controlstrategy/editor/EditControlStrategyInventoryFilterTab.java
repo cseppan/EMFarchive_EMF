@@ -76,6 +76,8 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     private ComboBox version, dataset;
     
     private JCheckBox mergeInventories;
+
+    private JPanel invFilterCountyDatasetPanel;
     
     public EditControlStrategyInventoryFilterTab(ControlStrategy controlStrategy, ManageChangeables changeablesList, 
             MessagePanel messagePanel, EmfConsole parentConsole, 
@@ -95,7 +97,8 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     private void doLayout(ControlStrategyInputDataset[] controlStrategyInputDatasets) throws EmfException {
         tableData = new ControlStrategyInputDatasetTableData(controlStrategyInputDatasets);
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(createMiddleSection(controlStrategy), BorderLayout.CENTER);
+        invFilterCountyDatasetPanel = createMiddleSection(controlStrategy);
+        panel.add(invFilterCountyDatasetPanel, BorderLayout.CENTER);
         
         setLayout(new BorderLayout(5, 5));
         add(panel,BorderLayout.SOUTH);
@@ -492,10 +495,18 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
 
     public void notifyStrategyTypeChange(StrategyType strategyType) {
         
-        if (strategyType != null && (strategyType.getName().equals(StrategyType.leastCost) || strategyType.getName().equals(StrategyType.leastCostCurve)))
+        if (strategyType != null && (strategyType.getName().equals(StrategyType.leastCost) || strategyType.getName().equals(StrategyType.leastCostCurve))) {            
             mergeInventories.setVisible(true);
-        else
+            invFilterCountyDatasetPanel.setVisible(true);
+        }
+        else if (strategyType != null && (strategyType.getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION))) {
+            mergeInventories.setVisible(true);
+            invFilterCountyDatasetPanel.setVisible(false);
+        }
+        else {
             mergeInventories.setVisible(false);
+            invFilterCountyDatasetPanel.setVisible(true);
+        }
     }
 
     public void notifyStrategyRun(ControlStrategy controlStrategy) {
@@ -542,7 +553,6 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     }
 
     public void fireStrategyTypeChanges(StrategyType strategyType) {
-        // NOTE Auto-generated method stub
-        
+        notifyStrategyTypeChange(strategyType);
     }
 }

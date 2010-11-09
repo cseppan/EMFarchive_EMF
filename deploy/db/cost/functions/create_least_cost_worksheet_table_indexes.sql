@@ -9,6 +9,7 @@ DECLARE
 	index_name varchar(64) := '';
 	is_point_table boolean := false;
 BEGIN
+	table_name := lower(table_name);
 
 	-- see if there are point specific columns in the inventory
 	is_point_table := public.check_table_for_columns(table_name, 'plantid,pointid,stackid,segment', ',');

@@ -78,6 +78,7 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
         leastCostCMWorksheetResult.setRunStatus("Completed.");
         setSummaryResultCount(leastCostCMWorksheetResult);
         saveControlStrategySummaryResult(leastCostCMWorksheetResult);
+        strategyResultList.add(leastCostCMWorksheetResult);
         // runSummaryQASteps((EmfDataset)leastCostCMWorksheetResult.getDetailedResultDataset(), 0);
     }
 
@@ -87,6 +88,7 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
         leastCostCurveSummaryResult.setRunStatus("Completed.");
         setSummaryResultCount(leastCostCurveSummaryResult);
         saveControlStrategySummaryResult(leastCostCurveSummaryResult);
+        strategyResultList.add(leastCostCurveSummaryResult);
         // runSummaryQASteps((EmfDataset)leastCostCurveSummaryResult.getDetailedResultDataset(), 0);
     }
 

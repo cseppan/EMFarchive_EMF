@@ -4,10 +4,11 @@ $BODY$
 DECLARE
 	index_name varchar(64) := '';
 BEGIN
+	table_name := lower(table_name);
 
 	-- create source_id btree index
 	IF length('source_id_' || table_name) >= 63 - 10 THEN
-		index_name := 'source_id_' || substr(table_name, 11, 63);
+		index_name := 'source_id_' || substr(table_name, 12, 63);
 	ELSE
 		index_name := 'source_id_' || table_name;
 	END IF;
@@ -18,7 +19,7 @@ BEGIN
 
 	-- create record_id btree index
 	IF length('record_id' || table_name) >= 63 - 10 THEN
-		index_name := 'record_id_' || substr(table_name, 11, 63);
+		index_name := 'record_id_' || substr(table_name, 12, 63);
 	ELSE
 		index_name := 'record_id_' || table_name;
 	END IF;
@@ -30,7 +31,7 @@ BEGIN
 
 	-- create fips btree index
 	IF length('fips_' || table_name) >= 63 - 5 THEN
-		index_name := 'fips_' || substr(table_name, 6, 63);
+		index_name := 'fips_' || substr(table_name, 7, 63);
 	ELSE
 		index_name := 'fips_' || table_name;
 	END IF;
@@ -41,7 +42,7 @@ BEGIN
 
 	-- create scc btree index
 	IF length('scc_' || table_name) >= 63 - 4 THEN
-		index_name := 'scc_' || substr(table_name, 5, 63);
+		index_name := 'scc_' || substr(table_name, 6, 63);
 	ELSE
 		index_name := 'scc_' || table_name;
 	END IF;
@@ -52,7 +53,7 @@ BEGIN
 
 	-- create plantid btree index
 	IF length('plantid_' || table_name) >= 63 - 8 THEN
-		index_name := 'plantid_' || substr(table_name, 9, 63);
+		index_name := 'plantid_' || substr(table_name, 10, 63);
 	ELSE
 		index_name := 'plantid_' || table_name;
 	END IF;
@@ -63,7 +64,7 @@ BEGIN
 
 	-- create pointid btree index
 	IF length('pointid_' || table_name) >= 63 - 8 THEN
-		index_name := 'pointid_' || substr(table_name, 9, 63);
+		index_name := 'pointid_' || substr(table_name, 10, 63);
 	ELSE
 		index_name := 'pointid_' || table_name;
 	END IF;
@@ -74,7 +75,7 @@ BEGIN
 
 	-- create stackid btree index
 	IF length('stackid_' || table_name) >= 63 - 8 THEN
-		index_name := 'stackid_' || substr(table_name, 9, 63);
+		index_name := 'stackid_' || substr(table_name, 10, 63);
 	ELSE
 		index_name := 'stackid_' || table_name;
 	END IF;
@@ -85,7 +86,7 @@ BEGIN
 
 	-- create segment btree index
 	IF length('segment_' || table_name) >= 63 - 8 THEN
-		index_name := 'segment_' || substr(table_name, 9, 63);
+		index_name := 'segment_' || substr(table_name, 10, 63);
 	ELSE
 		index_name := 'segment_' || table_name;
 	END IF;
@@ -96,7 +97,7 @@ BEGIN
 
 	-- create poll btree index
 	IF length('poll_' || table_name) >= 63 - 5 THEN
-		index_name := 'poll_' || substr(table_name, 6, 63);
+		index_name := 'poll_' || substr(table_name, 7, 63);
 	ELSE
 		index_name := 'poll_' || table_name;
 	END IF;
@@ -107,7 +108,7 @@ BEGIN
 
 	-- create cm_id btree index
 	IF length('cm_id_' || table_name) >= 63 - 6 THEN
-		index_name := 'cm_id_' || substr(table_name, 7, 63);
+		index_name := 'cm_id_' || substr(table_name, 8, 63);
 	ELSE
 		index_name := 'cm_id_' || table_name;
 	END IF;
