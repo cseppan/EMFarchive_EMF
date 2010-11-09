@@ -828,21 +828,21 @@ public abstract class AbstractStrategyTask implements Strategy {
             EmfDataset contldInv = (EmfDataset) strategyResult.getControlledInventoryDataset();
             
             if (result != null) {
-System.out.println(result.getName());
+//System.out.println(result.getName());
 
 //                Version version = dao.getVersion(session, result.getId(), result.getDefaultVersion());
-System.out.println(result.getName());
+//System.out.println(result.getName());
                 
 //                if (version != null) {
 //                    version.setCreator(user);
-                    System.out.println(result.getName());
+//                    System.out.println(result.getName());
                     updateVersion(result, null, dbServer, session, dao);
-                    System.out.println(result.getName());
+//                    System.out.println(result.getName());
 //                }
             }
             
             if (contldInv != null) {
-                System.out.println(result.getName());
+//                System.out.println(result.getName());
 //                Version version = dao.getVersion(session, contldInv.getId(), contldInv.getDefaultVersion());
 
 

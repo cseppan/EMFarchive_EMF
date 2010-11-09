@@ -51,6 +51,8 @@ public class StrategyLoader extends AbstractStrategyLoader {
             runStrategy(controlStrategyInputDataset, detailedResult, controlStrategyTargetPollutant.getPollutant());
         }
         
+        runStrategyFinalize(controlStrategyInputDataset, detailedResult);
+        
         //create strategy messages result
         strategyMessagesResult = createStrategyMessagesResult(inputDataset, controlStrategyInputDataset.getVersion());
         populateStrategyMessagesDataset(controlStrategyInputDataset, strategyMessagesResult, detailedResult);
@@ -99,6 +101,19 @@ public class StrategyLoader extends AbstractStrategyLoader {
         //finally analyze the table, so the indexes take affect immediately, 
         //NOT when the SQL engine gets around to analyzing eventually
         dataTable.analyzeTable(table);
+    }
+
+    private void runStrategyFinalize(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
+        String query = "SELECT public.run_multi_pollutant_max_emis_red_strategy_finalize("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
+        
+        System.out.println(System.currentTimeMillis() + " " + query);
+        try {
+            datasource.query().execute(query);
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            //
+        }
     }
 
     private void runStrategy(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult, Pollutant targetPollutant) throws EmfException {
