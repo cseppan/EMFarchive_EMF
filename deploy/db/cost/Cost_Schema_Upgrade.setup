@@ -1409,3 +1409,7 @@ alter table emf.control_strategy_target_pollutants
 add column inv_filter text,
 add column county_dataset_id integer,
 add column county_dataset_version integer;
+
+-- 11/20/2010 Add is_final to control strategy table
+ALTER TABLE control_strategies
+   ADD COLUMN is_final boolean DEFAULT false;

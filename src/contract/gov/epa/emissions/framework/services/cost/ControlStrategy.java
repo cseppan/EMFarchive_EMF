@@ -86,6 +86,8 @@ public class ControlStrategy implements Lockable, Serializable {
     
     private String copiedFrom;
     
+    private Boolean isFinal;
+    
     public ControlStrategy() {
         this.lock = new Mutex();
 //        this.controlStrategyInputDatasets = new ArrayList();
@@ -447,5 +449,13 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public ControlStrategyTargetPollutant[] getTargetPollutants() {
         return targetPollutants;
+    }
+
+    public void setIsFinal(Boolean isFinal) {
+        this.isFinal = isFinal;
+    }
+
+    public Boolean getIsFinal() {
+        return isFinal;
     }
 }

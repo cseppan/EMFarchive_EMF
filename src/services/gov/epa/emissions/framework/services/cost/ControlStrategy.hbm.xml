@@ -34,6 +34,9 @@
 	<property name="mergeInventories" column="merge_inventories" type="boolean" not-null="false"/>
 	<property name="includeUnspecifiedCosts" column="include_unspecified_costs" type="boolean" not-null="false"/>
 
+	<property name="isFinal" column="is_final" type="boolean" not-null="false"/>
+
+
 	<many-to-one name="countyDataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="county_dataset_id"/>
 
 	<one-to-one 
