@@ -92,7 +92,7 @@ public class ViewControlStrategyConstraintsTab extends EmfPanel implements ViewC
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         
-        if (controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
+        if (controlStrategy.getStrategyType() != null && controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)) {
             try {
                 add(getBorderedPanel(createMultiPollutantsPanel(controlStrategy.getTargetPollutants(), 
                         presenter.getAllPollutants()), "Multi-Pollutant Max Emis Reducation"), BorderLayout.CENTER);
