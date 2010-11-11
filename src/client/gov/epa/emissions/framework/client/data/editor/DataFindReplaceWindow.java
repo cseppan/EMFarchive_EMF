@@ -22,6 +22,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
@@ -135,7 +136,7 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
                     validateFields();
 
                     String col = columnNames.getSelectedItem().toString();
-                    String findString = find.getText().trim();
+                    String findString = (find.getText() == null) ?  "": find.getText();
                     String replaceString = (replaceWith.getText() == null) ? "" : replaceWith.getText().trim();
                     String rowFilter = (filterLabel.getText().equals("NO FILTER")) ? "" : filterLabel.getText();
 
@@ -144,18 +145,28 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
                     resetDataeditorRevisionField();
                     setMsg("Successfully replaced column values.");
                 } catch (EmfException e) {
-                    setErrorMsg(e.getMessage());
+                    if (!e.getMessage().trim().isEmpty())
+                        setErrorMsg(e.getMessage());
                 }
             }
         };
     }
 
     private void validateFields() throws EmfException {
-        if (find.getText() == null || find.getText().trim().isEmpty())
-            throw new EmfException("Please specify in the Find field.");
-
+        String findString = (find.getText() == null) ?  "": find.getText();
+        String replaceString = (replaceWith.getText() == null) ? "" : replaceWith.getText().trim();
+        
         if (columnNames.getSelectedItem() == null)
             throw new EmfException("Please select a valid column");
+        if (findString.equals(replaceString))
+            throw new EmfException("Please specify different find and replace values.");
+        if (replaceString.isEmpty()){
+            String message = "Replace field is empty, would you like to continue?";
+            int selection = JOptionPane.showConfirmDialog( this, message, "Warning", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+            if (selection == JOptionPane.NO_OPTION)   
+                throw new EmfException("");
+        }
     }
     
     private void resetDataeditorRevisionField() {
