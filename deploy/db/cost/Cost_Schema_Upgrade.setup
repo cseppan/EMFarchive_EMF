@@ -1411,5 +1411,5 @@ add column county_dataset_id integer,
 add column county_dataset_version integer;
 
 -- 11/10/2010 Add is_final to control strategy table
-ALTER TABLE control_strategies
+ALTER TABLE emf.control_strategies
    ADD COLUMN is_final boolean DEFAULT false;
