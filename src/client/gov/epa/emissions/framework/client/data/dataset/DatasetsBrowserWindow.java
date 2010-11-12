@@ -124,6 +124,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         dsTypesBox.setSelectedItem(type);
     }
     
+    public void setNameFilter(String nameFilter) {
+        textFilter.setText(nameFilter);
+    }
+    
     public void setDSTypeSelection(int index) {
         dsTypesBox.setSelectedIndex(index);
     }

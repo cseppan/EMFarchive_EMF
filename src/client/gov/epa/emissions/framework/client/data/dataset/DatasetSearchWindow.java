@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -45,6 +46,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
     private ComboBox keyword;
     
+    private ComboBox creatorsBox;
+    
     private ComboBox dsTypesBox;
     
     private ComboBox projectsCombo;
@@ -56,7 +59,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     private EmfConsole parent;
     
     public DatasetSearchWindow(String title, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super(title, new Dimension(500, 320), desktopManager);
+        super(title, new Dimension(500, 340), desktopManager);
         parent = parentConsole;
     }
 
@@ -89,6 +92,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         dsTypesBox.setPreferredSize(dim);
         keyword = new ComboBox("Select one", presenter.getKeywords());
         keyword.setPreferredSize(dim);
+        creatorsBox = new ComboBox("Select one", getAllUsers());
+        creatorsBox.setPreferredSize(dim);
         
         projectsCombo = new ComboBox("Select one", presenter.getProjects());
         projectsCombo.setPreferredSize(dim);
@@ -100,16 +105,18 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                 
         if (preText != null)
             name.setText(preText);
+        creatorsBox.setSelectedItem(presenter.getUser());
 
         layoutGen.addLabelWidgetPair("Name contains:", name, panel);
         layoutGen.addLabelWidgetPair("Description contains:", desc, panel);
+        layoutGen.addLabelWidgetPair("Creator:", creatorsBox, panel);
         layoutGen.addLabelWidgetPair("Dataset type:", dsTypesBox, panel);
         layoutGen.addLabelWidgetPair("Keyword:", keyword, panel);
         layoutGen.addLabelWidgetPair("Keyword value:", value, panel);
         layoutGen.addLabelWidgetPair("Project:", projectsCombo, panel);
 
         // Lay out the panel.
-        layoutGen.makeCompactGrid(panel, 6, 2, // rows, cols
+        layoutGen.makeCompactGrid(panel, 7, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 10);// xPad, yPad
 
@@ -143,7 +150,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                     }
 
                     DatasetType type = (DatasetType)dsTypesBox.getSelectedItem();
-                    presenter.refreshViewOnSearch(datasets, getDstype(datasets, type));
+                    presenter.refreshViewOnSearch(datasets, getDstype(datasets, type), name.getText());
                 } catch (EmfException e) {
                     if (e.getMessage().length() > 100)
                         messagePanel.setError(e.getMessage().substring(0, 100) + "...");
@@ -196,6 +203,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     protected boolean checkFields() {
         if ((name.getText() == null || name.getText().trim().isEmpty())
                 && (desc.getText() == null || desc.getText().trim().isEmpty())
+                && creatorsBox.getSelectedItem() == null
                 && dsTypesBox.getSelectedItem() == null
                 && keyword.getSelectedItem() == null
                 && projectsCombo.getSelectedItem() == null)
@@ -216,6 +224,11 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
             ds.setKeyVals(new KeyVal[] { kv });
         }
         
+        
+        User user = (User) creatorsBox.getSelectedItem();
+        if (user != null) {
+            ds.setCreator(user.getUsername());
+        }
         Project project = (Project) projectsCombo.getSelectedItem();
 
         if (project != null) {
@@ -230,6 +243,12 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         dbDSTypes.add(new DatasetType("All"));
         dbDSTypes.addAll(Arrays.asList(presenter.getDSTypes()));
         return dbDSTypes.toArray(new DatasetType[0]);
+    }
+    
+    private User[] getAllUsers() throws EmfException {
+        List<User> users = new ArrayList<User>();
+        users.addAll(Arrays.asList(presenter.getUsers()));
+        return users.toArray(new User[0]);
     }
     
     private DatasetType getDstype(EmfDataset[] datasets, DatasetType type) {

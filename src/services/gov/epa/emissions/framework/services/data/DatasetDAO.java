@@ -1621,6 +1621,9 @@ public class DatasetDAO {
         String name = ds.getName();
         String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE "
                 + getPattern(name.toLowerCase().trim()));
+        String creator = ds.getCreator();
+        String dsCreatorStr = (creator == null || creator.trim().isEmpty() ? "" : " AND lower(DS.creator) LIKE "
+            + getPattern(creator.toLowerCase().trim()));
         String dsKeyStr = getDSKeyStr(ds.getKeyVals());
         String desc = ds.getDescription();
         String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE "
@@ -1633,6 +1636,7 @@ public class DatasetDAO {
                 + " WHERE DS.status <> 'Deleted'"
                 + dsTypeStr
                 + dsNameStr
+                + dsCreatorStr
                 + checkBackSlash(descStr)
                 + dsProjStr
                 + " ORDER BY DS.name";
@@ -1650,6 +1654,7 @@ public class DatasetDAO {
                 + dsTypeStr
                 + (dsTypeKeyStr.isEmpty() ? "" : " AND TYPE.id = DS.datasetType.id")
                 + dsNameStr
+                + dsCreatorStr
                 + checkBackSlash(descStr) + dsProjStr + " ORDER BY DS.name";
 
         List<EmfDataset> ds2 = session.createQuery(dstypequery).list();

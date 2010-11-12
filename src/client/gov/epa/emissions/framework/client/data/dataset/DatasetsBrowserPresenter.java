@@ -60,9 +60,10 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         view.clearMessage();
     }
     
-    public void refreshViewOnSearch(EmfDataset[] datasets, DatasetType type) {
+    public void refreshViewOnSearch(EmfDataset[] datasets, DatasetType type, String nameFilter) {
         //DatasetType dsType = getDstype(datasets, type);
-        view.setDSTypeSelection(0);
+        view.setDSTypeSelection(type);
+        view.setNameFilter(nameFilter);
         view.refresh(datasets);
         view.clearMessage();
     }
@@ -84,6 +85,10 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         return session.dataCommonsService().getDatasetTypes();
     }
     
+    public User[] getUsers() throws EmfException {
+        return session.userService().getUsers();
+    }
+    
     private EmfDataset[] getDatasets(String nameContains) throws EmfException {
         return dataService().getDatasets(nameContains);
     }
@@ -92,7 +97,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         return session.dataService();
     }
     
-    private User getUser() {
+    public User getUser() {
         return session.user();
     }
 
