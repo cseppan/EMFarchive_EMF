@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.ui.InfoDialog;
+import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -55,6 +56,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private Button stopButton;
     
+    private Button refreshButton;
+    
     private EditControlStrategyMeasuresTab measuresTabView;
 
     private ControlStrategyProgramsTab programsTabView;
@@ -70,7 +73,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private StrategyType lastStrategyType;
     
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
-        super("Edit Control Strategy", new Dimension(780, 600), desktopManager);
+        super("Edit Control Strategy", new Dimension(810, 620), desktopManager);
 //        this.setMinimumSize(new Dimension(700, 300));
         this.session = session;
         this.desktopManager = desktopManager;
@@ -89,6 +92,11 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         this.lastStrategyType = controlStrategy.getStrategyType();
         doLayout(controlStrategy, controlStrategyResults);
 //        pack();
+        if ( this.controlStrategy.getIsFinal()){
+            this.saveButton.setEnabled(false);
+            this.runButton.setEnabled(false);
+            this.refreshButton.setEnabled(false);            
+        }         
         super.display();
 //        super.resetChanges();
     }
@@ -268,7 +276,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         if (!summary.getRunStatus().equalsIgnoreCase("Running"))
             container.add(runButton);
 
-        Button refreshButton = new Button("Refresh", refreshAction());
+        refreshButton = new Button("Refresh", refreshAction());
         container.add(refreshButton);
 
         stopButton = new StopButton(stopAction());
@@ -385,9 +393,16 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         stopButton.setEnabled(!enable);
     }
 
-    protected void save() throws EmfException {
+    protected void save() throws EmfException { // TODO: disable save, refresh, run button if final
         clearMessage();
         presenter.doSave(controlStrategy);
+        if (controlStrategy.getIsFinal())
+        {
+            this.saveButton.setEnabled(false);
+            this.runButton.setEnabled(false);
+            this.refreshButton.setEnabled(false);
+
+        }
         messagePanel
             .setMessage("Strategy was saved successfully.");
         resetChanges();

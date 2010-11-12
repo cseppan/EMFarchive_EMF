@@ -90,7 +90,7 @@ public class RunQAStepTask {
             runQAProgram.run();
             endTime = System.currentTimeMillis();
             System.out.println("Ran QA step, " + qaStep.getName() + ", in " + ((endTime - startTime) / (1000))  + " secs");
-        } finally {
+        } finally { // add catch to deal with exception
             close(dbServer);
         }
         complete(suffix, qaStep);

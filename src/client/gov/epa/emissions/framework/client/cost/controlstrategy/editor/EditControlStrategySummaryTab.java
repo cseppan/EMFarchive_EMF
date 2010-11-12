@@ -94,6 +94,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private ComboBox strategyTypeCombo;
 
     protected JCheckBox useCostEquationCheck;
+    
+    protected JCheckBox makeFinalCheck;
 
     private JCheckBox includeUnspecifiedCostsCheck;
 
@@ -146,15 +148,28 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         layoutGenerator.addLabelWidgetPair("Name:", name(), panelTop);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panelTop);
-
+//      JPanel subPanel = new JPanel(new BorderLayout());
+//      subPanel.add(new JLabel("Project:"));
+//      subPanel.add(projects());
+        layoutGenerator.addLabelWidgetPair("Project:", projects(), panelTop);
+//      layoutGenerator.addWidgetPair(middleLeftPanel, middleRightPanel, panelBottom);
+//      layoutGenerator.addLabelWidgetPair("Creator:", creator(), panelTop);
+//      layoutGenerator.addLabelWidgetPair("Last Modified Date: ", lastModifiedDate(), panelTop);
+//      layoutGenerator.addLabelWidgetPair("Copied From:", new JLabel("   "), panelTop);
+//      layoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), panelTop);
+        layoutGenerator.makeCompactGrid(panelTop, 3, 2, // rows, cols
+              5, 5, // initialX, initialY
+              10, 10);// xPad, yPad
+      
         JPanel middleLeftPanel = new JPanel(new SpringLayout());
         // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator middleLeftLayoutGenerator = new SpringLayoutGenerator();
         middleLeftLayoutGenerator.addLabelWidgetPair("Creator:", creator(), middleLeftPanel);
         middleLeftLayoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), middleLeftPanel);
-        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 2, 2, // rows, cols
+        middleLeftLayoutGenerator.addLabelWidgetPair("Is Final:", makeFinal(), middleLeftPanel);
+        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
+                30, 10);// xPad, yPad
 
         JPanel middleRightPanel = new JPanel(new SpringLayout());
         // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
@@ -168,26 +183,16 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         middleRightLayoutGenerator.addLabelWidgetPair("Copied From:", this.createLeftAlignedLabel(copiedFrom),
                 middleRightPanel);
+        middleRightLayoutGenerator.addLabelWidgetPair("", new JLabel(""),
+                middleRightPanel);
 
-        middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 2, 2, // rows, cols
-                5, 5, // initialX, initialY
-                30, 10);// xPad, yPad
-
-//        JPanel subPanel = new JPanel(new BorderLayout());
-//        subPanel.add(new JLabel("Project:"));
-//        subPanel.add(projects());
-        
-        layoutGenerator.addLabelWidgetPair("Project:", projects(), panelTop);
-        panelBottom.add(middleLeftPanel);
-        panelBottom.add(middleRightPanel);
-//        layoutGenerator.addWidgetPair(middleLeftPanel, middleRightPanel, panelBottom);
-//        layoutGenerator.addLabelWidgetPair("Creator:", creator(), panelTop);
-//        layoutGenerator.addLabelWidgetPair("Last Modified Date: ", lastModifiedDate(), panelTop);
-//        layoutGenerator.addLabelWidgetPair("Copied From:", new JLabel("   "), panelTop);
-//        layoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), panelTop);
-        layoutGenerator.makeCompactGrid(panelTop, 3, 2, // rows, cols
+        middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
+
+        panelBottom.add(middleLeftPanel);
+        panelBottom.add(middleRightPanel);
+        
         panel.add(panelTop);
         panel.add(panelBottom);
         return panel;
@@ -215,6 +220,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         
         return strategyTypeCombo;
     }
+    
+    private JCheckBox makeFinal() {
+
+        makeFinalCheck = new JCheckBox("", null, controlStrategy.getIsFinal()); // need to check with database to see if it is final
+        return makeFinalCheck;
+    }    
 
     private JPanel createLowerSection() throws EmfException {
         JPanel panel = new JPanel(new BorderLayout());
@@ -492,6 +503,9 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         }
         controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
         controlStrategy.setIncludeUnspecifiedCosts(includeUnspecifiedCostsCheck.isSelected());
+        
+        Boolean isFinal = makeFinalCheck.isSelected();
+        controlStrategy.setIsFinal(isFinal);
     }
 
     private void updateMultiTargetPolls() {

@@ -88,8 +88,10 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
     private JPanel pollutantsPanel;
 
     private ComboBox strategyTypeCombo;
-
+    
     protected JCheckBox useCostEquationCheck;
+    
+    protected JCheckBox isFinalCheck;
 
     private JCheckBox includeUnspecifiedCostsCheck;
 
@@ -148,7 +150,9 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
         SpringLayoutGenerator middleLeftLayoutGenerator = new SpringLayoutGenerator();
         middleLeftLayoutGenerator.addLabelWidgetPair("Creator:", creator(), middleLeftPanel);
         middleLeftLayoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), middleLeftPanel);
-        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 2, 2, // rows, cols
+        middleLeftLayoutGenerator.addLabelWidgetPair("Is Final:", makeFinal(), middleLeftPanel);
+        
+        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -164,7 +168,9 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
 
         middleRightLayoutGenerator.addLabelWidgetPair("Copied From:", this.createLeftAlignedLabel(copiedFrom),
                 middleRightPanel);
-        middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 2, 2, // rows, cols
+        middleRightLayoutGenerator.addLabelWidgetPair("", new JLabel(""),
+                middleRightPanel);
+        middleRightLayoutGenerator.makeCompactGrid(middleRightPanel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 30, 10);// xPad, yPad
 
@@ -289,6 +295,12 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
 
         return this.useCostEquationCheck;
     }
+    
+    private JCheckBox makeFinal() {
+
+        isFinalCheck = new JCheckBox("", null, controlStrategy.getIsFinal()); // need to check with database to see if it is final
+        return isFinalCheck;
+    }     
 
     private JComponent includeUnspecifiedCostsCheckBox() {
 
