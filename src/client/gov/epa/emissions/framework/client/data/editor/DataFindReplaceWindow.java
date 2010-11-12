@@ -133,7 +133,8 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
                 clearMsgPanel();
 
                 try {
-                    validateFields();
+                    if (!validateFields())
+                        return;
 
                     String col = columnNames.getSelectedItem().toString();
                     String findString = (find.getText() == null) ?  "": find.getText();
@@ -152,7 +153,7 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
         };
     }
 
-    private void validateFields() throws EmfException {
+    private boolean validateFields() throws EmfException {
         String findString = (find.getText() == null) ?  "": find.getText();
         String replaceString = (replaceWith.getText() == null) ? "" : replaceWith.getText().trim();
         
@@ -165,8 +166,9 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
             int selection = JOptionPane.showConfirmDialog( this, message, "Warning", JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (selection == JOptionPane.NO_OPTION)   
-                throw new EmfException("");
+                return false;
         }
+        return true; 
     }
     
     private void resetDataeditorRevisionField() {
