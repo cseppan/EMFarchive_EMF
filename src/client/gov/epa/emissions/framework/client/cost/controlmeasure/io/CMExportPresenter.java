@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure.io;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasureExportService;
 
 import java.io.File;
@@ -66,5 +68,13 @@ public class CMExportPresenter {
             folder = "";// default, if unspecified
 
         return folder;
+    }
+    
+    public ControlMeasure[] getControlMeasureBySector(int[] sectorIds) throws EmfException {
+        return session.controlMeasureService().getControlMeasureBySector(sectorIds);
+    }
+    
+    public Sector[] getDistinctControlMeasureSectors() throws EmfException {
+        return session.controlMeasureService().getDistinctControlMeasureSectors();
     }
 }

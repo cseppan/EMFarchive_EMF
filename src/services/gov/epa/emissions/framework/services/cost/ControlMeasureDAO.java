@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Reference;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
@@ -624,6 +626,29 @@ public class ControlMeasureDAO {
 
     public List<ControlMeasurePropertyCategory> getPropertyCategories(Session session) {
         Query query = session.createQuery("from ControlMeasurePropertyCategory as e order by e.name");
+        query.setCacheable(true);
+        return query.list();
+    }
+
+    public List<Sector> getDistinctControlMeasureSectors(Session session) {
+        Query query = session.createQuery("select distinct s FROM ControlMeasure AS cm inner join cm.sectors AS s order by s.name");
+        query.setCacheable(true);
+        return query.list();
+    }
+
+    public List<ControlMeasure> getControlMeasureBySectors(int[] sectorIds, Session session) {
+        String idList = "";
+        for (int i = 0; i < sectorIds.length; ++i) {
+            idList += (i > 0 ? ","  : "") + sectorIds[i];
+        }
+        
+        Query query = session.createQuery("select new ControlMeasure(cm.id, cm.name) "
+                + "FROM ControlMeasure AS cm "
+                + (sectorIds != null && sectorIds.length > 0 
+                        ? "inner join cm.sectors AS s "
+                          + "WHERE s.id in (" + idList + ") " 
+                        : "")
+                + "order by cm.name");
         query.setCacheable(true);
         return query.list();
     }

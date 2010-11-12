@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Reference;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
@@ -517,5 +518,32 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
     public ControlMeasurePropertyCategory getPropertyCategory(String categoryName) throws EmfException {
         return new ControlMeasurePropertyCategories(sessionFactory).getCategory(categoryName);
+    }
+
+    public Sector[] getDistinctControlMeasureSectors() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List<Sector> all = dao.getDistinctControlMeasureSectors(session);
+            return all.toArray(new Sector[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve control measure sectors.", e);
+            throw new EmfException("Could not retrieve control measures sectors.");
+        } finally {
+            session.close();
+        }
+        
+    }
+
+    public ControlMeasure[] getControlMeasureBySector(int[] sectorIds) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            List<ControlMeasure> all = dao.getControlMeasureBySectors(sectorIds, session);
+            return all.toArray(new ControlMeasure[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve control measures.", e);
+            throw new EmfException("Could not retrieve control measuress.");
+        } finally {
+            session.close();
+        }
     }
 }

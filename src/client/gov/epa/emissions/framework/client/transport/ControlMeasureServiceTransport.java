@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Reference;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
@@ -365,5 +366,22 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.addStringParam("categoryName");
         call.setReturnType(mappings.controlMeasurePropertyCategory());
         return (ControlMeasurePropertyCategory) call.requestResponse(new Object[] { categoryName });
+    }
+
+    public Sector[] getDistinctControlMeasureSectors() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getDistinctControlMeasureSectors");
+        call.setReturnType(mappings.sectors());
+        return (Sector[]) call.requestResponse(new Object[] {});
+    }
+
+    public ControlMeasure[] getControlMeasureBySector(int[] sectorIds) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getControlMeasureBySector");
+        call.addParam("sectorIds", mappings.integers());
+        call.setReturnType(mappings.controlMeasures());
+        return (ControlMeasure[]) call.requestResponse(new Object[] { sectorIds });
     }
 }

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Reference;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EMFService;
 import gov.epa.emissions.framework.services.EmfException;
@@ -84,4 +85,8 @@ public interface ControlMeasureService extends EMFService {
 
     ControlMeasurePropertyCategory getPropertyCategory(String categoryName) throws EmfException;
     
+    Sector[] getDistinctControlMeasureSectors() throws EmfException;
+    
+    ControlMeasure[] getControlMeasureBySector(int[] sectorIds) throws EmfException;
+
 }
