@@ -915,8 +915,8 @@ public class DataServiceImpl implements DataService {
             String updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith + "' WHERE " + col + "='"
                     + find + "' AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ;
 
-            String updateDelVersions = "UPDATE " + table + " SET delete_versions = coalesce(delete_versions,'')||',"
-                    + vNum + "'" + whereClause;
+            String updateDelVersions = "UPDATE " + table + " SET delete_versions = trim(both ',' from coalesce(delete_versions,'')||'," 
+                    + vNum + "') " + whereClause;
 
             if (DebugLevels.DEBUG_16) {
                 System.out.println("Query to select records: " + selectQuery);
