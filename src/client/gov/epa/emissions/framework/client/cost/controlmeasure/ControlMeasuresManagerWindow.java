@@ -437,7 +437,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         Button importButton = new ImportButton(importAction());
         panel.add(importButton);
 
-        Button exportButton = new ExportButton(exportAction());
+        Button exportButton = new ExportButton(exportAction()); // TODO: control measure exporting, from here
         exportButton.setToolTipText("Export existing Control Measure(s)");
         panel.add(exportButton);
 
@@ -505,12 +505,16 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         List cmList = getSelectedMeasures();
 
         if (cmList.size() == 0) {
-            showError("Please select a control measure.");
-            return;
+            //showError("Please select a control measure.");
+            //return;
+            presenter.doExport((ControlMeasure[]) cmList.toArray(new ControlMeasure[0]), desktopManager, table
+                    .getSelectedCount(), parentConsole, true);
+        } else {
+            presenter.doExport((ControlMeasure[]) cmList.toArray(new ControlMeasure[0]), desktopManager, table
+                    .getSelectedCount(), parentConsole, false);
         }
-
-        presenter.doExport((ControlMeasure[]) cmList.toArray(new ControlMeasure[0]), desktopManager, table
-                .getSelectedCount(), parentConsole);
+//        presenter.doExport((ControlMeasure[]) cmList.toArray(new ControlMeasure[0]), desktopManager, table
+//                .getSelectedCount(), parentConsole);
     }
 
     private Component getItem(String label, JComponent comp, int width, int height) {

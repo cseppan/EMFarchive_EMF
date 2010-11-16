@@ -1,6 +1,9 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure.io;
 
+import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -8,26 +11,39 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasureTableData;
+import gov.epa.emissions.framework.client.cost.controlmeasure.LightControlMeasureTableData;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
+import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class CMExportWindow extends DisposableInteralFrame implements CMExportView {
 
@@ -48,17 +64,44 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     private EmfSession session;
     
     private EmfConsole parentConsole;
+    
+    private JRadioButton controlMeasureRadioButton;
+    
+    private JRadioButton sectorRadioButton;
+    
+    private ButtonGroup radioButtonGroup;
+    
+    private ControlMeasureTableData tableData;
+    
+    private SelectableSortFilterWrapper table;
+    
+    private JComboBox sectorComboBox;
+    
+    private Sector[] allSectors;
+    
+    private boolean bySector;
+    
+    Sector[] sectors;
+    
 
-    public CMExportWindow(ControlMeasure[] controlMeasures, DesktopManager desktopManager, int totalMeasuers, EmfSession session, EmfConsole parentConsole) {
+    public CMExportWindow(ControlMeasure[] controlMeasures, DesktopManager desktopManager, int totalMeasuers, EmfSession session, EmfConsole parentConsole, boolean bySector) {
         super(title(controlMeasures, totalMeasuers), desktopManager);
         super.setName("cmExportWindow:" + hashCode());
 
         this.controlMeasures = controlMeasures;
         this.session = session;
         this.parentConsole = parentConsole;
+        this.bySector = bySector;
 
-        this.getContentPane().add(createLayout());
-        this.pack();
+//        this.getContentPane().add(createLayout());
+//        this.pack();
+    }
+    
+    @Override
+    public void display(){
+      this.getContentPane().add(createLayout());
+      this.pack();
+      desktopManager.openWindow(this);
     }
 
     private static String title(ControlMeasure[] controlMeasures, int total) {
@@ -78,11 +121,117 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
+        panel.add(createTopPanel());
         panel.add(createExportPanel());
         panel.add(createButtonsPanel());
 
         return panel;
     }
+    
+    private JPanel createTopPanel()
+    {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        
+        controlMeasureRadioButton = new JRadioButton("Control Measures");
+        sectorRadioButton = new JRadioButton("Sectors");        
+        radioButtonGroup = new ButtonGroup();
+        radioButtonGroup.add( this.controlMeasureRadioButton);
+        radioButtonGroup.add( this.sectorRadioButton);
+        if ( this.bySector){
+            sectorRadioButton.setSelected(true);
+            controlMeasureRadioButton.setSelected( false);
+        } else {
+            sectorRadioButton.setSelected(false);
+            controlMeasureRadioButton.setSelected( true);
+        }
+        controlMeasureRadioButton.setAction(
+          new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                checkBySector();
+            }});
+        sectorRadioButton.setAction(
+          new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                checkBySector();
+            }});
+        
+        panel.add( createControlMeasurePanel());
+        panel.add( createSectorPanel());
+        panel.setBorder( BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        
+        return panel;
+    }
+    private void checkBySector(){
+        if ( controlMeasureRadioButton.isSelected()){
+            this.bySector = false;
+        } else {
+            this.bySector = true;
+        }
+    }
+    
+    private JPanel createControlMeasurePanel(){
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        
+        panel.add( this.controlMeasureRadioButton);
+        
+        tableData = new LightControlMeasureTableData(controlMeasures, null, null, null);        
+        JPanel tablePanel = new JPanel();
+        tablePanel.setLayout(new BorderLayout());
+        table = new SelectableSortFilterWrapper(parentConsole, tableData, sortCriteria());
+        tablePanel.add(table); 
+        
+        panel.add( tablePanel);
+        
+        panel.setBorder( BorderFactory.createEmptyBorder(5,5,5,10));
+        
+        return panel;        
+    }
+    
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Name" };
+        return new SortCriteria(columnNames, new boolean[] { true }, new boolean[] { true });
+    }
+    
+    private JPanel createSectorPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        
+        panel.add(this.sectorRadioButton);
+        
+        try {
+            this.sectors = presenter.getDistinctControlMeasureSectors();
+            List<Sector> sectorList = new ArrayList<Sector>();
+            sectorList.add(new Sector("All", "All"));
+            sectorList.addAll( Arrays.asList( sectors));
+            allSectors = (Sector[]) sectorList.toArray(new Sector[0]);
+            
+//            List<String> testStringList = new ArrayList<String>();
+//            testStringList.add( "Item1");
+//            testStringList.add( "Item2");
+
+            sectorComboBox = new ComboBox("Select Sector", allSectors);
+//            sectorComboBox = new ComboBox(testStringList.toArray());
+            sectorComboBox.setSelectedIndex(0);
+            sectorComboBox.addActionListener(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    // TODO
+                }
+            });
+            panel.add(sectorComboBox);
+            panel.setBorder( BorderFactory.createEmptyBorder(5,5,5,10));
+            
+        } 
+        catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+            messagePanel.setMessage(e.getMessage());
+            
+        }
+        
+        return panel;
+    }    
 
     private JPanel createExportPanel() {
         JPanel panel = new JPanel(new SpringLayout());
@@ -123,6 +272,8 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
         layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
+        
+        panel.setBorder( BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
         return panel;
     }
@@ -153,6 +304,8 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
         container.add(done);
 
         panel.add(container, BorderLayout.EAST);
+        
+        panel.setBorder( BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
         return panel;
     }
@@ -160,16 +313,58 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     private void refresh() {
         super.validate();
     }
+    
+    private int[] getSectorIDs(){
+        int [] IDs = null;
+        if ( this.bySector) {
+            if ( sectorComboBox.getSelectedIndex() == 0){
+                messagePanel.setError("Please select Sector(s).");
+            } else if (sectorComboBox.getSelectedIndex() == 1) {
+                IDs = new int[ this.sectors.length];
+                for ( int i = 0; i<this.sectors.length; i++) {
+                    IDs[i] = this.sectors[i].getId();
+                }
+            } else {
+                IDs = new int[ 1];
+                IDs[0] = this.sectors[ sectorComboBox.getSelectedIndex()-2].getId();
+                return IDs;
+            }
+        } else {
+            messagePanel.setError("Export by Control Measures, not by Sector.");
+        }
+        return IDs;
+    }
 
     private void doExport() {
         try {
             validateFolder(folder.getText());
             
-            if (!overwrite.isSelected())
-                presenter.doExportWithoutOverwrite(getControlMeasureIds(controlMeasures), folder.getText(), prefix.getText());
-            else
-                presenter.doExportWithOverwrite(getControlMeasureIds(controlMeasures), folder.getText(), prefix.getText());
-
+            if (!overwrite.isSelected()) {
+                if ( !this.bySector) {
+                    presenter.doExportWithoutOverwrite(getControlMeasureIds(controlMeasures), folder.getText(), prefix.getText());
+                }
+                else {
+                    int [] sectorIDs = this.getSectorIDs();
+                    if ( sectorIDs != null){
+                        ControlMeasure[] controlMeasures = presenter.getControlMeasureBySector(sectorIDs);
+                        presenter.doExportWithoutOverwrite(getControlMeasureIds(controlMeasures), folder.getText(), prefix.getText());
+                    } else {
+                        return;
+                    }
+                }
+            } else {
+                if ( !this.bySector) {
+                    presenter.doExportWithOverwrite(getControlMeasureIds(controlMeasures), folder.getText(), prefix.getText());
+                } else {
+                    int [] sectorIDs = this.getSectorIDs();
+                    if ( sectorIDs != null){
+                        ControlMeasure[] controlMeasures = presenter.getControlMeasureBySector(sectorIDs);
+                        presenter.doExportWithOverwrite(getControlMeasureIds(controlMeasures), folder.getText(), prefix.getText());
+                    } else {
+                        return;
+                    }
+                }
+            }
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
             exportButton.setEnabled(false);
@@ -221,4 +416,12 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
         if (folder.contains("/home/") || folder.endsWith("/home"))
             throw new EmfException("Export data into user's home directory is not allowed.");
     }
+    
+    class RadioListener implements ActionListener { 
+        public void actionPerformed(ActionEvent e) {
+            //jlbPicture.setIcon(new ImageIcon(""+e.getActionCommand() 
+            //                              + ".jpg"));
+        }
+    }
+
 }

@@ -27,8 +27,9 @@ public class CMExportPresenter {
     public void display(CMExportView view) {
         this.view = view;
         view.observe(this);
-        view.setMostRecentUsedFolder(getFolder());
         view.display();
+        view.setMostRecentUsedFolder(getFolder());
+        
     }
 
     private String getFolder() {
