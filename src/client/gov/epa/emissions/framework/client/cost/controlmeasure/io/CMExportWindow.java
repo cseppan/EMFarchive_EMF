@@ -39,8 +39,10 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
@@ -75,7 +77,8 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     
     private SelectableSortFilterWrapper table;
     
-    private JComboBox sectorComboBox;
+//    private JComboBox sectorComboBox;
+    private JList sectorListBox;
     
     private Sector[] allSectors;
     
@@ -203,7 +206,7 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
         try {
             this.sectors = presenter.getDistinctControlMeasureSectors();
             List<Sector> sectorList = new ArrayList<Sector>();
-            sectorList.add(new Sector("All", "All"));
+//            sectorList.add(new Sector("All", "All"));
             sectorList.addAll( Arrays.asList( sectors));
             allSectors = (Sector[]) sectorList.toArray(new Sector[0]);
             
@@ -211,15 +214,27 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
 //            testStringList.add( "Item1");
 //            testStringList.add( "Item2");
 
-            sectorComboBox = new ComboBox("Select Sector", allSectors);
-//            sectorComboBox = new ComboBox(testStringList.toArray());
-            sectorComboBox.setSelectedIndex(0);
-            sectorComboBox.addActionListener(new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    // TODO
-                }
-            });
-            panel.add(sectorComboBox);
+//            sectorComboBox = new ComboBox("Select Sector", allSectors);
+////            sectorComboBox = new ComboBox(testStringList.toArray());
+//            sectorComboBox.setEnabled( true);
+//            sectorComboBox.setSelectedIndex(0);
+//            sectorComboBox.addActionListener(new AbstractAction() {
+//                public void actionPerformed(ActionEvent e) {
+//                    // TODO
+//                }
+//            });
+            
+            List<String> sectorStrList = new ArrayList<String>();
+            
+            sectorListBox = new JList( allSectors);
+            sectorListBox.setVisibleRowCount(3);
+            JScrollPane scrollPane = new JScrollPane( sectorListBox);
+//            double oldH = scrollPane.getViewportBorderBounds().getHeight();
+//            double oldW = scrollPane.getViewportBorderBounds().getWidth();
+//            scrollPane.getViewportBorderBounds().resize((int)oldW, 30);
+
+            panel.add(scrollPane); 
+            //panel.add(sectorComboBox);
             panel.setBorder( BorderFactory.createEmptyBorder(5,5,5,10));
             
         } 
@@ -317,18 +332,27 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     private int[] getSectorIDs(){
         int [] IDs = null;
         if ( this.bySector) {
-            if ( sectorComboBox.getSelectedIndex() == 0){
+//            if ( sectorComboBox.getSelectedIndex() == 0){
+//                messagePanel.setError("Please select Sector(s).");
+//            } else if (sectorComboBox.getSelectedIndex() == 1) {
+//                IDs = new int[ this.sectors.length];
+//                for ( int i = 0; i<this.sectors.length; i++) {
+//                    IDs[i] = this.sectors[i].getId();
+//                }
+//            } else {
+//                IDs = new int[ 1];
+//                IDs[0] = this.sectors[ sectorComboBox.getSelectedIndex()-2].getId();
+//                return IDs;
+//            }
+            int [] inx = sectorListBox.getSelectedIndices();
+            if ( inx.length == 0){
                 messagePanel.setError("Please select Sector(s).");
-            } else if (sectorComboBox.getSelectedIndex() == 1) {
-                IDs = new int[ this.sectors.length];
-                for ( int i = 0; i<this.sectors.length; i++) {
-                    IDs[i] = this.sectors[i].getId();
-                }
             } else {
-                IDs = new int[ 1];
-                IDs[0] = this.sectors[ sectorComboBox.getSelectedIndex()-2].getId();
-                return IDs;
-            }
+                IDs = new int[ inx.length];
+                for ( int i = 0; i<inx.length; i++) {
+                    IDs[i] = this.sectors[inx[i]].getId();
+                }
+            }            
         } else {
             messagePanel.setError("Export by Control Measures, not by Sector.");
         }
