@@ -54,12 +54,14 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
     private TextField value;
     
+    private TextField qaStep;
+    
     private String preText;
     
     private EmfConsole parent;
     
     public DatasetSearchWindow(String title, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super(title, new Dimension(500, 340), desktopManager);
+        super(title, new Dimension(520, 380), desktopManager);
         parent = parentConsole;
     }
 
@@ -102,6 +104,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         desc = new TextField("descfilter", 30);
         value = new TextField("keyvalue", 30);
         value.setToolTipText("Please select a Keyword for this field to be valid.");
+        qaStep = new TextField("qaStep", 30);
+        qaStep.setToolTipText("QA step name contains.");
                 
         if (preText != null)
             name.setText(preText);
@@ -113,10 +117,11 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         layoutGen.addLabelWidgetPair("Dataset type:", dsTypesBox, panel);
         layoutGen.addLabelWidgetPair("Keyword:", keyword, panel);
         layoutGen.addLabelWidgetPair("Keyword value:", value, panel);
+        layoutGen.addLabelWidgetPair("QAStep name contains:", qaStep, panel);
         layoutGen.addLabelWidgetPair("Project:", projectsCombo, panel);
 
         // Lay out the panel.
-        layoutGen.makeCompactGrid(panel, 7, 2, // rows, cols
+        layoutGen.makeCompactGrid(panel, 8, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 10);// xPad, yPad
 
@@ -132,12 +137,13 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
             public void actionPerformed(ActionEvent event) {
                 try {
                     messagePanel.clear();
-                    
+                    EmfDataset[] datasets;
                     if (!checkFields())
                         return;
-                    
+
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    EmfDataset[] datasets = search(getDataset(), false);
+
+                    datasets = search(getDataset(),qaStep.getText(), false);
 
                     if (datasets.length == 1 && datasets[0].getName().startsWith("Alert!!! More than 300 datasets selected.")) {
                         String msg = "Number of datasets > 300. Would you like to continue?";
@@ -145,8 +151,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                                 JOptionPane.QUESTION_MESSAGE);
                         if (option == JOptionPane.NO_OPTION)
                             return;
-                        
-                        datasets = search(getDataset(), true);
+
+                        datasets = search(getDataset(),qaStep.getText(), true);
                     }
 
                     DatasetType type = (DatasetType)dsTypesBox.getSelectedItem();
@@ -191,8 +197,11 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         name.setText("");
         desc.setText("");
         value.setText("");
+        creatorsBox.setSelectedIndex(0);
         dsTypesBox.setSelectedIndex(0);
         keyword.setSelectedIndex(0);
+        value.setText("");
+        qaStep.setText("");
         projectsCombo.setSelectedIndex(0);
     }
     
@@ -200,19 +209,20 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         preText = name;
     }
 
-    protected boolean checkFields() {
+    private boolean checkFields() {
         if ((name.getText() == null || name.getText().trim().isEmpty())
                 && (desc.getText() == null || desc.getText().trim().isEmpty())
                 && creatorsBox.getSelectedItem() == null
                 && dsTypesBox.getSelectedItem() == null
                 && keyword.getSelectedItem() == null
+                && (qaStep.getText() == null || qaStep.getText().trim().isEmpty())
                 && projectsCombo.getSelectedItem() == null)
             return false;
         
         return true;
     }
 
-    protected EmfDataset getDataset() {
+    private EmfDataset getDataset() {
         EmfDataset ds = new EmfDataset();
         ds.setName(name.getText());
         ds.setDescription(desc.getText());
@@ -222,8 +232,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         if (kw != null) {
             KeyVal kv = new KeyVal(kw, value.getText());
             ds.setKeyVals(new KeyVal[] { kv });
-        }
-        
+        }    
         
         User user = (User) creatorsBox.getSelectedItem();
         if (user != null) {
@@ -264,7 +273,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         return temp;
     }
     
-    public DatasetType getSelectedDSType() {
+    private DatasetType getSelectedDSType() {
         DatasetType selected = (DatasetType)dsTypesBox.getSelectedItem();
         
         if (selected != null && selected.getName().equals("All"))
@@ -272,9 +281,9 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
         return selected;
     }
-
-    public EmfDataset[] search(EmfDataset dataset, boolean unconditional) throws EmfException {
-        return presenter.advSearch4Datasets(dataset, unconditional);
+    
+    private EmfDataset[] search(EmfDataset dataset, String qaStep, boolean unconditional) throws EmfException {
+        return presenter.advSearch4Datasets(dataset, qaStep, unconditional);
     }
 
     public void observe(DatasetsBrowserPresenter presenter) {

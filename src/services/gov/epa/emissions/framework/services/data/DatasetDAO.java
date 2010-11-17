@@ -1611,66 +1611,75 @@ public class DatasetDAO {
 
     public void importRemoteDataset() {
         //
+    }
+    
+    public List<EmfDataset> findSimilarDatasets(EmfDataset ds, String qaStep, boolean unconditional, Session session) {
+        String dsTypeStr = (ds.getDatasetType() == null ? "" : " AND DS.datasetType.id = "
+            + ds.getDatasetType().getId());
+    String name = ds.getName();
+    String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE "
+            + getPattern(name.toLowerCase().trim()));
+    String creator = ds.getCreator();
+    String dsCreatorStr = (creator == null || creator.trim().isEmpty() ? "" : " AND lower(DS.creator) LIKE "
+        + getPattern(creator.toLowerCase().trim()));
+    String dsKeyStr = getDSKeyStr(ds.getKeyVals());
+    String desc = ds.getDescription(); 
+    String qaStr = "";
+    if ( !( qaStep==null || qaStep.length()==0) )
+       qaStr = " AND lower(QS.name) LIKE "+ getPattern(qaStep.toLowerCase().trim())+ " AND DS.id=QS.datasetId" ;
+    String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE "
+            + getPattern(desc.toLowerCase().trim()));
+    String dsProjStr = (ds.getProject() == null ? "" : " AND DS.project.id = " + ds.getProject().getId());
+    String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
+            + " DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
+            + " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse as IU LEFT JOIN DS.project as P LEFT JOIN DS.region as R "
+            + (qaStr.isEmpty() ? "" : ", QAStep as QS ")
+            + dsKeyStr
+            + " WHERE DS.status <> 'Deleted'"
+            + dsTypeStr
+            + qaStr
+            + dsNameStr
+            + dsCreatorStr
+            + checkBackSlash(descStr)
+            + dsProjStr
+            + " ORDER BY DS.name";
+    if ( DebugLevels.DEBUG_12)
+        System.out.print(dsquery+ "\n");
+    
+    List<EmfDataset> ds1 = session.createQuery(dsquery).list();
+    
+    String dsTypeKeyStr = getDSTypeKeyStr(ds.getKeyVals());
+    String dstypequery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
+            + " DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
+            + " FROM EmfDataset AS DS "
+            + (dsTypeKeyStr.isEmpty() ? "" : ", DatasetType AS TYPE")
+            + (qaStr.isEmpty() ? "" : ", QAStep as QS ")
+            + " LEFT JOIN DS.intendedUse as IU LEFT JOIN DS.project as P LEFT JOIN DS.region as R "
+            + dsTypeKeyStr
+            + " WHERE DS.status <> 'Deleted'"
+            + dsTypeStr
+            + qaStr
+            + (dsTypeKeyStr.isEmpty() ? "" : " AND TYPE.id = DS.datasetType.id")
+            + dsNameStr
+            + dsCreatorStr    
+            + checkBackSlash(descStr) + dsProjStr + " ORDER BY DS.name";
+    if ( DebugLevels.DEBUG_12)
+        System.out.print(dstypequery);
+    
+    List<EmfDataset> ds2 = session.createQuery(dstypequery).list();
+    List<EmfDataset> all = new ArrayList<EmfDataset>();
+    all.addAll(ds1);
+    all.addAll(ds2);
 
+    TreeSet<EmfDataset> set = new TreeSet<EmfDataset>(all);
+    List<EmfDataset> total = new ArrayList<EmfDataset>(set);
+
+    if (total.size() > 300 && !unconditional) {
+        total.get(0).setName("Alert!!! More than 300 datasets selected.");
+        return total.subList(0, 1);
     }
 
-    @SuppressWarnings("unchecked")
-    public List<EmfDataset> findSimilarDatasets(EmfDataset ds, boolean unconditional, Session session) {
-        String dsTypeStr = (ds.getDatasetType() == null ? "" : " AND DS.datasetType.id = "
-                + ds.getDatasetType().getId());
-        String name = ds.getName();
-        String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE "
-                + getPattern(name.toLowerCase().trim()));
-        String creator = ds.getCreator();
-        String dsCreatorStr = (creator == null || creator.trim().isEmpty() ? "" : " AND lower(DS.creator) LIKE "
-            + getPattern(creator.toLowerCase().trim()));
-        String dsKeyStr = getDSKeyStr(ds.getKeyVals());
-        String desc = ds.getDescription();
-        String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE "
-                + getPattern(desc.toLowerCase().trim()));
-        String dsProjStr = (ds.getProject() == null ? "" : " AND DS.project.id = " + ds.getProject().getId());
-        String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
-                + " DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
-                + " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse as IU LEFT JOIN DS.project as P LEFT JOIN DS.region as R "
-                + dsKeyStr
-                + " WHERE DS.status <> 'Deleted'"
-                + dsTypeStr
-                + dsNameStr
-                + dsCreatorStr
-                + checkBackSlash(descStr)
-                + dsProjStr
-                + " ORDER BY DS.name";
-
-        List<EmfDataset> ds1 = session.createQuery(dsquery).list();
-
-        String dsTypeKeyStr = getDSTypeKeyStr(ds.getKeyVals());
-        String dstypequery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
-                + " DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
-                + " FROM EmfDataset AS DS"
-                + (dsTypeKeyStr.isEmpty() ? "" : ", DatasetType AS TYPE")
-                + " LEFT JOIN DS.intendedUse as IU LEFT JOIN DS.project as P LEFT JOIN DS.region as R "
-                + dsTypeKeyStr
-                + " WHERE DS.status <> 'Deleted'"
-                + dsTypeStr
-                + (dsTypeKeyStr.isEmpty() ? "" : " AND TYPE.id = DS.datasetType.id")
-                + dsNameStr
-                + dsCreatorStr
-                + checkBackSlash(descStr) + dsProjStr + " ORDER BY DS.name";
-
-        List<EmfDataset> ds2 = session.createQuery(dstypequery).list();
-        List<EmfDataset> all = new ArrayList<EmfDataset>();
-        all.addAll(ds1);
-        all.addAll(ds2);
-
-        TreeSet<EmfDataset> set = new TreeSet<EmfDataset>(all);
-        List<EmfDataset> total = new ArrayList<EmfDataset>(set);
-
-        if (total.size() > 300 && !unconditional) {
-            total.get(0).setName("Alert!!! More than 300 datasets selected.");
-            return total.subList(0, 1);
-        }
-
-        return total;
+    return total;
     }
 
     /**
@@ -1741,6 +1750,5 @@ public class DatasetDAO {
 
         hibernateFacade.add(endStatus, session);
     }
-
 
 }
