@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.Dimension;
+
 import javax.swing.JPanel;
 
 public class DefaultVersionPanel extends JPanel {

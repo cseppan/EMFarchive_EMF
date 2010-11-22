@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -42,6 +43,10 @@ public class EditableSummaryTabPresenterImpl implements EditableSummaryTabPresen
 
     public EmfDataset reloadDataset() throws EmfException {
         return session.dataService().getDataset(dataset.getId());
+    }
+    
+    public Version[] getVersions() throws EmfException{
+        return session.dataEditorService().getVersions(dataset.getId());
     }
 
 }

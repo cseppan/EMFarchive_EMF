@@ -377,6 +377,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
             messagePanel.setMessage("Please wait while retrieving dataset summary...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             this.dataset = presenter.reloadDataset();
+            this.versions=presenter.getVersions();
             super.removeAll();
             setLayout();
             super.validate();
