@@ -80,7 +80,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     public void display(EmfDataset[] datasets) throws EmfException {
         getAllDSTypes();
         createDSTypesComboBox();
-        //createNameContains(); 
         JPanel panel = createLayout(datasets);
         Container contentPane = getContentPane();
         contentPane.add(panel);
@@ -93,11 +92,9 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         dbDSTypes.addAll(Arrays.asList(presenter.getDSTypes()));
         this.allDSTypes = dbDSTypes.toArray(new DatasetType[0]);
     }
-
-    private void createDSTypesComboBox() {
-        dsTypesBox = new ComboBox("Select one", allDSTypes);
-        dsTypesBox.setPreferredSize(new Dimension(360, 25));
-        dsTypesBox.addActionListener(new AbstractAction() {
+    
+    private Action typeAction() {
+        return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 DatasetType type = getSelectedDSType();
                 try {
@@ -108,7 +105,13 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                     messagePanel.setError("Could not retrieve all datasets for dataset type " + type.getName());
                 }
             }
-        });
+        };
+    }    
+
+    private void createDSTypesComboBox() {
+        dsTypesBox = new ComboBox("Select one", allDSTypes);
+        dsTypesBox.setPreferredSize(new Dimension(360, 25));
+        dsTypesBox.addActionListener(typeAction());
     }
 
     public DatasetType getSelectedDSType() {
@@ -120,22 +123,9 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         return (DatasetType) selected;
     }
     
-    public void setDSTypeSelection(DatasetType type) {
-        dsTypesBox.setSelectedItem(type);
-    }
-    
-    public void setNameFilter(String nameFilter) {
-        textFilter.setText(nameFilter);
-    }
-    
     public void setDSTypeSelection(int index) {
         dsTypesBox.setSelectedIndex(index);
     }
-    
-//    private void loadDataset(){
-//        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
-//        ConfirmDialog confirmDialog1 = new ConfirmDialog(message1, "Warning", this);
-//    }
 
     private JPanel createLayout(EmfDataset[] datasets) {
         JPanel panel = new JPanel();
@@ -172,16 +162,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         JPanel topPanel = new JPanel(new BorderLayout());
         textFilter = new TextField("textfilter", 10);
         textFilter.setEditable(true);
-        textFilter.addActionListener(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                DatasetType type = getSelectedDSType();
-                try {
-                     doRefresh();          
-                } catch (EmfException e1) {
-                    messagePanel.setError("Could not retrieve all datasets for dataset type " + type.getName());
-                }
-            }
-        });
+        textFilter.addActionListener(typeAction());
         
         Button advButton = new Button("Advanced", new AbstractAction(){
             public void actionPerformed(ActionEvent arg0) {

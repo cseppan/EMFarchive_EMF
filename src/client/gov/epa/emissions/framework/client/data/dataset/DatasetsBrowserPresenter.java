@@ -46,7 +46,6 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
 
     public void doExport(ExportView exportView, ExportPresenter presenter, EmfDataset[] datasets) {
         if (datasets.length == 0) {
-//            view.showMessage("To Export, you will need to select at least one non-External type Dataset");
             view.showMessage("To Export, you will need to select at least one Dataset"); // external type allowed to export now
             return;
         }
@@ -62,8 +61,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     
     public void refreshViewOnSearch(EmfDataset[] datasets, DatasetType type, String nameFilter) {
         //DatasetType dsType = getDstype(datasets, type);
-        view.setDSTypeSelection(type);
-        view.setNameFilter(nameFilter);
+        view.setDSTypeSelection(0);
         view.refresh(datasets);
         view.clearMessage();
     }
