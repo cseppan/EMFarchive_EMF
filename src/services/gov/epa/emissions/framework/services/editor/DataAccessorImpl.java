@@ -119,6 +119,10 @@ public class DataAccessorImpl implements DataAccessor {
         return sessionLifecycle.getVersions(datasetId);
     }
 
+    public Version getVersion(int datasetId, int version) throws EmfException {
+        return sessionLifecycle.getVersion(datasetId, version);
+    }
+
     public void shutdown() throws EmfException {
         try {
             cache.invalidate();

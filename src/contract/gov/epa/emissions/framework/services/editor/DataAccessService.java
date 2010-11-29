@@ -23,6 +23,8 @@ public interface DataAccessService {
     // version-related
     Version[] getVersions(int datasetId) throws EmfException;
     
+    Version getVersion(int datasetId, int version) throws EmfException;
+
     TableMetadata getTableMetadata(String table) throws EmfException;
 
 }

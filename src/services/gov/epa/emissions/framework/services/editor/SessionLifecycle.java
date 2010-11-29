@@ -43,6 +43,19 @@ public class SessionLifecycle {
         }
     }
 
+    public Version getVersion(int datasetId, int version) throws EmfException {
+        Session session = null;
+        try {
+            session = sessionFactory.getSession();
+            return versions.get(datasetId, version, session);
+        } catch (HibernateException e) {
+            LOG.error("Could not get all versions of Dataset : " + datasetId, e);
+            throw new EmfException("Could not get all versions of Dataset : " + datasetId);
+        } finally {
+            session.close();
+        }
+    }
+
     public DataAccessToken open(DataAccessToken token, int pageSize) throws Exception {
         Session session = sessionFactory.getSession();
         cache.init(token, pageSize, session);

@@ -76,6 +76,10 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
         return accessor.getVersions(datasetId);
     }
 
+    public Version getVersion(int datasetId, int version) throws EmfException {
+        return accessor.getVersion(datasetId, version);
+    }
+
     public DataAccessToken openSession(DataAccessToken token) throws EmfException {
 //        Version current = accessor.currentVersion(token.getVersion());
 //        if (!current.isFinalVersion())

@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ComboBox;
@@ -16,6 +18,7 @@ import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
+import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -27,9 +30,11 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
 import gov.epa.emissions.framework.client.data.QAPrograms;
+import gov.epa.emissions.framework.client.meta.qa.comparedatasetsprogram.CompareDatasetsQAProgamWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
+import gov.epa.emissions.framework.services.data.DatasetVersion;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
@@ -51,6 +56,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.swing.AbstractAction;
@@ -156,6 +162,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private static final String MultiInvRepProgram = "Multi-inventory column report";
 
+    private static final String COMPARE_DATASETS_PROGRAM = "Compare Datasets";
     private static final String MultiInvDifRepProgram = "Multi-inventory difference report";
     private static final String CompareControlStrategies = "Compare Control Strategies";
     private static final String createMoEmisByCountyFromAnnEmisProgram = "Create monthly emissions by county from annual emissions";
@@ -185,6 +192,51 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     public static final String detailedResultTag = "-detailed_result";
 
+    public static final String BASE_TAG = "-base"; 
+    //Sample:
+/*
+dataset name1|1
+dataset name2|5
+dataset name3|3
+*/
+    
+    public static final String COMPARE_TAG = "-compare";
+    //Sample:
+/*
+dataset name1|1
+dataset name2|5
+dataset name3|3
+*/
+    
+    public static final String GROUP_BY_EXPRESSIONS_TAG = "-groupby";
+    //Sample:
+/*
+scc
+fips
+plantid
+pointid
+stackid
+segment
+poll
+*/
+    
+    public static final String AGGREGATE_EXPRESSIONS_TAG = "-aggregate";
+    //Sample:
+/*
+ann_emis
+avd_emis
+*/
+    
+    public static final String MATCHING_EXPRESSIONS_TAG = "-matching";
+/*
+scc|scc
+fips|fips
+plantid|plantid
+pointid|pointid
+stackid|stackid
+segment|segment
+poll|poll
+*/
     private String lineFeeder = System.getProperty("line.separator");
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
@@ -889,6 +941,13 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
                     showAvgDayToAnnualWindow();
                 } else if (MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showMultiInvDiffWindow();
+                } else if (COMPARE_DATASETS_PROGRAM.equalsIgnoreCase(program.getSelectedItem().toString())){
+                    try {
+                        showCompareDatasetsWindow();
+                    } catch (EmfException e1) {
+                        // NOTE Auto-generated catch block
+                        e1.printStackTrace();
+                    }
                 } else if (CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showMultiInvDiffWindow();
                 } else if (createMoEmisByCountyFromAnnEmisProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
@@ -952,6 +1011,138 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
             EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
             presenter.display(origDataset, step);
         }
+    }
+
+    private void showCompareDatasetsWindow() throws EmfException {
+        
+/*sample program arguments        
+
+-base
+ptipm_cap2005v2_nc_sc_va|0
+-compare
+$DATASET
+-groupby
+scc
+substring(fips,1,2)
+-aggregate
+ann_emis
+avd_emis
+-matching
+substring(fips,1,2)=substring(region_cd,1,2)
+scc=scc_code
+ann_emis=emis_ann
+avd_emis=emis_avd
+*/
+        
+        // When there is no data in window, set button causes new window to pop up,
+        // with the warning message to also show up. When data in window is invalid, a new window still
+        // pops up, but with a different warning message.
+        // Also change the window name to EditQASetArgumentsWindow
+        invBase = null;
+        invCompare = null;
+        invTables = null;
+        summaryType = "";
+
+        String programSwitches = "";
+        programSwitches = programArguments.getText();
+        String programVal = program.getSelectedItem().toString();
+        String[] arguments;
+
+        String[] baseTokens = new String[] {};
+        String[] compareTokens = new String[] {};
+        
+        List<DatasetVersion> baseDatasetList = new ArrayList<DatasetVersion>();
+        List<DatasetVersion> compareDatasetList = new ArrayList<DatasetVersion>();
+
+        int indexBase = programSwitches.indexOf(BASE_TAG);
+        int indexCompare = programSwitches.indexOf(COMPARE_TAG);
+        int indexGroupBy = programSwitches.indexOf(GROUP_BY_EXPRESSIONS_TAG);
+        int indexAggregate = programSwitches.indexOf(AGGREGATE_EXPRESSIONS_TAG);
+        int indexMatching = programSwitches.indexOf(MATCHING_EXPRESSIONS_TAG);
+
+
+        if (indexBase != -1) {
+            arguments = parseSwitchArguments(programSwitches, indexBase, programSwitches.indexOf("\n-", indexBase) != -1 ? programSwitches.indexOf("\n-", indexBase) : programSwitches.length());
+            if (arguments != null && arguments.length > 0) baseTokens = arguments;
+            for (String datasetVersion : baseTokens) {
+                String[] datasetVersionToken = new String[] {};
+                if (!datasetVersion.equals("$DATASET")) { 
+                    datasetVersionToken = datasetVersion.split("\\|");
+                } else {
+                    EmfDataset qaStepDataset = presenter.getDataset(step.getDatasetId());
+                    datasetVersionToken = new String[] { qaStepDataset.getName(), qaStepDataset.getDefaultVersion() + "" };
+                }
+
+                EmfDataset dataset = presenter.getDataset(datasetVersionToken[0]);
+                //make sure dataset exists
+                if (dataset == null)
+                    break;
+//                    throw new EmfException("Dataset, " + datasetVersionToken[0] + ", doesn't exist.");
+//                datasetVersion.setDataset(dataset);
+                Version version = presenter.version(dataset.getId(), Integer.parseInt(datasetVersionToken[1]));
+                //make sure version exists
+                if (version == null)
+                    break;
+//                    throw new EmfException("Version, " + datasetVersionToken[0] + " - " + datasetVersion.getDatasetVersion() + ", doesn't exists.");
+//                datasetVersion.setVersion(version);
+
+                baseDatasetList.add(new DatasetVersion(dataset, version));
+            }
+        }
+        if (indexCompare != -1) {
+            arguments = parseSwitchArguments(programSwitches, indexCompare, programSwitches.indexOf("\n-", indexCompare) != -1 ? programSwitches.indexOf("\n-", indexCompare) : programSwitches.length());
+            if (arguments != null && arguments.length > 0) compareTokens = arguments;
+            for (String datasetVersion : compareTokens) {
+                String[] datasetVersionToken = new String[] {};
+                if (!datasetVersion.equals("$DATASET")) { 
+                    datasetVersionToken = datasetVersion.split("\\|");
+                } else {
+                    EmfDataset qaStepDataset = presenter.getDataset(step.getDatasetId());
+                    datasetVersionToken = new String[] { qaStepDataset.getName(), qaStepDataset.getDefaultVersion() + "" };
+                }
+                EmfDataset dataset = presenter.getDataset(datasetVersionToken[0]);
+                //make sure dataset exists
+                if (dataset == null)
+                    break;
+//                    throw new EmfException("Dataset, " + datasetVersionToken[0] + ", doesn't exist.");
+//                datasetVersion.setDataset(dataset);
+                Version version = presenter.version(dataset.getId(), Integer.parseInt(datasetVersionToken[1]));
+                //make sure version exists
+                if (version == null)
+                    break;
+//                    throw new EmfException("Version, " + datasetVersionToken[0] + " - " + datasetVersion.getDatasetVersion() + ", doesn't exists.");
+//                datasetVersion.setVersion(version);
+
+                compareDatasetList.add(new DatasetVersion(dataset, version));
+            }
+        }
+
+        
+//        if (!(programSwitches.trim().equals("")) 
+//                && baseIndex != -1 && compareIndex != -1
+//                && invTableIndex != -1 && sumTypeIndex != -1  ) {
+//            try {
+//                getBaseInventories(programSwitches, 0, compareIndex);
+//                getCompareInventories(programSwitches, compareIndex, invTableIndex);
+//                getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
+//                getSummaryType(programSwitches, sumTypeIndex);
+//            } catch (EmfException e) {
+//                messagePanel.setError(e.getMessage());
+////            }finally {
+////                EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invCompare, invTables,
+////                        summaryType);
+////                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
+////                presenter.display(origDataset, step);
+//            }
+//        }
+        CompareDatasetsQAProgamWindow view = new CompareDatasetsQAProgamWindow(desktopManager, programVal, session,
+                baseDatasetList.toArray(new DatasetVersion[0]), compareDatasetList.toArray(new DatasetVersion[0]),
+                programSwitches.substring(indexGroupBy + GROUP_BY_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexGroupBy) != -1 ? programSwitches.indexOf("\n-", indexGroupBy) : programSwitches.length()), 
+                programSwitches.substring(indexAggregate + AGGREGATE_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexAggregate) != -1 ? programSwitches.indexOf("\n-", indexAggregate) : programSwitches.length()), 
+                programSwitches.substring(indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length())
+                );
+        EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
+        presenter.display(origDataset, step);
     }
 
     private void showAvgDaySummaryWindow() {
@@ -1831,5 +2022,26 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         if (gspros != null) arguments += getTagString(gsproTag, gspros);
 
         updateArgumentsTextArea(arguments);
+    }
+
+    private String[] parseSwitchArguments(String programSwitches, int beginIndex, int endIndex) {
+        List<String> inventoryList = new ArrayList<String>();
+        String value = "";
+        String valuesString = "";
+        
+        valuesString = programSwitches.substring(beginIndex, endIndex);
+        StringTokenizer tokenizer2 = new StringTokenizer(valuesString, "\n");
+        tokenizer2.nextToken(); // skip the flag
+
+        while (tokenizer2.hasMoreTokens()) {
+            value = tokenizer2.nextToken().trim();
+            if (!value.isEmpty())
+                inventoryList.add(value);
+        }
+        return inventoryList.toArray(new String[0]);
+    }
+
+    public void updateProgramArguments(String programArguments) {
+        updateArgumentsTextArea(programArguments);
     }
 }

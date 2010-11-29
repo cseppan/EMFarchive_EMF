@@ -116,6 +116,22 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
 
     public void observe(CMExportPresenter presenter) {
         this.presenter = presenter;
+//        try {
+//            for (Sector sector : presenter.getDistinctControlMeasureSectors()) {
+//                System.out.println(sector.getId() + " " + sector.getName());
+//            }
+//            for (ControlMeasure sector : presenter.getControlMeasureBySector(new int[] {1,2})) {
+//                System.out.println(sector.getId() + " " + sector.getName());
+//            }
+//            for (ControlMeasure sector : presenter.getControlMeasureBySector(new int[] {})) {
+//                System.out.println(sector.getId() + " " + sector.getName());
+//            }
+//        } catch (EmfException e) {
+//            // NOTE Auto-generated catch block
+//            e.printStackTrace();
+//        }
+
+
     }
 
     private JPanel createLayout() {
@@ -127,6 +143,7 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
         panel.add(createTopPanel());
         panel.add(createExportPanel());
         panel.add(createButtonsPanel());
+        
 
         return panel;
     }

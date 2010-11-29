@@ -21,6 +21,8 @@ public interface DataAccessor {
 
     Version[] getVersions(int datasetId) throws EmfException;
 
+    Version getVersion(int datasetId, int version) throws EmfException;
+
     void shutdown() throws EmfException;
 
     DataAccessToken openSession(DataAccessToken token, int pageSize) throws Exception;

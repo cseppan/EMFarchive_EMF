@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -78,4 +79,22 @@ public class EditQAEmissionsPresenter {
         editQAStepView.updateECControlScenarioArguments(inventory, detailedResult, 
                 gsrefDatasets, gsproDatasets);
     }
+    
+    public Version getVersion(int datasetId, int version) throws EmfException {
+        try {
+            Version[] versions = session.dataEditorService().getVersions(datasetId);
+            for (Version v : versions) {
+                if (v.getVersion() == version)
+                    return v;
+            }
+            return null;
+        } finally {
+            //
+        }
+    }
+
+    public void updateProgramArguments(String programArguments) {
+        editQAStepView.updateProgramArguments(programArguments);
+    }
+
 }

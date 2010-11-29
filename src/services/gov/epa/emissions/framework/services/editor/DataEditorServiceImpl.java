@@ -217,6 +217,10 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         return accessor.getVersions(datasetId);
     }
 
+    public Version getVersion(int datasetId, int version) throws EmfException {
+        return accessor.getVersion(datasetId, version);
+    }
+
     public DataAccessToken openSession(User user, DataAccessToken token) throws EmfException {
         return openSession(user, token, accessor.defaultPageSize());
     }

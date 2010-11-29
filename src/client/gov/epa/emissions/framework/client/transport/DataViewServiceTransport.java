@@ -100,6 +100,13 @@ public class DataViewServiceTransport implements DataViewService {
         return (TableMetadata)call.requestResponse(new Object[] { table });
     }
     
-    
+    public Version getVersion(int datasetId, int version) throws EmfException {
+        call.setOperation("getVersion");
+        call.addLongParam("datasetId");
+        call.addLongParam("version");
+        call.setReturnType(mappings.version());
+
+        return (Version) call.requestResponse(new Object[] { new Integer(datasetId), new Integer(version) });
+    }
 
 }

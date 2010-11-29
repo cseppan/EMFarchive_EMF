@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
@@ -19,6 +21,8 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.Date;
 import java.util.StringTokenizer;
+
+import org.hibernate.Session;
 
 public class EditQAStepPresenter {
 
@@ -227,6 +231,10 @@ public class EditQAStepPresenter {
         return session.dataService().getDataset(datasetName);
     }
 
+    public EmfDataset getDataset(int id) throws EmfException {
+        return session.dataService().getDataset(id);
+    }
+
     public String getTableAsString(QAStepResult stepResult) throws EmfException {
         return session.dataService().getTableAsString("emissions." + stepResult.getTable());
     }
@@ -246,4 +254,14 @@ public class EditQAStepPresenter {
     public Pollutant[] getPollutants() throws EmfException {
         return session.dataCommonsService().getPollutants();       
     }
+    
+    public Version version(int datasetId, int version) throws EmfException {
+        try {
+            return session.dataViewService().getVersion(datasetId, version);
+        } finally {
+            //
+        }
+    }
+
+
 }

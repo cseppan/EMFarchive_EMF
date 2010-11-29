@@ -1125,11 +1125,12 @@ public class SectorScenarioTask {
                 Version version = dao.getVersion(session, result.getId(), result.getDefaultVersion());
                 
                 if (version != null) {
-                    version.setCreator(user);
+//                    version.setCreator(user);
                     updateVersion(result, version, dbServer, session, dao);
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException("Cannot update result datasets (strategy id: " + sectorScenarioOutput.getSectorScenarioId() + "). " + e.getMessage());
         } finally {
             if (session != null && session.isConnected())
@@ -1138,6 +1139,8 @@ public class SectorScenarioTask {
     }
     
     private void updateVersion(EmfDataset dataset, Version version, DbServer dbServer, Session session, DatasetDAO dao) throws Exception {
+//        creator.updateVersionZeroRecordCount(dataset);
+
         version = dao.obtainLockOnVersion(user, version.getId(), session);
         version.setNumberRecords((int)dao.getDatasetRecordsNumber(dbServer, session, dataset, version));
         dao.updateVersionNReleaseLock(version, session);

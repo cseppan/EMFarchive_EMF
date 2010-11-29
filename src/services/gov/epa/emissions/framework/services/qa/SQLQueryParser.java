@@ -797,7 +797,7 @@ public class SQLQueryParser {
         }
     }
 
-    private String createTableQuery() {
+    public String createTableQuery() {
         // System.out.println("The table name in createTableQuery method is: " + tableName);
         return "CREATE TABLE " + qualifiedName(emissionDatasourceName, tableName) + " AS ";
     }

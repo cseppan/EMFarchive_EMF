@@ -547,7 +547,7 @@ public class FastAnalysisTask {
                 Version version = dao.getVersion(session, result.getId(), result.getDefaultVersion());
 
                 if (version != null) {
-                    version.setCreator(user);
+//                    version.setCreator(user);
                     updateVersion(result, version, dbServer, session, dao);
                 }
             }

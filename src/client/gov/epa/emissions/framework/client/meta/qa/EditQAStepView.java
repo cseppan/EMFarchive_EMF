@@ -53,4 +53,6 @@ public interface EditQAStepView extends ManagedView {
             Object[] exclPollutants);
 
     void updateECControlScenarioArguments(Object inventory, Object detailedResult, Object[] gsrefs, Object[] gspros);
+
+    void updateProgramArguments(String programArguments);
 }

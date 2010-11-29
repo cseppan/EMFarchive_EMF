@@ -486,6 +486,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             copied.setName(name);
             copied.setCreator(creator);
             copied.setLastModifiedDate(new Date());
+            copied.setIsFinal(false);
             copied.setRunStatus("Not started");
             copied.setCopiedFrom(cs.getName());
             if (copied.isLocked()) {
