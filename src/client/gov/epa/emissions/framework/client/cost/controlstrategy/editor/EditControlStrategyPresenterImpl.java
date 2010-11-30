@@ -69,6 +69,10 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             view.notifyLockFailure(controlStrategy);
             return;
         }
+        if (controlStrategy.getIsFinal() != null && controlStrategy.getIsFinal()) {// view mode only, has been finalized...
+            view.notifyFinalFailure(controlStrategy);
+            return;
+        }
         ControlStrategyResult[] controlStrategyResults = getResult();
 //        hasResults = false;
 //        if (controlStrategyResults!= null && controlStrategyResults.length > 0) hasResults = true;

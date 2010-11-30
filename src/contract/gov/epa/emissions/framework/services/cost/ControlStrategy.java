@@ -111,7 +111,8 @@ public class ControlStrategy implements Lockable, Serializable {
             Project project, StrategyType strategyType,
             int costYear, int inventoryYear,
             User creator, Double totalCost,
-            Double totalReduction) {
+            Double totalReduction,
+            Boolean isFinal) {
         this();
         this.id = id;
         this.name = name;
@@ -126,6 +127,7 @@ public class ControlStrategy implements Lockable, Serializable {
         this.creator = creator;
         this.setTotalCost(totalCost);
         this.setTotalReduction(totalReduction);
+        this.setIsFinal(isFinal);
     }
 
 //    ControlStrategy(cS.id, cS.name, " +

@@ -47,6 +47,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
         //index the detailed result, its will speed up the processing...
         createDetailedResultIndexes(detailedResultDS);
         
+        //make sure and process in the order that the arrays are built (based on hibernate list_index column)
         for (ControlStrategyTargetPollutant controlStrategyTargetPollutant : controlStrategy.getTargetPollutants()) {
             runStrategy(controlStrategyInputDataset, detailedResult, controlStrategyTargetPollutant.getPollutant());
         }

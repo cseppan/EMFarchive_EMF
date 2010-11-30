@@ -76,13 +76,18 @@ public class TargetPollutantEditorDialog extends JDialog implements TargetPollut
 
     private SingleLineMessagePanel messagePanel;
 
-    public TargetPollutantEditorDialog(EmfConsole parent, ManageChangeables changeables, ControlStrategyTargetPollutant controlStrategyTargetPollutant) {
+    private int order;
+
+    private JLabel orderLabel;
+
+    public TargetPollutantEditorDialog(EmfConsole parent, ManageChangeables changeables, ControlStrategyTargetPollutant controlStrategyTargetPollutant, int order) {
         super(parent);
         super.setIconImage(EmfImageTool.createImage("/logo.JPG"));
         
         this.parent = parent;
         this.changeables = changeables;
         this.controlStrategyTargetPollutant = controlStrategyTargetPollutant;
+        this.order = order;
     }
 
     public void display() {
@@ -102,7 +107,7 @@ public class TargetPollutantEditorDialog extends JDialog implements TargetPollut
 
         setTitle("Edit Control Strategy Target Pollutant");
         this.pack();
-        this.setSize(700,600);
+        this.setSize(800,450);
         this.setLocation(ScreenUtils.getPointToCenter(parent));
         this.setVisible(true);
     }
@@ -123,6 +128,10 @@ public class TargetPollutantEditorDialog extends JDialog implements TargetPollut
 //        source.getCountyDatasetVersion()
         
         
+        orderLabel = new JLabel(order + "");
+//      this.addChangeable(locale);
+        layoutGenerator.addLabelWidgetPair("Order:", orderLabel, panel);
+
         
         pollutant = new JLabel(controlStrategyTargetPollutant.getPollutant().getName());
 //        this.addChangeable(locale);
@@ -162,12 +171,12 @@ public class TargetPollutantEditorDialog extends JDialog implements TargetPollut
         if (value == null)
             value = "";
         
-        filter = new TextArea("filter", value, 40, 2);
+        filter = new TextArea("filter", value, 32, 2);
         filter.setToolTipText("Enter a filter that could be entered as a SQL where clause (e.g., ANN_EMIS>5000 and SCC like '30300%')");
         JScrollPane scrollPane = new JScrollPane(filter);
         changeables.addChangeable(filter);
         
-        layoutGenerator.addLabelWidgetPair("Inventory Filter:", scrollPane, panel);
+        layoutGenerator.addLabelWidgetPair("<html>Inventory Filter:<br/>(e.g., ANN_EMIS&gt;5000 and SCC like '30300%')</html>", scrollPane, panel);
 
         EmfDataset[] datasets = editControlStrategyPresenter.getDatasets( editControlStrategyPresenter.getDatasetType("List of Counties (CSV)") );
 //        String width = EmptyStrings.create(80);
@@ -200,7 +209,7 @@ public class TargetPollutantEditorDialog extends JDialog implements TargetPollut
         layoutGenerator.addLabelWidgetPair("County Dataset:", dataset, panel);
         layoutGenerator.addLabelWidgetPair("County Dataset Version:", version, panel);
 
-        layoutGenerator.makeCompactGrid(panel, 9, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 10, 2, // rows, cols
                 10, 10, // initialX, initialY
                 10, 10); // xPad, yPad
 

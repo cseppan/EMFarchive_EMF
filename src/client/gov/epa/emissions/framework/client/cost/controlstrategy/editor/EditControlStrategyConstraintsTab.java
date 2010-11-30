@@ -145,7 +145,15 @@ public class EditControlStrategyConstraintsTab extends JPanel implements Control
                 ControlStrategyTargetPollutant[] selectedTargetPollutants = (table.selected()).toArray(new ControlStrategyTargetPollutant[0]);
                 //get all measures
 for (ControlStrategyTargetPollutant selectedTargetPollutant : selectedTargetPollutants) {
-    TargetPollutantEditorDialog selectionDialog = new TargetPollutantEditorDialog(parentConsole, changeablesList, selectedTargetPollutant);
+    int order = 1;
+    for (int i = 0; i < controlStrategy.getTargetPollutants().length; i++) {
+        ControlStrategyTargetPollutant targetPollutant = controlStrategy.getTargetPollutants()[i];
+        if (targetPollutant.getPollutant().equals(selectedTargetPollutant.getPollutant())) {
+            order = i + 1;
+            break;
+        }
+    }
+    TargetPollutantEditorDialog selectionDialog = new TargetPollutantEditorDialog(parentConsole, changeablesList, selectedTargetPollutant, order);
     TargetPollutantEditorPresenter selectionPresenter = new TargetPollutantEditorPresenter(presenter, selectionDialog, session, editControlStrategyPresenter);
     selectionDialog.observe(selectionPresenter, editControlStrategyPresenter);
     selectionDialog.display();
@@ -167,7 +175,7 @@ for (ControlStrategyTargetPollutant selectedTargetPollutant : selectedTargetPoll
     }
     
     private SortCriteria sortCriteria() {
-        String[] columnNames = {"Pollutant" };
+        String[] columnNames = {"Order" };
         return new SortCriteria(columnNames, new boolean[] {true}, new boolean[] { true });
     }
 

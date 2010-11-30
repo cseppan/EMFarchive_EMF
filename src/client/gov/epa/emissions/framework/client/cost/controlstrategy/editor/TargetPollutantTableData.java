@@ -28,41 +28,41 @@ public class TargetPollutantTableData extends AbstractTableData {
         List<ViewableRow> rows = new ArrayList<ViewableRow>();
        
         for (int i = 0; i < targets.length; i++)
-            rows.add(row(targets[i], pollutants));
+            rows.add(row(i + 1, targets[i], pollutants));
 
         return rows;
     }
     
-    private ViewableRow row(ControlStrategyTargetPollutant target, Pollutant[] polls) {
-        RowSource<ControlStrategyTargetPollutant> source = new TargetPollutantRowSource(target, polls);
+    private ViewableRow row(int order, ControlStrategyTargetPollutant target, Pollutant[] polls) {
+        RowSource<ControlStrategyTargetPollutant> source = new TargetPollutantRowSource(order, target, polls);
         return new ViewableRow(source);
     }
     
     public String[] columns() {
-        return new String[] { "Pollutant"
-                            , "MaxEmisReduction"
-                            , "MaxControlEfficiency"
-                            , "MinCostPerTon"
-                            , "MinAnnCost"
-                            , "ReplacementControlMinEfficiencyDiff" 
-                            , "Inventory Filter" 
-                            , "County Dataset" 
-                            , "County Dataset Version" 
-                            };
+        return new String[] { "Order"
+                ,"Pollutant"
+                , "Max Emis Red"
+                , "Max CEFF"
+                , "Min CPT"
+                , "Min Ann Cost"
+                , "Inv Filter" 
+                , "County Dataset" 
+                , "County Dataset Version" 
+                , "Replacement Control Min Efficiency Diff" 
+                };
     }
 
     public Class<?> getColumnClass(int col) {
-        if (col == 0
+        if (col == 1
                 || col == 6
-//                || col == 7
-//                || col == 8
                 )
             return String.class;
                 
         if (col == 7)
             return EmfDataset.class;
 
-        if (col == 8)
+        if (col == 0 
+                || col == 8)
             return Integer.class;
 
         return Double.class;
@@ -110,7 +110,7 @@ public class TargetPollutantTableData extends AbstractTableData {
     }
     
     public void add(ControlStrategyTargetPollutant target) {
-        rows.add(row(target, pollutants));
+        rows.add(row(rows.size() + 1, target, pollutants));
     }
 
     private void remove(ControlStrategyTargetPollutant target) {

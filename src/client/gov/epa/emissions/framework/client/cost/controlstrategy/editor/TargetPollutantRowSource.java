@@ -14,10 +14,13 @@ public class TargetPollutantRowSource implements RowSource<ControlStrategyTarget
 
     private HashMap<String, Pollutant> pollutants;
 
-    public TargetPollutantRowSource(ControlStrategyTargetPollutant source, 
+    private Integer order;
+
+    public TargetPollutantRowSource(Integer order, ControlStrategyTargetPollutant source, 
             Pollutant[] allPollutants) {
         this.source = source;
         this.pollutants = new HashMap<String, Pollutant>();
+        this.order = order;
         
         for (Pollutant pol : allPollutants)
             pollutants.put(pol.getName(), pol);
@@ -25,15 +28,16 @@ public class TargetPollutantRowSource implements RowSource<ControlStrategyTarget
 
     public Object[] values() {
         Object[] values = { 
+                this.order, 
                 source.getPollutant().getName(), 
                 source.getMaxEmisReduction(),
                 source.getMaxControlEfficiency(),
                 source.getMinCostPerTon(),
                 source.getMinAnnCost(),
-                source.getReplacementControlMinEfficiencyDiff() == null ? new Double(10.0) : source.getReplacementControlMinEfficiencyDiff(),
                 source.getInvFilter(),
                 source.getCountyDataset(),
-                source.getCountyDatasetVersion()
+                source.getCountyDatasetVersion(),
+                source.getReplacementControlMinEfficiencyDiff() == null ? new Double(10.0) : source.getReplacementControlMinEfficiencyDiff()
                 };
         
         return values;
@@ -42,30 +46,33 @@ public class TargetPollutantRowSource implements RowSource<ControlStrategyTarget
     public void setValueAt(int column, Object val) {
         switch (column) {
         case 0:
-            source.setPollutant(pollutants.get(val));
+//            source.setPollutant(pollutants.get(val));
             break;
         case 1:
-            source.setMaxEmisReduction((Double) val);
+            source.setPollutant(pollutants.get(val));
             break;
         case 2:
-            source.setMaxControlEfficiency((Double) val);
+            source.setMaxEmisReduction((Double) val);
             break;
         case 3:
-            source.setMinCostPerTon((Double) val);
+            source.setMaxControlEfficiency((Double) val);
             break;
         case 4:
-            source.setMinAnnCost((Double) val);
+            source.setMinCostPerTon((Double) val);
             break;
         case 5:
-            source.setReplacementControlMinEfficiencyDiff((Double) val);
+            source.setMinAnnCost((Double) val);
             break;
         case 6:
-            source.setInvFilter((String) val);
+            source.setReplacementControlMinEfficiencyDiff((Double) val);
             break;
         case 7:
-            source.setCountyDataset((EmfDataset) val);
+            source.setInvFilter((String) val);
             break;
         case 8:
+            source.setCountyDataset((EmfDataset) val);
+            break;
+        case 9:
             source.setCountyDatasetVersion((Integer) val);
             break;
         default:

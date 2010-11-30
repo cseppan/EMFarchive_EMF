@@ -136,7 +136,7 @@ public class ViewControlStrategyConstraintsTab extends EmfPanel implements ViewC
     }
     
     private SortCriteria sortCriteria() {
-        String[] columnNames = {"Pollutant" };
+        String[] columnNames = {"Order" };
         return new SortCriteria(columnNames, new boolean[] {true}, new boolean[] { true });
     }
 

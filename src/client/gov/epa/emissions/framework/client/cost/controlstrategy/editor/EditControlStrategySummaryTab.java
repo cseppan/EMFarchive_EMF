@@ -223,7 +223,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     
     private JCheckBox makeFinal() {
 
-        makeFinalCheck = new JCheckBox("", null, controlStrategy.getIsFinal()); // need to check with database to see if it is final
+        makeFinalCheck = new JCheckBox("", null, (controlStrategy.getIsFinal() != null ? controlStrategy.getIsFinal() : false)); // need to check with database to see if it is final
         return makeFinalCheck;
     }    
 
@@ -644,7 +644,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         updateStartDate(startTime);
         
         updateSummaryPanelValuesExceptStartDate(""+completionTime, "" + userName , controlStrategy.getTotalCost(), 
-                controlStrategy.getTotalReduction());
+                (!controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION) ? (controlStrategy.getTotalReduction() != null ? controlStrategy.getTotalReduction() + "" : null) : "N/A"));
     }
 
     private void updateStartDate(Date startTime) {
@@ -657,11 +657,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         startDate.setText((startDateString == null ||startDateString.trim()=="" ? "Not started" : startDateString));
     }
 
-    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName,  Double cost, Double emisReduction) {
+    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName, Double cost, String emisReduction) {
         completionDate.setText(closeDate);
         user.setText(userName);
         costValue.setText(cost == null ? "" : "$" + decFormat.format(cost));
-        emissionReductionValue.setText(emisReduction == null ? "" : decFormat.format(emisReduction));
+        emissionReductionValue.setText(emisReduction == null ? "" : (!emisReduction.equals("N/A") ? decFormat.format(Double.parseDouble(emisReduction)) : "N/A"));
     }
 
     public void stopRun() {

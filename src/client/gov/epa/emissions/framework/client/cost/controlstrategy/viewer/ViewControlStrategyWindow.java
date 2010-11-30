@@ -226,9 +226,6 @@ public class ViewControlStrategyWindow extends DisposableInteralFrame implements
         JButton saveButton = new DisabledButton("Save");
         container.add(saveButton);
 
-        JButton copyButton = new DisabledButton("Copy");
-        container.add(copyButton);
-
         Button closeButton = new CloseButton(closeAction());
         container.add(closeButton);
         getRootPane().setDefaultButton(closeButton);

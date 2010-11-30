@@ -92,7 +92,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         this.lastStrategyType = controlStrategy.getStrategyType();
         doLayout(controlStrategy, controlStrategyResults);
 //        pack();
-        if ( this.controlStrategy.getIsFinal()){
+        if ( (this.controlStrategy.getIsFinal() != null ? this.controlStrategy.getIsFinal() : false)){
             this.saveButton.setEnabled(false);
             this.runButton.setEnabled(false);
             this.refreshButton.setEnabled(false);            
@@ -260,10 +260,6 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
         saveButton = new SaveButton(saveAction());
         container.add(saveButton);
-
-        Button copyButton = new CopyButton(null);
-        copyButton.setEnabled(false);
-        container.add(copyButton);
 
         Button closeButton = new CloseButton(closeAction());
         container.add(closeButton);
@@ -450,7 +446,15 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     public void notifyLockFailure(ControlStrategy controlStrategy) {
         String message = "Cannot edit Control Strategy: " + controlStrategy
                 + System.getProperty("line.separator") + " as it was locked by User: " + controlStrategy.getLockOwner()
-                + "(at " + format(controlStrategy.getLockDate()) + ")";
+                + " (at " + format(controlStrategy.getLockDate()) + ")";
+        InfoDialog dialog = new InfoDialog(this, "Message", message);
+        dialog.confirm();
+    }
+
+    public void notifyFinalFailure(ControlStrategy controlStrategy) {
+        String message = "Cannot edit Control Strategy: " + controlStrategy
+                + System.getProperty("line.separator") + " as it was finalized by User: " + controlStrategy.getCreator()
+                + " (at " + format(controlStrategy.getLastModifiedDate()) + ")";
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }

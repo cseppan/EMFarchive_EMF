@@ -184,8 +184,10 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     }
     private void checkBySector(){
         if ( controlMeasureRadioButton.isSelected()){
+            this.sectorListBox.setEnabled(false);
             this.bySector = false;
         } else {
+            this.sectorListBox.setEnabled(true);
             this.bySector = true;
         }
     }
@@ -193,6 +195,7 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     private JPanel createControlMeasurePanel(){
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setBorder(BorderFactory.createTitledBorder("Export By Measure:"));
         
         panel.add( this.controlMeasureRadioButton);
         
@@ -204,7 +207,7 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
         
         panel.add( tablePanel);
         
-        panel.setBorder( BorderFactory.createEmptyBorder(5,5,5,10));
+//        panel.setBorder( BorderFactory.createEmptyBorder(5,5,5,10));
         
         return panel;        
     }
@@ -217,13 +220,14 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
     private JPanel createSectorPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setBorder(BorderFactory.createTitledBorder("Export By Sector:"));
         
         panel.add(this.sectorRadioButton);
         
         try {
             this.sectors = presenter.getDistinctControlMeasureSectors();
             List<Sector> sectorList = new ArrayList<Sector>();
-//            sectorList.add(new Sector("All", "All"));
+            sectorList.add(new Sector("All", "All"));
             sectorList.addAll( Arrays.asList( sectors));
             allSectors = (Sector[]) sectorList.toArray(new Sector[0]);
             
@@ -252,7 +256,7 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
 
             panel.add(scrollPane); 
             //panel.add(sectorComboBox);
-            panel.setBorder( BorderFactory.createEmptyBorder(5,5,5,10));
+//            panel.setBorder( BorderFactory.createEmptyBorder(5,5,5,10));
             
         } 
         catch (EmfException e) {
@@ -366,7 +370,10 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
                 messagePanel.setError("Please select Sector(s).");
             } else {
                 IDs = new int[ inx.length];
-                for ( int i = 0; i<inx.length; i++) {
+                for ( int i = 0; i < inx.length; i++) {
+                    //this means the all item was selected...
+                    if (inx[i] == 0)
+                        return new int[] {};
                     IDs[i] = this.sectors[inx[i]].getId();
                 }
             }            

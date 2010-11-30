@@ -591,8 +591,8 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
         Date startTime = controlStrategy.getStartDate() == null ? null : controlStrategy.getStartDate();
         updateStartDate(startTime);
 
-        updateSummaryPanelValuesExceptStartDate("" + completionTime, "" + userName,
-                controlStrategy.getTotalCost(), controlStrategy.getTotalReduction());
+        updateSummaryPanelValuesExceptStartDate("" + completionTime, "" + userName, controlStrategy.getTotalCost(), 
+                (!controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION) ? (controlStrategy.getTotalReduction() != null ? controlStrategy.getTotalReduction() + "" : null) : "N/A"));
     }
 
     private void updateStartDate(Date startTime) {
@@ -605,12 +605,19 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
         startDate.setText((startDateString == null || startDateString.trim() == "" ? "Not started" : startDateString));
     }
 
-    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName, Double cost,
-            Double reduction) {
+//    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName, Double cost,
+//            Double reduction) {
+//        completionDate.setText(closeDate);
+//        user.setText(userName);
+//        costValue.setText(cost == null ? "" : "$" + decFormat.format(cost));
+//        emissionReductionValue.setText(reduction == null ? "" : decFormat.format(reduction));
+//    }
+//    
+    private void updateSummaryPanelValuesExceptStartDate(String closeDate, String userName, Double cost, String emisReduction) {
         completionDate.setText(closeDate);
         user.setText(userName);
         costValue.setText(cost == null ? "" : "$" + decFormat.format(cost));
-        emissionReductionValue.setText(reduction == null ? "" : decFormat.format(reduction));
+        emissionReductionValue.setText(emisReduction == null ? "" : (!emisReduction.equals("N/A") ? decFormat.format(Double.parseDouble(emisReduction)) : "N/A"));
     }
 
     public void stopRun() {
