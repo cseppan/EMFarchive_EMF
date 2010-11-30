@@ -79,7 +79,7 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
             EmfSession session, DatasetVersion[] baseDatasetVersions, DatasetVersion[] compareDatasetVersions, 
             String groupByExpressions, String aggregateExpressions, String matchingExpressions) {
         
-        super("Emissions Inventories Editor", new Dimension(600, 400), desktopManager);
+        super("Emissions Inventories Editor", new Dimension(650, 600), desktopManager);
         this.program = program; 
         this.session = session;
         this.baseDatasetVersions = baseDatasetVersions;
@@ -117,14 +117,17 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
 
         this.groupByExpressionsTextField = new TextArea("Group By Expressions", this.groupByExpressions, 40, 5);
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(this.groupByExpressionsTextField);
+        scrollableComment.setPreferredSize(new Dimension(450, 105));
         layoutGenerator.addLabelWidgetPair("Group By Expressions:", scrollableComment, content);
 
         this.aggregateExpressionsTextField = new TextArea("Aggregate Expressions", this.aggregateExpressions, 40, 5);
         ScrollableComponent scrollableComment2 = ScrollableComponent.createWithVerticalScrollBar(this.aggregateExpressionsTextField);
+        scrollableComment2.setPreferredSize(new Dimension(450, 105));
         layoutGenerator.addLabelWidgetPair("Aggregate Expressions:", scrollableComment2, content);
 
         this.matchingExpressionsTextField = new TextArea("Matching Expressions", this.matchingExpressions, 40, 5);
         ScrollableComponent scrollableComment3 = ScrollableComponent.createWithVerticalScrollBar(this.matchingExpressionsTextField);
+        scrollableComment3.setPreferredSize(new Dimension(450, 105));
         layoutGenerator.addLabelWidgetPair("Matching Expressions:", scrollableComment3, content);
 
         

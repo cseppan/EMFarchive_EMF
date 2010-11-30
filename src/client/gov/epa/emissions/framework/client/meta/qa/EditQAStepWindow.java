@@ -1137,10 +1137,16 @@ avd_emis=emis_avd
 //        }
         CompareDatasetsQAProgamWindow view = new CompareDatasetsQAProgamWindow(desktopManager, programVal, session,
                 baseDatasetList.toArray(new DatasetVersion[0]), compareDatasetList.toArray(new DatasetVersion[0]),
-                programSwitches.substring(indexGroupBy + GROUP_BY_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexGroupBy) != -1 ? programSwitches.indexOf("\n-", indexGroupBy) : programSwitches.length()), 
-                programSwitches.substring(indexAggregate + AGGREGATE_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexAggregate) != -1 ? programSwitches.indexOf("\n-", indexAggregate) : programSwitches.length()), 
-                programSwitches.substring(indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length())
-                );
+
+//                programSwitches.substring(indexGroupBy + GROUP_BY_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexGroupBy) != -1 ? programSwitches.indexOf("\n-", indexGroupBy) : programSwitches.length()), 
+//                programSwitches.substring(indexAggregate + AGGREGATE_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexAggregate) != -1 ? programSwitches.indexOf("\n-", indexAggregate) : programSwitches.length()), 
+//                programSwitches.substring(indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length())
+
+                (indexGroupBy != -1 ? programSwitches.substring(indexGroupBy + GROUP_BY_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexGroupBy) != -1 ? programSwitches.indexOf("\n-", indexGroupBy) : programSwitches.length()) : ""), 
+                (indexAggregate != -1 ? programSwitches.substring(indexAggregate + AGGREGATE_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexAggregate) != -1 ? programSwitches.indexOf("\n-", indexAggregate) : programSwitches.length()) : ""), 
+                (indexMatching != -1 ? programSwitches.substring(indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length()) : "")
+
+        );
         EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
         presenter.display(origDataset, step);
     }
