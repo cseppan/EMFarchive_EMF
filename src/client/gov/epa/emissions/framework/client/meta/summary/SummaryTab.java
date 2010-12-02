@@ -168,6 +168,7 @@ public class SummaryTab extends JPanel implements SummaryTabView, RefreshObserve
         
         super.removeAll();
         this.dataset = presenter.reloadDataset(); 
+        this.version=presenter.getVersion();
         setLayout();
         super.validate();       
     }
