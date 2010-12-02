@@ -286,7 +286,7 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (String) call.requestResponse(new Object[] {  });
     }
 
-    public StrategyResultType[] getOptionalStrategyResultTypes() throws EmfException {
+    public synchronized StrategyResultType[] getOptionalStrategyResultTypes() throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getOptionalStrategyResultTypes");
@@ -303,6 +303,15 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.setReturnType(mappings.string());
 
         return (String) call.requestResponse(new Object[] { new Integer(id) });
+    }
+
+    public synchronized String getCoSTSUs() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCoSTSUs");
+        call.setReturnType(mappings.string());
+
+        return (String) call.requestResponse(new Object[] { });
     }
 
 }

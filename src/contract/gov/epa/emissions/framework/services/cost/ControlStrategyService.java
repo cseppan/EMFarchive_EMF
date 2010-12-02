@@ -64,4 +64,7 @@ public interface ControlStrategyService extends EMFService {
     public String getDefaultExportDirectory() throws EmfException;
 
     public String getStrategyRunStatus(int id) throws EmfException;
+    
+    public String getCoSTSUs() throws EmfException;
+    
 }

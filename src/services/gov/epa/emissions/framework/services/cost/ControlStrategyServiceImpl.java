@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.cost.analysis.SummarizeStrategy;
 import gov.epa.emissions.framework.services.cost.analysis.StrategySummaryFactory;
@@ -13,6 +14,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
@@ -581,4 +583,20 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             session.close();
         }
     }
+
+    public synchronized String getCoSTSUs() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty("COST_SU", session);
+            
+            return property.getValue();
+        } finally {
+            session.close();
+        }
+    }
+    
+    public synchronized boolean isCoSTSU(String username) throws EmfException {
+        return true;
+    }
+    
 }

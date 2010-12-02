@@ -1413,3 +1413,6 @@ add column county_dataset_version integer;
 -- 11/10/2010 Add is_final to control strategy table
 ALTER TABLE emf.control_strategies
    ADD COLUMN is_final boolean DEFAULT false;
+
+-- 12/1/2010 Add new class Temporary
+insert into emf.control_measure_classes values (DEFAULT, 'Temporary', 'Temporary');

@@ -24,7 +24,11 @@ public class CMImportPresenter {
     }
 
     void importControlMeasures(String directory, String[] files) throws EmfException {
+        
+        //Maybe validate if user is a CoST SU, if truncate is true
         importRules.validate(directory, files);
+        
+        
         startImportMessage(view);
 //        importing = true;
 //        session.controlMeasureImportService().importControlMeasures(mapToRemote(directory), files, session.user());
