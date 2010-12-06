@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure.io;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -19,7 +20,26 @@ public class CMImportPresenter {
         this.importRules = new CMImportInputRules();
     }
 
-    public void doImport(String directory, String[] files) throws EmfException {
+    public void doImport(int [] sectorIDs, String directory, String[] files) throws EmfException {
+        
+        if ( sectorIDs != null) { // need to purge control measure by sectors
+            
+            // TODO: JIZHEN do validation here
+            
+            if ( sectorIDs.length == 0) { // TODO: JIZHEN purge all
+                System.out.println("Purge all");
+                
+            } else { // TODO: JIZHEN purge by sectors
+                System.out.println("Purge by sectors: ");
+                for ( int i=0; i<sectorIDs.length; i++) {
+                    System.out.print(sectorIDs[i] + " ");
+                }
+                System.out.println("");
+            }
+        }
+        
+        //return;
+        
         importControlMeasures(directory, files);
     }
 
@@ -87,5 +107,12 @@ public class CMImportPresenter {
     public void removeImportStatuses() throws EmfException {
         session.controlMeasureImportService().removeImportStatuses(session.user());
     }
+    
+    public Sector[] getDistinctControlMeasureSectors() throws EmfException {
+        return session.controlMeasureService().getDistinctControlMeasureSectors();
+    }
 
+    public String getCoSTSUs() throws EmfException {
+        return session.controlStrategyService().getCoSTSUs();
+    }
 }

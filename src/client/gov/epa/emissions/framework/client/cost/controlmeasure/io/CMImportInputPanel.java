@@ -1,9 +1,11 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure.io;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -16,7 +18,9 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -24,7 +28,9 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
@@ -33,11 +39,11 @@ public class CMImportInputPanel extends JPanel {
 
     private MessagePanel messagePanel;
 
-    private CMImportPresenter presenter;
-
-    private TextField pattern;
+    private CMImportPresenter presenter = null;
 
     private TextField folder;
+    
+    private TextField pattern;
 
     private TextArea filenames;
 
@@ -48,13 +54,19 @@ public class CMImportInputPanel extends JPanel {
     private EmfConsole parentConsole;
 
     private static String lastFolder = null;
+    
+    private boolean superUser = false;
+    private JCheckBox chkPurge;
+    private JList sectorListBox; 
+    private Sector[] sectors;
+    private Sector[] allSectors;
 
     public CMImportInputPanel(EmfConsole parentConsole, MessagePanel messagePanel, EmfSession session) {
         this.messagePanel = messagePanel;
         this.session = session;
         this.parentConsole = parentConsole;
 
-        initialize();
+        //initialize();
     }
 
     private void initialize() {
@@ -89,6 +101,10 @@ public class CMImportInputPanel extends JPanel {
         fileNamesPanel.add(new JLabel("Filenames"),BorderLayout.WEST);
         fileNamesPanel.add(fileTextAreaPane);
         //layoutGenerator.addLabelWidgetPair("Filenames", fileTextAreaPane, mainPanel);
+        
+        // JIZHEN detect if this is super user
+        this.superUser = this.checkIfSuperUser();        
+        JPanel sectorPanel = this.createSectorPanel();
 
         JPanel statusPanel = new JPanel(new BorderLayout(10,10));
         importStatusTextArea = new TextArea("Import Status", "", width);
@@ -111,12 +127,79 @@ public class CMImportInputPanel extends JPanel {
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(fileNamesPanel);
         mainPanel.add(Box.createVerticalStrut(10));
+        if ( this.superUser) {
+            mainPanel.add(sectorPanel);
+            mainPanel.add(Box.createVerticalStrut(10));
+        }
         this.setBorder(BorderFactory.createEmptyBorder(10,10,10,20));
         this.setLayout(new BorderLayout(10,10));
         this.add(mainPanel,BorderLayout.NORTH);
         this.add(statusPanel);
-        
+     }
+    
+    private boolean checkIfSuperUser() {
+        try {
+            User currentUser = session.user();
+            String costSUs = presenter.getCoSTSUs();
+            StringTokenizer st = new StringTokenizer(costSUs,"|");
+            while ( st.hasMoreTokens()) {
+                String token = st.nextToken();
+                if ( token.equals( currentUser.getName())) {
+                    return true;
+                }
+            }
+            return false;
 
+        } catch (EmfException e1) {
+            // NOTE Auto-generated catch block
+            e1.printStackTrace();
+            messagePanel.setMessage(e1.getMessage());
+            return false;
+        }        
+    }
+    
+    private JPanel createSectorPanel() {
+        JPanel sectorPanel = null;
+        if ( this.superUser) {
+            sectorPanel = new JPanel();
+            sectorPanel.setLayout(new BoxLayout(sectorPanel, BoxLayout.Y_AXIS));
+            sectorPanel.setBorder(BorderFactory.createTitledBorder("Purge Existing Measures By Sectors"));
+            
+            JPanel chkPanel = new JPanel();
+            chkPanel.setLayout(new BorderLayout(10,10));
+            JLabel emptyLabel = new JLabel("               ");
+            chkPanel.add( emptyLabel, BorderLayout.WEST);
+            this.chkPurge = new JCheckBox( "Purge     ");
+            chkPanel.add( this.chkPurge);
+            
+            JPanel secPanel = new JPanel();
+            secPanel.setLayout(new BorderLayout(10,10));
+            JLabel secLabel = new JLabel("Sector    ");
+            secPanel.add( secLabel, BorderLayout.WEST);
+            
+            if ( this.presenter != null) {
+                try {
+                    this.sectors = presenter.getDistinctControlMeasureSectors();
+                    List<Sector> sectorList = new ArrayList<Sector>();
+                    sectorList.add(new Sector("All", "All"));
+                    sectorList.addAll( Arrays.asList( sectors));
+                    allSectors = sectorList.toArray(new Sector[0]);
+                    sectorListBox = new JList( allSectors);
+                    sectorListBox.setVisibleRowCount(2);
+                    JScrollPane scrollPane = new JScrollPane( sectorListBox);
+                    secPanel.add(scrollPane);                     
+                } catch (EmfException e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                    messagePanel.setMessage(e.getMessage());
+                }                
+            }
+            
+            sectorPanel.add(chkPanel);
+            sectorPanel.add(Box.createVerticalStrut(10));
+            sectorPanel.add(secPanel);
+        }
+        return sectorPanel;
     }
 
     private JButton browseFileButton() {
@@ -146,6 +229,7 @@ public class CMImportInputPanel extends JPanel {
 
     public void register(CMImportPresenter presenter) {
         this.presenter = presenter;
+        this.initialize();
     }
 
     private void selectFilesFromPattern() {
@@ -254,6 +338,37 @@ public class CMImportInputPanel extends JPanel {
 
     public void addStatusMessage(String messages) {
         importStatusTextArea.append(messages);
+    }
+    
+    // will be used by the CMImportWindow
+    
+    public boolean isSuperUser() {
+        return this.superUser;
+    }
+    
+    public boolean toPurge() {
+        return this.superUser && this.chkPurge.isSelected();
+    }
+    
+    public int[] getSectorIDs(){
+        int [] IDs = null;
+        if ( this.toPurge()) {
+            int [] inx = sectorListBox.getSelectedIndices();
+            if ( inx.length == 0){
+                messagePanel.setError("Please select Sector(s).");
+            } else {
+                IDs = new int[ inx.length];
+                for ( int i = 0; i < inx.length; i++) {
+                    //this means the all item was selected...
+                    if (inx[i] == 0)
+                        return new int[] {};
+                    IDs[i] = this.sectors[inx[i]].getId();
+                }
+            }            
+        } else {
+            messagePanel.setError("Did not choose to purge Control Measures.");
+        }
+        return IDs;
     }
 
 }

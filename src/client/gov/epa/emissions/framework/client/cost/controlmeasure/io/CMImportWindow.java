@@ -20,6 +20,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JCheckBox;
+import javax.swing.JList;
 import javax.swing.JPanel;
 
 public class CMImportWindow extends ReusableInteralFrame implements CMImportView, RefreshObserver {
@@ -97,7 +99,15 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
     private void doImport() {
         try {
             importButton.setEnabled(false);
-            presenter.doImport(importInputPanel.folder(), importInputPanel.files());
+            
+            // check if do purge
+            int [] sectorIDs = null;
+            if ( this.importInputPanel.toPurge()) {
+                sectorIDs = this.importInputPanel.getSectorIDs();
+            }
+            
+            presenter.doImport(sectorIDs, importInputPanel.folder(), importInputPanel.files());
+            
             importing = true;
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
