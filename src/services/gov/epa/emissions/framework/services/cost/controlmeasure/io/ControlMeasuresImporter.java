@@ -65,10 +65,16 @@ public class ControlMeasuresImporter implements Importer {
     
     private EfficiencyRecordGenerator generator;
 
-    public ControlMeasuresImporter(File folder, String[] fileNames, User user, HibernateSessionFactory factory, DbServerFactory dbServerFactory)
+    private boolean truncate;
+
+    private int[] sectorIds;
+
+    public ControlMeasuresImporter(File folder, String[] fileNames, User user, boolean truncate, int[] sectorIds, HibernateSessionFactory factory, DbServerFactory dbServerFactory)
             throws EmfException, ImporterException {
         File[] files = fileNames(folder, fileNames);
         this.user = user;
+        this.truncate = truncate;
+        this.sectorIds = sectorIds;
         this.sessionFactory = factory;
         this.dbServer = dbServerFactory.getDbServer();
         this.statusDao = new StatusDAO(factory);

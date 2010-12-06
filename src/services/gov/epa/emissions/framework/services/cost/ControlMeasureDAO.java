@@ -137,6 +137,32 @@ public class ControlMeasureDAO {
         hibernateFacade.remove(current(controlMeasureId, session), session);
     }
 
+    public void remove(int[] sectorIds, Session session, DbServer dbServer) throws EmfException {
+        removeSccs(sectorIds, session);
+//      LOG.error("remove EfficiencyRecords");
+      //removeEfficiencyRecords(cmId, session);
+        
+        AggregateEfficiencyRecordDAO aerDAO = new AggregateEfficiencyRecordDAO();
+        aerDAO.removeAggregateEfficiencyRecords(sectorIds, dbServer);
+
+        removeEfficiencyRecords(sectorIds, session);
+        
+        
+        String idList = "";
+        for (int i = 0; i < sectorIds.length; ++i) {
+            idList += (i > 0 ? ","  : "") + sectorIds[i];
+        }
+        
+        String hqlDelete = "delete ControlMeasure cm where cm.id IN (select icm.id "
+                + "FROM ControlMeasure AS icm "
+                + (sectorIds != null && sectorIds.length > 0 
+                        ? "inner join icm.sectors AS s "
+                          + "WHERE s.id in (" + idList + ") " 
+                        : "") + ")";
+        session.createQuery( hqlDelete ).executeUpdate();
+        session.flush();
+    }
+
     public int copy(int controlMeasureId, User creator, Session session, DbServer dbServer) throws EmfException {
         ControlMeasure cm = current(controlMeasureId, session);
         session.clear();//must do this
@@ -190,6 +216,23 @@ public class ControlMeasureDAO {
 //        for (int i = 0; i < sccs.length; i++) {
 //            hibernateFacade.remove(sccs[i], session);
 //        }
+    }
+
+    private void removeSccs(int[] sectorIds, Session session) {
+        
+        String idList = "";
+        for (int i = 0; i < sectorIds.length; ++i) {
+            idList += (i > 0 ? ","  : "") + sectorIds[i];
+        }
+
+        String hqlDelete = "delete Scc scc where scc.controlMeasureId  IN (select cm.id "
+                + "FROM ControlMeasure AS cm "
+                + (sectorIds != null && sectorIds.length > 0 
+                        ? "inner join cm.sectors AS s "
+                          + "WHERE s.id in (" + idList + ") " 
+                        : "") + ")";
+        session.createQuery( hqlDelete ).executeUpdate();
+        session.flush();
     }
 
     public ControlMeasure obtainLocked(User user, int controlMeasureId, Session session) {
@@ -439,6 +482,23 @@ public class ControlMeasureDAO {
 //        for (int i = 0; i < list.size(); i++) {
 //            hibernateFacade.remove(list.get(i), session);
 //        }
+    }
+
+    public void removeEfficiencyRecords(int[] sectorIds, Session session) {
+        
+        String idList = "";
+        for (int i = 0; i < sectorIds.length; ++i) {
+            idList += (i > 0 ? ","  : "") + sectorIds[i];
+        }
+        
+        String hqlDelete = "delete EfficiencyRecord er where er.controlMeasureId IN (select cm.id "
+                + "FROM ControlMeasure AS cm "
+                + (sectorIds != null && sectorIds.length > 0 
+                        ? "inner join cm.sectors AS s "
+                          + "WHERE s.id in (" + idList + ") " 
+                        : "") + ")";
+        session.createQuery( hqlDelete ).executeUpdate();
+        session.flush();
     }
 
     public void removeEfficiencyRecords(int controlMeasureId, DbServer dbServer) throws EmfException {

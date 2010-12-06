@@ -315,7 +315,7 @@ public class MaxEmsRedStrategyTestDetailedCase extends ServiceTestCase {
     private void importControlMeasures() throws EmfException, Exception {
         File folder = new File("test/data/cost/controlMeasure");
         String[] fileNames = { "CMSummary.csv", "CMSCCs.csv", "CMEfficiencies.csv", "CMReferences.csv" };
-        CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), sessionFactory, dbServerFactory());
+        CMImportTask task = new CMImportTask(folder, fileNames, emfUser(), false, new int[] {}, sessionFactory, dbServerFactory());
         task.run();
     }
 

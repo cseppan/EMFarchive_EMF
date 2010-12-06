@@ -36,7 +36,7 @@ public class ControlMeasuresExporter implements Exporter {
     
     private PostgresCOPYExport postgresCOPYExport;
 //    private EquationTypeMap equationTypeMap;
-    private String idList = "";
+    private String idList = "-9999"; //add some unknown id, makes it easier when building the delimited list.
 
     public ControlMeasuresExporter(File folder, String prefix, ControlMeasure[] controlMeasures, String[] sccs,
             User user, HibernateSessionFactory factory, DbServerFactory dbServerFactory) {
@@ -51,7 +51,7 @@ public class ControlMeasuresExporter implements Exporter {
         this.postgresCOPYExport = new PostgresCOPYExport(dbServer);
  //       this.equationTypeMap = new EquationTypeMap(getEquationTypes());
         for (ControlMeasure controlMeasure : controlMeasures) 
-            idList += (idList.length() > 0 ? "," : "") + controlMeasure.getId();
+            idList += "," + controlMeasure.getId();
     }
 
     public void run() throws ExporterException {

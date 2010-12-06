@@ -1416,3 +1416,6 @@ ALTER TABLE emf.control_strategies
 
 -- 12/1/2010 Add new class Temporary
 insert into emf.control_measure_classes values (DEFAULT, 'Temporary', 'Temporary');
+
+-- 12/5/2010 Add new CoST 
+insert into emf.properties values(DEFAULT, 'COST_CMDB_BACKUP_FOLDER', 'FILL_IN_CORRECT_FOLDER');

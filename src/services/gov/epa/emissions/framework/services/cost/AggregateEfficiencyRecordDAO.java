@@ -37,6 +37,14 @@ public class AggregateEfficiencyRecordDAO {
         }
     }
 
+    public void removeAggregateEfficiencyRecords(int[] sectorIds, DbServer dbServer) throws EmfException {
+        try {
+            dbServer.getEmfDatasource().query().execute(removeQuery(sectorIds));
+        } catch (SQLException e) {
+            throw new EmfException(e.getMessage());
+        }
+    }
+
     public void removeAggregateEfficiencyRecords(ControlMeasure[] measures, DbServer dbServer) throws EmfException {
         try {
             for (int i = 0; i < measures.length; i++) {
@@ -70,6 +78,23 @@ public class AggregateEfficiencyRecordDAO {
 
         String query = "delete from emf.aggregrated_efficiencyrecords " +
             "where control_measures_id = " + controlMeasureId + ";";
+
+        return query;
+    }
+
+    private String removeQuery(int[] sectorIds) {
+
+        String idList = "";
+        for (int i = 0; i < sectorIds.length; ++i) {
+            idList += (i > 0 ? ","  : "") + sectorIds[i];
+        }
+        
+        String query = "delete from emf.aggregrated_efficiencyrecords where control_measures_id IN (select cm.id "
+                + "FROM emf.control_measures AS cm "
+                + (sectorIds != null && sectorIds.length > 0 
+                        ? "where cm.id in (select control_measure_id emf.control_measure_sectors "
+                          + "WHERE id in (" + idList + ") )" 
+                        : "") ;
 
         return query;
     }

@@ -40,7 +40,7 @@ public class ControlMeasureImportServiceImpl implements ControlMeasureImportServ
 
     public synchronized void importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
         try {
-            CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, sessionFactory, dbServerFactory);
+            CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, true, new int[] { 4 },sessionFactory, dbServerFactory);
             threadPool.execute(new GCEnforcerTask("Import control measures from files: " + fileNames[0] + ", etc.", importTask));
         } catch (Exception e) {
             LOG.error("Could not import control measures.", e);
