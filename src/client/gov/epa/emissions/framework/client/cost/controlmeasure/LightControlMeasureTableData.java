@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -18,7 +19,7 @@ public class LightControlMeasureTableData extends ControlMeasureTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Abbreviation", "Pollutant", "Sector" };
+        return new String[] { "Name", "Abbreviation", "Pollutant", "Sector", "Class" };
     }
 
     public Class getColumnClass(int col) {
@@ -32,6 +33,10 @@ public class LightControlMeasureTableData extends ControlMeasureTableData {
     public void refresh(Pollutant pollutant, String year) {
        //
     }
+    
+    private String measureClass(ControlMeasureClass cmClass) {
+        return (cmClass == null) ? "" : cmClass.getName();
+    }    
 
     private List createRows(ControlMeasure[] measures) {
         List rows = new ArrayList();
@@ -39,10 +44,13 @@ public class LightControlMeasureTableData extends ControlMeasureTableData {
         targetYear = year;
         for (int i = 0; i < measures.length; i++) {
             ControlMeasure measure = measures[i];
-
-            Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(measure), this.getSectorsString(measure) };
-            Row row = new ViewableRow(measure, values);
-            rows.add(row);
+            
+            if ( measure != null) {
+                Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(measure), this.getSectorsString(measure), this.measureClass(measure.getCmClass()) };
+                Row row = new ViewableRow(measure, values);
+                rows.add(row);
+            }
+            
         }
         return rows;
     }
