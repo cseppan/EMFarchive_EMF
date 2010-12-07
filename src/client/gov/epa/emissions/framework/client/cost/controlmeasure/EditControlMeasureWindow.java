@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -20,6 +21,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.StringTokenizer;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -269,5 +271,4 @@ public class EditControlMeasureWindow extends DisposableInteralFrame implements 
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }
-
 }

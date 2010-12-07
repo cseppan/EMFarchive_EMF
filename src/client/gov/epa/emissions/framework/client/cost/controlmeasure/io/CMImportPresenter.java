@@ -20,7 +20,8 @@ public class CMImportPresenter {
         this.importRules = new CMImportInputRules();
     }
 
-    public void doImport(int [] sectorIDs, String directory, String[] files) throws EmfException {
+    public void doImport(//boolean purge, 
+            int [] sectorIDs, String directory, String[] files) throws EmfException {
         
         if ( sectorIDs != null) { // need to purge control measure by sectors
             
@@ -39,6 +40,8 @@ public class CMImportPresenter {
         }
         
         //return;
+        
+        //session.controlMeasureImportService().importControlMeasures(folderPath, fileNames, user)
         
         importControlMeasures(directory, files);
     }

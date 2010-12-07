@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.Utils;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -32,6 +33,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -293,6 +295,27 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         container.add(panel, BorderLayout.NORTH);
         return container;
     }
+    
+    protected boolean checkIfSuperUser() {
+        try {
+            User currentUser = session.user();
+            String costSUs = session.controlStrategyService().getCoSTSUs(); //presenter.getCoSTSUs();
+            StringTokenizer st = new StringTokenizer(costSUs,"|");
+            while ( st.hasMoreTokens()) {
+                String token = st.nextToken();
+                if ( token.equals( currentUser.getName())) {
+                    return true;
+                }
+            }
+            return false;
+
+        } catch (EmfException e1) {
+            // NOTE Auto-generated catch block
+            e1.printStackTrace();
+            messagePanel.setMessage(e1.getMessage());
+            return false;
+        }        
+    }    
 
     private JPanel createRightPanel() {
         JPanel container = new JPanel(new BorderLayout());

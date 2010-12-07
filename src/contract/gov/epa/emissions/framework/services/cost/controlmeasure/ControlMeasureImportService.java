@@ -7,7 +7,8 @@ import gov.epa.emissions.framework.services.basic.Status;
 
 public interface ControlMeasureImportService extends EMFService {
 
-    void importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException;
+    void importControlMeasures( //boolean purge, int[] sectorIDs, 
+            String folderPath, String[] fileNames, User user) throws EmfException;
 
     Status[] getImportStatus(User user) throws EmfException;
 
