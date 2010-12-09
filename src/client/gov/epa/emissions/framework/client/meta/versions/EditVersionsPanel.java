@@ -316,20 +316,26 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         panel.add(tableCombo);
 
         Button view = viewButton(tableCombo);
-        if (dataset.getInternalSources().length == 0) {
+        if (dataset.getDatasetType() != null && 
+                ( dataset.getDatasetType().isExternal() ||
+                  dataset.getInternalSources().length == 0)) { 
             view.setEnabled(false);
         }
         panel.add(view);
 
         Button edit = editButton(tableCombo);
-        if (dataset.getInternalSources().length == 0) {
+        if (dataset.getDatasetType() != null && 
+                ( dataset.getDatasetType().isExternal() ||
+                  dataset.getInternalSources().length == 0)) { 
             edit.setEnabled(false);
         }
         panel.add(edit);
 
         Button copy = copyButton(tableCombo);
-        if (dataset.getInternalSources().length == 0) {
-            edit.setEnabled(false);
+        if (dataset.getDatasetType() != null && 
+                ( dataset.getDatasetType().isExternal() ||
+                  dataset.getInternalSources().length == 0)) {  
+            copy.setEnabled(false);
         }
         panel.add(copy);
 
