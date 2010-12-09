@@ -27,10 +27,13 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class EditQAEmissionsWindow extends DisposableInteralFrame implements EditQAEmissionsView {
     
@@ -89,22 +92,76 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
-        JPanel content = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-       
-        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(dataset), content);
-        layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
-        summaryTypeCombo();
-        layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
-        layoutGenerator.makeCompactGrid(content, 3, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad*/
+        
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
-        layout.add(content);
+        
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add( createLabelInPanel("Emission inventories: ", 130,30));
+        panel.add( emisinv(dataset));
+        //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        layout.add( panel);
+        
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add( createLabelInPanel("Inventory table:      ", 130,30));
+        panel.add( invTablePanel());
+        //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        panel.setMaximumSize( new Dimension(1500, 30));
+        layout.add( panel);
+        
+        summaryTypeCombo();
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add( createLabelInPanel("Summary Type:         ", 130,30));
+        panel.add( summaryTypes);
+        //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        layout.add( panel);        
+        
+//        JPanel content = new JPanel(new SpringLayout());
+//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+//       
+//        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(dataset), content);
+//        layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
+//        summaryTypeCombo();
+//        layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
+//        layoutGenerator.makeCompactGrid(content, 3, 2, // rows, cols
+//                5, 5, // initialX, initialY
+//                10, 10);// xPad, yPad*/
+//
+//        layout.add(content);
+        
+        
         layout.add(buttonPanel());
         
         return layout;
+    }
+    
+    protected JPanel createLabelInPanel( String lbl, int width, int height) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setSize(width, height);
+        panel.setMinimumSize( new Dimension(width, height));
+        panel.setMaximumSize( new Dimension(width, height));
+        panel.setPreferredSize( new Dimension(width, height));
+        
+        JLabel label = new JLabel( lbl);
+        label.setSize(width, height);
+        label.setMinimumSize( new Dimension(width, height));
+        label.setMaximumSize( new Dimension(width, height));   
+        label.setPreferredSize( new Dimension(width, height));
+        panel.add( label);
+        
+        
+//        System.out.println( label.getWidth());
+//        System.out.println( panel.getWidth());
+//        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        
+        return panel;
     }
     
     protected JPanel emisinv(EmfDataset dataset) {
@@ -124,16 +181,23 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
             setDatasetsFromStepWindow(invTables);
         
         JScrollPane pane = new JScrollPane(invTable);
-        pane.setPreferredSize(new Dimension(350, 25));
+        pane.setPreferredSize(new Dimension(800, 25));
         invTable.setToolTipText("The inventory table dataset.  Press select button to choose from a list.");
-       
+        pane.setMaximumSize(new Dimension(1500, 25));
+        
         Button addButton = new AddButton("Select", addAction());
+        addButton.setPreferredSize(new Dimension(75, 25));
+        addButton.setMaximumSize(new Dimension(75, 25));
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel invPanel = new JPanel(new BorderLayout(5,0));
         
-        invPanel.add(pane, BorderLayout.LINE_START);
+        JPanel invPanel = new JPanel();
+        invPanel.setMaximumSize( new Dimension(1500,30));
+        invPanel.setLayout( new BoxLayout(invPanel, BoxLayout.X_AXIS));
+        
+        invPanel.add(pane);
         invPanel.add(addButton);
+        
         return invPanel;
     }
     

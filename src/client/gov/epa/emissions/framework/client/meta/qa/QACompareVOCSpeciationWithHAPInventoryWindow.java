@@ -27,10 +27,13 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInteralFrame implements EditQAEmissionsView {
     
@@ -149,34 +152,117 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
-        JPanel content = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-       
-        layoutGenerator.addLabelWidgetPair("CAP Inventory:", capInvPanel(dataset), content);
-        layoutGenerator.addLabelWidgetPair("HAP Inventory:", hapInvPanel(dataset), content);
-        layoutGenerator.addLabelWidgetPair("Speciation Tool Species Info Dataset:", speciationToolGasProfileDatasetPanel(), content);
-        layoutGenerator.addLabelWidgetPair("Pollutant to Pollutant Conversion (GSCNV) Dataset:",  pollToPollConversionDatasetPanel(), content);
-        layoutGenerator.addLabelWidgetPair("Speciation Cross-Reference (GSREF) Datasets:",  speciationCrossReferenceDatasetsPanel(), content);
-        layoutGenerator.addLabelWidgetPair("Speciation Profile Weight Datasets:",  speciationProfileWeightDatasetsPanel(), content);
-        
-        summaryTypeCombo(dataset);
-        layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
-
-//        JPanel middlePanel = new JPanel(new SpringLayout());
-//        middlePanel.setBorder(new Border("Filters"));
-        
-        filterTextArea = new TextArea("filter", filter, 40, 2);
-        filterTextArea.setToolTipText("Enter a filter that could be entered as a SQL where clause (e.g., ANN_EMIS>5000 and SCC like '30300%')");
-        JScrollPane scrollPane = new JScrollPane(filterTextArea);
-        
-        layoutGenerator.addLabelWidgetPair("Inventory Filter:", scrollPane, content);
-
-        layoutGenerator.makeCompactGrid(content, 8, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad*/
         messagePanel = new SingleLineMessagePanel();
+        messagePanel.setMaximumSize( new Dimension(10000,30));
         layout.add(messagePanel);
-        layout.add(content);
+        
+        boolean boxlayout = true;
+        if ( boxlayout) {
+            int w = 300, h = 30;
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("CAP Inventory:", w,h));
+            panel.add( capInvPanel(dataset));
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            layout.add( panel);
+            
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("HAP Inventory:", w,h));
+            panel.add( hapInvPanel(dataset));
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            layout.add( panel);
+
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Speciation Tool Species Info Dataset:", w,h));
+            panel.add( speciationToolGasProfileDatasetPanel());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            //panel.setMaximumSize( new Dimension(1500, 1000));
+            layout.add( panel);
+            
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Pollutant to Pollutant Conversion (GSCNV) Dataset:", w,h));
+            panel.add( pollToPollConversionDatasetPanel());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            //panel.setMaximumSize( new Dimension(1500, 1000));
+            layout.add( panel);
+            
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Speciation Cross-Reference (GSREF) Datasets:", w,h));
+            panel.add( speciationCrossReferenceDatasetsPanel());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            //panel.setMaximumSize( new Dimension(1500, 1000));
+            layout.add( panel);
+            
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Speciation Profile Weight Datasets:", w,h));
+            panel.add( speciationProfileWeightDatasetsPanel());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            layout.add( panel);
+            
+            summaryTypeCombo(dataset);
+            
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Summary Type:", w,h));
+            panel.add( summaryTypes);
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            panel.setMaximumSize( new Dimension(1500, 30));
+            layout.add( panel);
+            
+            filterTextArea = new TextArea("filter", filter, 40, 2);
+            filterTextArea.setToolTipText("Enter a filter that could be entered as a SQL where clause (e.g., ANN_EMIS>5000 and SCC like '30300%')");
+            JScrollPane scrollPane = new JScrollPane(filterTextArea);
+            
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Inventory Filter:", w,h));
+            panel.add( scrollPane);
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            layout.add( panel);
+            
+        } else {        
+            JPanel content = new JPanel(new SpringLayout());
+            SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+            layoutGenerator.addLabelWidgetPair("CAP Inventory:", capInvPanel(dataset), content);
+            layoutGenerator.addLabelWidgetPair("HAP Inventory:", hapInvPanel(dataset), content);
+            layoutGenerator.addLabelWidgetPair("Speciation Tool Species Info Dataset:", speciationToolGasProfileDatasetPanel(), content);
+            layoutGenerator.addLabelWidgetPair("Pollutant to Pollutant Conversion (GSCNV) Dataset:",  pollToPollConversionDatasetPanel(), content);
+            layoutGenerator.addLabelWidgetPair("Speciation Cross-Reference (GSREF) Datasets:",  speciationCrossReferenceDatasetsPanel(), content);
+            layoutGenerator.addLabelWidgetPair("Speciation Profile Weight Datasets:",  speciationProfileWeightDatasetsPanel(), content);
+
+            summaryTypeCombo(dataset);
+            layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
+
+            //        JPanel middlePanel = new JPanel(new SpringLayout());
+            //        middlePanel.setBorder(new Border("Filters"));
+
+            filterTextArea = new TextArea("filter", filter, 40, 2);
+            filterTextArea.setToolTipText("Enter a filter that could be entered as a SQL where clause (e.g., ANN_EMIS>5000 and SCC like '30300%')");
+            JScrollPane scrollPane = new JScrollPane(filterTextArea);
+
+            layoutGenerator.addLabelWidgetPair("Inventory Filter:", scrollPane, content);
+
+            layoutGenerator.makeCompactGrid(content, 8, 2, // rows, cols
+                    5, 5, // initialX, initialY
+                    10, 10);// xPad, yPad*/
+
+            layout.add(content);
+        }
+        
         layout.add(buttonPanel());
         
         return layout;
@@ -195,10 +281,20 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", dataset.getDatasetType().equals(orlPointDST) ? addCAPPointInvAction() : addCAPNonPointInvAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -216,10 +312,20 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", dataset.getDatasetType().equals(orlPointDST) ? addHAPPointInvAction() : addHAPNonPointInvAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -237,10 +343,20 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", addSpeciationToolGasProfileDatasetAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -258,10 +374,20 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", addPollToPollConversionDatasetAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -280,10 +406,20 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", addSpeciationCrossReferenceDatasetsAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -302,10 +438,20 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         Button addButton = new AddButton("Select", addSpeciationProfileWeightDatasetsAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -333,6 +479,7 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
         JPanel panel = new JPanel();
         panel.add(new OKButton(okAction()));
         panel.add(new CancelButton(cancelAction()));
+        panel.setMaximumSize( new Dimension(10000,30));
         return panel;
     }
     
@@ -524,5 +671,23 @@ public class QACompareVOCSpeciationWithHAPInventoryWindow extends DisposableInte
            return ""; 
        return summaryTypes.getSelectedItem().toString();
    }
+    
+    protected JPanel createLabelInPanel( String lbl, int width, int height) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setSize(width, height);
+        panel.setMinimumSize( new Dimension(width, height));
+        panel.setMaximumSize( new Dimension(width, height));
+        panel.setPreferredSize( new Dimension(width, height));
+        
+        JLabel label = new JLabel( lbl);
+        label.setSize(width, height);
+        label.setMinimumSize( new Dimension(width, height));
+        label.setMaximumSize( new Dimension(width, height));   
+        label.setPreferredSize( new Dimension(width, height));
+        panel.add( label);
+        
+        return panel;
+    }    
    
 }

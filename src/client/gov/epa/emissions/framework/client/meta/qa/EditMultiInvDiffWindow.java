@@ -27,10 +27,13 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class EditMultiInvDiffWindow extends DisposableInteralFrame implements EditQAEmissionsView {
     
@@ -93,20 +96,61 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
-        JPanel content = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-       
-        layoutGenerator.addLabelWidgetPair("Base inventories:", emisinvBase(dataset), content);
-        layoutGenerator.addLabelWidgetPair("Compare inventories:", emisinvCompare(), content);
-        layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
-        summaryTypeCombo();
-        layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
-        layoutGenerator.makeCompactGrid(content, 4, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad*/
         messagePanel = new SingleLineMessagePanel();
+        messagePanel.setMaximumSize( new Dimension(10000,30));
         layout.add(messagePanel);
-        layout.add(content);
+        
+        boolean boxlayout = true;
+        if ( boxlayout) {
+            int w = 150, h = 30;
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Base inventories:", w,h));
+            panel.add( emisinvBase(dataset));
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            layout.add( panel);
+            
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Compare inventories:", w,h));
+            panel.add( emisinvCompare());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            layout.add( panel);
+            
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Inventory table:", w,h));
+            panel.add( invTablePanel());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            layout.add( panel);
+            
+            summaryTypeCombo();
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Summary Type:", w,h));
+            panel.add( summaryTypes);
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            layout.add( panel);
+            
+        } else {
+            JPanel content = new JPanel(new SpringLayout());
+            SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+            layoutGenerator.addLabelWidgetPair("Base inventories:", emisinvBase(dataset), content);
+            layoutGenerator.addLabelWidgetPair("Compare inventories:", emisinvCompare(), content);
+            layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
+            summaryTypeCombo();
+            layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
+            layoutGenerator.makeCompactGrid(content, 4, 2, // rows, cols
+                    5, 5, // initialX, initialY
+                    10, 10);// xPad, yPad*/
+
+            layout.add(content);
+        }
         layout.add(buttonPanel());
         
         return layout;
@@ -143,11 +187,22 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
         Button addButton = new AddButton("Select", addAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel invPanel = new JPanel(new BorderLayout(5,0));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
         
-        invPanel.add(pane, BorderLayout.LINE_START);
-        invPanel.add(addButton);
-        return invPanel;
+        //JPanel container = new JPanel(new FlowLayout());
+        
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
+
+        container.add(pane);
+        container.add(buttonPanel);
+        
+        return container;
     }
     
     private void summaryTypeCombo() {
@@ -168,6 +223,7 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
         JPanel panel = new JPanel();
         panel.add(new OKButton(okAction()));
         panel.add(new CancelButton(cancelAction()));
+        panel.setMaximumSize( new Dimension(10000,30));
         return panel;
     }
     
@@ -261,5 +317,23 @@ public class EditMultiInvDiffWindow extends DisposableInteralFrame implements Ed
            return ""; 
        return summaryTypes.getSelectedItem().toString();
    }
+   
+   protected JPanel createLabelInPanel( String lbl, int width, int height) {
+       JPanel panel = new JPanel();
+       panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+       panel.setSize(width, height);
+       panel.setMinimumSize( new Dimension(width, height));
+       panel.setMaximumSize( new Dimension(width, height));
+       panel.setPreferredSize( new Dimension(width, height));
+       
+       JLabel label = new JLabel( lbl);
+       label.setSize(width, height);
+       label.setMinimumSize( new Dimension(width, height));
+       label.setMaximumSize( new Dimension(width, height));   
+       label.setPreferredSize( new Dimension(width, height));
+       panel.add( label);
+       
+       return panel;
+   }    
    
 }

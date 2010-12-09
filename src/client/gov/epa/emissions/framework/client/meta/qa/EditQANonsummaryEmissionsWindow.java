@@ -16,9 +16,12 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class EditQANonsummaryEmissionsWindow extends DisposableInteralFrame implements EditQANonsummaryEmissionsView {
 
@@ -74,16 +77,25 @@ public EditQANonsummaryEmissionsWindow(DesktopManager desktopManager, String pro
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
-        JPanel content = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-       
-        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(dataset), content);
-        layoutGenerator.makeCompactGrid(content, 1, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad*/
+        
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        JLabel label = new JLabel("Emission inventories:  ");
+        panel.add( label);
+        panel.add( emisinv(dataset));
+        //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
+//        JPanel content = new JPanel(new SpringLayout());
+//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+//       
+//        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(dataset), content);
+//        layoutGenerator.makeCompactGrid(content, 1, 2, // rows, cols
+//                5, 5, // initialX, initialY
+//                10, 10);// xPad, yPad*/
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
-        layout.add(content);
+        layout.add( panel); //content);
         layout.add(buttonPanel());
         
         return layout;

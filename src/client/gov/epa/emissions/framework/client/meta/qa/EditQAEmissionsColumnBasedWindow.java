@@ -15,9 +15,12 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class EditQAEmissionsColumnBasedWindow extends EditQAEmissionsWindow implements EditQAEmissionsView {
     
@@ -46,22 +49,94 @@ public class EditQAEmissionsColumnBasedWindow extends EditQAEmissionsWindow impl
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
-        JPanel content = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-       
-        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(dataset), content);
-        layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
-        emissionTypeCombo();
-        layoutGenerator.addLabelWidgetPair("Emission Type:", emissionTypes, content);
         
-        summaryTypeCombo();
-        layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
-        layoutGenerator.makeCompactGrid(content, 4, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad*/
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
-        layout.add(content);
+        
+//        JPanel panel = new JPanel();
+//        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+//        JLabel label = new JLabel("Emission inventories: ");
+//        panel.add( label);
+//        panel.add( emisinv(dataset));
+//        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+//        layout.add( panel);
+//        
+//        panel = new JPanel();
+//        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+//        label = new JLabel("Inventory table:      ");
+//        panel.add( label);
+//        panel.add( invTablePanel());
+//        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+//        layout.add( panel);
+//        
+//        emissionTypeCombo();        
+//        panel = new JPanel();
+//        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+//        label = new JLabel("Emission Type:        ");
+//        panel.add( label);
+//        panel.add( emissionTypes);
+//        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+//        layout.add( panel);
+//        
+//        summaryTypeCombo();
+//        panel = new JPanel();
+//        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+//        label = new JLabel("Summary Type:         ");
+//        panel.add( label);
+//        panel.add( summaryTypes);
+//        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+//        layout.add( panel);
+        
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add( createLabelInPanel("Emission inventories: ", 130,30));
+        panel.add( emisinv(dataset));
+        //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        layout.add( panel);
+        
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add( createLabelInPanel("Inventory table:      ", 130,30));
+        panel.add( invTablePanel());
+        //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        panel.setMaximumSize( new Dimension(1500, 30));
+        layout.add( panel);
+        
+        emissionTypeCombo();        
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add( createLabelInPanel("Emission Type:        ", 130,30));
+        panel.add( emissionTypes);
+        //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        layout.add( panel);        
+        
+        summaryTypeCombo();
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add( createLabelInPanel("Summary Type:         ", 130,30));
+        panel.add( summaryTypes);
+        //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        layout.add( panel);          
+        
+//        JPanel content = new JPanel(new SpringLayout());
+//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+//       
+//        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(dataset), content);
+//        layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
+//        emissionTypeCombo();
+//        layoutGenerator.addLabelWidgetPair("Emission Type:", emissionTypes, content);
+//        
+//        summaryTypeCombo();
+//        layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
+//        layoutGenerator.makeCompactGrid(content, 4, 2, // rows, cols
+//                5, 5, // initialX, initialY
+//                10, 10);// xPad, yPad*/
+//        layout.add(content);
+        
         layout.add(buttonPanel());
         
         return layout;

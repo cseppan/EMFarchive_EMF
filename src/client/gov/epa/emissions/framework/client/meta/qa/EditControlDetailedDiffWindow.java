@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
@@ -17,9 +18,12 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class EditControlDetailedDiffWindow extends DisposableInteralFrame implements EditQAEmissionsView {
     
@@ -77,19 +81,52 @@ public class EditControlDetailedDiffWindow extends DisposableInteralFrame implem
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
-        JPanel content = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-       
-        layoutGenerator.addLabelWidgetPair("Base Result:", emisinvBase(dataset), content);
-        layoutGenerator.addLabelWidgetPair("Compare Result:", emisinvCompare(), content);
-        summaryTypeCombo();
-        layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
-        layoutGenerator.makeCompactGrid(content, 3, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad*/
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
-        layout.add(content);
+        
+        boolean boxlayout = true;
+        
+        if ( boxlayout) {
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Base Result:", 110,30));
+            panel.add( emisinvBase(dataset));
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            layout.add( panel);
+
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Compare Result:", 110,30));
+            panel.add( emisinvCompare());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            //panel.setMaximumSize( new Dimension(1500, 1000));
+            layout.add( panel);
+            
+            summaryTypeCombo();
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("Summary Type:", 110,30));
+            panel.add( summaryTypes);
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            //panel.setMaximumSize( new Dimension(1500, 1000));
+            layout.add( panel);            
+        } else {
+            JPanel content = new JPanel(new SpringLayout());
+            SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+           
+            layoutGenerator.addLabelWidgetPair("Base Result:", emisinvBase(dataset), content);
+            layoutGenerator.addLabelWidgetPair("Compare Result:", emisinvCompare(), content);
+            summaryTypeCombo();
+            layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
+            layoutGenerator.makeCompactGrid(content, 3, 2, // rows, cols
+                    5, 5, // initialX, initialY
+                    10, 10);// xPad, yPad*/
+            layout.add(content);            
+        }
+        
         layout.add(buttonPanel());
         
         return layout;
@@ -132,6 +169,7 @@ public class EditControlDetailedDiffWindow extends DisposableInteralFrame implem
         JPanel panel = new JPanel();
         panel.add(new OKButton(okAction()));
         panel.add(new CancelButton(cancelAction()));
+        panel.setMaximumSize( new Dimension(10000,30));
         return panel;
     }
     
@@ -217,5 +255,23 @@ public class EditControlDetailedDiffWindow extends DisposableInteralFrame implem
            return ""; 
        return summaryTypes.getSelectedItem().toString();
    }
+   
+   protected JPanel createLabelInPanel( String lbl, int width, int height) {
+       JPanel panel = new JPanel();
+       panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+       panel.setSize(width, height);
+       panel.setMinimumSize( new Dimension(width, height));
+       panel.setMaximumSize( new Dimension(width, height));
+       panel.setPreferredSize( new Dimension(width, height));
+       
+       JLabel label = new JLabel( lbl);
+       label.setSize(width, height);
+       label.setMinimumSize( new Dimension(width, height));
+       label.setMaximumSize( new Dimension(width, height));   
+       label.setPreferredSize( new Dimension(width, height));
+       panel.add( label);
+       
+       return panel;
+   }   
    
 }

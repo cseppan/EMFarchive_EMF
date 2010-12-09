@@ -120,7 +120,13 @@ public class SpringLayoutGenerator {
      */
     public void makeCompactGrid(Container parent, int rows, int cols, int initialX, int initialY, int xPad, int yPad) {
         SpringLayout layout;
-        layout = (SpringLayout) parent.getLayout();
+        //layout = (SpringLayout) parent.getLayout();
+        try {
+            layout = (SpringLayout)parent.getLayout();
+        } catch (ClassCastException exc) {
+            System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
+            return;
+        }
 
         // Align all cells in each column and make them the same width.
         Spring x = Spring.constant(initialX);
@@ -159,7 +165,10 @@ public class SpringLayoutGenerator {
     }
 
     public void addLabelWidgetPair(String label, JComponent widget, JPanel panel) {
-        addWidgetPair(new JLabel(label), widget, panel);
+        JLabel l = new JLabel(label, JLabel.TRAILING);
+        l.setLabelFor( widget);
+        //addWidgetPair(new JLabel(label, JLabel.TRAILING), widget, panel);
+        addWidgetPair(l, widget, panel);
     }
 
     public void addWidgetPair(JComponent widget1, JComponent widget2, JPanel panel) {
@@ -167,7 +176,8 @@ public class SpringLayoutGenerator {
 
         JPanel widgetPanel = new JPanel(new BorderLayout());
         widgetPanel.add(widget2, BorderLayout.LINE_START);
-        panel.add(widgetPanel);
+        panel.add(widgetPanel);        
+        //panel.add(widget2);
     }
 
 }

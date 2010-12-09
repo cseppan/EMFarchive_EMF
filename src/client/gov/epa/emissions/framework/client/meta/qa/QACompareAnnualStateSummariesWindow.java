@@ -25,11 +25,14 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class QACompareAnnualStateSummariesWindow extends DisposableInteralFrame implements EditQAEmissionsView {
     
@@ -118,6 +121,8 @@ public class QACompareAnnualStateSummariesWindow extends DisposableInteralFrame 
         super.setTitle("Setup "+qaStep.getName()+": " + dataset.getName() + "_" + qaStep.getId() );
         super.display();
         this.getContentPane().add(createLayout(dataset));
+        //this.pack();
+        //this.setVisible( true);
     }
 
     public void observe(EditQAEmissionsPresenter presenter1) {
@@ -128,25 +133,94 @@ public class QACompareAnnualStateSummariesWindow extends DisposableInteralFrame 
         
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
-        JPanel content = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-       
-        layoutGenerator.addLabelWidgetPair("ORL Inventories:", inventoryPanel(dataset), content);
-        layoutGenerator.addLabelWidgetPair("<html>" + DatasetType.smkmergeRptStateAnnualSummary.replaceFirst("annual summary", "annual<br/>summary") + " Datasets:</html>",  smokeReportDatasetsPanel(), content);
-        layoutGenerator.addLabelWidgetPair(DatasetType.invTable + " Dataset:",  invTableDatasetPanel(), content);
-        layoutGenerator.addLabelWidgetPair(DatasetType.stateComparisonTolerance + " Dataset:",  toleranceDatasetPanel(), content);
-        layoutGenerator.addLabelWidgetPair("<html>" + DatasetType.countryStateCountyNamesAndDataCOSTCY.replaceFirst("names and", "names<br/>and") + " Dataset:</html>",  coStCyDatasetPanel(), content);
-        
-        layoutGenerator.makeCompactGrid(content, 5, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad*/
         messagePanel = new SingleLineMessagePanel();
+        messagePanel.setMaximumSize( new Dimension(10000,30));
         layout.add(messagePanel);
-        layout.add(content);
+        
+        boolean boxlayout = true;
+        
+        if ( boxlayout) {
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("ORL Inventories:", 250,30));
+            panel.add( inventoryPanel(dataset));
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            layout.add( panel);
+
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("<html>" + DatasetType.smkmergeRptStateAnnualSummary.replaceFirst("annual summary", "annual<br/>summary") + " Datasets:</html>", 250,30));
+            panel.add( smokeReportDatasetsPanel());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            //panel.setMaximumSize( new Dimension(1500, 1000));
+            layout.add( panel);
+
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel(DatasetType.invTable + " Dataset:", 250,30));
+            panel.add( invTableDatasetPanel());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            //panel.setMaximumSize( new Dimension(1500, 1000));
+            layout.add( panel);
+
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel(DatasetType.stateComparisonTolerance + " Dataset:", 250,30));
+            panel.add( toleranceDatasetPanel());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            //panel.setMaximumSize( new Dimension(1500, 1000));
+            layout.add( panel);
+
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("<html>" + DatasetType.countryStateCountyNamesAndDataCOSTCY.replaceFirst("names and", "names<br/>and") + " Dataset:</html>", 250,30));
+            panel.add( coStCyDatasetPanel());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            //panel.setMaximumSize( new Dimension(1500, 1000));
+            layout.add( panel);
+        } else {        
+            JPanel content = new JPanel(new SpringLayout());
+            SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+            layoutGenerator.addLabelWidgetPair("ORL Inventories:", inventoryPanel(dataset), content);
+            layoutGenerator.addLabelWidgetPair("<html>" + DatasetType.smkmergeRptStateAnnualSummary.replaceFirst("annual summary", "annual<br/>summary") + " Datasets:</html>",  smokeReportDatasetsPanel(), content);
+            layoutGenerator.addLabelWidgetPair(DatasetType.invTable + " Dataset:",  invTableDatasetPanel(), content);
+            layoutGenerator.addLabelWidgetPair(DatasetType.stateComparisonTolerance + " Dataset:",  toleranceDatasetPanel(), content);
+            layoutGenerator.addLabelWidgetPair("<html>" + DatasetType.countryStateCountyNamesAndDataCOSTCY.replaceFirst("names and", "names<br/>and") + " Dataset:</html>",  coStCyDatasetPanel(), content);
+
+            layoutGenerator.makeCompactGrid(content, 5, 2, // rows, cols
+                    5, 5, // initialX, initialY
+                    10, 10);// xPad, yPad*/
+            layout.add(content);
+        }
+        
         layout.add(buttonPanel());
         
         return layout;
     }
+    
+    protected JPanel createLabelInPanel( String lbl, int width, int height) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setSize(width, height);
+        panel.setMinimumSize( new Dimension(width, height));
+        panel.setMaximumSize( new Dimension(width, height));
+        panel.setPreferredSize( new Dimension(width, height));
+        
+        JLabel label = new JLabel( lbl);
+        label.setSize(width, height);
+        label.setMinimumSize( new Dimension(width, height));
+        label.setMaximumSize( new Dimension(width, height));   
+        label.setPreferredSize( new Dimension(width, height));
+        panel.add( label);
+        
+        return panel;
+    }    
     
     private JPanel inventoryPanel(EmfDataset dataset) {
 //        datasetWidget = new AddRemoveDatasetWidget(this, program, parentConsole, session);
@@ -169,15 +243,22 @@ public class QACompareAnnualStateSummariesWindow extends DisposableInteralFrame 
         Button removeButton = new AddButton("Remove", removeInventoryAction() );
         removeButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+//        JPanel container = new JPanel(new FlowLayout());
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.add(addButton);
         buttonPanel.add(removeButton);
-        container.add(pane);
-        container.add(buttonPanel);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,60));
         
-        return container;
+        JPanel invPanel = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        invPanel.setLayout( new BoxLayout(invPanel, BoxLayout.X_AXIS));
+        
+        invPanel.add(pane);
+        invPanel.add(buttonPanel);
+        
+        return invPanel;
     }
     
     private JPanel invTableDatasetPanel() {
@@ -193,10 +274,20 @@ public class QACompareAnnualStateSummariesWindow extends DisposableInteralFrame 
         Button addButton = new AddButton("Select", addInvTableAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -215,10 +306,19 @@ public class QACompareAnnualStateSummariesWindow extends DisposableInteralFrame 
         Button addButton = new AddButton("Select", addCoStCyDatasetAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -237,10 +337,19 @@ public class QACompareAnnualStateSummariesWindow extends DisposableInteralFrame 
         Button addButton = new AddButton("Select", addToleranceAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -260,10 +369,19 @@ public class QACompareAnnualStateSummariesWindow extends DisposableInteralFrame 
         Button addButton = new AddButton("Select", addSmkRptDatasetsAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -272,6 +390,7 @@ public class QACompareAnnualStateSummariesWindow extends DisposableInteralFrame 
         JPanel panel = new JPanel();
         panel.add(new OKButton(okAction()));
         panel.add(new CancelButton(cancelAction()));
+        panel.setMaximumSize( new Dimension(10000,30));
         return panel;
     }
     

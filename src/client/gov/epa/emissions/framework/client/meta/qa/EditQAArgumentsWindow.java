@@ -10,14 +10,19 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 
 public class EditQAArgumentsWindow extends DisposableInteralFrame implements EditQAArgumentsView{
@@ -49,30 +54,25 @@ public class EditQAArgumentsWindow extends DisposableInteralFrame implements Edi
     public JPanel createLayout() {
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
-        JPanel content = new JPanel(new SpringLayout());
-        //layout = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-       
-        //Create the arguments text area and set its text to the text in the 
-        // QAStepWindow arguments text area.
+        
+        JPanel pnlArgument = new JPanel();
+        pnlArgument.setLayout(new BoxLayout(pnlArgument, BoxLayout.X_AXIS));
+        
+        JLabel lblArgument = new JLabel("Arguments:    ");
+        pnlArgument.add( lblArgument);
         
         arguments = new JTextArea();
         arguments.setWrapStyleWord(true);
         arguments.setLineWrap(true);
         arguments.setText(textAreaArguments);
+        JScrollPane scrollPane = new JScrollPane( arguments);
+        scrollPane.setPreferredSize(new Dimension(650,250));
+        pnlArgument.add( scrollPane);
         
-        //Put the text area in a scroll pane and set its size.
-       
-        ScrollableComponent viewableTextArea = new ScrollableComponent(arguments);
-        viewableTextArea.setPreferredSize(new Dimension(650,250));
-        
-        // Add the text area and button panel to the main window panel.
-        layoutGenerator.addLabelWidgetPair("Arguments:", viewableTextArea, content);
-        //layoutGenerator.addLabelWidgetPair("", buttonPanel(), layout);
-        layoutGenerator.makeCompactGrid(content, 1, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
-        layout.add(content);
+        pnlArgument.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        //pnlArgument.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+
+        layout.add( pnlArgument);
         layout.add(buttonPanel());
         
         return layout;
@@ -80,8 +80,13 @@ public class EditQAArgumentsWindow extends DisposableInteralFrame implements Edi
 
     private JPanel buttonPanel() {
         JPanel panel = new JPanel();
+        FlowLayout layout = new FlowLayout();
+        layout.setHgap(20);
+        layout.setVgap(25);
+        panel.setLayout(layout);
         panel.add(new OKButton(okAction()));
         panel.add(new CancelButton(cancelAction()));
+        panel.setMaximumSize(new Dimension(1000,80));
         return panel;
     }
 

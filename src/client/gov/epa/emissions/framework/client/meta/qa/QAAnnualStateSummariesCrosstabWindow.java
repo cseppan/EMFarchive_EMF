@@ -28,12 +28,14 @@ import java.util.TreeMap;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame {
     
@@ -104,6 +106,7 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
         super.display();
         this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
         messagePanel = new SingleLineMessagePanel();
+        messagePanel.setMaximumSize( new Dimension(10000,30));
         this.getContentPane().add(messagePanel);
         this.getContentPane().add(createLayout(dataset));
         this.getContentPane().add(pollSelectorPanel());
@@ -116,9 +119,34 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
     
     private JPanel createLayout(EmfDataset dataset) {
         
+        boolean boxlayout = true;
+        if ( boxlayout) {
+            JPanel layout = new JPanel();
+            layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
+            
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("<html>" + DatasetType.smkmergeRptStateAnnualSummary.replaceFirst("annual summary", "annual<br/>summary") + " Datasets:</html>", 200,30));
+            panel.add( smokeReportDatasetsPanel());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            layout.add( panel);
+            
+            panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+            panel.add( createLabelInPanel("<html>" + DatasetType.countryStateCountyNamesAndDataCOSTCY.replaceFirst("names and", "names<br/>and") + " Dataset:</html>", 200,30));
+            panel.add( coStCyDatasetPanel());
+            //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            //panel.setMaximumSize( new Dimension(10000, 1000));
+            layout.add( panel);
+            
+            return layout;
+        }
+        
         JPanel content = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-       
+         
         layoutGenerator.addLabelWidgetPair("<html>" + DatasetType.smkmergeRptStateAnnualSummary.replaceFirst("annual summary", "annual<br/>summary") + " Datasets:</html>",  smokeReportDatasetsPanel(), content);
         layoutGenerator.addLabelWidgetPair("<html>" + DatasetType.countryStateCountyNamesAndDataCOSTCY.replaceFirst("names and", "names<br/>and") + " Dataset:</html>",  coStCyDatasetPanel(), content);
         
@@ -143,10 +171,19 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
         Button addButton = new AddButton("Select", addCoStCyDatasetAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -231,16 +268,32 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
         Button excludePollButton = new AddButton("Exclude>>", addExcludedPollAction());
         excludePollButton.setMargin(new Insets(1, 2, 1, 2));
         leftListButtonPanel.add(upPollButton);
-        leftListButtonPanel.add(downPollButton);
+        leftListButtonPanel.add(downPollButton);        
+        leftListButtonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel masterButtonPanel = new JPanel();
+        masterButtonPanel.setLayout(new BoxLayout(masterButtonPanel, BoxLayout.Y_AXIS));
+        masterButtonPanel.add(addPollButton);
+        masterButtonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
+        JPanel excludeButtonPanel = new JPanel();
+        excludeButtonPanel.setLayout(new BoxLayout(excludeButtonPanel, BoxLayout.Y_AXIS));
+        excludeButtonPanel.add(excludePollButton);
+        excludeButtonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(leftListButtonPanel);
         container.add(leftPollListPanel);
-        container.add(addPollButton);
+        container.add(masterButtonPanel);
         container.add(masterPollListPanel);
-        container.add(excludePollButton);
+        container.add(excludeButtonPanel);
         container.add(exclPollListPanel);
+        
+        container.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         return container;
     }
@@ -260,10 +313,19 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
         Button addButton = new AddButton("Select", addSmkRptDatasetsAction());
         addButton.setMargin(new Insets(1, 2, 1, 2));
         
-        JPanel container = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.add(addButton);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        buttonPanel.setPreferredSize( new Dimension(75,30));
+        
+        //JPanel container = new JPanel(new FlowLayout());
+        JPanel container = new JPanel();
+        //invPanel.setMaximumSize( new Dimension(1500,30));
+        container.setLayout( new BoxLayout(container, BoxLayout.X_AXIS));
 
         container.add(pane);
-        container.add(addButton);
+        container.add(buttonPanel);
         
         return container;
     }
@@ -272,6 +334,7 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
         JPanel panel = new JPanel();
         panel.add(new OKButton(okAction()));
         panel.add(new CancelButton(cancelAction()));
+        panel.setMaximumSize( new Dimension(10000,30));
         return panel;
     }
   
@@ -516,4 +579,22 @@ public class QAAnnualStateSummariesCrosstabWindow extends DisposableInteralFrame
 //        reconcileExclPollListWidget();
 //        populateMasterPollListWidget();
 //    }
+    
+    protected JPanel createLabelInPanel( String lbl, int width, int height) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setSize(width, height);
+        panel.setMinimumSize( new Dimension(width, height));
+        panel.setMaximumSize( new Dimension(width, height));
+        panel.setPreferredSize( new Dimension(width, height));
+        
+        JLabel label = new JLabel( lbl);
+        label.setSize(width, height);
+        label.setMinimumSize( new Dimension(width, height));
+        label.setMaximumSize( new Dimension(width, height));   
+        label.setPreferredSize( new Dimension(width, height));
+        panel.add( label);
+        
+        return panel;
+    }    
 }
