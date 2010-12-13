@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
@@ -258,7 +259,18 @@ public class DataServiceImpl implements DataService {
                 }
                     
                 try {
-                    ds.setName(prefix + ds.getName());
+                    
+                    if ( ForBugs.FIX_BUG3555) {
+                        String newName = prefix + ds.getName();
+                        if ( newName != null) {
+                            newName = newName.trim();
+                        }
+                        ds.setName(newName);
+                    } else {
+                        ds.setName(prefix + ds.getName());
+                    }
+                    
+                    
                     ds.setStatus("Deleted");
                     updateDataset(ds);
                     count++;
@@ -966,7 +978,18 @@ public class DataServiceImpl implements DataService {
                         + type.getName() + ".");
             
             EmfDataset copied = (EmfDataset) DeepCopy.copy(dataset);
-            copied.setName(getUniqueNewName("Copy of " + dataset.getName() + "_v" + version.getVersion()));
+            
+            if ( ForBugs.FIX_BUG3555) {
+                String newName = dataset.getName();
+                if ( newName != null) {
+                    newName = newName.trim();
+                }
+                copied.setName(getUniqueNewName("Copy of " + newName + "_v" + version.getVersion()));
+            } else {
+                copied.setName(getUniqueNewName("Copy of " + dataset.getName() + "_v" + version.getVersion()));
+            }
+            
+            
             copied.setStatus(dataset.getStatus());
             copied.setDescription("#Copied from version " + version.getVersion() + " of dataset " + dataset.getName()
                     + " on " + time + System.getProperty("line.separator") + (dataset.getDescription()==null? "":dataset.getDescription()));

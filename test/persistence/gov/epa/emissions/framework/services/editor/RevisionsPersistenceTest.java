@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.editor;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.HibernateTestCase;
@@ -54,7 +55,17 @@ public class RevisionsPersistenceTest extends HibernateTestCase {
             save(user);
 
             dataset = new EmfDataset();
-            dataset.setName(user.getUsername() + "_" + id);
+            
+            if ( ForBugs.FIX_BUG3555) {
+                String newName = user.getUsername() + "_" + id;
+                if ( newName != null) {
+                    newName = newName.trim();
+                }
+                dataset.setName(newName);
+            } else {
+                dataset.setName(user.getUsername() + "_" + id);
+            }
+
             dataset.setAccessedDateTime(new Date());
             dataset.setCreatedDateTime(new Date());
             dataset.setCreator(user.getUsername());
@@ -98,7 +109,16 @@ public class RevisionsPersistenceTest extends HibernateTestCase {
             save(user);
 
             dataset = new EmfDataset();
-            dataset.setName(user.getUsername() + "_" + id);
+            
+            if ( ForBugs.FIX_BUG3555) {
+                String newName = user.getUsername() + "_" + id;
+                if ( newName != null) {
+                    newName = newName.trim();
+                }
+                dataset.setName(newName);
+            } else {
+                dataset.setName(user.getUsername() + "_" + id);
+            }
             dataset.setAccessedDateTime(new Date());
             dataset.setCreatedDateTime(new Date());
             dataset.setCreator(user.getUsername());

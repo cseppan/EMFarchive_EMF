@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.exim;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
@@ -252,7 +253,11 @@ public class ManagedImportService {
         String folder = output.getPath();
         String pattern = output.getPattern();
         String fullPath = output.getDatasetFile();
-        String datasetName = output.getDatasetName();
+        String datasetName = output.getDatasetName(); //.trim(); // TODO: JIZHEN1
+        if ( datasetName != null) {
+        	datasetName = datasetName.trim();
+        	output.setDatasetName(datasetName);
+        }
         String[] files = null;
 
         if ((folder == null || folder.trim().isEmpty()) && (fullPath == null || fullPath.trim().isEmpty()))
@@ -356,7 +361,7 @@ public class ManagedImportService {
         return submitterIds.toArray(new String[0]);
     }
 
-    public synchronized String importDatasetForCaseOutput(User user, CaseOutput output, Services services)
+    public synchronized String importDatasetForCaseOutput(User user, CaseOutput output, Services services) // TODO: JIZHEN
             throws EmfException {
         String fileFolder = output.getPath();
 
@@ -401,8 +406,17 @@ public class ManagedImportService {
             throw new EmfException(
                     "Invalid year or date format for EMF start/end date in file header (use MM/dd/YYYY hh:mm).");
         }
+        
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = name;
+            if ( newName != null) {
+                newName = newName.trim();
+            }
+            dataset.setName(newName);
+        } else {
+            dataset.setName(name);
+        }
 
-        dataset.setName(name);
         dataset.setCreator(user.getUsername());
         dataset.setCreatorFullName(user.getName());
         dataset.setDatasetType(datasetType);

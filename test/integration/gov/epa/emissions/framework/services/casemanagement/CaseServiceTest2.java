@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
@@ -646,7 +647,17 @@ public class CaseServiceTest2 extends ServiceTestCase {
         User owner = userService.getUser("emf");
 
         // setup dataset object
-        dataset.setName(name);
+        
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = name;
+            if ( newName != null) {
+                newName = newName.trim();
+            }
+            dataset.setName(newName);
+        } else {
+            dataset.setName(name);
+        }
+
         dataset.setCreator(owner.getUsername());
         DatasetType dataType = getDatasetType(type);
         dataset.setDatasetType(dataType);

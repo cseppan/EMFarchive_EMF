@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.qa;
 //import java.io.File;
 //import java.util.Date;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DbServer;
 //import gov.epa.emissions.commons.db.SqlDataTypes;
@@ -85,7 +86,17 @@ public class SQLQAFireProgramQueryTest extends ServiceTestCase {
     
     private EmfDataset dataset(int datasetId, String name, String tableName) {
         EmfDataset dataset = new EmfDataset();
-        dataset.setName(name);
+        
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = name;
+            if ( newName != null) {
+                newName = newName.trim();
+            }
+            dataset.setName(newName);
+        } else {
+            dataset.setName(name);
+        }
+
         dataset.setId(datasetId);
         dataset.setCreator("emf");
         InternalSource source = new InternalSource();

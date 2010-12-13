@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.ExternalSource;
@@ -170,6 +171,19 @@ public class DatasetDAO {
     }
 
     public void add(EmfDataset dataset, Session session) {
+        //NOTE: to trim the leading and trailing spaces???
+        String name = dataset.getName();
+        
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = name;
+            if ( newName != null) {
+                newName = newName.trim();
+            }
+            dataset.setName(newName);
+        } else {
+            dataset.setName(name);
+        }
+        
         hibernateFacade.add(dataset, session);
     }
 
@@ -257,8 +271,17 @@ public class DatasetDAO {
                 LOG.info("Could not get lock on dataset " + dataset.getName() + " to remove it.");
                 return;
             }
-
-            locked.setName(newName);
+            
+            if ( ForBugs.FIX_BUG3555) {
+                String name1 = newName;
+                if ( newName != null) {
+                    name1 = name1.trim();
+                }
+                locked.setName(name1);
+            } else {
+                locked.setName(newName);
+            }
+            
             locked.setStatus("Deleted");
 
             updateToRemove(locked, dataset, session);

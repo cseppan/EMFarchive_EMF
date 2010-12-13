@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.ControlStrategyOutputTableData;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
@@ -39,7 +40,17 @@ public class ControlStrategyOutputTableDataTest extends TestCase {
 
     private EmfDataset dataset(String name) {
         EmfDataset dataset = new EmfDataset();
-        dataset.setName(name);
+        
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = name;
+            if ( name != null) {
+                newName = newName.trim();
+            }
+            dataset.setName(newName);
+        } else {
+            dataset.setName(name);
+        }
+        
         return dataset;
     }
 

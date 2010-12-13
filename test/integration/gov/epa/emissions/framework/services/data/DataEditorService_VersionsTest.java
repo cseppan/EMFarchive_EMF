@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbUpdate;
@@ -45,7 +46,17 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
 
         dataset = new EmfDataset();
         table = "test" + new Date().getTime();
-        dataset.setName(table);
+        
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = table;
+            if ( newName != null) {
+                newName = newName.trim();
+            }
+            dataset.setName(newName);
+        } else {
+            dataset.setName(table);
+        }
+        
         setTestValues(dataset);
 
         doImport();

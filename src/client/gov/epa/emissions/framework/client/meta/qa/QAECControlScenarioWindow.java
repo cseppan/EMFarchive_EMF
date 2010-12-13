@@ -122,6 +122,8 @@ public class QAECControlScenarioWindow extends DisposableInteralFrame  {
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         JPanel content = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        
+        // TODO: JIZHEN BUG3548
        
         layoutGenerator.addLabelWidgetPair("ORL Inventory:", inventoryPanel(dataset), content);
         layoutGenerator.addLabelWidgetPair("<html>" + DatasetType.strategyDetailedResult.replace("Detailed Result", "Detailed<br/>Result") + " Dataset:</html>",  detailedResultDatasetPanel(), content);

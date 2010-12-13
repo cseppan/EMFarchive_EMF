@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.qa;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
@@ -158,7 +159,17 @@ public class QADaoTest extends ServiceTestCase {
         User owner = userDAO.get("emf", session);
 
         EmfDataset dataset = new EmfDataset();
-        dataset.setName(name);
+        
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = name;
+            if ( newName != null) {
+                newName = newName.trim();
+            }
+            dataset.setName(newName);
+        } else {
+            dataset.setName(name);
+        }
+
         dataset.setCreator(owner.getUsername());
 
         save(dataset);

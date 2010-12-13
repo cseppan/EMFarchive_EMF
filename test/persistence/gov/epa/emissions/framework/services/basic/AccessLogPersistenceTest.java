@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.basic;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.HibernateTestCase;
@@ -46,7 +47,17 @@ public class AccessLogPersistenceTest extends HibernateTestCase {
             save(user);
 
             dataset = new EmfDataset();
-            dataset.setName(user.getUsername() + "_" + id);
+            
+            if ( ForBugs.FIX_BUG3555) {
+                String userName = user.getUsername();
+                if ( userName != null) {
+                    userName = userName.trim();
+                }
+                dataset.setName(userName + "_" + id);
+            } else{
+                dataset.setName(user.getUsername() + "_" + id);
+            }
+            
             dataset.setAccessedDateTime(new Date());
             dataset.setCreatedDateTime(new Date());
             dataset.setCreator(user.getUsername());

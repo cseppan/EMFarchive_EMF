@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.sms;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
@@ -181,7 +182,16 @@ public class DatasetCreator {
         EmfDataset newDataset = new EmfDataset();
         Date start = new Date();
 
-        newDataset.setName(name);
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = name;
+            if ( newName != null) {
+                newName = newName.trim();
+            }
+            newDataset.setName(newName);
+        } else {
+            newDataset.setName(name);
+        }
+        
         newDataset.setCreator(user.getUsername());
         newDataset.setCreatorFullName(user.getName());
         newDataset.setDatasetType(type);

@@ -432,10 +432,20 @@ public class ImportTaskManager implements TaskManager {
                     Task et = iter.next();
                     // Cast task to import task or import case output task and get dataset name
                     String dsname = null;
-                    if (et instanceof ImportTask)
+                    if (et instanceof ImportTask) {
                         dsname = ((ImportTask) et).getDataset().getName();
-                    else
+                        if ( dsname != null) {
+                            dsname = dsname.trim();
+                            ((ImportTask) et).getDataset().setName(dsname);
+                        }
+                    }
+                    else {
                         dsname = ((ImportCaseOutputTask) et).getDataset().getName();
+                        if ( dsname != null) {
+                            dsname = dsname.trim();
+                            ((ImportCaseOutputTask) et).getDataset().setName(dsname);
+                        }
+                    }
                     String etStatus = et.getUser().getId() + "," + dsname + "\n";
                     sbuf.append(etStatus);
                 }
@@ -459,10 +469,20 @@ public class ImportTaskManager implements TaskManager {
                     Task et = iter.next();
                     // Cast task to import task or import case output task and get dataset name
                     String dsname = null;
-                    if (et instanceof ImportTask)
+                    if (et instanceof ImportTask) {
                         dsname = ((ImportTask) et).getDataset().getName();
-                    else
+                        if ( dsname != null) {
+                            dsname = dsname.trim();
+                            ((ImportTask) et).getDataset().setName(dsname);
+                        }
+                    }
+                    else {
                         dsname = ((ImportCaseOutputTask) et).getDataset().getName();
+                        if ( dsname != null) {
+                            dsname = dsname.trim();
+                            ((ImportCaseOutputTask) et).getDataset().setName(dsname);
+                        }
+                    }
                     String etStatus = et.getUser().getId() + "," + dsname + "\n";
                     sbuf.append(etStatus);
                 }

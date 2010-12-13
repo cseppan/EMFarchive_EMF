@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
@@ -224,7 +225,17 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
     private EmfDataset getDataset() {
         EmfDataset ds = new EmfDataset();
-        ds.setName(name.getText());
+
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = name.getText();
+            if ( name != null) {
+                newName = newName.trim();
+            }
+            ds.setName(newName);
+        } else {
+            ds.setName(name.getText());
+        }
+        
         ds.setDescription(desc.getText());
         ds.setDatasetType(getSelectedDSType());
         Keyword kw = (Keyword) keyword.getSelectedItem();

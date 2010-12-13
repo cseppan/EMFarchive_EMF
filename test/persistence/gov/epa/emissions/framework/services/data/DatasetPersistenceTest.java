@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
@@ -66,7 +67,17 @@ public class DatasetPersistenceTest extends HibernateTestCase {
             dataset.setCreator(owner.getUsername());
             dataset.setDescription("DESCRIPTION");
             dataset.setModifiedDateTime(new Date());
-            dataset.setName(datasetName);
+            
+            if ( ForBugs.FIX_BUG3555) {
+                String newName = datasetName;
+                if ( newName != null) {
+                    newName = newName.trim();
+                }
+                dataset.setName(newName);
+            } else {
+                dataset.setName(datasetName);
+            }
+            
             dataset.setProject(project);
             dataset.setRegion(region);
             

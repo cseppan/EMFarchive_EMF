@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.KeyVal;
@@ -1118,7 +1119,16 @@ public class CaseAssistanceService {
 
         Date date = new Date();
         EmfDataset external = new EmfDataset();
-        external.setName(name);
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = name;
+            if ( newName != null) {
+                newName = newName.trim();
+            }
+            external.setName(newName);
+        } else {
+            external.setName(name);
+        }
+        
         external.setDatasetType(type);
         external.setCreator(user.getUsername());
         external.setCreatedDateTime(date);

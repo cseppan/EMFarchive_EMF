@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost.analysis;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.importer.DataTable;
@@ -11,7 +12,16 @@ public class ResultTable {
     
     public ResultTable(String table, Datasource datasource) {
         EmfDataset dataset = new EmfDataset();
-        dataset.setName(table);
+        
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = table;
+            if ( newName != null) {
+                newName = newName.trim();
+            }
+            dataset.setName(newName);
+        } else {
+            dataset.setName(table);
+        }
         
         this.delegate = new DataTable(dataset, datasource);
     }

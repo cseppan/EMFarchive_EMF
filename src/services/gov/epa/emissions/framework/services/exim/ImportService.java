@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.exim;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 import gov.epa.emissions.commons.io.importer.ImporterException;
@@ -125,7 +126,16 @@ public class ImportService {
         EmfDataset dataset = new EmfDataset();
         File file = new File(folder, filename);
 
-        dataset.setName(datasetName);
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = datasetName;
+            if ( newName != null) {
+                newName = newName.trim();
+            }
+            dataset.setName(newName);
+        } else {
+            dataset.setName(datasetName);
+        }
+        
         dataset.setCreator(user.getUsername());
         dataset.setCreatorFullName(user.getName());
         dataset.setDatasetType(datasetType);

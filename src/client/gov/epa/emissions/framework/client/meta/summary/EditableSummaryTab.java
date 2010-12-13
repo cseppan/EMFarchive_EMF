@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
@@ -307,7 +308,15 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     public void save(EmfDataset dataset) {
         messagePanel.clear();
 
-        dataset.setName(name.getText().trim());
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = name.getText();
+            if ( newName != null){
+                newName = newName.trim();
+            }
+            dataset.setName( newName);
+        } else {
+            dataset.setName(name.getText().trim());
+        }
         dataset.setDescription(description.getText());
         updateProject();
         dataset.setStartDateTime(startDateTime.value());

@@ -424,7 +424,7 @@ public class CaseFileParser {
         input.setSector(new Sector(restoreChars(data[4]), data[4].equalsIgnoreCase("All sectors") ? "" : restoreChars(data[4])));
         input.setJobName(data[5].equalsIgnoreCase("All jobs for sector") ? "" : restoreChars(data[5]));
         input.setProgram(new CaseProgram(restoreChars(data[6])));
-        input.setDataset(new EmfDataset(0, restoreChars(data[7]), 0, 0, restoreChars(data[10])));
+        input.setDataset(new EmfDataset(0, restoreChars(data[7]).trim(), 0, 0, restoreChars(data[10])));
         Version version = (data[8] == null || data[8].equalsIgnoreCase("null") || data[8].trim().isEmpty()) ? null
                 : new Version(Integer.parseInt(data[8]));
         input.setVersion(version);

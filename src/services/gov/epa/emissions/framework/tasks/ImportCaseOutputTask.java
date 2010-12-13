@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.tasks;
 
+import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DbServer;
@@ -238,12 +239,31 @@ public class ImportCaseOutputTask extends Task {
 
     protected void addDataset() throws EmfException {
         Session session = sessionFactory.getSession();
-        String name = dataset.getName();
+        String name = dataset.getName(); // TODO: JIZHEN1
+        
+        if ( ForBugs.FIX_BUG3555) {
+            String newName = name;
+            if ( newName != null) {
+                newName = newName.trim();
+            }
+            dataset.setName(newName);
+        } else {
+            dataset.setName(name);
+        }
 
         try {
             if (datasetDao.datasetNameUsed(name, session)) {
                 name += "_" + CustomDateFormat.format_yyyy_MM_dd_HHmmssSS(new Date());
-                dataset.setName(name);
+                
+                if ( ForBugs.FIX_BUG3555) {
+                    String newName = name;
+                    if ( newName != null) {
+                        newName = newName.trim();
+                    }
+                    dataset.setName(newName);
+                } else {
+                    dataset.setName(name);
+                }
             }
 
             session.clear();
