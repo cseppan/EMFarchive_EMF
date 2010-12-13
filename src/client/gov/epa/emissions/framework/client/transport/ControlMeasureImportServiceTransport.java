@@ -25,17 +25,19 @@ public class ControlMeasureImportServiceTransport implements ControlMeasureImpor
         return call;
     }
 
-    public synchronized void importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
+    public synchronized void importControlMeasures(boolean purge, int [] sectorIDs, String folderPath, String[] fileNames, User user) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("importControlMeasures");
+        call.addBooleanParameter("purge");
+        call.addParam("sectorIDs", mappings.integers());
         call.addParam("folderPath", mappings.string());
         call.addParam("fileNames", mappings.strings());
         call.addParam("user", mappings.user());
 
         call.setReturnType(mappings.controlMeasures());
 
-        call.request(new Object[] { folderPath, fileNames, user });
+        call.request(new Object[] { new Boolean(purge), sectorIDs, folderPath, fileNames, user });
     }
 
     public synchronized Status[] getImportStatus(User user) throws EmfException {

@@ -19,7 +19,7 @@ public class LightControlMeasureTableData extends ControlMeasureTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Abbreviation", "Pollutant", "Sector", "Class" };
+        return new String[] { "Name", "Abbreviation", "Pollutant", "Sector" };
     }
 
     public Class getColumnClass(int col) {
@@ -34,10 +34,6 @@ public class LightControlMeasureTableData extends ControlMeasureTableData {
        //
     }
     
-    private String measureClass(ControlMeasureClass cmClass) {
-        return (cmClass == null) ? "" : cmClass.getName();
-    }    
-
     private List createRows(ControlMeasure[] measures) {
         List rows = new ArrayList();
         int year = targetYear;
@@ -46,7 +42,7 @@ public class LightControlMeasureTableData extends ControlMeasureTableData {
             ControlMeasure measure = measures[i];
             
             if ( measure != null) {
-                Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(measure), this.getSectorsString(measure), this.measureClass(measure.getCmClass()) };
+                Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(measure), this.getSectorsString(measure) };
                 Row row = new ViewableRow(measure, values);
                 rows.add(row);
             }

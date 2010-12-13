@@ -248,7 +248,7 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
             List<String> sectorStrList = new ArrayList<String>();
             
             sectorListBox = new JList( allSectors);
-            sectorListBox.setVisibleRowCount(3);
+            sectorListBox.setVisibleRowCount(5);
             JScrollPane scrollPane = new JScrollPane( sectorListBox);
 //            double oldH = scrollPane.getViewportBorderBounds().getHeight();
 //            double oldW = scrollPane.getViewportBorderBounds().getWidth();
@@ -374,7 +374,7 @@ public class CMExportWindow extends DisposableInteralFrame implements CMExportVi
                     //this means the all item was selected...
                     if (inx[i] == 0)
                         return new int[] {};
-                    IDs[i] = this.sectors[inx[i]].getId();
+                    IDs[i] = this.sectors[inx[i] - 1].getId();
                 }
             }            
         } else {

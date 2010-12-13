@@ -303,7 +303,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
             StringTokenizer st = new StringTokenizer(costSUs,"|");
             while ( st.hasMoreTokens()) {
                 String token = st.nextToken();
-                if ( token.equals( currentUser.getName())) {
+                if ( token.equals( currentUser.getUsername())) {
                     return true;
                 }
             }

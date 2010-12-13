@@ -418,7 +418,6 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         this.copyButton = new SelectAwareButton("Copy", copyAction, table, 0, confirmDialog);
         panel.add(this.copyButton);
 
-        // New button
         Button newControlMeasure = new NewButton(newControlMeasureAction());
         panel.add(newControlMeasure);
 

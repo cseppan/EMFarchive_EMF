@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.StringFormatter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
 public class CMImportTask implements Runnable {
@@ -56,6 +58,8 @@ public class CMImportTask implements Runnable {
         //then purge measures by sector(s)
         if (truncate) {
             Session session = sessionFactory.getSession();
+            
+            DbServer dbServer = dbServerFactory.getDbServer();
 
             try {
                 
@@ -72,11 +76,24 @@ public class CMImportTask implements Runnable {
                 CMExportTask exportTask = new CMExportTask(new File(backupFolder), CustomDateFormat.format_YYDDHHMMSS(new Date()), ids, user,
                         sessionFactory, dbServerFactory);
                 exportTask.run();
+                
+                
+                //delete measure by sector....
+//                session.setFlushMode(FlushMode.NEVER);
+                new ControlMeasureDAO().remove(sectorIds, sessionFactory, dbServer);
+                
             } catch (Exception e) {
 //                LOG.error("Could not export control measures.", e);
-                setDetailStatus("Could not export control measures: " + e.getMessage());
+                e.printStackTrace();
+                setDetailStatus("Could not backup/purge export control measures: " + e.getMessage());
             } finally {
                 session.close();
+                try {
+                    dbServer.disconnect();
+                } catch (Exception e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
         try {

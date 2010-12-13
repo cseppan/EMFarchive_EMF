@@ -589,7 +589,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         try {
             EmfProperty property = new EmfPropertiesDAO().getProperty("COST_SU", session);
             
-            return property.getValue();
+            return (property != null ? property.getValue() : "");
         } finally {
             session.close();
         }

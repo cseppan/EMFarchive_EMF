@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.sql.SQLException;
@@ -137,15 +138,30 @@ public class ControlMeasureDAO {
         hibernateFacade.remove(current(controlMeasureId, session), session);
     }
 
-    public void remove(int[] sectorIds, Session session, DbServer dbServer) throws EmfException {
-        removeSccs(sectorIds, session);
-//      LOG.error("remove EfficiencyRecords");
+    public void remove(int[] sectorIds, HibernateSessionFactory sessionFactory, DbServer dbServer) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            removeSccs(sectorIds, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        //      LOG.error("remove EfficiencyRecords");
       //removeEfficiencyRecords(cmId, session);
         
         AggregateEfficiencyRecordDAO aerDAO = new AggregateEfficiencyRecordDAO();
         aerDAO.removeAggregateEfficiencyRecords(sectorIds, dbServer);
 
-        removeEfficiencyRecords(sectorIds, session);
+        session = sessionFactory.getSession();
+        try {
+            removeEfficiencyRecords(sectorIds, session);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
         
         
         String idList = "";
@@ -153,14 +169,34 @@ public class ControlMeasureDAO {
             idList += (i > 0 ? ","  : "") + sectorIds[i];
         }
         
-        String hqlDelete = "delete ControlMeasure cm where cm.id IN (select icm.id "
+        String hqlSelect = "select icm "
                 + "FROM ControlMeasure AS icm "
                 + (sectorIds != null && sectorIds.length > 0 
                         ? "inner join icm.sectors AS s "
                           + "WHERE s.id in (" + idList + ") " 
-                        : "") + ")";
-        session.createQuery( hqlDelete ).executeUpdate();
-        session.flush();
+                        : "");
+        session = sessionFactory.getSession();
+        try {
+            List<ControlMeasure> controlMeasures  = session.createQuery( hqlSelect ).list();
+            for (ControlMeasure controlMeasure : controlMeasures) {
+                session.delete(controlMeasure);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+//doesn;t work, need to load full object then call session.delete(ControlMeasure);
+//      String hqlDelete = "delete ControlMeasure cm where cm.id IN (select icm.id "
+//          + "FROM ControlMeasure AS icm "
+//          + (sectorIds != null && sectorIds.length > 0 
+//                  ? "inner join icm.sectors AS s "
+//                    + "WHERE s.id in (" + idList + ") " 
+//                  : "") + ")";
+//        session.createQuery( hqlDelete ).executeUpdate();
+
+        
+//        session.flush();
     }
 
     public int copy(int controlMeasureId, User creator, Session session, DbServer dbServer) throws EmfException {
@@ -231,7 +267,7 @@ public class ControlMeasureDAO {
                         ? "inner join cm.sectors AS s "
                           + "WHERE s.id in (" + idList + ") " 
                         : "") + ")";
-        session.createQuery( hqlDelete ).executeUpdate();
+        int count = session.createQuery( hqlDelete ).executeUpdate();
         session.flush();
     }
 

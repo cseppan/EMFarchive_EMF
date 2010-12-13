@@ -92,9 +92,9 @@ public class AggregateEfficiencyRecordDAO {
         String query = "delete from emf.aggregrated_efficiencyrecords where control_measures_id IN (select cm.id "
                 + "FROM emf.control_measures AS cm "
                 + (sectorIds != null && sectorIds.length > 0 
-                        ? "where cm.id in (select control_measure_id emf.control_measure_sectors "
-                          + "WHERE id in (" + idList + ") )" 
-                        : "") ;
+                        ? "where cm.id in (select control_measure_id from emf.control_measure_sectors "
+                          + "WHERE sector_id in (" + idList + ") )" 
+                        : "") + ")";
 
         return query;
     }

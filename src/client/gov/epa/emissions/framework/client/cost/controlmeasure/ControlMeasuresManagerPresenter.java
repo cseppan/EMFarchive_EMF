@@ -116,13 +116,10 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
             String whereFilterString = whereFilteSB.toString();
             if (pollutant.getName().equals("ALL")) {
                 controlMeasures = (getDetails ? service().getSummaryControlMeasures(whereFilterString) : service()
-                        //.getControlMeasures(whereFilterString));
-                        .getSummaryControlMeasures(whereFilterString));
+                        .getControlMeasures(whereFilterString));
             } else {
                 controlMeasures = (getDetails ? service().getSummaryControlMeasures(pollutant.getId(),
-                        whereFilterString) : 
-                            //service().getControlMeasures(pollutant.getId(), whereFilterString));
-                            service().getSummaryControlMeasures(pollutant.getId(), whereFilterString));
+                        whereFilterString) : service().getControlMeasures(pollutant.getId(), whereFilterString));
             }
         }
 
@@ -150,12 +147,8 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         }
 
         if (pollutant.getName().equals("ALL") || pollutant.getName().equalsIgnoreCase("Select one"))
-            return (getDetails ? service().getSummaryControlMeasures(whereFilter) : 
-                //service().getControlMeasures(whereFilter));
-                service().getSummaryControlMeasures(whereFilter));
-        return (getDetails ? service().getSummaryControlMeasures(pollutant.getId(), whereFilter) : 
-            //service().getControlMeasures(pollutant.getId(), whereFilter));
-            service().getSummaryControlMeasures(pollutant.getId(), whereFilter));
+            return (getDetails ? service().getSummaryControlMeasures(whereFilter) : service().getControlMeasures(whereFilter));
+        return (getDetails ? service().getSummaryControlMeasures(pollutant.getId(), whereFilter) : service().getControlMeasures(pollutant.getId(), whereFilter));
         
     }
 

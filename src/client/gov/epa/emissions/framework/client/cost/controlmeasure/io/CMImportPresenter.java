@@ -20,8 +20,7 @@ public class CMImportPresenter {
         this.importRules = new CMImportInputRules();
     }
 
-    public void doImport(//boolean purge, 
-            int [] sectorIDs, String directory, String[] files) throws EmfException {
+    public void doImport(boolean purge, int [] sectorIDs, String directory, String[] files) throws EmfException {
         
         if ( sectorIDs != null) { // need to purge control measure by sectors
             
@@ -43,10 +42,10 @@ public class CMImportPresenter {
         
         //session.controlMeasureImportService().importControlMeasures(folderPath, fileNames, user)
         
-        importControlMeasures(directory, files);
+        importControlMeasures(purge, sectorIDs, directory, files);
     }
 
-    void importControlMeasures(String directory, String[] files) throws EmfException {
+    void importControlMeasures(boolean purge, int [] sectorIDs, String directory, String[] files) throws EmfException {
         
         //Maybe validate if user is a CoST SU, if truncate is true
         importRules.validate(directory, files);
@@ -55,7 +54,7 @@ public class CMImportPresenter {
         startImportMessage(view);
 //        importing = true;
 //        session.controlMeasureImportService().importControlMeasures(mapToRemote(directory), files, session.user());
-        session.controlMeasureImportService().importControlMeasures(directory, files, session.user());
+        session.controlMeasureImportService().importControlMeasures(purge, sectorIDs, directory, files, session.user());
     }
 
     private void startImportMessage(CMImportView view) {

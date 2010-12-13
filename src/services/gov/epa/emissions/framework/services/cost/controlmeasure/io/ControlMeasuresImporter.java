@@ -90,6 +90,15 @@ public class ControlMeasuresImporter implements Importer {
         this.generator = new EfficiencyRecordGenerator();
     }
 
+    //zero item is this first item is this...
+    public int validate() throws ImporterException, FileNotFoundException {
+        //First parse summary file, look at map "controlMeasures" and look at size...
+        parseSummary(controlMeasures);
+        
+        return controlMeasures.size();
+        
+    }
+    
     public void run() throws ImporterException {
         
         setStatus("Started importing control measures");
@@ -241,6 +250,13 @@ public class ControlMeasuresImporter implements Importer {
         CMSummaryImporter summary = cmImporters.summaryImporter();
         summary.run(controlMeasures);
         setStatus("Finished reading summary file");
+    }
+
+    private void parseSummary(Map controlMeasures) throws ImporterException, FileNotFoundException {
+//        setStatus("Started reading summary file");
+        CMSummaryImporter summary = cmImporters.summaryImporter();
+        summary.run(controlMeasures);
+//        setStatus("Finished reading summary file");
     }
 
     private EfficiencyRecord[] runEfficiencyRecords() throws ImporterException {

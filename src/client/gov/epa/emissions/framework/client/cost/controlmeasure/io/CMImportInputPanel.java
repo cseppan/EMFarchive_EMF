@@ -144,7 +144,7 @@ public class CMImportInputPanel extends JPanel {
             StringTokenizer st = new StringTokenizer(costSUs,"|");
             while ( st.hasMoreTokens()) {
                 String token = st.nextToken();
-                if ( token.equals( currentUser.getName())) {
+                if ( token.equals( currentUser.getUsername())) {
                     return true;
                 }
             }
@@ -185,7 +185,7 @@ public class CMImportInputPanel extends JPanel {
                     sectorList.addAll( Arrays.asList( sectors));
                     allSectors = sectorList.toArray(new Sector[0]);
                     sectorListBox = new JList( allSectors);
-                    sectorListBox.setVisibleRowCount(2);
+                    sectorListBox.setVisibleRowCount(5);
                     JScrollPane scrollPane = new JScrollPane( sectorListBox);
                     secPanel.add(scrollPane);                     
                 } catch (EmfException e) {

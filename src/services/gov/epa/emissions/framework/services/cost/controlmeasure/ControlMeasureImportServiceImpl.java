@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.CMImportTask;
+import gov.epa.emissions.framework.services.cost.controlmeasure.io.ControlMeasuresImporter;
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.io.File;
@@ -38,14 +39,27 @@ public class ControlMeasureImportServiceImpl implements ControlMeasureImportServ
         this.dbServerFactory = dbServerFactory;
     }
 
-    public synchronized void importControlMeasures(String folderPath, String[] fileNames, User user) throws EmfException {
+    public synchronized void importControlMeasures(boolean purge, int [] sectorIDs, String folderPath, String[] fileNames, User user) throws EmfException {
         try {
-            CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, true, new int[] { 4 },sessionFactory, dbServerFactory);
+            CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, purge, sectorIDs, sessionFactory, dbServerFactory);
             threadPool.execute(new GCEnforcerTask("Import control measures from files: " + fileNames[0] + ", etc.", importTask));
         } catch (Exception e) {
             LOG.error("Could not import control measures.", e);
             throw new EmfException("Could not import control measures: " + e.getMessage());
         }
+    }
+
+    public synchronized int getControlMeasureCountInSummaryFile(boolean purge, int [] sectorIDs, String folderPath, String[] fileNames, User user)  {
+//        try {
+////            ControlMeasuresImporter importer = null;
+////            importer = new ControlMeasuresImporter(folder, files, user, truncate, sectorIds, sessionFactory, dbServerFactory);
+////            return importer.validate();
+//            
+//        } catch (Exception e) {
+//            LOG.error("Could not import control measures.", e);
+//            throw new EmfException("Could not import control measures: " + e.getMessage());
+//        }
+        return 0;
     }
 
     public synchronized Status[] getImportStatus(User user) throws EmfException {
