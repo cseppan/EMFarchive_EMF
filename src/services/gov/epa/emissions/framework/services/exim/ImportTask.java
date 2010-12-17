@@ -79,14 +79,17 @@ public class ImportTask extends Task {
     }
 
     public void run() {
-        if (DebugLevels.DEBUG_1)
-            System.out.println(">>## ImportTask:run() " + taskId + " for dataset: " + this.dataset.getName());
-        if (DebugLevels.DEBUG_1)
-            System.out.println("Task#" + taskId + " RUN @@@@@ THREAD ID: " + Thread.currentThread().getId());
+        if (DebugLevels.DEBUG_1) {
+            log.debug(">>## ImportTask:run() " + taskId + " for dataset: " + this.dataset.getName());
+        }
+        if (DebugLevels.DEBUG_1) {
+            log.debug("Task#" + taskId + " RUN @@@@@ THREAD ID: " + Thread.currentThread().getId());
+        }
+            
 
         if (DebugLevels.DEBUG_1)
             if (DebugLevels.DEBUG_1)
-                System.out.println("Task# " + taskId + " running");
+                log.debug("Task# " + taskId + " running");
         
         Session session = null;
         DbServer dbServer = null;
@@ -94,14 +97,27 @@ public class ImportTask extends Task {
         String errorMsg = "";
         
         try {
+            
+            if (DebugLevels.DEBUG_1)
+                log.debug("  >=== 1 ===");
             dbServer = dbServerFactory.getDbServer();
             ImporterFactory importerFactory = new ImporterFactory(dbServer);
             Importer importer = importerFactory.createVersioned(dataset, path, files);
             long startTime = System.currentTimeMillis();
             session = sessionFactory.getSession();
             
+            if (DebugLevels.DEBUG_1)
+                log.debug("  >=== 02 ===");
+            
             prepare(session);
+            
+            if (DebugLevels.DEBUG_1)
+                log.debug("  >=== 03 ===");
+            
             importer.run();
+            
+            if (DebugLevels.DEBUG_1)
+                log.debug("  >=== 04 ===");
             
             if (dataset.isExternal() && importer instanceof VersionedImporter) {
                 Importer extImporter = ((VersionedImporter)importer).getWrappedImporter();
@@ -119,12 +135,28 @@ public class ImportTask extends Task {
             numSeconds = (System.currentTimeMillis() - startTime)/1000;
             complete(session, "Imported");
             isDone = true;
+            
+            if (DebugLevels.DEBUG_1)
+                log.debug("  >=== 2 ===");
+            
         } catch (Exception e) {
             errorMsg += e.getMessage();
             // this doesn't give the full path for some reason
             logError("File(s) import failed for user (" + user.getUsername() + ") at " + new Date().toString() + " -- " + filesList(), e);
-            removeDataset(dataset);
+            
+            if (DebugLevels.DEBUG_1)
+                log.debug("  >=== 3 ===");
+            
+            removeDataset(dataset); // TODO: JIZHEN BUG3316 internal sources of the dataset
+            
+            if (DebugLevels.DEBUG_1)
+                log.debug("  >=== 4 ===");
+            
         } finally {
+            
+            if (DebugLevels.DEBUG_1)
+                log.debug("  >=== 5 ===");
+            
             try {
                 if (isDone) {
                     addCompletedStatus();
@@ -144,6 +176,10 @@ public class ImportTask extends Task {
                     log.error("Error closing database connection.", e);
                 }
             }
+            
+            if (DebugLevels.DEBUG_1)
+                log.debug("  >=== 6 ===");
+            
         }
     }
 
@@ -283,7 +319,7 @@ public class ImportTask extends Task {
     protected void finalize() throws Throwable {
         taskCount--;
         if (DebugLevels.DEBUG_1)
-            System.out.println(">>>> Destroying object: " + createId());
+            log.debug(">>>> Destroying object: " + createId());
         super.finalize();
     }
 

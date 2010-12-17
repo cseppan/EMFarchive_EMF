@@ -91,8 +91,9 @@ public class ImportCaseOutputTask extends Task {
     }
 
     public void run() {
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1) {
             System.out.println(">>## ImportTask:run() " + taskId + " for dataset: " + this.dataset.getName());
+        }
         if (DebugLevels.DEBUG_1)
             System.out.println("Task#" + taskId + " RUN @@@@@ THREAD ID: " + Thread.currentThread().getId());
 

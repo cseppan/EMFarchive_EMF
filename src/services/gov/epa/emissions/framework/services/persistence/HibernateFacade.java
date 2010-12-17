@@ -22,7 +22,7 @@ public class HibernateFacade {
             id = session.save(obj);
             tx.commit();
         } catch (HibernateException e) {
-            tx.rollback();
+            tx.rollback();  //TODO: JIZHEN BUG3316
             throw e;
         }
         return id;
