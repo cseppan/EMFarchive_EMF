@@ -8,7 +8,6 @@ import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
@@ -18,7 +17,6 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -32,8 +30,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SpringLayout;
-import javax.swing.border.EtchedBorder;
 
 public class EditQAEmissionsWindow extends DisposableInteralFrame implements EditQAEmissionsView {
     
@@ -84,7 +80,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         this.presenter1 = presenter1;
     }
     
-    // A JList with Add and Remove buttons for the Emission Inventories.
+    // A JList with Add and Remove buttons for the Emission .
     // A Text Field for Adding the Inventory Table with a Select button
     // OK and Cancel buttons.
 
@@ -121,21 +117,6 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
         //panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         layout.add( panel);        
-        
-//        JPanel content = new JPanel(new SpringLayout());
-//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-//       
-//        layoutGenerator.addLabelWidgetPair("Emission inventories:", emisinv(dataset), content);
-//        layoutGenerator.addLabelWidgetPair("Inventory table:", invTablePanel(), content);
-//        summaryTypeCombo();
-//        layoutGenerator.addLabelWidgetPair("Summary Type:", summaryTypes, content);
-//        layoutGenerator.makeCompactGrid(content, 3, 2, // rows, cols
-//                5, 5, // initialX, initialY
-//                10, 10);// xPad, yPad*/
-//
-//        layout.add(content);
-        
-        
         layout.add(buttonPanel());
         
         return layout;

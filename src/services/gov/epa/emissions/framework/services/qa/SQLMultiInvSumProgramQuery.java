@@ -7,31 +7,12 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-public class SQLMultiInvSumProgramQuery {
+public class SQLMultiInvSumProgramQuery extends SQLQAProgramQuery{
     
-    private QAStep qaStep;
-
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
-    
-    private static final String poundQueryTag = "#";
-    
-    private String emissioDatasourceName;
-    
-    private static final String invTableTag = "-invtable";
-
-    private static final String summaryTypeTag = "-summaryType";
-
-    ArrayList<String> allDatasetNames = new ArrayList<String>();
-    
-    private boolean hasInvTableDataset;
+    private ArrayList<String> allDatasetNames = new ArrayList<String>();
     
     public SQLMultiInvSumProgramQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName, String tableName, QAStep qaStep) {
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissioDatasourceName = emissioDatasourceName;
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
     }
         
     public String createInvSumProgramQuery() throws EmfException {
@@ -44,13 +25,13 @@ public class SQLMultiInvSumProgramQuery {
         String summaryTypeToken = "State+SCC";
         String invTableDatasetName = "";
         
-        int index1 = programArguments.indexOf(invTableTag);
-        int index2 = programArguments.indexOf(summaryTypeTag);
+        int index1 = programArguments.indexOf(QAStep.invTableTag);
+        int index2 = programArguments.indexOf(QAStep.summaryTypeTag);
         inventoriesToken = programArguments.substring(0, index1).trim();
-        invtableToken = programArguments.substring(index1 + invTableTag.length(), index2 == -1 ? programArguments.length() : index2);
+        invtableToken = programArguments.substring(index1 + QAStep.invTableTag.length(), index2 == -1 ? programArguments.length() : index2);
         
         if (index2 != -1) {
-            summaryTypeToken = programArguments.substring(index2 + summaryTypeTag.length()).trim();
+            summaryTypeToken = programArguments.substring(index2 + QAStep.summaryTypeTag.length()).trim();
         } 
         //default just in case...
         if (summaryTypeToken.trim().length() == 0)
@@ -58,12 +39,14 @@ public class SQLMultiInvSumProgramQuery {
 
          //parse inventories names...
         if (inventoriesToken.length() > 0) {
-            StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken);
+            StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken, "\n");
             tokenizer2.nextToken();
             while (tokenizer2.hasMoreTokens()) {
                 String datasetName = tokenizer2.nextToken().trim();
-                if (datasetName.length() > 0)
+                if (datasetName.length() > 0){
+                    datasetNames.add(datasetName);
                     allDatasetNames.add(datasetName);
+                }
             }
         } else {
             //see if there are tables to build the query with, if not throw an exception
@@ -71,11 +54,14 @@ public class SQLMultiInvSumProgramQuery {
         }
 
          //parse inventory table name...
-         StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
+         StringTokenizer tokenizer3 = new StringTokenizer(invtableToken, "\n");
          while (tokenizer3.hasMoreTokens()) {
              invTableDatasetName  = tokenizer3.nextToken().trim();
+             datasetNames.add(invTableDatasetName);
              if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
          }
+         
+         checkDataset();
          
         //Create the query template and add placeholders (#, @!@, @@@, ...) for sql to be inserted in a later steps
          String outerQuery = "select @!@, " 
@@ -97,7 +83,7 @@ public class SQLMultiInvSumProgramQuery {
         }
 
         //replace # symbol with the unionized fire datasets query
-        outerQuery = outerQuery.replaceAll(poundQueryTag, innerSQL);
+        outerQuery = outerQuery.replaceAll(QAStep.poundQueryTag, innerSQL);
 
         //replace @!@ symbol with main columns in outer select statement
         String sql = "";
@@ -170,18 +156,8 @@ public class SQLMultiInvSumProgramQuery {
 
         private String query(String partialQuery, boolean createClause) throws EmfException {
             
-            SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
+            SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName );
             return parser.parse(partialQuery, createClause);
         }
         
-//        private EmfDataset getDataset(String dsName) throws EmfException {
-//            //System.out.println("Database name = \n" + dsName + "\n");
-//            DatasetDAO dao = new DatasetDAO();
-//            try {
-//                return dao.getDataset(sessionFactory.getSession(), dsName);
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//                throw new EmfException("The dataset name " + dsName + " is not valid");
-//            }
-//        }
 }

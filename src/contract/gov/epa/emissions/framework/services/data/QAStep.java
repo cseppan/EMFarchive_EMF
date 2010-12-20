@@ -8,6 +8,45 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class QAStep implements Serializable {
+    public static final String invTag = "-inventories";
+    
+    public static final String invBaseTag = "-inv_base";
+    public static final String invCompareTag = "-inv_compare";
+
+    public static final String invTableTag = "-invtable";
+
+    public static final String summaryTypeTag = "-summaryType";
+    
+    public static final String filterTag = "-filter";
+    
+    public static final String emissionTypeTag = "-emissionType";
+
+    public static final String avgDaySummaryProgram = "Average day to Annual Summary";
+
+    public static final String avgDayToAnnualProgram = "Average day to Annual Inventory";
+
+    public static final String compareVOCSpeciationWithHAPInventoryProgram = "Compare VOC Speciation With HAP Inventory";
+
+    public static final String fireDataSummaryProgram = "Fire Data Summary (Day-specific)";
+
+    public static final String MultiInvSumProgram = "Multi-inventory sum";
+
+    public static final String MultiInvRepProgram = "Multi-inventory column report";
+
+    public static final String COMPARE_DATASETS_PROGRAM = "Compare Datasets";
+
+    public static final String MultiInvDifRepProgram = "Multi-inventory difference report";
+    public static final String CompareControlStrategies = "Compare Control Strategies";
+    public static final String createMoEmisByCountyFromAnnEmisProgram = "Create monthly emissions by county from annual emissions";
+    public static final String compareAnnStateSummaryProgram = "Compare annual state summaries";
+    
+    public static final String smokeOutputAnnStateSummaryCrosstabProgram = "SMOKE output annual state summaries crosstab";
+    
+    public static final String ecControlScenarioProgram = "Estimate EC Impacts";
+    
+    public static final String sqlProgram = "SQL";
+    
+    public static final String poundQueryTag = "#";
 
     private String name;
 

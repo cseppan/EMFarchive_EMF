@@ -63,13 +63,13 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
     }
     
     public void display(DatasetType[] datasetTypes, DatasetType defaultType, boolean selectSingle) {
-        if ((defaultType != null) && (lastDatasetType != null))
-               System.out.println("defaultType.getName()="+defaultType.getName()+","+
-                       defaultType.getName().equals(lastDatasetType.getName()));
-        else
-        {
-            System.out.println("one or both is null");
-        }
+//        if ((defaultType != null) && (lastDatasetType != null))
+//               System.out.println("defaultType.getName()="+defaultType.getName()+","+
+//                       defaultType.getName().equals(lastDatasetType.getName()));
+//        else
+//        {
+//            System.out.println("one or both is null");
+//        }
         if ((defaultType != null) && (lastDatasetType != null) && 
            !defaultType.getName().equals(lastDatasetType.getName()))
         {

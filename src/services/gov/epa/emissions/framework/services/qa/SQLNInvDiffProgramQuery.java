@@ -7,31 +7,12 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-public class SQLNInvDiffProgramQuery {
+public class SQLNInvDiffProgramQuery extends SQLQAProgramQuery{
     
-    private QAStep qaStep;
-
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
-    
-    //private static final String poundQueryTag = "#";
-    
-    private String emissioDatasourceName;
-    
-//    private static final String invTag = "-inventories";
-    
-    private static final String invTableTag = "-invtable";
-    private static final String emissionTypeTag = "-emissionType";
-    private static final String summaryTypeTag = "-summaryType";
-
-    private boolean hasInvTableDataset;
+    ArrayList<String> allDatasetNames = new ArrayList<String>();
     
     public SQLNInvDiffProgramQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName, String tableName, QAStep qaStep) {
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissioDatasourceName = emissioDatasourceName;
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
     }
 
     public String createInvDiffProgramQuery() throws EmfException {
@@ -51,19 +32,17 @@ public class SQLNInvDiffProgramQuery {
         String sqlAnnEmisList = "";
         
 //        int indexBase = programArguments.indexOf(invTag);
-        int indexInvTable = programArguments.indexOf(invTableTag);
-        int emisIndex = programArguments.indexOf(emissionTypeTag);
-        int indexSumType = programArguments.indexOf(summaryTypeTag);
-        
-        ArrayList<String> datasetNames = new ArrayList<String>();
-        
+        int indexInvTable = programArguments.indexOf(QAStep.invTableTag);
+        int emisIndex = programArguments.indexOf(QAStep.emissionTypeTag);
+        int indexSumType = programArguments.indexOf(QAStep.summaryTypeTag);
+       
         if (indexInvTable != -1 && emisIndex !=-1){
             invBaseToken = programArguments.substring(0, indexInvTable).trim();
-            invtableToken = programArguments.substring(indexInvTable+ invTableTag.length(), emisIndex);
-            invEmisToken = programArguments.substring(emisIndex + emissionTypeTag.length(), indexSumType == -1 ? programArguments.length() : indexSumType);
+            invtableToken = programArguments.substring(indexInvTable+ QAStep.invTableTag.length(), emisIndex);
+            invEmisToken = programArguments.substring(emisIndex + QAStep.emissionTypeTag.length(), indexSumType == -1 ? programArguments.length() : indexSumType);
         }
         if (indexSumType != -1) {
-            summaryTypeToken = programArguments.substring(indexSumType + summaryTypeTag.length()).trim();
+            summaryTypeToken = programArguments.substring(indexSumType + QAStep.summaryTypeTag.length()).trim();
         } 
         //default just in case...
          
@@ -77,33 +56,39 @@ public class SQLNInvDiffProgramQuery {
 
          //parse inventories names for base and compare...
         if (invBaseToken.length() > 0 ) {
-            StringTokenizer tokenizer2 = new StringTokenizer(invBaseToken);
+            StringTokenizer tokenizer2 = new StringTokenizer(invBaseToken, "\n");
             tokenizer2.nextToken();  // skip -inventoy tag
             while (tokenizer2.hasMoreTokens()) {
                 String datasetName = tokenizer2.nextToken().trim();
-                if (datasetName.length() > 0)
+                if (datasetName.length() > 0){
+                    allDatasetNames.add(datasetName);
                     datasetNames.add(datasetName);
+                }
             }
-            
         } else {
             //see if there are tables to build the query with, if not throw an exception
             throw new EmfException("There are no ORL Inventory datasets specified (base).");
         }
         
          //parse inventory table name...
-         StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
+         StringTokenizer tokenizer3 = new StringTokenizer(invtableToken,"\n");
          while (tokenizer3.hasMoreTokens()) {
              invTableDatasetName  = tokenizer3.nextToken().trim();
-             if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
+             if (invTableDatasetName.length() > 0) {
+                 hasInvTableDataset = true;
+                 datasetNames.add(invTableDatasetName);
+             }
          }
+         
+         checkDataset();
 
          //build aliased comma delimited list for use in SELECT and GROUP BY clause
-         for (int j = 0; j < datasetNames.size(); j++) {
+         for (int j = 0; j < allDatasetNames.size(); j++) {
              aliasedPollList += (j > 0 ? "," : "") + "t" + j + ".poll";
              aliasedFipsList += (j > 0 ? "," : "") + "t" + j + ".fips";
              aliasedFipsStList += (j > 0 ? "," : "") + "t" + j + ".fipsst";
              aliasedSCCList += (j > 0 ? "," : "") + "t" + j + ".scc";
-             String datasetName = datasetNames.get(j).toString().trim();
+             String datasetName = allDatasetNames.get(j).toString().trim();
              //make sure dataset name only includes SQL friendly characters...
              for (int i = 0; i < datasetName.length(); i++) {
                  if (!Character.isLetterOrDigit(datasetName.charAt(i))) {
@@ -129,9 +114,9 @@ public class SQLNInvDiffProgramQuery {
 
         //build inner sql statement with the datasets specified, make sure and full outer join the tables together
          String innerSQLBase = "";
-         for (int j = 0; j < datasetNames.size(); j++) {
+         for (int j = 0; j < allDatasetNames.size(); j++) {
              innerSQLBase += (j > 0 ? " \nfull outer join " : "") 
-                 + "(" + createDatasetQuery(datasetNames.get(j).toString().trim(), invEmisToken.trim())
+                 + "(" + createDatasetQuery(allDatasetNames.get(j).toString().trim(), invEmisToken.trim())
                  + ") as t" + j + (j > 0 ? " \non " : "");
              if (j > 0) {
                  if (summaryTypeToken.equals("State+SCC")) 
@@ -222,7 +207,7 @@ public class SQLNInvDiffProgramQuery {
 
     private String query(String partialQuery, boolean createClause) throws EmfException {
 
-        SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
+        SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName );
         return parser.parse(partialQuery, createClause);
     }
 

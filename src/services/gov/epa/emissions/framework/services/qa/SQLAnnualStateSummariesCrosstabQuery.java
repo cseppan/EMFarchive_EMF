@@ -8,7 +8,6 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -21,19 +20,8 @@ import java.util.TreeMap;
 
 import org.hibernate.Session;
 
-public class SQLAnnualStateSummariesCrosstabQuery {
+public class SQLAnnualStateSummariesCrosstabQuery extends SQLQAProgramQuery{
     
-    private QAStep qaStep;
-
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
-    
-    
-    private String emissionDatasourceName;
-    
-    private DatasetDAO dao;
-
     public static final String smkRptTag = "-smkrpt";
 
     public static final String coStCyTag = "-costcy";
@@ -49,11 +37,7 @@ public class SQLAnnualStateSummariesCrosstabQuery {
     public SQLAnnualStateSummariesCrosstabQuery(HibernateSessionFactory sessionFactory, DbServer dbServer, 
             String emissioDatasourceName, String tableName, 
             QAStep qaStep) {
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissionDatasourceName = emissioDatasourceName;
-        this.dao = new DatasetDAO();
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
     }
 
     private String[] parseSwitchArguments(String programSwitches, int beginIndex, int endIndex) {
@@ -98,11 +82,18 @@ public class SQLAnnualStateSummariesCrosstabQuery {
 
         if (smkRptIndex != -1) {
             arguments = parseSwitchArguments(programArguments, smkRptIndex, programArguments.indexOf("\n-", smkRptIndex) != -1 ? programArguments.indexOf("\n-", smkRptIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) smkRptNames = arguments;
+            if (arguments != null && arguments.length > 0) {
+                smkRptNames = arguments;
+                for (String item: smkRptNames)
+                    datasetNames.add(item);
+            }
         }
         if (coStCyIndex != -1) {
             arguments = parseSwitchArguments(programArguments, coStCyIndex, programArguments.indexOf("\n-", coStCyIndex) != -1 ? programArguments.indexOf("\n-", coStCyIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) coStCyName = arguments[0];
+            if (arguments != null && arguments.length > 0) {
+                coStCyName = arguments[0];
+                datasetNames.add(coStCyName);
+            }
         }
         if (pollListIndex != -1) {
             arguments = parseSwitchArguments(programArguments, pollListIndex, programArguments.indexOf("\n-", pollListIndex) != -1 ? programArguments.indexOf("\n-", pollListIndex) : programArguments.length());
@@ -113,23 +104,7 @@ public class SQLAnnualStateSummariesCrosstabQuery {
             }
 
         }
-//        if (specieListIndex != -1) {
-//            arguments = parseSwitchArguments(programArguments, specieListIndex, programArguments.indexOf("\n-", specieListIndex) != -1 ? programArguments.indexOf("\n-", specieListIndex) : programArguments.length());
-//            if (arguments != null && arguments.length > 0) {
-//                species = arguments;
-//                for (String specie : species)
-//                    sortedColumnMap.put(specie, specie);
-//            }
-//        }
-//        if (exclPollIndex != -1) {
-//            arguments = parseSwitchArguments(programArguments, exclPollIndex, programArguments.indexOf("\n-", exclPollIndex) != -1 ? programArguments.indexOf("\n-", exclPollIndex) : programArguments.length());
-//            if (arguments != null && arguments.length > 0) exclPolls = arguments;
-//        }
-//        if (sortPollIndex != -1) {
-//            arguments = parseSwitchArguments(programArguments, sortPollIndex, programArguments.indexOf("\n-", sortPollIndex) != -1 ? programArguments.indexOf("\n-", sortPollIndex) : programArguments.length());
-//            if (arguments != null && arguments.length > 0) sortPolls = arguments;
-//        }
-        
+
         //validate everything has been specified...
         String errors = "";
         //make sure all datasets were specified, look at the names
@@ -153,15 +128,14 @@ public class SQLAnnualStateSummariesCrosstabQuery {
                 map.put(poll, poll);
             }
         }
-//        if (species != null && species.length > 0) {
-//            Map<String, String> map = new TreeMap<String, String>();
-//            for (String specie : species) {
-//                if (map.containsKey(specie))
-//                    errors += "Species list already has, " + specie + ". No duplicates are allowed in the species list. ";
-//                map.put(specie, specie);
-//            }
-//        }
-
+        
+        
+        //go ahead and throw error from here, no need to validate anymore if the above is not there...
+        if (errors.length() > 0) {
+            throw new EmfException(errors);
+        }
+        
+        checkDataset();
 
         //make sure the all the datasets actually exist
         EmfDataset[] smkRpts = new EmfDataset[] {};
@@ -169,9 +143,6 @@ public class SQLAnnualStateSummariesCrosstabQuery {
             smkRpts = new EmfDataset[smkRptNames.length];
             for (int i = 0; i < smkRptNames.length; i++) {
                 smkRpts[i] = getDataset(smkRptNames[i]);
-                if (smkRpts[i] == null) {
-                    errors += "Uknown " + DatasetType.smkmergeRptStateAnnualSummary + " dataset, " + smkRptNames[i] + ". ";
-                }
             }
         }
 
@@ -179,16 +150,7 @@ public class SQLAnnualStateSummariesCrosstabQuery {
         EmfDataset coStCy = null;
         coStCy = getDataset(coStCyName);
         String coStCyTableName = "emissions.state";
-        String coStCyVersion = new VersionedQuery(version(coStCy.getId(), coStCy.getDefaultVersion()), "costcy").query();
-        if (coStCy == null) {
-            errors += "Uknown " + DatasetType.countryStateCountyNamesAndDataCOSTCY + " dataset, " + coStCyName + ". ";
-        }
-        
-        //go ahead and throw error from here, no need to validate anymore if the above is not there...
-        if (errors.length() > 0) {
-            throw new EmfException(errors);
-        }
-        
+        String coStCyVersion = new VersionedQuery(version(coStCy.getId(), coStCy.getDefaultVersion()), "costcy").query();    
         
         //Outer SELECT clause, DISTINCT ON makes sure only one tolerance record is applied...
         sql = "select sector,\n"
@@ -294,18 +256,6 @@ public class SQLAnnualStateSummariesCrosstabQuery {
 
         SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName );
         return parser.parse(partialQuery, createClause);
-    }
-
-    private EmfDataset getDataset(String dsName) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getDataset(session, dsName);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new EmfException("The dataset name " + dsName + " is not valid");
-        } finally {
-            session.close();
-        }
     }
 
     private Version version(int datasetId, int version) {

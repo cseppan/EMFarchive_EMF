@@ -7,37 +7,14 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-public class SQLMultiInvDiffProgramQuery {
-    
-    private QAStep qaStep;
-
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
-    
-    //private static final String poundQueryTag = "#";
-    
-    private String emissioDatasourceName;
-    
-    private static final String invBaseTag = "-inv_base";
-    
-    private static final String invCompareTag = "-inv_compare";
-    
-    private static final String invTableTag = "-invtable";
-
-    private static final String summaryTypeTag = "-summaryType";
+public class SQLMultiInvDiffProgramQuery extends SQLQAProgramQuery{
 
     ArrayList<String> baseDatasetNames = new ArrayList<String>();
     
     ArrayList<String> compareDatasetNames = new ArrayList<String>();
     
-    private boolean hasInvTableDataset;
-    
     public SQLMultiInvDiffProgramQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName, String tableName, QAStep qaStep) {
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissioDatasourceName = emissioDatasourceName;
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
     }
         
     public String createInvDiffProgramQuery() throws EmfException {
@@ -51,18 +28,18 @@ public class SQLMultiInvDiffProgramQuery {
         String summaryTypeToken = "State+SCC";
         String invTableDatasetName = "";
         
-        int indexBase = programArguments.indexOf(invBaseTag);
-        int indexCompare = programArguments.indexOf(invCompareTag);
-        int indexInvTable = programArguments.indexOf(invTableTag);
-        int indexSumType = programArguments.indexOf(summaryTypeTag);
+        int indexBase = programArguments.indexOf(QAStep.invBaseTag);
+        int indexCompare = programArguments.indexOf(QAStep.invCompareTag);
+        int indexInvTable = programArguments.indexOf(QAStep.invTableTag);
+        int indexSumType = programArguments.indexOf(QAStep.summaryTypeTag);
         
         if (indexBase !=-1  && indexCompare !=-1 && indexInvTable != -1){
             invBaseToken = programArguments.substring(0, indexCompare).trim();
             invCompareToken = programArguments.substring(indexCompare, indexInvTable).trim();
-            invtableToken = programArguments.substring(indexInvTable + invTableTag.length(), indexSumType == -1 ? programArguments.length() : indexSumType);
+            invtableToken = programArguments.substring(indexInvTable + QAStep.invTableTag.length(), indexSumType == -1 ? programArguments.length() : indexSumType);
         }
         if (indexSumType != -1) {
-            summaryTypeToken = programArguments.substring(indexSumType + summaryTypeTag.length()).trim();
+            summaryTypeToken = programArguments.substring(indexSumType + QAStep.summaryTypeTag.length()).trim();
         } 
         //default just in case...
         if (summaryTypeToken.trim().length() == 0)
@@ -70,12 +47,14 @@ public class SQLMultiInvDiffProgramQuery {
 
          //parse inventories names for base and compare...
         if (invBaseToken.length() > 0 ) {
-            StringTokenizer tokenizer2 = new StringTokenizer(invBaseToken);
+            StringTokenizer tokenizer2 = new StringTokenizer(invBaseToken, "\n");
             tokenizer2.nextToken();
             while (tokenizer2.hasMoreTokens()) {
                 String datasetName = tokenizer2.nextToken().trim();
-                if (datasetName.length() > 0)
+                if (datasetName.length() > 0){
                     baseDatasetNames.add(datasetName);
+                    datasetNames.add(datasetName);
+                }
             }
             
         } else {
@@ -85,12 +64,14 @@ public class SQLMultiInvDiffProgramQuery {
         
         // get compare datasets
        if ( invCompareToken.length() > 0 ) {
-            StringTokenizer tokenizer2 = new StringTokenizer(invCompareToken);
+            StringTokenizer tokenizer2 = new StringTokenizer(invCompareToken, "\n");
             tokenizer2.nextToken();
             while (tokenizer2.hasMoreTokens()) {
                 String datasetName = tokenizer2.nextToken().trim();
-                if (datasetName.length() > 0)
+                if (datasetName.length() > 0){
                     compareDatasetNames.add(datasetName);
+                    datasetNames.add(datasetName);
+                }
             }
         } else {
             //see if there are tables to build the query with, if not throw an exception
@@ -98,11 +79,15 @@ public class SQLMultiInvDiffProgramQuery {
         }
 
          //parse inventory table name...
-         StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
+         StringTokenizer tokenizer3 = new StringTokenizer(invtableToken, "\n");
          while (tokenizer3.hasMoreTokens()) {
              invTableDatasetName  = tokenizer3.nextToken().trim();
+             datasetNames.add(invTableDatasetName);
              if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
          }
+         
+         checkDataset();
+         
          String diffQuery = "select @@!, " + (hasInvTableDataset ? "coalesce(t.smoke_name, 'AN UNSPECIFIED DESCRIPTION') as smoke_name" : "t.poll, coalesce(t.poll_desc, 'AN UNSPECIFIED DESCRIPTION') as poll_desc") + ", t.base_ann_emis, t.compare_ann_emis, (t.compare_ann_emis-t.base_ann_emis) as diff_ann_emis, " 
              + " \nabs(t.compare_ann_emis-t.base_ann_emis) as abs_diff_ann, "
              + " \ncase when t.base_ann_emis >0  then ((t.compare_ann_emis-t.base_ann_emis)/t.base_ann_emis)*100 "
@@ -262,7 +247,7 @@ public class SQLMultiInvDiffProgramQuery {
 
     private String query(String partialQuery, boolean createClause) throws EmfException {
 
-        SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
+        SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName );
         String fullQuery = parser.parse(partialQuery, createClause);
 //        System.out.println("Full query=\n"+fullQuery);
         return fullQuery;

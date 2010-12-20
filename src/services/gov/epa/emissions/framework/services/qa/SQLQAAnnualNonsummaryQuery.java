@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -10,26 +9,14 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 
-public class SQLQAAnnualNonsummaryQuery {
+public class SQLQAAnnualNonsummaryQuery extends SQLQAProgramQuery{
     
     // Input is currently a set of 12 or 24 or 12*n monthly files
     // The lists are filled using command-line and/or GUI input.
     
-    private QAStep qaStep;
-
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
-    
-    private String emissioDatasourceName;
-
     public SQLQAAnnualNonsummaryQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName, String tableName, QAStep qaStep) {
         
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissioDatasourceName = emissioDatasourceName;
-        
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
     }
     
     ArrayList<String> janDatasetNames = new ArrayList<String>();
@@ -65,12 +52,17 @@ public class SQLQAAnnualNonsummaryQuery {
         
         String programArguments = qaStep.getProgramArguments();
         
-        StringTokenizer tokenizer2 = new StringTokenizer(programArguments);
+        StringTokenizer tokenizer2 = new StringTokenizer(programArguments, "\n");
         tokenizer2.nextToken();
         while (tokenizer2.hasMoreTokens()) {
-             allDatasetNames.add(tokenizer2.nextToken());
+            String datasetName = tokenizer2.nextToken().trim();
+            if (datasetName.length() > 0){
+                allDatasetNames.add(datasetName);
+                datasetNames.add(datasetName);
             }
-        
+        }
+        // check if all datasets exist
+        checkDataset();
 
         for (int j = 0; j < allDatasetNames.size(); j++) {
             //Check for month name and year name here
@@ -80,9 +72,9 @@ public class SQLQAAnnualNonsummaryQuery {
             EmfDataset dataset;
            
             try {
-                dataset = getDataset(allDatasetNames.get(j).toString().trim());
+                dataset = getDataset(allDatasetNames.get(j).toString());
             } catch(EmfException ex){
-                throw new EmfException("The dataset named " + allDatasetNames.get(j).toString().trim() + " does not exist");
+                throw new EmfException(ex.getMessage());
             }
             
             // New String Tokenizers for the StartDate and StopDate values.
@@ -289,18 +281,8 @@ public class SQLQAAnnualNonsummaryQuery {
         private String query(String partialQuery, boolean createClause) throws EmfException {
             //System.out.println(dbServer + "\n" + qaStep + "\n" + tableName + "\n" 
                     //+ partialQuery + "\n" + dataset + "\n" + version);
-            SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
+            SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName );
             return parser.parse(partialQuery, createClause);
         }
         
-        private EmfDataset getDataset(String dsName) throws EmfException {
-            //System.out.println("Database name = \n" + dsName + "\n");
-            DatasetDAO dao = new DatasetDAO();
-            try {
-                return dao.getDataset(sessionFactory.getSession(), dsName);
-            } catch (Exception ex) {
-                //ex.printStackTrace();
-                throw new EmfException("The dataset named" + dsName + " does not exist");
-            }
-        }
 }

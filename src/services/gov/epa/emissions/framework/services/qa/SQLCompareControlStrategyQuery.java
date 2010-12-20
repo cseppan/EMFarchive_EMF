@@ -7,26 +7,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-public class SQLCompareControlStrategyQuery {
-    
-    private QAStep qaStep;
-
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
-    
-    //private static final String poundQueryTag = "#";
-    
-    private String emissioDatasourceName;
-    
-    private static final String invBaseTag = "-inv_base";
-    
-    private static final String invCompareTag = "-inv_compare";
-    
-    private static final String invTableTag = "-invtable";
-
-    private static final String summaryTypeTag = "-summaryType";
-
+public class SQLCompareControlStrategyQuery extends SQLQAProgramQuery {
     ArrayList<String> baseDatasetNames = new ArrayList<String>();
     
     ArrayList<String> compareDatasetNames = new ArrayList<String>();
@@ -34,10 +15,7 @@ public class SQLCompareControlStrategyQuery {
     //private boolean hasInvTableDataset;
     
     public SQLCompareControlStrategyQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName, String tableName, QAStep qaStep) {
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissioDatasourceName = emissioDatasourceName;
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
     }
         
     public String createCompareQuery() throws EmfException {
@@ -51,18 +29,18 @@ public class SQLCompareControlStrategyQuery {
         String summaryTypeToken = "Plant";
         //String invTableDatasetName = "";
         
-        int indexBase = programArguments.indexOf(invBaseTag);
-        int indexCompare = programArguments.indexOf(invCompareTag);
-        int indexInvTable = programArguments.indexOf(invTableTag);
-        int indexSumType = programArguments.indexOf(summaryTypeTag);
+        int indexBase = programArguments.indexOf(QAStep.invBaseTag);
+        int indexCompare = programArguments.indexOf(QAStep.invCompareTag);
+        int indexInvTable = programArguments.indexOf(QAStep.invTableTag);
+        int indexSumType = programArguments.indexOf(QAStep.summaryTypeTag);
         
         if (indexBase !=-1  && indexCompare !=-1 && indexInvTable != -1){
             invBaseToken = programArguments.substring(0, indexCompare).trim();
             invCompareToken = programArguments.substring(indexCompare, indexInvTable).trim();
-            invtableToken = programArguments.substring(indexInvTable + invTableTag.length(), indexSumType == -1 ? programArguments.length() : indexSumType);
+            invtableToken = programArguments.substring(indexInvTable + QAStep.invTableTag.length(), indexSumType == -1 ? programArguments.length() : indexSumType);
         }
         if (indexSumType != -1) {
-            summaryTypeToken = programArguments.substring(indexSumType + summaryTypeTag.length()).trim();
+            summaryTypeToken = programArguments.substring(indexSumType + QAStep.summaryTypeTag.length()).trim();
         } 
         //default just in case...
         if (summaryTypeToken.trim().length() == 0)
@@ -70,12 +48,14 @@ public class SQLCompareControlStrategyQuery {
 
          //parse inventories names for base and compare...
         if (invBaseToken.length() > 0 ) {
-            StringTokenizer tokenizer2 = new StringTokenizer(invBaseToken);
+            StringTokenizer tokenizer2 = new StringTokenizer(invBaseToken, "\n");
             tokenizer2.nextToken();
             while (tokenizer2.hasMoreTokens()) {
                 String datasetName = tokenizer2.nextToken().trim();
-                if (datasetName.length() > 0)
+                if (datasetName.length() > 0){
                     baseDatasetNames.add(datasetName);
+                    datasetNames.add(datasetName);
+                }
             }
             
         } else {
@@ -85,17 +65,21 @@ public class SQLCompareControlStrategyQuery {
         
         // get compare datasets
        if ( invCompareToken.length() > 0 ) {
-            StringTokenizer tokenizer2 = new StringTokenizer(invCompareToken);
+            StringTokenizer tokenizer2 = new StringTokenizer(invCompareToken, "\n");
             tokenizer2.nextToken();
             while (tokenizer2.hasMoreTokens()) {
                 String datasetName = tokenizer2.nextToken().trim();
-                if (datasetName.length() > 0)
+                if (datasetName.length() > 0){
                     compareDatasetNames.add(datasetName);
+                    datasetNames.add(datasetName);
+                }
             }
         } else {
             //see if there are tables to build the query with, if not throw an exception
             throw new EmfException("There are no control strategy deetailed datasets specified (compare).");
         }
+       
+        checkDataset();
 
          //parse inventory table name...
          StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
@@ -219,7 +203,7 @@ public class SQLCompareControlStrategyQuery {
     
     private String query(String partialQuery, boolean createClause) throws EmfException {
 
-        SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
+        SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName );
         return parser.parse(partialQuery, createClause);
     }
 

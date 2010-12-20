@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
@@ -21,8 +20,6 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.util.Date;
 import java.util.StringTokenizer;
-
-import org.hibernate.Session;
 
 public class EditQAStepPresenter {
 

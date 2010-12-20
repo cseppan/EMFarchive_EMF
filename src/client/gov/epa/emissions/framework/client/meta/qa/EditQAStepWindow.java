@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
-import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.db.version.Version;
@@ -18,7 +17,6 @@ import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.ExportButton;
 import gov.epa.emissions.commons.gui.buttons.RunButton;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
-import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -56,7 +54,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.swing.AbstractAction;
@@ -136,43 +133,6 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private String summaryType = "";
     private String emissionType = "";
-
-    private static final String invTag = "-inventories";
-    
-    private static final String invBaseTag = "-inv_base";
-    private static final String invCompareTag = "-inv_compare";
-
-    private static final String invTableTag = "-invtable";
-
-    private static final String summaryTypeTag = "-summaryType";
-    
-    private static final String filterTag = "-filter";
-    
-    private static final String emissionTypeTag = "-emissionType";
-
-    private static final String avgDaySummaryProgram = "Average day to Annual Summary";
-
-    private static final String avgDayToAnnualProgram = "Average day to Annual Inventory";
-
-    protected static final String compareVOCSpeciationWithHAPInventoryProgram = "Compare VOC Speciation With HAP Inventory";
-
-    private static final String fireDataSummaryProgram = "Fire Data Summary (Day-specific)";
-
-    private static final String MultiInvSumProgram = "Multi-inventory sum";
-
-    private static final String MultiInvRepProgram = "Multi-inventory column report";
-
-    private static final String COMPARE_DATASETS_PROGRAM = "Compare Datasets";
-    private static final String MultiInvDifRepProgram = "Multi-inventory difference report";
-    private static final String CompareControlStrategies = "Compare Control Strategies";
-    private static final String createMoEmisByCountyFromAnnEmisProgram = "Create monthly emissions by county from annual emissions";
-    private static final String compareAnnStateSummaryProgram = "Compare annual state summaries";
-    
-    private static final String smokeOutputAnnStateSummaryCrosstabProgram = "SMOKE output annual state summaries crosstab";
-    
-    private static final String ecControlScenarioProgram = "Estimate EC Impacts";
-    
-    private static final String sqlProgram = "SQL";
     
     public static final String smkRptTag = "-smkrpt";
 
@@ -638,14 +598,14 @@ poll|poll
         String programSwitches = "";
         boolean check = true;
         programSwitches = programArguments.getText();
-        int invTableIndex = programSwitches.indexOf(invTableTag);
-        int invIndex = programSwitches.indexOf(invTag);
-        int emiIndex = programSwitches.indexOf(emissionTypeTag);
-        int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+        int invTableIndex = programSwitches.indexOf(QAStep.invTableTag);
+        int invIndex = programSwitches.indexOf(QAStep.invTag);
+        int emiIndex = programSwitches.indexOf(QAStep.emissionTypeTag);
+        int sumTypeIndex = programSwitches.indexOf(QAStep.summaryTypeTag);
 
-        if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                || fireDataSummaryProgram.equals(program.getSelectedItem().toString())
-                || MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString()))
+        if (QAStep.avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
+                || QAStep.fireDataSummaryProgram.equals(program.getSelectedItem().toString())
+                || QAStep.MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString()))
         {
             if (!(programSwitches.trim().equals("")) && invIndex != -1 
                     && invTableIndex !=-1 && sumTypeIndex !=-1 ) {
@@ -662,7 +622,7 @@ poll|poll
             if (!check)
                 throw new EmfException(" Inventories, summary type are needed ");
 
-        }else if (compareVOCSpeciationWithHAPInventoryProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+        }else if (QAStep.compareVOCSpeciationWithHAPInventoryProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
 
             int capIndex = programSwitches.indexOf("-cap");
             int hapIndex = programSwitches.indexOf("-hap");
@@ -727,7 +687,7 @@ poll|poll
             if (errors.length() > 0) 
                 throw new EmfException(errors);
         
-        }else if (MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+        }else if (QAStep.MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
             if (!(programSwitches.trim().equals("")) && invIndex != -1 
                     && emiIndex !=-1 && invTableIndex !=-1 && sumTypeIndex !=-1) 
                  check =true; 
@@ -737,7 +697,7 @@ poll|poll
              if (!check)
                  throw new EmfException(" Inventories, summary type are needed "); 
         
-        } else if (avgDayToAnnualProgram.equals(program.getSelectedItem())) {
+        } else if (QAStep.avgDayToAnnualProgram.equals(program.getSelectedItem())) {
             // if argument is empty, return false
             if (!(programSwitches.trim().equals("")) && invIndex != -1) {
                 getInventories(programSwitches, 0, programSwitches.length());
@@ -747,27 +707,27 @@ poll|poll
                 check = false;
             if (!check)
                 throw new EmfException (" Inventories are needed ");
-        } else if (sqlProgram.equals(program.getSelectedItem())) {
+        } else if (QAStep.sqlProgram.equals(program.getSelectedItem())) {
             if (!programSwitches.trim().toUpperCase().startsWith("SELECT ")) {
                 check = false;
                 throw new EmfException(" SQL is not start with SELECT ");
             }
-        }else if (MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                || CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
+        }else if (QAStep.MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())
+                || QAStep.CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
             check = checkMultiInvDiff(programSwitches) ;
             if (!check)
                 throw new EmfException (" Both base and compare inventories are needed ");
-        } else if (createMoEmisByCountyFromAnnEmisProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+        } else if (QAStep.createMoEmisByCountyFromAnnEmisProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
             //
         }
         return check;
     }
     
     private boolean checkMultiInvDiff(String programSwitches) throws EmfException{
-        int baseIndex = programSwitches.indexOf(invBaseTag);
-        int compareIndex = programSwitches.indexOf(invCompareTag);
-        int invTableIndex = programSwitches.indexOf(invTableTag);
-        int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+        int baseIndex = programSwitches.indexOf(QAStep.invBaseTag);
+        int compareIndex = programSwitches.indexOf(QAStep.invCompareTag);
+        int invTableIndex = programSwitches.indexOf(QAStep.invTableTag);
+        int sumTypeIndex = programSwitches.indexOf(QAStep.summaryTypeTag);
         if (!(programSwitches.trim().equals("")) 
                 && baseIndex != -1 && compareIndex != -1
                 && sumTypeIndex != -1) {
@@ -801,16 +761,20 @@ poll|poll
         inventoriesString = programSwitches.substring(beginIndex, endIndex);
         StringTokenizer tokenizer2 = new StringTokenizer(inventoriesString, "\n");
         tokenizer2.nextToken(); // skip the flag
+        EmfDataset ds = null;
 
         while (tokenizer2.hasMoreTokens()) {
             try {
                 nextDataset = tokenizer2.nextToken().trim();
                 //System.out.println("----"+ nextDataset);
                 if (!nextDataset.isEmpty())
+                    ds = presenter.getDataset(nextDataset);
+                if ( ds !=null) 
                     inventoryList.add(presenter.getDataset(nextDataset));
+                else
+                    throw new EmfException("Could not get dataset --" + nextDataset);
             } catch (EmfException ex) {
-                //messagePanel.setError("The dataset name " + nextDataset + " is not valid");
-                 throw new EmfException("The dataset name " + nextDataset + " is not valid. ");
+                 throw new EmfException(ex.getMessage());
             }
         }
         return inventoryList;
@@ -929,34 +893,34 @@ poll|poll
                 clear();
                 saveButton.setEnabled(true);
                 runButton.setEnabled(true);
-                if (avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                        || fireDataSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
-                        || MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                if (QAStep.avgDaySummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
+                        || QAStep.fireDataSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())
+                        || QAStep.MultiInvSumProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showAvgDaySummaryWindow();
-                }else if (MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+                }else if (QAStep.MultiInvRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     showColumnSummaryWindow();
-                } else if (compareVOCSpeciationWithHAPInventoryProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+                } else if (QAStep.compareVOCSpeciationWithHAPInventoryProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     showCompareCAPHAPInventoriesWindow();
-                } else if (avgDayToAnnualProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+                } else if (QAStep.avgDayToAnnualProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     showAvgDayToAnnualWindow();
-                } else if (MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                } else if (QAStep.MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showMultiInvDiffWindow();
-                } else if (COMPARE_DATASETS_PROGRAM.equalsIgnoreCase(program.getSelectedItem().toString())){
+                } else if (QAStep.COMPARE_DATASETS_PROGRAM.equalsIgnoreCase(program.getSelectedItem().toString())){
                     try {
                         showCompareDatasetsWindow();
                     } catch (EmfException e1) {
                         // NOTE Auto-generated catch block
                         e1.printStackTrace();
                     }
-                } else if (CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
+                } else if (QAStep.CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showMultiInvDiffWindow();
-                } else if (createMoEmisByCountyFromAnnEmisProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                } else if (QAStep.createMoEmisByCountyFromAnnEmisProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showCreateMoEmisByCountyFromAnnEmisWindow();
-                } else if (compareAnnStateSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                } else if (QAStep.compareAnnStateSummaryProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showCompareAnnualStateSummariesWindow();
-                } else if (smokeOutputAnnStateSummaryCrosstabProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
+                } else if (QAStep.smokeOutputAnnStateSummaryCrosstabProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showAnnualStateSummariesCrosstabWindow();
-                } else if (ecControlScenarioProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
+                } else if (QAStep.ecControlScenarioProgram.equalsIgnoreCase(program.getSelectedItem().toString())) {
                     showECControlScenarioWindow();
                 }else{
                     doSetWindow();
@@ -980,20 +944,27 @@ poll|poll
         programSwitches = programArguments.getText();
         String programVal = program.getSelectedItem().toString();
         
-        int baseIndex = programSwitches.indexOf(invBaseTag);
-        int compareIndex = programSwitches.indexOf(invCompareTag);
-        int invTableIndex = programSwitches.indexOf(invTableTag);
-        int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+        int baseIndex = programSwitches.indexOf(QAStep.invBaseTag);
+        int compareIndex = programSwitches.indexOf(QAStep.invCompareTag);
+        int invTableIndex = programSwitches.indexOf(QAStep.invTableTag);
+        int sumTypeIndex = programSwitches.indexOf(QAStep.summaryTypeTag);
         if (!(programSwitches.trim().equals("")) 
                 && baseIndex != -1 && compareIndex != -1
                 && invTableIndex != -1 && sumTypeIndex != -1  ) {
             try {
                 getBaseInventories(programSwitches, 0, compareIndex);
+            } catch (EmfException e) {
+                System.out.println(e.getMessage());
+                messagePanel.setError(e.getMessage());
+            }
+            try{
                 getCompareInventories(programSwitches, compareIndex, invTableIndex);
                 getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
                 getSummaryType(programSwitches, sumTypeIndex);
             } catch (EmfException e) {
+                //e.printStackTrace();
                 messagePanel.setError(e.getMessage());
+                
 //            }finally {
 //                EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invCompare, invTables,
 //                        summaryType);
@@ -1001,7 +972,7 @@ poll|poll
 //                presenter.display(origDataset, step);
             }
         }
-        if (CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
+        if (QAStep.CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
             EditControlDetailedDiffWindow view = new EditControlDetailedDiffWindow(desktopManager, programVal, session, invBase, invCompare, summaryType);
             EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
             presenter.display(origDataset, step);
@@ -1117,24 +1088,7 @@ avd_emis=emis_avd
             }
         }
 
-        
-//        if (!(programSwitches.trim().equals("")) 
-//                && baseIndex != -1 && compareIndex != -1
-//                && invTableIndex != -1 && sumTypeIndex != -1  ) {
-//            try {
-//                getBaseInventories(programSwitches, 0, compareIndex);
-//                getCompareInventories(programSwitches, compareIndex, invTableIndex);
-//                getInventoryTable(programSwitches, invTableIndex, sumTypeIndex);
-//                getSummaryType(programSwitches, sumTypeIndex);
-//            } catch (EmfException e) {
-//                messagePanel.setError(e.getMessage());
-////            }finally {
-////                EditMultiInvDiffWindow view = new EditMultiInvDiffWindow(desktopManager, programVal, session, invBase, invCompare, invTables,
-////                        summaryType);
-////                EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this);
-////                presenter.display(origDataset, step);
-//            }
-//        }
+     
         CompareDatasetsQAProgamWindow view = new CompareDatasetsQAProgamWindow(desktopManager, programVal, session,
                 baseDatasetList.toArray(new DatasetVersion[0]), compareDatasetList.toArray(new DatasetVersion[0]),
 
@@ -1164,9 +1118,9 @@ avd_emis=emis_avd
         String programVal = program.getSelectedItem().toString();
         
         programSwitches = programArguments.getText();
-        int invTableIndex = programSwitches.indexOf(invTableTag);
-        int invIndex = programSwitches.indexOf(invTag);
-        int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+        int invTableIndex = programSwitches.indexOf(QAStep.invTableTag);
+        int invIndex = programSwitches.indexOf(QAStep.invTag);
+        int sumTypeIndex = programSwitches.indexOf(QAStep.summaryTypeTag);
         if (!(programSwitches.trim().equals("")) 
                 && invIndex != -1 && invTableIndex != -1 
                 && sumTypeIndex != -1) {
@@ -1204,10 +1158,10 @@ avd_emis=emis_avd
         String programVal = program.getSelectedItem().toString();
         
         programSwitches = programArguments.getText();
-        int invTableIndex = programSwitches.indexOf(invTableTag);
-        int invIndex = programSwitches.indexOf(invTag);
-        int emiIndex = programSwitches.indexOf(emissionTypeTag);
-        int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+        int invTableIndex = programSwitches.indexOf(QAStep.invTableTag);
+        int invIndex = programSwitches.indexOf(QAStep.invTag);
+        int emiIndex = programSwitches.indexOf(QAStep.emissionTypeTag);
+        int sumTypeIndex = programSwitches.indexOf(QAStep.summaryTypeTag);
         if (!(programSwitches.trim().equals("")) 
                 && invIndex != -1 && invTableIndex != -1 
                 && emiIndex !=-1 && sumTypeIndex != -1) {
@@ -1241,7 +1195,7 @@ avd_emis=emis_avd
         String programSwitches = "";
         String programVal = program.getSelectedItem().toString();
         programSwitches = programArguments.getText();
-        int invIndex = programSwitches.indexOf(invTag);
+        int invIndex = programSwitches.indexOf(QAStep.invTag);
         if (!(programSwitches.trim().equals("")) && invIndex != -1) {
             try {
                 getInventories(programSwitches, 0, programSwitches.length());
@@ -1258,141 +1212,6 @@ avd_emis=emis_avd
         presenter.display(origDataset, step);
 
     }
-
-//    public class CompareCAPHAPInventoriesInputs {
-//        private EmfDataset capInventory = null;
-//        private EmfDataset hapInventory = null;
-//        private EmfDataset speciationToolSpecieInfoDataset = null;
-//        private EmfDataset pollToPollConversionDataset = null;
-//        private EmfDataset [] speciationProfileWeightDatasets = null; 
-//        private EmfDataset [] speciationCrossReferenceDatasets = null;
-//        private String summaryType = "";
-//        
-//        public CompareCAPHAPInventoriesInputs(EmfDataset capInventory,
-//            EmfDataset hapInventory,
-//            EmfDataset speciationToolSpecieInfoDataset,
-//            EmfDataset pollToPollConversionDataset,
-//            EmfDataset [] speciationProfileWeightDatasets,
-//            EmfDataset [] speciationCrossReferenceDatasets,
-//            String summaryType) {
-//            this.setCapInventory(capInventory);
-//            this.setHapInventory(hapInventory);
-//            this.setSpeciationToolSpecieInfoDataset(speciationToolSpecieInfoDataset);
-//            this.setPollToPollConversionDataset(pollToPollConversionDataset);
-//            this.setSpeciationProfileWeightDatasets(speciationProfileWeightDatasets); 
-//            this.setSpeciationCrossReferenceDatasets(speciationCrossReferenceDatasets);
-//            this.setSummaryType(summaryType);
-//        }
-//
-//        public void setCapInventory(EmfDataset capInventory) {
-//            this.capInventory = capInventory;
-//        }
-//
-//        public EmfDataset getCapInventory() {
-//            return capInventory;
-//        }
-//
-//        public void setHapInventory(EmfDataset hapInventory) {
-//            this.hapInventory = hapInventory;
-//        }
-//
-//        public EmfDataset getHapInventory() {
-//            return hapInventory;
-//        }
-//
-//        public void setSpeciationToolSpecieInfoDataset(EmfDataset speciationToolSpecieInfoDataset) {
-//            this.speciationToolSpecieInfoDataset = speciationToolSpecieInfoDataset;
-//        }
-//
-//        public EmfDataset getSpeciationToolSpecieInfoDataset() {
-//            return speciationToolSpecieInfoDataset;
-//        }
-//
-//        public void setPollToPollConversionDataset(EmfDataset pollToPollConversionDataset) {
-//            this.pollToPollConversionDataset = pollToPollConversionDataset;
-//        }
-//
-//        public EmfDataset getPollToPollConversionDataset() {
-//            return pollToPollConversionDataset;
-//        }
-//
-//        public void setSpeciationProfileWeightDatasets(EmfDataset [] speciationProfileWeightDatasets) {
-//            this.speciationProfileWeightDatasets = speciationProfileWeightDatasets;
-//        }
-//
-//        public EmfDataset [] getSpeciationProfileWeightDatasets() {
-//            return speciationProfileWeightDatasets;
-//        }
-//
-//        public void setSpeciationCrossReferenceDatasets(EmfDataset [] speciationCrossReferenceDatasets) {
-//            this.speciationCrossReferenceDatasets = speciationCrossReferenceDatasets;
-//        }
-//
-//        public EmfDataset [] getSpeciationCrossReferenceDatasets() {
-//            return speciationCrossReferenceDatasets;
-//        }
-//
-//        public void setSummaryType(String summaryType) {
-//            this.summaryType = summaryType;
-//        }
-//
-//        public String getSummaryType() {
-//            return summaryType;
-//        }
-//    }
-//    
-//    private CompareCAPHAPInventoriesInputs getCompareCAPHAPInventoriesInputs(String programSwitches) throws EmfException {
-//        
-//        int capIndex = programSwitches.indexOf("-cap");
-//        int hapIndex = programSwitches.indexOf("-hap");
-//        int gstsiIndex = programSwitches.indexOf("-gstsi");
-//        int gscnvIndex = programSwitches.indexOf("-gscnv");
-//        int gspwIndex = programSwitches.indexOf("-gspw");
-//        int gsrefIndex = programSwitches.indexOf("-gsref");
-//        int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
-//        EmfDataset capInventory = null;
-//        EmfDataset hapInventory = null;
-//        EmfDataset speciationToolSpecieInfoDataset = null;
-//        EmfDataset pollToPollConversionDataset = null;
-//        EmfDataset [] speciationProfileWeightDatasets = null; 
-//        EmfDataset [] speciationCrossReferenceDatasets = null;
-//        EmfDataset[] datasets;
-//        String summaryType = "";
-//        CompareCAPHAPInventoriesInputs compareCAPHAPInventoriesInputs = null;
-//        if (capIndex != -1) {
-//            datasets = getDatasets(programSwitches, capIndex, programSwitches.indexOf("\n-", capIndex) != -1 ? programSwitches.indexOf("\n-", capIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
-//            if (datasets != null && datasets.length > 0) capInventory = datasets[0];
-//        }
-//        if (hapIndex != -1) {
-//            datasets = getDatasets(programSwitches, hapIndex, programSwitches.indexOf("\n-", hapIndex) != -1 ? programSwitches.indexOf("\n-", hapIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
-//            if (datasets != null && datasets.length > 0) hapInventory = datasets[0];
-//        }
-//        if (gstsiIndex != -1) {
-//            datasets = getDatasets(programSwitches, gstsiIndex, programSwitches.indexOf("\n-", gstsiIndex) != -1 ? programSwitches.indexOf("\n-", gstsiIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
-//            if (datasets != null && datasets.length > 0) speciationToolSpecieInfoDataset = datasets[0];
-//        }
-//        if (gscnvIndex != -1) {
-//            datasets = getDatasets(programSwitches, gscnvIndex, programSwitches.indexOf("\n-", gscnvIndex) != -1 ? programSwitches.indexOf("\n-", gscnvIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
-//            if (datasets != null && datasets.length > 0) pollToPollConversionDataset = datasets[0];
-//        }
-//        if (gspwIndex != -1) {
-//            datasets = getDatasets(programSwitches, gspwIndex, programSwitches.indexOf("\n-", gspwIndex) != -1 ? programSwitches.indexOf("\n-", gspwIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
-//            if (datasets != null && datasets.length > 0) speciationProfileWeightDatasets = datasets;
-//        }
-//        if (gsrefIndex != -1) {
-//            datasets = getDatasets(programSwitches, gsrefIndex, programSwitches.indexOf("\n-", gsrefIndex) != -1 ? programSwitches.indexOf("\n-", gsrefIndex) : programSwitches.length()).toArray(new EmfDataset[0]);
-//            if (datasets != null && datasets.length > 0) speciationCrossReferenceDatasets = datasets;
-//        }
-//        summaryType = getSummaryType(programSwitches, sumTypeIndex, programSwitches.indexOf("\n-", sumTypeIndex) != -1 ? programSwitches.indexOf("\n-", sumTypeIndex) : programSwitches.length());
-//        compareCAPHAPInventoriesInputs = new CompareCAPHAPInventoriesInputs(capInventory,
-//                hapInventory,
-//                speciationToolSpecieInfoDataset,
-//                pollToPollConversionDataset,
-//                speciationProfileWeightDatasets,
-//                speciationCrossReferenceDatasets,
-//                summaryType);
-//        return compareCAPHAPInventoriesInputs;
-//    }
     
     private void showCompareCAPHAPInventoriesWindow() {
         // When there is no data in window, set button causes new window to pop up,
@@ -1414,7 +1233,7 @@ avd_emis=emis_avd
             int gspwIndex = programSwitches.indexOf("-gspw");
             int gsrefIndex = programSwitches.indexOf("-gsref");
             int filterIndex = programSwitches.indexOf("-filter");
-            int sumTypeIndex = programSwitches.indexOf(summaryTypeTag);
+            int sumTypeIndex = programSwitches.indexOf(QAStep.summaryTypeTag);
             EmfDataset capInventory = null;
             EmfDataset hapInventory = null;
             EmfDataset speciationToolSpecieInfoDataset = null;
@@ -1584,7 +1403,7 @@ avd_emis=emis_avd
         String programVal = program.getSelectedItem().toString();
         String programSwitches = programArguments.getText();        
         try {
-            int invIndex = programSwitches.indexOf(invTag);
+            int invIndex = programSwitches.indexOf(QAStep.invTag);
             int detailedResultIndex = programSwitches.indexOf(detailedResultTag);
             int gsproIndex = programSwitches.indexOf(gsproTag);
             int gsrefIndex = programSwitches.indexOf(gsrefTag);
@@ -1723,10 +1542,10 @@ avd_emis=emis_avd
             String summaryType) {
         clear();
         String datasetNames = "";
-        datasetNames += getInvString(invTag, retreivedInventories);
-        datasetNames += getInvString(invTableTag, retrievedInvTable);
+        datasetNames += getInvString(QAStep.invTag, retreivedInventories);
+        datasetNames += getInvString(QAStep.invTableTag, retrievedInvTable);
         
-        datasetNames += summaryTypeTag + lineFeeder;
+        datasetNames += QAStep.summaryTypeTag + lineFeeder;
         if (summaryType.length() > 0)
             datasetNames += summaryType + lineFeeder ;
         updateArgumentsTextArea(datasetNames);
@@ -1737,14 +1556,14 @@ avd_emis=emis_avd
             String summaryType, String emissionType) {
         clear();
         String datasetNames = "";
-        datasetNames += getInvString(invTag, retreivedInventories);
-        datasetNames += getInvString(invTableTag, retrievedInvTable);
+        datasetNames += getInvString(QAStep.invTag, retreivedInventories);
+        datasetNames += getInvString(QAStep.invTableTag, retrievedInvTable);
         
-        datasetNames += emissionTypeTag + lineFeeder;
+        datasetNames += QAStep.emissionTypeTag + lineFeeder;
         if (emissionType.length() > 0)
             datasetNames += emissionType + lineFeeder ;
         
-        datasetNames += summaryTypeTag + lineFeeder;
+        datasetNames += QAStep.summaryTypeTag + lineFeeder;
         if (summaryType.length() > 0)
             datasetNames += summaryType + lineFeeder ;
         updateArgumentsTextArea(datasetNames);
@@ -1754,11 +1573,11 @@ avd_emis=emis_avd
     public void updateInventories(Object[] invBase, Object[] invCompare, Object[] invTables, String summaryType) {
         clear();
         String datasetNames = "";
-        datasetNames += getInvString(invBaseTag, invBase);
-        datasetNames += getInvString(invCompareTag, invCompare);
-        datasetNames += getInvString(invTableTag, invTables);
+        datasetNames += getInvString(QAStep.invBaseTag, invBase);
+        datasetNames += getInvString(QAStep.invCompareTag, invCompare);
+        datasetNames += getInvString(QAStep.invTableTag, invTables);
         
-        datasetNames += summaryTypeTag + lineFeeder;
+        datasetNames += QAStep.summaryTypeTag + lineFeeder;
         if (summaryType.length() > 0)
             datasetNames += summaryType + lineFeeder;
 
@@ -1782,10 +1601,10 @@ avd_emis=emis_avd
         if (speciationProfileWeightDatasets != null) datasetNames += getInvString("-gspw", speciationProfileWeightDatasets);
         if (speciationCrossReferenceDatasets != null) datasetNames += getInvString("-gsref", speciationCrossReferenceDatasets);
 
-        datasetNames += summaryTypeTag + lineFeeder;
+        datasetNames += QAStep.summaryTypeTag + lineFeeder;
         if (summaryType != null && summaryType.length() > 0)
             datasetNames += summaryType + lineFeeder;
-        datasetNames += filterTag + lineFeeder;
+        datasetNames += QAStep.filterTag + lineFeeder;
         if (filter != null && filter.length() > 0)
             datasetNames += filter + lineFeeder;
 
@@ -1812,7 +1631,7 @@ avd_emis=emis_avd
 
         clear();
         String datasetNames = "";
-        datasetNames += getInvString(invTag, retreivedInventories);
+        datasetNames += getInvString(QAStep.invTag, retreivedInventories);
         updateArgumentsTextArea(datasetNames);
     }
 
@@ -2022,7 +1841,7 @@ avd_emis=emis_avd
             Object[] gsrefs, Object[] gspros) {
         clear();
         String arguments = "";
-        if (inventory != null) arguments += getInvString(invTag, new Object[] {inventory});
+        if (inventory != null) arguments += getInvString(QAStep.invTag, new Object[] {inventory});
         if (detailedResult != null) arguments += getInvString(detailedResultTag, new Object[] {detailedResult});
         if (gsrefs != null) arguments += getTagString(gsrefTag, gsrefs);
         if (gspros != null) arguments += getTagString(gsproTag, gspros);

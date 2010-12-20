@@ -10,7 +10,6 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.DateUtil;
-import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -23,20 +22,10 @@ import java.util.StringTokenizer;
 
 import org.hibernate.Session;
 
-public class SQLECControlScenarioQuery {
-    
-    private QAStep qaStep;
-
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
+public class SQLECControlScenarioQuery extends SQLQAProgramQuery{
     
     private DbServer dbServer;
     
-    private String emissionDatasourceName;
-    
-    private DatasetDAO dao;
-
     public static final String invTag = "-inv";
 
     public static final String gsrefTag = "-gsref";
@@ -48,11 +37,7 @@ public class SQLECControlScenarioQuery {
     public SQLECControlScenarioQuery(HibernateSessionFactory sessionFactory, DbServer dbServer, 
             String emissioDatasourceName, String tableName, 
             QAStep qaStep) {
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissionDatasourceName = emissioDatasourceName;
-        this.dao = new DatasetDAO();
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
         this.dbServer = dbServer;
     }
 
@@ -73,24 +58,6 @@ public class SQLECControlScenarioQuery {
         return inventoryList.toArray(new String[0]);
     }
     
-//    private String parseSummaryType(String programSwitches, int beginIndex, int endIndex) {
-//        String value = "";
-//        String valuesString = "";
-//        
-//        valuesString = programSwitches.substring(beginIndex, endIndex);
-//        StringTokenizer tokenizer2 = new StringTokenizer(valuesString, "\n");
-//        tokenizer2.nextToken(); // skip the switch tag
-//
-//        //get only the first value, that is not empty...
-//        while (tokenizer2.hasMoreTokens()) {
-//            value = tokenizer2.nextToken().trim();
-//            if (!value.isEmpty()) 
-//                break;
-//        }
-//        return value;
-//    }
-
-
     private  KeyVal[] keyValFound(EmfDataset dataset, String keyword) {
         KeyVal[] keys = dataset.getKeyVals();
         List<KeyVal> list = new ArrayList<KeyVal>();
@@ -123,19 +90,30 @@ public class SQLECControlScenarioQuery {
 
         if (invIndex != -1) {
             arguments = parseSwitchArguments(programArguments, invIndex, programArguments.indexOf("\n-", invIndex) != -1 ? programArguments.indexOf("\n-", invIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) inventoryName = arguments[0];
+            if (arguments != null && arguments.length > 0)  inventoryName = arguments[0];
         }
         if (gsproIndex != -1) {
             arguments = parseSwitchArguments(programArguments, gsproIndex, programArguments.indexOf("\n-", gsproIndex) != -1 ? programArguments.indexOf("\n-", gsproIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) gsproNames = arguments;
+            if (arguments != null && arguments.length > 0) {
+                gsproNames = arguments;
+                for ( String item : gsproNames )
+                    datasetNames.add(item);
+            }
         }
         if (gsrefIndex != -1) {
             arguments = parseSwitchArguments(programArguments, gsrefIndex, programArguments.indexOf("\n-", gsrefIndex) != -1 ? programArguments.indexOf("\n-", gsrefIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) gsrefNames = arguments;
+            if (arguments != null && arguments.length > 0) {
+                gsrefNames = arguments;
+                for ( String item : gsproNames )
+                datasetNames.add(item);
+            }
         }
         if (detailedResultIndex != -1) {
             arguments = parseSwitchArguments(programArguments, detailedResultIndex, programArguments.indexOf("\n-", detailedResultIndex) != -1 ? programArguments.indexOf("\n-", detailedResultIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) detailedResultName = arguments[0];
+            if (arguments != null && arguments.length > 0) {
+                detailedResultName = arguments[0];
+                datasetNames.add(detailedResultName);
+            }
         }
         
         //validate everything has been specified...
@@ -153,16 +131,18 @@ public class SQLECControlScenarioQuery {
 //        if (detailedResultName == null || detailedResultName.length() == 0) {
 //            errors += "Missing " + DatasetType.strategyDetailedResult + " dataset. ";
 //        }
-
+        //go ahead and throw error from here, no need to validate anymore if the above is not there...
+        if (errors.length() > 0) {
+            throw new EmfException(errors);
+        }
+        
+        checkDataset();
         //make sure the all the datasets actually exist
         EmfDataset[] gspros  = new EmfDataset[] {};
         if (gsproNames != null) {
             gspros = new EmfDataset[gsproNames.length];
             for (int i = 0; i < gsproNames.length; i++) {
                 gspros[i] = getDataset(gsproNames[i]);
-                if (gspros[i] == null) {
-                    errors += "Uknown " + DatasetType.chemicalSpeciationProfilesGSPRO + " dataset, " + gsproNames[i] + ". ";
-                }
             }
         }
         EmfDataset[] gsrefs = new EmfDataset[] {};
@@ -170,9 +150,6 @@ public class SQLECControlScenarioQuery {
             gsrefs = new EmfDataset[gsrefNames.length];
             for (int i = 0; i < gsrefNames.length; i++) {
                 gsrefs[i] = getDataset(gsrefNames[i]);
-                if (gsrefs[i] == null) {
-                    errors += "Uknown " + DatasetType.chemicalSpeciationCrossReferenceGSREF + " dataset, " + gsrefNames[i] + ". ";
-                }
             }
         }
         
@@ -185,9 +162,7 @@ public class SQLECControlScenarioQuery {
         } else {
             detailedResult = getDataset(detailedResultName);
         }
-        if (detailedResult == null) {
-            errors += "Uknown " + DatasetType.strategyDetailedResult + " dataset, " + detailedResultName + ". ";
-        }
+        
         String detailedResultTableName = qualifiedEmissionTableName(detailedResult);
         String detailedResultVersion = new VersionedQuery(version(detailedResult.getId(), detailedResult.getDefaultVersion()), "dr").query();
 
@@ -217,15 +192,6 @@ public class SQLECControlScenarioQuery {
         }
 
         inventory = getDataset(inventoryName);
-        if (inventory == null) {
-            //then lets 
-            errors += "Uknown inventory dataset, " + inventoryName + ". ";
-        }
-
-        //go ahead and throw errors from here, if there are some...
-        if (errors.length() > 0) {
-            throw new EmfException(errors);
-        }
         
         //use the inventory default version if one can't be found
         if (inventoryVersionNumber == null) 
@@ -511,18 +477,6 @@ public class SQLECControlScenarioQuery {
 
         SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName );
         return parser.parse(partialQuery, createClause);
-    }
-
-    private EmfDataset getDataset(String dsName) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getDataset(session, dsName);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new EmfException("The dataset name " + dsName + " is not valid");
-        } finally {
-            session.close();
-        }
     }
 
     private EmfDataset getDataset(int dsId) throws EmfException {

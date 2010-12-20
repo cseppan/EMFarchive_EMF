@@ -7,7 +7,6 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -22,21 +21,9 @@ import java.util.StringTokenizer;
 
 import org.hibernate.Session;
 
-public class SQLCreateMoEmisByCtyFromAnnEmisQuery {
-    
-    private QAStep qaStep;
-
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
+public class SQLCreateMoEmisByCtyFromAnnEmisQuery extends SQLQAProgramQuery{
     
     private DbServer dbServer;
-    
-    //private static final String poundQueryTag = "#";
-    
-    private String emissionDatasourceName;
-    
-    private DatasetDAO dao;
 
     public static final String smkRptTag = "-smkrpt";
     
@@ -48,16 +35,10 @@ public class SQLCreateMoEmisByCtyFromAnnEmisQuery {
     
     ArrayList<String> compareDatasetNames = new ArrayList<String>();
     
-    //private boolean hasInvTableDataset;
-    
     public SQLCreateMoEmisByCtyFromAnnEmisQuery(HibernateSessionFactory sessionFactory, DbServer dbServer, 
             String emissioDatasourceName, String tableName, 
             QAStep qaStep) {
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissionDatasourceName = emissioDatasourceName;
-        this.dao = new DatasetDAO();
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
         this.dbServer = dbServer;
     }
 
@@ -77,23 +58,6 @@ public class SQLCreateMoEmisByCtyFromAnnEmisQuery {
         }
         return inventoryList.toArray(new String[0]);
     }
-    
-//    private String parseSummaryType(String programSwitches, int beginIndex, int endIndex) {
-//        String value = "";
-//        String valuesString = "";
-//        
-//        valuesString = programSwitches.substring(beginIndex, endIndex);
-//        StringTokenizer tokenizer2 = new StringTokenizer(valuesString, "\n");
-//        tokenizer2.nextToken(); // skip the switch tag
-//
-//        //get only the first value, that is not empty...
-//        while (tokenizer2.hasMoreTokens()) {
-//            value = tokenizer2.nextToken().trim();
-//            if (!value.isEmpty()) 
-//                break;
-//        }
-//        return value;
-//    }
 
     public String createCompareQuery() throws EmfException {
         String sql = "";
@@ -113,12 +77,20 @@ public class SQLCreateMoEmisByCtyFromAnnEmisQuery {
 
         if (temporalProfileIndex != -1) {
             arguments = parseSwitchArguments(programArguments, temporalProfileIndex, programArguments.indexOf("\n-", temporalProfileIndex) != -1 ? programArguments.indexOf("\n-", temporalProfileIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) temporalProfileName = arguments[0];
+            if (arguments != null && arguments.length > 0) {
+                temporalProfileName = arguments[0];
+                datasetNames.add(temporalProfileName);
+            }
         }
         if (smkRptIndex != -1) {
             arguments = parseSwitchArguments(programArguments, smkRptIndex, programArguments.indexOf("\n-", smkRptIndex) != -1 ? programArguments.indexOf("\n-", smkRptIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) smkRptNames = arguments;
+            if (arguments != null && arguments.length > 0) {
+                smkRptNames = arguments;
+                for (String item: smkRptNames)
+                    datasetNames.add(item);
+            }
         }
+        
         if (yearIndex != -1) {
             arguments = parseSwitchArguments(programArguments, yearIndex, programArguments.indexOf("\n-", yearIndex) != -1 ? programArguments.indexOf("\n-", yearIndex) : programArguments.length());
             if (arguments != null && arguments.length > 0) if (arguments[0] != null && arguments[0].trim().length() > 0) yearAsString = arguments[0].trim();
@@ -142,26 +114,21 @@ public class SQLCreateMoEmisByCtyFromAnnEmisQuery {
                 errors += "The year is not valid format, it must be a number. ";
             }
         }
-
+        
+        if (errors.length() > 0) {
+            throw new EmfException(errors);
+        }
+        
+        checkDataset();
         //make sure the all the datasets actually exist
         EmfDataset temporalProfile = getDataset(temporalProfileName);
-        if (temporalProfile == null) {
-            errors += "Missing temporal profile dataset. ";
-        }
+       
         String temporalProfileTable = qualifiedEmissionTableName(temporalProfile);
         String temporalProfileVersion = new VersionedQuery(version(temporalProfile.getId(), temporalProfile.getDefaultVersion()), "t").query();
 
         EmfDataset[] smkRpts = new EmfDataset[smkRptNames.length];
         for (int i = 0; i < smkRptNames.length; i++) {
             smkRpts[i] = getDataset(smkRptNames[i]);
-            if (smkRpts[i] == null) {
-                errors += "Missing Smkreport county-moncode annual dataset, " + smkRptNames[i] + ". ";
-            }
-        }
-        
-        //go ahead and throw error from here, no need to validate anymore if the above is not there...
-        if (errors.length() > 0) {
-            throw new EmfException(errors);
         }
         
         //look to see if the sector has been specified and also see if the sector 
@@ -177,14 +144,6 @@ public class SQLCreateMoEmisByCtyFromAnnEmisQuery {
                 throw new EmfException("Another dataset, " + sectorMap.get(sector).getName() + ", is already using this sector, " + sector + ".  A paticular sector can only be associated to one SMOKE Report.");
             }
         }        
-        
-        //go ahead and throw errors from here, if there are some...
-        if (errors.length() > 0) {
-            throw new EmfException(errors);
-        }
-        
-//        capIsPoint = checkTableForColumns(emissionTableName(dataset), "plantid,pointid,stackid,segment");
-        
         
         String sumWeightsForYear = "(jan + feb + mar + apr + may + jun + jul + aug + sep + oct + nov + dece)";
         
@@ -349,18 +308,6 @@ public class SQLCreateMoEmisByCtyFromAnnEmisQuery {
 
         SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName );
         return parser.parse(partialQuery, createClause);
-    }
-
-    private EmfDataset getDataset(String dsName) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getDataset(session, dsName);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new EmfException("The dataset name " + dsName + " is not valid");
-        } finally {
-            session.close();
-        }
     }
 
     private String getDatasetSector(EmfDataset dataset) throws EmfException {

@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -9,33 +8,14 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-public class SQLQAAnnualQuery {
+public class SQLQAAnnualQuery extends SQLQAProgramQuery{
     
     // Input is currently a set of 12 or 24 or 12*n monthly files
     // The lists are filled using command-line and/or GUI input.
     
-    private QAStep qaStep;
 
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
-    
-    private static final String poundQueryTag = "#";
-    
-    private String emissioDatasourceName;
-    
-    private static final String invTableTag = "-invtable";
-    
-    private static final String summaryTypeTag = "-summaryType";
-    
-    private boolean hasInvTableDataset;
-
-    public SQLQAAnnualQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName, String tableName, QAStep qaStep) {
-        
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissioDatasourceName = emissioDatasourceName;
+    public SQLQAAnnualQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName, String tableName, QAStep qaStep) {       
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
         
     }
     
@@ -81,41 +61,45 @@ public class SQLQAAnnualQuery {
         String summaryTypeToken = "State+SCC";
         String invTableDatasetName = "";
         
-        int index1 = programArguments.indexOf(invTableTag);
-        int index2 = programArguments.indexOf(summaryTypeTag);
+        int index1 = programArguments.indexOf(QAStep.invTableTag);
+        int index2 = programArguments.indexOf(QAStep.summaryTypeTag);
         inventoriesToken = programArguments.substring(0, index1);
-        invtableToken = programArguments.substring(index1 + invTableTag.length(),index2 == -1 ? programArguments.length() : index2 );
+        invtableToken = programArguments.substring(index1 + QAStep.invTableTag.length(),index2 == -1 ? programArguments.length() : index2 );
 
         if (index2 != -1) {
-            summaryTypeToken = programArguments.substring(index2 + summaryTypeTag.length()).trim();
+            summaryTypeToken = programArguments.substring(index2 + QAStep.summaryTypeTag.length()).trim();
         } 
         
       //default just in case...
         if (summaryTypeToken.trim().length() == 0)
             summaryTypeToken = "State+SCC";
         
-         StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken);
+         StringTokenizer tokenizer2 = new StringTokenizer(inventoriesToken, "\n");
          tokenizer2.nextToken();
          while (tokenizer2.hasMoreTokens()) {
              String datasetName = tokenizer2.nextToken().trim();
-//             System.out.println("The dataset name is : \n" + datasetName);
-             if (datasetName.length() > 0)
+             //System.out.println("The dataset name is : \n" + datasetName);
+             if (datasetName.length() > 0){
                  allDatasetNames.add(datasetName);
+                 datasetNames.add(datasetName);
+             }
              else {
                  //see if there are tables to build the query with, if not throw an exception
                  throw new EmfException("There are no Onroad Inventory datasets specified.");
              }
          }
-         StringTokenizer tokenizer3 = new StringTokenizer(invtableToken);
+         StringTokenizer tokenizer3 = new StringTokenizer(invtableToken, "\n");
          while (tokenizer3.hasMoreTokens()) {
              invTableDatasetName  = tokenizer3.nextToken().trim();
-             if (invTableDatasetName.length() > 0) hasInvTableDataset = true;
+             if (invTableDatasetName.length() > 0) {
+                 hasInvTableDataset = true;
+                 datasetNames.add(invTableDatasetName);
+             }
          }
 
-         //System.out.println("TheArrayList is : \n" + allDatasetNames +allDatasetNames.size());
-
-        //Create the outer query
+        checkDataset();
         
+        //Create the outer query        
         String outerQuery = "select @!@, coalesce(" + (hasInvTableDataset ? "i.name," : "") + "p.pollutant_code_desc, te.poll) as poll," //"select @!@, i.name, sum(coalesce(cast(i.factor as double precision)* mo_emis, 1.0*mo_emis)) as ann_emis from\n # as te left outer join\n $DATASET_TABLE[\"" + invTableDatasetName + "\", 1] i on te.poll = i.cas  group by @@@, i.name order by @@@, i.name";
             + "sum(" + (hasInvTableDataset ? "coalesce(cast(i.factor as double precision), 1.0)" : "1.0") + " * mo_emis) as ann_emis "
             + "from\n # as te "
@@ -131,14 +115,14 @@ public class SQLQAAnnualQuery {
         //System.out.println("The query so far is: \n" + fullQuery);
         
         //Find the pound tag to make the substitution of the monthly query part.
-        int index = almostQuery.indexOf(poundQueryTag);
+        int index = almostQuery.indexOf(QAStep.poundQueryTag);
         if (index == -1)
-            throw new EmfException("The '" + poundQueryTag + "' is expected in the program arguments");
+            throw new EmfException("The '" + QAStep.poundQueryTag + "' is expected in the program arguments");
         
         //Break up the token into a prefix and suffix string.
         
         String annualQueryPrefix = almostQuery.substring(0, index);
-        String annualQuerySuffix = almostQuery.substring(index + poundQueryTag.length());
+        String annualQuerySuffix = almostQuery.substring(index + QAStep.poundQueryTag.length());
         
         // Add a new section to take the different dataset names (which will be input through the GUI window).
         
@@ -399,18 +383,8 @@ public class SQLQAAnnualQuery {
         //private String query(DbServer dbServer, QAStep qaStep, String tableName, String partialQuery, EmfDataset dataset, Version version) throws EmfException {
         private String query(String partialQuery, boolean createClause) throws EmfException {
             
-            SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
+            SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName );
             return parser.parse(partialQuery, createClause);
         }
         
-        private EmfDataset getDataset(String dsName) throws EmfException {
-//            System.out.println("Database name = \n" + dsName + "\n");
-            DatasetDAO dao = new DatasetDAO();
-            try {
-                return dao.getDataset(sessionFactory.getSession(), dsName);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                throw new EmfException("The dataset name " + dsName + " is not valid");
-            }
-        }
 }

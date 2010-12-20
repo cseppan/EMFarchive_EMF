@@ -9,7 +9,6 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.DateUtil;
-import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -22,25 +21,13 @@ import java.util.StringTokenizer;
 
 import org.hibernate.Session;
 
-public class SQLCompareAnnualStateSummariesQuery {
-
-    private QAStep qaStep;
-
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
+public class SQLCompareAnnualStateSummariesQuery extends SQLQAProgramQuery {
 
     private DbServer dbServer;
-
-    private String emissionDatasourceName;
-
-    private DatasetDAO dao;
-
-    public static final String smkRptTag = "-smkrpt";
-
+    
     public static final String invTag = "-inv";
 
-    public static final String invTableTag = "-invtable";
+    public static final String smkRptTag = "-smkrpt";
 
     public static final String toleranceTag = "-tolerance";
 
@@ -48,11 +35,7 @@ public class SQLCompareAnnualStateSummariesQuery {
 
     public SQLCompareAnnualStateSummariesQuery(HibernateSessionFactory sessionFactory, DbServer dbServer,
             String emissioDatasourceName, String tableName, QAStep qaStep) {
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissionDatasourceName = emissioDatasourceName;
-        this.dao = new DatasetDAO();
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
         this.dbServer = dbServer;
     }
 
@@ -73,30 +56,13 @@ public class SQLCompareAnnualStateSummariesQuery {
         return inventoryList.toArray(new String[0]);
     }
 
-    // private String parseSummaryType(String programSwitches, int beginIndex, int endIndex) {
-    // String value = "";
-    // String valuesString = "";
-    //        
-    // valuesString = programSwitches.substring(beginIndex, endIndex);
-    // StringTokenizer tokenizer2 = new StringTokenizer(valuesString, "\n");
-    // tokenizer2.nextToken(); // skip the switch tag
-    //
-    // //get only the first value, that is not empty...
-    // while (tokenizer2.hasMoreTokens()) {
-    // value = tokenizer2.nextToken().trim();
-    // if (!value.isEmpty())
-    // break;
-    // }
-    // return value;
-    // }
-
     public String createCompareQuery() throws EmfException {
         String sql = "";
         String programArguments = qaStep.getProgramArguments();
 
         int smkRptIndex = programArguments.indexOf(smkRptTag);
         int invIndex = programArguments.indexOf(invTag);
-        int invTableIndex = programArguments.indexOf(invTableTag);
+        int invTableIndex = programArguments.indexOf(QAStep.invTableTag);
         int toleranceIndex = programArguments.indexOf(toleranceTag);
         int coStCyIndex = programArguments.indexOf(coStCyTag);
         // int yearIndex = programArguments.indexOf(yearTag);
@@ -114,34 +80,46 @@ public class SQLCompareAnnualStateSummariesQuery {
             arguments = parseSwitchArguments(programArguments, invIndex,
                     programArguments.indexOf("\n-", invIndex) != -1 ? programArguments.indexOf("\n-", invIndex)
                             : programArguments.length());
-            if (arguments != null && arguments.length > 0)
+            if (arguments != null && arguments.length > 0){
                 inventoryNames = arguments;
+                for (String item: inventoryNames)
+                    datasetNames.add(item);
+            }
         }
         if (smkRptIndex != -1) {
             arguments = parseSwitchArguments(programArguments, smkRptIndex, programArguments
                     .indexOf("\n-", smkRptIndex) != -1 ? programArguments.indexOf("\n-", smkRptIndex)
                     : programArguments.length());
-            if (arguments != null && arguments.length > 0)
+            if (arguments != null && arguments.length > 0){
                 smkRptNames = arguments;
+                for (String item: smkRptNames)
+                    datasetNames.add(item);
+            }
         }
         if (invTableIndex != -1) {
             arguments = parseSwitchArguments(programArguments, invTableIndex, programArguments.indexOf("\n-",
                     invTableIndex) != -1 ? programArguments.indexOf("\n-", invTableIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0)
+            if (arguments != null && arguments.length > 0){
                 invTableName = arguments[0];
+                datasetNames.add(invTableName);
+            }
         }
         if (toleranceIndex != -1) {
             arguments = parseSwitchArguments(programArguments, toleranceIndex, programArguments.indexOf("\n-",
                     toleranceIndex) != -1 ? programArguments.indexOf("\n-", toleranceIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0)
+            if (arguments != null && arguments.length > 0){
                 toleranceName = arguments[0];
+                datasetNames.add(toleranceName);
+            }
         }
         if (coStCyIndex != -1) {
             arguments = parseSwitchArguments(programArguments, coStCyIndex, programArguments
                     .indexOf("\n-", coStCyIndex) != -1 ? programArguments.indexOf("\n-", coStCyIndex)
                     : programArguments.length());
-            if (arguments != null && arguments.length > 0)
+            if (arguments != null && arguments.length > 0){
                 coStCyName = arguments[0];
+                datasetNames.add(coStCyName);
+            }
         }
 
         // validate everything has been specified...
@@ -162,6 +140,12 @@ public class SQLCompareAnnualStateSummariesQuery {
         if (coStCyName == null || coStCyName.length() == 0) {
             errors += "Missing " + DatasetType.countryStateCountyNamesAndDataCOSTCY + " dataset. ";
         }
+        
+        // go ahead and throw error from here, no need to validate anymore if the above is not there...
+        if (errors.length() > 0) {
+            throw new EmfException(errors);
+        }
+        checkDataset();
 
         // make sure the all the datasets actually exist
         EmfDataset[] inventories = new EmfDataset[] {};
@@ -169,31 +153,20 @@ public class SQLCompareAnnualStateSummariesQuery {
             inventories = new EmfDataset[inventoryNames.length];
             for (int i = 0; i < inventoryNames.length; i++) {
                 inventories[i] = getDataset(inventoryNames[i]);
-                if (inventories[i] == null) {
-                    errors += "Uknown inventory dataset, " + inventoryNames[i] + ". ";
-                }
             }
         }
         EmfDataset[] smkRpts = new EmfDataset[] {};
         if (smkRptNames != null) {
             smkRpts = new EmfDataset[smkRptNames.length];
-            for (int i = 0; i < smkRptNames.length; i++) {
+            for (int i = 0; i < smkRptNames.length; i++) 
                 smkRpts[i] = getDataset(smkRptNames[i]);
-                if (smkRpts[i] == null) {
-                    errors += "Uknown " + DatasetType.smkmergeRptStateAnnualSummary + " dataset, " + smkRptNames[i]
-                            + ". ";
-                }
-            }
         }
 
         EmfDataset invTable = null;
         invTable = getDataset(invTableName);
         String invTableTableName = qualifiedEmissionTableName(invTable);
         String invTableVersion = new VersionedQuery(version(invTable.getId(), invTable.getDefaultVersion()), "invtable")
-                .query();
-        if (invTable == null) {
-            errors += "Uknown " + DatasetType.invTable + " dataset, " + invTableName + ". ";
-        }
+                .query();       
 
         // make sure tolerance dataset exists
         EmfDataset tolerance = null;
@@ -211,25 +184,11 @@ public class SQLCompareAnnualStateSummariesQuery {
         String coStCyTableName = "emissions.state";
         String coStCyVersion = new VersionedQuery(version(coStCy.getId(), coStCy.getDefaultVersion()), "costcy")
                 .query();
-        if (coStCy == null) {
-            errors += "Uknown " + DatasetType.countryStateCountyNamesAndDataCOSTCY + " dataset, " + coStCyName + ". ";
-        }
-
-        // go ahead and throw error from here, no need to validate anymore if the above is not there...
-        if (errors.length() > 0) {
-            throw new EmfException(errors);
-        }
+        
 
         // look to see if the sector has been specified
         for (EmfDataset dataset : inventories) {
             String sector = getDatasetSector(dataset);
-            if (sector == null || sector.trim().length() == 0)
-                errors += "Dataset, " + dataset.getName() + ", is missing the sector.";
-        }
-
-        // go ahead and throw errors from here, if there are some...
-        if (errors.length() > 0) {
-            throw new EmfException(errors);
         }
 
         // capIsPoint = checkTableForColumns(emissionTableName(dataset), "plantid,pointid,stackid,segment");
@@ -366,18 +325,6 @@ public class SQLCompareAnnualStateSummariesQuery {
 
         SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName);
         return parser.parse(partialQuery, createClause);
-    }
-
-    private EmfDataset getDataset(String dsName) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getDataset(session, dsName);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new EmfException("The dataset name " + dsName + " is not valid");
-        } finally {
-            session.close();
-        }
     }
 
     private Version version(int datasetId, int version) {

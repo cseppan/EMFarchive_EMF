@@ -7,7 +7,6 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -21,22 +20,8 @@ import java.util.regex.Pattern;
 
 import org.hibernate.Session;
 
-public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
-    
-    private QAStep qaStep;
-
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
-    
-    private DbServer dbServer;
-    
-    //private static final String poundQueryTag = "#";
-    
-    private String emissionDatasourceName;
-    
-    private DatasetDAO dao;
-
+public class SQLCompareVOCSpeciationWithHAPInventoryQuery extends SQLQAProgramQuery{
+   
     public static final String capTag = "-cap";
     
     public static final String hapTag = "-hap";
@@ -49,9 +34,9 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
 
     public static final String gsrefTag = "-gsref";
 
-    public static final String summaryTypeTag = "-summaryType";
-
     public static final String filterTag = "-filter";
+    
+    private DbServer dbServer;
 
     ArrayList<String> baseDatasetNames = new ArrayList<String>();
     
@@ -62,11 +47,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
     public SQLCompareVOCSpeciationWithHAPInventoryQuery(HibernateSessionFactory sessionFactory, DbServer dbServer, 
             String emissioDatasourceName, String tableName, 
             QAStep qaStep) {
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissionDatasourceName = emissioDatasourceName;
-        this.dao = new DatasetDAO();
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
         this.dbServer = dbServer;
     }
 
@@ -114,7 +95,7 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         int gscnvIndex = programArguments.indexOf(gscnvTag);
         int gspwIndex = programArguments.indexOf(gspwTag);
         int gsrefIndex = programArguments.indexOf(gsrefTag);
-        int sumTypeIndex = programArguments.indexOf(summaryTypeTag);
+        int sumTypeIndex = programArguments.indexOf(QAStep.summaryTypeTag);
         int filterIndex = programArguments.indexOf(filterTag);
         String capInventory = null;
         String hapInventory = null;
@@ -139,27 +120,47 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
 
         if (capIndex != -1) {
             arguments = parseSwitchArguments(programArguments, capIndex, programArguments.indexOf("\n-", capIndex) != -1 ? programArguments.indexOf("\n-", capIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) capInventory = arguments[0];
+            if (arguments != null && arguments.length > 0) {
+                capInventory = arguments[0];
+                datasetNames.add(capInventory);
+            }
         }
         if (hapIndex != -1) {
             arguments = parseSwitchArguments(programArguments, hapIndex, programArguments.indexOf("\n-", hapIndex) != -1 ? programArguments.indexOf("\n-", hapIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) hapInventory = arguments[0];
+            if (arguments != null && arguments.length > 0) {
+                hapInventory = arguments[0];
+                datasetNames.add(hapInventory);
+            }
         }
         if (gstsiIndex != -1) {
             arguments = parseSwitchArguments(programArguments, gstsiIndex, programArguments.indexOf("\n-", gstsiIndex) != -1 ? programArguments.indexOf("\n-", gstsiIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) speciationToolSpecieInfoDataset = arguments[0];
+            if (arguments != null && arguments.length > 0) {
+                speciationToolSpecieInfoDataset = arguments[0];
+                datasetNames.add(speciationToolSpecieInfoDataset);
+            }
         }
         if (gscnvIndex != -1) {
             arguments = parseSwitchArguments(programArguments, gscnvIndex, programArguments.indexOf("\n-", gscnvIndex) != -1 ? programArguments.indexOf("\n-", gscnvIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) pollToPollConversionDataset = arguments[0];
+            if (arguments != null && arguments.length > 0) {
+                pollToPollConversionDataset = arguments[0];
+                datasetNames.add(pollToPollConversionDataset);
+            }
         }
         if (gspwIndex != -1) {
             arguments = parseSwitchArguments(programArguments, gspwIndex, programArguments.indexOf("\n-", gspwIndex) != -1 ? programArguments.indexOf("\n-", gspwIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) speciationProfileWeightDatasets = arguments;
+            if (arguments != null && arguments.length > 0) {
+                speciationProfileWeightDatasets = arguments;
+                for (String item : speciationProfileWeightDatasets)
+                    datasetNames.add(item);
+            }
         }
         if (gsrefIndex != -1) {
             arguments = parseSwitchArguments(programArguments, gsrefIndex, programArguments.indexOf("\n-", gsrefIndex) != -1 ? programArguments.indexOf("\n-", gsrefIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0) speciationCrossReferenceDatasets = arguments;
+            if (arguments != null && arguments.length > 0) {
+                speciationCrossReferenceDatasets = arguments;
+                for (String item : speciationCrossReferenceDatasets)
+                    datasetNames.add(item);
+            }
         }
         summaryType = parseSummaryType(programArguments, sumTypeIndex, programArguments.indexOf("\n-", sumTypeIndex) != -1 ? programArguments.indexOf("\n-", sumTypeIndex) : programArguments.length());
         filter = parseSummaryType(programArguments, filterIndex, programArguments.indexOf("\n-", filterIndex) != -1 ? programArguments.indexOf("\n-", filterIndex) : programArguments.length());
@@ -210,6 +211,8 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         if (errors.length() > 0) {
             throw new EmfException(errors);
         }
+        
+        checkDataset(); // check existance of datasets
         
         EmfDataset dataset = getDataset(capInventory);
         String capInventoryTable = qualifiedEmissionTableName(dataset);
@@ -1441,17 +1444,6 @@ public class SQLCompareVOCSpeciationWithHAPInventoryQuery {
         return parser.parse(partialQuery, createClause);
     }
 
-    private EmfDataset getDataset(String dsName) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getDataset(session, dsName);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new EmfException("The dataset name " + dsName + " is not valid");
-        } finally {
-            session.close();
-        }
-    }
     private Version version(int datasetId, int version) {
         Session session = sessionFactory.getSession();
         try {
