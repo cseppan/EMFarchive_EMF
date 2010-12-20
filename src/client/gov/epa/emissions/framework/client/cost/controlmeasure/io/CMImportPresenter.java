@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.cost.ControlMeasure;
 
 import java.io.File;
 
@@ -22,9 +23,7 @@ public class CMImportPresenter {
 
     public void doImport(boolean purge, int [] sectorIDs, String directory, String[] files) throws EmfException {
         
-        if ( sectorIDs != null) { // need to purge control measure by sectors
-            
-            // TODO: JIZHEN do validation here
+        if ( purge && sectorIDs != null) { // need to purge control measure by sectors
             
             if ( sectorIDs.length == 0) { // TODO: JIZHEN purge all
                 System.out.println("Purge all");
@@ -36,11 +35,24 @@ public class CMImportPresenter {
                 }
                 System.out.println("");
             }
+            
+            // TODO: JIZHEN do validation here
+            
+            ControlMeasure[] oldCMs = session.controlMeasureService().getControlMeasureBySector(sectorIDs);
+            int numOldCMs = oldCMs.length;
+            int numNewCMs = session.controlMeasureImportService().getControlMeasureCountInSummaryFile(purge, sectorIDs, directory, files, session.user());
+            String msg = "You will import " + numNewCMs + " control measures, BUT pure " + numOldCMs + " existing ones. Do you really want to do that?";
+            boolean doPurege = view.confirmToPurge(msg);
+            
+            if ( !doPurege) {
+                return;
+            }
+            
+            importControlMeasures(purge, sectorIDs, directory, files);
+            
+            return;
+
         }
-        
-        //return;
-        
-        //session.controlMeasureImportService().importControlMeasures(folderPath, fileNames, user)
         
         importControlMeasures(purge, sectorIDs, directory, files);
     }

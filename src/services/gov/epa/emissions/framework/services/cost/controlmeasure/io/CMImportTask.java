@@ -112,6 +112,25 @@ public class CMImportTask implements Runnable {
             //
         }
     }
+    
+    public int getControlMeasureCountInSummaryFile(boolean purge, int [] sectorIDs, String folderPath, String[] fileNames, User user)  {
+        try {
+            ControlMeasuresImporter importer = null;
+            try {
+                importer = new ControlMeasuresImporter(folder, files, user, truncate, sectorIds, sessionFactory, dbServerFactory);
+            } catch (Exception e) {
+                setDetailStatus(e.getMessage());
+                setStatus(e.getMessage());
+            }
+            if (importer != null)
+                return importer.getControlMeasureCountInSummaryFile();
+        } catch (Exception e) {
+            //
+        } finally {
+            //
+        }
+        return 0;
+  }
 
     private void setDetailStatus(String message) {
         Status endStatus = new Status();

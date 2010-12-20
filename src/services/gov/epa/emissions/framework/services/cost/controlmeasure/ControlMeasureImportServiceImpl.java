@@ -49,17 +49,15 @@ public class ControlMeasureImportServiceImpl implements ControlMeasureImportServ
         }
     }
 
-    public synchronized int getControlMeasureCountInSummaryFile(boolean purge, int [] sectorIDs, String folderPath, String[] fileNames, User user)  {
-//        try {
-////            ControlMeasuresImporter importer = null;
-////            importer = new ControlMeasuresImporter(folder, files, user, truncate, sectorIds, sessionFactory, dbServerFactory);
-////            return importer.validate();
-//            
-//        } catch (Exception e) {
-//            LOG.error("Could not import control measures.", e);
-//            throw new EmfException("Could not import control measures: " + e.getMessage());
-//        }
-        return 0;
+    public synchronized int getControlMeasureCountInSummaryFile(boolean purge, int [] sectorIDs, String folderPath, String[] fileNames, User user)  throws EmfException {
+        try {
+            CMImportTask importTask = new CMImportTask(new File(folderPath), fileNames, user, purge, sectorIDs, sessionFactory, dbServerFactory);
+            int num = importTask.getControlMeasureCountInSummaryFile(purge, sectorIDs, folderPath, fileNames, user);
+            return num;
+        } catch (Exception e) {
+            LOG.error("Could not import control measures.", e);
+            throw new EmfException("Could not getControlMeasureCountInSummaryFile: " + e.getMessage());
+        }
     }
 
     public synchronized Status[] getImportStatus(User user) throws EmfException {

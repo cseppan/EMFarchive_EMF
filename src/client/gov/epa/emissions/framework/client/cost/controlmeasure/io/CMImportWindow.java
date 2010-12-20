@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class CMImportWindow extends ReusableInteralFrame implements CMImportView, RefreshObserver {
@@ -41,7 +42,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
     private EmfConsole parentConsole;
     
     public CMImportWindow(EmfConsole parentConsole, DesktopManager desktopManager, EmfSession session) {
-        super("Import Control Measures", new Dimension(700, 500), desktopManager);
+        super("Import Control Measures", new Dimension(700, 600), desktopManager);
         super.setName("importControlMeasures");
 
         this.parentConsole = parentConsole;
@@ -166,4 +167,18 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
         }
         return true;
     }
+    
+    public boolean confirmToPurge( String msg) {
+        
+        int n = JOptionPane.showConfirmDialog(
+                this,
+                msg,
+                "Confirm if want to purge existing measures",
+                JOptionPane.YES_NO_OPTION);
+        if ( n == JOptionPane.YES_OPTION) {
+            return true;
+        }
+        return false;
+    }
+ 
 }

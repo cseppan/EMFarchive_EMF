@@ -91,12 +91,18 @@ public class ControlMeasuresImporter implements Importer {
     }
 
     //zero item is this first item is this...
-    public int validate() throws ImporterException, FileNotFoundException {
-        //First parse summary file, look at map "controlMeasures" and look at size...
-        parseSummary(controlMeasures);
-        
-        return controlMeasures.size();
-        
+//    public int validate() throws ImporterException, FileNotFoundException {
+//        //First parse summary file, look at map "controlMeasures" and look at size...
+//        parseSummary(controlMeasures);
+//        
+//        return controlMeasures.size();
+//        
+//    }
+    
+    public int getControlMeasureCountInSummaryFile() throws ImporterException, FileNotFoundException {
+        Map tmpControlMeasures = new HashMap(); // don't use the global Map to avoid side effect
+        parseSummary(tmpControlMeasures);        
+        return tmpControlMeasures.size();
     }
     
     public void run() throws ImporterException {

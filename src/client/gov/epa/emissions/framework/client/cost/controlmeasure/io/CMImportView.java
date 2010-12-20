@@ -9,5 +9,6 @@ public interface CMImportView extends ManagedView {
     void setDefaultBaseFolder(String folder);
 
     void setMessage(String message);
-
+    
+    boolean confirmToPurge( String msg); 
 }
