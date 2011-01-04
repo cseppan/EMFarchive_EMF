@@ -8,16 +8,15 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.DatasetVersion;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.qa.SQLQAProgramQuery;
 import gov.epa.emissions.framework.services.qa.SQLQueryParser;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,15 +26,7 @@ import java.util.StringTokenizer;
 
 import org.hibernate.Session;
 
-public class SQLCompareDatasetsProgramQuery {
-    
-    private QAStep qaStep;
-
-    private String tableName;
-
-    private HibernateSessionFactory sessionFactory;
-    
-    private String emissioDatasourceName;
+public class SQLCompareDatasetsProgramQuery extends SQLQAProgramQuery{
     
     public static final String BASE_TAG = "-base"; 
     //Sample:
@@ -101,16 +92,10 @@ poll|poll
     private boolean hasInvTableDataset;
     
     private Datasource datasource;
-
-    private DatasetDAO datasetDAO;
     
     public SQLCompareDatasetsProgramQuery(HibernateSessionFactory sessionFactory, Datasource datasource, String emissioDatasourceName, String tableName, QAStep qaStep) {
-        this.qaStep = qaStep;
-        this.tableName = tableName;
-        this.sessionFactory = sessionFactory;
-        this.emissioDatasourceName = emissioDatasourceName;
-        this.datasource = datasource;
-        this.datasetDAO = new DatasetDAO();
+        super(sessionFactory,emissioDatasourceName,tableName,qaStep);
+        this.datasource = datasource;    
     }
 
 //    public class DatasetVersion {
@@ -258,6 +243,7 @@ poll|poll
                     EmfDataset qaStepDataset = getDataset(qaStep.getDatasetId());
                     datasetVersionToken = new String[] { qaStepDataset.getName(), qaStepDataset.getDefaultVersion() + "" };
                 }
+                datasetNames.add(datasetVersionToken[0]);
                 baseDatasetList.add(new DatasetVersion(datasetVersionToken[0], Integer.parseInt(datasetVersionToken[1])));
             }
         }
@@ -272,9 +258,13 @@ poll|poll
                     EmfDataset qaStepDataset = getDataset(qaStep.getDatasetId());
                     datasetVersionToken = new String[] { qaStepDataset.getName(), qaStepDataset.getDefaultVersion() + "" };
                 }
+                datasetNames.add(datasetVersionToken[0]);
                 compareDatasetList.add(new DatasetVersion(datasetVersionToken[0], Integer.parseInt(datasetVersionToken[1])));
             }
         }
+        
+        checkDataset();
+        
         if (indexGroupBy != -1) {
             arguments = parseSwitchArguments(programArguments, indexGroupBy, programArguments.indexOf("\n-", indexGroupBy) != -1 ? programArguments.indexOf("\n-", indexGroupBy) : programArguments.length());
             if (arguments != null && arguments.length > 0) groupByExpressions = arguments;
@@ -295,9 +285,7 @@ poll|poll
             }
         }
 
-        
-        
-        
+     
         //Validate program arguments (i.e., does dataset and version exist, does mapping make sense, etc...)
        
         
@@ -358,8 +346,8 @@ poll|poll
         }
 
         //get columns that represent both the compare and base datasets
-        baseColumns = getDatasetColumnMap(((DatasetVersion)baseDatasetList.get(0)).getDataset());
-        compareColumns = getDatasetColumnMap(((DatasetVersion)compareDatasetList.get(0)).getDataset());
+        baseColumns = getDatasetColumnMap(baseDatasetList.get(0).getDataset());
+        compareColumns = getDatasetColumnMap(compareDatasetList.get(0).getDataset());
 
         //see if there are issues with the matching expressions
         if (matchingExpressionMap.size() > 0 ) {
@@ -577,7 +565,7 @@ poll|poll
         System.out.println(sql);
 
         
-        SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissioDatasourceName, tableName );
+        SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName );
 //return the built query
         return parser.createTableQuery() + " " + sql;
     }
@@ -660,17 +648,7 @@ poll|poll
         throw new EmfException("Unknown compare dataset expression.");
     }
     
-    private String getCompareExpression(String expression, Map<String,Column> compareColumns, String tableAlias) {
-        Set<String> columnsKeySet = compareColumns.keySet();
-        Iterator<String> iterator = columnsKeySet.iterator();
-        while (iterator.hasNext()) {
-            String columnName = iterator.next();
-            if (expression.toLowerCase().contains(columnName.toLowerCase())) 
-                return expression.replace(columnName, tableAlias + "." + columnName);
-        }
-        return null;
-    }
-    
+
     private Column getCompareColumn(String columnName, Map<String,ColumnMatchingMap> columnMatchingMap, Map<String,Column> compareColumns) {
         Column compareColumn = compareColumns.get(columnName);
         if (compareColumn != null) {
@@ -686,30 +664,6 @@ poll|poll
             map.put(column.getName(), column);
         }
         return map;
-    }
-    
-    private EmfDataset getDataset(String dsName) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return datasetDAO.getDataset(session, dsName);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new EmfException("The dataset name " + dsName + " is not valid");
-        } finally {
-            session.close();
-        }
-    }
-
-    private EmfDataset getDataset(int id) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return datasetDAO.getDataset(session, id);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new EmfException("The dataset id " + id + " is not valid");
-        } finally {
-            session.close();
-        }
     }
 
     private Version version(int datasetId, int version) {

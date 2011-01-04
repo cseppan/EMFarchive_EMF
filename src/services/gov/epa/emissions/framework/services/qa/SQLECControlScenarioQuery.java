@@ -479,18 +479,6 @@ public class SQLECControlScenarioQuery extends SQLQAProgramQuery{
         return parser.parse(partialQuery, createClause);
     }
 
-    private EmfDataset getDataset(int dsId) throws EmfException {
-        Session session = sessionFactory.getSession();
-        try {
-            return dao.getDataset(session, dsId);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new EmfException("The dataset id " + dsId + " is not valid");
-        } finally {
-            session.close();
-        }
-    }
-
     private Version version(int datasetId, int version) {
         Session session = sessionFactory.getSession();
         try {

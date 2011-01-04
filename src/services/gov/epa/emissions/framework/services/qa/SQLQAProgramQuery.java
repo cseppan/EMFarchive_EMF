@@ -71,4 +71,17 @@ public class SQLQAProgramQuery {
         }
 
     }
+    
+    protected EmfDataset getDataset(int id) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getDataset(session, id);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new EmfException("The dataset id " + id + " is not valid");
+        } finally {
+            session.close();
+        }
+    }
+
 }
