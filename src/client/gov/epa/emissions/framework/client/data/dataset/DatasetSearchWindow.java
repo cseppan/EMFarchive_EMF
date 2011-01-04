@@ -56,6 +56,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     private TextField value;
     
     private TextField qaStep;
+    private TextField qaStepArguments;
     
     private String preText;
     
@@ -107,6 +108,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         value.setToolTipText("Please select a Keyword for this field to be valid.");
         qaStep = new TextField("qaStep", 30);
         qaStep.setToolTipText("QA step name contains.");
+        qaStepArguments = new TextField("qaStepArguments", 30);
+        qaStepArguments.setToolTipText("QA step argument contains.");
                 
         if (preText != null)
             name.setText(preText);
@@ -118,11 +121,12 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         layoutGen.addLabelWidgetPair("Dataset type:", dsTypesBox, panel);
         layoutGen.addLabelWidgetPair("Keyword:", keyword, panel);
         layoutGen.addLabelWidgetPair("Keyword value:", value, panel);
-        layoutGen.addLabelWidgetPair("QAStep name contains:", qaStep, panel);
+        layoutGen.addLabelWidgetPair("QA name contains:", qaStep, panel);
+        layoutGen.addLabelWidgetPair("QA arugment contains:", qaStepArguments, panel);
         layoutGen.addLabelWidgetPair("Project:", projectsCombo, panel);
 
         // Lay out the panel.
-        layoutGen.makeCompactGrid(panel, 8, 2, // rows, cols
+        layoutGen.makeCompactGrid(panel, 9, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 10);// xPad, yPad
 
@@ -144,7 +148,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-                    datasets = search(getDataset(),qaStep.getText(), false);
+                    datasets = search(getDataset(),qaStep.getText(), qaStepArguments.getText(), false);
 
                     if (datasets.length == 1 && datasets[0].getName().startsWith("Alert!!! More than 300 datasets selected.")) {
                         String msg = "Number of datasets > 300. Would you like to continue?";
@@ -153,7 +157,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                         if (option == JOptionPane.NO_OPTION)
                             return;
 
-                        datasets = search(getDataset(),qaStep.getText(), true);
+                        datasets = search(getDataset(),qaStep.getText(),qaStepArguments.getText(), true);
                     }
 
                     DatasetType type = (DatasetType)dsTypesBox.getSelectedItem();
@@ -203,6 +207,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         keyword.setSelectedIndex(0);
         value.setText("");
         qaStep.setText("");
+        qaStepArguments.setText("");
         projectsCombo.setSelectedIndex(0);
     }
     
@@ -217,6 +222,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                 && dsTypesBox.getSelectedItem() == null
                 && keyword.getSelectedItem() == null
                 && (qaStep.getText() == null || qaStep.getText().trim().isEmpty())
+                && (qaStepArguments.getText() == null || qaStepArguments.getText().trim().isEmpty())
                 && projectsCombo.getSelectedItem() == null)
             return false;
         
@@ -293,8 +299,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         return selected;
     }
     
-    private EmfDataset[] search(EmfDataset dataset, String qaStep, boolean unconditional) throws EmfException {
-        return presenter.advSearch4Datasets(dataset, qaStep, unconditional);
+    private EmfDataset[] search(EmfDataset dataset, String qaStep,String qaArgument, boolean unconditional) throws EmfException {
+        return presenter.advSearch4Datasets(dataset, qaStep, qaArgument, unconditional);
     }
 
     public void observe(DatasetsBrowserPresenter presenter) {

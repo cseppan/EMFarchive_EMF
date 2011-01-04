@@ -1398,11 +1398,11 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public EmfDataset[] findDatasets(EmfDataset dataset, String qaStep, boolean unconditional) throws EmfException {
+    public EmfDataset[] findDatasets(EmfDataset dataset, String qaStep, String qaArgument, boolean unconditional) throws EmfException {
         Session session = sessionFactory.getSession();
         
         try {
-            return dao.findSimilarDatasets(dataset, qaStep, unconditional, session).toArray(new EmfDataset[0]);
+            return dao.findSimilarDatasets(dataset, qaStep, qaArgument, unconditional, session).toArray(new EmfDataset[0]);
         } catch (Exception e) {
             LOG.error("Could not find similar datasets.", e);
             throw new EmfException("Could not find similar datasets.");

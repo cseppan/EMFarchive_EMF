@@ -1636,7 +1636,7 @@ public class DatasetDAO {
         //
     }
     
-    public List<EmfDataset> findSimilarDatasets(EmfDataset ds, String qaStep, boolean unconditional, Session session) {
+    public List<EmfDataset> findSimilarDatasets(EmfDataset ds, String qaStep, String qaArgument, boolean unconditional, Session session) {
         String dsTypeStr = (ds.getDatasetType() == null ? "" : " AND DS.datasetType.id = "
             + ds.getDatasetType().getId());
     String name = ds.getName();
@@ -1648,8 +1648,13 @@ public class DatasetDAO {
     String dsKeyStr = getDSKeyStr(ds.getKeyVals());
     String desc = ds.getDescription(); 
     String qaStr = "";
+//    String qaArgStr = "";
     if ( !( qaStep==null || qaStep.length()==0) )
-       qaStr = " AND lower(QS.name) LIKE "+ getPattern(qaStep.toLowerCase().trim())+ " AND DS.id=QS.datasetId" ;
+        qaStr = " AND lower(QS.name) LIKE "+ getPattern(qaStep.toLowerCase().trim())+ " AND DS.id=QS.datasetId" ;
+    if ( !( qaArgument==null || qaArgument.length()==0) )
+        qaStr += " AND lower(QS.programArguments) LIKE "+ getPattern(qaArgument.toLowerCase().trim());
+    if ( !qaStr.isEmpty())
+        qaStr += " AND DS.id=QS.datasetId" ;
     String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE "
             + getPattern(desc.toLowerCase().trim()));
     String dsProjStr = (ds.getProject() == null ? "" : " AND DS.project.id = " + ds.getProject().getId());
