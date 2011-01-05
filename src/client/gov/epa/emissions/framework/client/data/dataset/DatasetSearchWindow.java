@@ -122,7 +122,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         layoutGen.addLabelWidgetPair("Keyword:", keyword, panel);
         layoutGen.addLabelWidgetPair("Keyword value:", value, panel);
         layoutGen.addLabelWidgetPair("QA name contains:", qaStep, panel);
-        layoutGen.addLabelWidgetPair("QA arugment contains:", qaStepArguments, panel);
+        layoutGen.addLabelWidgetPair("Search QA arguments:", qaStepArguments, panel);
         layoutGen.addLabelWidgetPair("Project:", projectsCombo, panel);
 
         // Lay out the panel.
