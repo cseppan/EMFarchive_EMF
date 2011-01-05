@@ -32,7 +32,7 @@ public class TableToString {
             ResultSet rs = datasource.query().executeQuery("select * from " + qualifiedTableName + " where 1 = 0");
             ResultSetMetaData md = rs.getMetaData();
             for (int i = 1; i <= md.getColumnCount(); i++) {
-                this.columnNameList += (i > 1 ? "," : "") + "\"" + md.getColumnName(i).toLowerCase() + "\"";
+                this.columnNameList += (i > 1 ? "," : "") + "\"" + md.getColumnName(i) + "\"";
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,7 +107,7 @@ public class TableToString {
         
         for (int i = startingColumn; i <= columnCount; i++) {
             colTypes += md.getColumnTypeName(i) + "(" + md.getPrecision(i) + ")" + (i < columnCount ? "|" : "");
-            colNames += (i > startingColumn ? delimiter : "") + "\"" + md.getColumnName(i).toLowerCase() + "\"";
+            colNames += (i > startingColumn ? delimiter : "") + "\"" + md.getColumnName(i) + "\"";
         }
         //the analysis engine only supports reports with more than one column, so add a dummy column for now.
         if (columnCount == 1) {

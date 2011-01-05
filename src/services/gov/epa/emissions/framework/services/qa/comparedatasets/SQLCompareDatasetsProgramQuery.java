@@ -346,8 +346,8 @@ poll|poll
         }
 
         //get columns that represent both the compare and base datasets
-        baseColumns = getDatasetColumnMap(baseDatasetList.get(0).getDataset());
-        compareColumns = getDatasetColumnMap(compareDatasetList.get(0).getDataset());
+        baseColumns = getDatasetColumnMap(((DatasetVersion)baseDatasetList.get(0)).getDataset());
+        compareColumns = getDatasetColumnMap(((DatasetVersion)compareDatasetList.get(0)).getDataset());
 
         //see if there are issues with the matching expressions
         if (matchingExpressionMap.size() > 0 ) {
@@ -648,7 +648,17 @@ poll|poll
         throw new EmfException("Unknown compare dataset expression.");
     }
     
-
+    private String getCompareExpression(String expression, Map<String,Column> compareColumns, String tableAlias) {
+        Set<String> columnsKeySet = compareColumns.keySet();
+        Iterator<String> iterator = columnsKeySet.iterator();
+        while (iterator.hasNext()) {
+            String columnName = iterator.next();
+            if (expression.toLowerCase().contains(columnName.toLowerCase())) 
+                return expression.replace(columnName, tableAlias + "." + columnName);
+        }
+        return null;
+    }
+    
     private Column getCompareColumn(String columnName, Map<String,ColumnMatchingMap> columnMatchingMap, Map<String,Column> compareColumns) {
         Column compareColumn = compareColumns.get(columnName);
         if (compareColumn != null) {
@@ -658,12 +668,7 @@ poll|poll
     }
     
     private Map<String,Column> getDatasetColumnMap(EmfDataset dataset) throws SQLException {
-        Column[] columns = new TableMetaData(datasource).getColumns(dataset.getInternalSources()[0].getTable());
-        Map<String,Column> map = new HashMap<String,Column>();
-        for (Column column : columns) {
-            map.put(column.getName(), column);
-        }
-        return map;
+        return new TableMetaData(datasource).getColumnMap(dataset.getInternalSources()[0].getTable());
     }
 
     private Version version(int datasetId, int version) {

@@ -89,7 +89,7 @@ public class InputDatasetSelectionDialog extends JDialog implements InputDataset
         }
         else
         {
-           setTitle("Select Inventory Datasets");
+           setTitle("Select Datasets");
         }   
         this.pack();
         this.setSize(500, 400);

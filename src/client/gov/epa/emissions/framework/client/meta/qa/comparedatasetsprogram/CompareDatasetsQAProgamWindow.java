@@ -14,9 +14,9 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.dataset.AddRemoveDatasetVersionWidget;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionDialog;
 import gov.epa.emissions.framework.client.data.dataset.InputDatasetSelectionPresenter;
-import gov.epa.emissions.framework.client.meta.qa.AddRemoveDatasetVersionWidget;
 import gov.epa.emissions.framework.client.meta.qa.AddRemoveDatasetWidget;
 import gov.epa.emissions.framework.client.meta.qa.EditQAEmissionsPresenter;
 import gov.epa.emissions.framework.client.meta.qa.EditQAEmissionsView;
@@ -144,7 +144,7 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
     }
     
     private JPanel baseDatasetVersionWidget() throws EmfException {
-        datasetWidgetBase = new AddRemoveDatasetVersionWidget(this, program, parentConsole, session);
+        datasetWidgetBase = new AddRemoveDatasetVersionWidget(false, this, parentConsole, session);
         datasetWidgetBase.setPreferredSize(new Dimension(350,250));
         List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
         if(baseDatasetVersions != null && baseDatasetVersions.length > 0) {
@@ -158,7 +158,7 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
     }
     
     private JPanel compareDatasetVersionWidget() throws EmfException {
-        datasetWidgetCompare = new AddRemoveDatasetVersionWidget(this, program, parentConsole, session);
+        datasetWidgetCompare = new AddRemoveDatasetVersionWidget(false, this, parentConsole, session);
         datasetWidgetCompare.setPreferredSize(new Dimension(350,250));
         List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
         if(compareDatasetVersions != null && compareDatasetVersions.length > 0) {
