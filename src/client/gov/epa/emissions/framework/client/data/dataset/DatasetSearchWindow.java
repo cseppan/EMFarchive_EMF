@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
@@ -8,6 +7,7 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.CloseButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.commons.security.User;
@@ -24,12 +24,14 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -60,10 +62,12 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     
     private String preText;
     
+    private DatasetType[] allDSTypes;
+    
     private EmfConsole parent;
     
     public DatasetSearchWindow(String title, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super(title, new Dimension(520, 380), desktopManager);
+        super(title, new Dimension(580, 400), desktopManager);
         parent = parentConsole;
     }
 
@@ -92,24 +96,26 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         SpringLayoutGenerator layoutGen = new SpringLayoutGenerator();
 
         Dimension dim = new Dimension(350, 60);
-        dsTypesBox = new ComboBox("Select one", getAllDSTypes());
+        
+        allDSTypes=getAllDSTypes();
+        dsTypesBox = new ComboBox("Select one", allDSTypes);
         dsTypesBox.setPreferredSize(dim);
+         
         keyword = new ComboBox("Select one", presenter.getKeywords());
         keyword.setPreferredSize(dim);
+         
         creatorsBox = new ComboBox("Select one", getAllUsers());
         creatorsBox.setPreferredSize(dim);
         
         projectsCombo = new ComboBox("Select one", presenter.getProjects());
         projectsCombo.setPreferredSize(dim);
-        
-        name = new TextField("namefilter", 30);
+       
+        name = new TextField("namefilter", 30);      
         desc = new TextField("descfilter", 30);
         value = new TextField("keyvalue", 30);
         value.setToolTipText("Please select a Keyword for this field to be valid.");
         qaStep = new TextField("qaStep", 30);
         qaStep.setToolTipText("QA step name contains.");
-        qaStepArguments = new TextField("qaStepArguments", 30);
-        qaStepArguments.setToolTipText("QA step argument contains.");
                 
         if (preText != null)
             name.setText(preText);
@@ -122,7 +128,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         layoutGen.addLabelWidgetPair("Keyword:", keyword, panel);
         layoutGen.addLabelWidgetPair("Keyword value:", value, panel);
         layoutGen.addLabelWidgetPair("QA name contains:", qaStep, panel);
-        layoutGen.addLabelWidgetPair("Search QA arguments:", qaStepArguments, panel);
+        layoutGen.addLabelWidgetPair("Search QA arguments:", datasetPanel(), panel);
         layoutGen.addLabelWidgetPair("Project:", projectsCombo, panel);
 
         // Lay out the panel.
@@ -132,6 +138,53 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
         return panel;
     }
+    
+    private JPanel datasetPanel() {
+
+        qaStepArguments = new TextField("qaStepArguments", 30);
+        qaStepArguments.setToolTipText("QA step argument contains.");
+        
+        Button selectButton = new AddButton("Find Dataset", selectAction());
+        selectButton.setMargin(new Insets(1, 2, 1, 2));
+
+        JPanel invPanel = new JPanel(new BorderLayout(5, 0));
+         
+        invPanel.add(qaStepArguments, BorderLayout.LINE_START);
+        invPanel.add(selectButton);
+        return invPanel;
+    }
+    
+    protected Action selectAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doAddWindow();
+            }
+        };
+    }
+    
+    protected void doAddWindow() {
+        
+        try {
+            
+            InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parent);
+            InputDatasetSelectionPresenter selectDatasetPresenter = new InputDatasetSelectionPresenter(view, presenter.getSession(), allDSTypes);
+            
+            selectDatasetPresenter.display(null, true);
+            if (view.shouldCreate())
+                setDatasets(selectDatasetPresenter.getDatasets());
+        } catch (Exception e) {
+             messagePanel.setError(e.getMessage());
+        }
+    }
+    
+    private void setDatasets(EmfDataset[] datasets) {
+        if (datasets == null || datasets.length == 0) {
+            return;
+        }
+        if (datasets != null || datasets.length > 0) 
+            qaStepArguments.setText(datasets[0].getName());
+    }
+    
 
     private JPanel createControlPanel() {
         JPanel controlPanel = new JPanel();
@@ -231,17 +284,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
     private EmfDataset getDataset() {
         EmfDataset ds = new EmfDataset();
-
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = name.getText();
-            if ( name != null) {
-                newName = newName.trim();
-            }
-            ds.setName(newName);
-        } else {
-            ds.setName(name.getText());
-        }
-        
+        ds.setName(name.getText());
         ds.setDescription(desc.getText());
         ds.setDatasetType(getSelectedDSType());
         Keyword kw = (Keyword) keyword.getSelectedItem();
@@ -266,7 +309,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     
     private DatasetType[] getAllDSTypes() throws EmfException {
         List<DatasetType> dbDSTypes = new ArrayList<DatasetType>();
-        dbDSTypes.add(new DatasetType("All"));
+        //dbDSTypes.add(new DatasetType("All"));
         dbDSTypes.addAll(Arrays.asList(presenter.getDSTypes()));
         return dbDSTypes.toArray(new DatasetType[0]);
     }

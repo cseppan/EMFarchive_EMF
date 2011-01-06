@@ -33,6 +33,10 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     public DatasetsBrowserPresenter(EmfSession session) {
         this.session = session;
     }
+    
+    public EmfSession getSession(){
+        return session; 
+    }
 
     public void doDisplay(DatasetsBrowserView view) throws EmfException {
         this.view = view;
