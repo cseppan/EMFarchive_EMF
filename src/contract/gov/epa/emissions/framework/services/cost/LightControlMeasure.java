@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
+
 import java.io.Serializable;
 
 public class LightControlMeasure implements Serializable {
@@ -16,6 +18,8 @@ public class LightControlMeasure implements Serializable {
     private String abbreviation;
 
     private boolean includeExclude;
+    
+    private ControlTechnology controlTechnology;
 
     public LightControlMeasure() {
         //
@@ -86,5 +90,13 @@ public class LightControlMeasure implements Serializable {
 
     public void setAbbreviation(String abbreviation) {
         this.abbreviation = abbreviation;
+    }
+
+    public void setControlTechnology(ControlTechnology ct) {
+        this.controlTechnology = ct;
+    }
+
+    public ControlTechnology getControlTechnology() {
+        return controlTechnology;
     }
 }
