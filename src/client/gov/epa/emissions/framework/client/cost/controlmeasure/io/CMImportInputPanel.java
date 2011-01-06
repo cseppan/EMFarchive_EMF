@@ -362,7 +362,8 @@ public class CMImportInputPanel extends JPanel {
                     //this means the all item was selected...
                     if (inx[i] == 0)
                         return new int[] {};
-                    IDs[i] = this.sectors[inx[i]].getId();
+                    IDs[i] = this.sectors[inx[i] - 1].getId();
+//                    IDs[i] = this.sectors[inx[i]].getId();
                 }
             }            
         } else {
