@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
@@ -343,19 +344,19 @@ public class ControlStrategyDAO {
     }
     
     private EmfDataset[] getLockedDatasets(EmfDataset[] datasets, User user, Session session) {
-        List lockedList = new ArrayList();
+        List<EmfDataset> lockedList = new ArrayList<EmfDataset>();
         
         for (int i = 0; i < datasets.length; i++) {
             EmfDataset locked = obtainLockedDataset(datasets[i], user, session);
             if (locked == null) {
-                releaseLocked((EmfDataset[])lockedList.toArray(new EmfDataset[0]), user, session);
+                releaseLocked(lockedList.toArray(new EmfDataset[0]), user, session);
                 return null;
             }
             
             lockedList.add(locked);
         }
         
-        return (EmfDataset[])lockedList.toArray(new EmfDataset[0]);
+        return lockedList.toArray(new EmfDataset[0]);
     }
 
     private EmfDataset obtainLockedDataset(EmfDataset dataset, User user, Session session) {
@@ -470,6 +471,52 @@ public class ControlStrategyDAO {
     public String getStrategyRunStatus(Session session, int id) {
         return (String)session.createQuery("select cS.runStatus " +
                 "from ControlStrategy cS where cS.id = " + id).uniqueResult();
+    }
+
+    public List<ControlStrategy> getControlStrategiesByControlMeasures(int[] cmIds, Session session) {
+        List<ControlStrategy> list = new ArrayList<ControlStrategy>();
+        String idList = "";
+        for (int i = 0; i < cmIds.length; ++i) {
+            idList += (i > 0 ? ","  : "") + cmIds[i];
+        }
+        try {
+            Query query = session.createQuery("select cs "
+                    + "FROM ControlStrategy AS cs "
+                    + (cmIds != null && cmIds.length > 0 
+                            ? "inner join cs.controlMeasures AS csm inner join csm.controlMeasure AS cm "
+                               + "WHERE cm.id in (" + idList + ") " 
+                            : "")
+                    + "order by cs.name");
+//            Query query = session.createQuery("select new ControlStrategy(cs.id, cs.name, cs.controlMeasures) "
+//                    + "FROM ControlStrategy AS cs "
+//                    + (cmIds != null && cmIds.length > 0 
+//                            ? "inner join cs.controlMeasures AS csm inner join csm.controlMeasure AS cm "
+//                               + "WHERE cm.id in (" + idList + ") " 
+//                            : "")
+//                    + "order by cs.name");
+            query.setCacheable(true);
+            list = query.list();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
+    public void finalizeControlStrategy(int controlStrategyId, String description, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.createQuery("update ControlStrategy set isFinal = :isFinal, description = description || '\n\n' || :description, lastModifiedDate = :date where id = :id")
+            .setBoolean("isFinal", true)
+            .setText("description", description)
+            .setTimestamp("date", new Date())
+            .setInteger("id", controlStrategyId)
+            .executeUpdate();
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
 }

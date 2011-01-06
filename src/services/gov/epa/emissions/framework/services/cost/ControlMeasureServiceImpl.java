@@ -546,4 +546,18 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             session.close();
         }
     }
+//    public List<ControlStrategy> getLightControlStrategies(int[] cmIds, Session session) {
+
+//    public ControlStrategy[] getLightControlStrategies(int[] cmIds) throws EmfException {
+//        Session session = sessionFactory.getSession();
+//        try {
+//            List<ControlMeasure> all = dao.getControlMeasureBySectors(sectorIds, session);
+//            return all.toArray(new ControlMeasure[0]);
+//        } catch (RuntimeException e) {
+//            LOG.error("Could not retrieve control measures.", e);
+//            throw new EmfException("Could not retrieve control measuress.");
+//        } finally {
+//            session.close();
+//        }
+//    }
 }

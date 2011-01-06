@@ -13,6 +13,8 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
+import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -71,16 +73,52 @@ public class CMImportTask implements Runnable {
                 
                 EmfProperty property = new EmfPropertiesDAO().getProperty("COST_CMDB_BACKUP_FOLDER", session);
                 
-                String backupFolder = property.getValue();
+                String backupFolder = property.getValue(); 
 
                 CMExportTask exportTask = new CMExportTask(new File(backupFolder), CustomDateFormat.format_YYDDHHMMSS(new Date()), ids, user,
                         sessionFactory, dbServerFactory);
                 exportTask.run();
+            
+                
+                
+                //look for dependencies on Control Strategies and Control Programs
+                ControlStrategyDAO csDAO = new ControlStrategyDAO();
+                List<ControlStrategy> cs = new ControlStrategyDAO().getControlStrategiesByControlMeasures(ids, session);
+
+//README                
+//To get a count of the measures being deleted from a strategy
+//create a function that can iterate over the strategy's measures (ALL Measures are returned not just the ones of interest to us)
+//and see if they match the an item in the ids array, 
+//you should be able to use a similar technique and build a Collection of DISTINCT Strategy ControlTechnolgies 
+//so this can iterated over and reported on in the strategy/control program description
+//Actually, the controlStrategy.getControlMeasures()[0].getControlMeasure() returns a Light version of the ControlMeasure -- LightControlMeasure.java is the POJO
+//this class doesn't have the ControlTechnology field -- you need to add the getter/setter for this to the POJO and then make sure you map the new field 
+//in the LightControlMeasure.hbm.xml file, rebuild, and it now should be populated and accesible.
+                
+//Here is some sample code on how finalize a control strategy with a message being appended to the description
+//Create something similar for the ControlProgram, but name it something like updateControlProgramDescription, since
+//we're not finalizing a ControlProgram
+//                for (ControlStrategy controlStrategy : cs) {
+//                    csDAO.finalizeControlStrategy(controlStrategy.getId(), "Some Message for the Description Field", session);
+//                    controlStrategy.getControlMeasures()[0].getControlMeasure()
+//                    break;
+//                }
+                
+                System.out.println(cs.size());
+                
+                //next you need to finalize Control Strategies and add a relevant message to the description
+                
+                
+                
+                //next you need to update the Control Programs and add a relevant message to the description
+                
+                
                 
                 
                 //delete measure by sector....
 //                session.setFlushMode(FlushMode.NEVER);
-                new ControlMeasureDAO().remove(sectorIds, sessionFactory, dbServer);
+
+//                new ControlMeasureDAO().remove(sectorIds, sessionFactory, dbServer);
                 
             } catch (Exception e) {
 //                LOG.error("Could not export control measures.", e);
