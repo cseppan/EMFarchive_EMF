@@ -480,7 +480,7 @@ public class ControlStrategyDAO {
             idList += (i > 0 ? ","  : "") + cmIds[i];
         }
         try {
-            Query query = session.createQuery("select cs "
+            Query query = session.createQuery("select distinct cs "
                     + "FROM ControlStrategy AS cs "
                     + (cmIds != null && cmIds.length > 0 
                             ? "inner join cs.controlMeasures AS csm inner join csm.controlMeasure AS cm "
@@ -502,13 +502,13 @@ public class ControlStrategyDAO {
         return list;
     }
     
-    public void finalizeControlStrategy(int controlStrategyId, String description, Session session) {
+    public void finalizeControlStrategy(int controlStrategyId, String msg, Session session) {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            session.createQuery("update ControlStrategy set isFinal = :isFinal, description = description || '\n\n' || :description, lastModifiedDate = :date where id = :id")
+            session.createQuery("update ControlStrategy set isFinal = :isFinal, description = description || '\n\n' || :msg, lastModifiedDate = :date where id = :id")
             .setBoolean("isFinal", true)
-            .setText("description", description)
+            .setText("msg", msg)
             .setTimestamp("date", new Date())
             .setInteger("id", controlStrategyId)
             .executeUpdate();

@@ -96,13 +96,23 @@ public class CMImportTask implements Runnable {
                 
                 String desc = "";
                 for ( ControlStrategy s : cs) {
-                    desc = s.getDescription();
+                    
+                    setDetailStatus( ">>> \n" + s.getDescription() + "\n"); // for debug
+                    
+                    desc = ""; //s.getDescription();
+                    if ( desc != null && desc.trim() != "") {
+                        desc += "\n";
+                    }
                     desc += "Purge: " + this.truncate + "\n";
                     desc += "Date deleted: " + new Date() + "\n";
                     int numCMToBeDeleted = this.getNumControlMeasuresDeleted(s, ids);
                     desc += "Measures deleted: " + numCMToBeDeleted + "\n";
                     desc += "Control Technolgies Affected: \n";
-                    
+                    desc += this.getControlTechnologiesAffected(s, ids);
+                    setDetailStatus( ">>> " + s.getName() + ": \n" + desc + "\n"); // for debug
+                    //s.setDescription( desc);
+                    //s.setIsFinal( true);
+                    csDAO.finalizeControlStrategy(s.getId(), desc, session);
                 }
 
 //README                
