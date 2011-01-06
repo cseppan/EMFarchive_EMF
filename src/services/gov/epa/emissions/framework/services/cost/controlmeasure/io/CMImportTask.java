@@ -15,10 +15,14 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
+import gov.epa.emissions.framework.services.cost.ControlStrategyMeasure;
+import gov.epa.emissions.framework.services.cost.LightControlMeasure;
+import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -83,7 +87,23 @@ public class CMImportTask implements Runnable {
                 
                 //look for dependencies on Control Strategies and Control Programs
                 ControlStrategyDAO csDAO = new ControlStrategyDAO();
-                List<ControlStrategy> cs = new ControlStrategyDAO().getControlStrategiesByControlMeasures(ids, session);
+                List<ControlStrategy> cs = //new ControlStrategyDAO().getControlStrategiesByControlMeasures(ids, session);
+                    csDAO.getControlStrategiesByControlMeasures(ids, session);
+                
+                String msg = "There are " + cs.size() + " Strategies affected.";
+                setDetailStatus( msg + "\n");
+                setStatus( msg);
+                
+                String desc = "";
+                for ( ControlStrategy s : cs) {
+                    desc = s.getDescription();
+                    desc += "Purge: " + this.truncate + "\n";
+                    desc += "Date deleted: " + new Date() + "\n";
+                    int numCMToBeDeleted = this.getNumControlMeasuresDeleted(s, ids);
+                    desc += "Measures deleted: " + numCMToBeDeleted + "\n";
+                    desc += "Control Technolgies Affected: \n";
+                    
+                }
 
 //README                
 //To get a count of the measures being deleted from a strategy
@@ -188,6 +208,50 @@ public class CMImportTask implements Runnable {
         endStatus.setTimestamp(new Date());
 
         statusDao.add(endStatus);
+    }
+    
+    private int getNumControlMeasuresDeleted( ControlStrategy cs, int [] cmIDs) {
+        ControlStrategyMeasure[] csms = cs.getControlMeasures();
+        if ( csms == null || cmIDs == null || cmIDs.length == 0 || csms.length == 0) {
+            return 0;
+        }
+        int count = 0;
+        for ( int i = 0; i<csms.length; i++) {
+            int id = csms[i].getControlMeasure().getId();
+            boolean toBeDeleted = false;
+            for ( int j=0; i<cmIDs.length; j++) {
+                if ( cmIDs[j] == id) {
+                    toBeDeleted = true;
+                    break;
+                }
+            }
+            if ( toBeDeleted ) {
+                count ++;
+            }
+        }
+        return count;
+    }
+    
+    private String getControlTechnologiesAffected(ControlStrategy cs, int [] cmIDs){
+        if ( cs == null || cmIDs == null || cmIDs.length == 0)
+            return "";
+        String techNames = "";
+        List<Integer> ctIDList = new ArrayList<Integer>();
+        
+        ControlStrategyMeasure[] csms = cs.getControlMeasures();
+        for ( int i = 0; i<csms.length; i++) {
+            LightControlMeasure lcm = csms[i].getControlMeasure();
+            ControlTechnology ct = lcm.getControlTechnology();
+            int id = ct.getId();
+            if ( !ctIDList.contains( id)) {
+                ctIDList.add( id);
+                techNames += "  " + ct.getName() + "\n";
+            }
+        }
+        
+        System.out.println( techNames);        
+        
+        return techNames;        
     }
 
 }

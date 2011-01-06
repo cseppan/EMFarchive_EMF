@@ -92,8 +92,8 @@ public class LightControlMeasure implements Serializable {
         this.abbreviation = abbreviation;
     }
 
-    public void setControlTechnology(ControlTechnology ct) {
-        this.controlTechnology = ct;
+    public void setControlTechnology(ControlTechnology controlTechnology) {
+        this.controlTechnology = controlTechnology;
     }
 
     public ControlTechnology getControlTechnology() {

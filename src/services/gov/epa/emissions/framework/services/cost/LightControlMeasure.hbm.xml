@@ -17,6 +17,11 @@
             name="majorPollutant" 
             class="gov.epa.emissions.commons.data.Pollutant"
             column="major_pollutant"/> 
+            
+        <many-to-one cascade="save-update"
+            name="controlTechnology" 
+            class="gov.epa.emissions.framework.services.cost.data.ControlTechnology"
+            column="control_technology"/> 
 
     </class>
 </hibernate-mapping>  
