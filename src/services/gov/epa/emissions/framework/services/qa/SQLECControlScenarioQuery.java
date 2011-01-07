@@ -90,7 +90,10 @@ public class SQLECControlScenarioQuery extends SQLQAProgramQuery{
 
         if (invIndex != -1) {
             arguments = parseSwitchArguments(programArguments, invIndex, programArguments.indexOf("\n-", invIndex) != -1 ? programArguments.indexOf("\n-", invIndex) : programArguments.length());
-            if (arguments != null && arguments.length > 0)  inventoryName = arguments[0];
+            if (arguments != null && arguments.length > 0)  {
+                inventoryName = arguments[0];
+                datasetNames.add(inventoryName);
+            }
         }
         if (gsproIndex != -1) {
             arguments = parseSwitchArguments(programArguments, gsproIndex, programArguments.indexOf("\n-", gsproIndex) != -1 ? programArguments.indexOf("\n-", gsproIndex) : programArguments.length());
@@ -104,8 +107,8 @@ public class SQLECControlScenarioQuery extends SQLQAProgramQuery{
             arguments = parseSwitchArguments(programArguments, gsrefIndex, programArguments.indexOf("\n-", gsrefIndex) != -1 ? programArguments.indexOf("\n-", gsrefIndex) : programArguments.length());
             if (arguments != null && arguments.length > 0) {
                 gsrefNames = arguments;
-                for ( String item : gsproNames )
-                datasetNames.add(item);
+                for ( String item : gsrefNames )
+                    datasetNames.add(item);
             }
         }
         if (detailedResultIndex != -1) {

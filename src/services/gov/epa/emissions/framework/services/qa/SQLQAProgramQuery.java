@@ -46,7 +46,7 @@ public class SQLQAProgramQuery {
                 for (String dsName : datasetNames){
                     //System.out.println(dsName);
                     if ( !dao.exists(dsName, session))
-                        errors += "The dataset name " + dsName + " does not exist. \n";
+                        errors += "The dataset name \"" + dsName + "\" does not exist. ";
                 }
                 if ( errors.length() > 0)
                     throw new EmfException(errors);
