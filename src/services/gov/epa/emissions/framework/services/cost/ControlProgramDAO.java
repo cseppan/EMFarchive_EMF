@@ -7,9 +7,14 @@ import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -130,5 +135,44 @@ public class ControlProgramDAO {
     public ControlProgram getControlProgram(int id, Session session) {
         ControlProgram cs = (ControlProgram) hibernateFacade.load(ControlProgram.class, Restrictions.eq("id", new Integer(id)), session);
         return cs;
+    }
+    
+    public List<ControlProgram> getControlProgramsByControlMeasures(int[] cmIds, Session session) {
+        List<ControlProgram> list = new ArrayList<ControlProgram>();
+        String idList = "";
+        for (int i = 0; i < cmIds.length; ++i) {
+            idList += (i > 0 ? ","  : "") + cmIds[i];
+        }
+        try {
+            Query query = session.createQuery("select distinct cp "
+                    + "FROM ControlProgram AS cp "
+                    + (cmIds != null && cmIds.length > 0 
+                            ? "inner join cp.controlMeasures AS cpm "
+                               + "WHERE cpm.id in (" + idList + ") " 
+                            : "")
+                    + "order by cp.name");
+            query.setCacheable(true);
+            list = query.list();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
+    public void updateControlProgram(int controlProgramId, String msg, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.createQuery("update ControlProgram set description =  '' || "
+                        + "description || '\n------\n' || :msg, lastModifiedDate = :date where id = :id")
+            .setText("msg", msg)
+            .setTimestamp("date", new Date())
+            .setInteger("id", controlProgramId)
+            .executeUpdate();
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 }

@@ -506,7 +506,8 @@ public class ControlStrategyDAO {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            session.createQuery("update ControlStrategy set isFinal = :isFinal, description = description || '\n\n' || :msg, lastModifiedDate = :date where id = :id")
+            session.createQuery("update ControlStrategy set isFinal = :isFinal, description =  '' || "
+                        + "description || '\n------\n' || :msg, lastModifiedDate = :date where id = :id")
             .setBoolean("isFinal", true)
             .setText("msg", msg)
             .setTimestamp("date", new Date())
