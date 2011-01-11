@@ -144,14 +144,19 @@ public class ControlMeasureDAO {
         try {
             Transaction tx = session.beginTransaction();
             removeSccs(sectorIds, session);
-
             
             AggregateEfficiencyRecordDAO aerDAO = new AggregateEfficiencyRecordDAO();
             aerDAO.removeAggregateEfficiencyRecords(sectorIds, dbServer);
             
             removeEfficiencyRecords(sectorIds, session);
-
-            removeStrategyMeasuresBySector(sectorIds, session);
+            
+            List<ControlMeasure> lstCM = getControlMeasureBySectors(sectorIds, session);
+            int [] cmIDs = new int[lstCM.size()];
+            for ( int i=0; i<lstCM.size(); i++) {
+                cmIDs[i] = lstCM.get(i).getId();
+            }
+            removeStrategyMeasures(cmIDs, dbServer);
+            removeProgramMeasures(cmIDs, dbServer);
             
             String idList = "";
             for (int i = 0; i < sectorIds.length; ++i) {
@@ -173,6 +178,7 @@ public class ControlMeasureDAO {
             tx.commit();
         } catch (Exception e) {
             e.printStackTrace();
+            throw new EmfException(e.getMessage());
         } finally {
             session.close();
         }
@@ -553,27 +559,55 @@ public class ControlMeasureDAO {
 //            hibernateFacade.remove(list.get(i), session);
 //        }
     }
-
-    public void removeStrategyMeasuresBySector(int[] sectorIds, Session session) {
+    
+    public void removeProgramMeasures(int[] cmIds, DbServer dbServer) throws EmfException {
         
-        String idList = "";
-        for (int i = 0; i < sectorIds.length; ++i) {
-            idList += (i > 0 ? ","  : "") + sectorIds[i];
+        String cmIdList = "";
+        for (int i = 0; i < cmIds.length; ++i) {
+            cmIdList += (i > 0 ? ","  : "") + cmIds[i];
         }
         
+        try {
+            dbServer.getEmfDatasource().query().execute("delete from emf.control_program_measures " +
+                    "where control_measure_id in (" + cmIdList + ");");
+            } catch (SQLException e) {
+                throw new EmfException(e.getMessage());
+            } 
+    }
+
+    public void removeStrategyMeasures(int[] cmIds, DbServer dbServer) throws EmfException {
+        
+        String cmIdList = "";
+        for (int i = 0; i < cmIds.length; ++i) {
+            cmIdList += (i > 0 ? ","  : "") + cmIds[i];
+        }
+        
+        try {
+            dbServer.getEmfDatasource().query().execute("delete from emf.control_strategy_measures " +
+                    "where control_measure_id in (" + cmIdList + ");");
+            } catch (SQLException e) {
+                throw new EmfException(e.getMessage());
+            }        
+        
+//        String idList = "";
+//        for (int i = 0; i < sectorIds.length; ++i) {
+//            idList += (i > 0 ? ","  : "") + sectorIds[i];
+//        }
         
         
-        String hqlDelete = "delete emf.control_strategy_measures where control_measure_id in (" +
-            "select icm.id "
-            + "FROM emf.control_measures icm "
-            + (sectorIds != null && sectorIds.length > 0 
-                    ? "inner join emf.control_measure_sectors s on icm.control_measure_id = s.control_measure_id "
-                      + "WHERE s.sector_id in (" + idList + ") " 
-                    : "") + ")";
-        session.createSQLQuery( hqlDelete )
-        .executeUpdate();
-//        String hqlDelete = "delete ControlStrategy.controlMeasures cm where cm.id in (" +
-//        "select icm.id "
+        
+//        String hqlDelete = "delete emf.control_strategy_measures where control_measure_id in (" +
+//            "select icm.id "
+//            + "FROM emf.control_measures icm "
+//            + (sectorIds != null && sectorIds.length > 0 
+//                    ? "inner join emf.control_measure_sectors s on icm.control_measure_id = s.control_measure_id "
+//                      + "WHERE s.sector_id in (" + idList + ") " 
+//                    : "") + ")";
+//        session.createSQLQuery( hqlDelete )
+//        .executeUpdate();
+        
+//        String hqlDelete = "delete from ControlStrategy.controlMeasures cm where cm.id in (" +
+//        "select distinct icm.id "
 //        + "FROM ControlMeasure AS icm "
 //        + (sectorIds != null && sectorIds.length > 0 
 //                ? "inner join icm.sectors AS s "
@@ -581,7 +615,19 @@ public class ControlMeasureDAO {
 //                : "") + ")";
 //        session.createQuery( hqlDelete )
 //        .executeUpdate();
-        session.flush();
+        
+//        String hqlDelete = "delete ControlStrategyMeasure csm where csm.controlMeasureId in (" +
+//        "select distinct icm.id "
+//        + "FROM ControlMeasure AS icm "
+//        + (sectorIds != null && sectorIds.length > 0 
+//                ? "inner join icm.sectors AS s "
+//                  + "WHERE s.id in (" + idList + ") " 
+//                : "") + ")";
+//        session.createQuery( hqlDelete )
+//        .executeUpdate();        
+//        
+//        session.flush();
+        
 //        Criterion c = Restrictions.eq("controlMeasureId", new Integer(controlMeasureId));
 //        List list = hibernateFacade.get(EfficiencyRecord.class, c, session);
 //        for (int i = 0; i < list.size(); i++) {

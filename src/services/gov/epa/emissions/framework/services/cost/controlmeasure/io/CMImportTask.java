@@ -108,7 +108,7 @@ public class CMImportTask implements Runnable {
                     cmMsg += "Measures deleted: " + numCMToBeDeleted + "\n";
                     cmMsg += "Control Technolgies Affected: \n";
                     cmMsg += this.getControlTechnologiesAffected(s, ids);
-                    setDetailStatus( ">>> " + s.getName() + ": \n" + cmMsg + "\n"); // for debug
+                    //setDetailStatus( ">>> " + s.getName() + ": \n" + cmMsg + "\n"); // for debug
                     //s.setDescription( desc);
                     //s.setIsFinal( true);
                     csDAO.finalizeControlStrategy(s.getId(), cmMsg, session);
@@ -133,7 +133,7 @@ public class CMImportTask implements Runnable {
                     cmMsg += "Measures deleted: " + numCMToBeDeleted + "\n";
                     cmMsg += "Control Technolgies Affected: \n";
                     cmMsg += this.getControlTechnologiesAffected(p, ids);
-                    setDetailStatus( ">>> " + p.getName() + ": \n" + cmMsg + "\n"); // for debug
+                    //setDetailStatus( ">>> " + p.getName() + ": \n" + cmMsg + "\n"); // for debug
                     //s.setDescription( desc);
                     //s.setIsFinal( true);
                     cpDAO.updateControlProgram(p.getId(), cmMsg, session);
@@ -172,12 +172,12 @@ public class CMImportTask implements Runnable {
                 //delete measure by sector....
 //                session.setFlushMode(FlushMode.NEVER);
 
-//                new ControlMeasureDAO().remove(sectorIds, sessionFactory, dbServer);
+                new ControlMeasureDAO().remove(sectorIds, sessionFactory, dbServer);
                 
             } catch (Exception e) {
 //                LOG.error("Could not export control measures.", e);
                 e.printStackTrace();
-                setDetailStatus("Could not backup/purge export control measures: " + e.getMessage());
+                setDetailStatus("Exception occured: " + e.getMessage());
             } finally {
                 session.close();
                 try {
