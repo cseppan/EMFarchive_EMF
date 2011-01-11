@@ -52,6 +52,15 @@
 
 	<property name="tomcat.stop.prefix" value="-jar -Duser.dir=${tomcat.home} ${tomcat.home}/bin/bootstrap.jar" />
 	<property name="tomcat.stop" value="${tomcat.stop.prefix} stop" />
+	
+	<property name="win7.tomcat.start.prefix" value="-jar -Duser.dir=&quot;${tomcat.home}&quot; -Djava.endorsed.dirs=&quot;${tomcat.home}&quot;/common/endorsed ${tomcat.memory.vmargs} &quot;${tomcat.home}&quot;/bin/bootstrap.jar" />
+	<property name="win7.tomcat.start" value="${win7.tomcat.start.prefix} start" />
+	<property name="win7.tomcat.start.debug.prefix" value="-jar -Duser.dir=&quot;${tomcat.home}&quot; -Djava.endorsed.dirs=&quot;${tomcat.home}&quot;/common/endorsed ${tomcat.memory.vmargs} ${tomcat.debug.vmargs} &quot;${tomcat.home}&quot;/bin/bootstrap.jar" />
+	<property name="win7.tomcat.start.debug" value="${win7.tomcat.start.debug.prefix} start" />
+
+	<property name="win7.tomcat.stop.prefix" value="-jar -Duser.dir=&quot;${tomcat.home}&quot; &quot;${tomcat.home}&quot;/bin/bootstrap.jar" />
+	<property name="win7.tomcat.stop" value="${win7.tomcat.stop.prefix} stop" />
+	
 
 	<property name="" value="" />
 	<!-- end Tomcat properties -->
@@ -528,7 +537,7 @@
 			<arg line="${tomcat.start}" />
 		</exec>
 	</target>
-
+	
 	<target name="tomcat-start-with-debug">
 		<echo message="Starting with debug: ${tomcat.start.debug}" />
 		<!-- Note Linux executable -->
@@ -545,6 +554,37 @@
 		</echo>
 		<echo message="Tomcat stopped." />
 	</target>
+	
+	<target name="win7-redeploy" depends="win7-tomcat-stop, simple-deploy, win7-tomcat-start" description="Stops Tomcat, deploys EMF, and starts Tomcat" />
+	
+	<target name="win7-redeploy-debug" depends="win7-tomcat-stop, simple-deploy, win7-tomcat-start-with-debug" description="Stops Tomcat, deploys EMF, and starts Tomcat" />
+	
+	<target name="win7-tomcat-restart" depends="win7-tomcat-stop, win7-tomcat-start" />
+	
+	<target name="win7-tomcat-start">
+		<echo message="Starting with: ${win7.tomcat.start}" />
+		<!-- Note Linux executable -->
+		<exec executable="${jdk.home}/bin/java.exe" dir="${build.home}" output="${build.home}/tomcat-start.txt" error="${build.home}/tomcat-start-error.txt" failonerror="yes">
+			<arg line="${win7.tomcat.start}" />
+		</exec>
+	</target>	
+	
+	<target name="win7-tomcat-start-with-debug">
+		<echo message="Starting with debug: ${win7.tomcat.start.debug}" />
+		<!-- Note Linux executable -->
+		<exec executable="${jdk.home}/bin/java.exe" dir="${build.home}" output="${build.home}/tomcat-start.txt" error="${build.home}/tomcat-start-error.txt" failonerror="yes">
+			<arg line="${win7.tomcat.start.debug}" />
+		</exec>
+	</target>	
+	
+	<target name="win7-tomcat-stop">
+		<exec executable="${jdk.home}/bin/java.exe" dir="${build.home}" output="${build.home}/tomcat-stop.txt" error="${build.home}/tomcat-stop-error.txt" failonerror="false">
+			<arg line="${win7.tomcat.stop}" />
+		</exec>
+		<echo>
+		</echo>
+		<echo message="Tomcat stopped." />
+	</target>	
 
 	<!--  ===============END  Tomcat Deployment Targets ====================================== -->
 
