@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.cost;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Pollutant;
@@ -52,16 +51,15 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         String tableName = "test" + Math.round(Math.random() * 1000) % 1000;
         EmfDataset inputDataset = new EmfDataset();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = tableName;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            inputDataset.setName(newName);
+        String newName = tableName;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            inputDataset.setName(tableName);
+            throw new EmfException("Dataset name is null");
         }
-        inputDataset.setCreator(emfUser().getUsername());
+        inputDataset.setName(newName);
+
+            inputDataset.setCreator(emfUser().getUsername());
         inputDataset.setDatasetType(getDatasetType(type));//orlNonpointDatasetType());
 
         add(inputDataset);

@@ -1,11 +1,11 @@
 package gov.epa.emissions.framework.services.basic;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.HibernateTestCase;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.ExImDbUpdate;
@@ -48,15 +48,13 @@ public class AccessLogPersistenceTest extends HibernateTestCase {
 
             dataset = new EmfDataset();
             
-            if ( ForBugs.FIX_BUG3555) {
-                String userName = user.getUsername();
-                if ( userName != null) {
-                    userName = userName.trim();
-                }
-                dataset.setName(userName + "_" + id);
-            } else{
-                dataset.setName(user.getUsername() + "_" + id);
+            String userName = user.getUsername();
+            if ( userName != null) {
+                userName = userName.trim();
+            } else {
+                throw new EmfException("User name is null");
             }
+            dataset.setName(userName + "_" + id);
             
             dataset.setAccessedDateTime(new Date());
             dataset.setCreatedDateTime(new Date());

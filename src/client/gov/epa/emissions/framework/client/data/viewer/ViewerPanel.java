@@ -7,19 +7,22 @@ import gov.epa.emissions.framework.client.data.DataSortFilterPanel;
 import gov.epa.emissions.framework.client.data.DoubleRenderer;
 import gov.epa.emissions.framework.client.data.PaginationPanel;
 import gov.epa.emissions.framework.client.data.TableColumnHeaders;
+import gov.epa.emissions.framework.client.data.DateRenderer;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 import gov.epa.emissions.framework.ui.TableColumnWidth;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
@@ -150,6 +153,15 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
 
         viewTable.setDefaultRenderer(Double.class, doubleRenderer);
         viewTable.setDefaultRenderer(Float.class, doubleRenderer);
+        
+        DateRenderer fcr = new DateRenderer();
+        viewTable.setDefaultRenderer(java.sql.Timestamp.class, fcr);
+        viewTable.setDefaultRenderer(java.sql.Date.class, fcr);
+        viewTable.setDefaultRenderer(java.sql.Time.class, fcr);
+        viewTable.setDefaultRenderer(java.util.Date.class, fcr);
+        viewTable.setDefaultRenderer(java.util.Calendar.class, fcr);
+        viewTable.setDefaultRenderer(java.util.GregorianCalendar.class, fcr);
+        
         viewTable.repaint();
     }
 

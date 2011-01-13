@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
@@ -68,7 +69,7 @@ public class ControlStrategyResultsTest extends ServiceTestCase {
         assertEquals(StrategyResultType.detailedStrategyResult, detailedStrategyResultType.getName());
     }
 
-    private EmfDataset dataset() {
+    private EmfDataset dataset() throws EmfException {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("test_dataset" + Math.random());
         dataset.setCreator("emf");

@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.cost;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
@@ -15,6 +14,7 @@ import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
@@ -40,16 +40,14 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
     protected EmfDataset setInputDataset(String type) throws Exception {
         EmfDataset inputDataset = new EmfDataset();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = tableName;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            inputDataset.setName(newName);
+        String newName = tableName;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            inputDataset.setName(tableName);
+            throw new EmfException("Dataset name is null");
         }
-        
+        inputDataset.setName(newName);
+       
         inputDataset.setCreator(emfUser().getUsername());
         inputDataset.setDatasetType(orlNonpointDatasetType());
 

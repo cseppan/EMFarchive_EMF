@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.exim;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 import gov.epa.emissions.commons.io.importer.ImporterException;
@@ -96,7 +95,7 @@ public class ImportService {
         }
     }
 
-    public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType) {
+    public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType) throws EmfException {
         showMultipleDatasets(user, filenames);
 
         for (int i = 0; i < filenames.length; i++) {
@@ -122,19 +121,17 @@ public class ImportService {
     }
 
     private EmfDataset createDataset(String folder, String filename, String datasetName, User user,
-            DatasetType datasetType) {
+            DatasetType datasetType) throws EmfException {
         EmfDataset dataset = new EmfDataset();
         File file = new File(folder, filename);
 
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = datasetName;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = datasetName;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(datasetName);
+            throw new EmfException("Dataset name is null");
         }
+        dataset.setName(newName);
         
         dataset.setCreator(user.getUsername());
         dataset.setCreatorFullName(user.getName());

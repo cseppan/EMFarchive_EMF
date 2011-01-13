@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.qa;
 //import java.io.File;
 //import java.util.Date;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DbServer;
 //import gov.epa.emissions.commons.db.SqlDataTypes;
@@ -13,6 +12,7 @@ import gov.epa.emissions.commons.db.version.Version;
 //import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 //import gov.epa.emissions.commons.io.importer.VersionedImporter;
 //import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -86,18 +86,16 @@ public class SQLMultiInvProgramQueryTest extends ServiceTestCase {
         }
     }
     
-    private EmfDataset dataset(int datasetId, String name, String tableName) {
+    private EmfDataset dataset(int datasetId, String name, String tableName) throws EmfException {
         EmfDataset dataset = new EmfDataset();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = name;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = name;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(name);
+            throw new EmfException("Dataset name is null");
         }
+        dataset.setName(newName);
         
         dataset.setId(datasetId);
         dataset.setCreator("emf");

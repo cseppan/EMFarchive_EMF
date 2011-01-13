@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.exim;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
@@ -407,15 +406,13 @@ public class ManagedImportService {
                     "Invalid year or date format for EMF start/end date in file header (use MM/dd/YYYY hh:mm).");
         }
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = name;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = name;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(name);
+            throw new EmfException("Dataset name is null");
         }
+        dataset.setName(newName);
 
         dataset.setCreator(user.getUsername());
         dataset.setCreatorFullName(user.getName());

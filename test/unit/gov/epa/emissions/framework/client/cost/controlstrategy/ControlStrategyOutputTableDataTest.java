@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.ControlStrategyOutputTableData;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -17,7 +17,7 @@ public class ControlStrategyOutputTableDataTest extends TestCase {
 
     private ControlStrategyResult result;
 
-    protected void setUp() {
+    protected void setUp() throws EmfException{
         result = new ControlStrategyResult();
         EmfDataset detailDataset1 = detailDataset("detailed dataset1");
         result.setDetailedResultDataset(detailDataset1);
@@ -31,25 +31,23 @@ public class ControlStrategyOutputTableDataTest extends TestCase {
         data = new ControlStrategyOutputTableData(new ControlStrategyResult[] { result });
     }
 
-    private EmfDataset detailDataset(String name) {
+    private EmfDataset detailDataset(String name) throws EmfException {
         EmfDataset dataset = dataset(name);
         dataset.setStatus("Created By Control Strategy");
         return dataset;
 
     }
 
-    private EmfDataset dataset(String name) {
+    private EmfDataset dataset(String name) throws EmfException {
         EmfDataset dataset = new EmfDataset();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = name;
-            if ( name != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = name;
+        if ( name != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(name);
+            throw new EmfException("Dataset name is null");
         }
+        dataset.setName(newName);
         
         return dataset;
     }

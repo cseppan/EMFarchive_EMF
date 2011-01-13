@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.ClipBoardCopy;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.data.DateRenderer;
 import gov.epa.emissions.framework.client.data.DoubleRenderer;
 import gov.epa.emissions.framework.client.data.ObserverPanel;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
@@ -157,6 +158,13 @@ public class EditablePagePanel extends JPanel {
             JTable table = scrollTable.getTable();            
             table.setDefaultRenderer(Double.class, doubleRenderer);
             table.setDefaultRenderer(Float.class, doubleRenderer);
+            DateRenderer fcr = new DateRenderer();
+            table.setDefaultRenderer(java.sql.Timestamp.class, fcr);
+            table.setDefaultRenderer(java.sql.Date.class, fcr);
+            table.setDefaultRenderer(java.sql.Time.class, fcr);
+            table.setDefaultRenderer(java.util.Date.class, fcr);
+            table.setDefaultRenderer(java.util.Calendar.class, fcr);
+            table.setDefaultRenderer(java.util.GregorianCalendar.class, fcr);
  
             addCopyPasteClipBoard(editableTable);
         }

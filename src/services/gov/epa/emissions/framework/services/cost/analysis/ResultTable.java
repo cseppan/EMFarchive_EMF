@@ -1,27 +1,25 @@
 package gov.epa.emissions.framework.services.cost.analysis;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.importer.DataTable;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class ResultTable {
     
     private DataTable delegate;
     
-    public ResultTable(String table, Datasource datasource) {
+    public ResultTable(String table, Datasource datasource) throws EmfException {
         EmfDataset dataset = new EmfDataset();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = table;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = table;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(table);
+            throw new EmfException("Dataset name is null");
         }
+        dataset.setName(newName);
         
         this.delegate = new DataTable(dataset, datasource);
     }

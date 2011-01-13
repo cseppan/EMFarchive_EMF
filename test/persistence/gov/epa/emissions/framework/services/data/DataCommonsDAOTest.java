@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.UserDAO;
@@ -182,7 +183,7 @@ public class DataCommonsDAOTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldPersistRevisionOnAdd() {
+    public void testShouldPersistRevisionOnAdd() throws EmfException {
         Revision rev = null;
 
         User user = userDao.get("emf", session);
@@ -204,7 +205,7 @@ public class DataCommonsDAOTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldAddANDGetThreeRevisions() {
+    public void testShouldAddANDGetThreeRevisions() throws EmfException {
         Revision rev1 = null, rev2 = null, rev3 = null;
 
         User user = userDao.get("emf", session);
@@ -233,7 +234,7 @@ public class DataCommonsDAOTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldPersistNoteOnAdd() {
+    public void testShouldPersistNoteOnAdd() throws EmfException {
         User user = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
@@ -254,7 +255,7 @@ public class DataCommonsDAOTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldGetAllNotes() {
+    public void testShouldGetAllNotes() throws EmfException {
         User user = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());

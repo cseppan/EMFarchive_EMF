@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.data;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.ExternalSource;
@@ -170,19 +169,17 @@ public class DatasetDAO {
                                 + " order by DS.name").list();
     }
 
-    public void add(EmfDataset dataset, Session session) {
+    public void add(EmfDataset dataset, Session session) throws EmfException {
         //NOTE: to trim the leading and trailing spaces???
         String name = dataset.getName();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = name;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = name;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(name);
+            throw new EmfException("Dataset name is null");
         }
+        dataset.setName(newName);
         
         hibernateFacade.add(dataset, session);
     }
@@ -272,15 +269,13 @@ public class DatasetDAO {
                 return;
             }
             
-            if ( ForBugs.FIX_BUG3555) {
-                String name1 = newName;
-                if ( newName != null) {
-                    name1 = name1.trim();
-                }
-                locked.setName(name1);
+            String name1 = newName;
+            if ( newName != null) {
+                name1 = name1.trim();
             } else {
-                locked.setName(newName);
+                throw new EmfException("Dataset name is null");
             }
+            locked.setName(name1);
             
             locked.setStatus("Deleted");
 

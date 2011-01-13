@@ -21,6 +21,13 @@ public class DataEditorTable extends EditableTable {
         setDefaultEditor(Float.class, numericTableCellEditor);
         setDefaultEditor(Integer.class, numericTableCellEditor);
         setDefaultEditor(String.class, new StringTableCellEditor(tableMetadata, messagePanel));
+        DateDataCellEditor dateCellEditor = new DateDataCellEditor(messagePanel);
+        setDefaultEditor(java.sql.Timestamp.class, dateCellEditor);
+        setDefaultEditor(java.sql.Time.class, dateCellEditor);
+        setDefaultEditor(java.sql.Date.class, dateCellEditor);
+        setDefaultEditor(java.util.Date.class, dateCellEditor);
+        setDefaultEditor(java.util.Calendar.class, dateCellEditor);
+        setDefaultEditor(java.util.GregorianCalendar.class, dateCellEditor);
     }
 
     public void setValueAt(Object value, int row, int column) {

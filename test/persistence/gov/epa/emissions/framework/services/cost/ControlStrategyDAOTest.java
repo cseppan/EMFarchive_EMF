@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.cost;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
@@ -74,20 +73,18 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
             remove(element);
             remove(dataset);
         }
-    }    private EmfDataset dataset(String name) {
+    }    private EmfDataset dataset(String name) throws EmfException {
         User owner = new UserDAO().get("emf", session);
 
         EmfDataset dataset = new EmfDataset();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = name;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = name;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(name);
+            throw new EmfException("Dataset name is null");
         }
+        dataset.setName(newName);
         
         dataset.setCreator(owner.getUsername());
 

@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.data;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.Datasource;
@@ -15,6 +14,7 @@ import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.reference.CSVFileFormat;
 import gov.epa.emissions.commons.io.temporal.TemporalProfileImporter;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.UserDAO;
@@ -307,7 +307,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldObtainLockedDatasetForUpdate() {
+    public void testShouldObtainLockedDatasetForUpdate() throws EmfException {
         User owner = userDAO.get("emf", session);
         EmfDataset dataset = newDataset("dataset-dao-test");
 
@@ -340,7 +340,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() {
+    public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() throws EmfException {
         UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
         EmfDataset dataset = newDataset("dataset-dao-test");
@@ -358,7 +358,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldReleaseLock() {
+    public void testShouldReleaseLock() throws EmfException {
         UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
         EmfDataset dataset = newDataset("dataset-dao-test");
@@ -483,7 +483,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldDetectWhetherUsedByControlStrategiesOrCases() {
+    public void testShouldDetectWhetherUsedByControlStrategiesOrCases() throws EmfException {
         EmfDataset dataset = newDataset("dataset-dao-test");
         EmfDataset dataset2 = newDataset("test2");
         EmfDataset dataset3 = newDataset("test3");
@@ -516,20 +516,18 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
     
-    private EmfDataset newDataset(String name) {
+    private EmfDataset newDataset(String name) throws EmfException {
         User owner = userDAO.get("emf", session);
 
         EmfDataset dataset = new EmfDataset();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = name;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = name;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(name);
+            throw new EmfException("Dataset name is null");
         }
+        dataset.setName(newName);
 
         dataset.setCreator(owner.getUsername());
 

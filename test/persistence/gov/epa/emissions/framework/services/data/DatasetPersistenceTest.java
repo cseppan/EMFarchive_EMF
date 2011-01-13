@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.data;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
@@ -12,6 +11,7 @@ import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.HibernateTestCase;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -68,15 +68,13 @@ public class DatasetPersistenceTest extends HibernateTestCase {
             dataset.setDescription("DESCRIPTION");
             dataset.setModifiedDateTime(new Date());
             
-            if ( ForBugs.FIX_BUG3555) {
-                String newName = datasetName;
-                if ( newName != null) {
-                    newName = newName.trim();
-                }
-                dataset.setName(newName);
+            String newName = datasetName;
+            if ( newName != null) {
+                newName = newName.trim();
             } else {
-                dataset.setName(datasetName);
+                throw new EmfException("Dataset name is null");
             }
+            dataset.setName(newName);
             
             dataset.setProject(project);
             dataset.setRegion(region);

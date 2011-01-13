@@ -2,18 +2,29 @@ package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.commons.util.CustomDateFormat;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 
 public abstract class AbstractTableData implements TableData {
 
     public AbstractTableData() {
         //no data
     }
+    
+    public static Date toDate(Timestamp timestamp) {
+        long milliseconds = timestamp.getTime() + (timestamp.getNanos() / 1000000);
+        return new java.util.Date(milliseconds);
+    } 
 
     final protected String format(Date date) {
         return (date == null) ? "N/A" : CustomDateFormat.format_YYYY_MM_DD_HH_MM(date);
+    }
+    
+    final protected String format(Timestamp timestamp) {
+        return (timestamp == null) ? "N/A" : format(toDate(timestamp));
     }
 
     /**

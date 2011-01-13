@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.services.qa;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -134,7 +134,7 @@ public class QADaoTest extends ServiceTestCase {
         assertEquals(4, programs.length);
     }
 
-    public void testShouldCheckExistQAStep() {
+    public void testShouldCheckExistQAStep() throws EmfException {
         EmfDataset dataset = newDataset("dataset-dao-test");
 
         QAStep step = new QAStep();
@@ -155,21 +155,19 @@ public class QADaoTest extends ServiceTestCase {
 
     }
 
-    private EmfDataset newDataset(String name) {
+    private EmfDataset newDataset(String name) throws EmfException {
         User owner = userDAO.get("emf", session);
 
         EmfDataset dataset = new EmfDataset();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = name;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = name;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(name);
+            throw new EmfException("Dataset name is null");
         }
-
+        dataset.setName(newName);
+            
         dataset.setCreator(owner.getUsername());
 
         save(dataset);

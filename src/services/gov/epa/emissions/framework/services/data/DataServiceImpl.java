@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.data;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
@@ -260,16 +259,13 @@ public class DataServiceImpl implements DataService {
                     
                 try {
                     
-                    if ( ForBugs.FIX_BUG3555) {
-                        String newName = prefix + ds.getName();
-                        if ( newName != null) {
-                            newName = newName.trim();
-                        }
-                        ds.setName(newName);
+                    String newName = prefix + ds.getName();
+                    if ( newName != null) {
+                        newName = newName.trim();
                     } else {
-                        ds.setName(prefix + ds.getName());
+                        throw new EmfException("Dataset name is null");
                     }
-                    
+                    ds.setName(newName);
                     
                     ds.setStatus("Deleted");
                     updateDataset(ds);
@@ -979,16 +975,13 @@ public class DataServiceImpl implements DataService {
             
             EmfDataset copied = (EmfDataset) DeepCopy.copy(dataset);
             
-            if ( ForBugs.FIX_BUG3555) {
-                String newName = dataset.getName();
-                if ( newName != null) {
-                    newName = newName.trim();
-                }
-                copied.setName(getUniqueNewName("Copy of " + newName + "_v" + version.getVersion()));
+            String newName = dataset.getName();
+            if ( newName != null) {
+                newName = newName.trim();
             } else {
-                copied.setName(getUniqueNewName("Copy of " + dataset.getName() + "_v" + version.getVersion()));
+                throw new EmfException("Dataset name is null");
             }
-            
+            copied.setName(getUniqueNewName("Copy of " + newName + "_v" + version.getVersion()));
             
             copied.setStatus(dataset.getStatus());
             copied.setDescription("#Copied from version " + version.getVersion() + " of dataset " + dataset.getName()

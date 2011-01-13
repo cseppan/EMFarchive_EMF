@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.basic;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -151,15 +150,13 @@ public class LoggingServiceTest extends ServiceTestCase {
         EmfDataset dataset;
         dataset = new EmfDataset();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = user.getUsername() + "_" + id;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = user.getUsername() + "_" + id;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(user.getUsername() + "_" + id);
+            throw new EmfException("Dataset name is null");
         }
+        dataset.setName(newName);
 
         dataset.setAccessedDateTime(new Date());
         dataset.setCreatedDateTime(new Date());

@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.qa;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
@@ -13,6 +12,7 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.QAStepTask;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
@@ -71,15 +71,13 @@ public class QAStepTaskTest extends ServiceTestCase {
     public void testShouldCheckAndRunSummaryQASteps() throws Exception {
         EmfDataset inputDataset = new EmfDataset();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = tableName;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            inputDataset.setName(newName);
+        String newName = tableName;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            inputDataset.setName(tableName);
+            throw new EmfException("Dataset name is null");
         }
+        inputDataset.setName(newName);
         
         inputDataset.setCreator(userDAO.get("emf", session).getUsername());
         inputDataset.setDatasetType(getDatasetType(DatasetType.orlNonpointInventory));
@@ -102,7 +100,7 @@ public class QAStepTaskTest extends ServiceTestCase {
         modifier.insertOneRow(data);
     }
 
-    private EmfDataset newDataset(String name, String type) {
+    private EmfDataset newDataset(String name, String type) throws EmfException{
         User owner = userDAO.get("emf", session);
 
         if (type.equals(""))
@@ -110,15 +108,14 @@ public class QAStepTaskTest extends ServiceTestCase {
 
         EmfDataset dataset = new EmfDataset();
         
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = name;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = name;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(name);
+            throw new EmfException("Dataset name is null");
         }
+        dataset.setName(newName);
+        
         
         dataset.setCreator(owner.getUsername());
         dataset.setDatasetType(getDatasetType(type));

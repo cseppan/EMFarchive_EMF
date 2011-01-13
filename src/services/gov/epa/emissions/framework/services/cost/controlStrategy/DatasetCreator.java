@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.cost.controlStrategy;
 
-import gov.epa.emissions.commons.ForBugs;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
@@ -240,7 +239,7 @@ public class DatasetCreator {
     private EmfDataset createDataset(String name, 
             String description,
             DatasetType type,
-            EmfDataset inputDataset) {
+            EmfDataset inputDataset) throws EmfException {
         EmfDataset dataset = createDataset(name, 
                 description,
                 type);
@@ -261,19 +260,17 @@ public class DatasetCreator {
     
     private EmfDataset createDataset(String name, 
             String description,
-            DatasetType type) {
+            DatasetType type) throws EmfException {
         EmfDataset dataset = new EmfDataset();
         Date start = new Date();
 
-        if ( ForBugs.FIX_BUG3555) {
-            String newName = name;
-            if ( newName != null) {
-                newName = newName.trim();
-            }
-            dataset.setName(newName);
+        String newName = name;
+        if ( newName != null) {
+            newName = newName.trim();
         } else {
-            dataset.setName(name);
+            throw new EmfException("Dataset name is null");
         }
+        dataset.setName(newName);
         
         dataset.setCreator(user.getUsername());
         dataset.setCreatorFullName(user.getName());
