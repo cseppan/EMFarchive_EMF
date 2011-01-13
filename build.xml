@@ -555,9 +555,9 @@
 		<echo message="Tomcat stopped." />
 	</target>
 	
-	<target name="win7-redeploy" depends="win7-tomcat-stop, simple-deploy, win7-tomcat-start" description="Stops Tomcat, deploys EMF, and starts Tomcat" />
+	<target name="win7-redeploy" depends="win7-tomcat-stop, analysisengine-dist, commons-dist, simple-deploy, win7-tomcat-start" description="Stops Tomcat, deploys EMF, and starts Tomcat" />
 	
-	<target name="win7-redeploy-debug" depends="win7-tomcat-stop, simple-deploy, win7-tomcat-start-with-debug" description="Stops Tomcat, deploys EMF, and starts Tomcat" />
+	<target name="win7-redeploy-debug" depends="win7-tomcat-stop, analysisengine-dist, commons-dist, simple-deploy, win7-tomcat-start-with-debug" description="Stops Tomcat, deploys EMF, and starts Tomcat" />
 	
 	<target name="win7-tomcat-restart" depends="win7-tomcat-stop, win7-tomcat-start" />
 	
