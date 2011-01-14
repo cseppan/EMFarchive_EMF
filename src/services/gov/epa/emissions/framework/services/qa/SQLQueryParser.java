@@ -1,18 +1,16 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.commons.data.InternalSource;
-import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
-import gov.epa.emissions.framework.services.qa.QAVersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Hashtable;
-//import java.util.StringTokenizer;
 
 import org.hibernate.Session;
 
@@ -135,7 +133,8 @@ public class SQLQueryParser {
             throw new EmfException("There is still a  '" + isErrorQueryTag + "' in the program arguments");
         }
         
-        return versioned(query);
+        //return versioned(query);
+        return query;
     }
 
     private String expandOneTag(String query) throws EmfException {
@@ -170,10 +169,11 @@ public class SQLQueryParser {
         // The appropriate key plus the string array (as a "value") is put into the hashtable.
 
         String[] ds1 = { dataSetName, suffixTokens[0], ds1version, dsId, versionCompletePath };
+        tableValuesAliasesVersions.clear();
         tableValuesAliasesVersions.put("ds1", ds1);
 
         // The table name from the dataset is derived from the method below off of the second token.
-        return prefix + tableNameFromDataset(suffixTokens[1], dataset) + suffixTokens[2];
+        return prefix + versioned(tableNameFromDataset(suffixTokens[1], dataset) + suffixTokens[2]);
     }
 
     // Added this method to handle new tag $DATASET_TABLE[ datasetname, tablenum ]
@@ -256,6 +256,7 @@ public class SQLQueryParser {
             // The second string array value is calculated for the hashtable.
             // The appropriate key plus the string array (as a "value") is put into the hashtable.
             String[] ds2 = { dataSetName, suffixTokens[0], ds2version, ds2Id, versionCompletePath };
+            tableValuesAliasesVersions.clear();
             tableValuesAliasesVersions.put("ds2", ds2);
 
             /*
@@ -266,7 +267,7 @@ public class SQLQueryParser {
              */
 
             // The table name from the dataset is derived from the method below off of the second token.
-            return prefix + tableNameFromDataset(tableNum, dataSet2) + suffixTokens[2];
+            return prefix + versioned(tableNameFromDataset(tableNum, dataSet2) + suffixTokens[2]);
         } catch (RuntimeException e) {
             // NOTE Auto-generated catch block
             System.out.println("Could not parse query: "+query);
@@ -373,7 +374,7 @@ public class SQLQueryParser {
 
         // Chcek to see if the version1 value is valid, if not throw an exception.
         if (version1 == null)
-            throw new EmfException("The version name must be valid");
+            throw new EmfException("The version name must be valid: " + dataSet3.getName());
         // System.out.println("version object " + version1);
 
         // The complete path of the version is retrieved from the version object just created.
@@ -392,10 +393,11 @@ public class SQLQueryParser {
         // The third string array value is calculated for the hashtable.
         // The appropriate key plus the string array (as a "value") is put into the hashtable.
         String[] ds3 = { dataSetName, suffixTokens[0], ds3version, ds3Id, versionCompletePath };
+        tableValuesAliasesVersions.clear();
         tableValuesAliasesVersions.put("ds3", ds3);
 
         // The table name from the dataset is derived from the method below off of the second token.
-        return prefix + tableNameFromDataset(tableNum, dataSet3) + suffixTokens[2];
+        return prefix + versioned(tableNameFromDataset(tableNum, dataSet3) + suffixTokens[2]);
         // return "OK";
     }
     
@@ -698,7 +700,7 @@ public class SQLQueryParser {
 
         int index = nextDollarSign.indexOf(endQueryTag);
         if (index == -1)
-            throw new EmfException("The '" + endQueryTag + "' is expected in the program arguments");
+            throw new EmfException("The '" + endQueryTag + "' is expected in the program arguments:" + nextDollarSign);
 
         // Break up the token into a prefix and suffix string.
 
@@ -734,19 +736,19 @@ public class SQLQueryParser {
             aliasValue = suffix.charAt(1) + "";
         } else if 
         (
-            suffix.length() >= 3 && 
-            (
+                suffix.length() >= 3 && 
                 (
-                    Character.isSpaceChar(suffix.charAt(0)) && Character.isLetter(suffix.charAt(1))
-                    && suffix.charAt(1) != ')' 
-                    && (!Character.isLetterOrDigit(suffix.charAt(2)))
+                        (
+                                Character.isSpaceChar(suffix.charAt(0)) && Character.isLetter(suffix.charAt(1))
+                                && suffix.charAt(1) != ')' 
+                                    && (!Character.isLetterOrDigit(suffix.charAt(2)))
+                        )
                 )
-            )
         )
         {
             aliasValue = suffix.charAt(1) + "";
         } else {
-            throw new EmfException("A one-character alias value is expected after the '" + endQueryTag + "'");
+            throw new EmfException("A one-character alias value is expected after the '" + endQueryTag + "'" + suffix);
         }
         //System.out.println("alias: " + aliasValue);
         return new String[] { aliasValue, prefix, suffix };
@@ -790,7 +792,7 @@ public class SQLQueryParser {
         try {
             int value = Integer.parseInt(tableNo);
             if (value <= 0)
-                throw new EmfException("The table number should be greater or equal to one");
+                throw new EmfException("The table number should be greater or equal to one: "+tableNo );
             return value;
         } catch (NumberFormatException e) {
             throw new EmfException("Could not convert the table number to an integer -" + qaStep.getProgramArguments());
