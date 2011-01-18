@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.editor;
 
+import gov.epa.emissions.commons.CommonDebugLevel;
 import gov.epa.emissions.commons.PerformanceMetrics;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
@@ -8,8 +9,10 @@ import gov.epa.emissions.commons.db.TableDefinition;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsFactory;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.db.version.VersionedRecordsFactory;
 import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -74,7 +77,11 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
-        return accessor.getPage(token, pageNumber);
+        Page page = accessor.getPage(token, pageNumber);
+        if ( CommonDebugLevel.DEBUG_PAGE_2){
+            page.print();
+        }
+        return page;
     }
 
     public int getPageCount(DataAccessToken token) throws EmfException {
@@ -82,7 +89,11 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public Page getPageWithRecord(DataAccessToken token, int record) throws EmfException {
-        return accessor.getPageWithRecord(token, record);
+        Page page = accessor.getPageWithRecord(token, record);
+        if ( CommonDebugLevel.DEBUG_PAGE_2){
+            page.print();
+        }
+        return page;
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {
@@ -102,9 +113,104 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
             session.close();
         }
     }
+    
+    private VersionedRecord[] validateVersionedRecord( ColumnMetaData[] colMetaDate, VersionedRecord[] records) throws EmfException {
+        if ( colMetaDate != null && records != null){
+            for ( VersionedRecord vr : records) {
+                
+                if ( CommonDebugLevel.DEBUG_PAGE_2) {
+                    System.out.println("******");
+                    System.out.println("******");
+                    System.out.println("******");
+
+                    for ( int j=0; j<vr.size(); j++) {
+                        if ( vr.token(j) != null) {
+                            System.out.println( j + "> class: " + vr.token(j).getClass());
+                        } else {
+                            System.out.println( j + "> null");
+                        }
+                    }
+                }
+                
+                if ( vr != null && colMetaDate.length != vr.size() + vr.numVersionCols()) {
+                    throw new EmfException("VersionedRecord length + " + vr.numVersionCols() + " <> ColumnMetaData length");
+                }
+                
+                for ( int j=0; j<vr.size(); j++) {    
+                    String type = colMetaDate[j+vr.numVersionCols()].getType();
+                    if ( vr.token(j) != null && !vr.token(j).getClass().getName().equals( type)) {
+                        if ( vr.token(j) instanceof java.util.Calendar) {
+                            if ( type.equals( java.sql.Timestamp.class.getName())){
+                                java.sql.Timestamp ts = new java.sql.Timestamp(((java.util.Calendar)vr.token(j)).getTime().getTime());
+                                vr.replace(j, ts);
+                            } else if ( type.equals( java.sql.Time.class.getName())){
+                                java.sql.Time ts = new java.sql.Time(((java.util.Calendar)vr.token(j)).getTime().getTime());
+                                vr.replace(j, ts);
+                            } else if ( type.equals( java.sql.Date.class.getName())){
+                                java.sql.Date ts = new java.sql.Date(((java.util.Calendar)vr.token(j)).getTime().getTime());
+                                vr.replace(j, ts);
+                            } else if ( type.equals( java.util.Date.class.getName())){
+                                java.util.Date ts = ((java.util.Calendar)vr.token(j)).getTime();
+                                vr.replace(j, ts);
+                            } else {
+                                throw new EmfException("Do not support the conversion from " + vr.token(j).getClass() + " to " + type);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return records;
+    }
+    
+    private ChangeSet validateChangeSet( DataAccessToken token, ChangeSet changeset) throws EmfException {
+        TableMetadata tableMetaData = getTableMetadata( token.getTable());
+        ColumnMetaData[] colMetaDate = tableMetaData.getCols();
+        
+        if ( CommonDebugLevel.DEBUG_PAGE_2) {
+            if ( colMetaDate != null) {
+                for ( int i=0; i<colMetaDate.length; i++) {
+                    if ( colMetaDate[i] != null) {
+                        System.out.println( i + "> class: " + colMetaDate[i].getType() );
+                    } else {
+                        System.out.println( i + "> null" );
+                    }
+                }
+            }
+        }
+        
+        changeset.setNewRecords( validateVersionedRecord( colMetaDate, changeset.getNewRecords()));
+        changeset.setUpdatedRecords( validateVersionedRecord( colMetaDate, changeset.getUpdatedRecords()));
+        changeset.setDeletedRecords( validateVersionedRecord( colMetaDate, changeset.getDeletedRecords()));
+        
+        return changeset;
+    }
 
     public void submit(DataAccessToken token, ChangeSet changeset, int pageNumber) throws EmfException {
         try {
+            
+            if ( CommonDebugLevel.DEBUG_PAGE_2) {
+                System.out.println("======");
+                System.out.println("======");
+                System.out.println("======\n>>> Before Validation");
+                changeset.print();
+                System.out.println("======");
+                System.out.println("======");
+                System.out.println("======");
+            } 
+            
+            changeset = validateChangeSet ( token, changeset);
+            
+            if ( CommonDebugLevel.DEBUG_PAGE_2) {
+                System.out.println("\n======");
+                System.out.println("\n======");
+                System.out.println("\n======\n>>> After Validation");
+                changeset.print();
+                System.out.println("\n======");
+                System.out.println("\n======");
+                System.out.println("\n======");
+            } 
+            
             Session session = sessionFactory.getSession();
             cache.submitChangeSet(token, changeset, pageNumber, session);
             session.close();
@@ -112,7 +218,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
             LOG.error("Could not submit changes for Dataset: " + token.datasetId() + ". Version: " + token.getVersion()
                     + "." + e.getMessage(), e);
             throw new EmfException("Could not submit changes for Dataset: " + token.datasetId() + ". Version: "
-                    + token.getVersion());
+                    + token.getVersion() + " - " + e.getMessage());
         }
     }
 

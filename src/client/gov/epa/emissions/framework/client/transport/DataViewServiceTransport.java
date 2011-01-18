@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.CommonDebugLevel;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.TableMetadata;
@@ -24,8 +25,14 @@ public class DataViewServiceTransport implements DataViewService {
 
         call.setOperation("applyConstraints");
         call.setReturnType(mappings.page());
+        
+        Page page = (Page) call.requestResponse(new Object[] { token, rowFilter, sortOrder });
+        
+        if ( CommonDebugLevel.DEBUG_PAGE_2) {
+            page.print();
+        }
 
-        return (Page) call.requestResponse(new Object[] { token, rowFilter, sortOrder });
+        return page;
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
@@ -34,8 +41,14 @@ public class DataViewServiceTransport implements DataViewService {
 
         call.setOperation("getPage");
         call.setReturnType(mappings.page());
+        
+        Page page = (Page) call.requestResponse(new Object[] { token, new Integer(pageNumber) });
+        
+        if ( CommonDebugLevel.DEBUG_PAGE_2) {
+            page.print();
+        }
 
-        return (Page) call.requestResponse(new Object[] { token, new Integer(pageNumber) });
+        return page;
     }
 
     public int getPageCount(DataAccessToken token) throws EmfException {
@@ -54,8 +67,14 @@ public class DataViewServiceTransport implements DataViewService {
 
         call.addParam("token", mappings.dataAccessToken());
         call.addIntegerParam("record");
+        
+        Page page = (Page) call.requestResponse(new Object[] { token, new Integer(record) });
 
-        return (Page) call.requestResponse(new Object[] { token, new Integer(record) });
+        if ( CommonDebugLevel.DEBUG_PAGE_2) {
+            page.print();
+        }
+        
+        return page;
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {

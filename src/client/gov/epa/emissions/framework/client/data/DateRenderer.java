@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.CommonDebugLevel;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 
 import java.sql.Time;
@@ -26,6 +27,9 @@ public class DateRenderer extends DefaultTableCellRenderer {
 //            Date date = new Date( ((Time) value).getTime());
 //            setText( formatter.format(date));
 //        } else 
+        if ( CommonDebugLevel.DEBUG_PAGE){
+            System.out.println( "Renderer: " + value.getClass());
+        }
         if ( value instanceof Calendar) {
             setText( CustomDateFormat.format_yyyy_MM_dd_HHmmss(((Calendar) value).getTime()));
         } else if ( value instanceof Date) { // sql.Date, sql.Time, sql.Timestamp are subclasses of Util.Date

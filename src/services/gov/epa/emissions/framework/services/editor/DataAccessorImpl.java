@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.editor;
 
+import gov.epa.emissions.commons.CommonDebugLevel;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
@@ -67,6 +68,10 @@ public class DataAccessorImpl implements DataAccessor {
             Session session = sessionFactory.getSession();
             Page result = pageFetch.getPage(token, pageNumber, session);
             session.close();
+            
+            if ( CommonDebugLevel.DEBUG_PAGE_3){
+                result.print();
+            }
 
             return result;
         } catch (Exception e) {
@@ -91,6 +96,10 @@ public class DataAccessorImpl implements DataAccessor {
             Page page = pageFetch.getPageWithRecord(token, record, session);
             session.close();
 
+            if ( CommonDebugLevel.DEBUG_PAGE_3){
+                page.print();
+            }
+            
             return page;
         } catch (Exception ex) {
             LOG.error("Could not obtain the page with Record: " + record, ex);

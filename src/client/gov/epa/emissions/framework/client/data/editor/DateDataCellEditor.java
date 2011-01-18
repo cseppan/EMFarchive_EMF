@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data.editor;
 
+import gov.epa.emissions.commons.CommonDebugLevel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.Component;
@@ -27,6 +28,11 @@ public class DateDataCellEditor extends DefaultCellEditor {
     }
 
     public Object getCellEditorValue() {
+        
+        if ( CommonDebugLevel.DEBUG_PAGE) {
+            System.out.println( "editor - value class: " + value.getClass());
+            System.out.println( "editor - edited class: " + this.editedClass);
+        }
         return value;
     }
 
@@ -50,6 +56,11 @@ public class DateDataCellEditor extends DefaultCellEditor {
                 return value;
             } 
             
+            if ( CommonDebugLevel.DEBUG_PAGE) {
+                System.out.println( "editor - value class: " + value.getClass());
+                System.out.println( "editor - edited class: " + this.editedClass);
+            }
+           
             SimpleDateFormat dateFormat = new SimpleDateFormat();
             dateFormat.applyPattern("yyyy-MM-dd HH:mm:ss");
             

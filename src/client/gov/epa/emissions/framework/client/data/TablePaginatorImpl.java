@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.CommonDebugLevel;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.services.EmfException;
@@ -61,6 +62,12 @@ public class TablePaginatorImpl implements TablePaginator {
 
     private void loadPage(int pageNumber) throws EmfException {
         page = service.getPage(token(), pageNumber);
+        
+        if ( CommonDebugLevel.DEBUG_PAGE) {
+            System.out.println("loadPage");
+            page.print();
+        }
+        
         view.display(page);
     }
 
@@ -86,6 +93,12 @@ public class TablePaginatorImpl implements TablePaginator {
             return;
 
         page = service.getPageWithRecord(token(), record);
+        
+        if ( CommonDebugLevel.DEBUG_PAGE) {
+            System.out.println("doDisplayPageWithRecord");
+            page.print();
+        }
+        
         view.display(page);
     }
 

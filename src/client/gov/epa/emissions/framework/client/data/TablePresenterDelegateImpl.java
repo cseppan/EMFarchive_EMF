@@ -87,6 +87,10 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
 
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
         page = applyConstraints(rowFilter, sortOrder);
+        
+        System.out.println("doApplyConstraints");
+        page.print();
+        
         view.display(page);
         updateFilteredCount();
     }

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.editor;
 
 import java.sql.SQLException;
 
+import gov.epa.emissions.commons.CommonDebugLevel;
 import gov.epa.emissions.commons.PerformanceMetrics;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
@@ -57,7 +58,11 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
-        return accessor.getPage(token, pageNumber);
+        Page page = accessor.getPage(token, pageNumber);
+        if ( CommonDebugLevel.DEBUG_PAGE_2) {
+            page.print();
+        }
+        return page;
     }
 
     public int getPageCount(DataAccessToken token) throws EmfException {
@@ -65,7 +70,11 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
     }
 
     public Page getPageWithRecord(DataAccessToken token, int record) throws EmfException {
-        return accessor.getPageWithRecord(token, record);
+        Page page = accessor.getPageWithRecord(token, record);
+        if ( CommonDebugLevel.DEBUG_PAGE_2) {
+            page.print();
+        }
+        return page;
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {

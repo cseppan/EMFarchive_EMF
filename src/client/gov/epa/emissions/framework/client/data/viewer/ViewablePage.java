@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data.viewer;
 
+import gov.epa.emissions.commons.CommonDebugLevel;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.io.ColumnMetaData;
@@ -24,9 +25,10 @@ public class ViewablePage extends AbstractTableData {
 
     public ViewablePage(TableMetadata tableMetadata, Page page) {
         this.tableMetadata = tableMetadata;
-        this.rows = createRows(page);
         this.columnNames = createColumns();
         this.columnClasses = columnClasses();
+        this.rows = createRows(page);
+        
     }
     
     public Class getColumnClass(int col) {
@@ -81,6 +83,16 @@ public class ViewablePage extends AbstractTableData {
 
         for (int i = 0; i < records.length; i++) {
             Object[] values = values(records[i]);
+            
+            if ( CommonDebugLevel.DEBUG_PAGE) {
+            for ( int j=0; j<values.length; j++){
+                if ( values[j] != null)
+                    System.out.println( "" + j + " - col name: " + this.columnNames[j] + ", col class: " + this.columnClasses[j] + ", class: " + values[j].getClass() + ", value: " + values[j]);
+                else
+                    System.out.println( "" + j + " - null");
+            }
+            }
+            
             Row row = new ViewableRow(records[i], values);
             rows.add(row);
         }

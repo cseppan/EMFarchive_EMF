@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.CommonDebugLevel;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
@@ -26,8 +27,13 @@ public class DataEditorServiceTransport implements DataEditorService {
 
         call.setOperation("getPage");
         call.setReturnType(mappings.page());
+        
+        Page page = (Page) call.requestResponse(new Object[] { token, new Integer(pageNumber) });
+        if ( CommonDebugLevel.DEBUG_PAGE_2) {
+            page.print();
+        }
 
-        return (Page) call.requestResponse(new Object[] { token, new Integer(pageNumber) });
+        return page;
     }
 
     public int getPageCount(DataAccessToken token) throws EmfException {
@@ -45,8 +51,13 @@ public class DataEditorServiceTransport implements DataEditorService {
 
         call.addParam("token", mappings.dataAccessToken());
         call.addIntegerParam("recordId");
+        
+        Page page = (Page) call.requestResponse(new Object[] { token, new Integer(recordId) });
+        if ( CommonDebugLevel.DEBUG_PAGE_2) {
+            page.print();
+        }   
 
-        return (Page) call.requestResponse(new Object[] { token, new Integer(recordId) });
+        return page;
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {
@@ -77,6 +88,12 @@ public class DataEditorServiceTransport implements DataEditorService {
     }
 
     public void submit(DataAccessToken token, ChangeSet changeset, int pageNumber) throws EmfException {
+        
+        // TODO: JIZHEN debug ChangeSet
+        if ( CommonDebugLevel.DEBUG_PAGE_2 && changeset != null) {
+            changeset.print();
+        }  
+        
         call.addParam("token", mappings.dataAccessToken());
         call.addParam("changeset", mappings.changeset());
         call.addIntegerParam("pageNumber");
@@ -155,8 +172,13 @@ public class DataEditorServiceTransport implements DataEditorService {
 
         call.setOperation("applyConstraints");
         call.setReturnType(mappings.page());
+        
+        Page page = (Page) call.requestResponse(new Object[] { token, rowFilter, sortOrder });
+        if ( CommonDebugLevel.DEBUG_PAGE_2) {
+            page.print();
+        }
 
-        return (Page) call.requestResponse(new Object[] { token, rowFilter, sortOrder });
+        return page;
     }
 
     public TableMetadata getTableMetadata(String table) throws EmfException {

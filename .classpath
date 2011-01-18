@@ -48,7 +48,7 @@
 	<classpathentry kind="lib" path="lib/jnlp.jar"/>
 	<classpathentry kind="lib" path="lib/activation.jar"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
-	<classpathentry kind="lib" path="lib/analysis-engine.jar"/>
+	<classpathentry kind="lib" path="lib/analysis-engine.jar" sourcepath="/AnalysisEngine"/>
 	<classpathentry kind="lib" path="lib/xstream-1.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/epa-commons.jar"/>
 	<classpathentry kind="lib" path="lib/kmlGenerator.jar"/>

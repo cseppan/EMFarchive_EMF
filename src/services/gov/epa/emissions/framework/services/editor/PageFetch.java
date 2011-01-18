@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.editor;
 
+import gov.epa.emissions.commons.CommonDebugLevel;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.version.ChangeSet;
@@ -24,6 +25,11 @@ public class PageFetch {
         Page page = filteredPage(token, pageNumber, session);
         setRange(page, token, session);
 
+        if ( CommonDebugLevel.DEBUG_PAGE) {
+            System.out.println("------\n------\n------\nPageFetch:getPage()\n------\n------\n------");
+            page.print();
+        }
+        
         return page;
     }
 
@@ -44,6 +50,12 @@ public class PageFetch {
     private Page filteredPage(DataAccessToken token, int pageNumber, Session session) throws Exception {
         PageReader reader = cache.reader(token);
         Page page = reader.page(pageNumber);
+        
+        if ( CommonDebugLevel.DEBUG_PAGE) {
+            System.out.println("------\n------\n------\nPageFetch:getPage()\n------\n------\n------");
+            page.print();
+        }
+        
         ChangeSets changesets = cache.changesets(token, pageNumber, session);
         
         if (DebugLevels.DEBUG_19) {
