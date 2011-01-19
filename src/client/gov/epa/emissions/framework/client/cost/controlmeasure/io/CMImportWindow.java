@@ -173,7 +173,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
         int n = JOptionPane.showConfirmDialog(
                 this,
                 msg,
-                "Confirm if want to purge existing measures",
+                "Purge existing control measures?",
                 JOptionPane.YES_NO_OPTION);
         if ( n == JOptionPane.YES_OPTION) {
             return true;

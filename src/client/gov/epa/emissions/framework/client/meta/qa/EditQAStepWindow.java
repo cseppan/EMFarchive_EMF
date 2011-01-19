@@ -1433,7 +1433,7 @@ avd_emis=emis_avd
             }
 
             
-            if (invDataset == null && detailedResultDataset != null ) {
+            if (invDataset == null && detailedResultDataset != null) {
                 KeyVal[] keyVals = keyValFound(detailedResultDataset, "STRATEGY_INVENTORY_NAME");
                 if (keyVals.length > 0) {
                     invDataset = presenter.getDataset(keyVals[0].getValue());

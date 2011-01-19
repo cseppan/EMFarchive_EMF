@@ -324,7 +324,8 @@ public class ManagedExportService {
     }
 
     public synchronized String exportForClient(User user, EmfDataset[] datasets, Version[] versions, String dirName,
-            String rowFilters, String colOrders, String purpose, boolean overwrite) throws EmfException {
+            String rowFilters, EmfDataset filterDataset, Version filterDatasetVersion,
+            String filterDatasetJoinCondition, String colOrders, String purpose, boolean overwrite) throws EmfException {
 
         // FIXME: always overwrite
         // FIXME: hardcode overwite=true until verified with Alison
@@ -374,7 +375,7 @@ public class ManagedExportService {
 
                 // FIXME: Investigate if services reference needs to be unique for each dataset in this call
                 if (isExportable(dataset, version, services, user)) {
-                    ExportTask tsk = createExportTask(user, purpose, overwrite,rowFilters, colOrders,path, dataset, version);
+                    ExportTask tsk = createExportTask(user, purpose, overwrite,rowFilters, colOrders,path, dataset, version, filterDataset, filterDatasetVersion, filterDatasetJoinCondition);
 
                     eximTasks.add(tsk);
 
@@ -538,7 +539,8 @@ public class ManagedExportService {
     
     private synchronized ExportTask createExportTask(User user, String purpose, boolean overwrite, 
             String rowFilters, String colOrders, File path,
-            EmfDataset dataset, Version version) throws Exception {
+            EmfDataset dataset, Version version, EmfDataset filterDataset, Version filterDatasetVersion,
+            String filterDatasetJoinCondition) throws Exception {
         if (DebugLevels.DEBUG_9)
             System.out.println(">>## In export service:doExport() " + myTag() + " for datasetId: " + dataset.getId());
 
@@ -558,7 +560,8 @@ public class ManagedExportService {
             System.out.println("ManagedExportService: right before creating export task: dbFactory null? "
                     + (dbFactory == null) + " dataset: " + dataset.getName());
         ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, 
-                rowFilters, colOrders,dbFactory, sessionFactory, version);
+                rowFilters, colOrders,dbFactory, sessionFactory, version, filterDataset, filterDatasetVersion,
+                filterDatasetJoinCondition);
         // eximTask.setSubmitterId(exportTaskSubmitter.getSubmitterId());
 
         return eximTask;

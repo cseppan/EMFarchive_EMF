@@ -73,6 +73,12 @@ public class ExportTask extends Task {
     private String rowFilters="";
 
     private DatasetDAO datasetDao;
+    
+    private EmfDataset filterDataset;
+
+    private Version filterDatasetVersion;
+
+    private String filterDatasetJoinCondition;
 
     protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
             DbServerFactory dbFactory, HibernateSessionFactory sessionFactory, Version version) {
@@ -95,10 +101,13 @@ public class ExportTask extends Task {
     
     protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
             String rowFilters, String colOrders,
-            DbServerFactory dbFactory, HibernateSessionFactory sessionFactory, Version version) {
+            DbServerFactory dbFactory, HibernateSessionFactory sessionFactory, Version version, EmfDataset filterDataset, Version filterDatasetVersion, String filterDatasetJoinCondition) {
         this(user, file, dataset, services, accesslog, dbFactory, sessionFactory, version);
         this.rowFilters = rowFilters;
         this.colOrders = colOrders;
+        this.filterDataset = filterDataset;
+        this.filterDatasetVersion = filterDatasetVersion;
+        this.filterDatasetJoinCondition = filterDatasetJoinCondition;
     } 
 
     public void run() {
@@ -132,7 +141,7 @@ public class ExportTask extends Task {
                 dbServer = this.dbFactory.getDbServer();
                 VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer
                         .getSqlDataTypes(), batchSize(session));
-                Exporter exporter = exporterFactory.create(dataset, version, rowFilters, colOrders);
+                Exporter exporter = exporterFactory.create(dataset, version, rowFilters, colOrders, filterDataset, filterDatasetVersion, filterDatasetJoinCondition);
 
                 if (exporter instanceof ExternalFilesExporter)
                     ((ExternalFilesExporter) exporter).setExternalSources(extSrcs);
@@ -232,7 +241,7 @@ public class ExportTask extends Task {
             dbServer = this.dbFactory.getDbServer();
             VersionedExporterFactory exporterFactory = new VersionedExporterFactory(dbServer, dbServer
                     .getSqlDataTypes(), batchSize(session));
-            Exporter exporter = exporterFactory.create(dataset, version, rowFilters, colOrders);
+            Exporter exporter = exporterFactory.create(dataset, version, rowFilters, colOrders, filterDataset, filterDatasetVersion, filterDatasetJoinCondition);
 
             if (exporter instanceof ExternalFilesExporter)
                 ((ExternalFilesExporter) exporter).setExternalSources(extSrcs);

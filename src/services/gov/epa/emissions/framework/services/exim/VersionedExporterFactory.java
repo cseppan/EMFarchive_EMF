@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.orl.FlexibleDBExporter;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.lang.reflect.Constructor;
 
@@ -31,7 +32,7 @@ public class VersionedExporterFactory {
         this.batchSize = batchSize;
     }
 
-    public Exporter create(Dataset dataset, Version version, String rowFilters, String colOrders) throws EmfException {
+    public Exporter create(Dataset dataset, Version version, String rowFilters, String colOrders, Dataset filterDataset, Version filterDatasetVersion, String filterDatasetJoinCondition) throws EmfException {
         try {
             String exporterName = dataset.getDatasetType().getExporterClassName();
             Class[] classParams;
@@ -47,9 +48,9 @@ public class VersionedExporterFactory {
 //                return exporter;
 //            }
             classParams = new Class[] { Dataset.class, String.class, DbServer.class,
-                    DataFormatFactory.class, Integer.class };
+                    DataFormatFactory.class, Integer.class, Dataset.class, Version.class, String.class };
             params = new Object[] { dataset, rowFilters, dbServer, new VersionedDataFormatFactory(version, dataset),
-                    new Integer(batchSize) };
+                    new Integer(batchSize), filterDataset, filterDatasetVersion, filterDatasetJoinCondition };
 
             Constructor exporterConstructor = exporterClass.getDeclaredConstructor(classParams);
             return (Exporter) exporterConstructor.newInstance(params);

@@ -1419,3 +1419,14 @@ insert into emf.control_measure_classes values (DEFAULT, 'Temporary', 'Temporary
 
 -- 12/5/2010 Add new CoST 
 insert into emf.properties values(DEFAULT, 'COST_CMDB_BACKUP_FOLDER', 'FILL_IN_CORRECT_FOLDER');
+
+
+
+
+
+-- 1/5/2011 -- Update QA Program name --- "Estimate EC Impacts" from EC COntrol Scenario
+update emf.qa_programs
+set name = 'Estimate EC Impacts'
+where name = 'EC COntrol Scenario';
+
+

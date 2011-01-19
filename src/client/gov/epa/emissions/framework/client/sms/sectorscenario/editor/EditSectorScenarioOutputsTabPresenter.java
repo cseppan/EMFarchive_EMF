@@ -58,7 +58,7 @@ public class EditSectorScenarioOutputsTabPresenter implements EditSectorScenario
         for (int i = 0; i < datasets.length; i++) {
             versions[i] = service.getVersion(datasets[i], datasets[i].getDefaultVersion());
         }
-        service.exportDatasets(session.user(), datasets, versions, folder, true, "", "", "Exporting datasets");
+        service.exportDatasets(session.user(), datasets, versions, folder, true, "", null, null, null, "", "Exporting datasets");
     }
 
 //    private String mapToRemote(String dir) {

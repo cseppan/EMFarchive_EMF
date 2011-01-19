@@ -65,8 +65,9 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
             else {
                 datasetVersionsList.removeElements(new DatasetVersion[] { datasetVersions[i] }); 
                 datasetVersionsList.addElement(datasetVersions[i]);
-                datasetVersionsList.setSelectedIndex(datasetVersionsList.getLastVisibleIndex());
+//                datasetVersionsList.setSelectedIndex(datasetVersionsList.getLastVisibleIndex());
             }
+            datasetVersionsList.setSelectedIndex(datasetVersionsList.getLastVisibleIndex());
         }
     }
 

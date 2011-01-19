@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DatasetVersion;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
 
@@ -36,7 +37,7 @@ public class ExportPresenterImpl implements ExportPresenter {
         return (lastFolder != null) ? lastFolder : getDefaultFolder();
     }
 
-    public void doExport(EmfDataset[] datasets, Version[] versions, String folder, String rowFilters, 
+    public void doExport(EmfDataset[] datasets, Version[] versions, String folder, String rowFilters, DatasetVersion filterDatasetVersion, String filterDatasetJoinCondition, 
             String colOrders, String purpose, boolean overwrite) throws EmfException {
       
         ExImService services;
@@ -54,7 +55,7 @@ public class ExportPresenterImpl implements ExportPresenter {
                 lastFolder = folder;
 
            services.exportDatasetids(session.user(), datasetIds, versions, folder, overwrite, 
-                   rowFilters, colOrders, purpose);
+                   rowFilters, (filterDatasetVersion != null ? filterDatasetVersion.getDataset() : null), (filterDatasetVersion != null ? filterDatasetVersion.getVersion() : null), filterDatasetJoinCondition, colOrders, purpose);
            
         } catch (Exception e) {
             // NOTE Auto-generated catch block

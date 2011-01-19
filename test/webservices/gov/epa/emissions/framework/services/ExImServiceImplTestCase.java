@@ -465,7 +465,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             outputFile.mkdir();
 
         eximService.exportDatasets(user, new EmfDataset[] { imported[0] }, new Version[] { version },
-                outputFile.getAbsolutePath(), true, "", "", "Exporting NonPoint file");
+                outputFile.getAbsolutePath(), true, "", null, null, null, "", "Exporting NonPoint file");
 
         Thread.sleep(2000);// wait, until the export is complete
 
@@ -500,7 +500,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             outputFile.mkdir();
 
         eximService.exportDatasets(user, new EmfDataset[] { imported[0] }, new Version[] { version }, 
-                outputFile.getAbsolutePath(), false, "", "","Exporting NonPoint file");
+                outputFile.getAbsolutePath(), false, "", null, null, null, "","Exporting NonPoint file");
 
         // FIXME: verify the exported file exists
         Thread.sleep(2000);// wait, until the export is complete

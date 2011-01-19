@@ -12,10 +12,12 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.dataset.AddRemoveDatasetVersionWidget;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DatasetVersion;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
@@ -25,6 +27,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -35,6 +39,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
 
@@ -57,11 +62,17 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private String rowFilters;
     private ComboBox version;
 
+    private AddRemoveDatasetVersionWidget filterDatasetVersionWidget;
+
+    private TextArea filterDatasetJoinCondition;
+
     private JButton exportButton;
 
     private EmfConsole parentConsole;
 
     private DataCommonsService service;
+    
+    private EmfSession session;
 
     public ExportWindow(EmfDataset[] datasets, DesktopManager desktopManager, EmfConsole parentConsole,
             EmfSession session, String colOrders, String rowFilters) {
@@ -71,6 +82,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         this.datasets = datasets;
         this.parentConsole = parentConsole;
         this.service = session.dataCommonsService();
+        this.session = session;
         this.colOrders = colOrders;
         this.rowFilters = rowFilters;
 
@@ -145,12 +157,35 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         layoutGenerator.addLabelWidgetPair("Row Filter ", rowArea, panel);
         
+        //filter dataset version widget
+        try {
+            layoutGenerator.addLabelWidgetPair("Filter Dataset ", createFilterDatasetVersion(), panel);
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        // Filter Dataset Join Condition
+        //NOTE:  join conidition items must be delimited by a new line character
+        //where left hand expression is for the dataset being exported and the right hand expressions
+        //is for the filter dataset
+        //i.e.,
+        //fips=fips
+        //scc=scc
+        //plantid=plantid
+        
+        filterDatasetJoinCondition = new TextArea("rowFilter", rowFilters, width+10, 2);
+        filterDatasetJoinCondition.setToolTipText("<html>Filter Dataset Join Condition <br/>left hand side is for dataset being exported<br/>right hand side is for filter dataset<br/>i.e.,<br/>fips=fips<br/>scc=scc<br/>plantid=plantid</html>");
+        JScrollPane filterDatasetJoinConditionArea = new JScrollPane(filterDatasetJoinCondition, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        layoutGenerator.addLabelWidgetPair("Filter Dataset Join Condition ", filterDatasetJoinConditionArea, panel);
+        
         // purpose
         //JPanel purposePanel = new JPanel(new BorderLayout(4,10));
         purpose = new TextArea("purpose", "", width+10, 4);
         JScrollPane purposeArea = new JScrollPane(purpose, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        layoutGenerator.addLabelWidgetPair("Purpose  ",purposeArea, panel);
+        layoutGenerator.addLabelWidgetPair("Purpose  ", purposeArea, panel);
         //purposePanel.add(purposeArea);
  
         // overwrite
@@ -163,18 +198,33 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         //overwritePanel.setVisible(false);
         layoutGenerator.addLabelWidgetPair(" ",overwritePanel, panel);
         if (datasets.length == 1)    
-            layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
+            layoutGenerator.makeCompactGrid(panel, 8, 2, // rows, cols
                     10, 10, // initialX, initialY
                     5, 10);// xPad, yPad
         else
-            layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+            layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
                     10, 10, // initialX, initialY
                     5, 10);// xPad, yPad
 
         return panel;
     }
     
-    private JButton browseFileButton() {
+    private JPanel createFilterDatasetVersion() throws EmfException {
+        filterDatasetVersionWidget = new AddRemoveDatasetVersionWidget(true, this, parentConsole, session);
+        filterDatasetVersionWidget.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        filterDatasetVersionWidget.setPreferredSize(new Dimension(445, 60));
+//        List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
+//        if(baseDatasetVersions != null && baseDatasetVersions.length > 0) {
+//            
+//            for (DatasetVersion datasetVersion : baseDatasetVersions) {
+//                datasetVersions.add(datasetVersion);
+//            }
+//        }
+//        filterDatasetVersionWidget.setDatasetVersions(datasetVersions.toArray(new DatasetVersion[0]));
+        return filterDatasetVersionWidget;
+    }
+    
+     private JButton browseFileButton() {
         Button button = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 selectFolder();
@@ -240,14 +290,18 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
             validateRowFilterFormat(rowFiltersvalues);
             setRowAndColFilter(rowFiltersvalues, colOrdersvalues);
             
+            //validate filter dataset and join condition have both been specified
+            validateFilterDatasetAndJoinCondition();
+            
+            
             Version[] versions=null;
             if (datasets.length ==1)
                 versions=new Version[]{(Version) version.getSelectedItem()};
             
             if (!overwrite.isSelected())
-                presenter.doExport(datasets, versions, folder.getText(), rowFilters, colOrders, purpose.getText(), false);
+                presenter.doExport(datasets, versions, folder.getText(), rowFilters, (filterDatasetVersionWidget.getDatasetVersions().length > 0 ? (DatasetVersion)filterDatasetVersionWidget.getDatasetVersions()[0] : null), filterDatasetJoinCondition.getText(), colOrders, purpose.getText(), false);
             else
-                presenter.doExport(datasets, versions, folder.getText(), rowFilters, colOrders, purpose.getText(), true);
+                presenter.doExport(datasets, versions, folder.getText(), rowFilters, (filterDatasetVersionWidget.getDatasetVersions().length > 0 ? (DatasetVersion)filterDatasetVersionWidget.getDatasetVersions()[0] : null), filterDatasetJoinCondition.getText(), colOrders, purpose.getText(), true);
 
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
@@ -267,6 +321,13 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private void validateRowFilterFormat(String rowFilter) throws EmfException {
         if (rowFilter != null && rowFilter.contains("\""))
             throw new EmfException("Invalid Row Filter: Please use single quotes instead of double quotes.");
+    }
+
+    private void validateFilterDatasetAndJoinCondition() throws EmfException {
+        if (filterDatasetVersionWidget.getDatasetVersions().length > 0 && filterDatasetJoinCondition.getText().length() == 0)
+            throw new EmfException("Missing Filter Dataset Join Condition: Please specify a join condition (i.e., fips=fips).");
+        if (filterDatasetVersionWidget.getDatasetVersions().length == 0 && filterDatasetJoinCondition.getText().length() > 0)
+            throw new EmfException("Missing Filter Dataset: Please choose a filter dataset.");
     }
 
     public void setRowAndColFilter(String rowFilters, String colOrders) {

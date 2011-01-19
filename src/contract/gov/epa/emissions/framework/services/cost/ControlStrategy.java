@@ -104,12 +104,6 @@ public class ControlStrategy implements Lockable, Serializable {
         this(name);
         this.id = id;
     }
-    
-    public ControlStrategy(int id, String name, ControlStrategyMeasure[] controlMeasures) {
-        this(id, name);
-        this.controlMeasures = controlMeasures;
-        
-    }    
 
     public ControlStrategy(int id, String name,
             Date lastModifiedDate, String runStatus,

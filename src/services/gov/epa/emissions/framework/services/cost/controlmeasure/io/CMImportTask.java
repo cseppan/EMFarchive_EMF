@@ -253,7 +253,7 @@ public class CMImportTask implements Runnable {
         for ( int i = 0; i<csms.length; i++) {
             int id = csms[i].getControlMeasure().getId();
             boolean toBeDeleted = false;
-            for ( int j=0; i<cmIDs.length; j++) {
+            for ( int j=0; j<cmIDs.length; j++) {
                 if ( cmIDs[j] == id) {
                     toBeDeleted = true;
                     break;
@@ -276,10 +276,12 @@ public class CMImportTask implements Runnable {
         for ( int i = 0; i<csms.length; i++) {
             LightControlMeasure lcm = csms[i].getControlMeasure();
             ControlTechnology ct = lcm.getControlTechnology();
-            int id = ct.getId();
-            if ( !ctIDList.contains( id)) {
-                ctIDList.add( id);
-                techNames += "  " + ct.getName() + "\n";
+            if (ct != null) {
+                int id = ct.getId();
+                if ( !ctIDList.contains( id)) {
+                    ctIDList.add( id);
+                    techNames += "  " + ct.getName() + "\n";
+                }
             }
         }
         

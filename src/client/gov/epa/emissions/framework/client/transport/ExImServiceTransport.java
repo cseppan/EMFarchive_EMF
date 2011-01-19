@@ -19,9 +19,9 @@ public class ExImServiceTransport implements ExImService {
         mappings = new DataMappings();
     }
 
-    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String folder, 
-            boolean overwrite, String rowFilters, String colOrders, String purpose)
-            throws EmfException {
+    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String folder, boolean overwrite,
+            String rowFilters, EmfDataset filterDataset, Version filterDatasetVersion,
+            String filterDatasetJoinCondition, String colOrders, String purpose) throws EmfException {
         call.setOperation("exportDatasets");
         call.addParam("user", mappings.user());
         call.addParam("datasets", mappings.datasets());
@@ -29,11 +29,14 @@ public class ExImServiceTransport implements ExImService {
         call.addStringParam("folder");
         call.addBooleanParameter("overwrite");
         call.addStringParam("rowFilters");
+        call.addParam("filterDataset", mappings.dataset());
+        call.addParam("filterDatasetVersion", mappings.version());
+        call.addStringParam("filterDatasetJoinCondition");
         call.addStringParam("colOrders");
         call.addStringParam("purpose");
         call.setVoidReturnType();
 
-        call.request(new Object[] { user, datasets, versions, folder,overwrite, rowFilters, colOrders, purpose });
+        call.request(new Object[] { user, datasets, versions, folder,overwrite, rowFilters, filterDataset, filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose });
     }
 
     public void importDataset(User user, String folderPath, String[] fileNames, DatasetType datasetType,
@@ -83,9 +86,9 @@ public class ExImServiceTransport implements ExImService {
     /**
      * Added 07/16/2007 for exporting with Datasetids - Conrad
      */
-    public void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, 
-            boolean overwrite, String rowFilters, String colOrders, String purpose)
-            throws EmfException {
+    public void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, boolean overwrite,
+            String rowFilters, EmfDataset filterDataset, Version filterDatasetVersion, String filterDatasetJoinCondition, String colOrders,
+            String purpose) throws EmfException {
         call.setOperation("exportDatasetids");
         call.addParam("user", mappings.user());
         call.addParam("datasetids", mappings.integers());
@@ -93,11 +96,14 @@ public class ExImServiceTransport implements ExImService {
         call.addStringParam("folder");
         call.addBooleanParameter("overwrite");
         call.addStringParam("rowFilters");
+        call.addParam("filterDataset", mappings.dataset());
+        call.addParam("filterDatasetVersion", mappings.version());
+        call.addStringParam("filterDatasetJoinCondition");
         call.addStringParam("colOrders");
         call.addStringParam("purpose");
         call.setVoidReturnType();
 
-        call.request(new Object[] { user, datasetIds, versions, folder, overwrite,rowFilters, colOrders, purpose });
+        call.request(new Object[] { user, datasetIds, versions, folder, overwrite, rowFilters, filterDataset, filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose });
     }
 
     public String printStatusExportTaskManager() throws EmfException {
