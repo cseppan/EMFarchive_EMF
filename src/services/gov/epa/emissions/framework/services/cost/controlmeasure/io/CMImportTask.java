@@ -78,14 +78,10 @@ public class CMImportTask implements Runnable {
                     ids[i] = controlMeasures.get(i).getId();
                 
                 EmfProperty property = new EmfPropertiesDAO().getProperty("COST_CMDB_BACKUP_FOLDER", session);
-                
-                String backupFolder = property.getValue(); 
-
+                String backupFolder = property.getValue();
                 CMExportTask exportTask = new CMExportTask(new File(backupFolder), CustomDateFormat.format_YYDDHHMMSS(new Date()), ids, user,
                         sessionFactory, dbServerFactory);
                 exportTask.run();
-            
-                
                 
                 //look for dependencies on Control Strategies and Control Programs
                 ControlStrategyDAO csDAO = new ControlStrategyDAO();
@@ -214,10 +210,15 @@ public class CMImportTask implements Runnable {
                 setDetailStatus(e.getMessage());
                 setStatus(e.getMessage());
             }
-            if (importer != null)
-                return importer.getControlMeasureCountInSummaryFile();
+            if (importer != null) {
+                importer.setForScan( true);
+                int count = importer.getControlMeasureCountInSummaryFile();
+                importer.setForScan( false);
+                return count;
+            }
         } catch (Exception e) {
-            //
+            setDetailStatus(e.getMessage());
+            setStatus(e.getMessage());
         } finally {
             //
         }

@@ -68,6 +68,8 @@ public class ControlMeasuresImporter implements Importer {
     private boolean truncate;
 
     private int[] sectorIds;
+    
+    private boolean forScan = false;
 
     public ControlMeasuresImporter(File folder, String[] fileNames, User user, boolean truncate, int[] sectorIds, HibernateSessionFactory factory, DbServerFactory dbServerFactory)
             throws EmfException, ImporterException {
@@ -261,6 +263,7 @@ public class ControlMeasuresImporter implements Importer {
     private void parseSummary(Map controlMeasures) throws ImporterException, FileNotFoundException {
 //        setStatus("Started reading summary file");
         CMSummaryImporter summary = cmImporters.summaryImporter();
+        summary.setForScan( this.forScan);
         summary.run(controlMeasures);
 //        setStatus("Finished reading summary file");
     }
@@ -494,5 +497,13 @@ public class ControlMeasuresImporter implements Importer {
             System.out.println(string);
         }
         
+    }
+
+    public void setForScan(boolean forScan) {
+        this.forScan = forScan;
+    }
+
+    public boolean isForScan() {
+        return forScan;
     }
 }

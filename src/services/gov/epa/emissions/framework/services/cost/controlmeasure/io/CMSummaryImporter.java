@@ -28,6 +28,8 @@ public class CMSummaryImporter {
     
     private ArrayList abbreviations;
     
+    private boolean forScan = false;
+    
     
     public CMSummaryImporter(File file, CMFileFormat fileFormat, User user,
             HibernateSessionFactory sessionFactory) {
@@ -40,6 +42,7 @@ public class CMSummaryImporter {
 
     public void run(Map controlMeasures) throws ImporterException, FileNotFoundException {
         addStatus("Started reading Summary file");
+
         CSVReader reader = new CSVReader(new FileReader( file));
         //read the first header line...
         reader.read();
@@ -63,10 +66,13 @@ public class CMSummaryImporter {
             throw new ImporterException("Failed to import control measure records, " + cmSummaryRecord.getErrorCount() + " errors were found.");
         }
         addStatus("Finished reading Summary file");
+        forScan = false;
     }
 
     private void addStatus(String message) {
-        setStatus(message);
+        if ( !forScan) {
+            setStatus(message);
+        }
     }
 
     private void setStatus(String message) {
@@ -77,6 +83,14 @@ public class CMSummaryImporter {
         endStatus.setTimestamp(new Date());
 
         new StatusDAO(sessionFactory).add(endStatus);
+    }
+
+    public void setForScan(boolean forScan) {
+        this.forScan = forScan;
+    }
+
+    public boolean isForScan() {
+        return forScan;
     }
 
 }

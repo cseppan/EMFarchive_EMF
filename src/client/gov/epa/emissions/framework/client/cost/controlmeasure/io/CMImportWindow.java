@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.YesNoDialog;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -100,6 +101,8 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
     private void doImport() {
         try {
             importButton.setEnabled(false);
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
             
             // check if do purge
             int [] sectorIDs = null;
@@ -112,6 +115,8 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
             importing = true;
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
+        } finally {
+            this.setCursor(Cursor.getDefaultCursor());
         }
     }
 
@@ -119,7 +124,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
         if (confirmImport()) {
             presenter.doDone();
         } /*else
-            presenter.doDone();*/            
+            presenter.doDone();*/  
     }
 
     public void register(CMImportPresenter presenter) {
@@ -147,6 +152,7 @@ public class CMImportWindow extends ReusableInteralFrame implements CMImportView
         for (int i = importStatus.length - 1; i >= 0 && importStatus.length > 0; i--) {
             sb.append(importStatus[i].getMessage());
         }
+        
         importInputPanel.addStatusMessage(sb.toString());
     }
 

@@ -26,14 +26,14 @@ public class CMImportPresenter {
         if ( purge && sectorIDs != null) { // need to purge control measure by sectors
             
             if ( sectorIDs.length == 0) { // TODO: JIZHEN purge all
-                System.out.println("Purge all");
+                //System.out.println("Purge all");
                 
             } else { // TODO: JIZHEN purge by sectors
-                System.out.println("Purge by sectors: ");
+                //System.out.println("Purge by sectors: ");
                 for ( int i=0; i<sectorIDs.length; i++) {
-                    System.out.print(sectorIDs[i] + " ");
+                    //System.out.print(sectorIDs[i] + " ");
                 }
-                System.out.println("");
+                //System.out.println("");
             }
             
             // TODO: JIZHEN do validation here
