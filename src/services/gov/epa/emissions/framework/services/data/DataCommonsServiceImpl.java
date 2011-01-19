@@ -1267,6 +1267,14 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         if (type.toLowerCase().startsWith("date"))
             return types.timestamp();
         
+        if (type.toLowerCase().startsWith("timestamp without time zone"))
+            return types.timestamp();
+        
+        if (type.toLowerCase().trim().equals("timestamp"))
+            return types.timestamp();
+        
+        // timestamp with time zone - not include here
+        
         if (type.toLowerCase().startsWith("char"))
             return types.charType();
         

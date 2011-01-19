@@ -30,12 +30,22 @@ public class DateRenderer extends DefaultTableCellRenderer {
         if ( CommonDebugLevel.DEBUG_PAGE){
             System.out.println( "Renderer: " + value.getClass());
         }
+        
+        //System.out.println( "Renderer: " + value.getClass());
+        
         if ( value instanceof Calendar) {
-            setText( CustomDateFormat.format_yyyy_MM_dd_HHmmss(((Calendar) value).getTime()));
+            String text = CustomDateFormat.format_yyyy_MM_dd_HHmmssSSS(((Calendar) value).getTime());
+            //System.out.println( "Renderer: " + text);
+            setText( text);
         } else if ( value instanceof Date) { // sql.Date, sql.Time, sql.Timestamp are subclasses of Util.Date
-            setText( CustomDateFormat.format_yyyy_MM_dd_HHmmss((Date)value));
+            String text = CustomDateFormat.format_yyyy_MM_dd_HHmmssSSS((Date)value);
+            //System.out.println( "Renderer: " + text);
+            setText( text);
+        } else if ( value instanceof String) {
+            setText( (String) value);
         } else {
-            throw new IllegalArgumentException("Cannot format given Object of " + value.getClass() + ".");
+            //System.out.println( "Renderer: Cannot format given Object of " + value.getClass() + ".");
+            throw new IllegalArgumentException("Redenrer - Cannot format given Object of " + value.getClass() + ".");
         }
     }
 
