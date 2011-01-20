@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.CommonDebugLevel;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.io.TableMetadata;
@@ -88,8 +89,10 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
         page = applyConstraints(rowFilter, sortOrder);
         
-        System.out.println("doApplyConstraints");
-        page.print();
+        if ( CommonDebugLevel.DEBUG_PAGE_2) {
+            System.out.println("doApplyConstraints");
+            page.print();
+        }
         
         view.display(page);
         updateFilteredCount();

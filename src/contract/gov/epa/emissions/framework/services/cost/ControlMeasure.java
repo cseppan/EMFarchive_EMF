@@ -103,6 +103,12 @@ public class ControlMeasure implements Lockable, Serializable {
         this(name);
         this.id = id;
     }
+    
+    public ControlMeasure(int id, String name, String abbreviation) {
+        this(name);
+        this.id = id;
+        this.abbreviation = abbreviation;
+    }
 
     public float getAnnualizedCost() {
         return annualizedCost;

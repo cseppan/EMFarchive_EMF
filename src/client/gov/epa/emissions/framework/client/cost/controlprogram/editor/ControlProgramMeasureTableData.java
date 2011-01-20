@@ -20,8 +20,10 @@ public class ControlProgramMeasureTableData extends AbstractTableData {
     private List createRows(ControlMeasure[] cm) {
         List rows = new ArrayList();
         for (int i = 0; i < cm.length; i++) {
-            Row row = row(cm[i]);
-            rows.add(row);
+            if ( cm[i] != null) {
+                Row row = row(cm[i]);
+                rows.add(row);
+            }
         }
         return rows;
     }

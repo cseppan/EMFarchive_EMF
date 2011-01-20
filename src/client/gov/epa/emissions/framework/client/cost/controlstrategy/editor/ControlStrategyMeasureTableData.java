@@ -22,12 +22,18 @@ public class ControlStrategyMeasureTableData extends AbstractTableData {
         List rows = new ArrayList();
         for (int i = 0; i < cms.length; i++) {
             Row row = row(cms[i]);
-            rows.add(row);
+            if ( row != null) {
+                rows.add(row);
+            }
         }
         return rows;
     }
 
     private Row row(ControlStrategyMeasure csm) {
+        if ( csm == null) {
+            return null;
+        }
+        
         LightControlMeasure cm = csm.getControlMeasure();
         Object[] values = { cm.getAbbreviation(), 
         csm.getApplyOrder() != null ? csm.getApplyOrder() : Double.NaN,

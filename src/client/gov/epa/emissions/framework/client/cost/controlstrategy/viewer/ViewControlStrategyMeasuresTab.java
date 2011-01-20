@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
+import gov.epa.emissions.commons.CommonDebugLevel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -68,9 +69,18 @@ public class ViewControlStrategyMeasuresTab extends EmfPanel implements ViewCont
 
         try {
             controlStrategyMeasures = presenter.getControlMeasures();
-            tableData = new ControlStrategyMeasureTableData(controlStrategyMeasures);
+            if ( controlStrategyMeasures != null) {
+                tableData = new ControlStrategyMeasureTableData(controlStrategyMeasures);
+            } else {
+                throw new EmfException( "controlStrategyMeasures is null!");
+            }
         } catch (Exception e) {
+            if ( CommonDebugLevel.DEBUG_CMIMPORT) {
+                System.out.println("=== Exception occured: ");
+                e.printStackTrace();
+            }
             showError(e.getMessage());
+            return;
         }
 
         this.setLayout(new BorderLayout(5, 5));

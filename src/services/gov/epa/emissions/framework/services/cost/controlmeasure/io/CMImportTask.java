@@ -23,6 +23,8 @@ import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,8 +76,14 @@ public class CMImportTask implements Runnable {
                 List<ControlMeasure> controlMeasures = new ControlMeasureDAO().getControlMeasureBySectors(sectorIds, session);
                 int[] ids = new int[controlMeasures.size()];
                 
-                for (int i = 0; i < controlMeasures.size(); i++)
+                String cmMsg = "Control Measures to be deleted: " + controlMeasures.size() + "\n";
+                for (int i = 0; i < controlMeasures.size(); i++) {
                     ids[i] = controlMeasures.get(i).getId();
+                    cmMsg += "  Abbrev: " + controlMeasures.get(i).getAbbreviation();
+                    cmMsg += "; Name: " + controlMeasures.get(i).getName() + "\n";
+                    //setDetailStatus( cmMsg ); // in case there are many measures to be deleted, send msg one by one
+                }
+                setDetailStatus( cmMsg ); 
                 
                 EmfProperty property = new EmfPropertiesDAO().getProperty("COST_CMDB_BACKUP_FOLDER", session);
                 String backupFolder = property.getValue();
@@ -88,15 +96,18 @@ public class CMImportTask implements Runnable {
                 List<ControlStrategy> cs = //new ControlStrategyDAO().getControlStrategiesByControlMeasures(ids, session);
                     csDAO.getControlStrategiesByControlMeasures(ids, session);
                 
-                String msg = "There are " + cs.size() + " Strategies affected.";
-                setDetailStatus( msg + "\n");
+                String msg = "There are " + cs.size() + " Strategies affected and to be finalized.";
                 setStatus( msg);
-                
-                String cmMsg = "";
+                msg += "\n";
                 for ( ControlStrategy s : cs) {
-                    
-                    //setDetailStatus( ">>> \n" + s.getDescription() + "\n"); // for debug
-                    
+                    if ( s!= null) {
+                        msg += "  " + s.getName() + "\n";
+                    }
+                }
+                setDetailStatus( msg);
+                
+                cmMsg = "";
+                for ( ControlStrategy s : cs) {
                     cmMsg = ""; //s.getDescription();
                     cmMsg += "Purge: " + this.truncate + "\n";
                     cmMsg += "Date deleted: " + new Date() + "\n";
@@ -104,24 +115,33 @@ public class CMImportTask implements Runnable {
                     cmMsg += "Measures deleted: " + numCMToBeDeleted + "\n";
                     cmMsg += "Control Technolgies Affected: \n";
                     cmMsg += this.getControlTechnologiesAffected(s, ids);
-                    //setDetailStatus( ">>> " + s.getName() + ": \n" + cmMsg + "\n"); // for debug
+                    if ( DebugLevels.DEBUG_CMIMPORT) {
+                        setDetailStatus( ">>> " + s.getName() + ": \n" + cmMsg + "\n"); // for debug
+                    }
                     //s.setDescription( desc);
                     //s.setIsFinal( true);
                     csDAO.finalizeControlStrategy(s.getId(), cmMsg, session);
+                }
+                
+                if ( DebugLevels.DEBUG_CMIMPORT) {
+                    System.out.println("===== 1 =====");
                 }
                 
                 ControlProgramDAO cpDAO = new ControlProgramDAO();
                 List<ControlProgram> cp = //new ControlStrategyDAO().getControlStrategiesByControlMeasures(ids, session);
                     cpDAO.getControlProgramsByControlMeasures(ids, session);
                 
-                msg = "There are " + cp.size() + " Programs affected.";
-                setDetailStatus( msg + "\n");
+                msg = "There are " + cp.size() + " Programs affected:";
                 setStatus( msg);
+                msg += "\n";
+                for ( ControlProgram p : cp) {
+                    if ( p!= null) {
+                        msg += "  " + p.getName() + "\n";
+                    }
+                }
+                setDetailStatus( msg);
                 
                 for ( ControlProgram p : cp) {
-                    
-                    //setDetailStatus( ">>> \n" + s.getDescription() + "\n"); // for debug
-                    
                     cmMsg = ""; //s.getDescription();
                     cmMsg += "Purge: " + this.truncate + "\n";
                     cmMsg += "Date deleted: " + new Date() + "\n";
@@ -129,49 +149,28 @@ public class CMImportTask implements Runnable {
                     cmMsg += "Measures deleted: " + numCMToBeDeleted + "\n";
                     cmMsg += "Control Technolgies Affected: \n";
                     cmMsg += this.getControlTechnologiesAffected(p, ids);
-                    //setDetailStatus( ">>> " + p.getName() + ": \n" + cmMsg + "\n"); // for debug
+                    if ( DebugLevels.DEBUG_CMIMPORT) {
+                        setDetailStatus( ">>> " + p.getName() + ": \n" + cmMsg + "\n"); // for debug
+                    }
                     //s.setDescription( desc);
                     //s.setIsFinal( true);
                     cpDAO.updateControlProgram(p.getId(), cmMsg, session);
-                }                
-
-//README                
-//To get a count of the measures being deleted from a strategy
-//create a function that can iterate over the strategy's measures (ALL Measures are returned not just the ones of interest to us)
-//and see if they match the an item in the ids array, 
-//you should be able to use a similar technique and build a Collection of DISTINCT Strategy ControlTechnolgies 
-//so this can iterated over and reported on in the strategy/control program description
-//Actually, the controlStrategy.getControlMeasures()[0].getControlMeasure() returns a Light version of the ControlMeasure -- LightControlMeasure.java is the POJO
-//this class doesn't have the ControlTechnology field -- you need to add the getter/setter for this to the POJO and then make sure you map the new field 
-//in the LightControlMeasure.hbm.xml file, rebuild, and it now should be populated and accesible.
+                } 
                 
-//Here is some sample code on how finalize a control strategy with a message being appended to the description
-//Create something similar for the ControlProgram, but name it something like updateControlProgramDescription, since
-//we're not finalizing a ControlProgram
-//                for (ControlStrategy controlStrategy : cs) {
-//                    csDAO.finalizeControlStrategy(controlStrategy.getId(), "Some Message for the Description Field", session);
-//                    controlStrategy.getControlMeasures()[0].getControlMeasure()
-//                    break;
-//                }
-                
-                //System.out.println(cs.size());
-                
-                //next you need to finalize Control Strategies and add a relevant message to the description
-                
-                
-                
-                //next you need to update the Control Programs and add a relevant message to the description
-                
-                
-                
-                
-                //delete measure by sector....
-//                session.setFlushMode(FlushMode.NEVER);
+                if ( DebugLevels.DEBUG_CMIMPORT) {
+                    System.out.println("===== 2 =====");
+                }
 
                 new ControlMeasureDAO().remove(sectorIds, sessionFactory, dbServer);
                 
+                if ( DebugLevels.DEBUG_CMIMPORT) {
+                    System.out.println("===== 3 =====");
+                }
+                
             } catch (Exception e) {
-//                LOG.error("Could not export control measures.", e);
+                if ( DebugLevels.DEBUG_CMIMPORT) {
+                    System.out.println("Exception occured: " + e.getMessage());
+                }
                 e.printStackTrace();
                 setDetailStatus("Exception occured: " + e.getMessage());
             } finally {
@@ -246,20 +245,19 @@ public class CMImportTask implements Runnable {
     }
     
     private int getNumControlMeasuresDeleted( ControlStrategy cs, int [] cmIDs) {
-        ControlStrategyMeasure[] csms = cs.getControlMeasures();
-        if ( csms == null || cmIDs == null || cmIDs.length == 0 || csms.length == 0) {
+        
+        if ( cs == null || cmIDs == null || cmIDs.length == 0)
+            return 0;
+        
+        ControlStrategyMeasure[] csCMs = cs.getControlMeasures();
+        if ( csCMs == null || csCMs.length == 0) {
             return 0;
         }
+        
         int count = 0;
-        for ( int i = 0; i<csms.length; i++) {
-            int id = csms[i].getControlMeasure().getId();
-            boolean toBeDeleted = false;
-            for ( int j=0; j<cmIDs.length; j++) {
-                if ( cmIDs[j] == id) {
-                    toBeDeleted = true;
-                    break;
-                }
-            }
+        for ( int i = 0; i<csCMs.length; i++) {
+            int id = csCMs[i].getControlMeasure().getId();
+            boolean toBeDeleted = arrayContains( cmIDs, id);
             if ( toBeDeleted ) {
                 count ++;
             }
@@ -270,45 +268,59 @@ public class CMImportTask implements Runnable {
     private String getControlTechnologiesAffected(ControlStrategy cs, int [] cmIDs){
         if ( cs == null || cmIDs == null || cmIDs.length == 0)
             return "";
+        
+        ControlStrategyMeasure[] csms = cs.getControlMeasures();
+        if ( csms == null || csms.length == 0) {
+            return "";
+        }
+        
         String techNames = "";
         List<Integer> ctIDList = new ArrayList<Integer>();
         
-        ControlStrategyMeasure[] csms = cs.getControlMeasures();
         for ( int i = 0; i<csms.length; i++) {
+            if ( csms[i] == null) {
+                continue;
+            }
             LightControlMeasure lcm = csms[i].getControlMeasure();
-            ControlTechnology ct = lcm.getControlTechnology();
-            if (ct != null) {
-                int id = ct.getId();
-                if ( !ctIDList.contains( id)) {
-                    ctIDList.add( id);
-                    techNames += "  " + ct.getName() + "\n";
+            if ( lcm == null) {
+                continue;
+            }
+            int cmId = lcm.getId();
+            boolean toBeDeleted = arrayContains( cmIDs, cmId);
+            if ( toBeDeleted) {
+                ControlTechnology ct = lcm.getControlTechnology();
+                if (ct != null) {
+                    int id = ct.getId();
+                    if ( !ctIDList.contains( id)) {
+                        ctIDList.add( id);
+                        techNames += "  " + ct.getName() + "\n";
+                    }
                 }
             }
         }
         
-        System.out.println( techNames);        
+        if ( DebugLevels.DEBUG_CMIMPORT) {
+            System.out.println( techNames);        
+        }
         
         return techNames;        
     }
     
     private int getNumControlMeasuresDeleted( ControlProgram cp, int [] cmIDs) {
-        if ( cp == null) {
+        if ( cp == null || cmIDs == null || cmIDs.length == 0) {
             return 0;
         }
-        ControlMeasure[] csms = cp.getControlMeasures();
-        if ( csms == null || cmIDs == null || cmIDs.length == 0 || csms.length == 0) {
+        ControlMeasure[] cpCMs = cp.getControlMeasures();
+        if ( cpCMs == null || cpCMs.length == 0) {
             return 0;
         }
         int count = 0;
-        for ( int i = 0; i<csms.length; i++) {
-            int id = csms[i].getId();
-            boolean toBeDeleted = false;
-            for ( int j=0; i<cmIDs.length; j++) {
-                if ( cmIDs[j] == id) {
-                    toBeDeleted = true;
-                    break;
-                }
+        for ( int i = 0; i<cpCMs.length; i++) {
+            if ( cpCMs[i] == null) {
+                continue;
             }
+            int id = cpCMs[i].getId();
+            boolean toBeDeleted = arrayContains( cmIDs, id);
             if ( toBeDeleted ) {
                 count ++;
             }
@@ -316,25 +328,54 @@ public class CMImportTask implements Runnable {
         return count;
     }
     
-    private String getControlTechnologiesAffected(ControlProgram cs, int [] cmIDs){
-        if ( cs == null || cmIDs == null || cmIDs.length == 0)
+    private String getControlTechnologiesAffected(ControlProgram cp, int [] cmIDs){
+        if ( cp == null || cmIDs == null || cmIDs.length == 0)
             return "";
+        
+        ControlMeasure[] cpCMs = cp.getControlMeasures();
+        if ( cpCMs == null || cpCMs.length == 0) {
+            return "";
+        }
+        
         String techNames = "";
         List<Integer> ctIDList = new ArrayList<Integer>();
         
-        ControlMeasure[] csms = cs.getControlMeasures();
-        for ( int i = 0; i<csms.length; i++) {
-            ControlTechnology ct = csms[i].getControlTechnology();
-            int id = ct.getId();
-            if ( !ctIDList.contains( id)) {
-                ctIDList.add( id);
-                techNames += "  " + ct.getName() + "\n";
+        for ( int i = 0; i<cpCMs.length; i++) {
+            
+            if ( cpCMs[i] == null) {
+                continue;
+            }
+            int cmId = cpCMs[i].getId();
+            boolean toBeDeleted = arrayContains( cmIDs, cmId);
+            if ( toBeDeleted) {
+                ControlTechnology ct = cpCMs[i].getControlTechnology();
+                int id = ct.getId();
+                if ( !ctIDList.contains( id)) {
+                    ctIDList.add( id);
+                    techNames += "  " + ct.getName() + "\n";
+                }                
             }
         }
         
-        System.out.println( techNames);        
+        if ( DebugLevels.DEBUG_CMIMPORT) {
+            System.out.println( techNames);        
+        }
         
         return techNames;        
+    }
+    
+    private boolean arrayContains( int [] cmIDs, int id) {
+        if ( cmIDs == null || cmIDs.length == 0) {
+            return false;
+        }
+        boolean toBeDeleted = false;
+        for ( int j=0; j<cmIDs.length; j++) {
+            if ( cmIDs[j] == id) {
+                toBeDeleted = true;
+                break;
+            }
+        }
+        return toBeDeleted;
     }
 
 }

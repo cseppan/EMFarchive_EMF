@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -568,9 +569,21 @@ public class ControlMeasureDAO {
         }
         
         try {
-            dbServer.getEmfDatasource().query().execute("delete from emf.control_program_measures " +
-                    "where control_measure_id in (" + cmIdList + ");");
+            
+            String queryStr = "delete from emf.control_program_measures " +
+            "where control_measure_id in (" + cmIdList + ");";
+            
+            if ( DebugLevels.DEBUG_CMIMPORT) {
+                System.out.println( queryStr);
+            }
+            
+            dbServer.getEmfDatasource().query().execute( queryStr);
             } catch (SQLException e) {
+                
+                if ( DebugLevels.DEBUG_CMIMPORT) {
+                    System.out.println( e.getMessage());
+                }
+                
                 throw new EmfException(e.getMessage());
             } 
     }
@@ -583,56 +596,24 @@ public class ControlMeasureDAO {
         }
         
         try {
-            dbServer.getEmfDatasource().query().execute("delete from emf.control_strategy_measures " +
-                    "where control_measure_id in (" + cmIdList + ");");
-            } catch (SQLException e) {
-                throw new EmfException(e.getMessage());
-            }        
-        
-//        String idList = "";
-//        for (int i = 0; i < sectorIds.length; ++i) {
-//            idList += (i > 0 ? ","  : "") + sectorIds[i];
-//        }
-        
-        
-        
-//        String hqlDelete = "delete emf.control_strategy_measures where control_measure_id in (" +
-//            "select icm.id "
-//            + "FROM emf.control_measures icm "
-//            + (sectorIds != null && sectorIds.length > 0 
-//                    ? "inner join emf.control_measure_sectors s on icm.control_measure_id = s.control_measure_id "
-//                      + "WHERE s.sector_id in (" + idList + ") " 
-//                    : "") + ")";
-//        session.createSQLQuery( hqlDelete )
-//        .executeUpdate();
-        
-//        String hqlDelete = "delete from ControlStrategy.controlMeasures cm where cm.id in (" +
-//        "select distinct icm.id "
-//        + "FROM ControlMeasure AS icm "
-//        + (sectorIds != null && sectorIds.length > 0 
-//                ? "inner join icm.sectors AS s "
-//                  + "WHERE s.id in (" + idList + ") " 
-//                : "") + ")";
-//        session.createQuery( hqlDelete )
-//        .executeUpdate();
-        
-//        String hqlDelete = "delete ControlStrategyMeasure csm where csm.controlMeasureId in (" +
-//        "select distinct icm.id "
-//        + "FROM ControlMeasure AS icm "
-//        + (sectorIds != null && sectorIds.length > 0 
-//                ? "inner join icm.sectors AS s "
-//                  + "WHERE s.id in (" + idList + ") " 
-//                : "") + ")";
-//        session.createQuery( hqlDelete )
-//        .executeUpdate();        
-//        
-//        session.flush();
-        
-//        Criterion c = Restrictions.eq("controlMeasureId", new Integer(controlMeasureId));
-//        List list = hibernateFacade.get(EfficiencyRecord.class, c, session);
-//        for (int i = 0; i < list.size(); i++) {
-//            hibernateFacade.remove(list.get(i), session);
-//        }
+            
+            String queryStr = "delete from emf.control_strategy_measures " +
+            "where control_measure_id in (" + cmIdList + ");";
+            
+            if ( DebugLevels.DEBUG_CMIMPORT) {
+                System.out.println( queryStr);
+            }
+            
+            dbServer.getEmfDatasource().query().execute( queryStr);
+        } catch (SQLException e) {
+            
+            if ( DebugLevels.DEBUG_CMIMPORT) {
+                System.out.println( e.getMessage());
+            }
+            
+            throw new EmfException(e.getMessage());
+        }        
+
     }
 
     public void removeEfficiencyRecords(int[] sectorIds, Session session) {
@@ -853,7 +834,7 @@ public class ControlMeasureDAO {
             idList += (i > 0 ? ","  : "") + sectorIds[i];
         }
         
-        Query query = session.createQuery("select new ControlMeasure(cm.id, cm.name) "
+        Query query = session.createQuery("select new ControlMeasure(cm.id, cm.name, cm.abbreviation) "
                 + "FROM ControlMeasure AS cm "
                 + (sectorIds != null && sectorIds.length > 0 
                         ? "inner join cm.sectors AS s "

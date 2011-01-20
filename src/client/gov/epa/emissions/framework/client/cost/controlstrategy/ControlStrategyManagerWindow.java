@@ -23,6 +23,7 @@ import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.format.FormattedCellRenderer;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
+import gov.epa.emissions.commons.CommonDebugLevel;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -329,7 +330,19 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
                 try {
                     presenter.doView(view, controlStrategy);
                 } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
+                    if ( CommonDebugLevel.DEBUG_CMIMPORT) {
+                        System.out.println(" === Exception 1 ===");
+                        e.printStackTrace();
+                    }
+                    
+                    messagePanel.setError("Exception occured: " + e.getMessage());
+                } catch ( Exception e) {
+                    if ( CommonDebugLevel.DEBUG_CMIMPORT) {
+                        System.out.println(" === Exception 2 ===");
+                        e.printStackTrace();
+                    }
+                    
+                    messagePanel.setError("Exception occured: " + e.getMessage());
                 }
             }
         }
