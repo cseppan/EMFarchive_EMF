@@ -1072,4 +1072,30 @@ insert into emf.qa_programs values(DEFAULT,'Compare Datasets','gov.epa.emissions
 
 -- 12/02/2010 -- insert new property into emf.properties -- whenever do deployment, need to change the COST_SUs accordingly and uncomment it 
 -- insert into emf.properties values(DEFAULT, 'COST_SU', 'admin|jizhen|emf');
+
+-- 1/14/2011 -- change column types for 'Commnets' to accomodate more information
+ALTER TABLE emissions.monthly ALTER COLUMN comments TYPE text;
+ALTER TABLE emissions.weekly ALTER COLUMN comments TYPE text;
+ALTER TABLE emissions.diurnal_weekday ALTER COLUMN comments TYPE text;
+ALTER TABLE emissions.diurnal_weekend ALTER COLUMN comments TYPE text;
+ALTER TABLE emissions.country ALTER COLUMN comments TYPE text;
+ALTER TABLE emissions.state ALTER COLUMN comments TYPE text;
+ALTER TABLE emissions.county ALTER COLUMN comments TYPE text;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
