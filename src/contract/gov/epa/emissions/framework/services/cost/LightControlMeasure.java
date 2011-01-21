@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 
 import java.io.Serializable;
@@ -20,6 +21,10 @@ public class LightControlMeasure implements Serializable {
     private boolean includeExclude;
     
     private ControlTechnology controlTechnology;
+    
+    private User creator;
+    
+    private ControlMeasureClass cmClass;
 
     public LightControlMeasure() {
         //
@@ -98,5 +103,21 @@ public class LightControlMeasure implements Serializable {
 
     public ControlTechnology getControlTechnology() {
         return controlTechnology;
+    }
+    
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    } 
+    
+    public ControlMeasureClass getCmClass() {
+        return cmClass;
+    }
+
+    public void setCmClass(ControlMeasureClass cmClass) {
+        this.cmClass = cmClass;
     }
 }

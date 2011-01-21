@@ -22,6 +22,16 @@
             name="controlTechnology" 
             class="gov.epa.emissions.framework.services.cost.data.ControlTechnology"
             column="control_technology"/> 
+            
+        <many-to-one cascade="save-update"
+            name="creator" 
+            class="gov.epa.emissions.commons.security.User"
+            column="creator"/> 
+            
+        <many-to-one 
+            name="cmClass" 
+            class="gov.epa.emissions.framework.services.cost.ControlMeasureClass"
+            column="cm_class_id"/> 
 
     </class>
 </hibernate-mapping>  

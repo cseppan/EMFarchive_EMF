@@ -179,7 +179,7 @@ public class EditControlStrategyMeasuresTab extends JPanel implements ControlStr
     private void selectionView() {
         ControlMeasureSelectionView view = new ControlMeasureSelectionDialog(parent, changeablesList);
         ControlMeasureSelectionPresenter presenter = new ControlMeasureSelectionPresenter(this, view, session,
-                this.presenter.getAllControlMeasures());
+                this.presenter.getAllControlMeasures(), this.controlStrategy);
         try {
             presenter.display(view);
         } catch (Exception exp) {
