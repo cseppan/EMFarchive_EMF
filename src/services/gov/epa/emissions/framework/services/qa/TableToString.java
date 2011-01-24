@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.qa;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.ExporterException;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -62,7 +63,14 @@ public class TableToString {
 
     private void writeToString(long recordLimit, long recordOffset) throws Exception {
         try {
-            ResultSet rs = datasource.query().executeQuery("select * from " + qualifiedTableName + (recordLimit != 0 ? " order by " + this.columnNameList + " LIMIT " + recordLimit + " OFFSET " + recordOffset: ""));
+             
+            String query = "select * from " + qualifiedTableName + (recordLimit != 0 ? " order by " + this.columnNameList + " LIMIT " + recordLimit + " OFFSET " + recordOffset: "");
+            
+            if (DebugLevels.DEBUG_0)
+                System.out.println("\n query: " + query);
+
+            
+            ResultSet rs = datasource.query().executeQuery(query);
             ResultSetMetaData md = rs.getMetaData();
             int columnCount = md.getColumnCount();
             int startingColumn=1;
