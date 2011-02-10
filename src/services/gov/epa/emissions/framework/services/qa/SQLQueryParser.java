@@ -214,6 +214,8 @@ public class SQLQueryParser {
             //System.out.println("dataSetName: " + dataSetName);
             
             dataSet2 = getDataset(dataSetName.trim());
+            if ( dataSet2 == null )
+                throw new EmfException("The dataset name \"" + dataSetName + "\" is not valid");
 
             // The integer value of the default version is retrieved from the getDefaultVersion
             // method of the EmfDataset just created. It is converted to a String for the hashtable.
@@ -355,7 +357,8 @@ public class SQLQueryParser {
         // The dataset name is trimmed and then converted into an EmfDataset type through
         // the getDataset method.
         EmfDataset dataSet3 = getDataset(dataSetName.trim());
-
+        if ( dataSet3 == null )
+            throw new EmfException("The dataset name \"" + dataSetName + "\" is not valid");
         // The dataset id is retrieved from the dataset through its getId method.
         // It is then converted to a string to put in the hashtable.
         // Then the version is converted to an integer value.
@@ -450,7 +453,9 @@ public class SQLQueryParser {
 
         // The integer value of the default version is retrieved from the getDefaultVersion
         // method of the EmfDataset just created. It is converted to a String for the hashtable.
-
+        if ( dataSet4 == null )
+            throw new EmfException("The dataset name \"" + dataSetName + "\" is not valid");
+        
         int ds4IntVersion = dataSet4.getDefaultVersion();
 
         //System.out.println("Default Version as integer " + ds4IntVersion);
@@ -495,8 +500,9 @@ public class SQLQueryParser {
             }
         }
         if (outputTable == "")
-                throw new EmfException("The " +  qaStepName + " QA Step could not be found in the " + dataSet4 + " dataset.");
-       
+            throw new EmfException("The \"" +  qaStepName + "\" QA Step could not be found in the datset \"" + dataSet4 + 
+                    "\", default version is "+ds4IntVersion+". ");
+
         // Only need to send back the schema concatenated with the output table.
         return prefix + emissionDatasourceName + "." + outputTable + suffixTokens[1];
     }
@@ -569,6 +575,9 @@ public class SQLQueryParser {
         } else {
             dataSet5 = getDataset(dataSetName.trim());
         }
+        
+        if ( dataSet5 == null )
+            throw new EmfException("The dataset name \"" + dataSetName + "\" is not valid");
         //EmfDataset dataSet5 = getDataset(dataSetName.trim());
         //System.out.println("Database name = \n" + dataSet5 + "\n");
 
@@ -619,7 +628,7 @@ public class SQLQueryParser {
             }
         }
         if (outputTable == "")
-            throw new EmfException("The " +  qaStepName + " QA Step could not be found in the " + dataSet5 + " dataset.");
+            throw new EmfException("The \"" +  qaStepName + "\" QA Step could not be found in the " + dataSet5 + " dataset.");
         
         // Only need to send back the schema concatenated with the output table.
         return prefix + emissionDatasourceName + "." + outputTable + suffixTokens[1];
