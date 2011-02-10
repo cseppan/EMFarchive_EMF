@@ -64,6 +64,7 @@ avd_emis
 */
     
     public static final String MATCHING_EXPRESSIONS_TAG = "-matching";
+   
 /*
 scc|scc
 fips|fips
@@ -73,6 +74,7 @@ stackid|stackid
 segment|segment
 poll|poll
 */
+    public static final String JOIN_TYPE_TAG = "-join";
 
 //    private static final String FULL_JOIN_EXPRESSIONS_TAG = "-fulljoin";
 /*
@@ -97,53 +99,6 @@ poll|poll
         super(sessionFactory,emissioDatasourceName,tableName,qaStep);
         this.datasource = datasource;    
     }
-
-//    public class DatasetVersion {
-//        private EmfDataset dataset;
-//        private Version version;
-//        private String datasetName;
-//        private int datasetVersion;
-//        
-//        public DatasetVersion(String datasetName, int datasetVersion) {
-//            this.setDatasetName(datasetName);
-//            this.setDatasetVersion(datasetVersion);
-////            this.setDataset(dataset);
-////            this.setVersion(version);
-//        }
-//
-//        public void setDataset(EmfDataset dataset) {
-//            this.dataset = dataset;
-//        }
-//
-//        public EmfDataset getDataset() {
-//            return dataset;
-//        }
-//
-//        public void setDatasetName(String datasetName) {
-//            this.datasetName = datasetName;
-//        }
-//
-//        public String getDatasetName() {
-//            return datasetName;
-//        }
-//
-//        public void setVersion(Version version) {
-//            this.version = version;
-//        }
-//
-//        public Version getVersion() {
-//            return version;
-//        }
-//
-//        public void setDatasetVersion(int datasetVersion) {
-//            this.datasetVersion = datasetVersion;
-//        }
-//
-//        public int getDatasetVersion() {
-//            return datasetVersion;
-//        }
-//
-//    }
 
     public class ColumnMatchingMap {
         private String dataset1Expression;
@@ -231,6 +186,7 @@ poll|poll
         int indexGroupBy = programArguments.indexOf(GROUP_BY_EXPRESSIONS_TAG);
         int indexAggregate = programArguments.indexOf(AGGREGATE_EXPRESSIONS_TAG);
         int indexMatching = programArguments.indexOf(MATCHING_EXPRESSIONS_TAG);
+        int indexJoin = programArguments.indexOf(JOIN_TYPE_TAG);
         
         if (indexBase != -1) {
             arguments = parseSwitchArguments(programArguments, indexBase, programArguments.indexOf("\n-", indexBase) != -1 ? programArguments.indexOf("\n-", indexBase) : programArguments.length());
@@ -265,6 +221,11 @@ poll|poll
         
         checkDataset();
         
+        String joinSQL="";       
+        if (indexJoin != -1) 
+            joinSQL = programArguments.substring(indexJoin + JOIN_TYPE_TAG.length() + 1, programArguments.indexOf("\n-", indexJoin) != -1 ? programArguments.indexOf("\n-", indexJoin) : programArguments.length());          
+        if (joinSQL.trim().isEmpty())
+            joinSQL = " full outer join ";
         if (indexGroupBy != -1) {
             arguments = parseSwitchArguments(programArguments, indexGroupBy, programArguments.indexOf("\n-", indexGroupBy) != -1 ? programArguments.indexOf("\n-", indexGroupBy) : programArguments.length());
             if (arguments != null && arguments.length > 0) groupByExpressions = arguments;
@@ -284,8 +245,7 @@ poll|poll
                 matchingExpressionMap.put(dataset2Expression, new ColumnMatchingMap(dataset2Expression, dataset1Expression));
             }
         }
-
-     
+    
         //Validate program arguments (i.e., does dataset and version exist, does mapping make sense, etc...)
        
         
@@ -534,6 +494,7 @@ poll|poll
 //         diffQuery = diffQuery.replaceAll("#base", innerSQLBase);
 
          String innerSQLCompare = "";
+
          if (compareDatasetList.size() > 1) 
              innerSQLCompare = compareUnionSelectSQL + ", sum(c.cnt) as cnt from (";
          for (int j = 0; j < compareDatasetList.size(); j++) {
@@ -544,8 +505,8 @@ poll|poll
          }
          if (compareDatasetList.size() > 1) 
              innerSQLCompare += ") c " + compareUnionGroupBySQL;
-
-         String sql = selectSQL + ", sum(b.cnt) as count_b, sum(c.cnt) as count_c from (" + innerSQLBase + ") as b full outer join (" + innerSQLCompare + ") as c ";
+         
+         String sql = selectSQL + ", sum(b.cnt) as count_b, sum(c.cnt) as count_c from (" + innerSQLBase + ") as b " +joinSQL+" (" + innerSQLCompare + ") as c ";
 //         for (int j = 0; j < fullJoinExpressionList.size(); j++) {
 //             
 //             ColumnMatchingMap columnMatchingMap = fullJoinExpressionList.get(j);
@@ -668,6 +629,8 @@ poll|poll
     }
     
     private Map<String,Column> getDatasetColumnMap(EmfDataset dataset) throws SQLException {
+        if (dataset.getInternalSources() == null )
+            throw new SQLException("Dataset, " + dataset.getName() + ", does't have iternalsources. " );
         return new TableMetaData(datasource).getColumnMap(dataset.getInternalSources()[0].getTable());
     }
 

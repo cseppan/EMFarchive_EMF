@@ -197,6 +197,12 @@ stackid|stackid
 segment|segment
 poll|poll
 */
+    public static final String JOIN_TYPE_TAG = "-join";
+/*
+outer
+inner    
+*/
+    
     private String lineFeeder = System.getProperty("line.separator");
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
@@ -1030,6 +1036,7 @@ avd_emis=emis_avd
         int indexGroupBy = programSwitches.indexOf(GROUP_BY_EXPRESSIONS_TAG);
         int indexAggregate = programSwitches.indexOf(AGGREGATE_EXPRESSIONS_TAG);
         int indexMatching = programSwitches.indexOf(MATCHING_EXPRESSIONS_TAG);
+        int indexJoin     = programSwitches.indexOf(JOIN_TYPE_TAG);
 
 
         if (indexBase != -1) {
@@ -1088,7 +1095,6 @@ avd_emis=emis_avd
             }
         }
 
-     
         CompareDatasetsQAProgamWindow view = new CompareDatasetsQAProgamWindow(desktopManager, programVal, session,
                 baseDatasetList.toArray(new DatasetVersion[0]), compareDatasetList.toArray(new DatasetVersion[0]),
 
@@ -1098,8 +1104,8 @@ avd_emis=emis_avd
 
                 (indexGroupBy != -1 ? programSwitches.substring(indexGroupBy + GROUP_BY_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexGroupBy) != -1 ? programSwitches.indexOf("\n-", indexGroupBy) : programSwitches.length()) : ""), 
                 (indexAggregate != -1 ? programSwitches.substring(indexAggregate + AGGREGATE_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexAggregate) != -1 ? programSwitches.indexOf("\n-", indexAggregate) : programSwitches.length()) : ""), 
-                (indexMatching != -1 ? programSwitches.substring(indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length()) : "")
-
+                (indexMatching != -1 ? programSwitches.substring(indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length()) : ""),
+                (indexJoin != -1 ? programSwitches.substring(indexJoin + JOIN_TYPE_TAG.length() + 1, programSwitches.indexOf("\n-", indexJoin) != -1 ? programSwitches.indexOf("\n-", indexJoin) : programSwitches.length()) : "")
         );
         EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
         presenter.display(origDataset, step);
