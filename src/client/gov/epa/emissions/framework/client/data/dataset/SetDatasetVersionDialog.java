@@ -52,7 +52,7 @@ public class SetDatasetVersionDialog extends JDialog implements SetDatasetVersio
 
         setTitle("Set Version: " + dataset.getName());
         this.pack();
-        this.setSize(450,120);
+        this.setSize(450,130);
         this.setLocation(ScreenUtils.getPointToCenter(this));
         this.setVisible(true);
     }
