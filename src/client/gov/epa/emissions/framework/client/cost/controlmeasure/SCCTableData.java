@@ -14,8 +14,14 @@ import java.util.List;
 public class SCCTableData extends AbstractTableData {
 
     private List rows;
-
+    private Boolean lightVersion = null;
+    
     public SCCTableData(Scc[] sccs) {
+        rows = createRows(sccs);
+    }
+
+    public SCCTableData(Scc[] sccs, boolean lightVersion) {
+        this.lightVersion = lightVersion;
         rows = createRows(sccs);
     }
 
@@ -45,12 +51,20 @@ public class SCCTableData extends AbstractTableData {
     }
 
     private Row row(Scc scc) {
-        String[] values = { scc.getCode(), scc.getDescription() };
+        String[] values = { };
+        if (lightVersion != null && lightVersion)
+            values = new String[] { scc.getCode(), scc.getDescription() };
+        else
+            values = new String[] { scc.getCode(), scc.getDescription(), scc.getSector(), scc.getEi_category(), scc.getScc_l1(),
+                scc.getScc_l2(), scc.getScc_l3(), scc.getScc_l4(), scc.getLast_inventory_year(), scc.getMap_to(), scc.getCreated_date(),
+                scc.getRevised_date(), scc.getOption_group(), scc.getOption_set(), scc.getShort_name() };
         return new ViewableRow(scc, values);
     }
 
     public String[] columns() {
-        return new String[] { "SCC", "Description" };
+        if (lightVersion != null && lightVersion)
+            return new String[] { "SCC", "description" };
+        return new String[] { "SCC", "description", "sector","ei_category","scc_l1","scc_l2","scc_l3","scc_l4","last_inventory_year","map_to","created_date","revised_date","option_group","option_set","short_name"};
     }
 
     public Class getColumnClass(int col) {

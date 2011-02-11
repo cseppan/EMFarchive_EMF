@@ -1070,9 +1070,6 @@ ALTER TABLE internal_sources ALTER file_size TYPE bigint;
 -- 11/15/2010 -- Add new Compare Datasets QA Program
 insert into emf.qa_programs values(DEFAULT,'Compare Datasets','gov.epa.emissions.framework.services.qa.comparedatasets.SQLCompareDatasetsProgramQueryRunner');
 
--- 12/02/2010 -- insert new property into emf.properties -- whenever do deployment, need to change the COST_SUs accordingly and uncomment it 
--- insert into emf.properties values(DEFAULT, 'COST_SU', 'admin|jizhen|emf');
-
 -- 1/14/2011 -- change column types for 'Commnets' to accomodate more information
 ALTER TABLE emissions.monthly ALTER COLUMN comments TYPE text;
 ALTER TABLE emissions.weekly ALTER COLUMN comments TYPE text;

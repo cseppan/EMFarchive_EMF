@@ -204,17 +204,23 @@ public class ControlMeasuresImporter implements Importer {
                 Integer mappedId = idMap.get(id);
 
                 if (mappedId == null) {
-                    System.out.println("Control measure '" + controlMeasure.getName()
-                            + "' contains undefined reference '" + id + "'. Skipping reference.");
+                    setDetailStatus("Control measure " + controlMeasure.getAbbreviation() + ", " + controlMeasure.getName()
+                            + " contains undefined reference '" + id + "'. Skipping reference.\n");
                 }
                 else {
 
                     Reference reference = referenceMap.get(mappedId);
                     if (reference == null) {
-                        System.out.println("Unable to find reference with id '" + id + "' and mapped id '" + mappedId
-                                + "'. Skipping reference.");
+                        setDetailStatus("Unable to find reference with id '" + id + "' and mapped id '" + mappedId
+                                + "'. Skipping reference for control measure " + controlMeasure.getAbbreviation() + ", " + controlMeasure.getName()
+                                    + " .\n");
                     } else {
-                        references.add(reference);
+                        if (!references.contains(reference)) {
+                            references.add(reference);
+                        } else {
+                            setDetailStatus("Control measure " + controlMeasure.getAbbreviation() + ", " + controlMeasure.getName()
+                                    + " contains undefined reference '" + id + "'. Skipping reference.\n");
+                        }
                     }
                 }
 

@@ -101,25 +101,30 @@ public class ControlMeasureDAO {
     }
 
     // NOTE: it't not happening in one transaction. modify?
+    //No, there is situations where there is too much data and transaction would cause to much overhead
     public int add(ControlMeasure measure, Scc[] sccs, Session session) throws EmfException {
         //Validate control measure
         //make sure abbreviation is not 
         if (measure.getAbbreviation().trim().length() == 0) {
-            throw new EmfException("Summary tab: An abbreviation must be specified");
+            throw new EmfException("An abbreviation must be specified");
         }
         //make sure its not longer than 10 characters
         if (measure.getAbbreviation().trim().length() > 10) {
-            throw new EmfException("Summary tab: An abbreviation must not be longer than 10 characters");
+            throw new EmfException("An abbreviation must not be longer than 10 characters");
         }
         //make sure its does not contain a space
         if (measure.getAbbreviation().trim().indexOf(" ") > 0) {
-            throw new EmfException("Summary tab: An abbreviation can not contain a space");
+            throw new EmfException("An abbreviation can not contain a space");
         }
 
         checkForConstraints(measure, session);
         updateReferenceIds(measure, session);
-        hibernateFacade.add(measure, session);
-        int cmId = controlMeasureIds(measure, sccs, session);
+        int cmId = (Integer)hibernateFacade.add(measure, session);
+        measure.setId(cmId);
+//        int cmId = controlMeasureIds(measure, sccs, session);
+        for (int i = 0; i < sccs.length; i++) {
+            sccs[i].setControlMeasureId(cmId);
+        }
         hibernateFacade.add(sccs, session);
         session.flush();
         return cmId;
@@ -312,6 +317,12 @@ public class ControlMeasureDAO {
         session.flush();
     }
 
+    public ControlMeasure grabLocked(User user, int controlMeasureId, Session session) {
+        ControlMeasure controlMeasure = current(controlMeasureId, session);
+        lockingScheme.grabLock(user, controlMeasure, session);
+        return controlMeasure;
+    }
+
     public ControlMeasure obtainLocked(User user, int controlMeasureId, Session session) {
         return (ControlMeasure) lockingScheme.getLocked(user, current(controlMeasureId, session), session);
     }
@@ -333,15 +344,15 @@ public class ControlMeasureDAO {
         // Validate control measure
         // make sure abbreviation is not
         if (locked.getAbbreviation().trim().length() == 0) {
-            throw new EmfException("Summary tab: An abbreviation must be specified");
+            throw new EmfException("An abbreviation must be specified");
         }
         // make sure its not longer than 10 characters
         if (locked.getAbbreviation().trim().length() > 10) {
-            throw new EmfException("Summary tab: An abbreviation must not be longer than 10 characters");
+            throw new EmfException("An abbreviation must not be longer than 10 characters");
         }
         // make sure its does not contain a space
         if (locked.getAbbreviation().trim().indexOf(" ") > 0) {
-            throw new EmfException("Summary tab: An abbreviation can not contain a space");
+            throw new EmfException("An abbreviation can not contain a space");
         }
 
         checkForConstraints(locked, session);
@@ -452,8 +463,8 @@ public class ControlMeasureDAO {
         Criterion name = Restrictions.eq("name", controlMeasure.getName());
         Criterion abbrev = Restrictions.eq("abbreviation", controlMeasure.getAbbreviation());
 
-        if (nameExist(new Criterion[] { id, name }, session))
-            throw new EmfException("The Control Measure name is already in use: " + controlMeasure.getName());
+//        if (nameExist(new Criterion[] { id, name }, session))
+//            throw new EmfException("The Control Measure name is already in use: " + controlMeasure.getName());
 
         if (abbrExist(new Criterion[] { id, abbrev }, session))
             throw new EmfException("This control measure abbreviation is already in use: "
@@ -486,10 +497,10 @@ public class ControlMeasureDAO {
         boolean abbrExist = abbrExist(new Criterion[] { abbrev }, session);
         boolean nameExist = nameExist(measure.getName(), session);
 
-        if (nameExist) {// overwrite if name exist regard less of abbrev
-            cmId = controlMeasureId(measure, session);
+        if (abbrExist) {// overwrite based on the UNIQUE control measure abbreviation
+            cmId = getControlMeasureIdByAbbreviation(measure.getAbbreviation(), session);
             measure.setId(cmId);
-            ControlMeasure obtainLocked = obtainLocked(user, cmId, session);
+            ControlMeasure obtainLocked = grabLocked(user, cmId, session);
             if (obtainLocked == null)
                 throw new EmfException("Could not obtain the lock to update: " + measure.getName());
             measure.setLockDate(obtainLocked.getLockDate());
@@ -504,8 +515,8 @@ public class ControlMeasureDAO {
             aerDAO.removeAggregateEfficiencyRecords(cmId, dbServer);
 //            LOG.error("update measure and sccs");
             update(measure, sccs, session);
-        } else if (abbrExist) {
-            throw new EmfException("This control measure abbreviation is already in use: " + measure.getAbbreviation());
+//        } else if (abbrExist) {
+//            throw new EmfException("This control measure abbreviation is already in use: " + measure.getAbbreviation());
         } else {
             cmId = add(measure, sccs, session);
         }
@@ -514,7 +525,7 @@ public class ControlMeasureDAO {
 
     
     // use only after confirming measure is exist
-    private int controlMeasureId(ControlMeasure measure, Session session) {
+    private int getControlMeasureIdByAbbreviation(String abbreviation, Session session) {
 //        Criterion criterion = Restrictions.eq("name", measure.getName());
 //
 //        Transaction tx = null;
@@ -529,7 +540,9 @@ public class ControlMeasureDAO {
 //            throw e;
 //        }
 //
-        int id = (Integer)session.createQuery("select cM.id from ControlMeasure cM where trim(cM.name) =  '" + measure.getName().trim().replaceAll("'", "''") + "'").uniqueResult();
+        int id = (Integer)session.createQuery("select cM.id from ControlMeasure cM where cM.abbreviation =  :abbreviation")
+            .setString("abbreviation", abbreviation)
+            .uniqueResult();
         
         return id;
     

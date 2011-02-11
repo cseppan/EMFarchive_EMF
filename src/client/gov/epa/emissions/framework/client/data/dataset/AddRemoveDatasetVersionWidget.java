@@ -49,8 +49,11 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
     
     private boolean selectSingle;
 
-    public AddRemoveDatasetVersionWidget(boolean selectSingle, ManageChangeables changeables, EmfConsole parentConsole, EmfSession session) {
+    private int allowableRowCount = 0;  //Zero won't limit the rowcount
+
+    public AddRemoveDatasetVersionWidget(boolean selectSingle, int allowableRowCount, ManageChangeables changeables, EmfConsole parentConsole, EmfSession session) {
         this.selectSingle = selectSingle;
+        this.allowableRowCount = allowableRowCount;
         this.parentConsole = parentConsole;
         this.session = session;
         setupLayout(changeables);
@@ -59,15 +62,52 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
     
     // called when adding datasets
     public void setDatasetVersions(DatasetVersion[] datasetVersions) {
-        for (int i = 0; i < datasetVersions.length; i++) {
-            if (!isDuplicateDataset(datasetVersionsList.getModel(),datasetVersions[i]))
-               datasetVersionsList.addElement(datasetVersions[i]); 
-            else {
-                datasetVersionsList.removeElements(new DatasetVersion[] { datasetVersions[i] }); 
-                datasetVersionsList.addElement(datasetVersions[i]);
-//                datasetVersionsList.setSelectedIndex(datasetVersionsList.getLastVisibleIndex());
+        int rowCount = 0;
+        //remove all items and just repopulate, could have a constraint to limit to a certain allowable row count 
+        //see allowableRowCount field
+        if (allowableRowCount > 0) {
+            Object[] existingDatasetVersions = datasetVersionsList.getAllElements();
+            datasetVersionsList.removeAllElements();
+            //add new items...
+            for (int i = 0; i < datasetVersions.length; i++) {
+                DatasetVersion datasetVersion = datasetVersions[i];
+                if (!isDuplicateDataset(datasetVersionsList.getModel(),datasetVersion)) {
+                    datasetVersionsList.addElement(datasetVersion); 
+                    ++rowCount;
+                } else {
+                     datasetVersionsList.removeElements(new DatasetVersion[] { datasetVersion }); 
+                     datasetVersionsList.addElement(datasetVersion);
+                 }
+                datasetVersionsList.setSelectedIndex(datasetVersionsList.getLastVisibleIndex());
+                if (rowCount >= allowableRowCount) return;
             }
-            datasetVersionsList.setSelectedIndex(datasetVersionsList.getLastVisibleIndex());
+            //lets add some existing items if we haven't met the allowable row count...
+            if (allowableRowCount > rowCount) {
+                for (int i = existingDatasetVersions.length - 1 /*(allowableRowCount - datasetVersions.length)*/; i >= 0; --i) {
+                    DatasetVersion datasetVersion = (DatasetVersion) existingDatasetVersions[i];
+                    if (!isDuplicateDataset(datasetVersionsList.getModel(),datasetVersion)) {
+                        datasetVersionsList.add(0, datasetVersion); 
+                        ++rowCount;
+                    } 
+                    datasetVersionsList.setSelectedIndex(datasetVersionsList.getLastVisibleIndex());
+                    if (rowCount >= allowableRowCount) return;
+                }
+                
+            }
+
+        } else {
+            for (int i = 0; i < datasetVersions.length; i++) {
+//                ++rowCount;
+                DatasetVersion datasetVersion = datasetVersions[i];
+                if (!isDuplicateDataset(datasetVersionsList.getModel(),datasetVersion))
+                   datasetVersionsList.addElement(datasetVersion); 
+                else {
+                    datasetVersionsList.removeElements(new DatasetVersion[] { datasetVersion }); 
+                    datasetVersionsList.addElement(datasetVersion);
+//                    datasetVersionsList.setSelectedIndex(datasetVersionsList.getLastVisibleIndex());
+                }
+                datasetVersionsList.setSelectedIndex(datasetVersionsList.getLastVisibleIndex());
+            }
         }
     }
 
@@ -100,7 +140,11 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
     private void setupLayout(ManageChangeables changeables) {
         
         this.datasetVersionsList = new ListWidget(new DatasetVersion[0]);
-        this.datasetVersionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+//        if (this.modelSize > 0)
+//            this.datasetVersionsList.setModelSize(modelSize);
+//        this.datasetVersionsList.setModelSize(1);
+        this.datasetVersionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//        this.datasetVersionsList.setModelSize(1);
         changeables.addChangeable(datasetVersionsList);
         
         JScrollPane pane = new JScrollPane(datasetVersionsList);
@@ -214,4 +258,9 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
     public void setSelectionMode(int singleSelection) {
         datasetVersionsList.setSelectionMode(singleSelection);
     }
+    
+//    public void setModelSize(int modelSize) {
+//        this.modelSize = modelSize;
+//    }
+
 }

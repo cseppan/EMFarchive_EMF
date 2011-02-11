@@ -42,7 +42,7 @@ public class LockingScheme {
         return Long.parseLong(timeInterval.getValue());
     }
 
-    private void grabLock(User user, Lockable lockable, Session session) {
+    public void grabLock(User user, Lockable lockable, Session session) {
         lockable.setLockOwner(user.getUsername());
         lockable.setLockDate(new Date());
 

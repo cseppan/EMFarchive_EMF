@@ -111,16 +111,41 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
         layoutGenerator.addLabelWidgetPair("Compare datasets:", compareDatasetVersionWidget(), content);
 
         this.groupByExpressionsTextField = new TextArea("Group By Expressions", this.groupByExpressions, 40, 4);
+        this.groupByExpressionsTextField.setToolTipText("<html>Group By Expressions"
+                + "<br/><br/>This is a new line character delimited list of expressions that will be part of the group by expression when performing the comparison analysis."
+                + "<br/>The expressions must contain valid column(s) from either the base or comparison datasets.  If the aggregate expression exists only in the base"
+                + "<br/>or compare dataset, then a Mapping Expression must be specified in order for a proper mapping can happen for the comparison analysis (i.e., substring(fips,1,2)=substring(region_cd,1,2))."
+                + "<br/>Also, when an aggregrate expression contains any sort of functional operation (i.e., string concatenation --> fipsst || fipscounty),"
+                + "<br/>then this expression will also need to be mapped as part of the mapping expressions.  The group by expressions can be aliased by adding the \"AS ALIAS\" clause to the expression."
+                + "<br/>The expression can also contain SQL functions such as substring."
+                + "<br/><br/>Sample Group By Expressions:"
+                + "<br/><br/>scc AS scc_code<br/>substring(fips,1,2) as fipsst<br/>"
+                + "<br/>or"
+                + "<br/><br/>fipsst || fipscounty as fips<br/>substring(scc,1,5) as scc_lv5</html>");
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(this.groupByExpressionsTextField);
         scrollableComment.setPreferredSize(new Dimension(450, 105));
         layoutGenerator.addLabelWidgetPair("Group By Expressions:", scrollableComment, content);
 
         this.aggregateExpressionsTextField = new TextArea("Aggregate Expressions", this.aggregateExpressions, 40, 4);
+        this.aggregateExpressionsTextField.setToolTipText("<html>Aggregate Expressions"
+                + "<br/><br/>This is a new line character delimited list of expressions that will be aggregated across the specified above group by expressions."
+                + "<br/>The expressions must contain valid column(s) from either the base or comparison datasets.  If the aggregate expression exists only"
+                + "<br/>in the base or compare dataset, then a Mapping Expression must be specified in order for a proper mapping can happen for the comparison"
+                + "<br/>analysis."
+                + "<br/><br/>Sample Aggregate Expression:"
+                + "<br/>ann_emis<br/>avd_emis</html>");
         ScrollableComponent scrollableComment2 = ScrollableComponent.createWithVerticalScrollBar(this.aggregateExpressionsTextField);
         scrollableComment2.setPreferredSize(new Dimension(450, 105));
         layoutGenerator.addLabelWidgetPair("Aggregate Expressions:", scrollableComment2, content);
 
         this.matchingExpressionsTextField = new TextArea("Matching Expressions", this.matchingExpressions, 40, 4);
+        this.matchingExpressionsTextField.setToolTipText("<html>Matching Expressions"
+                + "<br/><br/>This is a new line character delimited list of mapping expressions that help cross reference what base dataset expression maps to what comparison dataset expression."
+                + "<br/>The mapping expression contains three parts, the base dataset expression, the equals \"=\" character, and the cross reference comparison dataset expression (i.e., base_expression=comparison_expression)."
+                + "<br/>The left hand part of the expression is for the base dataset and the right hand side is for the comparison dataset.  The mapping expressions must contain valid column(s)"
+                + "<br/>from either the base or comparison datasets."
+                + "<br/><br/>Sample Mapping Expression:"
+                + "<br/><br/>substring(fips,1,2)=substring(region_cd,1,2)<br/>scc=scc_code<br/>ann_emis=emis_ann<br/>avd_emis=emis_avd</html>");
         ScrollableComponent scrollableComment3 = ScrollableComponent.createWithVerticalScrollBar(this.matchingExpressionsTextField);
         scrollableComment3.setPreferredSize(new Dimension(450, 105));
         layoutGenerator.addLabelWidgetPair("Matching Expressions:", scrollableComment3, content);
@@ -160,7 +185,7 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
     }
     
     private JPanel baseDatasetVersionWidget() throws EmfException {
-        datasetWidgetBase = new AddRemoveDatasetVersionWidget(false, this, parentConsole, session);
+        datasetWidgetBase = new AddRemoveDatasetVersionWidget(false, 0, this, parentConsole, session);
         datasetWidgetBase.setPreferredSize(new Dimension(350,220));
         List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
         if(baseDatasetVersions != null && baseDatasetVersions.length > 0) {
@@ -174,7 +199,7 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
     }
     
     private JPanel compareDatasetVersionWidget() throws EmfException {
-        datasetWidgetCompare = new AddRemoveDatasetVersionWidget(false, this, parentConsole, session);
+        datasetWidgetCompare = new AddRemoveDatasetVersionWidget(false, 0, this, parentConsole, session);
         datasetWidgetCompare.setPreferredSize(new Dimension(350,220));
         List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
         if(compareDatasetVersions != null && compareDatasetVersions.length > 0) {

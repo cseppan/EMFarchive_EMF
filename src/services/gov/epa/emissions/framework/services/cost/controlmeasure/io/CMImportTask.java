@@ -92,11 +92,12 @@ public class CMImportTask implements Runnable {
                 exportTask.run();
                 
                 //look for dependencies on Control Strategies and Control Programs
+                //if they're are dependent strategies, then finalize these so they can't be used in the future
                 ControlStrategyDAO csDAO = new ControlStrategyDAO();
                 List<ControlStrategy> cs = //new ControlStrategyDAO().getControlStrategiesByControlMeasures(ids, session);
                     csDAO.getControlStrategiesByControlMeasures(ids, session);
                 
-                String msg = "There are " + cs.size() + " Strategies affected and to be finalized.";
+                String msg = "There are " + cs.size() + " control strategies that have dependent measures that will be purged.  These strategies will be finalized.";
                 setStatus( msg);
                 msg += "\n";
                 for ( ControlStrategy s : cs) {
@@ -108,15 +109,15 @@ public class CMImportTask implements Runnable {
                 
                 cmMsg = "";
                 for ( ControlStrategy s : cs) {
+                    Date now = new Date();
                     cmMsg = ""; //s.getDescription();
-                    cmMsg += "Purge: " + this.truncate + "\n";
-                    cmMsg += "Date deleted: " + new Date() + "\n";
+                    cmMsg += "A CMDB Import (on : " + now + ") has caused some measures\nassigned to this strategy to be purged from the system.  This strategy\nwill be finalized to ensure this won't be accessible during a strategy analysis run.\n";
                     int numCMToBeDeleted = this.getNumControlMeasuresDeleted(s, ids);
-                    cmMsg += "Measures deleted: " + numCMToBeDeleted + "\n";
+                    cmMsg += "Measures Deleted: " + numCMToBeDeleted + "\n";
                     cmMsg += "Control Technolgies Affected: \n";
                     cmMsg += this.getControlTechnologiesAffected(s, ids);
                     if ( DebugLevels.DEBUG_CMIMPORT) {
-                        setDetailStatus( ">>> " + s.getName() + ": \n" + cmMsg + "\n"); // for debug
+                        setDetailStatus( "  " + s.getName() + ": \n" + cmMsg + "\n"); // for debug
                     }
                     //s.setDescription( desc);
                     //s.setIsFinal( true);
@@ -142,11 +143,11 @@ public class CMImportTask implements Runnable {
                 setDetailStatus( msg);
                 
                 for ( ControlProgram p : cp) {
+                    Date now = new Date();
                     cmMsg = ""; //s.getDescription();
-                    cmMsg += "Purge: " + this.truncate + "\n";
-                    cmMsg += "Date deleted: " + new Date() + "\n";
+                    cmMsg += "A CMDB Import (on : " + now + ") has caused some measures\nassigned to this strategy to be purged from the system.  This strategy\nwill be finalized to ensure this won't be accessible during a strategy analysis run.\n";
                     int numCMToBeDeleted = this.getNumControlMeasuresDeleted(p, ids);
-                    cmMsg += "Measures deleted: " + numCMToBeDeleted + "\n";
+                    cmMsg += "Measures Deleted: " + numCMToBeDeleted + "\n";
                     cmMsg += "Control Technolgies Affected: \n";
                     cmMsg += this.getControlTechnologiesAffected(p, ids);
                     if ( DebugLevels.DEBUG_CMIMPORT) {

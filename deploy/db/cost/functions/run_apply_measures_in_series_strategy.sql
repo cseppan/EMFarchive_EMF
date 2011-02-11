@@ -45,6 +45,8 @@ DECLARE
 	emis_sql character varying;
 	percent_reduction_sql character varying;
 	inventory_sectors character varying := '';
+	creator_user_id integer := 0;
+	is_cost_su boolean := false; 
 BEGIN
 --	SET work_mem TO '512MB';
 --	SET enable_seqscan TO 'off';
@@ -95,7 +97,8 @@ BEGIN
 		cs.county_dataset_id,
 		cs.county_dataset_version,
 		cs.use_cost_equations,
-		cs.discount_rate / 100
+		cs.discount_rate / 100,
+		cs.creator_id
 	FROM emf.control_strategies cs
 	where cs.id = int_control_strategy_id
 	INTO target_pollutant_id,
@@ -105,8 +108,21 @@ BEGIN
 		county_dataset_id,
 		county_dataset_version,
 		use_cost_equations,
-		discount_rate;
+		discount_rate,
+		creator_user_id;
 
+	-- see if strategyt creator is a CoST SU
+	SELECT 
+		case 
+			when 
+				strpos('|' 
+				|| (select p.value from emf.properties p where p.name = 'COST_SU') 
+				|| '|', '|' || u.username || '|') > 0 then true 
+			else false 
+		end
+	FROM emf.users u
+	where u.id = creator_user_id
+	INTO is_cost_su;
 
 	-- see if there are point specific columns in the inventory
 	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
@@ -373,6 +389,17 @@ BEGIN
 
 			inner join emf.control_measures m
 			on m.id = scc.control_measures_id
+
+-- for Non CoST SUs, make sure they only see their temporary measures
+			' || case when not is_cost_su then '
+
+			inner join emf.control_measure_classes cmc
+			on cmc.id = m.cm_class_id
+			and (
+				(cmc.name = ''Temporary'' and m.creator = ' || creator_user_id || ')
+				or (cmc.name <> ''Temporary'')
+			)
+			' else '' end || '
 
 			inner join emf.control_measure_months ms
 			on ms.control_measure_id = m.id

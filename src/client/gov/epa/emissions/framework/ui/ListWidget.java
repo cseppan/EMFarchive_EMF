@@ -99,6 +99,10 @@ public class ListWidget extends JList implements Changeable {
         model.addElement(obj);
     }
 
+    public void add(int index, Object obj) {
+        model.add(index, obj);
+    }
+
     public void removeElements(Object[] removeValues) {
         for (int i = 0; i < removeValues.length; i++) {
             model.removeElement(removeValues[i]);
@@ -132,5 +136,10 @@ public class ListWidget extends JList implements Changeable {
         Object bObject = model.getElementAt(b);
         model.set(a, bObject);
         model.set(b, aObject);
+    }
+
+    public void setModelSize(int modelSize) {
+        this.model.setSize(modelSize);
+        this.model.trimToSize();
     }
 }

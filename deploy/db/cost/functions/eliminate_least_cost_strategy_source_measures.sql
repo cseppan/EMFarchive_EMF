@@ -1,4 +1,8 @@
-CREATE OR REPLACE FUNCTION public.eliminate_least_cost_strategy_source_measures(control_strategy_id integer, 
+drop FUNCTION public.eliminate_least_cost_strategy_source_measures(integer, 
+	integer, 
+	integer);
+	
+CREATE OR REPLACE FUNCTION public.eliminate_least_cost_strategy_source_measures(int_control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer) RETURNS void AS $$
 DECLARE
@@ -25,7 +29,7 @@ BEGIN
 		on i.dataset_id = sr.detailed_result_dataset_id
 		inner join emf.strategy_result_types srt
 		on srt.id = sr.strategy_result_type_id
-	where sr.control_strategy_id = control_strategy_id 
+	where sr.control_strategy_id = int_control_strategy_id 
 		and srt.name = 'Least Cost Control Measure Worksheet'
 	into worksheet_dataset_id,
 		worksheet_table_name;
@@ -35,7 +39,7 @@ BEGIN
 	FROM emf.control_strategies cs
 		inner join emf.pollutants p
 		on p.id = cs.pollutant_id
-	where cs.id = control_strategy_id
+	where cs.id = int_control_strategy_id
 	INTO target_pollutant;
 
 --	raise notice '%', 'start ' || clock_timestamp();

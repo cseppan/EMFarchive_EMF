@@ -39,7 +39,7 @@ public class SccFileReader {
         validate(list);
         String[] values = (String[]) list.toArray(new String[0]);
 
-        return new Scc(values[0], values[1]);
+        return new Scc(values[0], values[14], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[9], values[10], values[11], values[12], values[13]);
     }
 
     private void validate(List list) throws Exception {

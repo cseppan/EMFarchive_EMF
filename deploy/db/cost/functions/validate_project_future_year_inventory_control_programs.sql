@@ -74,7 +74,7 @@ BEGIN
 			END IF;
 
 			-- make sure the plant closure effective date is in the right format
-			execute 'select count(1) from emissions.' || control_program.table_name || ' where not public.isdate(effective_date)'
+			execute 'select count(1) from emissions.' || control_program.table_name || ' where not public.isdate(effective_date) and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version)
 			into count;
 			IF count > 0 THEN
 				RAISE EXCEPTION 'Control program, %, plant closure dataset has % effective date(s) that are not in the correct date format.', control_program.control_program_name, count;
@@ -82,7 +82,7 @@ BEGIN
 			END IF;
 
 			-- make sure there aren't missing fips codes
-			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(fips), '''') = ''''' || ' '
+			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(fips), '''') = ''''' || '  and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version)
 			into count;
 			IF count > 0 THEN
 				RAISE EXCEPTION 'Control program, %, plant closure dataset has % missing fip(s) codes.', control_program.control_program_name, count;
@@ -90,7 +90,7 @@ BEGIN
 			END IF;
 
 			-- make sure there aren't missing plant ids
-			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(plantid), '''') = ''''' || ' '
+			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(plantid), '''') = ''''' || '  and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version)
 			into count;
 			IF count > 0 THEN
 				RAISE EXCEPTION 'Control program, %, plant closure dataset has % missing plant Id(s).', control_program.control_program_name, count;
@@ -176,6 +176,7 @@ BEGIN
 					null::character varying(1) as replacement, null::integer as ranking
 				where 1 = 0
 
+--				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inventory_record.table_name, 'proj.fips,proj.scc,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.poll,proj.sic,proj.mact,proj.replacement,',control_program_dataset_filter_sql || ' and proj.application_control = ''Y'' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and ''1/1/' || inventory_year || '''::timestamp without time zone >= coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone)') || '
 				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inventory_record.table_name, 'proj.fips,proj.scc,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.poll,proj.sic,proj.mact,proj.replacement,',control_program_dataset_filter_sql || ' and proj.application_control = ''Y'' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone') || '
 			) tbl';
 

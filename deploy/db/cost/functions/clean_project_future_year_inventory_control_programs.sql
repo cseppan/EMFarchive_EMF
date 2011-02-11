@@ -186,12 +186,15 @@ vacuum analyze emissions.ds_deletions_2005_1050880615;
 					pointid = case when pointid is null or trim(pointid) = ''0'' or trim(pointid) = ''-9'' or trim(pointid) = '''' then null::character varying(15) else pointid end,
 					stackid = case when stackid is null or trim(stackid) = ''0'' or trim(stackid) = ''-9'' or trim(stackid) = '''' then null::character varying(15) else stackid end,
 					segment = case when segment is null or trim(segment) = ''0'' or trim(segment) = ''-9'' or trim(segment) = '''' then null::character varying(15) else segment end,
-					fips = case when fips is null or trim(fips) = ''0'' or trim(fips) = ''-9'' or trim(fips) = '''' then null::character varying(6) else fips end 
+					fips = case when fips is null or trim(fips) = ''0'' or trim(fips) = ''-9'' or trim(fips) = '''' then null::character varying(6) else fips end,
+					effective_date = case when effective_date is null or trim(effective_date) = ''0'' or trim(effective_date) = ''-9'' or trim(effective_date) = '''' then null::character varying(10) else effective_date end 
 				where trim(plantid) in (''0'',''-9'','''')
 					or trim(pointid) in (''0'',''-9'','''')
 					or trim(stackid) in (''0'',''-9'','''')
 					or trim(segment) in (''0'',''-9'','''')
-					or trim(fips) in (''0'',''-9'','''');';
+					or trim(fips) in (''0'',''-9'','''')
+					or trim(effective_date) in (''0'',''-9'','''')
+					;';
 
 
 

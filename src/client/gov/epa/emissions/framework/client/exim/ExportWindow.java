@@ -175,7 +175,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         //plantid=plantid
         
         filterDatasetJoinCondition = new TextArea("rowFilter", rowFilters, width+10, 2);
-        filterDatasetJoinCondition.setToolTipText("<html>Filter Dataset Join Condition <br/>left hand side is for dataset being exported<br/>right hand side is for filter dataset<br/>i.e.,<br/>fips=fips<br/>scc=scc<br/>plantid=plantid</html>");
+        filterDatasetJoinCondition.setToolTipText("<html>Filter Dataset Join Condition <br/>left hand side is for dataset being exported<br/>right hand side is for filter dataset<br/>i.e.,<br/>fips=fips<br/>scc=scc<br/>plantid=plantid<br/>or<br/>scc=scc_code<br/>substring(fips,1,2)=state_cd<br/>poll=poll_code</html>");
         JScrollPane filterDatasetJoinConditionArea = new JScrollPane(filterDatasetJoinCondition, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         layoutGenerator.addLabelWidgetPair("Filter Dataset Join Condition ", filterDatasetJoinConditionArea, panel);
@@ -210,9 +210,10 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     }
     
     private JPanel createFilterDatasetVersion() throws EmfException {
-        filterDatasetVersionWidget = new AddRemoveDatasetVersionWidget(true, this, parentConsole, session);
+        filterDatasetVersionWidget = new AddRemoveDatasetVersionWidget(true, 1, this, parentConsole, session);
         filterDatasetVersionWidget.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        filterDatasetVersionWidget.setPreferredSize(new Dimension(445, 60));
+//        filterDatasetVersionWidget.setModelSize(1);
+        filterDatasetVersionWidget.setPreferredSize(new Dimension(550, 80));
 //        List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
 //        if(baseDatasetVersions != null && baseDatasetVersions.length > 0) {
 //            

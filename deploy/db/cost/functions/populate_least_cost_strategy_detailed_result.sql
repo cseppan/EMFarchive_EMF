@@ -1,5 +1,10 @@
-
-CREATE OR REPLACE FUNCTION public.populate_least_cost_strategy_detailed_result(control_strategy_id integer, 
+drop FUNCTION public.populate_least_cost_strategy_detailed_result(integer, 
+	integer, 
+	integer, 
+	integer,
+	double precision);
+	
+CREATE OR REPLACE FUNCTION public.populate_least_cost_strategy_detailed_result(int_control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer, 
 	strategy_result_id integer,
@@ -82,7 +87,7 @@ BEGIN
 		on i.dataset_id = sr.detailed_result_dataset_id
 		inner join emf.strategy_result_types srt
 		on srt.id = sr.strategy_result_type_id
-	where sr.control_strategy_id = control_strategy_id 
+	where sr.control_strategy_id = int_control_strategy_id 
 		and srt.name = 'Least Cost Control Measure Worksheet'
 	into worksheet_dataset_id,
 		worksheet_table_name;
@@ -95,7 +100,7 @@ BEGIN
 		on i.dataset_id = sr.detailed_result_dataset_id
 		inner join emf.strategy_result_types srt
 		on srt.id = sr.strategy_result_type_id
-	where sr.control_strategy_id = control_strategy_id 
+	where sr.control_strategy_id = int_control_strategy_id 
 		and srt.name = 'Least Cost Curve Summary'
 	into costcurve_dataset_id,
 		costcurve_table_name;
@@ -111,7 +116,7 @@ BEGIN
 		cs.use_cost_equations,
 		cs.discount_rate / 100
 	FROM emf.control_strategies cs
-	where cs.id = control_strategy_id
+	where cs.id = int_control_strategy_id
 	INTO strategy_name,
 		target_pollutant_id,
 		inv_filter,
@@ -363,7 +368,7 @@ BEGIN
 		' || case when has_naics_column = false then 'null::character varying' else 'naics' end || ',
 		source_id,
 		' || input_dataset_id || '::integer,
-		' || control_strategy_id || '::integer,
+		' || int_control_strategy_id || '::integer,
 		cm_id,
 		original_dataset_id,
 		equation_type,

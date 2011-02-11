@@ -41,7 +41,7 @@ public class CMImportPresenter {
             ControlMeasure[] oldCMs = session.controlMeasureService().getControlMeasureBySector(sectorIDs);
             int numOldCMs = oldCMs.length;
             int numNewCMs = session.controlMeasureImportService().getControlMeasureCountInSummaryFile(purge, sectorIDs, directory, files, session.user());
-            String msg = "Are you sure you want to purge existing control measures?\n\nYou are importing " + numNewCMs + " control measures, BUT only purging " + numOldCMs + " existing control measures.\n\nThe existing control measures to be purged will be backed up via the export process.\n\nContinue with the purge?";
+            String msg = "Are you sure you want to purge existing control measures?\n\nYou are " + (numOldCMs != numNewCMs ? "only ": "") + "importing " + numNewCMs + " control measures " + (numOldCMs != numNewCMs ? ", BUT ": "AND ") + "purging " + numOldCMs + " existing control measures.\n\nThe existing control measures to be purged will be backed up via the export process.\n\nContinue with the purge?";
             boolean doPurege = view.confirmToPurge(msg);
             
             if ( !doPurege) {

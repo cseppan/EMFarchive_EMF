@@ -73,6 +73,8 @@ DECLARE
 	has_cpri_column boolean := false; 
 	has_primary_device_type_code_column boolean := false; 
 	remaining_emis_sql character varying;
+	creator_user_id integer := 0;
+	is_cost_su boolean := false; 
 BEGIN
 --	SET work_mem TO '256MB';
 --	SET enable_seqscan TO 'off';
@@ -125,7 +127,8 @@ BEGIN
 		cs.use_cost_equations,
 		cs.discount_rate / 100,
 		st."name",
-		coalesce(cs.include_unspecified_costs,true)
+		coalesce(cs.include_unspecified_costs,true),
+		cs.creator_id
 	FROM emf.control_strategies cs
 		inner join emf.strategy_types st
 		on st.id = cs.strategy_type_id
@@ -140,7 +143,8 @@ BEGIN
 		use_cost_equations,
 		discount_rate,
 		strategy_type,
-		include_unspecified_costs;
+		include_unspecified_costs,
+		creator_user_id;
 
 	-- get target pollutant name
 	select name
@@ -634,6 +638,17 @@ BEGIN
 
 			left outer join reference.gdplev gdplev_incr
 			on gdplev_incr.annual = er.cost_year
+
+-- for Non CoST SUs, make sure they only see their temporary measures
+			' || case when not is_cost_su then '
+
+			inner join emf.control_measure_classes cmc
+			on cmc.id = m.cm_class_id
+			and (
+				(cmc.name = ''Temporary'' and m.creator = ' || creator_user_id || ')
+				or (cmc.name <> ''Temporary'')
+			)
+			' else '' end || '
 
 			inner join emf.control_measure_months ms
 			on ms.control_measure_id = m.id

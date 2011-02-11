@@ -33,7 +33,7 @@ public class CMEfficiencyRecordReader {
     
     private int errorCount = 0;
 
-    private int errorLimit = 100;
+    private int errorLimit = 1000;
 
     private boolean warning = false;
 

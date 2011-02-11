@@ -138,7 +138,7 @@ public class EditableCMSCCTab extends JPanel implements ControlMeasureSccTabView
     }
 
     private void initModel(Scc[] sccs) {
-        tableData = new SCCTableData(sccs);
+        tableData = new SCCTableData(sccs, true);
 //        tableModel = new EmfTableModel(tableData);
 //        sortFilterSelectModel = new SortFilterSelectModel(tableModel);
     }
