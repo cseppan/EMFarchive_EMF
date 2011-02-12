@@ -137,6 +137,8 @@ public class EditQAStepPresenter {
 
         if (qaResult == null)
             throw new EmfException("Please run the QA Step before viewing the result.");
+        if (qaResult.getTable() == null || qaResult.getTable().isEmpty())
+            throw new EmfException("No QA Step result available to view.");
 
         File localFile = new File(tempQAStepFilePath(exportDir, qaResult));
         try {
@@ -173,7 +175,7 @@ public class EditQAStepPresenter {
     }
 
     private String tempQAStepFilePath(String exportDir, QAStepResult qaStepResult) throws EmfException {
-        String separator = File.separator;
+        String separator = File.separator; 
         UserPreference preferences = new DefaultUserPreferences();
         String tempDir = preferences.localTempDir();
         

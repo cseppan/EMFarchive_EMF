@@ -131,7 +131,7 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         if (qaResult == null || qaResult.getTable() == null || qaResult.getTable().isEmpty())
             throw new EmfException("No QA Step result available to view.");
         
-        File localFile = new File(tempQAStepFilePath());
+        File localFile = new File(tempQAStepFilePath(qaResult));
         try {
             if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
                 Writer output = new BufferedWriter(new FileWriter(localFile));
@@ -161,7 +161,7 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         view.displayResultsTable(qaStep.getName(), localFile.getAbsolutePath());
     }
 
-    private String tempQAStepFilePath() throws EmfException {
+    private String tempQAStepFilePath(QAStepResult qaStepResult) throws EmfException {
 
         String separator = File.separator;
         UserPreference preferences = new DefaultUserPreferences();
@@ -178,7 +178,7 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
                     + tempDir);
         }
 
-        return tempDir + separator + dataset.getName() + ".csv"; // this is how exported file name was
+        return tempDir + separator + qaStepResult.getTable() + ".csv"; // TODO: 2011-02
     }
     
     private String writerHeader(QAStep qaStep, QAStepResult stepResult, String dsName){

@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -87,8 +89,11 @@ public class ViewQAStepPresenter {
     }
     
     private String tempQAStepFilePath(String exportDir, QAStepResult qaStepResult) throws EmfException {
-        String separator = exportDir.length() > 0 ? (exportDir.charAt(0) == '/') ? "/" : "\\" : "\\";
-        String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR");
+        String separator = File.separator; 
+        UserPreference preferences = new DefaultUserPreferences();
+        String tempDir = preferences.localTempDir();
+//        String separator = exportDir.length() > 0 ? (exportDir.charAt(0) == '/') ? "/" : "\\" : "\\";
+//        String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR"); 
 
         if (tempDir == null || tempDir.isEmpty())
             tempDir = System.getProperty("java.io.tmpdir");

@@ -469,7 +469,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         });
     }
     
-    private void viewResults() throws EmfException {
+    private void viewResults() throws EmfException { // TODO: 2011-02
         QAStepResult stepResult = presenter.getStepResult(step);
         if (stepResult == null)
             throw new EmfException("Please run the QA step before trying to view.");

@@ -11,7 +11,6 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
-import gov.epa.emissions.framework.ui.TextAreaTableCellRenderer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,7 +29,9 @@ import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-public class StatusWindow extends ReusableInteralFrame implements StatusView, RefreshObserver {
+public class StatusWindow 
+  extends ReusableInteralFrame 
+  implements StatusView, RefreshObserver {
 
     private MessagePanel messagePanel;
 
@@ -39,7 +40,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
     private StatusPresenter presenter;
 
     private EmfConsole parent;
-
+    
     public StatusWindow(EmfConsole parent, DesktopManager desktopManager) {
         super("Status", desktopManager);
         super.setName("status");
@@ -105,12 +106,20 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
 
     private JScrollPane createTable() {
         statusTableModel = new StatusTableModel();
-        JTable table = new JTable(statusTableModel);
+        JTable 
+        table = //new JTable(statusTableModel);
+                new MultiLineTable(statusTableModel);
         table.setName("statusMessages");
         // FIXME: code put in for the demo
-        table.setRowHeight(50);
-        table.setDefaultRenderer(Object.class, new TextAreaTableCellRenderer());
-
+        //table.setRowHeight(50);
+        //table.setDefaultRenderer(Object.class, new TextAreaTableCellRenderer());
+        
+        table.setCellSelectionEnabled(true);
+        MultiLineCellRenderer multiLineCR = new MultiLineCellRenderer();
+        table.getColumnModel().getColumn(0).setCellRenderer(multiLineCR);
+        table.getColumnModel().getColumn(1).setCellRenderer(multiLineCR);
+        table.getColumnModel().getColumn(2).setCellRenderer(multiLineCR);
+        
         setColumnWidths(table.getColumnModel());
         table.setPreferredScrollableViewportSize(this.getSize());
 
@@ -168,5 +177,4 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
     public void doRefresh() {
         presenter.doRefresh();
     }
-
 }
