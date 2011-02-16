@@ -43,7 +43,7 @@ public class StatusTableModel extends AbstractTableModel {
     }
 
     public Object getValueAt(int row, int column) {
-        if ((rows.size() - 1 < row) || (column > header.columnsSize() - 1))
+        if ((rows.size() - 1 < row) || row < 0 || (column > header.columnsSize() - 1) || column < 0)
             return null;
 
         return ((Row) rows.get(row)).getValueAt(column);
