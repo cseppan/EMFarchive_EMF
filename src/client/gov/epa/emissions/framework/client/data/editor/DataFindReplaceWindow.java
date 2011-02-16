@@ -137,12 +137,12 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
                         return;
 
                     String col = columnNames.getSelectedItem().toString();
-                    String findString = (find.getText() == null) ?  "": find.getText();
+                    String findString = (find.getText() == null) ?  "": find.getText().trim();
                     String replaceString = (replaceWith.getText() == null) ? "" : replaceWith.getText().trim();
-                    String rowFilter = (filterLabel.getText().equals("NO FILTER")) ? "" : filterLabel.getText();
+                    String rowFilter = (filterLabel.getText().equals("NO FILTER")) ? "" : filterLabel.getText().trim();
 
                     presenter.replaceColValues(table, col, findString, replaceString, version, rowFilter);
-                    presenter.applyConstraint(rowFilter, sortOrder.getText());
+                    presenter.applyConstraint(rowFilter, sortOrder.getText().trim());
                     resetDataeditorRevisionField();
                     setMsg("Successfully replaced column values.");
                 } catch (EmfException e) {
