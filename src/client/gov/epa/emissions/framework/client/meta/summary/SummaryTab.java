@@ -23,6 +23,7 @@ import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 public class SummaryTab extends JPanel implements SummaryTabView, RefreshObserver {
@@ -137,7 +138,11 @@ public class SummaryTab extends JPanel implements SummaryTabView, RefreshObserve
 
         // name
 //      layoutGenerator.addLabelWidgetPair("Name:", new JLabel(dataset.getName()), panel);
-        layoutGenerator.addLabelWidgetPair("Name:", new JLabel(dataset.getName() + " (ID = " + dataset.getId() + ")"), panel);
+        JTextField nameField = new JTextField(dataset.getName() + " (ID = " + dataset.getId() + ")");
+        nameField.setEditable(false);
+        layoutGenerator.addLabelWidgetPair("Name:", 
+                nameField //new JLabel(dataset.getName() + " (ID = " + dataset.getId() + ")")
+                , panel);
 
 
         // description
