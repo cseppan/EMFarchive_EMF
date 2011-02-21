@@ -7,16 +7,29 @@ package gov.epa.emissions.framework.client.status;
  * @author Thomas Wernitz, Da Vinci Communications Ltd <thomas_wernitz@clear.net.nz>
  *
  * credit to Zafir Anjum for JTableEx and thanks to SUN for their source code ;)
+ * 
+ * Modified by IE, UNC on 2/21/2011
  */
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.plaf.*;
-import javax.swing.text.*;
-import java.util.*;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.Enumeration;
+import java.util.Vector;
+
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.text.Segment;
+import javax.swing.text.TabExpander;
 
 
 public class MultiLineTable extends JTable {
@@ -89,6 +102,10 @@ public class MultiLineTable extends JTable {
 	public int getHeight(String text, int width) {
 		FontMetrics fm = getFontMetrics(getFont());
 		int numLines = 1;
+		
+		if (text == null || text.trim().isEmpty())
+		    return numLines * fm.getHeight();
+		
 		Segment s = new Segment(text.toCharArray(), 0, 0);
 		s.count = s.array.length;
 		TabExpander te = new MyTabExpander(fm);
