@@ -636,7 +636,7 @@ public class SectorScenarioTask {
             runStatus = "Completed.";
             
         } catch(EmfException ex) {
-            runStatus = "Failed creating sector annotated " + inventory.getDatasetType().getName() + " OR copy output data to sandbox. Error processing inventory, " + sectorScenarioInventory.getDataset().getName() + ". Exception = " + ex.getMessage();
+            runStatus = "Failed creating sector annotated " + inventory.getDatasetType().getName() + ". Error processing inventory, " + sectorScenarioInventory.getDataset().getName() + ". Exception = " + ex.getMessage();
             setStatus(runStatus);
             throw ex;
         } finally {
@@ -1201,13 +1201,13 @@ public class SectorScenarioTask {
             }
             
             // copy the output to sandbox
-            status = "Start to copy the outputs to Sandbox Database";
-            setStatus(status);
+
             boolean exportSector = //true;
                                    sectorScenario.getExportOutput();
-            //sectorScenarioInventories[0].getExportSector();
             if ( exportSector) 
             {
+                status = "Start to copy the outputs to Sandbox Database";
+                setStatus(status);
                 for (int i = 0; i < sectorScenarioInventories.length; i++) {
                     try {
                         if ( sectorScenarioOutputs[i] != null) {
@@ -1219,11 +1219,10 @@ public class SectorScenarioTask {
                         //throw e;
                     }
                 }
+                status = "Completed copying the outputs to Sandbox Database";
+                setStatus(status);
             }
             sectorScenarioOutputs = null;
-            status = "Completed copying the outputs to Sandbox Database";
-            setStatus(status);
-            
         } catch (Exception e) {
             status = "Failed. Error processing inventory";
             e.printStackTrace();
