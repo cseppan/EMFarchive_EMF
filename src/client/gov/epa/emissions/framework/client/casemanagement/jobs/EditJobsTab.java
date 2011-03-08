@@ -138,9 +138,11 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
             messagePanel.setMessage("Please wait while all selected jobs are being canceled...");
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             String msg = cancelJobs();
-
-            if (msg != null && !msg.trim().isEmpty())
+            
+            if (msg != null && !msg.trim().isEmpty()){
+                refresh();
                 messagePanel.setMessage(msg);
+            }
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
         } finally {
@@ -410,9 +412,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         } catch (EmfException e) {
             throw new EmfException(e.getMessage());
         }
-        tableData.remove(jobs);
         refresh();
-        messagePanel.setMessage("Click Refresh to see case updates. " );
     }
 
     private void editJobs(List<CaseJob> jobs) throws EmfException {
@@ -660,7 +660,7 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
         // note that this will get called when the case is save
         try {
             if (tableData != null) // it's still null if you've never displayed this tab
-                doRefresh(tableData.sources());
+                doRefresh(presenter.getCaseJobsFromManager());
         } catch (Exception e) {
             messagePanel.setError("Cannot refresh current tab. " + e.getMessage());
         }
@@ -676,11 +676,6 @@ public class EditJobsTab extends JPanel implements EditJobsTabView, RefreshObser
 
     public void setMessage(String msg) {
         messagePanel.setMessage(msg);
-    }
-
-    public void addJob(CaseJob job) {
-        tableData.add(job);
-        setMessage("Added \"" + job.getName() + "\".  Click Refresh to see it in the table.");
     }
 
     private void panelRefresh() {

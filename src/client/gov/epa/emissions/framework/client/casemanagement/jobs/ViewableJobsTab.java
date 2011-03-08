@@ -107,7 +107,6 @@ public class ViewableJobsTab extends JPanel implements JobsTabView, RefreshObser
     }
 
     private void doRefresh(CaseJob[] jobs) throws Exception {
-        //super.removeAll();
         String outputFileDir = caseObj.getOutputFileDir();
 
         if (!outputDir.getText().equalsIgnoreCase(outputFileDir))
@@ -450,8 +449,11 @@ public class ViewableJobsTab extends JPanel implements JobsTabView, RefreshObser
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             String msg = cancelJobs();
 
-            if (msg != null && !msg.trim().isEmpty())
+            if (msg != null && !msg.trim().isEmpty()){
+                refresh();
                 messagePanel.setMessage(msg);
+            }
+                
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
         } finally {
@@ -492,7 +494,7 @@ public class ViewableJobsTab extends JPanel implements JobsTabView, RefreshObser
         // note that this will get called when the case is save
         try {
             if (tableData != null) // it's still null if you've never displayed this tab
-                doRefresh(tableData.sources());
+                doRefresh(presenter.getCaseJobs());
         } catch (Exception e) {
             messagePanel.setError("Cannot refresh current tab. " + e.getMessage());
         }

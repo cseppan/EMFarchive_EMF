@@ -501,7 +501,7 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
     }
 
     public void save(Case caseObj) throws EmfException {
-        caseObj.setName(name.getText());
+        caseObj.setName(name.getText().trim());
         saveFutureYear();
         caseObj.setDescription(description.getText());
         caseObj.setCaseTemplate(isTemplate.isSelected());

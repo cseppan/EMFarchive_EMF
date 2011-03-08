@@ -52,7 +52,7 @@ public class SetjobsStatusDialog extends JDialog{
 
         setTitle("Set Status ");
         this.pack();
-        this.setSize(450,120);
+        this.setSize(450,140);
         this.setLocation(ScreenUtils.getPointToCenter(this));
         this.setVisible(true);
     }
@@ -78,7 +78,6 @@ public class SetjobsStatusDialog extends JDialog{
 
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         status =new ComboBox(presenter.getRunStatuses());           
- //       versionCombo.setSize(new Dimension(200,10));
         status.setPreferredSize(new Dimension(300,15));
 
         layoutGenerator.addLabelWidgetPair("Status:", status, panel);

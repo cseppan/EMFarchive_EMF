@@ -110,7 +110,7 @@ public class NewCaseWindow extends DisposableInteralFrame implements NewCaseView
                     return;
                 }
                 
-                Case newCase = new Case(name.getText());
+                Case newCase = new Case(name.getText().trim());
                 newCase.setCaseCategory(cat);
                 
                 try {

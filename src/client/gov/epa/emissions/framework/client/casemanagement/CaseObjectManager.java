@@ -210,9 +210,26 @@ public class CaseObjectManager {
         jobs.addAll(Arrays.asList(caseService.getCaseJobs(caseId)));
         jobs.add(0, allJobsForSector);
         jobsForLastCaseId = jobs.toArray(new CaseJob[jobs.size()]);
-        // Arrays.sort(jobsForLastCaseId, new CaseJobNameComparator());
         lastCaseId = caseId;
         return jobsForLastCaseId;
+    }
+    
+    // only used by case jobs tab to exclude allJobsForSector
+    public synchronized CaseJob[] getCaseJobs(int caseId) throws EmfException {
+        if (this.lastCaseId != caseId) // if the same as the last case,
+        {
+            List<CaseJob> jobs = new ArrayList<CaseJob>();
+            jobs.addAll(Arrays.asList(caseService.getCaseJobs(caseId)));
+            jobs.add(0, allJobsForSector);
+            jobsForLastCaseId = jobs.toArray(new CaseJob[jobs.size()]);
+            // Arrays.sort(jobsForLastCaseId, new CaseJobNameComparator());
+            lastCaseId = caseId;
+        }
+        List<CaseJob> jobs = new ArrayList<CaseJob>();
+        jobs.addAll(Arrays.asList(jobsForLastCaseId));
+        jobs.remove(0);
+        
+        return jobs.toArray(new CaseJob[jobs.size()]);
     }
 
     public synchronized CaseJob getJobForAll() {

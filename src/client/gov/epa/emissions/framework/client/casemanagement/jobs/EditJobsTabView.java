@@ -11,8 +11,6 @@ public interface EditJobsTabView extends JobsTabView {
 
     CaseJob[] caseJobs();
 
-    void addJob(CaseJob job);
-    
     void refresh();
     
     int numberOfRecord();

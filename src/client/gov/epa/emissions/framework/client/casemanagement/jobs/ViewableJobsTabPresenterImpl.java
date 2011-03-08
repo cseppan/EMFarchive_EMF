@@ -92,6 +92,7 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
 
         System.out.println("Start running jobs");
         service().runJobs(jobIds, caseObj.getId(), session.user());
+        view.refresh();
         System.out.println("Finished running jobs");
     }
 
@@ -322,6 +323,10 @@ public class ViewableJobsTabPresenterImpl implements EditJobsTabPresenter{
         session.setEncryptedPassword(passcode);
         secServ.updateEncryptedPassword(host, username, session.getEncryptedPassword());
         smkPassRegistered = true;
+    }
+
+    public CaseJob[] getCaseJobsFromManager() throws EmfException {
+        return null;
     }
     
 }

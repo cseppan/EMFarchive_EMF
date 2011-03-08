@@ -87,8 +87,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         this.caseObjectManager.refreshJobList();
 
         if (newJob.getCaseId() == caseObj.getId()) {
-            view.addJob(newJob);
-            //addNewSectorToSummary(job);
+            view.refresh();
         }
 
         return newJob;
@@ -199,6 +198,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
 
         System.out.println("Start running jobs");
         service().runJobs(jobIds, caseObj.getId(), session.user());
+        view.refresh();
         System.out.println("Finished running jobs");
     }
 
@@ -346,15 +346,16 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
     public String cancelJobs(List<CaseJob> jobs) {
         try {
             String status = getJobsStatus(jobs.toArray(new CaseJob[0]));
-
+             
             if (status != null && status.equalsIgnoreCase("OK"))
                 return "None of the selected jobs is in an active state. No job is canceled.";
 
             if (status.equalsIgnoreCase("CANCEL")) {
                 int count = service().cancelJobs(getJobIds(jobs2Cancel), session.user());
+                refreshJobList();
                 return count + " jobs have been successfully canceled.";
             }
-
+            refreshJobList();
             return "No job has been canceled.";
         } catch (EmfException e) {
             String msg = e.getMessage();
@@ -438,6 +439,10 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         session.setEncryptedPassword(passcode);
         secServ.updateEncryptedPassword(host, username, session.getEncryptedPassword());
         smkPassRegistered = true;
+    }
+
+    public CaseJob[] getCaseJobsFromManager() throws EmfException {
+        return caseObjectManager.getCaseJobs(caseObj.getId());
     }   
 
 }
