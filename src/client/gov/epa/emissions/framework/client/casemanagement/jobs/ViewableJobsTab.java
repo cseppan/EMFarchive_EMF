@@ -430,7 +430,6 @@ public class ViewableJobsTab extends JPanel implements JobsTabView, RefreshObser
         setMessage("Please wait while submitting all case jobs...");
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         presenter.runJobs(jobs);
-        doRefresh(presenter.getCaseJobs());
         setMessage("Finished submitting jobs to run.");
     }
 
