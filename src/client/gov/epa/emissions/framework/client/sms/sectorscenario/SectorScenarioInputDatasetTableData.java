@@ -27,17 +27,25 @@ public class SectorScenarioInputDatasetTableData extends AbstractTableData {
     }
 
     private Row row(SectorScenarioInventory sectorScenarioInventory) {
-        Object[] values = { sectorScenarioInventory.getDataset().getDatasetType().getName(), sectorScenarioInventory.getDataset().getName(), sectorScenarioInventory.getVersion()};
+        Object[] values = { sectorScenarioInventory.getDataset().getDatasetType().getName(), sectorScenarioInventory.getDataset().getName(), sectorScenarioInventory.getVersion() //, sectorScenarioInventory.getExportSector(), sectorScenarioInventory.getExportEECS()
+                          };
         return new ViewableRow(sectorScenarioInventory, values);
     }
 
     public String[] columns() {
-        return new String[] { "Type", "Dataset", "Version" };
+        return new String[] { "Type", "Dataset", "Version" //, "Export Sector", "Export EECS" 
+                            };
     }
 
     public Class getColumnClass(int col) {
         if (col == 2)
+        {    
             return Integer.class;
+        }
+        if ( col == 3 || col == 4)
+        {
+            return Boolean.class;
+        }
 
         return String.class;
     }
@@ -47,6 +55,10 @@ public class SectorScenarioInputDatasetTableData extends AbstractTableData {
     }
 
     public boolean isEditable(int col) {
+        if ( col >= 3) 
+        {
+            return true;
+        }
         return false;
     }
 

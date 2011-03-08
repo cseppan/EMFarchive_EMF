@@ -17,6 +17,8 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.InfrastructureException;
 import gov.epa.emissions.framework.services.QAStepTask;
 import gov.epa.emissions.framework.services.basic.DateUtil;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -25,15 +27,20 @@ import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.persistence.DataSourceFactory;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.sql.DataSource;
 
 import org.hibernate.Session;
 
@@ -284,6 +291,305 @@ public class SectorScenarioTask {
 //
 //        return eecsAnnotatedInventoryOutput;
 //    }
+    
+    private void copyOutputToSandboxDB( SectorScenarioOutput sectorAnnotatedInventoryOutput, SectorScenarioInventory ssi) throws EmfException 
+    {
+        
+        // dump the table from emf emissions: do not use this approach now
+        /*
+        String postgreBinFolder = "\'C:\\Program Files\\PostgreSQL\\9.0\\bin\\\'";
+        String tmpDir = "C:\\tmp";
+        InternalSource[] sources = sectorAnnotatedInventoryOutput.getOutputDataset().getInternalSources();
+        String [] tables = tableNames( sources);
+        String command = "";
+        for ( String table : tables) {
+            command = "";
+            command += postgreBinFolder + "pg_dump –h localhost –p 5432 –U emf –n emissions –t emissions.";
+            command += table;
+            command += " EMF > dump.sq";
+        }
+        */
+        
+        if ( sectorAnnotatedInventoryOutput == null) {
+            throw new EmfException("Parameter sectorAnnotatedInventoryOutput is null");
+        }
+        
+        if ( ssi == null) {
+            throw new EmfException("Parameter SectorScenarioInventory ssi is null");
+        }
+        
+        String tmDir = null;
+        try {
+            tmDir = this.getIOTempDir();
+        } catch ( Exception e) {
+            setStatus("Could not get I/O temp directory: " + e.getMessage());
+            throw new EmfException( e.getMessage());
+        }
+        
+        DataSource sandboxDBDatasource = null;
+        try {
+            sandboxDBDatasource = new DataSourceFactory().getSectorSandboxDataSource();
+        } catch (InfrastructureException e1) {
+            //e1.printStackTrace();
+            setStatus("Could not connect to sector_data_sandbox: " + e1.getMessage());
+            sandboxDBDatasource = null;
+            throw new EmfException( e1.getMessage());
+        }
+        
+        Statement sandboxDBStatement = null;
+        InternalSource[] outputDatasetInternalSources = sectorAnnotatedInventoryOutput.getOutputDataset().getInternalSources();
+        String sql = null;
+        String table = null;
+        ResultSet sandboxDbResultSet = null; 
+        String tableNameInSandboxDB = null;
+        boolean tableExistInSandboxDB = false;
+        Statement emfStatement = null;
+        ResultSet emfResultSet = null;  
+        ResultSetMetaData emfMetaData = null;
+        ResultSetMetaData sandboxDbMetaData = null;
+        boolean toDrop = false;
+        
+        for ( InternalSource source : outputDatasetInternalSources) { 
+            
+            // clean all the resources
+            if ( sandboxDbResultSet != null) {
+                try { sandboxDbResultSet.close(); } catch ( Exception e1) { /**/ }
+                sandboxDbResultSet = null;
+            }
+            if ( sandboxDBStatement != null) {
+                try { sandboxDBStatement.close(); } catch ( Exception e1) { /**/ }
+                sandboxDBStatement = null;
+            }
+            if (emfResultSet != null) {
+                try { emfResultSet.close(); } catch (SQLException e) { /**/ }
+                emfResultSet = null;
+            }
+            if (emfStatement != null) {
+                try { emfStatement.close(); } catch (SQLException e) { /**/ }
+                emfStatement = null;
+            } 
+            
+            
+            table = source.getTable();
+
+            try {
+                sql = "COPY emissions.";
+                sql += table;
+                sql += " TO \'";
+                sql += tmDir + "/" + table + ".data\';";                
+                datasource.query().execute(sql);
+            } catch ( Exception e) {
+                setStatus("Error occured when copying from " + table + " to file\n" + e.getMessage());
+                continue;
+                //throw new EmfException(e.getMessage()); // do not throw exception in the for loop
+            }
+
+            try {
+                sandboxDBStatement = sandboxDBDatasource.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            } catch ( Exception e) {
+                setStatus("Error occured when creating sector_data_sandbox statement: " + e.getMessage());
+                continue;
+                // throw new EmfException(e.getMessage()); // do not throw exception in the for loop
+            }
+            
+            sandboxDbResultSet = null;            
+            tableNameInSandboxDB = "ds_" + this.sectorScenario.getName() + "_" + ssi.getDataset().getName();
+            tableNameInSandboxDB = tableNameInSandboxDB.trim();
+            tableNameInSandboxDB = tableNameInSandboxDB.replaceAll(" ", "_");
+            tableExistInSandboxDB = false;
+
+            try {
+                sql = "SELECT * FROM pg_tables WHERE tablename=\'" + tableNameInSandboxDB + "\' limit 1;";
+                sandboxDbResultSet = sandboxDBStatement.executeQuery(sql);
+                if ( sandboxDbResultSet.next()) {
+                    tableExistInSandboxDB = true;
+                }
+            } catch( Exception e) {
+                String msg = "Error when checking if table " + tableNameInSandboxDB + " exists in sandbox database";
+                setStatus( msg + ".");
+                continue;
+                // throw new EmfException( msg + ": " + e.getMessage()); // do not throw exception in the for loop
+            } 
+            
+            // get emf table metadata
+            emfStatement = null;
+            emfResultSet = null;  
+            emfMetaData = null;
+            sql = "SELECT * FROM emissions." + table + " LIMIT 1;";
+            try {
+                emfStatement = datasource.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                emfResultSet = emfStatement.executeQuery(sql);                        
+                emfMetaData = emfResultSet.getMetaData();
+            } catch ( Exception e) {
+                setStatus("Error occured when getting metadata of emission." + table + ": " + e.getMessage());
+                continue;
+                //throw new EmfException( e.getMessage());
+            } 
+
+            sandboxDbMetaData = null;
+            toDrop = false;
+            if ( tableExistInSandboxDB) {
+                try {
+                    sql = "SELECT * FROM " + tableNameInSandboxDB + " limit 1;";
+                    sandboxDbResultSet = sandboxDBStatement.executeQuery(sql);
+                    sandboxDbMetaData = sandboxDbResultSet.getMetaData();
+                    if ( sandboxDbMetaData.getColumnCount() != emfMetaData.getColumnCount()) {
+                        toDrop = true;
+                    } else {
+                        for ( int i=1; i<=sandboxDbMetaData.getColumnCount(); i++) {
+                            if ( sandboxDbMetaData.getColumnType(i) != emfMetaData.getColumnType(i)) {
+                                toDrop = true;
+                                break;
+                            }
+                        }
+                    }
+                } catch ( Exception e) {
+                    setStatus("Error occured when checking if need to drop table " + tableNameInSandboxDB + " in sandbox db: " + e.getMessage());
+                    continue;
+                }                 
+            }             
+            
+            // use truncate, not drop table, check if dataset type match - even they match, still need to check columns - name and type
+            
+            if ( toDrop) {
+                try {
+                    sql = "DROP TABLE IF EXISTS " + tableNameInSandboxDB + ";";
+                    sandboxDBStatement.execute(sql);
+                    
+                    sql = "DROP INDEX IF EXISTS fips_" + tableNameInSandboxDB + ";";
+                    sandboxDBStatement.execute(sql);
+
+                    sql = "DROP INDEX IF EXISTS scc_" + tableNameInSandboxDB + ";";
+                    sandboxDBStatement.execute(sql);
+
+                    sql = "DROP INDEX IF EXISTS eecs_" + tableNameInSandboxDB + ";";
+                    sandboxDBStatement.execute(sql);
+
+                    sql = "DROP INDEX IF EXISTS sector_" + tableNameInSandboxDB + ";";
+                    sandboxDBStatement.execute(sql);  
+                } catch( Exception e) {
+                    setStatus("Error when droping table " + tableNameInSandboxDB + " OR its indices in sandbox database.");
+                    // don't throw exception here
+                    // and don't use continue here
+                }
+            }
+            
+            if ( toDrop || !tableExistInSandboxDB) { 
+                try {
+                    int numCol = emfMetaData.getColumnCount();
+                    int colType = 0;
+                    sql = "CREATE TABLE " + tableNameInSandboxDB; // use sector scenario
+                    sql +=" (";
+                    for ( int i=1; i<=numCol; i++)
+                    {
+                        sql += emfMetaData.getColumnName(i) + " "
+                        +  emfMetaData.getColumnTypeName(i);
+                        colType = emfMetaData.getColumnType( i);
+                        if ( i!= numCol)
+                        {
+                            if ( i == 1)
+                            {
+                                sql += " PRIMARY KEY, ";
+                            } else {
+                                if ( !emfMetaData.getColumnTypeName(i).trim().equalsIgnoreCase("text") &&
+                                        (colType == java.sql.Types.NVARCHAR ||
+                                                colType == java.sql.Types.VARCHAR ||   
+                                                colType == java.sql.Types.NCHAR ||
+                                                colType == java.sql.Types.CHAR))
+                                {
+                                    sql += "(" + emfMetaData.getPrecision(i) + "), "; 
+                                } else {
+                                    sql += ", ";
+                                }
+                            }
+                        }
+                    }
+                    sql += " )"
+                        + " WITH ( OIDS=FALSE );";
+                } catch ( Exception e) {
+                    setStatus("Error occured when construction create table statement: " + e.getMessage());
+                    continue;
+                    //throw new EmfException( e.getMessage());
+                } 
+                
+                try {
+                    sandboxDBStatement.execute(sql);
+                } catch ( Exception e) {
+                    setStatus("Error occured when creating table " + tableNameInSandboxDB + " in sector_data_sandbox: " + e.getMessage());
+                    continue;
+                    //throw new EmfException( e.getMessage());
+                }
+
+                try {
+                    sql = "ALTER TABLE " + tableNameInSandboxDB + " OWNER TO brian_stitt;";
+                    sandboxDBStatement.execute(sql);
+
+                    sql = "CREATE INDEX fips_" + tableNameInSandboxDB + " ON " + tableNameInSandboxDB + " USING btree(fips);";
+                    sandboxDBStatement.execute(sql);
+
+                    sql = "CREATE INDEX scc_" + tableNameInSandboxDB + " ON " + tableNameInSandboxDB + " USING btree(scc);";
+                    sandboxDBStatement.execute(sql);
+
+                    sql = "CREATE INDEX eecs_" + tableNameInSandboxDB + " ON " + tableNameInSandboxDB + " USING btree(eecs);";
+                    sandboxDBStatement.execute(sql);
+
+                    sql = "CREATE INDEX sector_" + tableNameInSandboxDB + " ON " + tableNameInSandboxDB + " USING btree(sector);";
+                    sandboxDBStatement.execute(sql);               
+                } catch ( Exception e) {
+                    setStatus("Error occured when changing owner OR creating indices on table " + tableNameInSandboxDB + ": " + e.getMessage());
+                    continue;
+                    //throw new EmfException( e.getMessage());
+                } 
+            } else { // truncate table
+                try {
+                    sql = "TRUNCATE " + tableNameInSandboxDB + ";";
+                    sandboxDBStatement.execute(sql);
+                } catch ( Exception e) {
+                    setStatus("Error occured when truncate table " + tableNameInSandboxDB + ": " + e.getMessage());
+                    continue;
+                }                
+            }
+
+            try {
+                sql = "COPY public." + tableNameInSandboxDB;
+                sql += " FROM \'";
+                sql += tmDir + "/" + table + ".data\'";
+                sandboxDBStatement.execute(sql);
+            } catch ( Exception e) {
+                setStatus("Error occured when copying to " + tableNameInSandboxDB + " from file: " + e.getMessage());
+                continue; 
+                //throw new EmfException( e.getMessage());
+            } 
+        } // for source
+        
+        if ( sandboxDbResultSet != null) {
+            try { sandboxDbResultSet.close(); } catch ( Exception e1) { /**/ }
+            sandboxDbResultSet = null;
+        }
+        if ( sandboxDBStatement != null) {
+            try { sandboxDBStatement.close(); } catch ( Exception e1) { /**/ }
+            sandboxDBStatement = null;
+        }
+        if (emfResultSet != null) {
+            try { emfResultSet.close(); } catch (SQLException e) { /**/ }
+            emfResultSet = null;
+        }
+        if (emfStatement != null) {
+            try { emfStatement.close(); } catch (SQLException e) { /**/ }
+            emfStatement = null;
+        }
+        tmDir = null;
+        sandboxDBStatement = null;
+        outputDatasetInternalSources = null;
+        sql = null;
+        table = null;
+        sandboxDbResultSet = null; 
+        tableNameInSandboxDB = null;
+        emfStatement = null;
+        emfResultSet = null;  
+        emfMetaData = null;
+        sandboxDbMetaData = null;
+    }
 
     public SectorScenarioOutput createSectorAnnotatedInventoryOutput(EmfDataset sectorDetailedMappingDataset, String[] sectors, SectorScenarioInventory sectorScenarioInventory) throws Exception {
         EmfDataset inventory = sectorScenarioInventory.getDataset();
@@ -306,13 +612,31 @@ public class SectorScenarioTask {
             
             updateOutputDatasetVersionRecordCount(sectorAnnotatedInventoryOutput);
 
-            runStatus = "Completed.";
+            //runStatus = "Completed.";
 
             setStatus("Completed creating sector annotated " + inventory.getDatasetType().getName() + " inventory from the inventory, " 
                     + sectorScenarioInventory.getDataset().getName() 
                     + ".");
+            
+//            // TODO: 2011-02-15 output the result to sandbox db
+//            
+//            boolean exportSector = true; //sectorScenarioInventory.getExportSector();
+//            if ( exportSector) 
+//            {
+//                try {
+//                    copyOutputToSandboxDB( sectorAnnotatedInventoryOutput);
+//                } catch ( EmfException e) {
+//                    throw e;
+//                }
+//               
+//            }
+//            
+//            setStatus("Completed copying the output datasets to sandbox database "); 
+            
+            runStatus = "Completed.";
+            
         } catch(EmfException ex) {
-            runStatus = "Failed creating sector annotated " + inventory.getDatasetType().getName() + ". Error processing inventory, " + sectorScenarioInventory.getDataset().getName() + ". Exception = " + ex.getMessage();
+            runStatus = "Failed creating sector annotated " + inventory.getDatasetType().getName() + " OR copy output data to sandbox. Error processing inventory, " + sectorScenarioInventory.getDataset().getName() + ". Exception = " + ex.getMessage();
             setStatus(runStatus);
             throw ex;
         } finally {
@@ -325,7 +649,9 @@ public class SectorScenarioTask {
 
         return sectorAnnotatedInventoryOutput;
     }
-
+    
+    
+    
     private EmfDataset createEECSDetailedMappingDataset() throws EmfException {
         DatasetType datasetType = getDatasetType(DatasetType.EECS_DETAILED_MAPPING_RESULT);
         return creator.addDataset("ds", sectorScenario.getAbbreviation() + "_" + DatasetType.EECS_DETAILED_MAPPING_RESULT, 
@@ -830,6 +1156,8 @@ public class SectorScenarioTask {
                 saveSectorScenario(sectorScenario);
             }
             
+            SectorScenarioOutput [] sectorScenarioOutputs = new SectorScenarioOutput[sectorScenarioInventories.length];
+            
             for (int i = 0; i < sectorScenarioInventories.length; i++) {
                 try {
                     
@@ -837,10 +1165,10 @@ public class SectorScenarioTask {
 //                    if (sectorScenario.getAnnotateInventoryWithEECS()) {
 //                        createEecsAnnotatedInventoryOutput(eecsDetailedMappingResultOutput.getOutputDataset(), sectorScenarioInventories[i]);
 //                    }
-                    
+                    sectorScenarioOutputs[i] = null;
                     Short createInventoryMethod = SectorScenario.CREATE_SINGLE_INVENTORY;//sectorScenario.getCreateInventoryMethod();
                     if (createInventoryMethod == SectorScenario.CREATE_SINGLE_INVENTORY) {
-                        createSectorAnnotatedInventoryOutput(sectorDetailedMappingResultOutput.getOutputDataset(), sectorScenario.getSectors(), sectorScenarioInventories[i]);
+                        sectorScenarioOutputs[i] = createSectorAnnotatedInventoryOutput(sectorDetailedMappingResultOutput.getOutputDataset(), sectorScenario.getSectors(), sectorScenarioInventories[i]);
                     } else if (createInventoryMethod == SectorScenario.CREATE_N_SECTOR_INVENTORIES) {
                         for (String sector : sectorScenario.getSectors()) {
                             createSectorSpecificInventoryOutput(sectorDetailedMappingResultOutput.getOutputDataset(), sector, sectorScenarioInventories[i]);
@@ -849,6 +1177,9 @@ public class SectorScenarioTask {
 
                     recordCount = 0; //loader.getRecordCount();
                     status = "Completed.";
+                    
+                    // output the result to sandbox db
+                    
                 } catch (Exception e) {
                     e.printStackTrace();
                     status = "Failed. Error processing inventory: " + sectorScenarioInventories[i].getDataset().getName() + ". " + e.getMessage();
@@ -866,16 +1197,33 @@ public class SectorScenarioTask {
                         return;
 //                        throw new EmfException("Strategy run was cancelled.");
                     }
-                    //
                 }
             }
-
-            //now create the measure summary result based on the results from the strategy run...
-//            generateStrategyMeasureSummaryResult();
-
-//            //now create the county summary result based on the results from the strategy run...
-//            generateStrategyCountySummaryResult();
-
+            
+            // copy the output to sandbox
+            status = "Start to copy the outputs to Sandbox Database";
+            setStatus(status);
+            boolean exportSector = //true;
+                                   sectorScenario.getExportOutput();
+            //sectorScenarioInventories[0].getExportSector();
+            if ( exportSector) 
+            {
+                for (int i = 0; i < sectorScenarioInventories.length; i++) {
+                    try {
+                        if ( sectorScenarioOutputs[i] != null) {
+                            copyOutputToSandboxDB( sectorScenarioOutputs[i], sectorScenarioInventories[i]);
+                        }
+                    } catch ( EmfException e) {
+                        status = "Error occured when transfering " + sectorScenarioOutputs[i].getOutputDataset().getName() + " to Sandbox Database: " + e.getMessage(); // more details needed
+                        setStatus(status);
+                        //throw e;
+                    }
+                }
+            }
+            sectorScenarioOutputs = null;
+            status = "Completed copying the outputs to Sandbox Database";
+            setStatus(status);
+            
         } catch (Exception e) {
             status = "Failed. Error processing inventory";
             e.printStackTrace();
@@ -897,7 +1245,6 @@ public class SectorScenarioTask {
 
     private void afterRun() {
         // NOTE Auto-generated method stub
-        
     }
 
     private void beforeRun() {
@@ -1342,4 +1689,23 @@ public class SectorScenarioTask {
 
         return hasIt;
     }
+    
+    private String[] tableNames(InternalSource[] sources) {
+        List tables = new ArrayList();
+        for (int i = 0; i < sources.length; i++)
+            tables.add(sources[i].getTable());
+
+        return (String[]) tables.toArray(new String[0]);
+    }  
+    
+    private synchronized String getIOTempDir() throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty("ImportExportTempDir", session);
+            return (property != null ? property.getValue() : "");
+        } finally {
+            session.close();
+        }
+    }
+
 }

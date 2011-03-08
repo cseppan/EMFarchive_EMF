@@ -6,6 +6,7 @@ import java.text.NumberFormat;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 @SuppressWarnings("serial")
@@ -23,6 +24,7 @@ public class DoubleRenderer extends DefaultTableCellRenderer {
             int row, int column) {
 
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        label.setHorizontalAlignment(SwingConstants.RIGHT);
         String text = (value == null) ? "" : value.toString();
 
         if (decimalPlaces == -1 || text.isEmpty()) {

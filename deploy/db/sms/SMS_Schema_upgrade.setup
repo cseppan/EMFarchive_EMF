@@ -156,6 +156,8 @@ UPDATE emf.fileformat_columns
 set constraints = 'NULL'
 where file_format_id = (select id from emf.file_formats where name = 'Sector Detailed Mapping Result') 
 	and "name" = 'PLANTID';
-
+	
+-- 02-21-2011
+ALTER TABLE sms.sector_scenario ADD COLUMN export_output boolean default FALSE;
 
 	

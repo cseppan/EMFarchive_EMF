@@ -45,12 +45,15 @@
     	<list-index column="list_index"/>
     	<composite-element class="gov.epa.emissions.framework.services.sms.SectorScenarioInventory">
 			<property name="version" column="inventory_dataset_version" type="integer" not-null="true"/>
+<!--			<property name="exportSector" column="export_sector" type="java.lang.Boolean" not-null="true"/>-->
+<!--			<property name="exportEECS" column="export_eecs" type="java.lang.Boolean" not-null="true"/>-->
         	<many-to-one name="dataset" class="gov.epa.emissions.framework.services.data.EmfDataset" column="inventory_dataset_id" not-null="true" cascade="none"/>
     	</composite-element>
 	</array>
 	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
   	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
 	<property name="deleteResults" column="delete_results" type="boolean" not-null="false"/>
+	<property name="exportOutput" column="export_output" type="java.lang.Boolean" not-null="true"/>
 
   </class> 
 </hibernate-mapping>  

@@ -352,11 +352,11 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
                 try {
                     stopButton.setEnabled(true);
                     //perform a save action first and catch any new changes...
-                    save();
+                    save(); // TODO: 2011-02-14
                     
                     enableButtons(false);
                     //now run the scenario
-                    presenter.runSectorScenario(sectorScenario.getId());
+                    presenter.runSectorScenario(sectorScenario.getId()); // TODO: 2011-02-14
                     outputsTabView.notifyScenarioRun(sectorScenario);
                     messagePanel
                         .setMessage("Running sector scenario. Monitor the status window for progress, and refresh this window after completion to see outputs");

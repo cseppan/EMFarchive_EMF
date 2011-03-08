@@ -20,6 +20,19 @@ public class DataSourceFactory {
 
         return ds;
     }
+    
+    public DataSource getSectorSandboxDataSource() throws InfrastructureException {
+        DataSource ds = null;
+        try {
+            Context ctx = new InitialContext();
+            ds = (DataSource) ctx.lookup("java:/comp/env/jdbc/SECTORSANDBOX");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new InfrastructureException("Unable to lookup Datasource using JNDI");
+        }
+
+        return ds;
+    }    
 
     public DataSource getEISDataSource() throws InfrastructureException {
         DataSource ds = null;
@@ -33,7 +46,6 @@ public class DataSourceFactory {
 
         return ds;
     }
-
 
 //    private static Log log = LogFactory.getLog(DataSource.class);
 //

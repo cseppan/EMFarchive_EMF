@@ -34,6 +34,8 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
     
     private JRadioButton fillMissEECS;
     
+    private JCheckBox exportOutput;
+    
     private ButtonGroup buttonGroup;
     
     protected EmfSession session;
@@ -96,6 +98,13 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
         radioPanel.add(useEECSFromInv);
         radioPanel.add(fillMissEECS);
         
+        this.exportOutput = new JCheckBox("transfer");
+        this.exportOutput.setSelected(sectorScenario.getExportOutput());
+        
+        radioPanel.add(new JLabel(" "));
+        radioPanel.add(new JLabel("Transfer Sector Scenario Output"));
+        radioPanel.add(this.exportOutput);
+        
         return radioPanel;
     }
         
@@ -155,6 +164,11 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
         if (buttonGroup.getSelection().equals(fillMissEECS.getModel())){
             Short choice = 3; 
             sectorScenario.setAnnotatingEecsOption(choice);
+        }
+        if (this.exportOutput.isSelected()) {
+            sectorScenario.setExportOutput( true);
+        } else {
+            sectorScenario.setExportOutput( false);
         }
     }
 

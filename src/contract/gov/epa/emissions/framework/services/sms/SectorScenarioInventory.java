@@ -9,6 +9,11 @@ public class SectorScenarioInventory implements Serializable {
     private EmfDataset dataset;
 
     private int version;
+    
+//    private Boolean exportSector = false;
+//    
+//    private Boolean exportEECS = false;
+    
 
     public SectorScenarioInventory() {
         //
@@ -53,4 +58,20 @@ public class SectorScenarioInventory implements Serializable {
     public int getVersion() {
         return version;
     }
+
+//    public void setExportSector(Boolean exportSector) {
+//        this.exportSector = exportSector;
+//    }
+//
+//    public Boolean getExportSector() {
+//        return exportSector;
+//    }
+//
+//    public void setExportEECS(Boolean exportEECS) {
+//        this.exportEECS = exportEECS;
+//    }
+//
+//    public Boolean getExportEECS() {
+//        return exportEECS;
+//    }
 }
