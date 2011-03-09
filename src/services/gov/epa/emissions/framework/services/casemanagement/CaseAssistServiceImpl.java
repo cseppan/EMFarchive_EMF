@@ -80,7 +80,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
         return TaskManagerFactory.getCaseJobTaskManager(sessionFactory).getStatusOfWaitAndRunTable();
     }
 
-    public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException { // TODO: JIZHEN
+    public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
         if (DebugLevels.DEBUG_14)
             System.out.println("Start registering case outputs. " + new Date());
         try {
@@ -93,9 +93,9 @@ public class CaseAssistServiceImpl implements CaseAssistService {
             }
 
             if (useTaskMangerForCaseOutputs)
-                getImportService().importDatasetsForCaseOutput(job.getRunJobUser(), outputs); // TODO: JIZHEN
+                getImportService().importDatasetsForCaseOutput(job.getRunJobUser(), outputs);
             else
-                getImportService().registerCaseOutputs(job.getRunJobUser(), outputs); // TODO: JIZHEN
+                getImportService().registerCaseOutputs(job.getRunJobUser(), outputs); 
         } catch (Exception e) {
             e.printStackTrace();
             if (e.getMessage().startsWith("Error registering output"))

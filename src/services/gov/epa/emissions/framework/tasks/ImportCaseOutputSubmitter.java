@@ -45,7 +45,6 @@ public class ImportCaseOutputSubmitter extends ImportSubmitter {
         if (DebugLevels.DEBUG_0) {
             System.out.println("!!!ImportCaseOutputSubmitter: User: " + user);
             System.out.println("!!!ImportCaseOutputSubmitter: Task: " + task.getSubmitterId());
-            //System.out.println("!!!ImportCaseOutputSubmitter: statusDAO: " + statusServices);
         }
 
         // FIXME: After moving this code to ImportJobSubmitter only write out failed importtask messages here

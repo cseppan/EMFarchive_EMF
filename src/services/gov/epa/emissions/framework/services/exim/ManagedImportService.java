@@ -360,7 +360,7 @@ public class ManagedImportService {
         return submitterIds.toArray(new String[0]);
     }
 
-    public synchronized String importDatasetForCaseOutput(User user, CaseOutput output, Services services) // TODO: JIZHEN
+    public synchronized String importDatasetForCaseOutput(User user, CaseOutput output, Services services) 
             throws EmfException {
         String fileFolder = output.getPath();
 
@@ -675,7 +675,7 @@ public class ManagedImportService {
         CaseOutput output = qoutput.convert2CaseOutput();
         Services services = services();
 
-        addOutputTasks(user, output, services, false);
+        addOutputTasks(user, output, services, true);
     }
 
     private void runOutputTasks() throws Exception {

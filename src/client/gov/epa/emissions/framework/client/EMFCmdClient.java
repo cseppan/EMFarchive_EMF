@@ -426,11 +426,11 @@ public class EMFCmdClient {
                 System.out.println("EMF command client sent " + nonEmptyMessages.length + " messages successfully.");
             }
             ArrayList outputKeyArrayList = new ArrayList();
-            CaseOutput[] nonEmptyOutputs = getNonEmptyOutputs(outputs, keys, outputKeyArrayList); // TODO: JIZHEN
+            CaseOutput[] nonEmptyOutputs = getNonEmptyOutputs(outputs, keys, outputKeyArrayList);
             String[] nonEmptyOutputKeys = new String[outputKeyArrayList.size()];
             outputKeyArrayList.toArray(nonEmptyOutputKeys);
 
-            registerOutputs(nonEmptyOutputKeys, service, nonEmptyOutputs); // TODO: JIZHEN
+            registerOutputs(nonEmptyOutputKeys, service, nonEmptyOutputs);
 
             if (DEBUG) {
                 System.out.println("EMF command client sent " + nonEmptyOutputs.length + " outputs successfully.");
@@ -457,7 +457,8 @@ public class EMFCmdClient {
                                 + nonEmptyOutputs[i].getDatasetFile() + nonEmptyOutputs[i].getPattern() + ";"
                                 + nonEmptyOutputs[i].getPath());
                 }
-                service.registerOutputs(nonEmptyOutputs, keys); // TODO: JIZHEN
+                service.registerOutputs(nonEmptyOutputs, keys);
+                
                 if (DEBUG)
                     System.out.println("EMF command client registered " + nonEmptyOutputs.length
                             + " outputs successfully.");
