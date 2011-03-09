@@ -675,7 +675,7 @@ public class ManagedImportService {
         CaseOutput output = qoutput.convert2CaseOutput();
         Services services = services();
 
-        addOutputTasks(user, output, services, true);
+        addOutputTasks(user, output, services, false);
     }
 
     private void runOutputTasks() throws Exception {

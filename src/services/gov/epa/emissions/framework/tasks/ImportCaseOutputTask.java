@@ -13,6 +13,7 @@ import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
+import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.casemanagement.CaseDAO;
 import gov.epa.emissions.framework.services.casemanagement.outputs.CaseOutput;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
@@ -337,6 +338,18 @@ public class ImportCaseOutputTask extends Task {
         if (this.useTaskManager)
             ImportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(),
                     message);
+        else 
+            setStatus(message);
+    }
+    
+    private synchronized void setStatus(String message) {
+        Status endStatus = new Status();
+        endStatus.setUsername(user.getUsername());
+        endStatus.setType("CaseOutputImport");
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
+
+        statusServices.add(endStatus);
     }
     
     private Version version(int datasetId, int versionNumber) throws EmfException {
