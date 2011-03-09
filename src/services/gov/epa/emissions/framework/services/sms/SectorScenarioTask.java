@@ -336,6 +336,26 @@ public class SectorScenarioTask {
             throw new EmfException( e1.getMessage());
         }
         
+        Connection sandboxDBConnection = null;
+        try {
+            sandboxDBConnection = sandboxDBDatasource.getConnection();
+        } catch (SQLException e2) {
+            // NOTE Auto-generated catch block
+            e2.printStackTrace();
+            setStatus("Could not connect to sector_data_sandbox: " + e2.getMessage());
+            if ( sandboxDBConnection != null) {
+                try {
+                    sandboxDBConnection.close();
+                } catch (SQLException e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
+                sandboxDBConnection = null;
+            }
+            sandboxDBDatasource = null;
+            throw new EmfException( e2.getMessage());
+        }
+        
         Statement sandboxDBStatement = null;
         InternalSource[] outputDatasetInternalSources = sectorAnnotatedInventoryOutput.getOutputDataset().getInternalSources();
         String sql = null;
@@ -385,7 +405,7 @@ public class SectorScenarioTask {
             }
 
             try {
-                sandboxDBStatement = sandboxDBDatasource.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                sandboxDBStatement = sandboxDBConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             } catch ( Exception e) {
                 setStatus("Error occured when creating sector_data_sandbox statement: " + e.getMessage());
                 continue;
@@ -578,17 +598,18 @@ public class SectorScenarioTask {
             try { emfStatement.close(); } catch (SQLException e) { /**/ }
             emfStatement = null;
         }
+        if ( sandboxDBConnection != null){
+            try { sandboxDBConnection.close(); } catch( Exception e) { /**/ }
+            sandboxDBConnection = null;
+        }
         tmDir = null;
-        sandboxDBStatement = null;
         outputDatasetInternalSources = null;
         sql = null;
         table = null;
-        sandboxDbResultSet = null; 
         tableNameInSandboxDB = null;
-        emfStatement = null;
-        emfResultSet = null;  
         emfMetaData = null;
         sandboxDbMetaData = null;
+        sandboxDBDatasource = null;
     }
 
     public SectorScenarioOutput createSectorAnnotatedInventoryOutput(EmfDataset sectorDetailedMappingDataset, String[] sectors, SectorScenarioInventory sectorScenarioInventory) throws Exception {
@@ -1237,13 +1258,38 @@ public class SectorScenarioTask {
                 e.printStackTrace();
                 throw new EmfException(e.getMessage());
             } finally {
-                disconnectDbServer();
+                //disconnectDbServer();
             }
         }
     }
 
     private void afterRun() {
         // NOTE Auto-generated method stub
+        this.sectorScenario = null;
+        this.dbServerFactory = null;
+        if ( this.dbServer != null) {
+            try {
+                this.dbServer.getConnection().close();
+            } catch ( Exception e) {
+                /**/
+            }
+            try{
+                if (this.dbServer.isConnected() ) {
+                    this.dbServer.disconnect();
+                }
+            } catch ( Exception e) {
+                /**/
+            }
+        }
+        this.dbServer = null;
+        this.datasource = null;
+        this.sessionFactory = null;
+        this.user = null;
+        this.statusDAO = null;
+        this.sectorScenarioDAO = null;
+        this.keywords = null;
+        this.creator = null;
+        this.sectorScenarioOutputList = null;
     }
 
     private void beforeRun() {
