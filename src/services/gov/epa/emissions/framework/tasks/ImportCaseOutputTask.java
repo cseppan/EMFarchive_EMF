@@ -343,13 +343,15 @@ public class ImportCaseOutputTask extends Task {
     }
     
     private synchronized void setStatus(String message) {
-        Status endStatus = new Status();
-        endStatus.setUsername(user.getUsername());
-        endStatus.setType("CaseOutputImport");
-        endStatus.setMessage(message);
-        endStatus.setTimestamp(new Date());
+        if ( message.toLowerCase().contains("fail") || message.toLowerCase().contains("error")){
+            Status endStatus = new Status();
+            endStatus.setUsername(user.getUsername());
+            endStatus.setType("CaseOutputImport");
+            endStatus.setMessage(message);
+            endStatus.setTimestamp(new Date());
 
-        statusServices.add(endStatus);
+            statusServices.add(endStatus);
+        }
     }
     
     private Version version(int datasetId, int versionNumber) throws EmfException {
