@@ -916,14 +916,22 @@ public class DataServiceImpl implements DataService {
                 whereClause = " WHERE " + col + " LIKE '" + find + "' AND (" + versionedQuery.query() + ")"
                 + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
                 + " AND dataset_id = " + version.getDatasetId() + " AND version <> " + vNum;
+                
+                selectQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols) + " FROM "
+                + table + whereClause;
 
                 selectCurVerQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols)
                 + " FROM " + table + " WHERE " + col + " LIKE '" + find + "' AND (" + versionedQuery.query() + ")"
                 + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
                 + " AND dataset_id = " + version.getDatasetId() + " AND version = " + vNum;
+                
+                insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")" + selectQuery;
 
                 updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith + "' WHERE " + col + " LIKE '"
-                + find + "' AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ;        
+                + find + "' AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ; 
+                
+                updateDelVersions = "UPDATE " + table + " SET delete_versions = trim(both ',' from coalesce(delete_versions,'')||'," 
+                + vNum + "') " + whereClause;
             }
             
             else {
