@@ -905,27 +905,50 @@ public class DataServiceImpl implements DataService {
             VersionedQuery versionedQuery = new VersionedQuery(version);
             String[] cols = getTableColumns(dataModifier, table, "");
             int vNum = version.getVersion();
+            String whereClause = "";
+            String selectQuery = "";
+            String selectCurVerQuery = "";
+            String insertQuery = "";
+            String updateQuery = "";
+            String updateDelVersions = "";
+            
+            if (find.contains("%")){
+                whereClause = " WHERE " + col + " LIKE '" + find + "' AND (" + versionedQuery.query() + ")"
+                + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
+                + " AND dataset_id = " + version.getDatasetId() + " AND version <> " + vNum;
 
-            String whereClause = " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")"
-                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
-                    + " AND dataset_id = " + version.getDatasetId() + " AND version <> " + vNum;
+                selectCurVerQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols)
+                + " FROM " + table + " WHERE " + col + " LIKE '" + find + "' AND (" + versionedQuery.query() + ")"
+                + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
+                + " AND dataset_id = " + version.getDatasetId() + " AND version = " + vNum;
 
-            String selectQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols) + " FROM "
-                    + table + whereClause;
+                updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith + "' WHERE " + col + " LIKE '"
+                + find + "' AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ;        
+            }
+            
+            else {
+                whereClause = " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")"
+                + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
+                + " AND dataset_id = " + version.getDatasetId() + " AND version <> " + vNum;
 
-            String selectCurVerQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols)
-                    + " FROM " + table + " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")"
-                    + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
-                    + " AND dataset_id = " + version.getDatasetId() + " AND version = " + vNum;
+                selectQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols) + " FROM "
+                + table + whereClause;
 
-            String insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")" + selectQuery;
+                selectCurVerQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols)
+                + " FROM " + table + " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")"
+                + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
+                + " AND dataset_id = " + version.getDatasetId() + " AND version = " + vNum;
 
-            String updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith + "' WHERE " + col + "='"
-                    + find + "' AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ;
+                insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")" + selectQuery;
 
-            String updateDelVersions = "UPDATE " + table + " SET delete_versions = trim(both ',' from coalesce(delete_versions,'')||'," 
-                    + vNum + "') " + whereClause;
+                updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith + "' WHERE " + col + "='"
+                + find + "' AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ;
 
+                updateDelVersions = "UPDATE " + table + " SET delete_versions = trim(both ',' from coalesce(delete_versions,'')||'," 
+                + vNum + "') " + whereClause;
+
+            }
+            
             if (DebugLevels.DEBUG_16) {
                 System.out.println("Query to select records: " + selectQuery);
                 System.out.println("Query to select records in current version: " + selectCurVerQuery);
@@ -949,7 +972,7 @@ public class DataServiceImpl implements DataService {
             }
 
             // NOTE: if no records found in previous version and current version, throw exception
-            throw new EmfException("No record found for column = '" + col + "' and value ='" + find + "'.");
+            throw new EmfException("No record found for column = '" + col + "' and value  LIKE '" + find + "'.");
         } catch (SQLException e) {
             LOG.error("Could not query table : ", e);
             throw new EmfException("Could not query table.");

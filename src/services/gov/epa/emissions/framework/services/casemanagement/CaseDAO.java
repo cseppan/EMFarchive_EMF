@@ -23,6 +23,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
+import gov.epa.emissions.framework.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -1438,7 +1439,7 @@ public class CaseDAO {
     
     public Case[] getCases(Session session, String nameContains) {
 
-        String ns = getPattern(nameContains.toLowerCase().trim());
+        String ns = Utils.getPattern(nameContains.toLowerCase().trim());
 
         List<?> cases=session
         .createQuery(
@@ -1450,7 +1451,7 @@ public class CaseDAO {
 
     public Case[] getCases(Session session, CaseCategory category, String nameContains) {
         
-        String ns = getPattern(nameContains.toLowerCase().trim());
+        String ns = Utils.getPattern(nameContains.toLowerCase().trim());
         List<?> cases = session
         .createQuery(
                 "FROM Case as CA WHERE lower(CA.name) like "  + ns
@@ -2020,12 +2021,4 @@ public class CaseDAO {
         return dsIds;
     }
     
-    private String getPattern(String name) {
-        name = name.replaceAll("\\*", "%%");
-        name = name.replaceAll("!", "!!");
-        name = name.replaceAll("'", "''");
-        name = name.replaceAll("_", "!_");
-        
-        return "'%%" + name + "%%'" + (name.contains("!") ? " ESCAPE '!'" : "");
-    }
 }

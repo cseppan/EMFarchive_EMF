@@ -25,6 +25,15 @@ public class Utils {
     public static void sortParameters(List<CaseParameter> parameters) {
         Collections.sort(parameters, G_TO_L_PARAMETER_COMPARATOR);
     }
+    
+    public static String getPattern(String name) {
+        name = name.replaceAll("\\*", "%%");
+        name = name.replaceAll("!", "!!");
+        name = name.replaceAll("'", "''");
+        name = name.replaceAll("_", "!_");
+        
+        return "'%%" + name + "%%'" + (name.contains("!") ? " ESCAPE '!'" : "");
+    }
 
     public static boolean areEqualOrBothNull(Object o1, Object o2) {
 

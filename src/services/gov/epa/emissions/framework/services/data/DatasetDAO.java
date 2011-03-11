@@ -32,6 +32,7 @@ import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
+import gov.epa.emissions.framework.utils.Utils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -124,7 +125,7 @@ public class DatasetDAO {
     }
 
     public int getNumOfDatasets(Session session, String name) {
-        String ns = getPattern(name.toLowerCase().trim());
+        String ns = Utils.getPattern(name.toLowerCase().trim());
         List<?> num = session.createQuery(
                 "SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " + " AND lower(ds.name) like "
                         + ns).list();
@@ -140,7 +141,7 @@ public class DatasetDAO {
     }
 
     public int getNumOfDatasets(Session session, int dsTypeId, String name) {
-        String ns = getPattern(name.toLowerCase().trim());
+        String ns = Utils.getPattern(name.toLowerCase().trim());
         List<?> num = session.createQuery(
                 "SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " + " AND ds.datasetType.id = "
                         + dsTypeId + " AND lower(ds.name) like " + ns).list();
@@ -158,7 +159,7 @@ public class DatasetDAO {
     }
 
     public List allNonDeleted(Session session, String nameContains) {
-        String ns = getPattern(nameContains.toLowerCase().trim());
+        String ns = Utils.getPattern(nameContains.toLowerCase().trim());
         return session
                 .createQuery(
                         "select new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
@@ -372,7 +373,7 @@ public class DatasetDAO {
     }
 
     public List getDatasetsWithFilter(Session session, int datasetTypeId, String nameContains) {
-        String ns = getPattern(nameContains.toLowerCase().trim());
+        String ns = Utils.getPattern(nameContains.toLowerCase().trim());
         return session
                 .createQuery(
                         "select new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
@@ -385,7 +386,7 @@ public class DatasetDAO {
     }
 
     public List getDatasets(Session session, int datasetTypeId, String nameContains) {
-        String ns = getPattern(nameContains.toLowerCase().trim());
+        String ns = Utils.getPattern(nameContains.toLowerCase().trim());
         return session
                 .createQuery(
                         "select new EmfDataset( DS.id, DS.name, DS.defaultVersion, DS.datasetType.id, DS.datasetType.name) from EmfDataset as DS where DS.datasetType.id = "
@@ -1636,22 +1637,22 @@ public class DatasetDAO {
             + ds.getDatasetType().getId());
     String name = ds.getName();
     String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE "
-            + getPattern(name.toLowerCase().trim()));
+            + Utils.getPattern(name.toLowerCase().trim()));
     String creator = ds.getCreator();
     String dsCreatorStr = (creator == null || creator.trim().isEmpty() ? "" : " AND lower(DS.creator) LIKE "
-        + getPattern(creator.toLowerCase().trim()));
+        + Utils.getPattern(creator.toLowerCase().trim()));
     String dsKeyStr = getDSKeyStr(ds.getKeyVals());
     String desc = ds.getDescription(); 
     String qaStr = "";
 //    String qaArgStr = "";
     if ( !( qaStep==null || qaStep.length()==0) )
-        qaStr = " AND lower(QS.name) LIKE "+ getPattern(qaStep.toLowerCase().trim())+ " AND DS.id=QS.datasetId" ;
+        qaStr = " AND lower(QS.name) LIKE "+ Utils.getPattern(qaStep.toLowerCase().trim())+ " AND DS.id=QS.datasetId" ;
     if ( !( qaArgument==null || qaArgument.length()==0) )
-        qaStr += " AND lower(QS.programArguments) LIKE "+ getPattern(qaArgument.toLowerCase().trim());
+        qaStr += " AND lower(QS.programArguments) LIKE "+ Utils.getPattern(qaArgument.toLowerCase().trim());
     if ( !qaStr.isEmpty())
         qaStr += " AND DS.id=QS.datasetId" ;
     String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE "
-            + getPattern(desc.toLowerCase().trim()));
+            + Utils.getPattern(desc.toLowerCase().trim()));
     String dsProjStr = (ds.getProject() == null ? "" : " AND DS.project.id = " + ds.getProject().getId());
     String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
             + " DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
@@ -1703,18 +1704,6 @@ public class DatasetDAO {
     }
 
     return total;
-    }
-
-    /**
-     * This should be moved to a utility class so that any class can use it.
-     */
-    private String getPattern(String name) {
-        name = name.replaceAll("\\*", "%%");
-        name = name.replaceAll("!", "!!");
-        name = name.replaceAll("'", "''");
-        name = name.replaceAll("_", "!_");
-
-        return "'%%" + name + "%%'" + (name.contains("!") ? " ESCAPE '!'" : "");
     }
 
     private String getDSKeyStr(KeyVal[] keyVals) {
