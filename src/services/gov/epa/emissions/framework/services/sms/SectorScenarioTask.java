@@ -1265,8 +1265,8 @@ public class SectorScenarioTask {
 
     private void afterRun() {
         // NOTE Auto-generated method stub
-        this.sectorScenario = null;
-        this.dbServerFactory = null;
+//        this.sectorScenario = null;
+//        this.dbServerFactory = null;
         if ( this.dbServer != null) {
             try {
                 this.dbServer.getConnection().close();
@@ -1281,15 +1281,15 @@ public class SectorScenarioTask {
                 /**/
             }
         }
-        this.dbServer = null;
-        this.datasource = null;
-        this.sessionFactory = null;
-        this.user = null;
-        this.statusDAO = null;
-        this.sectorScenarioDAO = null;
-        this.keywords = null;
-        this.creator = null;
-        this.sectorScenarioOutputList = null;
+//        this.dbServer = null;
+//        this.datasource = null;
+//        this.sessionFactory = null;
+//        this.user = null;
+//        this.statusDAO = null;
+//        this.sectorScenarioDAO = null;
+//        this.keywords = null;
+//        this.creator = null;
+//        this.sectorScenarioOutputList = null;
     }
 
     private void beforeRun() {
