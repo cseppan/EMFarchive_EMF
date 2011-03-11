@@ -1258,38 +1258,27 @@ public class SectorScenarioTask {
                 e.printStackTrace();
                 throw new EmfException(e.getMessage());
             } finally {
-                //disconnectDbServer();
+                disconnectDbServer();
             }
         }
     }
 
     private void afterRun() {
         // NOTE Auto-generated method stub
-//        this.sectorScenario = null;
-//        this.dbServerFactory = null;
-        if ( this.dbServer != null) {
-            try {
-                this.dbServer.getConnection().close();
-            } catch ( Exception e) {
-                /**/
-            }
-            try{
-                if (this.dbServer.isConnected() ) {
-                    this.dbServer.disconnect();
-                }
-            } catch ( Exception e) {
-                /**/
-            }
-        }
-//        this.dbServer = null;
-//        this.datasource = null;
-//        this.sessionFactory = null;
-//        this.user = null;
-//        this.statusDAO = null;
-//        this.sectorScenarioDAO = null;
-//        this.keywords = null;
-//        this.creator = null;
-//        this.sectorScenarioOutputList = null;
+//        if ( this.dbServer != null) {
+//            try {
+//                this.dbServer.getConnection().close();
+//            } catch ( Exception e) {
+//                /**/
+//            }
+//            try{
+//                if (this.dbServer.isConnected() ) {
+//                    this.dbServer.disconnect();
+//                }
+//            } catch ( Exception e) {
+//                /**/
+//            }
+//        }
     }
 
     private void beforeRun() {
@@ -1585,7 +1574,9 @@ public class SectorScenarioTask {
 
     protected void disconnectDbServer() throws EmfException {
         try {
-            dbServer.disconnect();
+            if ( dbServer != null && dbServer.isConnected()) {
+                dbServer.disconnect();
+            }
         } catch (Exception e) {
             throw new EmfException("Could not disconnect DbServer - " + e.getMessage());
         }
