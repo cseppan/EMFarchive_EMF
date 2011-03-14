@@ -213,6 +213,7 @@ public class DataEditorService_DataTest_one extends ServiceTestCase {
     }
 
     public void testNewRecordsAreSavedOnSave() throws Exception {
+        int oldNumRecords = token.getVersion().getNumberRecords();
         Version v1 = versionOne();
 
         ChangeSet changeset = new ChangeSet();
@@ -231,7 +232,7 @@ public class DataEditorService_DataTest_one extends ServiceTestCase {
         changeset.addNew(record8);
 
         service.submit(token, changeset, 1);
-        service.save(token, dataset, v1);
+        service.save(token, oldNumRecords, dataset, v1);
 
         DefaultVersionedRecordsFactory reader = new DefaultVersionedRecordsFactory(datasource);
         int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).total();
@@ -249,6 +250,7 @@ public class DataEditorService_DataTest_one extends ServiceTestCase {
     }
 
     public void testLockRenewedOnSave() throws Exception {
+        int oldNumRecords = token.getVersion().getNumberRecords();
         Version v1 = versionOne();
 
         ChangeSet changeset = new ChangeSet();
@@ -259,7 +261,7 @@ public class DataEditorService_DataTest_one extends ServiceTestCase {
         changeset.addNew(record6);
 
         service.submit(token, changeset, 1);
-        DataAccessToken saved = service.save(token, dataset, v1);
+        DataAccessToken saved = service.save(token, oldNumRecords, dataset, v1);
         assertTrue("Should renew lock on save", saved.isLocked(user));
     }
 
@@ -269,6 +271,7 @@ public class DataEditorService_DataTest_one extends ServiceTestCase {
     }
 
     public void testShouldBeAbleToSubmitMultipleChangeSetsForSameVersion() throws Exception {
+        int oldNumRecords = token.getVersion().getNumberRecords();
         Version v1 = versionOne();
 
         ChangeSet changeset1 = new ChangeSet();
@@ -285,7 +288,7 @@ public class DataEditorService_DataTest_one extends ServiceTestCase {
         changeset2.addNew(record7);
         service.submit(token, changeset2, 1);
 
-        service.save(token, dataset, v1);
+        service.save(token, oldNumRecords, dataset, v1);
 
         VersionedRecordsFactory reader = new DefaultVersionedRecordsFactory(datasource);
         int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).total();

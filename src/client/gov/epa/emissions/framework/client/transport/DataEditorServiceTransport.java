@@ -138,8 +138,9 @@ public class DataEditorServiceTransport implements DataEditorService {
         call.request(new Object[] { user, token });
     }
 
-    public DataAccessToken save(DataAccessToken token, EmfDataset dataset, Version version) throws EmfException {
+    public DataAccessToken save(DataAccessToken token, int oldNumRecords, EmfDataset dataset, Version version) throws EmfException {
         call.addParam("token", mappings.dataAccessToken());
+        call.addLongParam("oldNumRecords");
         call.addParam("dataset", mappings.dataset());
         call.addParam("version",mappings.version());
         

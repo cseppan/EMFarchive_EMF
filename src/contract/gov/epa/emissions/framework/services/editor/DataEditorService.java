@@ -12,7 +12,7 @@ public interface DataEditorService extends DataAccessService {
 
     void discard(DataAccessToken token) throws EmfException;
 
-    DataAccessToken save(DataAccessToken token, EmfDataset dataset, Version version) throws EmfException;
+    DataAccessToken save(DataAccessToken token, int oldNumRecords, EmfDataset dataset, Version version) throws EmfException;
 
     Version derive(Version baseVersion, User user, String name) throws EmfException;
 
