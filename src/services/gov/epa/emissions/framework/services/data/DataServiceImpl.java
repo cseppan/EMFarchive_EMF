@@ -1434,5 +1434,17 @@ public class DataServiceImpl implements DataService {
             session.close();
         }
     }
+
+    public void updateVersion(Version locked) throws EmfException {
+        Session session = this.sessionFactory.getSession();
+
+        try {
+            dao.updateVersion(locked, session);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+    }
     
 }

@@ -677,6 +677,10 @@ public class DatasetDAO {
     public void updateVersionNReleaseLock(Version target, Session session) throws EmfException {
         lockingScheme.releaseLockOnUpdate(target, (Version) current(target.getId(), Version.class, session), session);
     }
+    
+    public void updateVersion(Version target, Session session) throws EmfException {
+        hibernateFacade.updateOnly(target, session);
+    }
 
     public Version obtainLockOnVersion(User user, int id, Session session) {
         return (Version) lockingScheme.getLocked(user, (Version) current(id, Version.class, session), session);

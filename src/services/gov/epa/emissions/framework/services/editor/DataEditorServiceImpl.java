@@ -235,7 +235,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
     }
 
-    public DataAccessToken save(DataAccessToken token, int oldNumRecords, EmfDataset dataset, Version version) throws EmfException {
+    public DataAccessToken save(DataAccessToken token, EmfDataset dataset, Version version) throws EmfException {
         try {
             if (!accessor.isLockOwned(token))
                 return token;// abort
@@ -245,11 +245,6 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         } catch (Exception e) {
             LOG.error("Could not save changes for Dataset: " + token.datasetId() + ". Version: " + token.getVersion()
                     + "\t" + e.getMessage(), e);
-            try {
-                token.getVersion().setNumberRecords(oldNumRecords);
-                accessor.renewLock(token); // re-store the # of records in version table
-            } catch ( EmfException e2) {
-            }
             throw new EmfException("Could not save changes for Dataset: " + token.datasetId() + ". Version: "
                     + token.getVersion() + "\t" + e.getMessage());
         }

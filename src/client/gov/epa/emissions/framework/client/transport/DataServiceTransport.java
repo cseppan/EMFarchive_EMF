@@ -454,4 +454,14 @@ public class DataServiceTransport implements DataService {
         return (EmfDataset[]) call.requestResponse(new Object[]{ dataset, qaStep, qaArgument, new Boolean(unconditional) });
     }
 
+    public void updateVersion(Version locked) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("updateVersion");
+        call.addParam("locked", mappings.version());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { locked });
+    }
+
 }

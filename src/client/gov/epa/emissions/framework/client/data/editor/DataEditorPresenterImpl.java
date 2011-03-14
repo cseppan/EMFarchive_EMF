@@ -129,34 +129,38 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
 
     void save(DataEditorView view, DataAccessToken token, EditableTablePresenter tablePresenter,
             DataEditorService service, ClosingRule closingRule) throws EmfException {
-        int numRecsOld = service.getTotalRecords(token);
+        int numOfRecords = service.getTotalRecords(token);
         boolean submitChanges = tablePresenter.submitChanges();
-        int numRecs2 = service.getTotalRecords(token);
         changesSaved = changesSaved || submitChanges;
         Date currentDate = new Date();
         dataset.setModifiedDateTime(currentDate);
         token.getVersion().setLastModifiedDate(currentDate);
-        //token.getVersion().setNumberRecords(service.getTotalRecords(token));
         token.getVersion().setNumberRecords(tablePresenter.getTotalRecords());
-        int numRecs3 = service.getTotalRecords(token);
-        
         try {
-            token = service.save(token, numRecsOld, dataset, version);
-            int numRecs4 = service.getTotalRecords(token);
+            try {
+                token = service.save(token, dataset, version);
+            } catch (Exception e) {
+                numOfRecords = session.dataService().getNumOfRecords("emissions." + token.getTable(), token.getVersion(), null);
+                token.getVersion().setNumberRecords( numOfRecords);
+                session.dataService().updateVersion(token.getVersion());
+                e.printStackTrace();
+//                try {
+//                    tablePresenter.reloadCurrent();
+//                    view.updateLockPeriod(token.lockStart(), token.lockEnd());
+//                    reset(view); 
+//                }catch ( Exception e1) {
+//                    
+//                }
+                throw new EmfException(e.getMessage());
+            }
             tablePresenter.reloadCurrent();
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
             reset(view);
         } catch (EmfException e) {
             view.notifySaveFailure(e.getMessage());
-            int numRecs5 = service.getTotalRecords(token);
             discard(service, token, tablePresenter);
-            int numRecs6 = service.getTotalRecords(token);
-            token.getVersion().setNumberRecords(numRecsOld);
-            int numRecs7 = service.getTotalRecords(token);
             closingRule.proceedWithClose(session.user(), areChangesSaved());
         }
-        
-        numRecsOld = service.getTotalRecords(token);
     }
 
     public void doAddNote(NewNoteView view) throws EmfException {
