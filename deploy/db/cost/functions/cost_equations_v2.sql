@@ -79,7 +79,7 @@ BEGIN
 	END IF;
 	return null;
 END;
-$$ LANGUAGE plpgsql IMMUTABLE STRICT;
+$$ LANGUAGE plpgsql IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION public.calculate_capital_recovery_factor(discount_rate double precision, 
 	equipment_life double precision) returns double precision AS $$
@@ -91,7 +91,7 @@ BEGIN
 
 	return (discount_rate * (1 + discount_rate) ^ equipment_life) / ((discount_rate + 1) ^ equipment_life - 1);
 END;
-$$ LANGUAGE plpgsql IMMUTABLE STRICT;
+$$ LANGUAGE plpgsql IMMUTABLE;
 
 
 
@@ -459,29 +459,6 @@ BEGIN
              cap_recovery_factor := public.calculate_capital_recovery_factor(discount_rate, equipment_life);
         END IF;
 
-	-- calculate capital cost
-	capital_cost := (3449803 + 135.86 * stack_flow_rate);
-
-	-- calculate annualized capital cost
-	annualized_capital_cost := capital_cost * cap_recovery_factor;
-
-	--	Fixed O&M = $797,667
-	--		where $797,667 is the fixed O&M cost derived from model plant data
-	fixed_operation_maintenance_cost := 797667;
-
-	--	Variable O&M = $58.84 * STKFLOW * 60
- 	--		where $58.84 is the variable O&M cost derived from model plant data, 
- 	--		STKFLOW is the stack gas flow rate (ft3/s) from the emissions inventory, 
- 	--		and 60 is a conversion factor to convert STKFLOW to ft3/min.
-	-- 	Darin says that the seconds to minutes conversion is not necessary
-	variable_operation_maintenance_cost := 58.84 * stack_flow_rate;
-
-	-- calculate operation maintenance cost
-	--	operation_maintenance_cost := (797667 + 58.84 * stack_flow_rate); (previous equation)
-	operation_maintenance_cost := fixed_operation_maintenance_cost + variable_operation_maintenance_cost;
-
-	-- calculate annual cost
-	annual_cost := annualized_capital_cost + operation_maintenance_cost;
 	-- calculate capital cost
 	capital_cost := (3449803 + 135.86 * stack_flow_rate);
 
@@ -1048,8 +1025,7 @@ BEGIN
 
 			-- Type 8
 			IF equation_type = 'Type 8' THEN
---let missing stkflow to go thorugh
---				IF coalesce(stack_flow_rate, 0) <> 0 THEN
+				IF coalesce(stack_flow_rate, 0) <> 0 THEN
 					select costs.annual_cost,
 						costs.capital_cost,
 						costs.operation_maintenance_cost,
@@ -1086,7 +1062,7 @@ BEGIN
 					annualized_capital_cost := ref_yr_chained_gdp_adjustment_factor * annualized_capital_cost;
 					computed_cost_per_ton := ref_yr_chained_gdp_adjustment_factor * computed_cost_per_ton;
 					return;
-				--END IF;
+				END IF;
 				valid_cost := false;
 				actual_equation_type := '-Type 8';
 			END IF;
@@ -1627,20 +1603,13 @@ CREATE OR REPLACE FUNCTION public.get_strategy_costs(
 	design_capacity_unit_denominator character varying, 
 	annual_avg_hours_per_year double precision, 
 	ceff double precision, 
-	ref_yr_incremental_cost_per_ton double precision,  
-	OUT annual_cost double precision, 
-	OUT capital_cost double precision, 
-	OUT variable_operation_maintenance_cost double precision, 
-	OUT fixed_operation_maintenance_cost double precision, 
-	OUT operation_maintenance_cost double precision, 
-	OUT annualized_capital_cost double precision, 
-	OUT computed_cost_per_ton double precision, 
-	OUT actual_equation_type character varying(255)
+	ref_yr_incremental_cost_per_ton double precision
 --	,OUT valid_cost boolean
-	)  AS $$
+	)  RETURNS emf.equation_cost AS $$
 DECLARE
 	converted_design_capacity double precision;
 	valid_cost boolean;
+	equation_cost emf.equation_cost;
 BEGIN
 	-- at first, we can only assume that everything is right...
 	valid_cost := true;
@@ -1673,32 +1642,32 @@ BEGIN
 						variable_coefficient3, 
 						variable_coefficient4) as costs
 
-					into annual_cost,
-						capital_cost,
-						variable_operation_maintenance_cost,
-						fixed_operation_maintenance_cost,
-						operation_maintenance_cost,
-						annualized_capital_cost,
-						computed_cost_per_ton;
-					IF annual_cost is not null THEN
+					into equation_cost.annual_cost,
+						equation_cost.capital_cost,
+						equation_cost.variable_operation_maintenance_cost,
+						equation_cost.fixed_operation_maintenance_cost,
+						equation_cost.operation_maintenance_cost,
+						equation_cost.annualized_capital_cost,
+						equation_cost.computed_cost_per_ton;
+					IF equation_cost.annual_cost is not null THEN
 						valid_cost := true;
-						actual_equation_type := 'Type 12';
+						equation_cost.actual_equation_type := 'Type 12';
 					ELSE
 						valid_cost := false;
-						actual_equation_type := '-Type 12';
+						equation_cost.actual_equation_type := '-Type 12';
 					END IF;
 					-- adjust costs to the reference cost year
-					annual_cost := ref_yr_chained_gdp_adjustment_factor * annual_cost;
-					capital_cost := ref_yr_chained_gdp_adjustment_factor * capital_cost;
-					variable_operation_maintenance_cost := ref_yr_chained_gdp_adjustment_factor * variable_operation_maintenance_cost;
-					fixed_operation_maintenance_cost := ref_yr_chained_gdp_adjustment_factor * fixed_operation_maintenance_cost;
-					operation_maintenance_cost := ref_yr_chained_gdp_adjustment_factor * operation_maintenance_cost;
-					annualized_capital_cost := ref_yr_chained_gdp_adjustment_factor * annualized_capital_cost;
-					computed_cost_per_ton := ref_yr_chained_gdp_adjustment_factor * computed_cost_per_ton;
-					return;
+					equation_cost.annual_cost := ref_yr_chained_gdp_adjustment_factor * annual_cost;
+					equation_cost.capital_cost := ref_yr_chained_gdp_adjustment_factor * capital_cost;
+					equation_cost.variable_operation_maintenance_cost := ref_yr_chained_gdp_adjustment_factor * variable_operation_maintenance_cost;
+					equation_cost.fixed_operation_maintenance_cost := ref_yr_chained_gdp_adjustment_factor * fixed_operation_maintenance_cost;
+					equation_cost.operation_maintenance_cost := ref_yr_chained_gdp_adjustment_factor * operation_maintenance_cost;
+					equation_cost.annualized_capital_cost := ref_yr_chained_gdp_adjustment_factor * annualized_capital_cost;
+					equation_cost.computed_cost_per_ton := ref_yr_chained_gdp_adjustment_factor * computed_cost_per_ton;
+					return equation_cost;
 				END IF;
 				valid_cost := false;
-				actual_equation_type := '-Type 12';
+				equation_cost.actual_equation_type := '-Type 12';
 
 			ELSE
 				--call second version of this function
@@ -1739,14 +1708,14 @@ BEGIN
 					annual_avg_hours_per_year,
 					ceff,
 					ref_yr_incremental_cost_per_ton) as costs
-				into annual_cost,
-					capital_cost,
-					variable_operation_maintenance_cost,
-					fixed_operation_maintenance_cost,
-					operation_maintenance_cost,
-					annualized_capital_cost,
-					computed_cost_per_ton;
-				return;
+				into equation_cost.annual_cost,
+					equation_cost.capital_cost,
+					equation_cost.variable_operation_maintenance_cost,
+					equation_cost.fixed_operation_maintenance_cost,
+					equation_cost.operation_maintenance_cost,
+					equation_cost.annualized_capital_cost,
+					equation_cost.computed_cost_per_ton;
+				return equation_cost;
 			END IF;
 		END IF;
 	END IF;
@@ -1764,17 +1733,18 @@ BEGIN
 		capital_recovery_factor, 
 		case when coalesce(ceff, 0.0) <> 0.0 and coalesce(ref_yr_incremental_cost_per_ton, 0.0) <> 0.0 then ref_yr_incremental_cost_per_ton else ref_yr_cost_per_ton end, 
 		emis_reduction) as costs
-	into annual_cost,
-		capital_cost,
-		operation_maintenance_cost,
-		annualized_capital_cost,
-		computed_cost_per_ton;
+	into equation_cost.annual_cost,
+		equation_cost.capital_cost,
+		equation_cost.operation_maintenance_cost,
+		equation_cost.annualized_capital_cost,
+		equation_cost.computed_cost_per_ton;
 	-- if no annual cost is specified then assume the cost is unspecified
-	IF annual_cost is not null THEN
+	IF equation_cost.annual_cost is not null THEN
 		valid_cost := true;
 	ELSE
 		valid_cost := false;
 	END IF;
+	RETURN equation_cost;
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
@@ -1901,5 +1871,26 @@ select public.get_strategy_costs(
 
 -- adjust acfm to scfm...
 --	select (2449 * 520 / (551 + 460.0))
+
+-- type 12
+-- capital_cost := 
+select	
+	case 
+		when use_cost_equations and equation_type = 'Type 12' and equation_type is not null and coalesce(stack_flow_rate, 0) <> 0 and coalesce(stack_temperature, 0) <> 0 then 
+			(coalesce(eq.value1/*total_capital_investment_fixed_factor*/, 0.0) + coalesce(eq.value2/*total_capital_investment_variable_factor*/, 0.0)) * ((stkflow * 60.0/*stack_flow_rate*/ * 520 / (stktmp/*stack_temperature*/ + 460.0)) / 150000) ^ 0.6;
+
+	else 
+		emis_reduction * ref_yr_cost_per_ton * capital_annualized_ratio;
+	end as capital_cost
+
+	
+		IF equation_type is not null THEN
+		
+			-- Type 12
+			IF equation_type = 'Type 12' THEN
+
+				IF coalesce(stack_flow_rate, 0) <> 0 and coalesce(stack_temperature, 0) <> 0 THEN
+	capital_cost := (coalesce(total_capital_investment_fixed_factor, 0.0) + coalesce(total_capital_investment_variable_factor, 0.0)) * ((stack_flow_rate * 520 / (stack_temperature + 460.0)) / 150000) ^ 0.6;
+
 
 */

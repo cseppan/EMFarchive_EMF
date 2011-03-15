@@ -53,7 +53,7 @@
     		<many-to-many class="gov.epa.emissions.commons.data.Sector" column="sector_id"/>
   		</array>
 
- 		<array name="references" table="control_measure_references">
+ 		<array name="references" table="control_measure_references" cascade="save-update">
     		<key column="control_measure_id" not-null="true"/>
     		<list-index column="list_index"/>
     		<many-to-many class="gov.epa.emissions.commons.data.Reference" column="reference_id"/>

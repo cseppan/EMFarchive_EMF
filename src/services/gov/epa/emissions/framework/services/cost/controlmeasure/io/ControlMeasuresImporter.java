@@ -166,7 +166,7 @@ public class ControlMeasuresImporter implements Importer {
         } catch (Exception e) {
             logError("Failed to import all control measures", e);
             setStatus("Failed to import all control measures, see the import control measures status field for more detailed information on the failure: " + e.getMessage());
-            setDetailStatus("Failed to import all control measures, see the import control measures status field for more detailed information on the failure: " + e.getMessage() + "\n");
+            setDetailStatus("Failed to import all control measures: " + e.getMessage() + "\n");
             throw new ImporterException("Failed to import all control measures: " + e.getMessage());
         } finally {
             try {

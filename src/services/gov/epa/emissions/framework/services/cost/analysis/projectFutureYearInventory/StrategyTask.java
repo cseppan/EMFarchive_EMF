@@ -141,21 +141,7 @@ public class StrategyTask extends AbstractStrategyTask {
     private void vacuumControlProgramTables(ControlProgram controlProgram) {
         String query = "";
         EmfDataset dataset = controlProgram.getDataset();
-        if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.plantClosure)) {
-            query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
-        } else if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.projection)) {
-            if (dataset.getDatasetType().getName().equals(DatasetType.projectionPacket)) {
-                query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
-            }
-        } else if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.control)) {
-            if (dataset.getDatasetType().getName().equals(DatasetType.controlPacket)) {
-                query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
-            }
-        } else if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.allowable)) {
-            if (dataset.getDatasetType().getName().equals(DatasetType.allowablePacket)) {
-                query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
-            }
-        }
+        query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
         
         System.out.println(System.currentTimeMillis() + " " + query);
         try {

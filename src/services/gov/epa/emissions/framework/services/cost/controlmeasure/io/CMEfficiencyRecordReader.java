@@ -169,7 +169,8 @@ public class CMEfficiencyRecordReader {
         }
         if (sb.length() > 0) {
             if (!warning) errorCount++;
-            status.addStatus(lineNo, sb);
+            status.setStatus("Line "+lineNo + ": Measure, " + tokens[0] + ", Efficiency Record Issue for pollutant, " + tokens[1] + ": " + sb.toString());
+//            status.addStatus(lineNo, sb);
         }
 
         if (errorCount >= errorLimit) throw new EmfException("The maximum allowable error limit (" + errorLimit + ") has been reached while parsing the control measure efficiency records.");
@@ -195,7 +196,7 @@ public class CMEfficiencyRecordReader {
     private ControlMeasure controlMeasure(String token, Map controlMeasures, StringBuffer sb, int lineNo) {
         ControlMeasure cm = (ControlMeasure) controlMeasures.get(token);
         if (cm == null) {
-            sb.append(format("abbreviation '" + token + "' is not in the control measure summary file"));
+            sb.append(format("Abbreviation '" + token + "' is not in the control measure summary file"));
             status.addStatus(lineNo, sb);
         }
         return cm;
@@ -204,7 +205,7 @@ public class CMEfficiencyRecordReader {
     private boolean checkForConstraints(String[] tokens, StringBuffer sb, int lineNo) throws EmfException, CMImporterException {
         String uniqueCompositeKey = tokens[0] + "_" + pollutants.getPollutant(tokens[1]).getName() + "_" + tokens[2] + "_" + tokens[4] + "_" + validation.existingDevCode(tokens[5]) + "_" + validation.effectiveDate(tokens[3]) + "_" + (this.colCount != 15 ? validation.minEmis(tokens[6]) + "_" + validation.minEmis(tokens[7]) : "_");
         if (this.compositeKeyMap.containsKey(uniqueCompositeKey)) {
-            sb.append("Efficiency record is a duplicate, remove the duplicate, abbrv = " + tokens[0] + ", poll = " + tokens[1]);
+            sb.append(format("Efficiency record is a duplicate, remove the duplicate, abbrv = " + tokens[0] + ", poll = " + tokens[1]));
             status.addStatus(lineNo, sb);
             return false;
         }
@@ -258,16 +259,20 @@ public class CMEfficiencyRecordReader {
     }
 
     private void controlEfficiency(EfficiencyRecord efficiencyRecord, String ce, StringBuffer sb) throws EmfException {
-        String efficiency = (ce.indexOf('%') != -1) ? ce.split("%")[0] : ce;
+        String efficiency = ((ce.indexOf('%') != -1) ? ce.split("%")[0] : ce).trim();
 
         try {
-            float value = validation.efficiency(efficiency);
-            if (value == 0) {
-                warning = true;
-                sb.append(format("The Control Efficiency is zero, 0%, this efficiency record will be dropped."));
-                throw new EmfException("The Control Efficiency is zero, 0%, this efficiency record will be dropped.");            
+            if (efficiency.length() > 0) {
+                Double value = validation.efficiency(efficiency);
+                if (value == 0) {
+                    warning = true;
+                    sb.append(format("The Control Efficiency is zero, 0%, this efficiency record will be dropped."));
+                    throw new EmfException("The Control Efficiency is zero, 0%, this efficiency record will be dropped.");            
+                }
+                efficiencyRecord.setEfficiency(value);
+            } else {
+                efficiencyRecord.setEfficiency(null);
             }
-            efficiencyRecord.setEfficiency(value);
         } catch (EmfException e) {
             sb.append(format(e.getMessage()));
             // If control Efficiency is not valid, we want the validation process to stop
@@ -298,7 +303,7 @@ public class CMEfficiencyRecordReader {
                     for (ControlMeasureEquation equation : equations) {
                         if (equation.getPollutant().equals(efficiencyRecord.getPollutant())) {
                             warning = true;
-                            sb.append(format("Warning: The " + abbreviation + " efficiency record for, " + efficiencyRecord.getPollutant().getName() + ", has empty default cost per ton when an equation uses the same pollutant."));
+                            sb.append(format("Warning: Missing default cost per ton when an equation uses the same pollutant.  A default CPT is not required."));
                         }
                     }
                 }

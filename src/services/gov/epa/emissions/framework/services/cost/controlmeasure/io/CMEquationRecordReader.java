@@ -72,7 +72,9 @@ public class CMEquationRecordReader {
                 for (int i = 0; i < equationTypeVariables.length; i++) {
 
                     try {
-                        Double value = Double.valueOf(tokens[equationTypeVariables[i].getFileColPosition() + 3]);
+                        Double value = null;
+                        if (tokens[equationTypeVariables[i].getFileColPosition() + 3].length() > 0)
+                            value = Double.valueOf(tokens[equationTypeVariables[i].getFileColPosition() + 3]);
                         if (equationTypeVariables[i].getFileColPosition() == 1) { 
                             equation.setValue1(value);
                         } else if (equationTypeVariables[i].getFileColPosition() == 2) { 

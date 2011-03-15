@@ -1,8 +1,8 @@
 /*
  * $Source: /home/catherine/Projects/emf_cvs/cvs_repo/EMF/src/client/gov/epa/emissions/framework/client/cost/controlmeasure/ControlMeasurePDFReportGenerator.java,v $
- * $Revision: 1.4 $
+ * $Revision: 1.5 $
  * $Author: ddelvecchio $
- * $Date: 2010/04/06 05:33:08 $
+ * $Date: 2011/03/15 05:55:48 $
  */
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
@@ -887,7 +887,7 @@ public class ControlMeasurePDFReportGenerator {
                 valueCell.setPadding(padding);
                 refYrCPTList.add(valueCell);
 
-                valueCell = new PdfPCell(new Phrase(this.getFloatAsString(efficiencyRecord.getEfficiency()),
+                valueCell = new PdfPCell(new Phrase(this.getDoubleAsString(efficiencyRecord.getEfficiency()),
                         REGULAR_FONT));
                 valueCell.setHorizontalAlignment(valueHAlign);
                 valueCell.setVerticalAlignment(valueVAlign);

@@ -240,7 +240,7 @@ public class ApplyMeasureInSeriesStrategyTestBase extends ServiceTestCase {
         EfficiencyRecord record = new EfficiencyRecord();
         record.setPollutant(pollutant);
         record.setLocale(locale);
-        record.setEfficiency(efficiency);
+        record.setEfficiency((double)efficiency);
         record.setRuleEffectiveness(100);
         record.setRulePenetration(100);
         record.setCostPerTon(cost);

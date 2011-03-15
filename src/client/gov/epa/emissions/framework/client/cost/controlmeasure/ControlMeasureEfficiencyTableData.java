@@ -54,7 +54,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
                 record.getCostYear() != null ? record.getCostYear() : "",
                 record.getCostPerTon() != null ? record.getCostPerTon() : NAN_VALUE, 
                 record.getRefYrCostPerTon() != null ? record.getRefYrCostPerTon() : NAN_VALUE, 
-                new Double(record.getEfficiency()), 
+                record.getEfficiency() != null ? record.getEfficiency() : NAN_VALUE,
                 record.getMinEmis() != null ? record.getMinEmis() : NAN_VALUE, 
                 record.getMaxEmis() != null ? record.getMaxEmis() : NAN_VALUE, 
                 new Double(record.getRuleEffectiveness()), 

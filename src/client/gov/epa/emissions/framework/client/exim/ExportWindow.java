@@ -42,6 +42,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
+import javax.swing.ToolTipManager;
 
 public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
@@ -108,7 +109,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private JPanel createLayout() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
+        ToolTipManager.sharedInstance().setDismissDelay(5000);
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
         panel.add(createExportPanel());

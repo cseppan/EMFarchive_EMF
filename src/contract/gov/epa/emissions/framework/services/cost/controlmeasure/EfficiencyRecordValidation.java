@@ -123,8 +123,8 @@ public class EfficiencyRecordValidation {
         return validation.value(costYear);
     }
 
-    public float efficiency(String efficiency) throws EmfException {
-        float value = parseFloat("control efficiency", efficiency);
+    public Double efficiency(String efficiency) throws EmfException {
+        Double value = parseDouble("control efficiency", efficiency);
         if (value > 100)
             throw new EmfException("The Control Efficiency can't be more than 100%, value = "
                     + efficiency);

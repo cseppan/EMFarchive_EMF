@@ -54,6 +54,8 @@ DECLARE
 	has_control_measures_col boolean := false;
 	has_pct_reduction_col boolean := false;
 	sql character varying := '';
+	compliance_date_cutoff_daymonth varchar(256) := '';
+	effective_date_cutoff_daymonth varchar(256) := '';
 BEGIN
 
 	-- get the input dataset info
@@ -192,6 +194,18 @@ BEGIN
 
 	chained_gdp_adjustment_factor := cost_year_chained_gdp / ref_cost_year_chained_gdp;
 
+	-- load the Compliance and Effective Date Cutoff Day/Month (Stored as properties)
+	select value
+	from emf.properties
+	where "name" = 'COST_PROJECT_FUTURE_YEAR_COMPLIANCE_DATE_CUTOFF_MONTHDAY'
+	into compliance_date_cutoff_daymonth;
+	compliance_date_cutoff_daymonth := coalesce(compliance_date_cutoff_daymonth, '07/01');	--default just in case
+	select value
+	from emf.properties
+	where "name" = 'COST_PROJECT_FUTURE_YEAR_EFFECTIVE_DATE_CUTOFF_MONTHDAY'
+	into effective_date_cutoff_daymonth;
+	effective_date_cutoff_daymonth := coalesce(effective_date_cutoff_daymonth, '07/01');	--default just in case
+	
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
 		county_dataset_filter_sql := ' and inv.fips in (SELECT fips
@@ -405,7 +419,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -437,7 +451,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -468,7 +482,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -498,7 +512,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -528,7 +542,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -559,7 +573,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 					' else '' end || '
@@ -589,7 +603,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -621,7 +635,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -652,7 +666,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -682,7 +696,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -711,7 +725,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -740,7 +754,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -770,7 +784,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 					' else '' end || '
@@ -799,7 +813,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 					' else '' end || '
@@ -831,7 +845,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -860,7 +874,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -888,7 +902,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -915,7 +929,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -944,7 +958,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -972,7 +986,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -999,7 +1013,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1025,7 +1039,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 					' else '' end || '
@@ -1056,7 +1070,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1084,7 +1098,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1112,7 +1126,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1139,7 +1153,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1167,7 +1181,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1194,7 +1208,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1221,7 +1235,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1247,7 +1261,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 					' else '' end || '
@@ -1276,7 +1290,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1303,7 +1317,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1330,7 +1344,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1356,7 +1370,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1383,7 +1397,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1409,7 +1423,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 
@@ -1435,7 +1449,7 @@ BEGIN
 						and ' || control_program_dataset_filter_sql || '
 						' || case when control_program.type <> 'Projection' then '
 						-- make the compliance date has been met
-						and coalesce(packet.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone
+						and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						' else '' end || '
 						and inv.record_id is null
 				) tbl';

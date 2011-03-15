@@ -18,6 +18,8 @@ DECLARE
 	county_dataset_version integer := null;
 	county_dataset_filter_sql text := '';
 	inventory_year int;
+	compliance_date_cutoff_daymonth varchar(256) := '';
+	effective_date_cutoff_daymonth varchar(256) := '';
 BEGIN
 
 	SELECT case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
@@ -30,6 +32,20 @@ BEGIN
 		county_dataset_id,
 		county_dataset_version,
 		inventory_year;
+
+	-- load the Compliance and Effective Date Cutoff Day/Month (Stored as properties)
+	select value
+	from emf.properties
+	where "name" = 'COST_PROJECT_FUTURE_YEAR_COMPLIANCE_DATE_CUTOFF_MONTHDAY'
+	into compliance_date_cutoff_daymonth;
+	compliance_date_cutoff_daymonth := coalesce(compliance_date_cutoff_daymonth, '07/01');	--default just in case
+	select value
+	from emf.properties
+	where "name" = 'COST_PROJECT_FUTURE_YEAR_EFFECTIVE_DATE_CUTOFF_MONTHDAY'
+	into effective_date_cutoff_daymonth;
+	effective_date_cutoff_daymonth := coalesce(effective_date_cutoff_daymonth, '07/01');	--default just in case
+	
+
 
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
@@ -166,18 +182,25 @@ BEGIN
 			--see http://www.smoke-model.org/version2.4/html/ch06s02.html for source matching hierarchy
 			sql := sql || '
 			select distinct on (record_id)
-				record_id,fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,replacement,
+				record_id,fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,replacement,compliance_date,
 				' || quote_literal(control_program.control_program_name) || ' as control_program_name,
 				ranking
 			from (
 				--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
 				select 
 					null::integer as record_id, null::character varying(6) as fips,null::character varying(10) as scc,null::character varying(15) as plantid,null::character varying(15) as pointid,null::character varying(15) as stackid,null::character varying(15) as segment,null::character varying(16) as poll,null::character varying(4) as sic,null::character varying(6) as mact,
-					null::character varying(1) as replacement, null::integer as ranking
+					null::character varying(1) as replacement, null::timestamp without time zone as compliance_date, null::integer as ranking
 				where 1 = 0
 
---				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inventory_record.table_name, 'proj.fips,proj.scc,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.poll,proj.sic,proj.mact,proj.replacement,',control_program_dataset_filter_sql || ' and proj.application_control = ''Y'' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and ''1/1/' || inventory_year || '''::timestamp without time zone >= coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone)') || '
-				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inventory_record.table_name, 'proj.fips,proj.scc,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.poll,proj.sic,proj.mact,proj.replacement,',control_program_dataset_filter_sql || ' and proj.application_control = ''Y'' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone') || '
+				' || public.build_project_future_year_inventory_matching_hierarchy_sql(
+					control_program.table_name, 
+					inventory_record.table_name, 
+					'proj.fips,proj.scc,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.poll,proj.sic,proj.mact,proj.replacement,proj.compliance_date,',
+					control_program_dataset_filter_sql || ' 
+					and proj.application_control = ''Y'' 
+					and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' 
+					and coalesce(proj.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone'
+					) || '
 			) tbl';
 
 
@@ -187,13 +210,12 @@ BEGIN
 		IF length(sql) > 0 THEN
 			execute 'select count(1)
 				from (' || sql || ') tbl
-				where replacement in (''A'',''R'')
-				group by record_id,fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,ranking
-				having count(1) = 2
+				group by record_id,fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,ranking,compliance_date
+				having count(1) >= 2
 				limit 1'
 			into count;
 			IF count > 0 THEN
-				RAISE EXCEPTION 'Inventory, %, dataset has source(s) that have both a replacement and additional control that have matching hierarchy ranking, both can''t be applied to the same source.', inventory_record.dataset_name;
+				RAISE EXCEPTION 'Inventory, %, dataset has source(s) with duplicate matching hierarchy packet records.  See the Strategy Messages output dataset for more detailed information on identifying the matching hierarchy records.', inventory_record.dataset_name;
 				return;
 			END IF;
 

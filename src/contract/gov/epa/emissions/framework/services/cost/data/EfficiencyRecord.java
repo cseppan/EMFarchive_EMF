@@ -31,7 +31,7 @@ public class EfficiencyRecord implements Serializable {
 
     private Double discountRate;
 
-    private float efficiency;
+    private Double efficiency;
 
     private Date effectiveDate;
 
@@ -86,11 +86,11 @@ public class EfficiencyRecord implements Serializable {
         this.discountRate = discountRate;
     }
 
-    public float getEfficiency() {
+    public Double getEfficiency() {
         return efficiency;
     }
 
-    public void setEfficiency(float efficiency) {
+    public void setEfficiency(Double efficiency) {
         this.efficiency = efficiency;
     }
 

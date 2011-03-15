@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.Session;
 
@@ -101,28 +103,28 @@ poll|poll
     }
 
     public class ColumnMatchingMap {
-        private String dataset1Expression;
-        private String dataset2Expression;
+        private String baseExpression;
+        private String compareExpression;
         
-        public ColumnMatchingMap(String dataset1Expression, String dataset2Expression) {
-            this.setDataset1Expression(dataset1Expression);
-            this.setDataset2Expression(dataset2Expression);
+        public ColumnMatchingMap(String baseExpression, String compareExpression) {
+            this.setBaseExpression(baseExpression);
+            this.setCompareExpression(compareExpression);
         }
 
-        public void setDataset1Expression(String dataset1Expression) {
-            this.dataset1Expression = dataset1Expression;
+        public void setBaseExpression(String baseExpression) {
+            this.baseExpression = baseExpression;
         }
 
-        public String getDataset1Expression() {
-            return dataset1Expression;
+        public String getBaseExpression() {
+            return baseExpression;
         }
 
-        public void setDataset2Expression(String dataset2Expression) {
-            this.dataset2Expression = dataset2Expression;
+        public void setCompareExpression(String compareExpression) {
+            this.compareExpression = compareExpression;
         }
 
-        public String getDataset2Expression() {
-            return dataset2Expression;
+        public String getCompareExpression() {
+            return compareExpression;
         }
         
     }
@@ -239,10 +241,10 @@ poll|poll
             if (arguments != null && arguments.length > 0) matchingExpressionTokens = arguments;
             for (String matchingExpressionToken : matchingExpressionTokens) {
                 String[] matchingExpression = matchingExpressionToken.split("\\=");
-                String dataset1Expression = matchingExpression[0];
-                String dataset2Expression = matchingExpression[1];
+                String dataset1Expression = matchingExpression[0].toLowerCase();
+                String dataset2Expression = matchingExpression[1].toLowerCase();
                 matchingExpressionMap.put(dataset1Expression, new ColumnMatchingMap(dataset1Expression, dataset2Expression));
-                matchingExpressionMap.put(dataset2Expression, new ColumnMatchingMap(dataset2Expression, dataset1Expression));
+                matchingExpressionMap.put(dataset2Expression, new ColumnMatchingMap(dataset1Expression, dataset2Expression));
             }
         }
     
@@ -316,10 +318,10 @@ poll|poll
                 String[] matchingExpressionToken = matchingExpression.split("\\=");
                 //make sure expression exists
                 if (!expressionExists(matchingExpressionToken[0], baseColumns))
-                    throw new EmfException("Matching expression 1, " + matchingExpressionToken[0] + ", doesn't exist as a column in the dataset.");
+                    throw new EmfException("The base matching expression, " + matchingExpressionToken[0] + ", doesn't exist as a column in the dataset.");
                 //make sure expression exists
                 if (!expressionExists(matchingExpressionToken[1], compareColumns))
-                    throw new EmfException("Matching expression 2, " + matchingExpressionToken[1] + ", doesn't exist as a column in the dataset.");
+                    throw new EmfException("The compare matching expression, " + matchingExpressionToken[1] + ", doesn't exist as a column in the dataset.");
 
             }
         } 
@@ -334,7 +336,7 @@ poll|poll
             for (String groupByExpression : groupByExpressions) {
 
                 //parse group by token and put in a map for later use...
-                String[] groupByExpressionParts = groupByExpression.toLowerCase().split(" as ");
+                String[] groupByExpressionParts = groupByExpression.split(" as ");
 //                StringTokenizer tokenizer = new StringTokenizer(groupByExpression.toLowerCase(), "\\ as ");
                 int count = groupByExpressionParts.length;
                 String expression = "";
@@ -369,7 +371,7 @@ poll|poll
                 baseExpressionExists = expressionExists(expression, baseColumns, matchingExpressionMap);
                 compareExpressionExists = expressionExists(expression, compareColumns, matchingExpressionMap);
                 if (!baseExpressionExists && !compareExpressionExists) {
-                    if (matchingExpressionMap.get(expression) == null)
+                    if (matchingExpressionMap.get(expression.toLowerCase()) == null)
                         throw new EmfException("GROUP BY expression, " + expression + ", needs a mapping entry specified, the column doesn't exist in either the base or compare datasets.");
                 }
             }
@@ -381,27 +383,29 @@ poll|poll
         if (aggregateExpressions.length > 0 ) {
             //make sure these expressions returns a number
             for (String aggregateExpression : aggregateExpressions) {
-                Column baseColumn = baseColumns.get(aggregateExpression);
-                Column compareColumn = compareColumns.get(aggregateExpression);
+                boolean baseColumnExists = expressionExists(aggregateExpression, baseColumns, matchingExpressionMap);
+//                Column baseColumn = baseColumns.get(aggregateExpression.toLowerCase());
+                boolean compareColumnExists = expressionExists(aggregateExpression, compareColumns, matchingExpressionMap);
+//                Column compareColumn = compareColumns.get(aggregateExpression.toLowerCase());
                 //make sure aggregate expression exists
-                if (baseColumn == null && compareColumn == null)
+                if (!baseColumnExists && !compareColumnExists)
                     throw new EmfException("Aggregate expression, " + aggregateExpression + ", doesn't exist as a column in either the base or compare datasets.");
                 //if either one of the dataset types doesn't contain the column, then make sure we have a mapping for it...
-                if (baseColumn == null || compareColumn == null) {
-                    if (matchingExpressionMap.get(aggregateExpression) == null)
+                if (!baseColumnExists || !compareColumnExists) {
+                    if (matchingExpressionMap.get(aggregateExpression.toLowerCase()) == null)
                         throw new EmfException("Aggregate expression, " + aggregateExpression + ", needs a mapping entry specified, the column doesn't exist in either the base or compare datasets.");
                 }
-                
-                Column column = (baseColumn != null ? baseColumn : (compareColumn != null ? compareColumn : null));
-                //make sure aggregate expression represents a number data type
-                if (!(column.getSqlType() == "INTEGER"
-                    || column.getSqlType() == "float(15)"
-                    || column.getSqlType() == "INT"
-                    || column.getSqlType() == "BIGINT"
-                    || column.getSqlType() == "double precision"
-                    || column.getSqlType() == "INT2"
-                ))
-                    throw new EmfException("Aggregate expression, " + aggregateExpression + ", must be a numeric data type (i.e., tinyint, smallint, int, bigint, double precision, float, numeric, decimal).");
+//                
+//                Column column = (baseColumn != null ? baseColumn : (compareColumn != null ? compareColumn : null));
+//                //make sure aggregate expression represents a number data type
+//                if (!(column.getSqlType() == "INTEGER"
+//                    || column.getSqlType() == "float(15)"
+//                    || column.getSqlType() == "INT"
+//                    || column.getSqlType() == "BIGINT"
+//                    || column.getSqlType() == "double precision"
+//                    || column.getSqlType() == "INT2"
+//                ))
+//                    throw new EmfException("Aggregate expression, " + aggregateExpression + ", must be a numeric data type (i.e., tinyint, smallint, int, bigint, double precision, float, numeric, decimal).");
                 
             }
         } else {
@@ -438,9 +442,9 @@ poll|poll
 //        for (int counter = 0; counter < expressionAliasMap.size(); ++counter) {
         //String groupByExpression : groupByExpressions) {
             String baseExpression = getBaseExpression(groupByExpression, matchingExpressionMap, baseColumns, "b");
-            Column baseColumn = getBaseColumn(groupByExpression, matchingExpressionMap, baseColumns);
+//            Column baseColumn = getBaseColumn(groupByExpression, matchingExpressionMap, baseColumns);
             String compareExpression = getCompareExpression(groupByExpression, matchingExpressionMap, compareColumns, "c");
-            Column compareColumn = getCompareColumn(groupByExpression, matchingExpressionMap, compareColumns);
+//            Column compareColumn = getCompareColumn(groupByExpression, matchingExpressionMap, compareColumns);
             
 //            selectSQL += (!selectSQL.equals("select ") ? ", " : "") + "coalesce(b." + baseColumn.getName() + ",c." + compareColumn.getName() + ") as " + groupByExpression + "";
 //            baseSelectSQL += (!baseSelectSQL.equals("select ") ? ", " : "") + "b." + baseColumn.getName();
@@ -467,13 +471,15 @@ poll|poll
 //        baseSelectSQL += ",count(1) as cnt";
 //        compareSelectSQL += ",count(1) as cnt";
         for (String aggregateExpression : aggregateExpressions) {
-            Column baseColumn = getBaseColumn(aggregateExpression, matchingExpressionMap, baseColumns);
-            Column compareColumn = getCompareColumn(aggregateExpression, matchingExpressionMap, compareColumns);
-            selectSQL += ",sum(b." + baseColumn.getName() + ") as " + aggregateExpression + "_b, sum(c." + compareColumn.getName() + ") as " + aggregateExpression + "_c, sum(c." + compareColumn.getName() + ") - sum(b." + baseColumn.getName() + ") as " + aggregateExpression + "_diff, abs(sum(c." + compareColumn.getName() + ") - sum(b." + baseColumn.getName() + ")) as " + aggregateExpression + "_absdiff, case when coalesce(sum(b." + baseColumn.getName() + "),0.0) <> 0.0 then (sum(c." + compareColumn.getName() + ") - sum(b." + baseColumn.getName() + ")) / sum(b." + baseColumn.getName() + ") * 100.0 else null::double precision end as " + aggregateExpression + "_pctdiff, case when coalesce(sum(b." + baseColumn.getName() + "),0.0) <> 0.0 then abs((sum(c." + compareColumn.getName() + ") - sum(b." + baseColumn.getName() + ")) / sum(b." + baseColumn.getName() + ") * 100.0) else null::double precision end as " + aggregateExpression + "_abspctdiff";
-            baseSelectSQL += ",sum(b." + baseColumn.getName() + ") as " + baseColumn.getName() + "";
-            compareSelectSQL += ",sum(c." + compareColumn.getName() + ") as " + compareColumn.getName() + "";
-            baseUnionSelectSQL += ",sum(b." + baseColumn.getName() + ") as " + baseColumn.getName() + "";
-            compareUnionSelectSQL += ",sum(c." + compareColumn.getName() + ") as " + compareColumn.getName() + "";
+//            Column baseColumn = getBaseColumn(aggregateExpression, matchingExpressionMap, baseColumns);
+            String baseAggregateExpression = getBaseExpression(aggregateExpression, matchingExpressionMap, baseColumns, "b");
+//            Column compareColumn = getCompareColumn(aggregateExpression, matchingExpressionMap, compareColumns);
+            String compareAggregateExpression = getCompareExpression(aggregateExpression, matchingExpressionMap, compareColumns, "c");
+            selectSQL += ",sum(b.\"" + aggregateExpression + "\") as \"" + aggregateExpression + "_b\", sum(c.\"" + aggregateExpression + "\") as \"" + aggregateExpression + "_c\", sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\") as \"" + aggregateExpression + "_diff\", abs(sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) as \"" + aggregateExpression + "_absdiff\", case when coalesce(sum(b.\"" + aggregateExpression + "\"),0.0) <> 0.0 then (sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) / sum(b.\"" + aggregateExpression + "\") * 100.0 else null::double precision end as \"" + aggregateExpression + "_pctdiff\", case when coalesce(sum(b.\"" + aggregateExpression + "\"),0.0) <> 0.0 then abs((sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) / sum(b.\"" + aggregateExpression + "\") * 100.0) else null::double precision end as \"" + aggregateExpression + "_abspctdiff\"";
+            baseSelectSQL += ",sum(" + baseAggregateExpression + ") as \"" + aggregateExpression + "\"";
+            compareSelectSQL += ",sum(" + compareAggregateExpression + ") as \"" + aggregateExpression + "\"";
+            baseUnionSelectSQL += ",sum(\"" + aggregateExpression + "\") as \"" + aggregateExpression + "\"";
+            compareUnionSelectSQL += ",sum(\"" + aggregateExpression + "\") as \"" + aggregateExpression + "\"";
         }
 
         //build inner sql statement with the datasets specified, make sure and unionize (append) the tables together
@@ -532,11 +538,11 @@ poll|poll
     }
 
     private Column getBaseColumn(String columnName, Map<String,ColumnMatchingMap> columnMatchingMap, Map<String,Column> baseColumns) {
-        Column baseColumn = baseColumns.get(columnName);
+        Column baseColumn = baseColumns.get(columnName.toLowerCase());
         if (baseColumn != null) {
             return baseColumn;
         }
-        return baseColumns.get(columnMatchingMap.get(columnName).getDataset1Expression());
+        return baseColumns.get(columnMatchingMap.get(columnName.toLowerCase()).getBaseExpression());
     }
     
     private boolean expressionExists(String expression, Map<String,Column> columns) {
@@ -544,8 +550,13 @@ poll|poll
         Iterator<String> iterator = columnsKeySet.iterator();
         while (iterator.hasNext()) {
             String columnName = iterator.next();
-            if (expression.toLowerCase().contains(columnName.toLowerCase())) 
+            Pattern pattern = getPattern(columnName);
+            Matcher matcher = pattern.matcher(expression);
+
+            //check to see if anything is found...
+            if (matcher.find()) {
                 return true;
+            }
         }
         return false;
     }
@@ -558,8 +569,8 @@ poll|poll
         Set<String> columnMatchingMapKeySet = columnMatchingMap.keySet();
         Iterator<String> iterator = columnMatchingMapKeySet.iterator();
         while (iterator.hasNext()) {
-            String columnName = iterator.next();
-            if (expression.toLowerCase().contains(columnName.toLowerCase())) 
+            String mappingExpression = iterator.next();
+            if (expression.toLowerCase().equals(mappingExpression)) 
                 return true;
         }
         
@@ -569,69 +580,104 @@ poll|poll
     private String getBaseExpression(String expression, Map<String,ColumnMatchingMap> columnMatchingMap, Map<String,Column> baseColumns, String tableAlias) throws EmfException {
         Set<String> columnsKeySet = baseColumns.keySet();
         Iterator<String> iterator = columnsKeySet.iterator();
-        while (iterator.hasNext()) {
-            String columnName = iterator.next();
-            if (expression.toLowerCase().contains(columnName.toLowerCase())) 
-                return expression.replace(columnName, tableAlias + "." + columnName);
+        String aliasedExpression = expression;
+        
+        //see if there is a mapping if so override the expression
+        if (columnMatchingMap.get(expression.toLowerCase()) != null) {
+            aliasedExpression = columnMatchingMap.get(expression.toLowerCase()).getBaseExpression();
         }
         
-        //didn't find the column in the known list of columns, lets see if there is a mapping for this.
-        Set<String> columnMatchingMapKeySet = columnMatchingMap.keySet();
-        iterator = columnMatchingMapKeySet.iterator();
+        //find all column names in the expression and alias each one
+        
+        //first check the expressions contains columns from the base dataset
         while (iterator.hasNext()) {
             String columnName = iterator.next();
-            if (expression.toLowerCase().contains(columnName.toLowerCase())) 
-                return columnMatchingMap.get(columnName).getDataset1Expression().replace(columnName, tableAlias + "." + columnName);
+
+            Pattern pattern = getPattern(columnName);
+            Matcher matcher = pattern.matcher(aliasedExpression);
+
+            //check to see if anything is found...
+            if (matcher.find()) {
+                aliasedExpression = matcher.replaceAll(tableAlias + ".\"" + baseColumns.get(columnName).getName() + "\"");
+            }
         }
-//
-//        return columnMatchingMap.get(expression).getDataset1Expression();
+        //something has changed, go ahead and return now
+        if (!aliasedExpression.equals(expression)) 
+            return aliasedExpression;
+        
         throw new EmfException("Unknown base dataset expression.");
     }
     
+    
+    //Patterns are expensive, so lets use a map to cache them...
+    private Map<String,Pattern> patternMap = new HashMap<String,Pattern> ();
+    
+    private Pattern getPattern(String columnName) {
+        if (!patternMap.containsValue(columnName))
+            patternMap.put(columnName, Pattern.compile("\\b(?i)" + columnName + "\\b"));
+        return patternMap.get(columnName);
+    }
+    
+    
+//    Pattern pattern = Pattern.compile("\\b(?i)" + columnName + "\\b");
+//    Matcher matcher = pattern.matcher(aliasedExpression);
+//
+//    //find all column names in the expression and alias each one
+//    //check to see if anything is found...
+//    if (matcher.find()) {
+//        
+//        aliasedExpression = matcher.replaceAll(tableAlias + "." + columnName);
+//        ++matchedColumnsCount;
     private String getCompareExpression(String expression, Map<String,ColumnMatchingMap> columnMatchingMap, Map<String,Column> compareColumns, String tableAlias) throws EmfException {
         Set<String> columnsKeySet = compareColumns.keySet();
         Iterator<String> iterator = columnsKeySet.iterator();
-        while (iterator.hasNext()) {
-            String columnName = iterator.next();
-            if (expression.toLowerCase().contains(columnName.toLowerCase())) 
-                return expression.replace(columnName, tableAlias + "." + columnName);
+        String aliasedExpression = expression;
+
+        //see if there is a mapping if so override the expression
+        if (columnMatchingMap.get(expression.toLowerCase()) != null) {
+            aliasedExpression = columnMatchingMap.get(expression.toLowerCase()).getCompareExpression();
         }
         
-        //didn't find the column in the known list of columns, lets see if there is a mapping for this.
-        Set<String> columnMatchingMapKeySet = columnMatchingMap.keySet();
-        iterator = columnMatchingMapKeySet.iterator();
         while (iterator.hasNext()) {
             String columnName = iterator.next();
-            if (expression.toLowerCase().contains(columnName.toLowerCase())) 
-                return columnMatchingMap.get(columnName).getDataset2Expression().replace(columnName, tableAlias + "." + columnName);
+            Pattern pattern = getPattern(columnName);
+            Matcher matcher = pattern.matcher(aliasedExpression);
+
+            //check to see if anything is found...
+            if (matcher.find()) {
+                aliasedExpression = matcher.replaceAll(tableAlias + ".\"" + compareColumns.get(columnName).getName() + "\"");
+            }
         }
+        //something has changed, go ahead and return now
+        if (!aliasedExpression.equals(expression)) 
+            return aliasedExpression;
 
         throw new EmfException("Unknown compare dataset expression.");
     }
     
-    private String getCompareExpression(String expression, Map<String,Column> compareColumns, String tableAlias) {
-        Set<String> columnsKeySet = compareColumns.keySet();
-        Iterator<String> iterator = columnsKeySet.iterator();
-        while (iterator.hasNext()) {
-            String columnName = iterator.next();
-            if (expression.toLowerCase().contains(columnName.toLowerCase())) 
-                return expression.replace(columnName, tableAlias + "." + columnName);
-        }
-        return null;
-    }
-    
     private Column getCompareColumn(String columnName, Map<String,ColumnMatchingMap> columnMatchingMap, Map<String,Column> compareColumns) {
-        Column compareColumn = compareColumns.get(columnName);
+        Column compareColumn = compareColumns.get(columnName.toLowerCase());
         if (compareColumn != null) {
             return compareColumn;
         }
-        return compareColumns.get(columnMatchingMap.get(columnName).getDataset2Expression());
+        return compareColumns.get(columnMatchingMap.get(columnName.toLowerCase()).getCompareExpression());
     }
     
     private Map<String,Column> getDatasetColumnMap(EmfDataset dataset) throws SQLException {
         if (dataset.getInternalSources() == null )
-            throw new SQLException("Dataset, " + dataset.getName() + ", does't have iternalsources. " );
-        return new TableMetaData(datasource).getColumnMap(dataset.getInternalSources()[0].getTable());
+            throw new SQLException("Dataset, " + dataset.getName() + ", does't have internalsources. " );
+        Map<String,Column> datasetColumnMap = new TableMetaData(datasource).getColumnMap(dataset.getInternalSources()[0].getTable());
+        Map<String,Column> lowerCaseDatasetColumnMap = new HashMap<String,Column>();
+        
+        //let's make sure and add ONLY user lower case versions so there is a consistent map regardless of case...
+        Set<String> columnsKeySet = datasetColumnMap.keySet();
+        Iterator<String> iterator = columnsKeySet.iterator();
+        while (iterator.hasNext()) {
+            String columnName = iterator.next();
+            lowerCaseDatasetColumnMap.put(columnName.toLowerCase(), datasetColumnMap.get(columnName));
+        }
+        
+        return lowerCaseDatasetColumnMap;
     }
 
     private Version version(int datasetId, int version) {

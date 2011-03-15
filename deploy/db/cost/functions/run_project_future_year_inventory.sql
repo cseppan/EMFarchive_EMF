@@ -67,6 +67,8 @@ DECLARE
 	has_control_measures_col boolean := false;
 	has_pct_reduction_col boolean := false;
 	sql character varying := '';
+	compliance_date_cutoff_daymonth varchar(256) := '';
+	effective_date_cutoff_daymonth varchar(256) := '';
 BEGIN
 
 	-- get the input dataset info
@@ -216,6 +218,18 @@ BEGIN
 
 	chained_gdp_adjustment_factor := cost_year_chained_gdp / ref_cost_year_chained_gdp;
 
+	-- load the Compliance and Effective Date Cutoff Day/Month (Stored as properties)
+	select value
+	from emf.properties
+	where "name" = 'COST_PROJECT_FUTURE_YEAR_COMPLIANCE_DATE_CUTOFF_MONTHDAY'
+	into compliance_date_cutoff_daymonth;
+	compliance_date_cutoff_daymonth := coalesce(compliance_date_cutoff_daymonth, '07/01');	--default just in case
+	select value
+	from emf.properties
+	where "name" = 'COST_PROJECT_FUTURE_YEAR_EFFECTIVE_DATE_CUTOFF_MONTHDAY'
+	into effective_date_cutoff_daymonth;
+	effective_date_cutoff_daymonth := coalesce(effective_date_cutoff_daymonth, '07/01');	--default just in case
+	
 	uncontrolled_emis_sql := 
 			case 
 				when dataset_month != 0 then 
@@ -373,8 +387,8 @@ BEGIN
 				and coalesce(pc.segment, inv.segment) = inv.segment
 				' else '' end || '
 
-				-- make sure and keep even if in the same year, they might not have closed, and dont worry about prorating...
-				and date_part(''year'', pc.effective_date::timestamp without time zone) < ' || inventory_year || '
+				-- only keep if before cutoff date
+				and pc.effective_date::timestamp without time zone < ''' || effective_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 
 				and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'pc') || '
 
@@ -637,8 +651,9 @@ BEGIN
 			END IF;
 			--see http://www.smoke-model.org/version2.4/html/ch06s02.html for source matching hierarchy
 			sql := sql || '
-			select distinct on (record_id)
-				record_id,ceff,rpen,reff,pri_cm_abbrev,replacement,
+			select 
+				--distinct on (record_id)
+				record_id,ceff,rpen,reff,pri_cm_abbrev,replacement,compliance_date,
 				' || quote_literal(control_program.control_program_name) || ' as control_program_name, ' || control_program.control_program_id || ' as control_program_id,
 				' || control_program.control_program_technologies_count || ' as control_program_technologies_count, ' || control_program.control_program_measures_count || ' as control_program_measures_count, 
 				ranking
@@ -646,13 +661,12 @@ BEGIN
 				--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
 				select 
 					null::integer as record_id, null::double precision as ceff, null::double precision as rpen,
-					null::double precision as reff, null::character varying(10) as pri_cm_abbrev, null::character varying(1) as replacement, null::integer as ranking
+					null::double precision as reff, null::character varying(10) as pri_cm_abbrev, null::character varying(1) as replacement, null::timestamp without time zone as compliance_date, null::integer as ranking
 				where 1 = 0
 
-				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.ceff,proj.rpen,proj.reff,proj.pri_cm_abbrev,proj.replacement,',control_program_dataset_filter_sql || ' and proj.application_control = ''Y'' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone') || '
---				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.cap,proj.replacement,case when replacement is not null then ''R'' when cap is not null then ''C'' end as allowable_type,',control_program_dataset_filter_sql || ' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and ''1/1/' || inventory_year || '''::timestamp without time zone >= coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone)') || '
+				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.ceff,proj.rpen,proj.reff,proj.pri_cm_abbrev,proj.replacement,proj.compliance_date,',control_program_dataset_filter_sql || ' and proj.application_control = ''Y'' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone') || '
 
-				order by record_id, replacement, ranking	
+				--order by record_id, replacement, ranking, coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) desc
 			 ) tbl';
 		END IF;
 
@@ -669,7 +683,7 @@ BEGIN
 				control_program_technologies_count, control_program_measures_count, 
 				ranking
 			from (' || sql;
-		sql := sql || ') tbl order by record_id, replacement, ranking';
+		sql := sql || ') tbl order by record_id, replacement, ranking, coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) desc';
 
 		inv_percent_reduction_sql := '(coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end, 0.0) * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end, 100) / 100 ' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end, 100.0) / 100.0 ' else '' end || ')';
 		cont_packet_percent_reduction_sql := '(cont.ceff * coalesce(cont.reff, 100) / 100 * coalesce(cont.rpen, 100) / 100)';
@@ -1003,20 +1017,20 @@ BEGIN
 			END IF;
 			--see http://www.smoke-model.org/version2.4/html/ch06s02.html for source matching hierarchy
 			sql := sql || '
-			select distinct on (record_id, allowable_type)
-				record_id,cap,replacement,allowable_type,
+			select 
+				--distinct on (record_id, allowable_type)
+				record_id,cap,replacement,allowable_type,compliance_date,
 				' || quote_literal(control_program.control_program_name) || ' as control_program_name, 
 				' || control_program.control_program_technologies_count || ' as control_program_technologies_count, ' || control_program.control_program_measures_count || ' as control_program_measures_count, 
 				ranking
 			from (
 				--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
 				select 
-					null::integer as record_id, null::double precision as cap, null::double precision as replacement, null::varchar(1) as allowable_type, null::integer as ranking
+					null::integer as record_id, null::double precision as cap, null::double precision as replacement, null::varchar(1) as allowable_type, null::timestamp without time zone as compliance_date, null::integer as ranking
 				where 1 = 0
 
-				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.cap,proj.replacement,case when replacement is not null then ''R'' when cap is not null then ''C'' end as allowable_type,',control_program_dataset_filter_sql || ' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone) >= ''1/1/' || inventory_year || '''::timestamp without time zone') || '
---				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.cap,proj.replacement,case when replacement is not null then ''R'' when cap is not null then ''C'' end as allowable_type,',control_program_dataset_filter_sql || ' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and ''1/1/' || inventory_year || '''::timestamp without time zone >= coalesce(proj.compliance_date, ''1/1/' || inventory_year || '''::timestamp without time zone)') || '
-				order by record_id, allowable_type, ranking
+				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.cap,proj.replacement,case when replacement is not null then ''R'' when cap is not null then ''C'' end as allowable_type,',control_program_dataset_filter_sql || ' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone') || '
+				--order by record_id, allowable_type, ranking, compliance_date desc
 			) tbl';
 		END IF;
 
@@ -1026,13 +1040,13 @@ BEGIN
 	IF length(sql) > 0 THEN
 		raise notice '%', 'next lets do caps and replacemnts ' || clock_timestamp();
 
-		sql := 'select distinct on (record_id)
+		sql := 'select distinct on (record_id, allowable_type)
 				record_id,cap,replacement,allowable_type,
 				control_program_name, 
 				control_program_technologies_count, control_program_measures_count, 
 				ranking
 			from (' || sql;
-		sql := sql || ') tbl order by record_id, allowable_type, ranking';
+		sql := sql || ') tbl order by record_id, allowable_type, ranking, coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) desc';
 
 		uncontrolled_emis_sql := 
 				case 

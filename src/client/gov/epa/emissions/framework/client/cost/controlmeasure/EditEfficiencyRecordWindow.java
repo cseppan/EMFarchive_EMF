@@ -29,7 +29,7 @@ public class EditEfficiencyRecordWindow extends EfficiencyRecordWindow implement
     public void populateFields() {
         pollutant.setSelectedItem(record.getPollutant());
         equationType.setSelectedItem(record.getEquationType());
-        efficiency.setText(record.getEfficiency() + "");
+        efficiency.setText((record.getEfficiency() != null ? record.getEfficiency() : "") + "");
         minEmis.setText((record.getMinEmis() != null ? record.getMinEmis() : "") + "");
         maxEmis.setText((record.getMaxEmis() != null ? record.getMaxEmis() : "") + "");
         costYear.setText((record.getCostYear() != null ? record.getCostYear() : "") + "");

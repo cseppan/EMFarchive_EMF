@@ -71,8 +71,8 @@ public class SCCControlMeasureMap {
 
         // Recursively check if there are two control measures that have the same control
         // efficiency
-        float previousEff = getEfficiency(previous);
-        float nextEff = getEfficiency(next);
+        Double previousEff = getEfficiency(previous);
+        Double nextEff = getEfficiency(next);
         
         if ( previousEff > nextEff)
             return previous;
@@ -116,7 +116,7 @@ public class SCCControlMeasureMap {
         return temp;
     }
 
-    private float getEfficiency(ControlMeasure measure) {
+    private Double getEfficiency(ControlMeasure measure) {
         EfficiencyRecord[] records = measure.getEfficiencyRecords();
 
         for (int i = 0; i < records.length; i++) {
@@ -125,7 +125,7 @@ public class SCCControlMeasureMap {
                 return records[i].getEfficiency();
         }
 
-        return 0; // assume efficiency >= 0;
+        return 0D; // assume efficiency >= 0;
     }
     
 }

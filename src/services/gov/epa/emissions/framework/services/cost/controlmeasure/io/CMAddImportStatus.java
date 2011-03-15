@@ -24,7 +24,7 @@ public class CMAddImportStatus {
             setStatus("Line "+lineNo + ": " + message);
     }
 
-    private void setStatus(String message) {
+    public void setStatus(String message) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
         endStatus.setType("CMImportDetailMsg");
@@ -35,7 +35,7 @@ public class CMAddImportStatus {
     }
 
     public String format(String text) {
-        return "   " + text + "\n";
+        return text + "\n";
     }
 
 }

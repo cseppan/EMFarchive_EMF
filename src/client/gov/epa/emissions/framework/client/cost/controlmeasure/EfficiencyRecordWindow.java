@@ -446,7 +446,10 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
 
         String dateStr = this.effectiveDate.getText().trim();
         String fieldName = "Effective Date";
-        Utils.validateDate(dateStr, fieldName);
+        //only validate if a date was specified
+        if (!dateStr.isEmpty()) {
+            Utils.validateDate(dateStr, fieldName);
+        }
         try {
             record.setEffectiveDate(CustomDateFormat.parse_MMddyyyy(dateStr));
         } catch (ParseException e) {
@@ -531,20 +534,12 @@ public abstract class EfficiencyRecordWindow extends DisposableInteralFrame {
     }
 
     private void saveEfficiency(TextField efficiency) throws EmfException {
-        if (efficiency.getText().trim().length() == 0)
-            throw new EmfException("Enter the Control Efficiency as a percentage (e.g., 90 for 90% reduction, or -10 for a 10% disbenefit)");
-
-        float value = verifier.parseFloat(efficiency);
-
-        //make sure the number makes sense...
-        if (value > 100)
-            throw new EmfException("The Control Efficiency can't be more than 100%.");
-
-        if (value < -100)
-            throw new EmfException("The Control Efficiency can't be less than -100%.");
-
-        if ((value >= 0) && (value <= 1)) // shouldn't have control efficiencies between 0 and 1
-            throw new EmfException("Enter the Control Efficiency as a percentage (e.g., 90 for 90% reduction, or -10 for a 10% disbenefit)");          
+        String efficiencyStr = efficiency.getText().trim();
+        Double value = null;
+        
+        //Only validate if something was specified 
+        if (!efficiencyStr.isEmpty())
+            value = verifier.parseDouble(efficiency);
         
         record.setEfficiency(value);
     }

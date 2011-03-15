@@ -66,6 +66,7 @@ public class RetrieveEfficiencyRecord {
         List effRecs = new ArrayList<EfficiencyRecord>();
         int costYear = 0;
         double costPerTon = 0;
+        double eff = 0;
         double minEmis = 0;
         double maxEmis = 0;
         double capRecFactor=0;
@@ -83,7 +84,8 @@ public class RetrieveEfficiencyRecord {
                 effRec.setExistingMeasureAbbr(rs.getString(6));
                 effRec.setExistingDevCode(rs.getInt(7));
                 effRec.setLocale(rs.getString(8));
-                effRec.setEfficiency(rs.getFloat(9));
+                eff = rs.getDouble(9);
+                effRec.setEfficiency(!rs.wasNull() ? eff : null);
                 costYear = rs.getInt(10);
                 effRec.setCostYear(!rs.wasNull() ? costYear : null);
                 costPerTon = rs.getDouble(11);

@@ -43,10 +43,11 @@ BEGIN
 		ELSE
 			index_name := index_name_prefix || '_' || table_name;
 		END IF;
-		execute 'CREATE INDEX ' || index_name || '
+/*		execute 'CREATE INDEX ' || index_name || '
 				ON emissions.' || table_name || '
 				USING btree
 				(' || table_col_list || ')';
+*/
 	END IF;
 END;
 $BODY$
@@ -116,3 +117,4 @@ $BODY$
   LANGUAGE 'plpgsql' VOLATILE;
 ALTER FUNCTION public.create_table_index(table_name character varying, table_col_list character varying, index_name_prefix character varying, clustered boolean) OWNER TO emf;
 
+SELECT public.create_table_index('DS_ptinv_ptnonipm_2020cc_1068478967','record_id','idx_94cccddf2c524dd39e0374e4698ebf9f',true::boolean);

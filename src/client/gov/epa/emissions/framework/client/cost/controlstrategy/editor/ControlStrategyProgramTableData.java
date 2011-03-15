@@ -26,14 +26,14 @@ public class ControlStrategyProgramTableData extends AbstractTableData {
         return rows;
     }
 
-    private Row row(ControlProgram controlTechnology) {
-        Object[] values = { controlTechnology.getName(), controlTechnology.getDescription() };
-        return new ViewableRow(controlTechnology, values);
+    private Row row(ControlProgram controlProgram) {
+        Object[] values = { controlProgram.getName(), controlProgram.getDescription(), (controlProgram.getControlProgramType() != null ? controlProgram.getControlProgramType().getName() : ""), (controlProgram.getDataset() != null ? controlProgram.getDataset().getName() : ""), (controlProgram.getDatasetVersion() != null ? controlProgram.getDatasetVersion() + "" : "") };
+        return new ViewableRow(controlProgram, values);
     }
 
    
     public String[] columns() {
-        return new String[] { "Name", "Desc" };
+        return new String[] { "Name", "Desc", "Type", "Dataset", "Dataset Version" };
     }
 
     public Class getColumnClass(int col) {

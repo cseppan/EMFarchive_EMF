@@ -53,7 +53,7 @@ public class EfficiencyRecordGenerator {
         tokens.add("" + efficiencyRecord.getExistingMeasureAbbr());
         tokens.add("" + efficiencyRecord.getExistingDevCode());
         tokens.add("" + efficiencyRecord.getLocale());
-        tokens.add("" + efficiencyRecord.getEfficiency());
+        tokens.add("" + (efficiencyRecord.getEfficiency() != null ? efficiencyRecord.getEfficiency() : ""));
         tokens.add("" + 0);
         tokens.add("" + (efficiencyRecord.getCostYear() != null ? efficiencyRecord.getCostYear() : ""));
         tokens.add("" + (efficiencyRecord.getCostPerTon() != null ? efficiencyRecord.getCostPerTon() : ""));
@@ -61,8 +61,8 @@ public class EfficiencyRecordGenerator {
         tokens.add("" + efficiencyRecord.getRuleEffectiveness());
         tokens.add("" + efficiencyRecord.getRulePenetration());
         tokens.add("" + efficiencyRecord.getEquationType());
-        tokens.add("" + efficiencyRecord.getCapRecFactor());
-        tokens.add("" + efficiencyRecord.getDiscountRate());
+        tokens.add("" + (efficiencyRecord.getCapRecFactor() != null ? efficiencyRecord.getCapRecFactor() : ""));
+        tokens.add("" + (efficiencyRecord.getDiscountRate() != null ? efficiencyRecord.getDiscountRate() : ""));
         
         tokens.add("" + efficiencyRecord.getDetail());
         tokens.add("" + (efficiencyRecord.getEffectiveDate() == null ? "" : efficiencyRecord.getEffectiveDate()));

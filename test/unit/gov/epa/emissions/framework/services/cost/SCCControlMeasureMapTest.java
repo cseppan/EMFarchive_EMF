@@ -113,7 +113,7 @@ public class SCCControlMeasureMapTest extends TestCase {
         
         EfficiencyRecord efficiencyRecord = new EfficiencyRecord();
         efficiencyRecord.setPollutant(new Pollutant("NOx"));
-        efficiencyRecord.setEfficiency((float) (50+addEfficiency));
+        efficiencyRecord.setEfficiency((double) (50+addEfficiency));
         cm.setEfficiencyRecords(new EfficiencyRecord[]{efficiencyRecord});
         
         cm.setSccs(cmSccs);
