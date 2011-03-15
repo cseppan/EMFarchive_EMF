@@ -166,7 +166,6 @@ public class HibernateFacade {
     public void removeObjects(Object[] objects, Session session) {
         Transaction tx = null;
         if ((session == null) || (!session.isConnected())){
-            System.out.print("Session null or not connected in removeObjects");
             throw new IllegalArgumentException("Session null or not connected in removeObjects");
         }
         try {

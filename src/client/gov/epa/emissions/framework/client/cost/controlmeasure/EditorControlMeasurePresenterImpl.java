@@ -138,7 +138,6 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
         if (retVal == JFileChooser.APPROVE_OPTION) {
 
             reportFile = fileChooser.getSelectedFile();
-            System.out.println("Saving: " + reportFile.getName() + ".");
 
             ControlMeasurePDFReportGenerator generator = new ControlMeasurePDFReportGenerator();
             generator.setSession(session);

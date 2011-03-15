@@ -75,7 +75,6 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         for (int i = 0; i < datasets.length; i++) {
             File localFile = new File(tempResultFilePath(datasets[i]));
             try {
-                System.out.println("Trying to open file "+localFile);
                 if (!localFile.exists() || localFile.lastModified() != datasets[i].getModifiedDateTime().getTime()) {
                     Writer output = new BufferedWriter(new FileWriter(localFile));
                     try {

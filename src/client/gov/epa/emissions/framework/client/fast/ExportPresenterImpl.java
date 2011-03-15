@@ -78,7 +78,6 @@ public class ExportPresenterImpl implements ExportPresenter {
         } catch (Exception e) {
             // NOTE Auto-generated catch block
             e.printStackTrace();
-            System.out.println("Exporting outputs failed.");
             throw new EmfException(e.getMessage());
         }
 
