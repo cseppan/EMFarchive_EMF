@@ -100,6 +100,7 @@ public class EditSectorScenarioOptionsTab extends JPanel implements EditSectorSc
         
         this.exportOutput = new JCheckBox("transfer");
         this.exportOutput.setSelected(sectorScenario.getExportOutput());
+        this.exportOutput.setEnabled( false);
         
         radioPanel.add(new JLabel(" "));
         radioPanel.add(new JLabel("Transfer Sector Scenario Output"));
