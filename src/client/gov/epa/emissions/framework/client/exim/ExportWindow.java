@@ -109,7 +109,9 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private JPanel createLayout() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        //this will force tooltips to stay open for 5000 milliseconds
         ToolTipManager.sharedInstance().setDismissDelay(5000);
+        
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
         panel.add(createExportPanel());
@@ -125,6 +127,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         // datasets
         TextArea datasetNames = new TextArea("datasets", getDatasetsLabel(datasets), width+10, 6);
         datasetNames.setEditable(false);
+        datasetNames.setToolTipText("Dataset(s) that will be exported.");
         JScrollPane dsArea = new JScrollPane(datasetNames, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
@@ -133,6 +136,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         // folder
         JPanel chooser = new JPanel(new BorderLayout(10, 10));
         folder = new TextField("folder", width);
+        folder.setToolTipText("Folder to store exported dataset(s).");
         chooser.add(folder);
         chooser.add(browseFileButton(), BorderLayout.EAST);
         layoutGenerator.addLabelWidgetPair("Folder  ",chooser, panel);
@@ -148,12 +152,13 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         if (datasets.length == 1) {
             version = new ComboBox();
             version.setPreferredSize(new Dimension(445, 20));
+            version.setToolTipText("Version of dataset.");
             
             layoutGenerator.addLabelWidgetPair("Version  ", version, panel);
         }
         // Row Filter
         rowFilter = new TextArea("rowFilter", rowFilters, width+10, 2);
-        rowFilter.setToolTipText(rowFilter.getText());
+        rowFilter.setToolTipText("<html>SQL WHERE clause to use to filter dataset.<br/>For example to filter on a certain state,<br/>substring(fips,1,2) = '37'<br/>or<br/>fips like '37%'<html>");
         JScrollPane rowArea = new JScrollPane(rowFilter, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         layoutGenerator.addLabelWidgetPair("Row Filter ", rowArea, panel);
@@ -184,6 +189,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         // purpose
         //JPanel purposePanel = new JPanel(new BorderLayout(4,10));
         purpose = new TextArea("purpose", "", width+10, 4);
+        purpose.setToolTipText("<html>Records the purpose of the dataset export.</html>");
         JScrollPane purposeArea = new JScrollPane(purpose, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         layoutGenerator.addLabelWidgetPair("Purpose  ", purposeArea, panel);
@@ -194,6 +200,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         overwrite = new JCheckBox("Overwrite files if they exist?", false);
         overwrite.setEnabled(true);
         overwrite.setName("overwrite");
+        overwrite.setToolTipText("<html>Overwrite the existing export dataset file.</html>");
         //overwrite.setVisible(false);
         overwritePanel.add(overwrite, BorderLayout.LINE_START);
         //overwritePanel.setVisible(false);
@@ -215,6 +222,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         filterDatasetVersionWidget.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 //        filterDatasetVersionWidget.setModelSize(1);
         filterDatasetVersionWidget.setPreferredSize(new Dimension(550, 80));
+        filterDatasetVersionWidget.setToolTipText("<html>Dataset and version to use as filter.  The \"Filter Dataset Join Condition\" needs to be specified when using a dataset filter.<html>");
+
 //        List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
 //        if(baseDatasetVersions != null && baseDatasetVersions.length > 0) {
 //            
