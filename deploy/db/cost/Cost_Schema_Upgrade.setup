@@ -1439,7 +1439,20 @@ CREATE INDEX control_measure_classes_name
    ON emf.control_measure_classes ("name" ASC NULLS LAST);
 
 
--- 3/3/2011 -- adding new equation type 12 to drive Petroleum Refineries Process Heaters
+
+-- 3/6/2011 
+CREATE INDEX idx_control_measure_properties_name
+   ON emf.control_measure_properties ("name" ASC NULLS LAST);
+
+-- check months table...
+
+
+-- 3/15/2011 Add new CoST propety to track Project Future Year Strategy Compliance and Effective 
+-- Date Cutoff DayMonth 
+insert into emf.properties values(DEFAULT, 'COST_PROJECT_FUTURE_YEAR_COMPLIANCE_DATE_CUTOFF_MONTHDAY', '07/01');
+insert into emf.properties values(DEFAULT, 'COST_PROJECT_FUTURE_YEAR_EFFECTIVE_DATE_CUTOFF_MONTHDAY', '07/01');
+
+-- 3/16/2011 -- adding new equation type 12 to drive Petroleum Refineries Process Heaters
 insert into emf.equation_types (name, description, inventory_fields, equation)
 select 'Type 12', 'NOx Controls for Gas-Fired Process Heaters at Petroleum Refineries Equations', 'stack_flow_rate,stack_temperature', 'stack_flow_rate (scfm) = stack_flow_rate (acfm) x 460 / (stack_temperature + 460)
 Total Capital Investment (TCI) = (Fixed TCI + Variable TCI) x (stack_flow_rate (scfm)/150,000)^.6
@@ -1463,15 +1476,3 @@ select e.id, 'Annual Operating Cost (AOC) Variable Factor', (select COALESCE(max
 from emf.equation_types as e 
 where name = 'Type 12';
 
-
--- 3/6/2011 
-CREATE INDEX idx_control_measure_properties_name
-   ON emf.control_measure_properties ("name" ASC NULLS LAST);
-
--- check months table...
-
-
--- 12/5/2010 Add new CoST propety to track Project Future Year Strategy Compliance and Effective 
--- Date Cutoff DayMonth 
-insert into emf.properties values(DEFAULT, 'COST_PROJECT_FUTURE_YEAR_COMPLIANCE_DATE_CUTOFF_MONTHDAY', '07/01');
-insert into emf.properties values(DEFAULT, 'COST_PROJECT_FUTURE_YEAR_EFFECTIVE_DATE_CUTOFF_MONTHDAY', '07/01');
