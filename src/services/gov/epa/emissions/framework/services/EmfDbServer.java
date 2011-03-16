@@ -35,7 +35,6 @@ public class EmfDbServer implements DbServer {
             dbServer = new PostgresDbServer(datasource.getConnection(), EmfDbServer.EMF_REFERENCE_SCHEMA,
                     EmfDbServer.EMF_EMISSIONS_SCHEMA,EmfDbServer.EMF_EMF_SCHEMA);
         }
-            
     }
 
     public Datasource getEmissionsDatasource() {

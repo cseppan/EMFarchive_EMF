@@ -1227,21 +1227,21 @@ public class SectorScenarioTask {
                                    sectorScenario.getExportOutput();
             if ( exportSector) 
             {
-//                status = "Start to copy the outputs to Sandbox Database";
-//                setStatus(status);
-//                for (int i = 0; i < sectorScenarioInventories.length; i++) {
-//                    try {
-//                        if ( sectorScenarioOutputs[i] != null) {
-//                            copyOutputToSandboxDB( sectorScenarioOutputs[i], sectorScenarioInventories[i]);
-//                        }
-//                    } catch ( EmfException e) {
-//                        status = "Error occured when transfering " + sectorScenarioOutputs[i].getOutputDataset().getName() + " to Sandbox Database: " + e.getMessage(); // more details needed
-//                        setStatus(status);
-//                        //throw e;
-//                    }
-//                }
-//                status = "Completed copying the outputs to Sandbox Database";
-//                setStatus(status);
+                status = "Start to copy the outputs to Sandbox Database";
+                setStatus(status);
+                for (int i = 0; i < sectorScenarioInventories.length; i++) {
+                    try {
+                        if ( sectorScenarioOutputs[i] != null) {
+                            copyOutputToSandboxDB( sectorScenarioOutputs[i], sectorScenarioInventories[i]);
+                        }
+                    } catch ( EmfException e) {
+                        status = "Error occured when transfering " + sectorScenarioOutputs[i].getOutputDataset().getName() + " to Sandbox Database: " + e.getMessage(); // more details needed
+                        setStatus(status);
+                        //throw e;
+                    }
+                }
+                status = "Completed copying the outputs to Sandbox Database";
+                setStatus(status);
             }
             sectorScenarioOutputs = null;
         } catch (Exception e) {

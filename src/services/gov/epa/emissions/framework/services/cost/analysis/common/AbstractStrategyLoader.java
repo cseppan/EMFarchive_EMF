@@ -122,7 +122,6 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         } catch (Exception e) {
             throw new EmfException("Could not disconnect DbServer - " + e.getMessage());
         }
-
     }
 
     protected ControlStrategyResult createStrategyResult(EmfDataset inputDataset, int inputDatasetVersion) throws EmfException {
