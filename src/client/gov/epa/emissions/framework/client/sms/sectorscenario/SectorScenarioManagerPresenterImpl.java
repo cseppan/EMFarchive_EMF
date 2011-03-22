@@ -69,8 +69,8 @@ public class SectorScenarioManagerPresenterImpl implements RefreshObserver, Sect
         presenter.doDisplay();
     }
 
-    public void doRemove(int[] ids) {
-        //service().;
+    public void doRemove(int[] ids) throws EmfException {
+        service().removeSectorScenarios(ids, session.user());
     }
 
     public void doSaveCopiedSectorScenarios(int id, User creator) throws EmfException {

@@ -36,6 +36,7 @@ public class SectorScenario implements Lockable, Serializable {
     private Project project;
     private Boolean deleteResults = true;
     private Boolean exportOutput = false;
+    private Boolean straightEecsMatch;
 
     public static final short CREATE_SINGLE_INVENTORY = 0;
     public static final short CREATE_N_SECTOR_INVENTORIES = 1;
@@ -304,4 +305,13 @@ public class SectorScenario implements Lockable, Serializable {
     public Boolean getExportOutput() {
         return exportOutput;
     }
+
+    public Boolean getStraightEecsMatch() {
+        return straightEecsMatch;
+    }
+
+    public void setStraightEecsMatch(Boolean straightEecsMatch) {
+        this.straightEecsMatch = straightEecsMatch;
+    }
+
 }

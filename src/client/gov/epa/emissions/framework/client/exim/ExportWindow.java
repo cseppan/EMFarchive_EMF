@@ -218,6 +218,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     }
     
     private JPanel createFilterDatasetVersion() throws EmfException {
+        
         filterDatasetVersionWidget = new AddRemoveDatasetVersionWidget(true, 1, this, parentConsole, session);
         filterDatasetVersionWidget.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 //        filterDatasetVersionWidget.setModelSize(1);

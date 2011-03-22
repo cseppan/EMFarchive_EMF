@@ -54,6 +54,7 @@
   	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
 	<property name="deleteResults" column="delete_results" type="boolean" not-null="false"/>
 	<property name="exportOutput" column="export_output" type="java.lang.Boolean" not-null="true"/>
+	<property name="straightEecsMatch" column="straight_eecs_match" type="java.lang.Boolean" not-null="true"/>
 
   </class> 
 </hibernate-mapping>  

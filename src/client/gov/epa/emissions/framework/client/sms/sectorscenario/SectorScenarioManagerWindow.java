@@ -194,7 +194,6 @@ public class SectorScenarioManagerWindow extends ReusableInteralFrame implements
             }
         });
         crudPanel.add(removeButton);
-        removeButton.setEnabled(false);
         
         Button copyButton = new CopyButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

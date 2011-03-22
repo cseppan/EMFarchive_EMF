@@ -46,7 +46,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
     private synchronized void init(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
-        dao = new SectorScenarioDAO();
+        dao = new SectorScenarioDAO(dbServerFactory, sessionFactory);
         threadPool = createThreadPool();
 
     }
@@ -71,7 +71,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             List cs = dao.all(session);
             return (SectorScenario[]) cs.toArray(new SectorScenario[0]);
         } catch (HibernateException e) {
-            LOG.error("Could not retrieve all sector scenarios." +e.getMessage());
+            LOG.error("Could not retrieve all sector scenarios." + e.getMessage());
             throw new EmfException("Could not retrieve all sector scenarios.");
         } finally {
             session.close();
@@ -112,8 +112,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
 
             return locked;
         } catch (Exception e) {
-            LOG.error("Could not obtain lock for Sector Scenario: id = " + id + " by owner: "
-                            + owner.getUsername(), e);
+            LOG.error("Could not obtain lock for Sector Scenario: id = " + id + " by owner: " + owner.getUsername(), e);
             throw new EmfException("Could not obtain lock for Sector Scenario: id = " + id + " by owner: "
                     + owner.getUsername());
         } finally {
@@ -181,7 +180,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
                         exception += "The Sector Scenario, " + cs.getName()
                                 + ", is in edit mode and can not be removed. ";
                     else
-                        remove(cs);
+                        remove(cs, user);
                 } else {
                     exception += "You do not have permission to remove the Sector Scenario: " + cs.getName() + ". ";
                 }
@@ -197,17 +196,19 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
         }
     }
 
-    private synchronized void remove(SectorScenario element) throws EmfException {
+    private synchronized void remove(SectorScenario element, User user) throws EmfException {
         Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
 
             if (!dao.canUpdate(element, session))
-                throw new EmfException("Sector Scenario name already in use");
+                throw new EmfException("Sector Scenario doesn't exist.");
 
-            SectorScenarioOutput[] controlStrategyResults = getSectorScenarioOutputs(element.getId());
-            for (int i = 0; i < controlStrategyResults.length; i++) {
-                dao.remove(controlStrategyResults[i], session);
-            }
+            dao.removeSectorScenarioResults(element.getId(), user, session, dbServer);
+            // SectorScenarioOutput[] sectorScenarioOutputs = getSectorScenarioOutputs(element.getId());
+            // for (int i = 0; i < sectorScenarioOutputs.length; i++) {
+            // dao.remove(sectorScenarioOutputs[i], session);
+            // }
 
             dao.remove(element, session);
         } catch (RuntimeException e) {
@@ -215,29 +216,11 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             throw new EmfException("Could not remove Sector Scenario: " + element.getName());
         } finally {
             session.close();
-        }
-    }
-
-    public synchronized void removeResultDatasets(Integer[] ids, User user) throws EmfException {
-        Session session = sessionFactory.getSession();
-        DatasetDAO dsDao = new DatasetDAO();
-        try {
-            for (Integer id : ids) {
-                EmfDataset dataset = dsDao.getDataset(session, id);
-
-                if (dataset != null) {
-                    try {
-                        dsDao.remove(user, dataset, session);
-                    } catch (EmfException e) {
-                        if (DebugLevels.DEBUG_12)
-                            System.out.println(e.getMessage());
-
-                        throw new EmfException(e.getMessage());
-                    }
-                }
+            try {
+                dbServer.disconnect();
+            } catch (Exception e) {
+                throw new EmfException("Could not disconnect DbServer - " + e.getMessage());
             }
-        } finally {
-            session.close();
         }
     }
 
@@ -246,28 +229,25 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
         try {
             // first see if the strategy has been canceled cor is running, is so don't run it...
             String runStatus = dao.getSectorScenarioRunStatus(sectorScenarioId, session);
-            if (runStatus.equals("Cancelled")
-                    || runStatus.equals("Running"))
+            if (runStatus.equals("Cancelled") || runStatus.equals("Running"))
                 return;
 
             SectorScenario sectorScenario = getById(sectorScenarioId);
-//            validateSectors(strategy);
-            //get rid of for now, since we don't auto export anything
-            //make sure a valid server-side export path was specified
-            //validateExportPath(strategy.getExportDirectory());
-            
-            //make the runner of the strategy is the owner of the strategy...
-            //NEED TO TALK TO ALISON ABOUT ISSUES, LOCEKD owner might not be the creator of resulting datsets,
-            //hence a exception when trying to purge/delete the resulting datasets
-            //if (control);
-            
+            // validateSectors(strategy);
+            // get rid of for now, since we don't auto export anything
+            // make sure a valid server-side export path was specified
+            // validateExportPath(strategy.getExportDirectory());
+
+            // make the runner of the strategy is the owner of the strategy...
+            // NEED TO TALK TO ALISON ABOUT ISSUES, LOCEKD owner might not be the creator of resulting datsets,
+            // hence a exception when trying to purge/delete the resulting datasets
+            // if (control);
 
             // queue up the strategy to be run, by setting runStatus to Waiting
             dao.setSectorScenarioRunStatusAndCompletionDate(sectorScenarioId, "Waiting", null, session);
 
-//            validatePath(strategy.getExportDirectory());
-            RunSectorScenario runSectorScenario = new RunSectorScenario(sessionFactory, dbServerFactory,
-                    threadPool);
+            // validatePath(strategy.getExportDirectory());
+            RunSectorScenario runSectorScenario = new RunSectorScenario(sessionFactory, dbServerFactory, threadPool);
             runSectorScenario.run(user, sectorScenario, this);
         } catch (EmfException e) {
             // queue up the strategy to be run, by setting runStatus to Waiting
@@ -341,7 +321,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             session.close();
         }
     }
-    
+
     public synchronized int isDuplicateAbbre(String abbre) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -372,7 +352,7 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             SectorScenario copied = (SectorScenario) DeepCopy.copy(cs);
             // change to applicable values
             copied.setName(name);
-            //make up the abbreviation for now...
+            // make up the abbreviation for now...
             copied.setAbbreviation(CustomDateFormat.format_YYYYMMDDHHMMSSSS(new Date()));
             copied.setCreator(creator);
             copied.setLastModifiedDate(new Date());

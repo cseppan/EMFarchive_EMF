@@ -8,6 +8,8 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DataServiceImpl.DeleteType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
@@ -248,12 +250,53 @@ public class SectorScenarioDAO {
 //        }
 //    }
 
-    public void removeSectorScenarioResults(int sectorScenarioId, Session session) {
-        String hqlDelete = "delete SectorScenarioOutput sr where sr.sectorScenarioId = :sectorScenarioId";
-        session.createQuery( hqlDelete )
-             .setInteger("sectorScenarioId", sectorScenarioId)
-             .executeUpdate();
-        session.flush();
+    public void removeSectorScenarioResults(int sectorScenarioId, User user, Session session, DbServer dbServer) throws EmfException {
+
+        try {
+            List<EmfDataset> dsList = new ArrayList<EmfDataset>();
+            //first get the datasets to delete
+            EmfDataset[] datasets = getOutputDatasets(sectorScenarioId, session);
+            if (datasets != null) {
+                for (EmfDataset dataset : datasets) {
+                    if (!user.isAdmin() && !dataset.getCreator().equalsIgnoreCase(user.getUsername())) {
+                        new StatusDAO(sessionFactory).add(new Status(user.getUsername(), "SectorScenario", "The sector scenario output dataset, " + dataset.getName() + ", will not be deleted since you are not the creator.", new Date()));
+                    } else {
+                        dsList.add(dataset);
+                    }
+                }
+            }
+
+//            String hqlDelete = "delete SectorScenarioOutput sr where sr.sectorScenarioId = :sectorScenarioId";
+//            session.createQuery( hqlDelete )
+//                 .setInteger("sectorScenarioId", sectorScenarioId)
+//                 .executeUpdate();
+//            session.clear();
+//            session.flush();
+            hibernateFacade.remove(getSectorScenarioOutputs(sectorScenarioId, session).toArray(new SectorScenarioOutput[0]), session);
+            session.clear();
+            session.flush();
+//delete and purge datasets
+            if (dsList != null && dsList.size() > 0){
+                removeResultDatasets(dsList.toArray(new EmfDataset[0]), user, session, dbServer);
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw new EmfException("Could not remove sector scenario outputs.", e);
+//        } catch (EmfException e) {
+//            e.printStackTrace();
+//            throw new EmfException("Could not remove sector scenario outputs.", e);
+        } finally {
+//            session.close();
+        }
+
+        
+        
+        
+        
+        
+        
+        
+        
     }
 
     public SectorScenario getByName(String name, Session session) {

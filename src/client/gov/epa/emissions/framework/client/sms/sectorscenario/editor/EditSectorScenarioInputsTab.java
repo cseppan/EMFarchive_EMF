@@ -30,12 +30,15 @@ import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -83,6 +86,8 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
     private BorderlessButton removeButton;
 
     private BorderlessButton viewButton;
+
+    private JCheckBox straightEECSMatch;
     
     public EditSectorScenarioInputsTab(SectorScenario sectorScenario, ManageChangeables changeablesList, 
             MessagePanel messagePanel, EmfConsole parentConsole, 
@@ -363,40 +368,6 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
 
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        eecsMappingDataset = new ComboBox("Not selected", presenter.getDatasets(presenter.getDatasetType(DatasetType.EECS_MAPPING)));
-        eecsMappingDataset.setPreferredSize(dimension);
-        if (sectorScenario.getEecsMapppingDataset() != null )
-            eecsMappingDataset.setSelectedItem(sectorScenario.getEecsMapppingDataset());
-        
-        eecsMappingDataset.addActionListener(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    fillVersions(eecsMappingDatasetVersion, (EmfDataset)eecsMappingDataset.getSelectedItem());
-                } catch (EmfException e1) {
-                    // NOTE Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-        });
-        
-        eecsMappingDatasetVersion =new ComboBox(new Version[0]);      
-//      version.setPrototypeDisplayValue(width);
-        try {       
-            fillVersions(eecsMappingDatasetVersion, (EmfDataset)eecsMappingDataset.getSelectedItem());
-            
-            Integer eecsMapppingDatasetVersion = sectorScenario.getEecsMapppingDatasetVersion();  
-            if (eecsMapppingDatasetVersion != null ) {
-                //System.out.print("eccs mapping is " + eecsMapppingDatasetVersion + "\n");
-                eecsMappingDatasetVersion.setSelectedIndex(eecsMapppingDatasetVersion);
-            }
-        } catch (EmfException e1) {
-            // NOTE Auto-generated catch block
-            e1.printStackTrace();
-        }
-
-        layoutGenerator.addLabelWidgetPair("EECS Mapping Dataset:", datasetPanel(eecsMappingDataset), panel);
-        layoutGenerator.addLabelWidgetPair("Dataset Version:", eecsMappingDatasetVersion, panel);
-
         sectorMappingDataset = new ComboBox("Not selected", presenter.getDatasets(presenter.getDatasetType(DatasetType.SECTOR_MAPPING)));
         sectorMappingDataset.setPreferredSize(dimension);
         if (sectorScenario.getSectorMapppingDataset() != null )
@@ -428,12 +399,63 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
         layoutGenerator.addLabelWidgetPair("Sector Mapping Dataset:", datasetPanel(sectorMappingDataset), panel);
         layoutGenerator.addLabelWidgetPair("Dataset Version:", sectorMappingDatasetVersion, panel);
 
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+        Boolean straightEECSMatchValue = sectorScenario.getStraightEecsMatch() != null ? sectorScenario.getStraightEecsMatch() : false;
+        straightEECSMatch = new JCheckBox("", null, straightEECSMatchValue);
+        straightEECSMatch.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                enableStraightEECSMatchFields(straightEECSMatch.isSelected());
+            }
+        });
+
+        eecsMappingDataset = new ComboBox("Not selected", presenter.getDatasets(presenter.getDatasetType(DatasetType.EECS_MAPPING)));
+        eecsMappingDataset.setPreferredSize(dimension);
+        if (sectorScenario.getEecsMapppingDataset() != null )
+            eecsMappingDataset.setSelectedItem(sectorScenario.getEecsMapppingDataset());
+        
+        eecsMappingDataset.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    fillVersions(eecsMappingDatasetVersion, (EmfDataset)eecsMappingDataset.getSelectedItem());
+                } catch (EmfException e1) {
+                    // NOTE Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        
+        eecsMappingDatasetVersion =new ComboBox(new Version[0]);      
+//      version.setPrototypeDisplayValue(width);
+        try {       
+            fillVersions(eecsMappingDatasetVersion, (EmfDataset)eecsMappingDataset.getSelectedItem());
+            
+            Integer eecsMapppingDatasetVersion = sectorScenario.getEecsMapppingDatasetVersion();  
+            if (eecsMapppingDatasetVersion != null ) {
+                //System.out.print("eccs mapping is " + eecsMapppingDatasetVersion + "\n");
+                eecsMappingDatasetVersion.setSelectedIndex(eecsMapppingDatasetVersion);
+            }
+        } catch (EmfException e1) {
+            // NOTE Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        enableStraightEECSMatchFields(straightEECSMatchValue);
+        
+        layoutGenerator.addLabelWidgetPair("Straight Match:", straightEECSMatch, panel);
+        layoutGenerator.addLabelWidgetPair("EECS Mapping Dataset:", datasetPanel(eecsMappingDataset), panel);
+        layoutGenerator.addLabelWidgetPair("Dataset Version:", eecsMappingDatasetVersion, panel);
+
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 10, // initialX, initialY
                 5, 5);// xPad, yPad
         return panel; 
 
     }
+
+    private void enableStraightEECSMatchFields(Boolean straightEECSMatchValue) {
+        eecsMappingDataset.setEnabled(straightEECSMatchValue);
+        eecsMappingDatasetVersion.setEnabled(straightEECSMatchValue);
+    }
+
 
     private JPanel datasetPanel(ComboBox datasetCom) {
 
@@ -476,9 +498,11 @@ public class EditSectorScenarioInputsTab extends JPanel implements EditSectorSce
     public void save(SectorScenario sectorScenario) throws EmfException{
         
         //perform some basic validation...
-        
+        Boolean straightEECSMatchValue = straightEECSMatch.isSelected();
+        sectorScenario.setStraightEecsMatch(straightEECSMatchValue);
+   
         EmfDataset ds =(EmfDataset) eecsMappingDataset.getSelectedItem();
-        if (ds == null)
+        if (straightEECSMatchValue && ds == null)
             throw new EmfException("Inputs Tab: Missing " + DatasetType.EECS_MAPPING + " dataset.");
         sectorScenario.setEecsMapppingDataset(ds);
         Version ver = (ds !=null ? (Version) eecsMappingDatasetVersion.getSelectedItem(): null);

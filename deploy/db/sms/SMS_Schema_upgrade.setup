@@ -160,4 +160,18 @@ where file_format_id = (select id from emf.file_formats where name = 'Sector Det
 -- 02-21-2011
 ALTER TABLE sms.sector_scenario ADD COLUMN export_output boolean default FALSE;
 
+-- 03/16/2011 Added straight_eecs_match column to sector_scenario table, set existing ones to true, but default new ones to false
+ALTER TABLE sms.sector_scenario ADD COLUMN straight_eecs_match boolean default true;
+ALTER TABLE sms.sector_scenario ALTER straight_eecs_match SET DEFAULT false;
+
+-- 03/16/2011 add new columns to Sector Detailed Mapping Result DS Type
+INSERT INTO emf.fileformat_columns (file_format_id, list_index, name, type, default_value, description, formatter, constraints, mandatory, width, spaces, fix_format_start, fix_format_end) select (select id from emf.file_formats where name = 'Sector Detailed Mapping Result') as file_format_id, 16, 'MACT', 'VARCHAR(6)', '', 'StringFormatter', '', 'NULL', false, 6, 0, 0, 0;
+INSERT INTO emf.fileformat_columns (file_format_id, list_index, name, type, default_value, description, formatter, constraints, mandatory, width, spaces, fix_format_start, fix_format_end) select (select id from emf.file_formats where name = 'Sector Detailed Mapping Result') as file_format_id, 17, 'MAP_MACT', 'VARCHAR(6)', '', 'StringFormatter', '', 'NULL', false, 6, 0, 0, 0;
+INSERT INTO emf.fileformat_columns (file_format_id, list_index, name, type, default_value, description, formatter, constraints, mandatory, width, spaces, fix_format_start, fix_format_end) select (select id from emf.file_formats where name = 'Sector Detailed Mapping Result') as file_format_id, 18, 'NAICS', 'VARCHAR(6)', '', 'StringFormatter', '', 'NULL', false, 6, 0, 0, 0;
+INSERT INTO emf.fileformat_columns (file_format_id, list_index, name, type, default_value, description, formatter, constraints, mandatory, width, spaces, fix_format_start, fix_format_end) select (select id from emf.file_formats where name = 'Sector Detailed Mapping Result') as file_format_id, 19, 'MAP_NAICS', 'VARCHAR(6)', '', 'StringFormatter', '', 'NULL', false, 6, 0, 0, 0;
+INSERT INTO emf.fileformat_columns (file_format_id, list_index, name, type, default_value, description, formatter, constraints, mandatory, width, spaces, fix_format_start, fix_format_end) select (select id from emf.file_formats where name = 'Sector Detailed Mapping Result') as file_format_id, 20, 'MAP_SCC', 'VARCHAR(10)', '', 'StringFormatter', '', 'NULL', false, 10, 0, 0, 0;
+UPDATE emf.fileformat_columns 
+set constraints = 'NULL'
+where file_format_id = (select id from emf.file_formats where name = 'Sector Detailed Mapping Result') 
+	and "name" = 'EECS';
 	

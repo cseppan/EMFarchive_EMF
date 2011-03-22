@@ -144,6 +144,7 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
 //            this.datasetVersionsList.setModelSize(modelSize);
 //        this.datasetVersionsList.setModelSize(1);
         this.datasetVersionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.datasetVersionsList.setToolTipText("<html>Dataset and version to use as filter.  The \"Filter Dataset Join Condition\" needs to be specified when using a dataset filter.<html>");
 //        this.datasetVersionsList.setModelSize(1);
         changeables.addChangeable(datasetVersionsList);
         

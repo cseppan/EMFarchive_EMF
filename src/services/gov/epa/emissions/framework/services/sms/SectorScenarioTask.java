@@ -180,13 +180,25 @@ public class SectorScenarioTask {
 
 //            for (SectorScenarioInventory sectorScenarioInventory : sectorScenarioInventories) {
 //              EmfDataset inventory = sectorScenarioInventory.getDataset();
-              setStatus("Started populating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the " + DatasetType.EECS_DETAILED_MAPPING_RESULT + ", " 
-                      + eecsDetailedMapping.getName() 
-                      + ".");
-              populateSectorDetailedMapping(eecsDetailedMapping, sectorDetailedMappingOutput);
-              setStatus("Completed populating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the " + DatasetType.EECS_DETAILED_MAPPING_RESULT + ", " 
-                      + eecsDetailedMapping.getName() 
-                      + ".");
+              if (sectorScenario.getStraightEecsMatch()) {
+                  setStatus("Started populating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the " + DatasetType.EECS_DETAILED_MAPPING_RESULT + ", " 
+                          + eecsDetailedMapping.getName() 
+                          + ".");
+                  populateSectorDetailedMapping(eecsDetailedMapping, sectorDetailedMappingOutput);
+                  setStatus("Completed populating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the " + DatasetType.EECS_DETAILED_MAPPING_RESULT + ", " 
+                          + eecsDetailedMapping.getName() 
+                          + ".");
+              } else {
+                  for (SectorScenarioInventory sectorScenarioInventory : sectorScenarioInventories) {
+                      setStatus("Started populating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the inventory, " 
+                              + sectorScenarioInventory.getDataset().getName() 
+                              + ".");
+                      populateSectorDetailedMapping(sectorScenarioInventory, sectorDetailedMappingOutput);
+                      setStatus("Completed populating " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " from the inventory, " 
+                              + sectorScenarioInventory.getDataset().getName() 
+                              + ".");
+                  }
+              }
 //            }
 
             updateOutputDatasetVersionRecordCount(sectorDetailedMappingOutput);
@@ -416,6 +428,12 @@ public class SectorScenarioTask {
             tableNameInSandboxDB = "ds_" + this.sectorScenario.getName() + "_" + ssi.getDataset().getName();
             tableNameInSandboxDB = tableNameInSandboxDB.trim();
             tableNameInSandboxDB = tableNameInSandboxDB.replaceAll(" ", "_");
+            for (int i = 0; i < tableNameInSandboxDB.length(); i++) {
+                if (!Character.isLetterOrDigit(tableNameInSandboxDB.charAt(i))) {
+                    tableNameInSandboxDB = tableNameInSandboxDB.replace(tableNameInSandboxDB.charAt(i), '_');
+                }
+            }
+
             tableExistInSandboxDB = false;
 
             try {
@@ -621,7 +639,7 @@ public class SectorScenarioTask {
         
         //Create EECS Detailed Mapping Result Output
         try {
-            setStatus("Started creating " + inventory.getDatasetType().getName() + " inventory from the inventory, " 
+            setStatus("Started creating sector annotated " + inventory.getDatasetType().getName() + " inventory from the inventory, " 
                     + sectorScenarioInventory.getDataset().getName() 
                     + ".");
 
@@ -730,6 +748,7 @@ public class SectorScenarioTask {
         String eecsMappingDatasetTableName = qualifiedEmissionTableName(eecsMappingDataset);
         
         cleanMappingDataset(eecsMappingDataset);
+        createSectorMappingIndexes(emissionTableName(eecsMappingDataset));
 //        EmfDataset sectorMappingDataset = sectorScenario.getSectorMapppingDataset();
 //        int sectorMappingDatasetVersionNumber = sectorScenario.getSectorMapppingDatasetVersion();
 //        Version sectorMappingDatasetVersion = version(sectorMappingDataset.getId(), sectorMappingDatasetVersionNumber);
@@ -769,10 +788,16 @@ public class SectorScenarioTask {
         + "'" + inventory.getDatasetType().getName().replaceAll("'", "''") + "'::varchar(255) as dataset_type "
         + "from " + inventoryTableName + " inv "
         + "left outer join ( "
+
+        //Matching criteria (UNION results together)
+
+        //Matching solely on scc (Default Priority 4)
+        //put first because scc will always be in inventory, and didn't want to deal with adding 
+        //or not adding union to the sql
         + "select inv.record_id,  "
         + "eecs_map.mact as map_mact, eecs_map.naics as map_naics, " 
         + "eecs_map.scc as map_scc,  "
-        + "eecs_map.eecs, eecs_map.priority "
+        + "eecs_map.eecs, coalesce(eecs_map.priority, 4) as priority "
         + "from " + inventoryTableName + " inv "
         + "inner join " + eecsMappingDatasetTableName + " eecs_map "
         + "on eecs_map.scc = inv.scc "
@@ -781,12 +806,87 @@ public class SectorScenarioTask {
         + "and eecs_map.scc is not null "
         + "and " + inventoryVersionedQuery.query() + " "
         + "and " + eecsMappingDatasetVersionedQuery.query() + " "
+
+        //Matching on mact, scc, and naics (Default Priority 1)
+        + (inventoryHasMactColumn && inventoryHasNaicsColumn ?
+        "union  "
+        + "select inv.record_id, "
+        + "eecs_map.mact as map_mact, eecs_map.naics as map_naics, " 
+        + "eecs_map.scc as map_scc, "
+        + "eecs_map.eecs, coalesce(eecs_map.priority, 1) as priority "
+        + "from " + inventoryTableName + " inv "
+        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
+        + "on eecs_map.mact = inv.mact "
+        + "and eecs_map.naics = inv.naics "
+        + "and eecs_map.scc = inv.scc "
+        + "where eecs_map.mact is not null "
+        + "and eecs_map.naics is not null "
+        + "and eecs_map.scc is not null "
+        + "and " + inventoryVersionedQuery.query() + " "
+        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
+        : "" )
+
+        //Matching on mact and scc (Default Priority 2)
         + (inventoryHasMactColumn ?
         "union  "
         + "select inv.record_id, "
         + "eecs_map.mact as map_mact, eecs_map.naics as map_naics, " 
         + "eecs_map.scc as map_scc, "
-        + "eecs_map.eecs, eecs_map.priority "
+        + "eecs_map.eecs, coalesce(eecs_map.priority, 2) as priority "
+        + "from " + inventoryTableName + " inv "
+        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
+        + "on eecs_map.mact = inv.mact "
+        + "and eecs_map.scc = inv.scc "
+        + "where eecs_map.mact is not null "
+        + "and eecs_map.naics is null "
+        + "and eecs_map.scc is not null "
+        + "and " + inventoryVersionedQuery.query() + " "
+        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
+        : "" )
+
+        //Matching on mact and naics (Default Priority 2)
+        + (inventoryHasMactColumn && inventoryHasNaicsColumn ?
+        "union  "
+        + "select inv.record_id, "
+        + "eecs_map.mact as map_mact, eecs_map.naics as map_naics, " 
+        + "eecs_map.scc as map_scc, "
+        + "eecs_map.eecs, coalesce(eecs_map.priority, 2) as priority "
+        + "from " + inventoryTableName + " inv "
+        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
+        + "on eecs_map.mact = inv.mact "
+        + "and eecs_map.naics = inv.naics "
+        + "where eecs_map.mact is not null "
+        + "and eecs_map.naics is not null "
+        + "and eecs_map.scc is null "
+        + "and " + inventoryVersionedQuery.query() + " "
+        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
+        : "" )
+
+        //Matching on scc and naics (Default Priority 2)
+        + (inventoryHasNaicsColumn ?
+        "union  "
+        + "select inv.record_id, "
+        + "eecs_map.mact as map_mact, eecs_map.naics as map_naics, " 
+        + "eecs_map.scc as map_scc, "
+        + "eecs_map.eecs, coalesce(eecs_map.priority, 2) as priority "
+        + "from " + inventoryTableName + " inv "
+        + "inner join " + eecsMappingDatasetTableName + " eecs_map "
+        + "on eecs_map.naics = inv.naics "
+        + "and eecs_map.scc = inv.scc "
+        + "where eecs_map.mact is null "
+        + "and eecs_map.naics is not null "
+        + "and eecs_map.scc is not null "
+        + "and " + inventoryVersionedQuery.query() + " "
+        + "and " + eecsMappingDatasetVersionedQuery.query() + " "
+        : "" )
+
+        //Matching solely on mact (Default Priority 3)
+        + (inventoryHasMactColumn ?
+        "union  "
+        + "select inv.record_id, "
+        + "eecs_map.mact as map_mact, eecs_map.naics as map_naics, " 
+        + "eecs_map.scc as map_scc, "
+        + "eecs_map.eecs, coalesce(eecs_map.priority, 3) as priority "
         + "from " + inventoryTableName + " inv "
         + "inner join " + eecsMappingDatasetTableName + " eecs_map "
         + "on eecs_map.mact = inv.mact "
@@ -796,12 +896,14 @@ public class SectorScenarioTask {
         + "and " + inventoryVersionedQuery.query() + " "
         + "and " + eecsMappingDatasetVersionedQuery.query() + " "
         : "" )
+
+        //Matching solely on naics (Default Priority 5)
         + (inventoryHasNaicsColumn ?
         "union  "
         + "select inv.record_id,  "
         + "eecs_map.mact as map_mact, eecs_map.naics as map_naics,  "
         + "eecs_map.scc as map_scc,  "
-        + "eecs_map.eecs, eecs_map.priority "
+        + "eecs_map.eecs, coalesce(eecs_map.priority, 5) as priority "
         + "from " + inventoryTableName + " inv "
         + "inner join " + eecsMappingDatasetTableName + " eecs_map "
         + "on eecs_map.naics = inv.naics "
@@ -811,11 +913,12 @@ public class SectorScenarioTask {
         + "and " + inventoryVersionedQuery.query() + " "
         + "and " + eecsMappingDatasetVersionedQuery.query() + " "
         : "" )
+
         + ") tblMatch "
         + "on tblMatch.record_id = inv.record_id "
         + "where " + inventoryVersionedQuery.query() + " ";
             
-        System.out.println(sql);
+//        System.out.println(sql);
         try {
             datasource.query().execute(sql);
         } catch (SQLException e) {
@@ -940,13 +1043,210 @@ public class SectorScenarioTask {
 //        + "on tblsector.eecs = tbleecs.eecs "
 //        + "where " + inventoryVersionedQuery.query() + " ";
 //            
-        System.out.println(sql);
+//        System.out.println(sql);
         try {
             datasource.query().execute(sql);
         } catch (SQLException e) {
             throw new EmfException("Error occured when inserting data to " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " table" + "\n" + e.getMessage());
         }
     }
+
+    private void populateSectorDetailedMapping(SectorScenarioInventory sectorScenarioInventory, SectorScenarioOutput sectorScenarioOutput) throws EmfException {
+        EmfDataset inventory = sectorScenarioInventory.getDataset();
+        int inventoryVersionNumber = sectorScenarioInventory.getVersion();
+        Version inventoryVersion = version(inventory.getId(), inventoryVersionNumber);
+        VersionedQuery inventoryVersionedQuery = new VersionedQuery(inventoryVersion, "inv");
+        String inventoryTableName = qualifiedEmissionTableName(inventory);
+        boolean inventoryHasMactColumn = hasColName("mact", inventory.getDatasetType().getFileFormat());
+        boolean inventoryHasNaicsColumn = hasColName("naics", inventory.getDatasetType().getFileFormat());
+        boolean inventoryHasPointColumns = hasColName("pointid", inventory.getDatasetType().getFileFormat());
+
+      
+//        Version eecsDetailedMappingDatasetVersion = version(eecsDetailedMappingDataset.getId(), 0);
+//        VersionedQuery eecsDetailedMappingDatasetVersionedQuery = new VersionedQuery(eecsDetailedMappingDatasetVersion, "inv");
+//        String eecsDetailedMappingDatasetTableName = qualifiedEmissionTableName(eecsDetailedMappingDataset);
+//        createIndexes(emissionTableName(eecsDetailedMappingDataset));
+      
+        EmfDataset sectorMappingDataset = sectorScenario.getSectorMapppingDataset();
+        int sectorMappingDatasetVersionNumber = sectorScenario.getSectorMapppingDatasetVersion();
+        Version sectorMappingDatasetVersion = version(sectorMappingDataset.getId(), sectorMappingDatasetVersionNumber);
+        VersionedQuery sectorMappingDatasetVersionedQuery = new VersionedQuery(sectorMappingDatasetVersion, "tblsector");
+        String sectorMappingDatasetTableName = qualifiedEmissionTableName(sectorMappingDataset);
+        createSectorMappingIndexes(emissionTableName(sectorMappingDataset));
+        cleanMappingDataset(sectorMappingDataset);
+
+      
+      //SET work_mem TO '512MB';
+      //NOTE:  Still need to  support mobile monthly files
+      String sql = "INSERT INTO " + qualifiedEmissionTableName(sectorScenarioOutput.getOutputDataset()) + " (dataset_id, version, fips, "
+      + (inventoryHasPointColumns ?
+          "plantid, pointid, stackid, segment, plant, "
+          : "")
+      + "scc, poll, ann_emis, avd_emis, mact, naics, eecs, priority, original_dataset_id, original_record_id, dataset_type, map_mact, map_naics, map_scc, sector) " 
+      + "select " + sectorScenarioOutput.getOutputDataset().getId() + " as dataset_id, 0 as version, " 
+      + "inv.fips, "
+      + (inventoryHasPointColumns ?
+      "inv.plantid, inv.pointid, "
+      + "inv.stackid, inv.segment, "
+      + "inv.plant, "
+      : "")
+      + "inv.scc, "
+      + "inv.poll, "
+      + "inv.ann_emis, "
+      + "inv.avd_emis, "
+      + (inventoryHasMactColumn ?
+      "inv.mact, "
+      : "null::varchar(6) as mact, ")
+      + (inventoryHasNaicsColumn ?
+      "inv.naics, "
+      : "null::varchar(6) as naics, ")
+      + "tblMatch.eecs, priority, "
+      + "inv.dataset_id as original_dataset_id, "
+      + "inv.record_id as original_record_id, "
+      + "'" + inventory.getDatasetType().getName().replaceAll("'", "''") + "'::varchar(255) as dataset_type, "
+      + "map_mact, map_naics, "
+      + "map_scc, tblMatch.sector "
+      + "from " + inventoryTableName + " inv "
+
+      + "left outer join ( "
+
+      //Matching criteria (UNION results together)
+
+      //Matching solely on scc (Default Priority 4)
+      //put first because scc will always be in inventory, and didn't want to deal with adding 
+      //or not adding union to the sql
+      + "select inv.record_id,  "
+      + "tblsector.mact as map_mact, tblsector.naics as map_naics, " 
+      + "tblsector.scc as map_scc,  "
+      + "tblsector.eecs, coalesce(tblsector.priority, 4) as priority, tblsector.sector "
+      + "from " + inventoryTableName + " inv "
+      + "inner join " + sectorMappingDatasetTableName + " tblsector "
+      + "on tblsector.scc = inv.scc "
+      + "where tblsector.mact is null "
+      + "and tblsector.naics is null "
+      + "and tblsector.scc is not null "
+      + "and " + inventoryVersionedQuery.query() + " "
+      + "and " + sectorMappingDatasetVersionedQuery.query() + " "
+
+      //Matching on mact, scc, and naics (Default Priority 1)
+      + (inventoryHasMactColumn && inventoryHasNaicsColumn ?
+      "union  "
+      + "select inv.record_id, "
+      + "tblsector.mact as map_mact, tblsector.naics as map_naics, " 
+      + "tblsector.scc as map_scc, "
+      + "tblsector.eecs, coalesce(tblsector.priority, 1) as priority, tblsector.sector "
+      + "from " + inventoryTableName + " inv "
+      + "inner join " + sectorMappingDatasetTableName + " tblsector "
+      + "on tblsector.mact = inv.mact "
+      + "and tblsector.naics = inv.naics "
+      + "and tblsector.scc = inv.scc "
+      + "where tblsector.mact is not null "
+      + "and tblsector.naics is not null "
+      + "and tblsector.scc is not null "
+      + "and " + inventoryVersionedQuery.query() + " "
+      + "and " + sectorMappingDatasetVersionedQuery.query() + " "
+      : "" )
+
+      //Matching on mact and scc (Default Priority 2)
+      + (inventoryHasMactColumn ?
+      "union  "
+      + "select inv.record_id, "
+      + "tblsector.mact as map_mact, tblsector.naics as map_naics, " 
+      + "tblsector.scc as map_scc, "
+      + "tblsector.eecs, coalesce(tblsector.priority, 2) as priority, tblsector.sector "
+      + "from " + inventoryTableName + " inv "
+      + "inner join " + sectorMappingDatasetTableName + " tblsector "
+      + "on tblsector.mact = inv.mact "
+      + "and tblsector.scc = inv.scc "
+      + "where tblsector.mact is not null "
+      + "and tblsector.naics is null "
+      + "and tblsector.scc is not null "
+      + "and " + inventoryVersionedQuery.query() + " "
+      + "and " + sectorMappingDatasetVersionedQuery.query() + " "
+      : "" )
+
+      //Matching on mact and naics (Default Priority 2)
+      + (inventoryHasMactColumn && inventoryHasNaicsColumn ?
+      "union  "
+      + "select inv.record_id, "
+      + "tblsector.mact as map_mact, tblsector.naics as map_naics, " 
+      + "tblsector.scc as map_scc, "
+      + "tblsector.eecs, coalesce(tblsector.priority, 2) as priority, tblsector.sector "
+      + "from " + inventoryTableName + " inv "
+      + "inner join " + sectorMappingDatasetTableName + " tblsector "
+      + "on tblsector.mact = inv.mact "
+      + "and tblsector.naics = inv.naics "
+      + "where tblsector.mact is not null "
+      + "and tblsector.naics is not null "
+      + "and tblsector.scc is null "
+      + "and " + inventoryVersionedQuery.query() + " "
+      + "and " + sectorMappingDatasetVersionedQuery.query() + " "
+      : "" )
+
+      //Matching on scc and naics (Default Priority 2)
+      + (inventoryHasNaicsColumn ?
+      "union  "
+      + "select inv.record_id, "
+      + "tblsector.mact as map_mact, tblsector.naics as map_naics, " 
+      + "tblsector.scc as map_scc, "
+      + "tblsector.eecs, coalesce(tblsector.priority, 2) as priority, tblsector.sector "
+      + "from " + inventoryTableName + " inv "
+      + "inner join " + sectorMappingDatasetTableName + " tblsector "
+      + "on tblsector.naics = inv.naics "
+      + "and tblsector.scc = inv.scc "
+      + "where tblsector.mact is null "
+      + "and tblsector.naics is not null "
+      + "and tblsector.scc is not null "
+      + "and " + inventoryVersionedQuery.query() + " "
+      + "and " + sectorMappingDatasetVersionedQuery.query() + " "
+      : "" )
+
+      //Matching solely on mact (Default Priority 3)
+      + (inventoryHasMactColumn ?
+      "union  "
+      + "select inv.record_id, "
+      + "tblsector.mact as map_mact, tblsector.naics as map_naics, " 
+      + "tblsector.scc as map_scc, "
+      + "tblsector.eecs, coalesce(tblsector.priority, 3) as priority, tblsector.sector "
+      + "from " + inventoryTableName + " inv "
+      + "inner join " + sectorMappingDatasetTableName + " tblsector "
+      + "on tblsector.mact = inv.mact "
+      + "where tblsector.mact is not null "
+      + "and tblsector.naics is null "
+      + "and tblsector.scc is null "
+      + "and " + inventoryVersionedQuery.query() + " "
+      + "and " + sectorMappingDatasetVersionedQuery.query() + " "
+      : "" )
+
+      //Matching solely on naics (Default Priority 5)
+      + (inventoryHasNaicsColumn ?
+      "union  "
+      + "select inv.record_id,  "
+      + "tblsector.mact as map_mact, tblsector.naics as map_naics,  "
+      + "tblsector.scc as map_scc,  "
+      + "tblsector.eecs, coalesce(tblsector.priority, 5) as priority, tblsector.sector "
+      + "from " + inventoryTableName + " inv "
+      + "inner join " + sectorMappingDatasetTableName + " tblsector "
+      + "on tblsector.naics = inv.naics "
+      + "where tblsector.mact is null "
+      + "and tblsector.naics is not null "
+      + "and tblsector.scc is null "
+      + "and " + inventoryVersionedQuery.query() + " "
+      + "and " + sectorMappingDatasetVersionedQuery.query() + " "
+      : "" )
+
+      + ") tblMatch "
+      + "on tblMatch.record_id = inv.record_id "
+      + "where " + inventoryVersionedQuery.query() + " "
+      + "order by inv.record_id, tblMatch.sector";
+
+//      System.out.println(sql);
+      try {
+          datasource.query().execute(sql);
+      } catch (SQLException e) {
+          throw new EmfException("Error occured when inserting data to " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " table" + "\n" + e.getMessage());
+      }
+  }
 
     private void createIndexes(String tableName) {
         DataTable dataTable = new DataTable(sectorScenario.getEecsMapppingDataset(), this.datasource);
@@ -959,6 +1259,20 @@ public class SectorScenarioTask {
         dataTable.addIndex(tableName, "original_dataset_id", false);
         dataTable.addIndex(tableName, "original_record_id", false);
         dataTable.addIndex(tableName, "priority", false);
+        dataTable.analyzeTable(tableName);
+    }
+
+    private void createSectorMappingIndexes(String tableName) {
+        DataTable dataTable = new DataTable(sectorScenario.getEecsMapppingDataset(), this.datasource);
+        tableName = tableName.toLowerCase();
+        dataTable.addIndex(tableName, "eecs", true);
+        dataTable.addIndex(tableName, "dataset_id", false);
+        dataTable.addIndex(tableName, "version", false);
+        dataTable.addIndex(tableName, "delete_versions", false);
+        dataTable.addIndex(tableName, "eecs", false);
+        dataTable.addIndex(tableName, "mact", false);
+        dataTable.addIndex(tableName, "naics", false);
+        dataTable.addIndex(tableName, "scc", false);
         dataTable.analyzeTable(tableName);
     }
 
@@ -1043,7 +1357,7 @@ public class SectorScenarioTask {
         + "where " + inventoryVersionedQuery.query() + " "
         + "order by inv.record_id, sector_map.priority ";
             
-        System.out.println(sql);
+//        System.out.println(sql);
         try {
             datasource.query().execute(sql);
         } catch (SQLException e) {
@@ -1144,7 +1458,7 @@ public class SectorScenarioTask {
     public void run() throws EmfException {
         
         //get rid of strategy results
-        deleteStrategyOutputs();
+        deleteSectorScenarioOutputs();
 
         //run any pre processes
         try {
@@ -1160,14 +1474,23 @@ public class SectorScenarioTask {
         try {
 
             SectorScenarioInventory[] sectorScenarioInventories = sectorScenario.getInventories();
+
+            Boolean straightEECSMatch = sectorScenario.getStraightEecsMatch();
+            SectorScenarioOutput sectorDetailedMappingResultOutput = null;
             
             //create ECCS Detailed Mapping Result, will contain results for all input inventories
-            SectorScenarioOutput eecsDetailedMappingResultOutput = createEECSDetailedMappingResultOutput(sectorScenarioInventories);
-            
-            
-            //create Sector Detailed Mapping Result, will contain results for all input inventories
-            SectorScenarioOutput sectorDetailedMappingResultOutput = createSectorDetailedMappingResultOutput(eecsDetailedMappingResultOutput.getOutputDataset(), sectorScenarioInventories);
-
+            if (straightEECSMatch) {
+                SectorScenarioOutput eecsDetailedMappingResultOutput = createEECSDetailedMappingResultOutput(sectorScenarioInventories);
+                
+                
+                //create Sector Detailed Mapping Result, will contain results for all input inventories
+                sectorDetailedMappingResultOutput = createSectorDetailedMappingResultOutput(eecsDetailedMappingResultOutput.getOutputDataset(), sectorScenarioInventories);
+            } else {
+                
+                //create Sector Detailed Mapping Result, will contain results for all input inventories
+                sectorDetailedMappingResultOutput = createSectorDetailedMappingResultOutput(null, sectorScenarioInventories);
+            }
+                
             //see if the scenario has sectors specified, if not then lets auto populate what was found during the above
             //analysis
 
@@ -1227,7 +1550,7 @@ public class SectorScenarioTask {
                                    sectorScenario.getExportOutput();
             if ( exportSector) 
             {
-                status = "Start to copy the outputs to Sandbox Database";
+                status = "Started copying outputs to Sandbox Database";
                 setStatus(status);
                 for (int i = 0; i < sectorScenarioInventories.length; i++) {
                     try {
@@ -1240,7 +1563,7 @@ public class SectorScenarioTask {
                         //throw e;
                     }
                 }
-                status = "Completed copying the outputs to Sandbox Database";
+                status = "Completed copying outputs to Sandbox Database";
                 setStatus(status);
             }
             sectorScenarioOutputs = null;
@@ -1290,7 +1613,7 @@ public class SectorScenarioTask {
         
     }
 
-    protected void deleteStrategyOutputs() throws EmfException {
+    protected void deleteSectorScenarioOutputs() throws EmfException {
         //get rid of strategy results...
         if (true){
             Session session = sessionFactory.getSession();
@@ -1530,9 +1853,9 @@ public class SectorScenarioTask {
     private void removeSectorScenarioOutputs() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            sectorScenarioDAO.removeSectorScenarioResults(sectorScenario.getId(), session);
+            sectorScenarioDAO.removeSectorScenarioResults(sectorScenario.getId(), user, session, dbServer);
         } catch (RuntimeException e) {
-            throw new EmfException("Could not remove previous control strategy result(s)");
+            throw new EmfException("Could not remove previous sector scenario output(s)");
         } finally {
             session.close();
         }

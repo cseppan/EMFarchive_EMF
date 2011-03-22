@@ -78,8 +78,10 @@ public class FastAnalysisRunTask implements Runnable {
                         runningCount = getFastAnalysisRunningCount();
                         if (runningCount < poolSize) {
                             for (FastRun controlStrategy : waitingStrategies.toArray(new FastRun[0])) {
-                                ssService.runFastRun(user, controlStrategy.getId());
-                                runningCount++;
+                                if (runningCount < poolSize) {
+                                    ssService.runFastRun(user, controlStrategy.getId());
+                                    runningCount++;
+                                }
                             }
                         }
                     }

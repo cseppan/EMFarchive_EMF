@@ -79,8 +79,10 @@ public class SectorScenarioRunTask implements Runnable {
                         runningCount = getSectorScenarioRunningCount();
                         if (runningCount < poolSize) {
                             for (SectorScenario controlStrategy : waitingStrategies.toArray(new SectorScenario[0])) {
-                                ssService.runSectorScenario(user, controlStrategy.getId());
-                                runningCount++;
+                                if (runningCount < poolSize) {
+                                    ssService.runSectorScenario(user, controlStrategy.getId());
+                                    runningCount++;
+                                }
                             }
                         }
                     }

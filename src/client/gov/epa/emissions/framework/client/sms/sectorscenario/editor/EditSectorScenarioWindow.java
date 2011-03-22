@@ -172,6 +172,10 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         container.setLayout(layout);
 
         saveButton = new SaveButton(saveAction());
+        if (sectorScenario.getRunStatus().equals("Not started")) 
+            saveButton.setEnabled(true);
+        else
+            saveButton.setEnabled(false);
         container.add(saveButton);
 
         Button closeButton = new CloseButton(closeAction());
@@ -246,8 +250,8 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
     public void refresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) {
 
-        if (sectorScenario.getRunStatus().equalsIgnoreCase("Finished"))
-            enableButtons(true);
+//        if (sectorScenario.getRunStatus().equalsIgnoreCase("Finished"))
+//            enableButtons(false);
     }
 
     public void enableButtons(boolean enable) {
@@ -355,6 +359,7 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
                     save(); // TODO: 2011-02-14
                     
                     enableButtons(false);
+                    runButton.setEnabled(false);
                     //now run the scenario
                     presenter.runSectorScenario(sectorScenario.getId()); // TODO: 2011-02-14
                     outputsTabView.notifyScenarioRun(sectorScenario);

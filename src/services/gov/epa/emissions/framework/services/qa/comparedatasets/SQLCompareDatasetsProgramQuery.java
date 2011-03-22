@@ -529,7 +529,7 @@ poll|poll
          
          sql += fullJoinClauseSQL + " " + groupBySQL + " " + groupBySQL.replace("group by", "order by");
 
-        System.out.println(sql);
+//        System.out.println(sql);
 
         
         SQLQueryParser parser = new SQLQueryParser(sessionFactory, emissionDatasourceName, tableName );
