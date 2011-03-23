@@ -339,7 +339,7 @@ public class SectorScenarioDAO {
             return;
         
         try {
-            new DataServiceImpl(dbServerFactory, sessionFactory).deleteDatasets(user, datasets, DeleteType.SECTOR_SCENARIO);
+            new DataServiceImpl(dbServerFactory, sessionFactory).deleteDatasets(user, lockedDatasets, DeleteType.SECTOR_SCENARIO);
         } catch (EmfException e) {
             if (!e.getType().equals(EmfException.MSG_TYPE))
                 throw new EmfException(e.getMessage());
