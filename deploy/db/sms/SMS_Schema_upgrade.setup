@@ -175,3 +175,5 @@ set constraints = 'NULL'
 where file_format_id = (select id from emf.file_formats where name = 'Sector Detailed Mapping Result') 
 	and "name" = 'EECS';
 	
+-- 03/22/3011 -- 
+ALTER TABLE sms.sector_scenario ALTER abbreviation TYPE character varying(128);

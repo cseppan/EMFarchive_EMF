@@ -748,7 +748,7 @@ public class SectorScenarioTask {
         String eecsMappingDatasetTableName = qualifiedEmissionTableName(eecsMappingDataset);
         
         cleanMappingDataset(eecsMappingDataset);
-        createSectorMappingIndexes(emissionTableName(eecsMappingDataset));
+        createEecsMappingIndexes(emissionTableName(eecsMappingDataset));
 //        EmfDataset sectorMappingDataset = sectorScenario.getSectorMapppingDataset();
 //        int sectorMappingDatasetVersionNumber = sectorScenario.getSectorMapppingDatasetVersion();
 //        Version sectorMappingDatasetVersion = version(sectorMappingDataset.getId(), sectorMappingDatasetVersionNumber);
@@ -942,7 +942,7 @@ public class SectorScenarioTask {
         Version eecsDetailedMappingDatasetVersion = version(eecsDetailedMappingDataset.getId(), 0);
         VersionedQuery eecsDetailedMappingDatasetVersionedQuery = new VersionedQuery(eecsDetailedMappingDatasetVersion, "inv");
         String eecsDetailedMappingDatasetTableName = qualifiedEmissionTableName(eecsDetailedMappingDataset);
-        createIndexes(emissionTableName(eecsDetailedMappingDataset));
+        createEecsMappingIndexes(emissionTableName(eecsDetailedMappingDataset));
         
         EmfDataset sectorMappingDataset = sectorScenario.getSectorMapppingDataset();
         int sectorMappingDatasetVersionNumber = sectorScenario.getSectorMapppingDatasetVersion();
@@ -950,6 +950,7 @@ public class SectorScenarioTask {
         VersionedQuery sectorMappingDatasetVersionedQuery = new VersionedQuery(sectorMappingDatasetVersion, "tblsector");
         String sectorMappingDatasetTableName = qualifiedEmissionTableName(sectorMappingDataset);
 
+        createSectorMappingIndexes(emissionTableName(sectorMappingDataset));
         cleanMappingDataset(sectorMappingDataset);
 
         
@@ -1248,7 +1249,7 @@ public class SectorScenarioTask {
       }
   }
 
-    private void createIndexes(String tableName) {
+    private void createEecsMappingIndexes(String tableName) {
         DataTable dataTable = new DataTable(sectorScenario.getEecsMapppingDataset(), this.datasource);
         tableName = tableName.toLowerCase();
         dataTable.addIndex(tableName, "record_id", true);
@@ -1256,16 +1257,14 @@ public class SectorScenarioTask {
         dataTable.addIndex(tableName, "version", false);
         dataTable.addIndex(tableName, "delete_versions", false);
         dataTable.addIndex(tableName, "eecs", false);
-        dataTable.addIndex(tableName, "original_dataset_id", false);
-        dataTable.addIndex(tableName, "original_record_id", false);
         dataTable.addIndex(tableName, "priority", false);
         dataTable.analyzeTable(tableName);
     }
 
     private void createSectorMappingIndexes(String tableName) {
-        DataTable dataTable = new DataTable(sectorScenario.getEecsMapppingDataset(), this.datasource);
+        DataTable dataTable = new DataTable(sectorScenario.getSectorMapppingDataset(), this.datasource);
         tableName = tableName.toLowerCase();
-        dataTable.addIndex(tableName, "eecs", true);
+        dataTable.addIndex(tableName, "record_id", true);
         dataTable.addIndex(tableName, "dataset_id", false);
         dataTable.addIndex(tableName, "version", false);
         dataTable.addIndex(tableName, "delete_versions", false);
@@ -1274,6 +1273,44 @@ public class SectorScenarioTask {
         dataTable.addIndex(tableName, "naics", false);
         dataTable.addIndex(tableName, "scc", false);
         dataTable.analyzeTable(tableName);
+    }
+
+    private void createSectorDetailedMappingIndexes(EmfDataset sectorMappingDetailedResult) {
+        DataTable dataTable = new DataTable(sectorMappingDetailedResult, this.datasource);
+        String tableName = sectorMappingDetailedResult.getInternalSources()[0].getTable().toLowerCase();
+        setStatus("Started creating indexes on " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " dataset, " 
+                + sectorMappingDetailedResult.getName() 
+                + ".  Depending on the size of the dataset, this could take several minutes.");
+        dataTable.addIndex(tableName, "record_id", true);
+        dataTable.addIndex(tableName, "dataset_id", false);
+        dataTable.addIndex(tableName, "version", false);
+        dataTable.addIndex(tableName, "delete_versions", false);
+        dataTable.addIndex(tableName, "original_dataset_id", false);
+        dataTable.addIndex(tableName, "original_record_id", false);
+        dataTable.analyzeTable(tableName);
+        setStatus("Completed creating indexes on " + DatasetType.SECTOR_DETAILED_MAPPING_RESULT + " dataset, " 
+                + sectorMappingDetailedResult.getName() 
+                + ".");
+    }
+
+    private void createInventoryIndexes(EmfDataset inventory) {
+        
+        DataTable dataTable = new DataTable(inventory, this.datasource);
+        String tableName = inventory.getInternalSources()[0].getTable().toLowerCase();
+        setStatus("Started creating indexes on inventory, " 
+                + inventory.getName() 
+                + ".  Depending on the size of the dataset, this could take several minutes.");
+        dataTable.addIndex(tableName, "record_id", true);
+        dataTable.addIndex(tableName, "dataset_id", false);
+        dataTable.addIndex(tableName, "version", false);
+        dataTable.addIndex(tableName, "delete_versions", false);
+        dataTable.addIndex(tableName, "scc", false);
+        dataTable.addIndex(tableName, "mact", false);
+        dataTable.addIndex(tableName, "naics", false);
+        dataTable.analyzeTable(tableName);
+        setStatus("Completed creating indexes on inventory, " 
+                + inventory.getName() 
+                + ".");
     }
 
     private void populateSectorAnnotatedInventory(EmfDataset sectorDetailedMappingDataset, String[] sectors, SectorScenarioInventory sectorScenarioInventory, SectorScenarioOutput sectorScenarioOutput) throws EmfException {
@@ -1294,7 +1331,8 @@ public class SectorScenarioTask {
         Version sectorDetailedMappingDatasetVersion = version(sectorDetailedMappingDataset.getId(), 0);
         VersionedQuery sectorDetailedMappingDatasetVersionedQuery = new VersionedQuery(sectorDetailedMappingDatasetVersion, "sector_map");
         String sectorDetailedMappingDatasetTableName = qualifiedEmissionTableName(sectorDetailedMappingDataset);
-
+        createSectorDetailedMappingIndexes(sectorDetailedMappingDataset);
+        
         EmfDataset sectorAnnotatedInventory = sectorScenarioOutput.getOutputDataset();
 
         short annotateEecsOption = sectorScenario.getAnnotatingEecsOption();
@@ -1490,7 +1528,7 @@ public class SectorScenarioTask {
                 //create Sector Detailed Mapping Result, will contain results for all input inventories
                 sectorDetailedMappingResultOutput = createSectorDetailedMappingResultOutput(null, sectorScenarioInventories);
             }
-                
+
             //see if the scenario has sectors specified, if not then lets auto populate what was found during the above
             //analysis
 
@@ -1651,15 +1689,23 @@ public class SectorScenarioTask {
     }
 
     public void makeSureInventoryDatasetHaveIndexes(SectorScenarioInventory sectorScenarioInventory) {
-        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(sectorScenarioInventory.getDataset()).toLowerCase() + "');analyze " + qualifiedEmissionTableName(sectorScenarioInventory.getDataset()).toLowerCase() + ";";
         try {
-            datasource.query().execute(query);
-        } catch (SQLException e) {
-            //e.printStackTrace();
+            createInventoryIndexes(sectorScenarioInventory.getDataset());
+        } catch (Exception e) {
+            e.printStackTrace();
             //supress all errors, the indexes might already be on the table...
         } finally {
             //
         }
+//        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(sectorScenarioInventory.getDataset()).toLowerCase() + "');analyze " + qualifiedEmissionTableName(sectorScenarioInventory.getDataset()).toLowerCase() + ";";
+//        try {
+//            datasource.query().execute(query);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            //supress all errors, the indexes might already be on the table...
+//        } finally {
+//            //
+//        }
     }
 
     protected boolean isRunStatusCancelled() throws EmfException {
