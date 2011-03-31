@@ -211,7 +211,7 @@ public abstract class AbstractStrategyTask implements Strategy {
         }
     }
 
-    protected void deleteStrategyResults() throws EmfException {
+    protected void deleteStrategyResults() throws EmfException { // JIZHEN-SECTOR
         //get rid of strategy results...
         if (controlStrategy.getDeleteResults()){
             Session session = sessionFactory.getSession();
@@ -230,7 +230,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                 }
 //                EmfDataset[] dsList = controlStrategyDAO.getResultDatasets(controlStrategy.getId(), session);
                 //get rid of old strategy results...
-                removeControlStrategyResults();
+                removeControlStrategyResults();  //JIZHEN-SECTOR
                 //delete and purge datasets
                 if (dsList != null && dsList.size() > 0){
                     controlStrategyDAO.removeResultDatasets(dsList.toArray(new EmfDataset[0]), user, session, dbServer);

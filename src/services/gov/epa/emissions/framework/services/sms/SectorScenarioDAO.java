@@ -272,6 +272,7 @@ public class SectorScenarioDAO {
 //                 .executeUpdate();
 //            session.clear();
 //            session.flush();
+
             hibernateFacade.remove(getSectorScenarioOutputs(sectorScenarioId, session).toArray(new SectorScenarioOutput[0]), session);
             session.clear();
             session.flush();
@@ -288,16 +289,97 @@ public class SectorScenarioDAO {
         } finally {
 //            session.close();
         }
-
-        
-        
-        
-        
-        
-        
-        
-        
+ 
     }
+    
+    public void checkIfUsed( int [] datasetIDs, User user, DbServer dbServer, Session session) throws EmfException {
+        String msgs = "";
+        try {
+            this.datasetDao.checkIfUsedByCases(datasetIDs, session);
+        } catch ( Exception e) {
+            msgs += e.getMessage() + "\n";
+        }
+        try {
+            this.datasetDao.checkIfUsedByControlPrograms(datasetIDs, session);
+        } catch ( Exception e) {
+            msgs += e.getMessage() + "\n";
+        }
+        try {
+            this.datasetDao.checkIfUsedByStrategies(datasetIDs, session);
+        } catch ( Exception e) {
+            msgs += e.getMessage() + "\n";
+        }
+        try {
+            List<Integer> notUsed = this.datasetDao.notUsedByFast(datasetIDs, user, dbServer, session);
+            if ( notUsed != null && notUsed.size() != datasetIDs.length) {
+                msgs += "Some output datasets are used by Fast.\n";
+            }
+        } catch ( Exception e) {
+            msgs += e.getMessage() + "\n";
+        }
+//        try {
+//            List<Integer> notUsed = this.datasetDao.notUsedBySectorScnarios(datasetIDs, user, session);
+//            if ( notUsed != null && notUsed.size() != datasetIDs.length) {
+//                msgs += "Some output datasets are used by SectorScenarios.\n";
+//            }
+//        } catch ( Exception e) {
+//            msgs += e.getMessage() + "\n";
+//        }
+        if ( msgs != "") {
+            throw new EmfException( msgs);
+        }
+    }
+    
+    public void removeSectorScenarioResultsV2(int sectorScenarioId, User user, Session session, DbServer dbServer) throws EmfException {
+
+        try {
+            List<EmfDataset> dsList = new ArrayList<EmfDataset>();
+            EmfDataset[] datasets = getOutputDatasets(sectorScenarioId, session);
+            if (datasets != null) {
+                List<String> msgList = new ArrayList<String>();
+                for (EmfDataset dataset : datasets) {
+                    if (!user.isAdmin() && !dataset.getCreator().equalsIgnoreCase(user.getUsername())) {
+                        String msg = "The sector scenario output dataset, " + dataset.getName() + ", will not be deleted since you are not the creator.";
+                        msgList.add( msg);
+                        new StatusDAO(sessionFactory).add(new Status(user.getUsername(), "SectorScenario", msg, new Date()));
+                    } else {
+                        dsList.add(dataset);
+                    }
+                }
+                if ( msgList.size()>0) {
+                    String msgs = "";                
+                    for ( int i=0; i<msgList.size(); i++) {
+                        msgs += msgList.get(i) + "\n";
+                    }
+                    throw new EmfException( msgs);
+                }
+            }
+
+//            String hqlDelete = "delete SectorScenarioOutput sr where sr.sectorScenarioId = :sectorScenarioId";
+//            session.createQuery( hqlDelete )
+//                 .setInteger("sectorScenarioId", sectorScenarioId)
+//                 .executeUpdate();
+//            session.clear();
+//            session.flush();
+
+            hibernateFacade.remove(getSectorScenarioOutputs(sectorScenarioId, session).toArray(new SectorScenarioOutput[0]), session);
+            session.clear();
+            session.flush();
+//delete and purge datasets
+            if (dsList != null && dsList.size() > 0){
+                removeResultDatasets(dsList.toArray(new EmfDataset[0]), user, session, dbServer);
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw new EmfException("Could not remove sector scenario outputs - ", e);
+//        } catch (EmfException e) {
+//            e.printStackTrace();
+//            throw new EmfException("Could not remove sector scenario outputs.", e);
+        } finally {
+//            session.close();
+        }
+ 
+    }    
 
     public SectorScenario getByName(String name, Session session) {
         SectorScenario cs = (SectorScenario) hibernateFacade.load(SectorScenario.class, Restrictions.eq("name", new String(name)), session);

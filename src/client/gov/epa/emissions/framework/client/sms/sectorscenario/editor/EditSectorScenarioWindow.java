@@ -195,6 +195,12 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
             public void actionPerformed(ActionEvent event) {
                 try {
                     presenter.doRefresh();
+                    // enable Run button JIZHEN-SECTOR
+                    SectorScenario ss = session.sectorScenarioService().getById(sectorScenario.getId());
+                    String status = ss.getRunStatus();
+                    if ( status.equals( "Finished") || status.equals( "Failed") || status.equals( "Canceled")) {
+                        runButton.setEnabled( true);
+                    }
                 } catch (EmfException e) {
                     showError(e.getMessage());
                 }

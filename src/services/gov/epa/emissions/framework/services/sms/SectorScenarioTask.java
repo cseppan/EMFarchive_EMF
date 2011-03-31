@@ -1496,7 +1496,12 @@ public class SectorScenarioTask {
     public void run() throws EmfException {
         
         //get rid of strategy results
-        deleteSectorScenarioOutputs();
+        try {
+            deleteSectorScenarioOutputs();
+        } catch ( Exception e) {
+            e.printStackTrace();
+            throw new EmfException(e.getMessage(), "CannotRerun");
+        }
 
         //run any pre processes
         try {
@@ -1656,28 +1661,52 @@ public class SectorScenarioTask {
         if (true){
             Session session = sessionFactory.getSession();
             try {
+
+                // first get the datasets to delete
                 List<EmfDataset> dsList = new ArrayList<EmfDataset>();
-                //first get the datasets to delete
                 EmfDataset[] datasets = sectorScenarioDAO.getOutputDatasets(sectorScenario.getId(), session);
                 if (datasets != null) {
+                    List<String> msgList = new ArrayList<String>();
                     for (EmfDataset dataset : datasets) {
                         if (!user.isAdmin() && !dataset.getCreator().equalsIgnoreCase(user.getUsername())) {
-                            setStatus("The sector scenario output dataset, " + dataset.getName() + ", will not be deleted since you are not the creator.");
+                            String msg = "The sector scenario output dataset, " + dataset.getName() + ", cannot be deleted since you are not the creator.";
+                            setStatus( msg);
+                            msgList.add( msg);
                         } else {
                             dsList.add(dataset);
                         }
                     }
+                    if ( msgList.size()>0) {
+                        String msgs = "";
+                        for ( int i=0; i<msgList.size(); i++) {
+                            msgs += msgList.get(i) + "\n";
+                        }
+                        msgList = null;
+                        throw new EmfException( msgs);
+                    }
+                    msgList = null;
                 }
-//                EmfDataset[] dsList = controlStrategyDAO.getResultDatasets(sectorScenario.getId(), session);
-                //get rid of old strategy results...
-                removeSectorScenarioOutputs();
-                //delete and purge datasets
-                if (dsList != null && dsList.size() > 0){
-                    sectorScenarioDAO.removeResultDatasets(dsList.toArray(new EmfDataset[0]), user, session, dbServer);
+                
+                // then check is the datasets can be deleted. If can, delete them.
+                if ( dsList != null && dsList.size() > 0) {
+                    
+                    int [] dsIDs = new int[ dsList.size()];
+                    for ( int i=0; i<dsList.size(); i++){
+                        dsIDs[i] = dsList.get(i).getId();
+                    }
+                    try {
+                        this.sectorScenarioDAO.checkIfUsed(dsIDs, user, dbServer, session);
+                    } catch ( Exception e) {
+                        throw new EmfException( "Can not delete sector scenario output datasets: \n" + e.getMessage());
+                    }
+                    
+                    removeSectorScenarioOutputs();
+                    //sectorScenarioDAO.removeResultDatasets(dsList.toArray(new EmfDataset[0]), user, session, dbServer);
                 }
+
             } catch (RuntimeException e) {
                 e.printStackTrace();
-                throw new EmfException("Could not remove sector scenario outputs.");
+                throw new EmfException("Could not remove sector scenario outputs: " + e.getMessage());
             } finally {
                 session.close();
             }
@@ -1899,7 +1928,7 @@ public class SectorScenarioTask {
     private void removeSectorScenarioOutputs() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            sectorScenarioDAO.removeSectorScenarioResults(sectorScenario.getId(), user, session, dbServer);
+            sectorScenarioDAO.removeSectorScenarioResultsV2(sectorScenario.getId(), user, session, dbServer);
         } catch (RuntimeException e) {
             throw new EmfException("Could not remove previous sector scenario output(s)");
         } finally {

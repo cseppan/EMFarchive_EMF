@@ -243,12 +243,13 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
             // hence a exception when trying to purge/delete the resulting datasets
             // if (control);
 
+            String preRunStatus = dao.getSectorScenarioRunStatus(sectorScenarioId, session);
             // queue up the strategy to be run, by setting runStatus to Waiting
             dao.setSectorScenarioRunStatusAndCompletionDate(sectorScenarioId, "Waiting", null, session);
 
             // validatePath(strategy.getExportDirectory());
             RunSectorScenario runSectorScenario = new RunSectorScenario(sessionFactory, dbServerFactory, threadPool);
-            runSectorScenario.run(user, sectorScenario, this);
+            runSectorScenario.run(user, sectorScenario, this, preRunStatus);
         } catch (EmfException e) {
             // queue up the strategy to be run, by setting runStatus to Waiting
             dao.setSectorScenarioRunStatusAndCompletionDate(sectorScenarioId, "Failed", null, session);

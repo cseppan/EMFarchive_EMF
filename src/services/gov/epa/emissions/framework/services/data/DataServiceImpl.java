@@ -248,7 +248,7 @@ public class DataServiceImpl implements DataService {
         int count = 0;
 
         try {
-            EmfDataset[] removables = getRemovableDatasets(datasets, owner, delType);
+            EmfDataset[] removables = getRemovableDatasets(datasets, owner, delType); //JIZHEN-SECTOR
                 
             for (EmfDataset ds : removables) {
                 if (ds.getStatus().equalsIgnoreCase("Deleted")) {
@@ -319,7 +319,7 @@ public class DataServiceImpl implements DataService {
         List<Integer> ids = new ArrayList<Integer>();
         
         try {
-            ids = getNotRefdDatasetIds(owner, session, dbServer, dsIDs, delType);
+            ids = getNotRefdDatasetIds(owner, session, dbServer, dsIDs, delType); // JIZHEN-SECTOR
         } catch (Exception e) {
             LOG.error("Error checking dataset usage: ", e);
         } 
@@ -347,7 +347,7 @@ public class DataServiceImpl implements DataService {
     }
 
     private List<Integer> getNotRefdDatasetIds(User owner, Session session, DbServer dbServer, int[] dsIDs, 
-            DeleteType delType) throws Exception {
+            DeleteType delType) throws Exception {  //JIZHEN-SECTOR
         List<Integer> ids;
         ids = dao.notUsedByCases(dsIDs, owner, session);
         

@@ -37,7 +37,7 @@ public class RunSectorScenario {
 //        this.services = services();
     }
 
-    public void run(User user, SectorScenario sectorScenario, SectorScenarioService service) throws EmfException {
+    public void run(User user, SectorScenario sectorScenario, SectorScenarioService service, String preStatus) throws EmfException {
         currentLimitations(user, sectorScenario);
         try {
             SectorScenarioTask sectorScenarioTask = new SectorScenarioTask(sectorScenario, user, dbServerFactory, sessionFactory);
@@ -45,7 +45,7 @@ public class RunSectorScenario {
             //        sessionFactory, dbServerFactory);
             SectorScenarioRunTask task = new SectorScenarioRunTask( sectorScenarioTask, user, 
                     services(), service, 
-                    sessionFactory);
+                    sessionFactory, preStatus);
             threadPool.execute(new GCEnforcerTask("Run SectorScenario: " + sectorScenario.getName(), task));
         } catch (Exception e) {
             log.error("Error running sector scenario: " + sectorScenario.getName(), e);

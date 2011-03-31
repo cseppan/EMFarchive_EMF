@@ -29,15 +29,18 @@ public class SectorScenarioRunTask implements Runnable {
     private SectorScenarioService ssService;
 
     private HibernateSessionFactory sessionFactory;
+    
+    private String preStatus;
 
     public SectorScenarioRunTask(SectorScenarioTask sectorScenarioTask, User user, 
             Services services, SectorScenarioService service,
-            HibernateSessionFactory sessionFactory) {
+            HibernateSessionFactory sessionFactory, String preStatus) {
         this.user = user;
         this.services = services;
         this.sectorScenarioTask = sectorScenarioTask;
         this.ssService = service;
         this.sessionFactory = sessionFactory;
+        this.preStatus = preStatus;
     }
 
     public void run() {
@@ -61,9 +64,16 @@ public class SectorScenarioRunTask implements Runnable {
                 completeStatus = "Finished";
                 addCompletedStatus();
             } catch (EmfException e) {
-                completeStatus = "Failed";
-                logError("Failed to run sector scenario : ", e);
-                setStatus("Failed to run sector scenario: " + "Reason: " + e.getMessage());
+                if (e.getType().equals("CannotRerun")) {
+                    completeStatus = preStatus; // + "-Can't Rerun";
+                    logError("Cannot rerun sector scenario : ", e);
+                    setStatus("Cannot rerun sector scenario: " + "Reason: " + e.getMessage());
+                } else {
+                    completeStatus = "Failed";
+                    logError("Failed to run sector scenario : ", e);
+                    setStatus("Failed to run sector scenario: " + "Reason: " + e.getMessage());
+                }
+                
             } finally {
 //                    closeConnection();
                 
