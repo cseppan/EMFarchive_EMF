@@ -198,8 +198,11 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
                     // enable Run button JIZHEN-SECTOR
                     SectorScenario ss = session.sectorScenarioService().getById(sectorScenario.getId());
                     String status = ss.getRunStatus();
-                    if ( status.equals( "Finished") || status.equals( "Failed") || status.equals( "Canceled")) {
+                    if ( status.equals( "Finished") || status.equals( "Failed") || status.equals( "Cancelled")) {
                         runButton.setEnabled( true);
+                    }
+                    if ( !status.equals( "Running")) {
+                        stopButton.setEnabled( false);
                     }
                 } catch (EmfException e) {
                     showError(e.getMessage());

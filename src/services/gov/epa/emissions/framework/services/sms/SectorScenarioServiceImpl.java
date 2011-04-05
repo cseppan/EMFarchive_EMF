@@ -229,7 +229,8 @@ public class SectorScenarioServiceImpl implements SectorScenarioService {
         try {
             // first see if the strategy has been canceled cor is running, is so don't run it...
             String runStatus = dao.getSectorScenarioRunStatus(sectorScenarioId, session);
-            if (runStatus.equals("Cancelled") || runStatus.equals("Running"))
+            if (//runStatus.equals("Cancelled") || 
+                    runStatus.equals("Running"))
                 return;
 
             SectorScenario sectorScenario = getById(sectorScenarioId);
