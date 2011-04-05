@@ -24,21 +24,10 @@ import org.hibernate.Session;
 
 public class SQLCompareCasesQuery {
 
-    private DbServerFactory dbServerFactory;
-
     private HibernateSessionFactory sessionFactory;
     
-    public static final String invTag = "-inv";
-
-    public static final String smkRptTag = "-smkrpt";
-
-    public static final String toleranceTag = "-tolerance";
-
-    public static final String coStCyTag = "-costcy";
-
-    public SQLCompareCasesQuery(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
+    public SQLCompareCasesQuery(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        this.dbServerFactory = dbServerFactory;
     }
 
     public String createCompareQuery(int[] caseIds) throws EmfException {
@@ -50,7 +39,9 @@ public class SQLCompareCasesQuery {
         String sectorSelectList = "case0.sector";
         String jobSelectList = "case0.job";
         String programSelectList = "case0.program";
-        String valueSelectList = "case0.\"value\"";
+        String matchSelectList = "case0.\"value\" = case0.\"value\"";
+        Case caseObj = getCase(caseIds[0]);
+        String valueSelectList = "regexp_replace(regexp_replace(regexp_replace(case0.\"value\", '\n', ' ', 'gi'), ',', '', 'gi'), '\"', '', 'gi') as \"" + caseObj.getAbbreviation().getName() + "\"";
         sql.append("select ");
         for (int i = 1; i < caseIds.length; ++i) {
             tabSelectList += ",case" + i + ".tab";
@@ -60,26 +51,31 @@ public class SQLCompareCasesQuery {
             sectorSelectList += ",case" + i + ".sector";
             jobSelectList += ",case" + i + ".job";
             programSelectList += ",case" + i + ".program";
-            valueSelectList += ",case" + i + ".\"value\"";
+            matchSelectList += "and case0.\"value\" = case" + i + ".\"value\"";
+            caseObj = getCase(caseIds[i]);
+            valueSelectList += ", regexp_replace(regexp_replace(case" + i + ".\"value\", '\n', ' ', 'gi'), '\"', '', 'gi') as \"" + caseObj.getAbbreviation().getName() + "\"";
         }
         sql.append(" coalesce(" + tabSelectList + ") as tab, ");
-        sql.append(" coalesce(" + nameSelectList + ") as \"name\", ");
+        sql.append(" regexp_replace(regexp_replace(coalesce(" + nameSelectList + "), '\n', ' ', 'gi'), '\"', '', 'gi') as \"name\", ");
         sql.append(" coalesce(" + envVarSelectList + ") as env_var,");
         sql.append(" coalesce(" + regionSelectList + ") as region,");
         sql.append(" coalesce(" + sectorSelectList + ") as sector,");
         sql.append(" coalesce(" + jobSelectList + ") as job,");
         sql.append(" coalesce(" + programSelectList + ") as program,");
+        sql.append(" case when " + matchSelectList + " then 'true'::character varying(5) else 'false'::character varying(5) end as match,");
 //    --  null::boolean as match,");
 //        case0."value" as cs0,");
 //        case1."value" as cs1");
         sql.append(" " + valueSelectList);
         sql.append(" from ");
         for (int i = 0; i < caseIds.length; ++i) {
+            //add join condition
             if (i > 0)
                 sql.append(" full join ");
             sql.append(" (");
             sql.append(buildIndividualCaseQuery(caseIds[i]));
             sql.append(" ) as case" + i);
+            //add join condition
             if (i > 0) {
                 sql.append(" on case" + i + ".tab = case0.tab");
                 sql.append(" and case" + i + ".name = case0.name");
@@ -99,10 +95,6 @@ public class SQLCompareCasesQuery {
         return sql.toString();
     }
 
-    private Case getCase(int caseId) {
-        return null;
-    }
-    
     private StringBuilder buildIndividualCaseQuery(int caseId) {
         StringBuilder sql = new StringBuilder();
         
@@ -123,7 +115,6 @@ public class SQLCompareCasesQuery {
         sql.append("null::character varying(255) as sector, ");
         sql.append("null::character varying(255) as job, ");
         sql.append("null::character varying(255) as program, ");
-//--  null::boolean as match, ");
         sql.append("summary_tab.\"value\" ");
         sql.append("from ( ");
         sql.append(buildGetCaseColumnValueSQL(caseId, "Name", "name"));
@@ -133,15 +124,16 @@ public class SQLCompareCasesQuery {
         sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "Copied From", "template_used"));
         sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "Last Modified Date", "last_modified_date"));
         sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "# of met layers", "num_met_layers"));
-        sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "# of met layers", "num_met_layers"));
+        sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "# of emission layers", "num_emissions_layers"));
         sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "Start Date", "start_date"));
         sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "Future Year", "future_year"));
         sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "End Date & Time", "end_date"));
+        sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "Version", "model_version"));
 
         sql.append(" union all SELECT 'Project' as \"key\", projects.name as \"value\" FROM cases.cases inner join emf.projects on projects.id = cases.project_id where cases.id = " + caseId);
         sql.append(" union all SELECT 'Sectors' as \"key\", string_agg(sectors.name, ',' ORDER BY sectors.name) as \"value\" FROM cases.case_sectors inner join emf.sectors on sectors.id = case_sectors.sector_id where case_sectors.case_id = " + caseId);
         sql.append(" union all SELECT 'Last Modified By' as \"key\", users.\"name\" as \"value\" FROM cases.cases inner join emf.users on users.id = cases.user_id where cases.id = " + caseId);
-        sql.append(" union all SELECT 'Model & Version' as \"key\", model_to_runs.\"name\" as \"value\" FROM cases.cases inner join cases.model_to_runs on model_to_runs.id = cases.model_to_run_id where cases.id = " + caseId);
+        sql.append(" union all SELECT 'Model' as \"key\", model_to_runs.\"name\" as \"value\" FROM cases.cases inner join cases.model_to_runs on model_to_runs.id = cases.model_to_run_id where cases.id = " + caseId);
         sql.append(" union all SELECT 'Modeling Region' as \"key\", regions.\"name\" as \"value\" FROM cases.cases inner join emf.regions on regions.id = cases.modeling_region_id where cases.id = " + caseId);
         sql.append(" union all SELECT 'Regions' as \"key\", string_agg(georegions.name, ',' ORDER BY georegions.name) as \"value\" FROM cases.case_regions inner join emf.georegions on georegions.id = case_regions.region_id where case_regions.case_id = " + caseId);
         sql.append(" union all SELECT 'Downstream Model' as \"key\", air_quality_models.\"name\" as \"value\" FROM cases.cases inner join cases.air_quality_models on air_quality_models.id = cases.air_quality_model_id where cases.id = " + caseId);
@@ -170,11 +162,10 @@ public class SQLCompareCasesQuery {
         sql.append(" inputnames.\"name\", ");
         sql.append(" input_envt_vars.\"name\" as env_var,");
         sql.append(" georegions.\"name\" as region,");
-        sql.append(" coalesce(sectors.\"name\", 'All sectors') as sector,");
-        sql.append(" coalesce(cases_casejobs.\"name\", 'All jobs for sector') as job,");
+        sql.append(" coalesce(sectors.\"name\", '') as sector,");
+        sql.append(" coalesce(cases_casejobs.\"name\", '') as job,");
         sql.append(" programs.name as program,");
-//null::boolean as match,");
-        sql.append(" datasets.name || ' [Version: ' || coalesce(versions.version || '', '') || ' DS Type: ' || coalesce(dataset_types.name, '') || ']' as \"value\"");
+        sql.append(" datasets.name || ' [v' || coalesce(versions.version || '', '') || ']' as \"value\"");
 
 
         sql.append(" from cases.cases_caseinputs");
@@ -229,10 +220,9 @@ public class SQLCompareCasesQuery {
         sql.append(" parameter_names.\"name\", ");
         sql.append(" parameter_env_vars.\"name\" as env_var,");
         sql.append(" georegions.\"name\" as region,");
-        sql.append(" coalesce(sectors.\"name\", 'All sectors') as sector,");
-        sql.append(" coalesce(cases_casejobs.\"name\", 'All jobs for sector') as job,");
+        sql.append(" coalesce(sectors.\"name\", '') as sector,");
+        sql.append(" coalesce(cases_casejobs.\"name\", '') as job,");
         sql.append(" programs.name as program,");
-//        --  null::boolean as match,");
         sql.append(" cases_parameters.env_value as \"value\"");
 
         sql.append(" from cases.cases_parameters");
@@ -263,8 +253,46 @@ public class SQLCompareCasesQuery {
 
         sql.append(" where cases_parameters.case_id = " + caseId);
         
-        
+        //--Jobs Tab Data
+        sql.append(" union all");
+
+        sql.append(" select");
+
+            sql.append(" null::integer as input_name_id, ");
+            sql.append(" cases_casejobs.region_id, ");
+            sql.append(" cases_casejobs.sector_id, ");
+            sql.append(" null::integer as program_id, ");
+            sql.append(" cases_casejobs.id as case_job_id, ");
+            sql.append(" null::integer as env_vars_id, ");
+            sql.append(" null::integer as param_name_id,");
+
+
+            sql.append(" 'Jobs' as tab, ");
+            sql.append(" cases_casejobs.\"name\", ");
+            sql.append(" null::character varying(255) as env_var,");
+            sql.append(" georegions.\"name\" as region,");
+            sql.append(" coalesce(sectors.\"name\", '') as sector,");
+            sql.append(" coalesce(cases_casejobs.\"name\", '') as job,");
+            sql.append(" null::character varying(255) as program,");
+            sql.append(" case_jobrunstatus.\"name\" as \"value\"");
+
+            sql.append(" from cases.cases_casejobs");
+
+            sql.append(" left outer join cases.cases");
+            sql.append(" on cases.id = cases_casejobs.case_id");
+          
+            sql.append(" left outer join emf.georegions");
+            sql.append(" on georegions.id = cases_casejobs.region_id");
+
+            sql.append(" left outer join cases.case_jobrunstatus");
+            sql.append(" on case_jobrunstatus.id = cases_casejobs.runstatus_id");
+
+            sql.append(" left outer join emf.sectors");
+            sql.append(" on sectors.id = cases_casejobs.sector_id");
+
+            sql.append(" where cases_casejobs.case_id = " + caseId);
 /*
+SQL Pattern to follow...
 
 --Summary Tab Data
 select 
@@ -531,10 +559,23 @@ where cases_parameters.case_id = 13
     public static void main(String[] args) {
         
         try {
-            System.out.println(new SQLCompareCasesQuery(null, null).createCompareQuery(new int[] {13, 14}));
+            System.out.println(new SQLCompareCasesQuery(null).createCompareQuery(new int[] {7, 8}));
         } catch (EmfException e) {
             // NOTE Auto-generated catch block
             e.printStackTrace();
         }
     }
+
+    private Case getCase(int caseId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return new CaseDAO().getCase(caseId, session);
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not get Case, id = " + caseId);
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+        }
+    }
+
 }

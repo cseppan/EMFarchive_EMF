@@ -1221,5 +1221,14 @@ public class CaseServiceTransport implements CaseService {
         
         return (String) call.requestResponse(new Object[] { caseId, grids });
     }
+    
+    public String getCaseComparisonResult(int[] caseIds) throws EmfException {
+        EmfCall call = call();
+        call.setOperation("getCaseComparisonResult");
+        call.addParam("caseIds", dataMappings.integers());
+        call.setStringReturnType();
+        
+        return (String) call.requestResponse(new Object[] { caseIds });
+    }
 
 }

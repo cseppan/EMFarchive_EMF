@@ -1,5 +1,13 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.util.StringTokenizer;
+import java.util.UUID;
+
+import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenterImpl;
@@ -9,10 +17,14 @@ import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerPresen
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerView;
 import gov.epa.emissions.framework.client.casemanagement.sensitivity.SensitivityPresenter;
 import gov.epa.emissions.framework.client.casemanagement.sensitivity.SensitivityView;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.data.QAStepResult;
 
 public class CaseManagerPresenterImpl implements CaseManagerPresenter {
 
@@ -153,4 +165,77 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
     public CaseCategory getSelectedCategory() {
         return view.getSelectedCategory();
     }
+
+    public void viewCaseComparisonResult(int[] caseIds, String exportDir) throws EmfException {
+        if (caseIds == null || caseIds.length == 0)
+            throw new EmfException("No cases to compare.");
+        
+        File localFile = new File(tempQAStepFilePath(exportDir));
+        try {
+            if (!localFile.exists()) {
+                Writer output = new BufferedWriter(new FileWriter(localFile));
+                try {
+                    output.write(  
+//                            writerHeader(qaStep, qaResult, dataset.getName())
+                            ""+ getCaseComparisonResult(caseIds) 
+                            );
+                }
+                finally {
+                    output.close();
+                }
+            }
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+        
+        view.displayCaseComparisonResult("Some Name", localFile.getAbsolutePath());
+    }
+    
+    private String getCaseComparisonResult(int[] caseIds) throws EmfException {
+        return service().getCaseComparisonResult(caseIds);
+    }
+
+    private String tempQAStepFilePath(String exportDir) throws EmfException {
+        String separator = File.separator; 
+        UserPreference preferences = new DefaultUserPreferences();
+        String tempDir = preferences.localTempDir();
+//        String separator = exportDir.length() > 0 ? (exportDir.charAt(0) == '/') ? "/" : "\\" : "\\";
+//        String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR"); 
+
+        if (tempDir == null || tempDir.isEmpty())
+            tempDir = System.getProperty("java.io.tmpdir");
+
+        File tempDirFile = new File(tempDir);
+
+        if (!(tempDirFile.exists() && tempDirFile.isDirectory() && tempDirFile.canWrite() && tempDirFile.canRead()))
+            throw new EmfException("Import-export temporary folder does not exist or lacks write permissions: "
+                    + tempDir);
+
+
+        return tempDir + separator + (UUID.randomUUID()).toString().replaceAll("-", "") + ".csv"; // this is how exported file name was
+    }
+
+//    private String writerHeader(QAStep qaStep, QAStepResult stepResult, String dsName){
+//        String lineFeeder = System.getProperty("line.separator");
+//        String header="#DATASET_NAME=" + dsName + lineFeeder;
+//        header +="#DATASET_VERSION_NUM= " + qaStep.getVersion() + lineFeeder;
+//        header +="#CREATION_DATE=" + CustomDateFormat.format_YYYY_MM_DD_HH_MM(stepResult.getTableCreationDate())+ lineFeeder;
+//        header +="#QA_STEP_NAME=" + qaStep.getName() + lineFeeder; 
+//        header +="#QA_PROGRAM=" + qaStep.getProgram()+ lineFeeder;
+//        String arguments= qaStep.getProgramArguments();
+//        StringTokenizer argumentTokenizer = new StringTokenizer(arguments);
+//        header += "#ARGUMENTS=" +argumentTokenizer.nextToken(); // get first token
+//
+//        while (argumentTokenizer.hasMoreTokens()){
+//            String next = argumentTokenizer.nextToken().trim(); 
+//            if (next.contains("-"))
+//                header += lineFeeder+ "#" +next;
+//            else 
+//                header += "  " +next;
+//        }
+//        header +=lineFeeder;
+//        //arguments.replaceAll(lineFeeder, "#");
+//        //System.out.println("after replace  \n" + header);
+//        return header;
+//    }
 }

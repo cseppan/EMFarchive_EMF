@@ -45,4 +45,5 @@ public interface CaseManagerPresenter {
     
     Case[] getCases(CaseCategory category, String nameContains) throws EmfException;
 
+    void viewCaseComparisonResult(int[] caseIds, String exportDir) throws EmfException;
 }

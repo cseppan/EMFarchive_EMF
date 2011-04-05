@@ -22,4 +22,6 @@ public interface CaseManagerView extends ManagedView {
     void setSelectedCategory();
     
     void setMessage(String message);
+
+    void displayCaseComparisonResult(String string, String absolutePath);
 }

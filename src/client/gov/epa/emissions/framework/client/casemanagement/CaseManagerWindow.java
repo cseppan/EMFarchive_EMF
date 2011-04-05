@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewer;
 import gov.epa.emissions.framework.client.casemanagement.sensitivity.SensitivityWindow;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
@@ -320,7 +321,36 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         sensitivityButton.setMnemonic('S');
         crudPanel.add(sensitivityButton);
         
+        Button compareButton = new Button("Compare", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                clearMsgPanel();
+                try {
+                    compareCases();
+                } catch (EmfException e1) {
+                    // NOTE Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        crudPanel.add(compareButton);
+        
         return crudPanel;
+    }
+
+    protected void compareCases() throws EmfException {
+        cases = selected();
+
+        if (cases.isEmpty()) {
+            messagePanel.setMessage("Please select a single case to use as the Parent Case for the sensitivity");
+            return;
+        }
+
+        int[] ids = new int[cases.size()];
+        
+        for (int i = 0; i < cases.size(); ++i) {
+            ids[i] = ((Case)cases.get(i)).getId();
+        }
+        presenter.viewCaseComparisonResult(ids, "");
     }
 
     private SelectAwareButton editButton(ConfirmDialog confirmDialog) {
@@ -537,6 +567,11 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     public void setMessage(String message) {
         messagePanel.setMessage(message);
 
+    }
+
+    public void displayCaseComparisonResult(String qaStepName, String exportedFileName) {
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QA Step Results: " + qaStepName, new Dimension(500, 500), desktopManager, parentConsole);
+        app.display(new String[] { exportedFileName });
     }   
 
 }

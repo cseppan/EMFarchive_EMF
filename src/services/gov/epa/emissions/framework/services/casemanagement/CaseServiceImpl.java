@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -16,6 +18,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterN
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.qa.QueryToString;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.Date;
@@ -764,4 +767,24 @@ public class CaseServiceImpl implements CaseService {
         return getCaseService().isGeoRegionInSummary(caseId, grids);
     }
 
+    public String getCaseComparisonResult(int[] caseIds) throws EmfException {
+        DbServer dbServer = dbFactory.getDbServer();
+        try {
+//            String sqlQuery = ;
+            return new QueryToString(dbServer, new SQLCompareCasesQuery(sessionFactory).createCompareQuery(caseIds), ",").toString();
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not retrieve case comparison result: " + e.getMessage(), e);
+        } catch (ExporterException e) {
+            throw new EmfException("Could not retrieve case comparison result: " + e.getMessage(), e);
+        } finally {
+            try {
+                if (dbServer != null && dbServer.isConnected())
+                    dbServer.disconnect();
+            } catch (Exception e) {
+                throw new EmfException("ManagedCaseService: error closing db server. " + e.getMessage());
+            }
+        }
+    }
+
+    
 }
