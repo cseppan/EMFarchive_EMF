@@ -341,7 +341,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         cases = selected();
 
         if (cases.isEmpty()) {
-            messagePanel.setMessage("Please select a single case to use as the Parent Case for the sensitivity");
+            messagePanel.setMessage("Please select at least one case to compare");
             return;
         }
 

@@ -83,7 +83,7 @@ public class SQLCompareCasesQuery {
                 sql.append(" and coalesce(case" + i + ".region_id, 0) = coalesce(case0.region_id, 0)");
                 sql.append(" and coalesce(case" + i + ".sector_id, 0) = coalesce(case0.sector_id, 0)");
                 sql.append(" and coalesce(case" + i + ".program_id, 0) = coalesce(case0.program_id, 0)");
-                sql.append(" and coalesce(case" + i + ".case_job_id, 0) = coalesce(case0.case_job_id, 0)");
+                sql.append(" and coalesce(case" + i + ".job, '') = coalesce(case0.job, '')");
                 sql.append(" and coalesce(case" + i + ".envt_vars_id, 0) = coalesce(case0.envt_vars_id, 0)");
             }
         
@@ -104,7 +104,7 @@ public class SQLCompareCasesQuery {
         sql.append("null::integer as region_id,  ");
         sql.append("null::integer as sector_id,  ");
         sql.append("null::integer as program_id,  ");
-        sql.append("null::integer as case_job_id,  ");
+//        sql.append("null::integer as case_job_id,  ");
         sql.append("null::integer as envt_vars_id, ");
         sql.append("null::integer as param_name_id, ");
 
@@ -153,7 +153,7 @@ public class SQLCompareCasesQuery {
         sql.append(" cases_caseinputs.region_id, ");
         sql.append(" cases_caseinputs.sector_id, ");
         sql.append(" cases_caseinputs.program_id, ");
-        sql.append(" cases_caseinputs.case_job_id, ");
+//        sql.append(" cases_caseinputs.case_job_id, ");
 
         sql.append(" cases_caseinputs.envt_vars_id,");
         sql.append(" null::integer as param_name_id,");
@@ -211,7 +211,8 @@ public class SQLCompareCasesQuery {
         sql.append(" cases_parameters.region_id, ");
         sql.append(" cases_parameters.sector_id, ");
         sql.append(" cases_parameters.program_id, ");
-        sql.append(" cases_parameters.case_job_id, ");
+//        sql.append(" cases_parameters.case_job_id as parameter_case_job_id, ");
+//        sql.append(" cases_casejobs.\"name\" as case_job_name, ");
         sql.append(" cases_parameters.env_vars_id, ");
         sql.append(" cases_parameters.param_name_id,");
 
@@ -262,7 +263,8 @@ public class SQLCompareCasesQuery {
             sql.append(" cases_casejobs.region_id, ");
             sql.append(" cases_casejobs.sector_id, ");
             sql.append(" null::integer as program_id, ");
-            sql.append(" cases_casejobs.id as case_job_id, ");
+//            sql.append(" null::integer as parameter_case_job_id, ");
+//            sql.append(" cases_casejobs.\"name\" as case_job_name, ");
             sql.append(" null::integer as env_vars_id, ");
             sql.append(" null::integer as param_name_id,");
 

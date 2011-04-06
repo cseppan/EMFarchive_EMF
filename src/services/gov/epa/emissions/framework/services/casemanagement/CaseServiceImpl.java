@@ -770,7 +770,6 @@ public class CaseServiceImpl implements CaseService {
     public String getCaseComparisonResult(int[] caseIds) throws EmfException {
         DbServer dbServer = dbFactory.getDbServer();
         try {
-//            String sqlQuery = ;
             return new QueryToString(dbServer, new SQLCompareCasesQuery(sessionFactory).createCompareQuery(caseIds), ",").toString();
         } catch (RuntimeException e) {
             throw new EmfException("Could not retrieve case comparison result: " + e.getMessage(), e);
