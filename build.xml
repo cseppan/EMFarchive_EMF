@@ -433,7 +433,9 @@
 		<tar tarfile="${build.home}/EMFClientInstaller.tar">
 			<tarfileset dir="${client.dist.dir}" prefix="EMFClientInstaller" />
 		</tar>
+		
 		<gzip zipfile="${build.home}/EMFClientInstaller.tar.gz" src="${build.home}/EMFClientInstaller.tar" />
+		
 		<zip destfile="${build.home}/EMFClientInstaller.zip">
 			<zipfileset dir="${client.dist.dir}" prefix="EMFClientInstaller" />
 		</zip>
