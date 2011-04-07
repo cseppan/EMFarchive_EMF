@@ -1029,7 +1029,7 @@ BEGIN
 					null::integer as record_id, null::double precision as cap, null::double precision as replacement, null::varchar(1) as allowable_type, null::timestamp without time zone as compliance_date, null::integer as ranking
 				where 1 = 0
 
-				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.cap,proj.replacement,case when replacement is not null then ''R'' when cap is not null then ''C'' end as allowable_type,',control_program_dataset_filter_sql || ' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone') || '
+				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.cap,proj.replacement,case when replacement is not null then ''R'' when cap is not null then ''C'' end as allowable_type,proj.compliance_date,',control_program_dataset_filter_sql || ' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone') || '
 				--order by record_id, allowable_type, ranking, compliance_date desc
 			) tbl';
 		END IF;
