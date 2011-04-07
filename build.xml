@@ -389,7 +389,8 @@
 
 	</target>
 
-	<target name="client-installer-dist" depends="clean, init, compile-client, client-env, client-dist-sandbox, commons-dist" description="Builds the EMF Client installer distribution files excluding dependent jar file">
+	<!-- <target name="client-installer-dist" depends="clean, init, compile-client, client-env, client-dist-sandbox, commons-dist" description="Builds the EMF Client installer distribution files excluding dependent jar file"> -->
+	<target name="client-installer-dist" depends="clean, init, compile-client, client-env, client-dist, commons-dist" description="Builds the EMF Client installer distribution files excluding dependent jar file">
 
 		<jar jarfile="${client.dist.dir}/${app.name}-client.jar">
 			<fileset dir="${build.classes.dir}" includes="**/*" />
@@ -428,6 +429,15 @@
 				</fileset>
 			</classpath>
 		</java>
+		
+		<tar tarfile="${build.home}/EMFClientInstaller.tar">
+			<tarfileset dir="${client.dist.dir}" prefix="EMFClientInstaller" />
+		</tar>
+		<gzip zipfile="${build.home}/EMFClientInstaller.tar.gz" src="${build.home}/EMFClientInstaller.tar" />
+		<zip destfile="${build.home}/EMFClientInstaller.zip">
+			<zipfileset dir="${client.dist.dir}" prefix="EMFClientInstaller" />
+		</zip>
+		
 	</target>
 
 	<target name="client-installer-dist-no-clean-init" depends="compile-client-no-clean-init, client-dist-sandbox-no-clean-init" description="Builds the EMF Client installer distribution files excluding dependent jar file">
