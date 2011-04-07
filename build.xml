@@ -417,7 +417,7 @@
 			<fileset dir="${commons.basedir}/build/sandbox" includes="*.jar" />
 		</copy>
 
-		<copy todir="${client.dist.dir}" file="./build/eclipse/gov/epa/emissions/framework/install/installer/runinstaller.bat" />
+		<copy todir="${client.dist.dir}" file="./src/client/gov/epa/emissions/framework/install/installer/runinstaller.bat" />
 
 		<java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList" fork="true" failonerror="true">
 			<arg value="${lib.dir}" />
