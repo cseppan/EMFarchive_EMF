@@ -185,10 +185,14 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
         container.add(Box.createHorizontalStrut(20));
 
         runButton = new RunButton(runAction());
-        if (sectorScenario.getRunStatus().equals("Not started")) 
+        String stat = sectorScenario.getRunStatus();
+        if (stat != null && (stat.equals("Not started") || stat.equals( "Finished") || 
+                             stat.equals( "Failed") || stat.equals( "Cancelled"))) {
             runButton.setEnabled(true);
-        else
+        }
+        else {
             runButton.setEnabled(false);
+        }
         container.add(runButton);
 
         refreshButton = new Button("Refresh", new AbstractAction(){
@@ -198,11 +202,12 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
                     // enable Run button JIZHEN-SECTOR
                     SectorScenario ss = session.sectorScenarioService().getById(sectorScenario.getId());
                     String status = ss.getRunStatus();
-                    if ( status.equals( "Finished") || status.equals( "Failed") || status.equals( "Cancelled")) {
+                    if ( status.equals("Not started") || status.equals( "Finished") || status.equals( "Failed") || status.equals( "Cancelled")) {
                         runButton.setEnabled( true);
                     }
                     if ( !status.equals( "Running")) {
                         stopButton.setEnabled( false);
+                        saveButton.setEnabled( true);
                     }
                 } catch (EmfException e) {
                     showError(e.getMessage());
@@ -265,10 +270,14 @@ public class EditSectorScenarioWindow extends DisposableInteralFrame implements 
 
     public void enableButtons(boolean enable) {
         saveButton.setEnabled(enable);
-        if (sectorScenario.getRunStatus().equals("Not started")) 
+        String stat = sectorScenario.getRunStatus();
+        if (stat != null && (stat.equals("Not started") || stat.equals( "Finished") || 
+                stat.equals( "Failed") || stat.equals( "Cancelled"))) {
             runButton.setEnabled(true);
-        else
+        }
+        else {
             runButton.setEnabled(false);
+        }
         stopButton.setEnabled(!enable);
     }
 
