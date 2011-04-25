@@ -9,7 +9,7 @@ public class Constants {
 	
 	public static final String TIME_FORMAT = "MM/dd/yyyy hh:mmaaa";
     public static final String EMF_URL = "http://www.ie.unc.edu/cempd/projects/emf/install/";
-	public static final String SERVER_ADDRESS = "http://orchid.nesc.epa.gov:8080/emf/services";
+	public static final String SERVER_ADDRESS = "http://sage.nesc.epa.gov:8080/emf/services";
     
 	public static final String INSTALLER_PREFERENCES_FILE = "EMFPrefsTemplate.txt";
     public static final String EMF_PREFERENCES_FILE = "EMFPrefs.txt";
