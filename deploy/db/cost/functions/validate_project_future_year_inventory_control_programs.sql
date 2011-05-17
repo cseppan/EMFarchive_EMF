@@ -22,7 +22,7 @@ DECLARE
 	effective_date_cutoff_daymonth varchar(256) := '';
 BEGIN
 
-	SELECT case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
+	SELECT case when length(trim(cs.filter)) > 0 then '(' || cs.filter || ')' else null end,
 		cs.county_dataset_id,
 		cs.county_dataset_version,
 		cs.analysis_year
@@ -49,9 +49,9 @@ BEGIN
 
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
-		county_dataset_filter_sql := ' and inv.fips in (SELECT fips
-			FROM emissions.' || (SELECT table_name FROM emf.internal_sources where dataset_id = county_dataset_id) || '
-			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
+		county_dataset_filter_sql := ' and inv.fips in (SELECT inv.fips
+			FROM emissions.' || (SELECT table_name FROM emf.internal_sources where dataset_id = county_dataset_id) || ' inv
+			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version, 'inv') || ')';
 	END IF;
 
 	-- validate that all inputs look fine, before actually running the projection.
@@ -125,6 +125,7 @@ BEGIN
 
 	-- look at the control packet control program, make sure there are no duplicates maching between an additonal and replacement control.
 
+	-- TODO Possibly:  did something similar for ALLOWABLE Packets
 	FOR inventory_record IN EXECUTE 
 		'select lower(i.table_name) as table_name, 
 			inv.dataset_id, 
@@ -144,7 +145,7 @@ BEGIN
 		sql := '';
 		
 		-- build version info into where clause filter
-		inv_filter := '(' || public.build_version_where_filter(inventory_record.dataset_id, inventory_record.dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
+		--inv_filter := '(' || public.build_version_where_filter(inventory_record.dataset_id, inventory_record.dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
 
 		FOR control_program IN EXECUTE 
 			'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
@@ -180,8 +181,12 @@ BEGIN
 			END IF;
 
 			--see http://www.smoke-model.org/version2.4/html/ch06s02.html for source matching hierarchy
+
+
+-- TODO:  Get rid of distinct and see if this catches dups in the same packet...not sure current approach will catch this issue
 			sql := sql || '
-			select distinct on (record_id)
+			select 
+			--distinct on (record_id)
 				record_id,fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,replacement,compliance_date,
 				' || quote_literal(control_program.control_program_name) || ' as control_program_name,
 				ranking
@@ -192,17 +197,18 @@ BEGIN
 					null::character varying(1) as replacement, null::timestamp without time zone as compliance_date, null::integer as ranking
 				where 1 = 0
 
+				union all
 				' || public.build_project_future_year_inventory_matching_hierarchy_sql(
-					control_program.table_name, 
-					inventory_record.table_name, 
-					'proj.fips,proj.scc,proj.plantid,proj.pointid,proj.stackid,proj.segment,proj.poll,proj.sic,proj.mact,proj.replacement,proj.compliance_date,',
-					control_program_dataset_filter_sql || ' 
-					and proj.application_control = ''Y'' 
-					and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' 
-					and coalesce(proj.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone'
+					inventory_record.dataset_id, inventory_record.dataset_version, 
+					control_program.dataset_id, control_program.dataset_version,
+					'fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,replacement,compliance_date',
+					inv_filter, 
+					county_dataset_id,
+					county_dataset_version,
+					'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone and application_control = ''Y'' ',
+					1	-- include only Matched Sources
 					) || '
 			) tbl';
-
 
 		END LOOP;
 

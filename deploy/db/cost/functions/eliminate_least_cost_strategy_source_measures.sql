@@ -11,6 +11,7 @@ DECLARE
 	worksheet_table_name varchar(64) := '';
 	target_pollutant varchar;
 	gimme_count integer := 0;
+	include_unspecified_costs boolean := true; 
 BEGIN
 --	SET work_mem TO '256MB';
 --	SET enable_seqscan TO 'off';
@@ -35,13 +36,15 @@ BEGIN
 		worksheet_table_name;
 
 	-- get target pollutant
-	SELECT p.name
+	SELECT p.name,
+		coalesce(cs.include_unspecified_costs,true)
 	FROM emf.control_strategies cs
 		inner join emf.pollutants p
 		on p.id = cs.pollutant_id
 	where cs.id = int_control_strategy_id
-	INTO target_pollutant;
-
+	INTO target_pollutant,
+		include_unspecified_costs;
+		
 --	raise notice '%', 'start ' || clock_timestamp();
 
 
@@ -63,6 +66,26 @@ BEGIN
 		) tbl
 		order by tbl.source, tbl.marginal, tbl.emis_reduction desc
 	)';
+
+	if not include_unspecified_costs then 
+		-- look for measure cost freebies, get rid of them
+		execute 'update emissions.' || worksheet_table_name || '
+		set status = 0
+		where record_id in (
+			select tbl2.record_id
+			from (
+			select CM_Id, source--, record_id
+			from emissions.' || worksheet_table_name || '
+			group by CM_Id, source
+			having sum(annual_cost) = 0.0
+			) tbl
+			inner join emissions.' || worksheet_table_name || ' tbl2
+			on tbl2.CM_Id = tbl.CM_Id
+			and tbl2.source = tbl.source
+		)';
+
+	end if;
+
 
 	get diagnostics gimme_count = row_count;
 --	raise notice '%', 'get rid of measures - you''d never pay more to get less (or the same) - emissions.' || worksheet_table_name || ' count = ' || gimme_count || ' - ' || clock_timestamp();

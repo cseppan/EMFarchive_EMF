@@ -79,22 +79,13 @@ poll|poll
     public static final String JOIN_TYPE_TAG = "-join";
 
 //    private static final String FULL_JOIN_EXPRESSIONS_TAG = "-fulljoin";
-/*
-scc|scc
-fips|fips
-plantid|plantid
-pointid|pointid
-stackid|stackid
-segment|segment
-poll|poll
-*/
 
+    public static final String WHERE_FILTER_TAG = "-where";
+    
     ArrayList<String> baseDatasetNames = new ArrayList<String>();
     
     ArrayList<String> compareDatasetNames = new ArrayList<String>();
-    
-    private boolean hasInvTableDataset;
-    
+        
     private Datasource datasource;
     
     public SQLCompareDatasetsProgramQuery(HibernateSessionFactory sessionFactory, Datasource datasource, String emissioDatasourceName, String tableName, QAStep qaStep) {
@@ -167,6 +158,10 @@ poll|poll
         String[] groupByExpressions = new String[] {};
         String[] aggregateExpressions = new String[] {};
         String[] matchingExpressionTokens = new String[] {};
+        String whereFilter = new String();
+        String baseWhereFilter = new String();
+        String compareWhereFilter = new String();
+        
 //        String[] fullJoinExpressionTokens = new String[] {};
         Map<String, Column> baseColumns;
         Map<String, Column> compareColumns;
@@ -189,6 +184,7 @@ poll|poll
         int indexAggregate = programArguments.indexOf(AGGREGATE_EXPRESSIONS_TAG);
         int indexMatching = programArguments.indexOf(MATCHING_EXPRESSIONS_TAG);
         int indexJoin = programArguments.indexOf(JOIN_TYPE_TAG);
+        int indexWhereFilter = programArguments.indexOf(WHERE_FILTER_TAG);
         
         if (indexBase != -1) {
             arguments = parseSwitchArguments(programArguments, indexBase, programArguments.indexOf("\n-", indexBase) != -1 ? programArguments.indexOf("\n-", indexBase) : programArguments.length());
@@ -224,7 +220,8 @@ poll|poll
         checkDataset();
         
         String joinSQL="";       
-        if (indexJoin != -1) 
+        if (indexJoin != -1
+                && (indexJoin + JOIN_TYPE_TAG.length() + 1) < (programArguments.indexOf("\n-", indexJoin) != -1 ? programArguments.indexOf("\n-", indexJoin) : programArguments.length())) 
             joinSQL = programArguments.substring(indexJoin + JOIN_TYPE_TAG.length() + 1, programArguments.indexOf("\n-", indexJoin) != -1 ? programArguments.indexOf("\n-", indexJoin) : programArguments.length());          
         if (joinSQL.trim().isEmpty())
             joinSQL = " full outer join ";
@@ -247,6 +244,9 @@ poll|poll
                 matchingExpressionMap.put(dataset2Expression, new ColumnMatchingMap(dataset1Expression, dataset2Expression));
             }
         }
+        if (indexWhereFilter != -1 
+                && (indexWhereFilter + WHERE_FILTER_TAG.length() + 1) < (programArguments.indexOf("\n-", indexWhereFilter) != -1 ? programArguments.indexOf("\n-", indexWhereFilter) : programArguments.length())) 
+            whereFilter = programArguments.substring(indexWhereFilter + WHERE_FILTER_TAG.length() + 1, programArguments.indexOf("\n-", indexWhereFilter) != -1 ? programArguments.indexOf("\n-", indexWhereFilter) : programArguments.length());
     
         //Validate program arguments (i.e., does dataset and version exist, does mapping make sense, etc...)
        
@@ -308,8 +308,8 @@ poll|poll
         }
 
         //get columns that represent both the compare and base datasets
-        baseColumns = getDatasetColumnMap(((DatasetVersion)baseDatasetList.get(0)).getDataset());
-        compareColumns = getDatasetColumnMap(((DatasetVersion)compareDatasetList.get(0)).getDataset());
+        baseColumns = getDatasetColumnMap((baseDatasetList.get(0)).getDataset());
+        compareColumns = getDatasetColumnMap((compareDatasetList.get(0)).getDataset());
 
         //see if there are issues with the matching expressions
         if (matchingExpressionMap.size() > 0 ) {
@@ -336,7 +336,7 @@ poll|poll
             for (String groupByExpression : groupByExpressions) {
 
                 //parse group by token and put in a map for later use...
-                String[] groupByExpressionParts = groupByExpression.split(" as ");
+                String[] groupByExpressionParts = groupByExpression.split(" (?i)as ");
 //                StringTokenizer tokenizer = new StringTokenizer(groupByExpression.toLowerCase(), "\\ as ");
                 int count = groupByExpressionParts.length;
                 String expression = "";
@@ -370,7 +370,7 @@ poll|poll
                 //if either one of the dataset types doesn't contain the column, then make sure we have a mapping for it...
                 baseExpressionExists = expressionExists(expression, baseColumns, matchingExpressionMap);
                 compareExpressionExists = expressionExists(expression, compareColumns, matchingExpressionMap);
-                if (!baseExpressionExists && !compareExpressionExists) {
+                if (!baseExpressionExists || !compareExpressionExists) {
                     if (matchingExpressionMap.get(expression.toLowerCase()) == null)
                         throw new EmfException("GROUP BY expression, " + expression + ", needs a mapping entry specified, the column doesn't exist in either the base or compare datasets.");
                 }
@@ -412,6 +412,21 @@ poll|poll
             throw new EmfException("There are no AGGREGATE expressions specified.");
         }
 
+        //see if there are issues with the where filter expression
+        if (whereFilter.length() > 0 ) {
+            boolean baseColumnExists = expressionExists(whereFilter, baseColumns, matchingExpressionMap);
+//          Column baseColumn = baseColumns.get(aggregateExpression.toLowerCase());
+            boolean compareColumnExists = expressionExists(whereFilter, compareColumns, matchingExpressionMap);
+//          Column compareColumn = compareColumns.get(aggregateExpression.toLowerCase());
+            //make sure aggregate expression exists
+            if (!baseColumnExists && !compareColumnExists)
+                throw new EmfException("Where Filter contains expressions that don't exist as a column in either the base or compare datasets.");
+            //if either one of the dataset types doesn't contain the column, then make sure we have a mapping for it...
+            if (!baseColumnExists || !compareColumnExists) {
+                if (matchingExpressionMap.get(whereFilter.toLowerCase()) == null)
+                    throw new EmfException("Where Filter contains expression that needs a mapping entry specified, the column doesn't exist in either the base or compare datasets.");
+          }
+        } 
         
         //Build SQL statement
         
@@ -482,7 +497,12 @@ poll|poll
             compareUnionSelectSQL += ",sum(\"" + aggregateExpression + "\") as \"" + aggregateExpression + "\"";
         }
 
-        //build inner sql statement with the datasets specified, make sure and unionize (append) the tables together
+        //alias where filter for use in the base and compare datasets
+        baseWhereFilter = aliasBaseExpression(whereFilter, matchingExpressionMap, baseColumns, "b");
+//      Column compareColumn = getCompareColumn(aggregateExpression, matchingExpressionMap, compareColumns);
+        compareWhereFilter = aliasCompareExpression(whereFilter, matchingExpressionMap, compareColumns, "c");
+
+      //build inner sql statement with the datasets specified, make sure and unionize (append) the tables together
          String innerSQLBase = "";
          if (baseDatasetList.size() > 1) 
              innerSQLBase = baseUnionSelectSQL + ", sum(b.cnt) as cnt from (";
@@ -491,7 +511,7 @@ poll|poll
              EmfDataset dataset = datasetVersion.getDataset();
              VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion.getVersion(), "b");
 
-             innerSQLBase += (j > 0 ? " \nunion all " : "") + baseSelectSQL + ", count(1) as cnt from emissions." + dataset.getInternalSources()[0].getTable() + " as b where " + datasetVersionedQuery.query() + " " + baseGroupBySQL;
+             innerSQLBase += (j > 0 ? " \nunion all " : "") + baseSelectSQL + ", count(1) as cnt from emissions." + dataset.getInternalSources()[0].getTable() + " as b where " + datasetVersionedQuery.query() + (baseWhereFilter.length() > 0 ? " and " + baseWhereFilter : "") + " " + baseGroupBySQL;
          }
          if (baseDatasetList.size() > 1) 
              innerSQLBase += ") b " + baseUnionGroupBySQL;
@@ -507,7 +527,7 @@ poll|poll
              DatasetVersion datasetVersion = compareDatasetList.get(j);
              EmfDataset dataset = datasetVersion.getDataset();
              VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion.getVersion(), "c");
-             innerSQLCompare += (j > 0 ? " \nunion all " : "") + compareSelectSQL + ", count(1) as cnt from emissions." + dataset.getInternalSources()[0].getTable() + " as c where " + datasetVersionedQuery.query() + " " + compareGroupBySQL;
+             innerSQLCompare += (j > 0 ? " \nunion all " : "") + compareSelectSQL + ", count(1) as cnt from emissions." + dataset.getInternalSources()[0].getTable() + " as c where " + datasetVersionedQuery.query() + (compareWhereFilter.length() > 0 ? " and " + compareWhereFilter : "") + " " + compareGroupBySQL;
          }
          if (compareDatasetList.size() > 1) 
              innerSQLCompare += ") c " + compareUnionGroupBySQL;
@@ -537,14 +557,6 @@ poll|poll
         return parser.createTableQuery() + " " + sql;
     }
 
-    private Column getBaseColumn(String columnName, Map<String,ColumnMatchingMap> columnMatchingMap, Map<String,Column> baseColumns) {
-        Column baseColumn = baseColumns.get(columnName.toLowerCase());
-        if (baseColumn != null) {
-            return baseColumn;
-        }
-        return baseColumns.get(columnMatchingMap.get(columnName.toLowerCase()).getBaseExpression());
-    }
-    
     private boolean expressionExists(String expression, Map<String,Column> columns) {
         Set<String> columnsKeySet = columns.keySet();
         Iterator<String> iterator = columnsKeySet.iterator();
@@ -570,8 +582,12 @@ poll|poll
         Iterator<String> iterator = columnMatchingMapKeySet.iterator();
         while (iterator.hasNext()) {
             String mappingExpression = iterator.next();
-            if (expression.toLowerCase().equals(mappingExpression)) 
+            Pattern pattern = getPattern(mappingExpression);
+            Matcher matcher = pattern.matcher(expression);
+
+            if (matcher.find()) {
                 return true;
+            }
         }
         
         return false;
@@ -606,6 +622,45 @@ poll|poll
             return aliasedExpression;
         
         throw new EmfException("Unknown base dataset expression.");
+    }
+    
+    private String aliasBaseExpression(String expression, Map<String,ColumnMatchingMap> columnMatchingMap, Map<String,Column> baseColumns, String tableAlias) {
+        Set<String> columnsKeySet = baseColumns.keySet();
+        Iterator<String> iterator = columnsKeySet.iterator();
+        Set<String> columnMatchingMapKeySet = columnMatchingMap.keySet();
+        Iterator<String> iterator2 = columnMatchingMapKeySet.iterator();
+        String aliasedExpression = expression;
+        
+        //see if there is a mapping if so override the expression
+//        if (columnMatchingMap.get(expression.toLowerCase()) != null) {
+//            aliasedExpression = columnMatchingMap.get(expression.toLowerCase()).getBaseExpression();
+//        }
+        while (iterator2.hasNext()) {
+            String mappedExpression = iterator2.next();
+            Pattern pattern = getPattern(mappedExpression);
+            Matcher matcher = pattern.matcher(aliasedExpression);
+
+            //check to see if anything is found...
+            if (matcher.find()) {
+                aliasedExpression = matcher.replaceAll(columnMatchingMap.get(mappedExpression).getBaseExpression());
+            }
+        }
+        
+        //find all column names in the expression and alias each one
+        
+        //first check the expressions contains columns from the base dataset
+        while (iterator.hasNext()) {
+            String columnName = iterator.next();
+
+            Pattern pattern = getPattern(columnName);
+            Matcher matcher = pattern.matcher(aliasedExpression);
+
+            //check to see if anything is found...
+            if (matcher.find()) {
+                aliasedExpression = matcher.replaceAll(tableAlias + ".\"" + baseColumns.get(columnName).getName() + "\"");
+            }
+        }
+        return aliasedExpression;
     }
     
     
@@ -655,12 +710,39 @@ poll|poll
         throw new EmfException("Unknown compare dataset expression.");
     }
     
-    private Column getCompareColumn(String columnName, Map<String,ColumnMatchingMap> columnMatchingMap, Map<String,Column> compareColumns) {
-        Column compareColumn = compareColumns.get(columnName.toLowerCase());
-        if (compareColumn != null) {
-            return compareColumn;
+    private String aliasCompareExpression(String expression, Map<String,ColumnMatchingMap> columnMatchingMap, Map<String,Column> compareColumns, String tableAlias) {
+        Set<String> columnsKeySet = compareColumns.keySet();
+        Iterator<String> iterator = columnsKeySet.iterator();
+        Set<String> columnMatchingMapKeySet = columnMatchingMap.keySet();
+        Iterator<String> iterator2 = columnMatchingMapKeySet.iterator();
+        String aliasedExpression = expression;
+
+        //see if there is a mapping if so override the expression
+//        if (columnMatchingMap.get(expression.toLowerCase()) != null) {
+//            aliasedExpression = columnMatchingMap.get(expression.toLowerCase()).getCompareExpression();
+//        }
+        while (iterator2.hasNext()) {
+            String mappedExpression = iterator2.next();
+            Pattern pattern = getPattern(mappedExpression);
+            Matcher matcher = pattern.matcher(aliasedExpression);
+
+            //check to see if anything is found...
+            if (matcher.find()) {
+                aliasedExpression = matcher.replaceAll(columnMatchingMap.get(mappedExpression).getCompareExpression());
+            }
         }
-        return compareColumns.get(columnMatchingMap.get(columnName.toLowerCase()).getCompareExpression());
+        
+        while (iterator.hasNext()) {
+            String columnName = iterator.next();
+            Pattern pattern = getPattern(columnName);
+            Matcher matcher = pattern.matcher(aliasedExpression);
+
+            //check to see if anything is found...
+            if (matcher.find()) {
+                aliasedExpression = matcher.replaceAll(tableAlias + ".\"" + compareColumns.get(columnName).getName() + "\"");
+            }
+        }
+        return aliasedExpression;
     }
     
     private Map<String,Column> getDatasetColumnMap(EmfDataset dataset) throws SQLException {

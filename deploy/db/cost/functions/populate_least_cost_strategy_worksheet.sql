@@ -500,8 +500,8 @@ BEGIN
 			EXISTING_MEASURE_ABBREVIATION,
 			EXISTING_PRIMARY_DEVICE_TYPE_CODE
 			) 
-	select *
-	from (
+--	select *
+--	from (
 		select DISTINCT ON (inv.record_id, er.control_measures_id) 
 			' || worksheet_dataset_id || ' as Dataset_Id,
 			m.abbreviation,
@@ -731,91 +731,17 @@ BEGIN
 						* ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton, -1E+308) <= ' || max_ann_cost_constraint, '')  || '
 			)' else '' end || '
 
-			' || case when include_unspecified_costs = true then '' else '
-			and (select sum(' || replace(replace(replace(replace(replace(replace(get_strategt_cost_inner_sql,'inv.','inv2.'),'er.','er2.'),'et.','et2.'),'eq.','eq2.'),'gdplev.','gdplev2.'),'gdplev_incr.','gdplev_incr2.') || '.annual_cost) as annual_cost
-
-			FROM emissions.' || inv_table_name || ' inv2
-
-				inner join emf.pollutants p2
-				on p2.name = inv2.poll
-				
-				left outer join emf.control_measure_equations eq2
-				on eq2.control_measure_id = m.id
-				and eq2.pollutant_id = p2.id
-
-				left outer join emf.equation_types et2
-				on et2.id = eq2.equation_type_id
-
-				left outer join reference.gdplev gdplev2
-				on gdplev2.annual = eq2.cost_year
-
-				inner join emf.control_measure_efficiencyrecords er2
-				on er2.control_measures_id = m.id
-				-- pollutant filter
-				and er2.pollutant_id = p2.id
-				-- min and max emission filter
-				and ' || replace(annualized_uncontrolled_emis_sql,'inv.','inv2.') || ' between coalesce(er2.min_emis, -1E+308) and coalesce(er2.max_emis, 1E+308)
-				-- locale filter
-				and (er2.locale = inv2.fips or er2.locale = substr(inv2.fips, 1, 2) or er2.locale = '''')
-				-- effecive date filter
-				and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er2.effective_date), ' || inventory_year || '::integer)		
-				-- Replacement vs Add On Logic...
-				and (
-
-					-- Measure is Add On Only!
-					(
-						(coalesce(er2.existing_measure_abbr, '''') <> '''' or er2.existing_dev_code <> 0)
-						and 
-						(
-							(length(inv2.control_measures) > 0 and strpos('','' || coalesce(inv2.control_measures, '''') || '','', '','' || er2.existing_measure_abbr || '','') > 0) '
-							|| case when has_cpri_column then ' or (inv2.cpri <> 0 and er2.existing_dev_code = inv2.cpri) '
-							when has_primary_device_type_code_column then ' or (length(inv2.primary_device_type_code) > 0 and er2.existing_dev_code || '''' = inv2.primary_device_type_code) '
-							else '' end || '
-						)
-					)
-
-					-- Measure is Replacement Only!
-					or 
-					(
-						coalesce(er2.existing_measure_abbr, '''') = '''' and coalesce(er2.existing_dev_code, 0) = 0
-					)
-
-				)
-
-				left outer join reference.gdplev gdplev_incr2
-				on gdplev_incr2.annual = er2.cost_year
-
-			where 	' || replace(inv_filter,'inv.','inv2.') || coalesce(replace(county_dataset_filter_sql,'inv.','inv2.'), '') || '
-
-				-- limit to specific source
-				and inv2.fips = inv.fips
-				and inv2.scc = inv.scc
-				' || case when is_point_table = false then '' else '
-				and inv2.plantid = inv.plantid
-				and inv2.pointid = inv.pointid
-				and inv2.stackid = inv.stackid
-				and inv2.segment = inv.segment
-				' end || '
-
-				-- dont include sources that have no emissions...
-				and ' || replace(replace(uncontrolled_emis_sql,'inv.','inv2.'),'invpm25or10.','invpm25or10_2.') || ' <> 0.0
-
-				-- dont include sources that have been fully controlled...
-				and coalesce(100 * inv2.ceff / 100 * coalesce(inv2.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv2.rpen / 100, 1.0)' else '' end || ', 0) <> 100.0
-
-			) > 0.0
-			' end || '
 
 		order by inv.record_id, 
 			er.control_measures_id, case when length(locale) = 5 then 0 when length(locale) = 2 then 1 else 2 end, ' || remaining_emis_sql || ', ' || get_strategt_cost_inner_sql || '.computed_cost_per_ton
-	) tbl
-		order by scc, fips, ' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || 'poll, emis_reduction, annual_cost
+--	) tbl
+--		order by scc, fips, ' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || 'poll, emis_reduction, annual_cost
 	';
 
 	get diagnostics gimme_count = row_count;
 	raise notice '%', 'add target pollutant records ' || gimme_count || ' - ' || clock_timestamp();
 
-	execute 'insert into emissions.' || worksheet_table_name || ' (
+	raise notice '%', 'insert into emissions.' || worksheet_table_name || ' (
 			Dataset_Id,
 			cm_abbrev,
 			poll,

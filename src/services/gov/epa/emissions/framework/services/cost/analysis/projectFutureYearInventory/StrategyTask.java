@@ -98,21 +98,38 @@ public class StrategyTask extends AbstractStrategyTask {
     }
 
     public void afterRun() {
-        //
+        try {
+            ((gov.epa.emissions.framework.services.cost.analysis.projectFutureYearInventory.StrategyLoader)(this.getLoader())).createMessageOutput();
+        } catch (Exception e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void beforeRun() throws EmfException {
         try {
             //lets clean the control program dataset tables, make sure missing values are converted to nulls (i.e., -9), 
             //trim fipscode to 5 characters not 6, etc...
+            setStatus("Started cleaning control programs (i.e., removing -9 or 0).");
             cleanControlPrograms();
+            setStatus("Finished cleaning control programs (i.e., removing -9 or 0).");
             //next lets vacuum the tables and index the control program packet tables...
+            setStatus("Started indexing control programs.");
             for (ControlProgram controlProgram : controlStrategy.getControlPrograms()) {
                     vacuumControlProgramTables(controlProgram);
                     indexTable(controlProgram);
             }
+            setStatus("Finished indexing control programs.");
+
+            //next lets index the inventories, they'll be needed during the validation routine
+            for (ControlStrategyInputDataset controlStrategyInputDataset : controlStrategy.getControlStrategyInputDatasets()) {
+                loader.makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset.getInputDataset());
+            }
+            
             //next lets validate the control program dataset tables, make sure format is correct, no data is missing, etc...
+            setStatus("Started validating control programs.");
             validateControlPrograms();
+            setStatus("Finished validating control programs.");
         } catch (EmfException e) {
             throw e;
         }

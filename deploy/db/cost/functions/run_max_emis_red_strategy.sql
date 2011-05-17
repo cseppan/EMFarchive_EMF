@@ -385,7 +385,7 @@ end
 	-- add both target and cobenefit pollutants, first get best target pollutant measure, then use that to apply to other pollutants.
 	execute
 --	raise notice '%', 
-	'insert into emissions.' || detailed_result_table_name || ' 
+/*	'insert into emissions.' || detailed_result_table_name || ' 
 		(
 		dataset_id,
 		cm_abbrev,
@@ -433,9 +433,10 @@ end
 		strategy_name,
 		control_technology,
 		source_group
-		)
+		)*/
+	'create table emissions.mer_old as 
 	select DISTINCT ON (inv.fips, inv.scc, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id) 
-		' || detailed_result_dataset_id || '::integer,
+		' || detailed_result_dataset_id || '::integer as dataset_id,
 		abbreviation,
 		inv.poll,
 		inv.scc,
@@ -452,22 +453,22 @@ end
 		' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' as rule_pen,
 		' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
 		' || percent_reduction_sql || ' as percent_reduction,
-		' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ',
-		' || case when is_point_table = false then '' || case when not has_pm_target_pollutant then 'inv.rpen' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || '' else '100' end || ',
-		' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ',
+		' || case when not has_pm_target_pollutant then 'inv.ceff' else 'coalesce(inv.ceff, invpm25or10.ceff)' end || ' as ceff,
+		' || case when is_point_table = false then '' || case when not has_pm_target_pollutant then 'inv.rpen' else 'coalesce(inv.rpen, invpm25or10.rpen)' end || '' else '100' end || ' as rpen,
+		' || case when not has_pm_target_pollutant then 'inv.reff' else 'coalesce(inv.reff, invpm25or10.reff)' end || ' as reff,
 		case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
 		' || emis_sql || ' - case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - ' || percent_reduction_sql || ' / 100) as emis_reduction,
 		' || emis_sql || ' as inv_emissions,
 		case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end as input_emis,
 		case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - ' || percent_reduction_sql || ' / 100) as output_emis,
-		1,
-		substr(inv.fips, 1, 2),
-		substr(inv.fips, 3, 3),
-		' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
-		' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
+		1 as apply_order,
+		substr(inv.fips, 1, 2) as fipsst,
+		substr(inv.fips, 3, 3) as fippstcy,
+		' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ' as sic,
+		' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ' as naics,
 		inv.record_id::integer as source_id,
-		' || intInputDatasetId || '::integer,
-		' || intControlStrategyId || '::integer,
+		' || intInputDatasetId || '::integer as input_dataset_id,
+		' || intControlStrategyId || '::integer as control_strategy_id,
 		er.control_measures_id,
 		' || get_strategt_cost_sql || '.actual_equation_type as equation_type,
 		' || quote_literal(inventory_sectors) || ' as sector,
@@ -478,8 +479,8 @@ end
 		tpm.existing_measure_abbr,
 		tpm.existing_dev_code,
 		' || quote_literal(strategy_name) || ' as strategy_name,
-		ct.name,
-		sg.name
+		ct.name as control_technology,
+		sg.name as source_group
 	FROM emissions.' || inv_table_name || ' inv
 
 		inner join emf.pollutants p

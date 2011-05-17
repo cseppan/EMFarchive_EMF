@@ -183,6 +183,14 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
                 detailedResultTableFormat);
     }
 
+    private EmfDataset createStrategyMessagesDataset() throws Exception {
+      return creator.addDataset("DS", 
+              DatasetCreator.createDatasetName(controlStrategy.getName() + "_strategy_msgs"), 
+              getDatasetType("Strategy Messages (CSV)"), 
+              new VersionedTableFormat(new StrategyMessagesFileFormat(dbServer.getSqlDataTypes()), dbServer.getSqlDataTypes()), 
+              strategyMessagesDatasetDescription());
+    }
+
     private EmfDataset createStrategyMessagesDataset(EmfDataset inventory) throws Exception {
       return creator.addDataset("DS", 
               DatasetCreator.createDatasetName(inventory.getName() + "_strategy_msgs"), 
@@ -266,13 +274,16 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return false;
     }
 
-    public void makeSureInventoryDatasetHasIndexes(ControlStrategyInputDataset controlStrategyInputDataset) {
-        createIndexes(controlStrategyInputDataset);
+    public void makeSureInventoryDatasetHasIndexes(Dataset dataset) {
+        createIndexes(dataset);
     }
 
-    private void createIndexes(ControlStrategyInputDataset controlStrategyInputDataset) {
-        DataTable dataTable = new DataTable(controlStrategyInputDataset.getInputDataset(), datasource);
-        String table = emissionTableName(controlStrategyInputDataset.getInputDataset());
+    private void createIndexes(Dataset dataset) {
+        DataTable dataTable = new DataTable(dataset, datasource);
+        String table = emissionTableName(dataset);
+        setStatus("Started creating indexes on inventory, " 
+                + dataset.getName() 
+                + ".  Depending on the size of the dataset, this could take several minutes.");
 
         //ALWAYS create indexes for these core columns...
         dataTable.addIndex(table, "record_id", true);
@@ -293,6 +304,10 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         //finally analyze the table, so the indexes take affect immediately, 
         //NOT when the SQL engine gets around to analyzing eventually
         dataTable.analyzeTable(table);
+    
+        setStatus("Completed creating indexes on inventory, " 
+                + dataset.getName() 
+                + ".");
     }
 
     private String getFilterFromRegionDataset() {
@@ -543,6 +558,24 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         } finally {
             session.close();
         }
+    }
+
+    protected ControlStrategyResult createStrategyMessagesResult() throws Exception 
+    {
+        ControlStrategyResult result = new ControlStrategyResult();
+        result.setControlStrategyId(controlStrategy.getId());
+//        result.setInputDataset(inventory);
+//        result.setInputDatasetVersion(inventoryVersion);
+        result.setDetailedResultDataset(createStrategyMessagesDataset());
+
+        result.setStrategyResultType(getStrategyMessagesResultType());
+        result.setStartTime(new Date());
+        result.setRunStatus("Start processing strategy messages result");
+
+        //persist result
+        saveControlStrategyResult(result);
+
+        return result;
     }
 
     protected ControlStrategyResult createStrategyMessagesResult(EmfDataset inventory, int inventoryVersion) throws Exception 

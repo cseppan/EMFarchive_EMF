@@ -118,7 +118,7 @@ public class SQLCompareCasesQuery {
         sql.append("summary_tab.\"value\" ");
         sql.append("from ( ");
         sql.append(buildGetCaseColumnValueSQL(caseId, "Name", "name"));
-        sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "Description", "description"));
+//        sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "Description", "description"));
         sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "Run Status", "run_status"));
         sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "Is Final", "is_final"));
         sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "Copied From", "template_used"));
@@ -131,7 +131,7 @@ public class SQLCompareCasesQuery {
         sql.append(" union all " + buildGetCaseColumnValueSQL(caseId, "Version", "model_version"));
 
         sql.append(" union all SELECT 'Project' as \"key\", projects.name as \"value\" FROM cases.cases inner join emf.projects on projects.id = cases.project_id where cases.id = " + caseId);
-        sql.append(" union all SELECT 'Sectors' as \"key\", string_agg(sectors.name, ',' ORDER BY sectors.name) as \"value\" FROM cases.case_sectors inner join emf.sectors on sectors.id = case_sectors.sector_id where case_sectors.case_id = " + caseId);
+//        sql.append(" union all SELECT 'Sectors' as \"key\", string_agg(sectors.name, ',' ORDER BY sectors.name) as \"value\" FROM cases.case_sectors inner join emf.sectors on sectors.id = case_sectors.sector_id where case_sectors.case_id = " + caseId);
         sql.append(" union all SELECT 'Last Modified By' as \"key\", users.\"name\" as \"value\" FROM cases.cases inner join emf.users on users.id = cases.user_id where cases.id = " + caseId);
         sql.append(" union all SELECT 'Model' as \"key\", model_to_runs.\"name\" as \"value\" FROM cases.cases inner join cases.model_to_runs on model_to_runs.id = cases.model_to_run_id where cases.id = " + caseId);
         sql.append(" union all SELECT 'Modeling Region' as \"key\", regions.\"name\" as \"value\" FROM cases.cases inner join emf.regions on regions.id = cases.modeling_region_id where cases.id = " + caseId);

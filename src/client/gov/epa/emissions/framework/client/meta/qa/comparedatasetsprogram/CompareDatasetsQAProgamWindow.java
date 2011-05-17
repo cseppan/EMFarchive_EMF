@@ -56,6 +56,8 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
     
     private TextArea matchingExpressionsTextField;
     
+    private TextArea whereFilterTextField;
+    
     private String groupByExpressions;
     
     private String aggregateExpressions;
@@ -67,11 +69,12 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
     private ComboBox joinTypes;
     
     private String joinType;
+    private String whereFilter;
         
     public CompareDatasetsQAProgamWindow(DesktopManager desktopManager, String program, 
             EmfSession session, DatasetVersion[] baseDatasetVersions, DatasetVersion[] compareDatasetVersions, 
             String groupByExpressions, String aggregateExpressions, String matchingExpressions, 
-            String joinType ) {
+            String joinType, String whereFilter ) {
         
         super("Emissions Inventories Editor", new Dimension(650, 600), desktopManager);
         this.program = program; 
@@ -82,6 +85,7 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
         this.aggregateExpressions = aggregateExpressions;
         this.matchingExpressions = matchingExpressions;
         this.joinType = joinType;
+        this.whereFilter = whereFilter;
     }
 
 
@@ -130,7 +134,7 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
         this.aggregateExpressionsTextField.setToolTipText("<html>Aggregate Expressions"
                 + "<br/><br/>This is a new line character delimited list of expressions that will be aggregated across the specified above group by expressions."
                 + "<br/>The expressions must contain valid column(s) from either the base or comparison datasets.  If the aggregate expression exists only"
-                + "<br/>in the base or compare dataset, then a Mapping Expression must be specified in order for a proper mapping can happen for the comparison"
+                + "<br/>in the base or compare dataset, then a Mapping Expression must be specified in order for a proper mapping to happen during the comparison"
                 + "<br/>analysis."
                 + "<br/><br/>Sample Aggregate Expression:"
                 + "<br/>ann_emis<br/>avd_emis</html>");
@@ -153,7 +157,19 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
         joinTypeCombo();
         layoutGenerator.addLabelWidgetPair("Join Type:", joinTypes, content);
         
-        layoutGenerator.makeCompactGrid(content, 6, 2, // rows, cols
+        this.whereFilterTextField = new TextArea("Row Filter", this.whereFilter, 40, 4);
+        this.whereFilterTextField.setToolTipText("<html>Row Filter"
+                + "<br/><br/>This is a SQL WHERE clause that is used to filter both the base and compare dataset(s)."
+                + "<br/>The expressions in the WHERE clause must contain valid column(s) from either the base or comparison datasets.  If the expression exists only"
+                + "<br/>in the base or compare dataset, then a Mapping Expression must be specified in order for a proper mapping to happen during the comparison"
+                + "<br/>analysis."
+                + "<br/><br/>Sample Row Filter:"
+                + "<br/><br/>For example to filter on a certain state and scc codes,<br/>substring(fips,1,2) = '37' and SCC_code in ('10100202','10100203')<br/>or<br/>fips like '37%' and  and SCC_code like '101002%'</html>");
+        ScrollableComponent scrollableComment4 = ScrollableComponent.createWithVerticalScrollBar(this.whereFilterTextField);
+        scrollableComment4.setPreferredSize(new Dimension(450, 105));
+        layoutGenerator.addLabelWidgetPair("Where Filter:", scrollableComment4, content);
+        
+        layoutGenerator.makeCompactGrid(content, 7, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad*/
         messagePanel = new SingleLineMessagePanel();
@@ -269,6 +285,8 @@ ann_emis=emis_ann
 avd_emis=emis_avd
 -join
 outer
+-where
+substring(fips,1,2)='37'
 */
                 StringBuilder programArguments = new StringBuilder();
                 //base tag
@@ -293,7 +311,11 @@ outer
                
                 //table join tag
                 programArguments.append(EditQAStepWindow.JOIN_TYPE_TAG + "\n");
-                programArguments.append(joinTypes.getSelectedItem()==null? "":joinTypes.getSelectedItem().toString());
+                programArguments.append(joinTypes.getSelectedItem()==null? "":joinTypes.getSelectedItem().toString()+"\n");
+
+                //table join tag
+                programArguments.append(EditQAStepWindow.WHERE_FILTER_TAG + "\n");
+                programArguments.append(whereFilterTextField.getText() + "\n");
 
                 presenter.updateProgramArguments(programArguments.toString());
                 dispose();

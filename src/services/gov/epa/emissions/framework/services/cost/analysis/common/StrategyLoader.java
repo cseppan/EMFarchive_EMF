@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
@@ -17,4 +18,6 @@ public interface StrategyLoader {
     ControlStrategyResult[] getControlStrategyResults();
 
     ControlStrategyResult getStrategyMessagesResult();
+    
+    void makeSureInventoryDatasetHasIndexes(Dataset dataset);
 }

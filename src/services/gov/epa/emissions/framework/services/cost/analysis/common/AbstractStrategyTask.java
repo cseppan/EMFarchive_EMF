@@ -70,7 +70,7 @@ public abstract class AbstractStrategyTask implements Strategy {
     
     protected List<ControlStrategyResult> strategyResultList;
 
-    private StrategyLoader loader;
+    protected StrategyLoader loader;
     
     public AbstractStrategyTask(ControlStrategy controlStrategy, User user, 
             DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory, StrategyLoader loader) throws EmfException {

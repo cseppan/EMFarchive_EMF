@@ -67,9 +67,10 @@ public class StrategyLoader extends LeastCostAbstractStrategyLoader {
 
             //still need to calculate the total cost and reduction...
             //setResultTotalCostTotalReductionAndCount(result); //NOTE: we don't need to calculate the total cost and reduction
-            result.setRecordCount(recordCount);
+//            result.setRecordCount(recordCount);
             result.setTotalCost(null);
             result.setTotalReduction(null);
+            setResultCount(result);
 
             //add summary information as keywords to the detailed result dataset
             addDetailedResultSummaryDatasetKeywords((EmfDataset)result.getDetailedResultDataset(), uncontrolledEmis * pctRed / 100);

@@ -206,6 +206,7 @@ BEGIN
 
 	execute 'select count(1) from emissions.' || worksheet_table_name || ' where status is null and poll = ' || quote_literal(target_pollutant)
 	into record_count;
+	record_count := coalesce(record_count, 0);
 	raise notice '%', 'emissions.' || worksheet_table_name || ' count = ' || record_count || ' - ' || clock_timestamp();
 
 	-- lets figure out what maximum emission reduction, is possible

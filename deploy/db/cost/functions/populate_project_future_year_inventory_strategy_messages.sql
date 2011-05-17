@@ -1,6 +1,6 @@
 --SELECT public.populate_project_future_year_inventory_strategy_messages(89, 952, 0, 3135)
 
-DROP FUNCTION public.populate_project_future_year_inventory_strategy_messages(integer, integer, integer, integer);
+--DROP FUNCTION public.populate_project_future_year_inventory_strategy_messages(integer, integer, integer, integer);
 
 CREATE OR REPLACE FUNCTION public.populate_project_future_year_inventory_strategy_messages(
 	int_control_strategy_id integer, 
@@ -253,7 +253,8 @@ BEGIN
 		''None''::character varying(255) as control_program,
 		''Source has a 100 ceff but has an emission.'' as "comment"
 	FROM emissions.' || inv_table_name || ' inv
-	where 	inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) <> 0.0';
+	where 	inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) <> 0.0'
+	|| ' and ' || inv_filter;
 
 	FOR control_program IN EXECUTE 
 		'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 

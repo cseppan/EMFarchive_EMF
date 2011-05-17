@@ -142,11 +142,12 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
 
                 String columnDelimitedList = fileFormat.columnList();
 
-                String sql = "INSERT INTO " + qualifiedEmissionTableName(mergedDataset) + " (dataset_id, "
-                        + columnDelimitedList + ") ";
                 ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy
                         .getControlStrategyInputDatasets();
+                //insert one table at a time...
                 for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
+                    String sql = "INSERT INTO " + qualifiedEmissionTableName(mergedDataset) + " (dataset_id, "
+                    + columnDelimitedList + ") ";
                     EmfDataset inputDataset = controlStrategyInputDatasets[i].getInputDataset();
                     if (!inputDataset.getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
                         String tableName = qualifiedEmissionTableName(controlStrategyInputDatasets[i].getInputDataset());
@@ -199,17 +200,16 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
                         inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("ORIGINAL_RECORD_ID", "RECORD_ID as ORIGINAL_RECORD_ID");
                         inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("MONTH", (inputDataset.applicableMonth() + 1) + "::smallint as \"month\"");
                         VersionedQuery versionedQuery = new VersionedQuery(version(inputDataset, controlStrategyInputDatasets[i].getVersion()));
-                        sql += (i > 0 ? " union all " : "") 
-                            + "select " + mergedDataset.getId() + " as dataset_id, " + inventoryColumnDelimitedList + " "
+                        sql += //(i > 0 ? " union all " : "") + 
+                            "select " + mergedDataset.getId() + " as dataset_id, " + inventoryColumnDelimitedList + " "
                             + "from " + tableName + " e "
                             + "where " + versionedQuery.query()
                             + leastCostAbstractStrategyLoader.getFilterForSourceQuery();
+                        System.out.println(System.currentTimeMillis() + " " + sql);
+                        datasource.query().execute(sql);
                     }
                 }
 
-                //System.out.println(sql);
-                System.out.println(System.currentTimeMillis() + " " + sql);
-                datasource.query().execute(sql);
             }
         } catch (SQLException e) {
             throw new EmfException("Error occured when inserting data into the merged inventory dataset table" + "\n" + e.getMessage());
@@ -303,15 +303,16 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
                     // add to strategy...
                     ControlStrategyInputDataset controlStrategyInputDataset = new ControlStrategyInputDataset(
                             mergedDataset);
-                    leastCostAbstractStrategyLoader.makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset);
                     controlStrategy.addControlStrategyInputDatasets(controlStrategyInputDataset);
                     updateControlStrategyWithLock(controlStrategy);
                 } else {
                     if (controlStrategy.getDeleteResults() || results.length == 0)
                         truncateORLMergedDataset(mergedDataset);
                 }
-                if (controlStrategy.getDeleteResults() || results.length == 0)
+                if (controlStrategy.getDeleteResults() || results.length == 0) {
                     populateORLMergedDataset(mergedDataset);
+                    leastCostAbstractStrategyLoader.makeSureInventoryDatasetHasIndexes(mergedDataset);
+                }
 
             }
         }

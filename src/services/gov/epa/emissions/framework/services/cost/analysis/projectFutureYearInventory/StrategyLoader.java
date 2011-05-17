@@ -23,8 +23,9 @@ public class StrategyLoader extends AbstractStrategyLoader {
 
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
         EmfDataset inputDataset = controlStrategyInputDataset.getInputDataset();
-        //make sure inventory has indexes created...
-        makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset);
+//not needed, done in the beforeRun method.
+//        //make sure inventory has indexes created...
+//        makeSureInventoryDatasetHasIndexes(inputDataset);
 
         //reset counters
         recordCount = 0;
@@ -36,9 +37,34 @@ public class StrategyLoader extends AbstractStrategyLoader {
         
         populateInventory(controlStrategyInputDataset, result);
         
+//        //create strategy messages result
+//        strategyMessagesResult = createStrategyMessagesResult(inputDataset, controlStrategyInputDataset.getVersion());
+//        populateStrategyMessagesDataset(strategyMessagesResult);
+//        setResultCount(strategyMessagesResult);
+//        
+//        //if the messages dataset is empty (no records) then remove the dataset and strategy result, there
+//        //is no point and keeping it around.
+//        if (strategyMessagesResult.getRecordCount() == 0) {
+//            deleteStrategyMessageResult(strategyMessagesResult);
+//            //set it null, so it referenced later it will be known that it doesn't exist...
+//            strategyMessagesResult = null;
+//        } else {
+//            strategyMessagesResult.setCompletionTime(new Date());
+//            strategyMessagesResult.setRunStatus("Completed.");
+//            saveControlStrategyResult(strategyMessagesResult);
+//        }
+
+        //do this after updating the previous result, else it will override it...
+        //still need to set the record count...
+        setResultCount(result);
+
+        return result;
+    }
+    
+    protected void createMessageOutput() throws Exception {
         //create strategy messages result
-        strategyMessagesResult = createStrategyMessagesResult(inputDataset, controlStrategyInputDataset.getVersion());
-        populateStrategyMessagesDataset(controlStrategyInputDataset, strategyMessagesResult);
+        strategyMessagesResult = createStrategyMessagesResult();
+        populateStrategyMessagesDataset(strategyMessagesResult);
         setResultCount(strategyMessagesResult);
         
         //if the messages dataset is empty (no records) then remove the dataset and strategy result, there
@@ -52,12 +78,6 @@ public class StrategyLoader extends AbstractStrategyLoader {
             strategyMessagesResult.setRunStatus("Completed.");
             saveControlStrategyResult(strategyMessagesResult);
         }
-
-        //do this after updating the previous result, else it will override it...
-        //still need to set the record count...
-        setResultCount(result);
-
-        return result;
     }
 
     private void populateInventory(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
@@ -74,9 +94,9 @@ public class StrategyLoader extends AbstractStrategyLoader {
         }
     }
 
-    private void populateStrategyMessagesDataset(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
+    private void populateStrategyMessagesDataset(ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "";
-        query = "SELECT public.populate_project_future_year_inventory_strategy_messages("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
+        query = "SELECT public.populate_project_future_year_inventory_strategy_messages("  + controlStrategy.getId() + ", " + controlStrategyResult.getId() + ");";
         System.out.println(System.currentTimeMillis() + " " + query);
         try {
             datasource.query().execute(query);

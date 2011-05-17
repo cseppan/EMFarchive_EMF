@@ -586,7 +586,10 @@ BEGIN
 			on fipscode.state_county_fips = inv.fips
 			and fipscode.country_num = ''0''' else '' end || '
 
-		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '';
+		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+
+			--remove plant closures from consideration
+			and inv.record_id not in (select source_id from emissions.' || detailed_result_table_name || ' where apply_order = 0)';
 	END IF;
 
 
@@ -931,6 +934,8 @@ BEGIN
 				or (cont.replacement = ''A'')
 			)
 
+			--remove plant closures from consideration
+			and inv.record_id not in (select source_id from emissions.' || detailed_result_table_name || ' where apply_order = 0)
 		order by inv.record_id, 
 			--makes sure replacements trump add on controls
 			replacement, 
@@ -1231,6 +1236,9 @@ BEGIN
 
 --			and cont.ceff >= coalesce(inv.ceff, 0.0)
 --			and ' || emis_sql || ' <> 0
+
+			--remove plant closures from consideration
+			and inv.record_id not in (select source_id from emissions.' || detailed_result_table_name || ' where apply_order = 0)
 
 		order by inv.record_id, 
 			--makes sure we get the highest ranking control packet record

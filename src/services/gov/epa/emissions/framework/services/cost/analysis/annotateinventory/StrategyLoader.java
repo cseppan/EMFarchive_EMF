@@ -31,7 +31,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
         EmfDataset inputDataset = controlStrategyInputDataset.getInputDataset();
         //make sure inventory has indexes created...
-        makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset);
+        makeSureInventoryDatasetHasIndexes(inputDataset);
 
         //reset counters
         recordCount = 0;

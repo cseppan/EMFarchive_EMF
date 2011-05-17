@@ -25,7 +25,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
     public ControlStrategyResult loadStrategyResult(ControlStrategyInputDataset controlStrategyInputDataset) throws Exception {
         EmfDataset inputDataset = controlStrategyInputDataset.getInputDataset();
         //make sure inventory has indexes created...
-        makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset);
+        makeSureInventoryDatasetHasIndexes(inputDataset);
         //make sure inventory has the target pollutant, if not show a warning message
         if (!inventoryHasTargetPollutant(controlStrategyInputDataset)) {
             setStatus("Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". Target pollutant, " + controlStrategy.getTargetPollutant().getName() + ", is not in the inventory.");
@@ -70,7 +70,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
     private void runStrategy(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "";
         query = "SELECT public.run_max_emis_red_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
-//        System.out.println(System.currentTimeMillis() + " " + query);
+        System.out.println(query);
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {

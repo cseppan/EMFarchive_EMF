@@ -202,6 +202,11 @@ poll|poll
 outer
 inner    
 */
+    public static final String WHERE_FILTER_TAG = "-where";
+/*
+substring(fips,1,2)='37'
+*/
+    
     
     private String lineFeeder = System.getProperty("line.separator");
 
@@ -1037,6 +1042,7 @@ avd_emis=emis_avd
         int indexAggregate = programSwitches.indexOf(AGGREGATE_EXPRESSIONS_TAG);
         int indexMatching = programSwitches.indexOf(MATCHING_EXPRESSIONS_TAG);
         int indexJoin     = programSwitches.indexOf(JOIN_TYPE_TAG);
+        int indexWhereFilter = programSwitches.indexOf(WHERE_FILTER_TAG);
 
 
         if (indexBase != -1) {
@@ -1104,8 +1110,9 @@ avd_emis=emis_avd
 
                 (indexGroupBy != -1 ? programSwitches.substring(indexGroupBy + GROUP_BY_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexGroupBy) != -1 ? programSwitches.indexOf("\n-", indexGroupBy) : programSwitches.length()) : ""), 
                 (indexAggregate != -1 ? programSwitches.substring(indexAggregate + AGGREGATE_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexAggregate) != -1 ? programSwitches.indexOf("\n-", indexAggregate) : programSwitches.length()) : ""), 
-                (indexMatching != -1 ? programSwitches.substring(indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length()) : ""),
-                (indexJoin != -1 ? programSwitches.substring(indexJoin + JOIN_TYPE_TAG.length() + 1, programSwitches.indexOf("\n-", indexJoin) != -1 ? programSwitches.indexOf("\n-", indexJoin) : programSwitches.length()) : "")
+                (indexMatching != -1  && (indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length()) ? programSwitches.substring(indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length()) : ""),
+                (indexJoin != -1 && (indexJoin + JOIN_TYPE_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexJoin) != -1 ? programSwitches.indexOf("\n-", indexJoin) : programSwitches.length()) ? programSwitches.substring(indexJoin + JOIN_TYPE_TAG.length() + 1, programSwitches.indexOf("\n-", indexJoin) != -1 ? programSwitches.indexOf("\n-", indexJoin) : programSwitches.length()) : ""),
+                (indexWhereFilter != -1 && (indexWhereFilter + WHERE_FILTER_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) ? programSwitches.substring(indexWhereFilter + WHERE_FILTER_TAG.length() + 1, programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) : "")
         );
         EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
         presenter.display(origDataset, step);
