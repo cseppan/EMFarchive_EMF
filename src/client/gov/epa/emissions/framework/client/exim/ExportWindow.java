@@ -158,7 +158,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         }
         // Row Filter
         rowFilter = new TextArea("rowFilter", rowFilters, width+10, 2);
-        rowFilter.setToolTipText("<html>SQL WHERE clause to use to filter dataset.<br/>For example to filter on a certain state,<br/>substring(fips,1,2) = '37'<br/>or<br/>fips like '37%'<html>");
+        rowFilter.setToolTipText("<html>SQL WHERE clause used to filter dataset.<br/>For example to filter on a certain state,<br/>substring(fips,1,2) = '37'<br/>or<br/>fips like '37%'<html>");
         JScrollPane rowArea = new JScrollPane(rowFilter, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         layoutGenerator.addLabelWidgetPair("Row Filter ", rowArea, panel);

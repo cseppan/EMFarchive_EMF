@@ -247,7 +247,8 @@ poll|poll
         if (indexWhereFilter != -1 
                 && (indexWhereFilter + WHERE_FILTER_TAG.length() + 1) < (programArguments.indexOf("\n-", indexWhereFilter) != -1 ? programArguments.indexOf("\n-", indexWhereFilter) : programArguments.length())) 
             whereFilter = programArguments.substring(indexWhereFilter + WHERE_FILTER_TAG.length() + 1, programArguments.indexOf("\n-", indexWhereFilter) != -1 ? programArguments.indexOf("\n-", indexWhereFilter) : programArguments.length());
-    
+        //strip off any unnecessary characters
+        whereFilter = whereFilter.replaceAll("\n","").trim();
         //Validate program arguments (i.e., does dataset and version exist, does mapping make sense, etc...)
        
         
