@@ -36,8 +36,9 @@ public class SQLCompareDatasetsProgramQueryRunner extends SQLQAProgramRunner {
         
         String programArguments = qaStep.getProgramArguments();
         if (programArguments == null || programArguments.trim().length() == 0) {
-            throw new EmfException("Please specify the multi-inventory sum program query");
+            throw new EmfException("Please specify the QA Program \"Compare Datadsets\" configuration settings in the program argument.");
         }
+        
         //System.out.println("The input to tableName is: " + qaStep);
         String tableName = tableName(qaStep);
         //System.out.println("The tableName is: " + tableName);
