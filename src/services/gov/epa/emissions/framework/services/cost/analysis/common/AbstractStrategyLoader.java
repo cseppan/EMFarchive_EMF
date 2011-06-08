@@ -637,7 +637,13 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         query = "SELECT public.populate_max_emis_red_strategy_messages("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + strategyMessagesResult.getId() + ", " + detailedResult.getId() + ");";
         System.out.println(System.currentTimeMillis() + " " + query);
         try {
+            setStatus("Started populating Strategy Messages Output from inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
             datasource.query().execute(query);
+            setStatus("Completed populating Strategy Messages Output from inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
         } catch (SQLException e) {
             System.out.println("SQLException runStrategyUsingSQLApproach");
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());

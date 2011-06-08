@@ -385,7 +385,7 @@ end
 	-- add both target and cobenefit pollutants, first get best target pollutant measure, then use that to apply to other pollutants.
 	execute
 --	raise notice '%', 
-/*	'insert into emissions.' || detailed_result_table_name || ' 
+	'insert into emissions.' || detailed_result_table_name || ' 
 		(
 		dataset_id,
 		cm_abbrev,
@@ -433,8 +433,8 @@ end
 		strategy_name,
 		control_technology,
 		source_group
-		)*/
-	'create table emissions.mer_old as 
+		)
+--	create table emissions.mer_old as 
 	select DISTINCT ON (inv.fips, inv.scc, ' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || 'er.pollutant_id) 
 		' || detailed_result_dataset_id || '::integer as dataset_id,
 		abbreviation,

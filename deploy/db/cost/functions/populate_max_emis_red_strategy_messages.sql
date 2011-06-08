@@ -271,58 +271,55 @@ BEGIN
 		control_program,
 		message
 		)
-	select 
+		select 
 		' || strategy_messages_dataset_id || '::integer,
-		a.fips,
-		a.scc,
+		fips,
+		scc,
 		' || case when is_point_table then '
-		a.plantid, 
-		a.pointid, 
-		a.stackid, 
-		a.segment, 
+		plantid, 
+		pointid, 
+		stackid, 
+		segment, 
 		' else '' end || ' 
-		a.poll,
+		poll,
 		''Warning''::character varying(11) as status,
 		null::character varying(255) as control_program,
-		case 
-			when a.poll = ''PM10'' and a.ceff is not null then 
-				''PM2_5 is missing CEFF, '' || a.ceff || ''%.''
-			when a.poll = ''PM2_5'' and a.ceff is null then 
-				''PM2_5 is missing CEFF, '' || b.ceff || ''%.''
-			when a.poll = ''PM2_5'' and a.ceff is not null then 
-				''PM10 is missing CEFF, '' || a.ceff || ''%.''
-			when a.poll = ''PM10'' and a.ceff is null then 
-				''PM10 is missing CEFF, '' || b.ceff || ''%.''
-			else ''''
-			end  as "comment"
-	FROM emissions.' || inv_table_name || ' a
+		poll || '' source record is missing CEFF, will use '' || 
+		(case when poll = ''PM10'' then ''PM2_5'' else ''PM10'' end) || '' CEFF,'' || 
+		coalesce(
+			case 
+				when coalesce(lagging_ceff,0.0) <> 0.0 then lagging_ceff 
+				else null 
+			end, 
+			case 
+				when coalesce(leading_ceff,0.0) <> 0.0 then leading_ceff 
+				else null 
+			end) 
+			|| ''%.'' as "comment"
 
-		full join emissions.' || inv_table_name || ' b
-		on b.fips = a.fips
-		and b.scc = a.scc
 
-		' || case when is_point_table then '
-		and b.plantid = a.plantid
-		and b.pointid = a.pointid
-		and b.stackid = a.stackid
-		and b.segment = a.segment
-		' else '' end || ' 
-	where ' || inv_filter || ' and b.poll in (''PM2_5'',''PM10'')
-		and a.poll in (''PM2_5'',''PM10'')
-		and (
-			(b.ceff is null and a.ceff is not null)
-			or (b.ceff is not null and a.ceff is null)
-		)
-	order by a.fips,
-		a.scc, 
-		' || case when is_point_table then '
-		a.plantid, 
-		a.pointid, 
-		a.stackid, 
-		a.segment, 
-		' else '' end || ' 
-		a.poll';
+		from (
+			select record_id,
+				' || case when is_point_table = false then '' else 'plantid,pointid,stackid,segment,' end || '
+				poll,
+				scc,
+				fips,
+				ceff,
+				lag(a.ceff, 1 , a.ceff) over source_window as lagging_ceff, 
+				lead(a.ceff, 1 , a.ceff) over source_window as leading_ceff,
+				sum(case when coalesce(a.ceff,0.0) = 0.0 then 1 else null end) over source_window as missing_ceff_count,
+				sum(1) over source_window as partition_record_count
 
+			from emissions.' || inv_table_name || ' a
+
+			where ' || inv_filter || '
+				and a.poll in (''PM10'',''PM2_5'')
+
+			WINDOW source_window AS (PARTITION BY fips,scc' || case when is_point_table = false then '' else ',plantid,pointid,stackid,segment' end || ' order by fips,scc' || case when is_point_table = false then '' else ',plantid,pointid,stackid,segment' end || ')
+		) foo
+		where missing_ceff_count <> partition_record_count
+			and coalesce(ceff,0.0) = 0.0;';
+			
 	-- check to see if any of the sources that have an existing control (cpri/primary_device_type_code or control_measures columns are populated)
 	-- are missing the ceff value
 	execute 'insert into emissions.' || strategy_messages_table_name || ' 

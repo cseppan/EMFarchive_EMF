@@ -606,28 +606,19 @@ public abstract class AbstractStrategyTask implements Strategy {
             for (int i = 0; i < datasets.length; i++) {
 
                 //make sure inventory has indexes created...
-                makeSureInventoryDatasetHasIndexes(datasets[i]);
-
-                String sql = "select public.populate_sources_table('" + emissionTableName(datasets[i].getInputDataset()) + "'," + (filter.length() == 0 ? "null::text" : "'" + filter.replaceAll("'", "''").substring(5) + "'") + ");analyze emf.sources;";
+//                makeSureInventoryDatasetHasIndexes(datasets[i]);
+                loader.makeSureInventoryDatasetHasIndexes(datasets[i].getInputDataset());
+                String sql = "select public.populate_sources_table('" + emissionTableName(datasets[i].getInputDataset()) + "'," + (filter.length() == 0 ? "null::text" : "'" + filter.replaceAll("'", "''").substring(5) + "'") + ");";
                 System.out.println( sql);
                 try {
+                    //populate source table...
                     datasource.query().execute(sql);
+                    //analzye source table...
+                    datasource.query().execute("analyze emf.sources;");
                 } catch (SQLException e) {
                     throw new EmfException("Error occured when populating the sources table " + "\n" + e.getMessage());
                 }
             }
-        }
-    }
-
-    public void makeSureInventoryDatasetHasIndexes(ControlStrategyInputDataset controlStrategyInputDataset) {
-        String query = "SELECT public.create_orl_table_indexes('" + emissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + "');analyze " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()).toLowerCase() + ";";
-        try {
-            datasource.query().execute(query);
-        } catch (SQLException e) {
-            //e.printStackTrace();
-            //supress all errors, the indexes might already be on the table...
-        } finally {
-            //
         }
     }
 

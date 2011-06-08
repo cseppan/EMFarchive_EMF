@@ -49,7 +49,14 @@ public class StrategyLoader extends AbstractStrategyLoader {
         
         //make sure and process in the order that the arrays are built (based on hibernate list_index column)
         for (ControlStrategyTargetPollutant controlStrategyTargetPollutant : controlStrategy.getTargetPollutants()) {
+            setStatus("Started processing target pollutant, " + controlStrategyTargetPollutant.getPollutant().getName() + ", on inventory, " 
+                    + inputDataset.getName() 
+                    + ".");
+
             runStrategy(controlStrategyInputDataset, detailedResult, controlStrategyTargetPollutant.getPollutant());
+            setStatus("Completed processing target pollutant, " + controlStrategyTargetPollutant.getPollutant().getName() + ", on inventory, " 
+                    + inputDataset.getName() 
+                    + ".");
         }
         
         runStrategyFinalize(controlStrategyInputDataset, detailedResult);

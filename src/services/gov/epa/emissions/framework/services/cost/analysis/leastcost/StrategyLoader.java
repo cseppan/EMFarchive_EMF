@@ -55,7 +55,7 @@ public class StrategyLoader extends LeastCostAbstractStrategyLoader {
 //            }
 //        }
 
-        double targetEmissionReduction = getTargetEmissionReduction();
+        Double targetEmissionReduction = getTargetEmissionReduction();
         populateDetailedResult(controlStrategyInputDataset, detailedResult, targetEmissionReduction);
 
         //create strategy messages result
@@ -89,7 +89,7 @@ public class StrategyLoader extends LeastCostAbstractStrategyLoader {
     public Double getTargetEmissionReduction() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            return (Double)session.createQuery("select cS.domainWideEmisReduction " +
+            return (Double)session.createQuery("select coalesce(cS.domainWideEmisReduction, 0.0) " +
                     "from ControlStrategyConstraint cS " +
                     "where cS.controlStrategyId = " + controlStrategy.getId()).uniqueResult();
         } catch (RuntimeException e) {

@@ -9,16 +9,9 @@ DECLARE
 	unit_denominator character varying;
 BEGIN
 
-raise notice '%', unit_numerator;
-raise notice '%', unit_denominator;
-raise notice '%', design_capacity;
-
         --default if not known
         unit_numerator := coalesce(trim(upper(design_capacity_unit_numerator)), '');
 	unit_denominator := coalesce(trim(upper(design_capacity_unit_denominator)), '');
-raise notice '%', unit_numerator;
-raise notice '%', unit_denominator;
-raise notice '%', design_capacity;
 
         --if you don't know the units then you can't convert the design capacity
 	IF length(unit_numerator) = 0 THEN
@@ -39,9 +32,6 @@ raise notice '%', design_capacity;
         measure (which is mass/volume) will likely be necessary.   Let me know
         if you need help with the conversions. 
 */
-raise notice '%', unit_numerator;
-raise notice '%', unit_denominator;
-raise notice '%', design_capacity;
 
         --capacity is already in the right units...
         --no conversion is necessary, these are the expected units.

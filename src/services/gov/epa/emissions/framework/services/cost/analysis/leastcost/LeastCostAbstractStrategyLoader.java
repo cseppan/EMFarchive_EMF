@@ -187,11 +187,19 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
         query2 = "analyze "  + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + ";";
         query3 = "SELECT public.eliminate_least_cost_strategy_source_measures("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ");analyze "  + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + ";";
         try {
+            setStatus("Started populating Least Cost Worksheet with inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
             datasource.query().execute(query);
             System.out.println(System.currentTimeMillis() + " finished " + query);
+            setStatus("Completed populating Least Cost Worksheet with inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
             datasource.query().execute(query2);
             System.out.println(System.currentTimeMillis() + " finished " + query2);
+            setStatus("Started eliminating unqualified measures from the Least Cost Worksheet.");
             datasource.query().execute(query3);
+            setStatus("Completed eliminating unqualified measures from the Least Cost Worksheet.");
             System.out.println(System.currentTimeMillis() + " finished " + query3);
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
@@ -239,7 +247,13 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
         query = "SELECT public.populate_least_cost_strategy_detailed_result("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ", " + emisReduction + "::double precision);";
         System.out.println(System.currentTimeMillis() + " " + query);
         try {
+            setStatus("Started populating Strategy Detailed Result from inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
             datasource.query().executeQuery(query);
+            setStatus("Completed populating Strategy Detailed Result from inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {

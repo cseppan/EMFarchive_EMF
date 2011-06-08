@@ -186,9 +186,12 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
                             inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("RPEN", "100::double precision as RPEN");
                             if (!hasDesignCapacityColumns) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("DESIGN_CAPACITY, DESIGN_CAPACITY_UNIT_NUMERATOR, DESIGN_CAPACITY_UNIT_DENOMINATOR", "null::double precision as DESIGN_CAPACITY, null::text as DESIGN_CAPACITY_UNIT_NUMERATOR, null::text as DESIGN_CAPACITY_UNIT_DENOMINATOR");
                         } else {
-                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("PLANTID, POINTID, STACKID, SEGMENT, PLANT", "''::text as PLANTID, ''::text as POINTID, ''::text as STACKID, ''::text as SEGMENT, ''::text as PLANT");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("PLANTID, POINTID, STACKID, SEGMENT, PLANT", "null::text as PLANTID, null::text as POINTID, null::text as STACKID, null::text as SEGMENT, null::text as PLANT");
                             inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("DESIGN_CAPACITY, DESIGN_CAPACITY_UNIT_NUMERATOR, DESIGN_CAPACITY_UNIT_DENOMINATOR", "null::double precision as DESIGN_CAPACITY, null::text as DESIGN_CAPACITY_UNIT_NUMERATOR, null::text as DESIGN_CAPACITY_UNIT_DENOMINATOR");
                             inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("STKFLOW", "null::double precision as STKFLOW");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("STKTEMP", "null::double precision as STKTEMP");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("STKVEL", "null::double precision as STKVEL");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("STKDIAM", "null::double precision as STKDIAM");
                             inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("ANNUAL_AVG_HOURS_PER_YEAR", "null::double precision as ANNUAL_AVG_HOURS_PER_YEAR");
                         }
                         if (!hasNAICSColumn) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("NAICS", "null::text as NAICS");
@@ -206,7 +209,17 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
                             + "where " + versionedQuery.query()
                             + leastCostAbstractStrategyLoader.getFilterForSourceQuery();
                         System.out.println(System.currentTimeMillis() + " " + sql);
+                        setStatus("Started populating ORL Merged inventory, " 
+                                + mergedDataset.getName() 
+                                + ", with the inventory, " 
+                                + inputDataset.getName() 
+                                + ".");
                         datasource.query().execute(sql);
+                        setStatus("Completed populating ORL Merged inventory, " 
+                                + mergedDataset.getName() 
+                                + ", with the inventory, " 
+                                + inputDataset.getName() 
+                                + ".");
                     }
                 }
 
