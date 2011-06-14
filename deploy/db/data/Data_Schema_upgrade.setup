@@ -1079,20 +1079,6 @@ ALTER TABLE emissions.country ALTER COLUMN comments TYPE text;
 ALTER TABLE emissions.state ALTER COLUMN comments TYPE text;
 ALTER TABLE emissions.county ALTER COLUMN comments TYPE text;
 
+-6/14/11 -- create new array_idx function -- helps determine array index position...
+-- run the data/functions/array_idx.sql
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 

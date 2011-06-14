@@ -1,3 +1,6 @@
 
 -- 6/8/11 -- create new reference table
 -- run the create_facility_source_type_codes_table.sql
+
+-6/14/11 -- create new regulatory_codes table
+-- run the regulatory_codes_table.sql
