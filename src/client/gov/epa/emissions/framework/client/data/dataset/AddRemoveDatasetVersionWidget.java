@@ -50,6 +50,8 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
     private boolean selectSingle;
 
     private int allowableRowCount = 0;  //Zero won't limit the rowcount
+    
+    DatasetType[] datasetTypesToInclude = null;
 
     public AddRemoveDatasetVersionWidget(boolean selectSingle, int allowableRowCount, ManageChangeables changeables, EmfConsole parentConsole, EmfSession session) {
         this.selectSingle = selectSingle;
@@ -58,6 +60,10 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
         this.session = session;
         setupLayout(changeables);
 
+    }
+    
+    public void setDatasetTypesToInclude(DatasetType[] datasetTypesToInclude) {
+        this.datasetTypesToInclude = datasetTypesToInclude;
     }
     
     // called when adding datasets
@@ -219,12 +225,15 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
         try {
             // FIXME: really, we don't want to contact the server to get the dataset types - could be slow
             DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes();
+            if ( this.datasetTypesToInclude == null) {
+                this.datasetTypesToInclude = allDatasetTypes;
+            }
             
             // Make an object of the view and presenter of the dialog, and run the presenter's display ().
             // Set the list of datasets in the JList of this widget (which is part of the EditQAEmissionsWindow
             // to that of the datasets retrieved from the presenter.
             InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole);
-            InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, allDatasetTypes);
+            InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, this.datasetTypesToInclude); //allDatasetTypes);
             presenter.display(getDatasetType(0), this.selectSingle);
             List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
             for (EmfDataset dataset : presenter.getDatasets()) {

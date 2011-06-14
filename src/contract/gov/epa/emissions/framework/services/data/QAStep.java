@@ -20,6 +20,16 @@ public class QAStep implements Serializable {
     public static final String filterTag = "-filter";
     
     public static final String emissionTypeTag = "-emissionType";
+    
+    public static final String FF10P_TAG = "-ff10p"; 
+    
+    public static final String SSFF_TAG = "-ssff"; 
+    
+    public static final String MANYNEIID_TAG = "-manyneiid"; 
+    
+    public static final String MANYFRS_TAG = "-manyfrs"; 
+    
+    public static final String WHERE_FILTER_TAG = "-where";
 
     public static final String avgDaySummaryProgram = "Average day to Annual Summary";
 
@@ -34,6 +44,8 @@ public class QAStep implements Serializable {
     public static final String MultiInvRepProgram = "Multi-inventory column report";
 
     public static final String COMPARE_DATASETS_PROGRAM = "Compare Datasets";
+    
+    public static final String Enhance_Flat_File_2010_Point = "Enhance Flat File 2010 Point";
 
     public static final String MultiInvDifRepProgram = "Multi-inventory difference report";
     public static final String CompareControlStrategies = "Compare Control Strategies";

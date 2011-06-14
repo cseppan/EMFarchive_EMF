@@ -29,6 +29,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
 import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.client.meta.qa.comparedatasetsprogram.CompareDatasetsQAProgamWindow;
+import gov.epa.emissions.framework.client.meta.qa.flatFile2010Pnt.EnhanceFlatFile2010PointSettingWindows;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
@@ -122,6 +123,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private JLabel creationStatusLabel;
 
     private JLabel creationDateLabel;
+    
+    private EmfDataset[] flatFile2010PointInv = null;
+    private EmfDataset[] supportingSmokeFlatFileInv = null;
 
     private EmfDataset[] inventories = null;
     private EmfDataset[] invBase = null;
@@ -153,6 +157,15 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     public static final String detailedResultTag = "-detailed_result";
 
     public static final String BASE_TAG = "-base"; 
+    
+    public static final String FF10P_TAG = "-ff10p"; 
+    
+    public static final String SSFF_TAG = "-ssff"; 
+    
+    public static final String MANYNEIID_TAG = "-manyneiid"; 
+    
+    public static final String MANYFRS_TAG = "-manyfrs"; 
+
     //Sample:
 /*
 dataset name1|1
@@ -923,6 +936,13 @@ substring(fips,1,2)='37'
                         // NOTE Auto-generated catch block
                         e1.printStackTrace();
                     }
+                } else if (QAStep.Enhance_Flat_File_2010_Point.equalsIgnoreCase(program.getSelectedItem().toString())){
+                    try {
+                        showEnhanceFlatFile2010PointSettingWindows();
+                    } catch (EmfException e1) {
+                        // NOTE Auto-generated catch block
+                        e1.printStackTrace();
+                    }
                 } else if (QAStep.CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
                     showMultiInvDiffWindow();
                 } else if (QAStep.createMoEmisByCountyFromAnnEmisProgram.equalsIgnoreCase(program.getSelectedItem().toString())){
@@ -940,6 +960,8 @@ substring(fips,1,2)='37'
         });
         return export;
     }
+
+
 
     private void showMultiInvDiffWindow() {
         // When there is no data in window, set button causes new window to pop up,
@@ -994,6 +1016,104 @@ substring(fips,1,2)='37'
             presenter.display(origDataset, step);
         }
     }
+    
+    protected void showEnhanceFlatFile2010PointSettingWindows() throws EmfException{
+        // When there is no data in window, set button causes new window to pop up,
+        // with the warning message to also show up. When data in window is invalid, a new window still
+        // pops up, but with a different warning message.
+        // Also change the window name to EditQASetArgumentsWindow
+        
+        //flatFile2010PointInv = null;
+        //supportingSmokeFlatFileInv = null;
+        
+        flatFile2010PointInv = null;
+        supportingSmokeFlatFileInv = null;
+
+        String programSwitches = "";
+        programSwitches = programArguments.getText();
+        String programVal = program.getSelectedItem().toString();
+        String[] arguments;
+
+        String[] ff10pTokens = new String[] {};
+        String[] ssffTokens = new String[] {};
+        
+        List<DatasetVersion> ff10pDatasetList = new ArrayList<DatasetVersion>();
+        List<DatasetVersion> ssffDatasetList = new ArrayList<DatasetVersion>();
+
+        int indexFF10P = programSwitches.indexOf(QAStep.FF10P_TAG);
+        int indexSSFF = programSwitches.indexOf(QAStep.SSFF_TAG);
+        int indexMultiNEI = programSwitches.indexOf(QAStep.MANYNEIID_TAG);
+        int indexMultiFRS = programSwitches.indexOf(QAStep.MANYFRS_TAG);
+        int indexWhereFilter = programSwitches.indexOf(QAStep.WHERE_FILTER_TAG);
+
+        if (indexFF10P != -1) {
+            arguments = parseSwitchArguments(programSwitches, indexFF10P, programSwitches.indexOf("\n-", indexFF10P) != -1 ? programSwitches.indexOf("\n-", indexFF10P) : programSwitches.length());
+            if (arguments != null && arguments.length > 0) ff10pTokens = arguments;
+            for (String datasetVersion : ff10pTokens) {
+                String[] datasetVersionToken = new String[] {};
+                if (!datasetVersion.equals("$DATASET")) { 
+                    datasetVersionToken = datasetVersion.split("\\|");
+                } else {
+                    EmfDataset qaStepDataset = presenter.getDataset(step.getDatasetId());
+                    datasetVersionToken = new String[] { qaStepDataset.getName(), qaStepDataset.getDefaultVersion() + "" };
+                }
+
+                EmfDataset dataset = presenter.getDataset(datasetVersionToken[0]);
+                //make sure dataset exists
+                if (dataset == null)
+                    break;
+                Version version = presenter.version(dataset.getId(), Integer.parseInt(datasetVersionToken[1]));
+                //make sure version exists
+                if (version == null)
+                    break;
+                ff10pDatasetList.add(new DatasetVersion(dataset, version));
+            }
+        }
+        if (indexSSFF != -1) {
+            arguments = parseSwitchArguments(programSwitches, indexSSFF, programSwitches.indexOf("\n-", indexSSFF) != -1 ? programSwitches.indexOf("\n-", indexSSFF) : programSwitches.length());
+            if (arguments != null && arguments.length > 0) ssffTokens = arguments;
+            for (String datasetVersion : ssffTokens) {
+                String[] datasetVersionToken = new String[] {};
+                if (!datasetVersion.equals("$DATASET")) { 
+                    datasetVersionToken = datasetVersion.split("\\|");
+                } else {
+                    EmfDataset qaStepDataset = presenter.getDataset(step.getDatasetId());
+                    datasetVersionToken = new String[] { qaStepDataset.getName(), qaStepDataset.getDefaultVersion() + "" };
+                }
+                EmfDataset dataset = presenter.getDataset(datasetVersionToken[0]);
+                //make sure dataset exists
+                if (dataset == null)
+                    break;
+
+                Version version = presenter.version(dataset.getId(), Integer.parseInt(datasetVersionToken[1]));
+                //make sure version exists
+                if (version == null)
+                    break;
+
+                ssffDatasetList.add(new DatasetVersion(dataset, version));
+            }
+        }
+        
+        boolean boolMultiNEI = false;
+        boolean boolMultiFRS = false;
+        String multiNEI = (indexMultiNEI != -1 ? programSwitches.substring(indexMultiNEI + MANYNEIID_TAG.length() + 1, programSwitches.indexOf("\n-", indexMultiNEI) != -1 ? programSwitches.indexOf("\n-", indexMultiNEI) : programSwitches.length()) : "");
+        if ("TRUE".equals( multiNEI.trim().toUpperCase())) {
+            boolMultiNEI = true;
+        }
+        String multiFRS = (indexMultiFRS != -1 ? programSwitches.substring(indexMultiFRS + MANYFRS_TAG.length() + 1, programSwitches.indexOf("\n-", indexMultiFRS) != -1 ? programSwitches.indexOf("\n-", indexMultiFRS) : programSwitches.length()) : "");
+        if ("TRUE".equals( multiFRS.trim().toUpperCase())) {
+            boolMultiFRS = true;
+        }
+        
+        EnhanceFlatFile2010PointSettingWindows view = new EnhanceFlatFile2010PointSettingWindows(desktopManager, programVal, session,
+                ff10pDatasetList.toArray(new DatasetVersion[0]), ssffDatasetList.toArray(new DatasetVersion[0]),
+                boolMultiNEI, 
+                boolMultiFRS, 
+                (indexWhereFilter != -1 && (indexWhereFilter + WHERE_FILTER_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) ? programSwitches.substring(indexWhereFilter + WHERE_FILTER_TAG.length() + 1, programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) : "")
+        );
+        EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
+        presenter.display(origDataset, step);        
+    }    
 
     private void showCompareDatasetsWindow() throws EmfException {
         
