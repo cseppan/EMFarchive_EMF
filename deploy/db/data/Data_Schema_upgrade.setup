@@ -1079,6 +1079,31 @@ ALTER TABLE emissions.country ALTER COLUMN comments TYPE text;
 ALTER TABLE emissions.state ALTER COLUMN comments TYPE text;
 ALTER TABLE emissions.county ALTER COLUMN comments TYPE text;
 
+-- 06/08/2011 -- Add new 'Enhance Flat File 2010 Point' QA Program
+insert into emf.qa_programs values(DEFAULT,'Enhance Flat File 2010 Point','gov.epa.emissions.framework.services.qa.flatFile2010Pnt.SQLEnhanceFlatFile2010PointRunner');
+update emf.qa_programs set run_classname='gov.epa.emissions.framework.services.qa.flatFile2010Pnt.SQLEnhanceFlatFile2010PointQueryRunner' where name='Enhance Flat File 2010 Point';
+
+-- 06/09/2011 -- create a QA Step Template for QA Program Enhance Flat File 2010 Point
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, 
+	list_index, 
+	name, 
+	qa_program_id, 
+	program_arguments, 
+	required, 
+	order_no, 
+	description)
+select dt.id, 
+	(select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
+	'Enhance Flat File 2010 Point', 
+	1, 
+	'-ff10p
+$DATASET', 
+	false, 
+	1, 
+	''
+from emf.dataset_types dt
+where name in ('Flat File 2010 Point');
+
 -6/14/11 -- create new array_idx function -- helps determine array index position...
 -- run the data/functions/array_idx.sql
 
