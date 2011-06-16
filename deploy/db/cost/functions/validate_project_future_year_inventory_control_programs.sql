@@ -1,7 +1,9 @@
---select public.validate_project_future_year_inventory_control_programs(109);
+--select public.validate_project_future_year_inventory_control_programs(137, 6030);
 
 CREATE OR REPLACE FUNCTION public.validate_project_future_year_inventory_control_programs(
-	control_strategy_id integer) RETURNS void AS
+	control_strategy_id integer,
+	message_strategy_result_id integer
+	) RETURNS void AS
 $BODY$
 DECLARE
 	inventory_record RECORD;
@@ -20,7 +22,22 @@ DECLARE
 	inventory_year int;
 	compliance_date_cutoff_daymonth varchar(256) := '';
 	effective_date_cutoff_daymonth varchar(256) := '';
+
+	strategy_messages_dataset_id integer := null;
+	strategy_messages_table_name varchar(64) := '';
+	prev_cp varchar(64) := '';
+	has_error boolean := false;
 BEGIN
+
+	-- get the detailed result dataset info
+	select sr.detailed_result_dataset_id,
+		lower(i.table_name)
+	from emf.strategy_results sr
+		inner join emf.internal_sources i
+		on i.dataset_id = sr.detailed_result_dataset_id
+	where sr.id = message_strategy_result_id
+	into strategy_messages_dataset_id,
+		strategy_messages_table_name;
 
 	SELECT case when length(trim(cs.filter)) > 0 then '(' || cs.filter || ')' else null end,
 		cs.county_dataset_id,
@@ -85,32 +102,169 @@ BEGIN
 		IF control_program.type = 'Plant Closure' THEN
 
 			IF not public.check_table_for_columns(control_program.table_name, 'effective_date,fips,plantid,pointid,stackid,segment,plant', ',') THEN
-				RAISE EXCEPTION 'Control program, %, plant closure dataset table has incorrect table structure, expecting the following columns -- fips, plantid, pointid, stackid, segment, plant, and effective_date.', control_program.control_program_name;
-				return;
+			--	RAISE EXCEPTION 'Control program, %, plant closure dataset table has incorrect table structure, expecting the following columns -- fips, plantid, pointid, stackid, segment, plant, and effective_date.', control_program.control_program_name;
+
+				execute
+				--raise notice '%',
+				 'insert into emissions.' || strategy_messages_table_name || ' 
+					(
+					dataset_id, 
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					status,
+					control_program,
+					message_type,
+					message,
+					inventory
+					)
+				select 
+					' || strategy_messages_dataset_id || '::integer,
+					null::character varying(6) as fips, 
+					null::character varying(10) as scc, 
+					null::character varying(15) as plantid, 
+					null::character varying(15) as pointid, 
+					null::character varying(15) as stackid, 
+					null::character varying(15) as segment, 
+					null::character varying(16) as poll, 
+					''Error''::character varying(11) as status,
+					''' || control_program.control_program_name || '''::character varying(255) as control_program,
+					''Packet Level''::character varying(255) as message_type,
+					''Control program, ' || control_program.control_program_name || ', plant closure dataset table has incorrect table structure, expecting the following columns -- fips, plantid, pointid, stackid, segment, plant, and effective_date.'' as "message",
+					null::character varying(255) as inventory';
+				has_error := true;
 			END IF;
 
 			-- make sure the plant closure effective date is in the right format
 			execute 'select count(1) from emissions.' || control_program.table_name || ' where not public.isdate(effective_date) and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version)
 			into count;
 			IF count > 0 THEN
-				RAISE EXCEPTION 'Control program, %, plant closure dataset has % effective date(s) that are not in the correct date format.', control_program.control_program_name, count;
-				return;
+				--RAISE EXCEPTION 'Control program, %, plant closure dataset has % effective date(s) that are not in the correct date format.', control_program.control_program_name, count;
+				execute
+				--raise notice '%',
+				 'insert into emissions.' || strategy_messages_table_name || ' 
+					(
+					dataset_id, 
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					status,
+					control_program,
+					message_type,
+					message,
+					inventory
+					)
+				select 
+					' || strategy_messages_dataset_id || '::integer,
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					''Error''::character varying(11) as status,
+					''' || control_program.control_program_name || '''::character varying(255) as control_program,
+					''Packet Level''::character varying(255) as message_type,
+					''Control program, ' || control_program.control_program_name || ', plant closure dataset has ' || count || ' effective date(s) that are not in the correct date format.'' as "message",
+					null::character varying(255) as inventory
+				from emissions.' || control_program.table_name || ' 
+				where not public.isdate(effective_date) 
+					and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version);
+				has_error := true;
 			END IF;
 
 			-- make sure there aren't missing fips codes
 			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(fips), '''') = ''''' || '  and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version)
 			into count;
 			IF count > 0 THEN
-				RAISE EXCEPTION 'Control program, %, plant closure dataset has % missing fip(s) codes.', control_program.control_program_name, count;
-				return;
+--				RAISE EXCEPTION 'Control program, %, plant closure dataset has % missing fip(s) codes.', control_program.control_program_name, count;
+				execute
+				--raise notice '%',
+				 'insert into emissions.' || strategy_messages_table_name || ' 
+					(
+					dataset_id, 
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					status,
+					control_program,
+					message_type,
+					message,
+					inventory
+					)
+				select 
+					' || strategy_messages_dataset_id || '::integer,
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					''Error''::character varying(11) as status,
+					''' || control_program.control_program_name || '''::character varying(255) as control_program,
+					''Packet Level''::character varying(255) as message_type,
+					''Control program, ' || control_program.control_program_name || ', plant closure dataset has ' || count || ' missing fip(s) codes.'' as "message",
+					null::character varying(255) as inventory
+				from emissions.' || control_program.table_name || ' 
+				where coalesce(trim(fips), '''') = ''''' || ' 
+					and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version);
+				has_error := true;
 			END IF;
 
 			-- make sure there aren't missing plant ids
 			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(plantid), '''') = ''''' || '  and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version)
 			into count;
 			IF count > 0 THEN
-				RAISE EXCEPTION 'Control program, %, plant closure dataset has % missing plant Id(s).', control_program.control_program_name, count;
-				return;
+--				RAISE EXCEPTION 'Control program, %, plant closure dataset has % missing plant Id(s).', control_program.control_program_name, count;
+				execute
+				--raise notice '%',
+				 'insert into emissions.' || strategy_messages_table_name || ' 
+					(
+					dataset_id, 
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					status,
+					control_program,
+					message_type,
+					message,
+					inventory
+					)
+				select 
+					' || strategy_messages_dataset_id || '::integer,
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					''Error''::character varying(11) as status,
+					''' || control_program.control_program_name || '''::character varying(255) as control_program,
+					''Packet Level''::character varying(255) as message_type,
+					''Control program, ' || control_program.control_program_name || ', plant closure dataset has ' || count || ' missing plant Id(s).'' as "message",
+					null::character varying(255) as inventory
+				from emissions.' || control_program.table_name || ' 
+				where coalesce(trim(plantid), '''') = ''''' || ' 
+					and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version);
+				has_error := true;
 			END IF;
 
 		-- look at the projection control program table format (make sure all the right columns are in the table)
@@ -126,7 +280,7 @@ BEGIN
 	-- look at the control packet control program, make sure there are no duplicates maching between an additonal and replacement control.
 
 	-- TODO Possibly:  did something similar for ALLOWABLE Packets
-	FOR inventory_record IN EXECUTE 
+/*	FOR inventory_record IN EXECUTE 
 		'select lower(i.table_name) as table_name, 
 			inv.dataset_id, 
 			inv.dataset_version,
@@ -141,7 +295,7 @@ BEGIN
 
 		where inv.control_strategy_id = ' || control_strategy_id
 	LOOP
-		-- reset
+*/		-- reset
 		sql := '';
 		
 		-- build version info into where clause filter
@@ -169,13 +323,86 @@ BEGIN
 				inner join emf.dataset_types dt
 				on dt.id = d.dataset_type
 			where csp.control_strategy_id = ' || control_strategy_id || '
-			and cpt."name" = ''Control'''
+				and cpt."name" in ( ''Control'',''Projection'',''Allowable'')
+			order by cpt."name"'
+			
 		LOOP
 
-			--store control dataset version filter in variable
-			select public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'proj')
-			into control_program_dataset_filter_sql;
-			
+			If prev_cp <> control_program.dataset_type THEN
+		IF length(sql) > 0 THEN
+			--raise notice '%',
+			execute 
+			'select count(1)
+				from (' || sql || ') tbl
+				group by fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,naics,compliance_date
+				having count(1) >= 2
+				limit 1'
+			into count;
+			IF count > 0 THEN
+--				RAISE EXCEPTION 'Inventory, %, has source(s) with duplicate matching hierarchy packet records.  See the Strategy Messages output dataset for more detailed information on identifying the matching hierarchy records.', inventory_record.dataset_name;
+
+
+
+				execute
+				--raise notice '%',
+				 'insert into emissions.' || strategy_messages_table_name || ' 
+					(
+					dataset_id, 
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					status,
+					control_program,
+					message_type,
+					message,
+					inventory,
+					sic,
+					mact,
+					naics,
+					--replacement,
+					compliance_date
+					)
+				select 
+					' || strategy_messages_dataset_id || '::integer,
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					''Error''::character varying(11) as status,
+					null::character varying(255) as control_program,
+					''Packet Level''::character varying(255) as message_type,
+					''Control programs, '' || string_agg(distinct control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'', '','' order by control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'') || '', have duplicate matching hierarchy packet records.'' as "message",
+					null::character varying(255) as inventory,
+					sic,
+					mact,
+					naics,
+					--replacement,
+					compliance_date
+				from (
+
+			select *, count(1) OVER w as packet_record_count
+			from (' || sql || ') tbl
+			WINDOW w AS (PARTITION BY fips,scc,plantid,pointid,stackid,segment,poll,sic,naics,mact,compliance_date,control_program_name)
+
+
+				) tbl
+				group by fips,scc,plantid,pointid,stackid,segment,poll,sic,naics,mact,compliance_date
+				having count(1) >= 2
+				';
+				has_error := true;
+			END IF;
+
+		END IF;
+				sql := '';
+			END IF;
+		
 			If length(sql) > 0 THEN 
 				sql := sql || ' union all ';
 			END IF;
@@ -187,53 +414,115 @@ BEGIN
 			sql := sql || '
 			select 
 			--distinct on (record_id)
-				record_id,fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,replacement,compliance_date,
-				' || quote_literal(control_program.control_program_name) || ' as control_program_name,
-				ranking
-			from (
-				--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
-				select 
-					null::integer as record_id, null::character varying(6) as fips,null::character varying(10) as scc,null::character varying(15) as plantid,null::character varying(15) as pointid,null::character varying(15) as stackid,null::character varying(15) as segment,null::character varying(16) as poll,null::character varying(4) as sic,null::character varying(6) as mact,
-					null::character varying(1) as replacement, null::timestamp without time zone as compliance_date, null::integer as ranking
-				where 1 = 0
-
-				union all
-				' || public.build_project_future_year_inventory_matching_hierarchy_sql(
-					inventory_record.dataset_id, inventory_record.dataset_version, 
-					control_program.dataset_id, control_program.dataset_version,
-					'fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,replacement,compliance_date',
-					inv_filter, 
-					county_dataset_id,
-					county_dataset_version,
-					'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone and application_control = ''Y'' ',
-					1	-- include only Matched Sources
-					) || '
-			) tbl';
-
+				fips,scc,plantid,pointid,stackid,segment,poll,sic,
+			' || case 
+				when control_program.type = 'Control' then 
+				'mact,null::character varying(6) as naics,compliance_date,'
+				when control_program.type = 'Allowable' then 
+				'null::character varying(6) as mact,naics,compliance_date,'
+				when control_program.type = 'Projection' then 
+				'mact,naics,null::timestamp without time zone as compliance_date,'
+				else 
+					' '
+			end || '
+				' || quote_literal(control_program.control_program_name) || '::character varying(255) as control_program_name
+			from emissions.' || control_program.table_name || '
+			where 
+			' || case 
+				when control_program.type = 'Control' then 
+					'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone 
+					and application_control = ''Y'' and '
+				when control_program.type = 'Allowable' then 
+					'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone and ' 
+				else 
+					' '
+			end || ' ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version) ||'';
+			prev_cp := control_program.dataset_type;
 		END LOOP;
 
 
+
 		IF length(sql) > 0 THEN
-			execute 'select count(1)
+			--raise notice '%',
+			execute 
+			'select count(1)
 				from (' || sql || ') tbl
-				group by record_id,fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,ranking,compliance_date
+				group by fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,naics,compliance_date
 				having count(1) >= 2
 				limit 1'
 			into count;
 			IF count > 0 THEN
-				RAISE EXCEPTION 'Inventory, %, dataset has source(s) with duplicate matching hierarchy packet records.  See the Strategy Messages output dataset for more detailed information on identifying the matching hierarchy records.', inventory_record.dataset_name;
-				return;
+--				RAISE EXCEPTION 'Inventory, %, has source(s) with duplicate matching hierarchy packet records.  See the Strategy Messages output dataset for more detailed information on identifying the matching hierarchy records.', inventory_record.dataset_name;
+
+
+
+				execute
+				--raise notice '%',
+				 'insert into emissions.' || strategy_messages_table_name || ' 
+					(
+					dataset_id, 
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					status,
+					control_program,
+					message_type,
+					message,
+					inventory,
+					sic,
+					mact,
+					naics,
+					--replacement,
+					compliance_date
+					)
+				select 
+					' || strategy_messages_dataset_id || '::integer,
+					fips, 
+					scc, 
+					plantid, 
+					pointid, 
+					stackid, 
+					segment, 
+					poll, 
+					''Error''::character varying(11) as status,
+					null::character varying(255) as control_program,
+					''Packet Level''::character varying(255) as message_type,
+					''Control programs, '' || string_agg(distinct control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'', '','' order by control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'') || '', have duplicate matching hierarchy packet records.'' as "message",
+					null::character varying(255) as inventory,
+					sic,
+					mact,
+					naics,
+					--replacement,
+					compliance_date
+				from (
+
+			select *, count(1) OVER w as packet_record_count
+			from (' || sql || ') tbl
+			WINDOW w AS (PARTITION BY fips,scc,plantid,pointid,stackid,segment,poll,sic,naics,mact,compliance_date,control_program_name)
+
+
+				) tbl
+				group by fips,scc,plantid,pointid,stackid,segment,poll,sic,naics,mact,compliance_date
+				having count(1) >= 2
+				';
+				has_error := true;
 			END IF;
 
 		END IF;
 
+/*
 	END LOOP;
+*/
 --				where replacement in (''A'',''R'')
 --				having count(1) = 2
 --				group by record_id, ranking
 
 END;
 $BODY$
-  LANGUAGE 'plpgsql' IMMUTABLE;
+  LANGUAGE 'plpgsql';
 ALTER FUNCTION public.validate_project_future_year_inventory_control_programs(int) OWNER TO emf;
 

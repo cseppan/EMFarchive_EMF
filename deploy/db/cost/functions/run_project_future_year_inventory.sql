@@ -1,4 +1,4 @@
-DROP FUNCTION run_project_future_year_inventory(integer, integer, integer, integer);
+DROP FUNCTION public.run_project_future_year_inventory(integer, integer, integer, integer);
 
 CREATE OR REPLACE FUNCTION public.run_project_future_year_inventory(
 	int_control_strategy_id integer, 
@@ -681,12 +681,12 @@ BEGIN
 	IF length(sql) > 0 THEN
 		raise notice '%', 'next lets do controls ' || clock_timestamp();
 		sql := 'select distinct on (record_id)
-				record_id,ceff,rpen,reff,pri_cm_abbrev,replacement,
+				record_id,ceff,rpen,reff,pri_cm_abbrev,replacement,compliance_date,
 				control_program_name, control_program_id,
 				control_program_technologies_count, control_program_measures_count, 
 				ranking
 			from (' || sql;
-		sql := sql || ') tbl order by record_id, replacement, ranking, coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) desc';
+		sql := sql || ') tbl order by record_id, ranking, replacement, coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) desc';
 
 		inv_percent_reduction_sql := '(coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end, 0.0) * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end, 100) / 100 ' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end, 100.0) / 100.0 ' else '' end || ')';
 		cont_packet_percent_reduction_sql := '(cont.ceff * coalesce(cont.reff, 100) / 100 * coalesce(cont.rpen, 100) / 100)';
@@ -937,10 +937,10 @@ BEGIN
 			--remove plant closures from consideration
 			and inv.record_id not in (select source_id from emissions.' || detailed_result_table_name || ' where apply_order = 0)
 		order by inv.record_id, 
-			--makes sure replacements trump add on controls
-			replacement, 
 			--makes sure we get the highest ranking control packet record
 			cont.ranking,
+			--makes sure replacements trump add on controls
+			replacement, 
 			case when length(er.locale) = 5 then 0 when length(er.locale) = 2 then 1 else 2 end, 	
 			cont.ceff - er.efficiency,
 			' || cont_packet_percent_reduction_sql || ' desc, 

@@ -1,4 +1,4 @@
-DROP FUNCTION run_max_emis_red_strategy(integer, integer, integer, integer);
+DROP FUNCTION public.run_max_emis_red_strategy(integer, integer, integer, integer);
 
 CREATE OR REPLACE FUNCTION public.run_max_emis_red_strategy(intControlStrategyId integer, intInputDatasetId integer, 
 	intInputDatasetVersion integer, intStrategyResultId int) RETURNS void AS $$

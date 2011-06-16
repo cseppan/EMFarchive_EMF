@@ -4,7 +4,7 @@ SELECT public.populate_project_future_year_inventory_strategy_messages(137, 5454
 SELECT public.build_project_future_year_inventory_matching_hierarchy_sql(952, 0, 4120, 1, '', null, 2);
 SELECT public.validate_project_future_year_inventory_control_programs(137);
 SELECT public.populate_project_future_year_inventory_strategy_messages(137, 5583)
-
+SELECT public.populate_project_future_year_inventory_strategy_messages(137, 5589)
 select * from emissions.ds_ptinv_ptnonipm_2020cc_strategy_msgs_150848_20110314150848738
 order by record_id desc
 limit 1000;
@@ -347,7 +347,11 @@ raise notice '%', 'give warning if CE is 100 and was assumed to be 0';
 		--	- Program does apply to at least one inventory, then report other inventories that aren't affected
 		--	- If Program does apply to inventory in some fashion, then report packets records that don't affect 
 		--	  any sources in that inventory
+
+		-- First look at Plant Closures
+		
 raise notice '%', 'now lets evaluate each packet and see what we find';
+
 		FOR control_program IN EXECUTE 
 			'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
 				cp.start_date, cp.end_date, 
@@ -467,146 +471,9 @@ raise notice '%', 'now lets evaluate each packet and see what we find';
 						and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'pc') || '';
 						
 				end if;
-			end if;
-
-			execute
-			--raise notice '%',
-			 'insert into packet_issues
-				(
-				packet_type, 
-				packet_name, 
-				packet_dataset_id, 
-				packet_dataset_version, 
-				packet_dataset_name, 
-				inventory_dataset_id, 
-				inventory_dataset_version, 
-				inventory_dataset_name, 
-				applies_to_inventory
-				)
-			select 
-				' || quote_literal(control_program.type) || ',
-				' || quote_literal(control_program.control_program_name) || ',
-				' || quote_literal(control_program.dataset_id) || ',
-				' || quote_literal(control_program.dataset_version) || ',
-				' || quote_literal(control_program.dataset_name) || ',
-				' || quote_literal(inventory_record.dataset_id) || ',
-				' || quote_literal(inventory_record.dataset_version) || ',
-				' || quote_literal(inventory_record.dataset_name) || ',
-				' || case when cnt > 0 then true else false end || '::boolean;';
-
-
-		END LOOP;
-	END LOOP;
-
-	sql := '';
-
-	-- cursor over inventories
-	FOR inventory_record IN EXECUTE 
-		'select lower(i.table_name) as table_name, 
-			inv.dataset_id, 
-			inv.dataset_version,
-			d.name as dataset_name
-		 from emf.input_datasets_control_strategies inv
-
-			inner join emf.internal_sources i
-			on i.dataset_id = inv.dataset_id
-
-			inner join emf.datasets d
-			on d.id = inv.dataset_id
-
-		where inv.control_strategy_id = ' || int_control_strategy_id
-	LOOP
-
-		-- get the input dataset info
-		select inventory_record.table_name
-		into inv_table_name;
-
-		-- see if there are point specific columns in the inventory
-		is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
-		
-		-- see if there is a mact column in the inventory
-		has_mact_column := public.check_table_for_columns(inv_table_name, 'mact', ',');
-
-		-- see if there is a sic column in the inventory
-		has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
-
-		-- see if there is a naics column in the inventory
-		has_naics_column := public.check_table_for_columns(inv_table_name, 'naics', ',');
-
-		-- see if there is a rpen column in the inventory
-		has_rpen_column := public.check_table_for_columns(inv_table_name, 'rpen', ',');
-
-		-- see if there is a cpri column in the inventory
-		has_cpri_column := public.check_table_for_columns(inv_table_name, 'cpri', ',');
-
-		-- see if there is a primary_device_type_code column in the inventory
-		has_primary_device_type_code_column := public.check_table_for_columns(inv_table_name, 'primary_device_type_code', ',');
-
-		-- see if there is design capacity columns in the inventory
-		has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',');
-
-		-- get month of the dataset, 0 (Zero) indicates an annual inventory
-		select public.get_dataset_month(inventory_record.dataset_id)
-		into dataset_month;
-
-		IF dataset_month = 1 THEN
-			no_days_in_month := 31;
-		ELSIF dataset_month = 2 THEN
-			no_days_in_month := 29;
-		ELSIF dataset_month = 3 THEN
-			no_days_in_month := 31;
-		ELSIF dataset_month = 4 THEN
-			no_days_in_month := 30;
-		ELSIF dataset_month = 5 THEN
-			no_days_in_month := 31;
-		ELSIF dataset_month = 6 THEN
-			no_days_in_month := 30;
-		ELSIF dataset_month = 7 THEN
-			no_days_in_month := 31;
-		ELSIF dataset_month = 8 THEN
-			no_days_in_month := 31;
-		ELSIF dataset_month = 9 THEN
-			no_days_in_month := 30;
-		ELSIF dataset_month = 10 THEN
-			no_days_in_month := 31;
-		ELSIF dataset_month = 11 THEN
-			no_days_in_month := 30;
-		ELSIF dataset_month = 12 THEN
-			no_days_in_month := 31;
-		END IF;
-
-		-- build version info into where clause filter
-		inv_filter := '(' || public.build_version_where_filter(inventory_record.dataset_id, inventory_record.dataset_version, 'inv') || ')' || coalesce(' and ' || public.alias_filter(strat_inv_filter, inv_table_name, 'inv'), '');
-
-
-		FOR control_program IN EXECUTE 
-			'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
-				cp.start_date, cp.end_date, 
-				cp.dataset_id, cp.dataset_version,
-				dt."name" as dataset_type, d."name" as dataset_name
-			 from emf.control_strategy_programs csp
-
-				inner join emf.control_programs cp
-				on cp.id = csp.control_program_id
-
-				inner join emf.control_program_types cpt
-				on cpt.id = cp.control_program_type_id
-
-				inner join emf.internal_sources i
-				on i.dataset_id = cp.dataset_id
-
-				inner join emf.datasets d
-				on d.id = i.dataset_id
-
-				inner join emf.dataset_types dt
-				on dt.id = d.dataset_type
-			where csp.control_strategy_id = ' || int_control_strategy_id || '
-				and cpt."name" = ''Projection''
-			order by processing_order'
-		LOOP
 
 			-- see if there any matching issues with the projection, control, or allowable packet
-			IF control_program.type = 'Projection' THEN --or control_program.type = 'Control' or control_program.type = 'Allowable' THEN
+			ELSEIF control_program.type = 'Projection' or control_program.type = 'Control' or control_program.type = 'Allowable' THEN
 
 				-- make sure the dataset type is right...
 				IF (control_program.type = 'Projection' and control_program.dataset_type = 'Projection Packet') 
@@ -615,22 +482,9 @@ raise notice '%', 'now lets evaluate each packet and see what we find';
 raise notice '%', 'first see if packet affects anything -- packet type, ' || control_program.type || ', packet, ' || control_program.dataset_id || ', inv ' || inventory_record.dataset_id;
 
 
-					If length(sql) > 0 THEN 
-						sql := sql || ' union all ';
-					END IF;
-
-
 					-- first see if there is any issues
 					execute '
-					select ' || quote_literal(control_program.type) || ',
-						' || quote_literal(control_program.control_program_name) || ',
-						' || quote_literal(control_program.dataset_id) || ',
-						' || quote_literal(control_program.dataset_version) || ',
-						' || quote_literal(control_program.dataset_name) || ',
-						' || quote_literal(inventory_record.dataset_id) || ',
-						' || quote_literal(inventory_record.dataset_version) || ',
-						' || quote_literal(inventory_record.dataset_name) || ',
-						case when count(1) > 0 then true else false end as applies_to_inventory
+					select count(1) 
 					 
 					from (
 						' ||
@@ -640,15 +494,7 @@ raise notice '%', 'first see if packet affects anything -- packet type, ' || con
 							inventory_record.dataset_version, --inv_dataset_version integer, 
 							control_program.dataset_id, --control_program_dataset_id integer, 
 							control_program.dataset_version, --control_program_dataset_version integer, 
-							'fips,plantid,pointid,stackid,segment,scc,poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message,
-							' || quote_literal(control_program.type) || ' as packet_type,
-							' || quote_literal(control_program.control_program_name) || ' as packet_name,
-							' || quote_literal(control_program.dataset_id) || ' as packet_dataset_id,
-							' || quote_literal(control_program.dataset_version) || ' as packet_dataset_version,
-							' || quote_literal(control_program.dataset_name) || ' as packet_dataset_name,
-							' || quote_literal(inventory_record.dataset_id) || ' as inventory_dataset_id,
-							' || quote_literal(inventory_record.dataset_version) || ' as inventory_dataset_version,
-							' || quote_literal(inventory_record.dataset_name) || ' as inventory_dataset_name', --select_columns varchar, 
+							'fips,plantid,pointid,stackid,segment,scc,poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message', --select_columns varchar, 
 							strat_inv_filter,--null'substring(fips,1,2) = ''37''', --inv_filter text,
 							county_dataset_id, --1279 county_dataset_id integer,
 							county_dataset_version, --county_dataset_version integer,
@@ -764,6 +610,154 @@ raise notice '%', 'first see if packet affects anything -- packet type, ' || con
 
 
 		END LOOP;
+
+
+--reset
+sql := '';
+
+		-- Second look at Projections
+
+		FOR control_program IN EXECUTE 
+			'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
+				cp.start_date, cp.end_date, 
+				cp.dataset_id, cp.dataset_version,
+				dt."name" as dataset_type, d."name" as dataset_name
+			 from emf.control_strategy_programs csp
+
+				inner join emf.control_programs cp
+				on cp.id = csp.control_program_id
+
+				inner join emf.control_program_types cpt
+				on cpt.id = cp.control_program_type_id
+
+				inner join emf.internal_sources i
+				on i.dataset_id = cp.dataset_id
+
+				inner join emf.datasets d
+				on d.id = i.dataset_id
+
+				inner join emf.dataset_types dt
+				on dt.id = d.dataset_type
+			where csp.control_strategy_id = ' || int_control_strategy_id || '
+				and cpt."name" = ''Plant Closure''
+			order by processing_order'
+		LOOP
+
+			-- make sure the dataset type is right...
+			IF (control_program.type = 'Projection' and control_program.dataset_type = 'Projection Packet') THEN
+raise notice '%', 'first see if packet affects anything -- packet type, ' || control_program.type || ', packet, ' || control_program.dataset_id || ', inv ' || inventory_record.dataset_id;
+				
+				sql := (case when lenght(sql) > 0 then ' union all ' else '' end) || public.build_project_future_year_inventory_matching_hierarchy_sql(
+					inventory_record.dataset_id, --inv_dataset_id integer, 
+					inventory_record.dataset_version, --inv_dataset_version integer, 
+					control_program.dataset_id, --control_program_dataset_id integer, 
+					control_program.dataset_version, --control_program_dataset_version integer, 
+					'fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,naics,cp."name" as control_program', --select_columns varchar, 
+					strat_inv_filter,--null'substring(fips,1,2) = ''37''', --inv_filter text,
+					county_dataset_id, --1279 county_dataset_id integer,
+					county_dataset_version, --county_dataset_version integer,
+					null::text,
+					1 --match_type integer	-- 1 = include only Matched Sources, 2 = Include packet records that didn't affect a source, 3 = ?
+					)
+
+
+			END IF;
+
+		END LOOP;
+
+
+		sql := 
+		'select *, 
+			rank() OVER (PARTITION BY record_id
+				order by record_id,ranking) as winner
+		from (
+			' || sql || 'limit 1 -- only need to return one...
+		) tbl
+		where winner > 2';
+
+		
+		-- first see if there is any issues
+		execute '
+		select count(1)
+		from (
+		' || sql || '
+		) tbl 
+		limit 1
+		'
+		into cnt;
+
+	raise notice '%', 'first see if packet affects anything -- packet type, ' || control_program.type || ', packet, ' || control_program.dataset_id || ', inv ' || inventory_record.dataset_id || ', cnt ' || cnt;
+		if cnt > 0 then
+			--see http://www.smoke-model.org/version2.4/html/ch06s02.html for source matching hierarchy
+	--				raise notice '%', 
+			execute
+			'insert into emissions.' || strategy_messages_table_name || ' 
+				(
+				dataset_id, 
+				fips, 
+				scc, 
+				plantid, 
+				pointid, 
+				stackid, 
+				segment, 
+				poll, 
+				status,
+				control_program,
+				message_type,
+				message,
+				inventory
+				)
+			select 
+				' || strategy_messages_dataset_id || '::integer,
+				fips, 
+				scc, 
+				plantid, 
+				pointid, 
+				stackid, 
+				segment, 
+				poll, 
+				''Warning''::character varying(11) as status,
+				' || quote_literal(control_program.control_program_name) || ' as control_program_name,
+				''Inventory Level''::character varying(255) as message_type,
+				message,
+				' || quote_literal(inventory_record.dataset_name) || '::character varying(255) as inventory
+
+			from (
+				--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
+				select 
+					null::integer as record_id,null::character varying as fips,null::character varying as plantid,null::character varying as pointid,null::character varying as stackid,null::character varying as segment,null::character varying as scc,null::character varying as poll,null::character varying as message,null::double precision as ranking
+				where 1 = 0
+
+				union all ' ||
+
+				public.build_project_future_year_inventory_matching_hierarchy_sql(
+					inventory_record.dataset_id, --inv_dataset_id integer, 
+					inventory_record.dataset_version, --inv_dataset_version integer, 
+					control_program.dataset_id, --control_program_dataset_id integer, 
+					control_program.dataset_version, --control_program_dataset_version integer, 
+					'fips,plantid,pointid,stackid,segment,scc,poll,''' || control_program.type || ' packet record does not affect any inventory records.'' as message', --select_columns varchar, 
+					strat_inv_filter,--null'substring(fips,1,2) = ''37''', --inv_filter text,
+					county_dataset_id, --1279 county_dataset_id integer,
+					county_dataset_version, --county_dataset_version integer,
+					case 
+						when control_program.type = 'Control' then 
+							'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone and application_control = ''Y''' 
+						when control_program.type = 'Allowable' then 
+							'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone' 
+						else 
+							null::text 
+					end,
+					2 --match_type integer	-- 1 = include only Matched Sources, 2 = Include packet records that didn't affect a source, 3 = ?
+					)
+
+			|| ') tbl';
+		END IF;
+
+
+
+
+
+		
 	END LOOP;
 
 
