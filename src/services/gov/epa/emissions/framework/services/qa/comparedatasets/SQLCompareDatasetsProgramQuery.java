@@ -763,16 +763,6 @@ poll|poll
         return lowerCaseDatasetColumnMap;
     }
 
-    private Version version(int datasetId, int version) {
-        Session session = sessionFactory.getSession();
-        try {
-            Versions versions = new Versions();
-            return versions.get(datasetId, version, session);
-        } finally {
-            session.close();
-        }
-    }
-
     private String[] parseSwitchArguments(String programSwitches, int beginIndex, int endIndex) {
         List<String> inventoryList = new ArrayList<String>();
         String value = "";

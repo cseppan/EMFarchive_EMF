@@ -258,26 +258,4 @@ public class SQLAnnualStateSummariesCrosstabQuery extends SQLQAProgramQuery{
         return parser.parse(partialQuery, createClause);
     }
 
-    private Version version(int datasetId, int version) {
-        Session session = sessionFactory.getSession();
-        try {
-            Versions versions = new Versions();
-            return versions.get(datasetId, version, session);
-        } finally {
-            session.close();
-        }
-    }
-    private String qualifiedEmissionTableName(Dataset dataset) {
-        return qualifiedName(emissionTableName(dataset));
-    }
-
-    private String emissionTableName(Dataset dataset) {
-        InternalSource[] internalSources = dataset.getInternalSources();
-        return internalSources[0].getTable();
-    }
-
-    private String qualifiedName(String table) {
-        return emissionDatasourceName + "." + table;
-    }
-
 }
