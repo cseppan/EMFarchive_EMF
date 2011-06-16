@@ -27,6 +27,77 @@ public abstract class AbstractCheckMessagesStrategyTask extends AbstractStrategy
         super(controlStrategy, user, dbServerFactory, sessionFactory, loader);
     }
 
+    protected boolean checkMessagesForErrors() throws EmfException {
+
+        List<StatusMessage> messages = new ArrayList<StatusMessage>();
+
+        ControlStrategyResult strategyMessagesResult = this.getLoader().getStrategyMessagesResult();
+        //check nothing if no result exists
+        if (strategyMessagesResult == null) return false;
+        InternalSource[] internalSources = strategyMessagesResult.getDetailedResultDataset().getInternalSources();
+        if (internalSources.length > 0) {
+
+            try {
+
+                String tableName = internalSources[0].getTable();
+                if (tableName != null) {
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("select distinct ");
+                    sb.append(STATUS_COLUMN_LABEL);
+                    sb.append(", ");
+                    sb.append(MESSAGE_COLUMN_LABEL);
+                    sb.append(" from emissions.");
+                    sb.append(tableName);
+                    sb.append(" where ");
+                    sb.append(STATUS_COLUMN_LABEL);
+                    sb.append("='Error';");
+
+                    String sql = sb.toString();
+                    System.out.println(sql);
+
+                    ResultSet rs = datasource.query().executeQuery(sql);
+
+                    String status = null;
+                    String message = null;
+                    while (rs.next()) {
+
+                        status = rs.getString(STATUS_COLUMN_LABEL);
+                        message = rs.getString(MESSAGE_COLUMN_LABEL);
+                    }
+
+                    if (status != null && message != null) {
+                        messages.add(new StatusMessage(status, message, 2));
+                    }
+
+                }
+            } catch (SQLException e) {
+                throw new EmfException("Error occured while retreiving strategy messages for control strategy '"
+                        + this.getControlStrategy().getName() + "':" + "\n" + e.getMessage());
+            }
+        }
+
+        if (messages.size() < 10) {
+
+            Collections.sort(messages);
+            for (StatusMessage statusMessage : messages) {
+                this.setStatus(statusMessage.createMessage());
+            }
+        } else {
+
+            this.setStatus("Multiple error messages were detected while running control strategy '"
+                    + this.getControlStrategy().getName() + "'. See '" + StrategyResultType.strategyMessages
+                    + "' output for details.");
+        }
+        
+        
+        //go ahead and update the strategy result count info.
+        setSummaryResultCount(strategyMessagesResult);
+        saveControlStrategyResult(strategyMessagesResult);
+        
+        return messages.size() > 0;
+    }
+    
     protected void checkMessagesForWarnings() throws EmfException {
 
         List<StatusMessage> messages = new ArrayList<StatusMessage>();

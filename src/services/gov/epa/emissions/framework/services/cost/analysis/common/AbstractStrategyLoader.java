@@ -560,58 +560,58 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         }
     }
 
-    protected ControlStrategyResult createStrategyMessagesResult() throws Exception 
+    public ControlStrategyResult createStrategyMessagesResult() throws Exception 
     {
-        ControlStrategyResult result = new ControlStrategyResult();
-        result.setControlStrategyId(controlStrategy.getId());
+        strategyMessagesResult = new ControlStrategyResult();
+        strategyMessagesResult.setControlStrategyId(controlStrategy.getId());
 //        result.setInputDataset(inventory);
 //        result.setInputDatasetVersion(inventoryVersion);
-        result.setDetailedResultDataset(createStrategyMessagesDataset());
+        strategyMessagesResult.setDetailedResultDataset(createStrategyMessagesDataset());
 
-        result.setStrategyResultType(getStrategyMessagesResultType());
-        result.setStartTime(new Date());
-        result.setRunStatus("Start processing strategy messages result");
+        strategyMessagesResult.setStrategyResultType(getStrategyMessagesResultType());
+        strategyMessagesResult.setStartTime(new Date());
+        strategyMessagesResult.setRunStatus("Start processing strategy messages result");
 
         //persist result
-        saveControlStrategyResult(result);
+        saveControlStrategyResult(strategyMessagesResult);
 
-        return result;
+        return strategyMessagesResult;
     }
 
     protected ControlStrategyResult createStrategyMessagesResult(EmfDataset inventory, int inventoryVersion) throws Exception 
     {
-        ControlStrategyResult result = new ControlStrategyResult();
-        result.setControlStrategyId(controlStrategy.getId());
-        result.setInputDataset(inventory);
-        result.setInputDatasetVersion(inventoryVersion);
-        result.setDetailedResultDataset(createStrategyMessagesDataset(inventory));
+        strategyMessagesResult = new ControlStrategyResult();
+        strategyMessagesResult.setControlStrategyId(controlStrategy.getId());
+        strategyMessagesResult.setInputDataset(inventory);
+        strategyMessagesResult.setInputDatasetVersion(inventoryVersion);
+        strategyMessagesResult.setDetailedResultDataset(createStrategyMessagesDataset(inventory));
 
-        result.setStrategyResultType(getStrategyMessagesResultType());
-        result.setStartTime(new Date());
-        result.setRunStatus("Start processing strategy messages result");
+        strategyMessagesResult.setStrategyResultType(getStrategyMessagesResultType());
+        strategyMessagesResult.setStartTime(new Date());
+        strategyMessagesResult.setRunStatus("Start processing strategy messages result");
 
         //persist result
-        saveControlStrategyResult(result);
+        saveControlStrategyResult(strategyMessagesResult);
 
-        return result;
+        return strategyMessagesResult;
     }
     
     protected ControlStrategyResult createStrategyMessagesResult(String namePrefix, EmfDataset inventory, int inventoryVersion) throws Exception 
     {
-        ControlStrategyResult result = new ControlStrategyResult();
-        result.setControlStrategyId(controlStrategy.getId());
-        result.setInputDataset(inventory);
-        result.setInputDatasetVersion(inventoryVersion);
-        result.setDetailedResultDataset(createStrategyMessagesDataset(namePrefix, inventory));
+        strategyMessagesResult = new ControlStrategyResult();
+        strategyMessagesResult.setControlStrategyId(controlStrategy.getId());
+        strategyMessagesResult.setInputDataset(inventory);
+        strategyMessagesResult.setInputDatasetVersion(inventoryVersion);
+        strategyMessagesResult.setDetailedResultDataset(createStrategyMessagesDataset(namePrefix, inventory));
 
-        result.setStrategyResultType(getStrategyMessagesResultType());
-        result.setStartTime(new Date());
-        result.setRunStatus("Start processing strategy messages result");
+        strategyMessagesResult.setStrategyResultType(getStrategyMessagesResultType());
+        strategyMessagesResult.setStartTime(new Date());
+        strategyMessagesResult.setRunStatus("Start processing strategy messages result");
 
         //persist result
-        saveControlStrategyResult(result);
+        saveControlStrategyResult(strategyMessagesResult);
 
-        return result;
+        return strategyMessagesResult;
     }
     
     protected void deleteStrategyMessageResult(ControlStrategyResult strategyMessagesResult) throws EmfException {

@@ -57,9 +57,9 @@ public class StrategyTask implements Runnable {
         if (runningCount < poolSize) {
             try {
                 prepare();
-                log.debug("Started to run strategy");
+                log.warn("Started to run strategy");
                 strategy.run();
-                log.debug("Finished to run strategy");
+                log.warn("Finished to run strategy");
                 completeStatus = "Finished";
                 addCompletedStatus();
             } catch (EmfException e) {

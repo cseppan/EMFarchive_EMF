@@ -8,16 +8,19 @@ import gov.epa.emissions.framework.services.cost.ControlProgram;
 import gov.epa.emissions.framework.services.cost.ControlProgramType;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
+import gov.epa.emissions.framework.services.cost.analysis.common.AbstractCheckMessagesStrategyTask;
+import gov.epa.emissions.framework.services.cost.analysis.common.AbstractStrategyLoader;
 import gov.epa.emissions.framework.services.cost.analysis.common.AbstractStrategyTask;
 import gov.epa.emissions.framework.services.cost.analysis.common.StrategyLoader;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.SQLException;
 import java.util.Date;
 
-public class StrategyTask extends AbstractStrategyTask {
+public class StrategyTask extends AbstractCheckMessagesStrategyTask {
 
     public StrategyTask(ControlStrategy controlStrategy, User user, DbServerFactory dbServerFactory,
             HibernateSessionFactory sessionFactory, StrategyLoader loader) throws EmfException {
@@ -99,7 +102,9 @@ public class StrategyTask extends AbstractStrategyTask {
 
     public void afterRun() {
         try {
-            ((gov.epa.emissions.framework.services.cost.analysis.projectFutureYearInventory.StrategyLoader)(this.getLoader())).createMessageOutput();
+            ((gov.epa.emissions.framework.services.cost.analysis.projectFutureYearInventory.StrategyLoader)(this.getLoader())).populateMessageOutput();
+
+            this.checkMessagesForWarnings();
         } catch (Exception e) {
             // NOTE Auto-generated catch block
             e.printStackTrace();
@@ -126,18 +131,23 @@ public class StrategyTask extends AbstractStrategyTask {
                 loader.makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset.getInputDataset());
             }
             
+            ((AbstractStrategyLoader) this.getLoader()).createStrategyMessagesResult();
             //next lets validate the control program dataset tables, make sure format is correct, no data is missing, etc...
             setStatus("Started validating control programs.");
-            validateControlPrograms();
+            validateControlPrograms(this.getLoader().getStrategyMessagesResult());
             setStatus("Finished validating control programs.");
+            boolean hasErrors = checkMessagesForErrors();
+            if (hasErrors) throw new EmfException("Multiple error messages were detected while running control strategy. See " + StrategyResultType.strategyMessages + " output.");
         } catch (EmfException e) {
             throw e;
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage(), e);
         }
     }
 
-    private void validateControlPrograms() throws EmfException {
+    private void validateControlPrograms(ControlStrategyResult controlStrategyResult) throws EmfException {
         try {
-            datasource.query().execute("select public.validate_project_future_year_inventory_control_programs(" + controlStrategy.getId() + "::integer);");
+            datasource.query().execute("select public.validate_project_future_year_inventory_control_programs(" + controlStrategy.getId() + "::integer, " + controlStrategyResult.getId() + "::integer);");
         } catch (SQLException e) {
             throw new EmfException(e.getMessage());
         } finally {
