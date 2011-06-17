@@ -96,7 +96,8 @@ public class DataViewCacheImpl implements DataViewCache {
             return;
         int batchSize = batchSize(properties, session);
         ScrollableVersionedRecords records = recordsReader.optimizedFetch(token.getVersion(), token.getTable(),
-                batchSize, session);
+                batchSize, pageSize, session);
+        
         PageReader reader = new PageReader(pageSize, records);
 
         cacheReader(token, reader);
@@ -116,7 +117,7 @@ public class DataViewCacheImpl implements DataViewCache {
             String sortOrder, Session session) throws Exception {
         int batchSize = batchSize(properties, session);
         ScrollableVersionedRecords records = recordsReader.optimizedFetch(token.getVersion(), token.getTable(),
-                batchSize, columnFilter, rowFilter, sortOrder, session);
+                batchSize, pageSize, columnFilter, rowFilter, sortOrder, session);
 
         PageReader reader = new PageReader(pageSize, records);
         cacheReader(token, reader);
