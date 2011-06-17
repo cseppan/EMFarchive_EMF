@@ -14,7 +14,7 @@ public class SQLQAFireProgramQuery extends SQLQAProgramQuery{
     public SQLQAFireProgramQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName, String tableName, QAStep qaStep) {
         super(sessionFactory,emissioDatasourceName,tableName,qaStep);
     }
-        
+    
     public String createFireProgramQuery() throws EmfException {
         
         String programArguments = qaStep.getProgramArguments();

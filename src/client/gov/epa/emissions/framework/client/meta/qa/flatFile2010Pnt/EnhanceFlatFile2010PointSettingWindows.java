@@ -208,7 +208,10 @@ public class EnhanceFlatFile2010PointSettingWindows extends DisposableInteralFra
                     messagePanel.setError("Please choose Supporting Smoke Flat File dataset.");
                     return;
                 }
-                
+                if (datasetWidgetSupportingFlatFile2.getDatasetVersions().length == 0) {
+                    messagePanel.setError("Please choose the second Supporting Flat File dataset.");
+                    return;
+                }
                 /*sample program arguments
                  
                 -ff10p
