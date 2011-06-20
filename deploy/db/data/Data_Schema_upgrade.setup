@@ -1079,7 +1079,6 @@ ALTER TABLE emissions.country ALTER COLUMN comments TYPE text;
 ALTER TABLE emissions.state ALTER COLUMN comments TYPE text;
 ALTER TABLE emissions.county ALTER COLUMN comments TYPE text;
 
---6/14/11 -- create new array_idx function -- helps determine array index position...
 -- 06/08/2011 -- Add new 'Enhance Flat File 2010 Point' QA Program
 insert into emf.qa_programs values(DEFAULT,'Enhance Flat File 2010 Point','gov.epa.emissions.framework.services.qa.flatFile2010Pnt.SQLEnhanceFlatFile2010PointRunner');
 update emf.qa_programs set run_classname='gov.epa.emissions.framework.services.qa.flatFile2010Pnt.SQLEnhanceFlatFile2010PointQueryRunner' where name='Enhance Flat File 2010 Point';
