@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.TableMetaData;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
+import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DatasetVersion;
@@ -14,7 +15,10 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.SQLQAProgramQuery;
 import gov.epa.emissions.framework.services.qa.SQLQueryParser;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -557,7 +561,7 @@ poll|poll
 //return the built query
         return parser.createTableQuery() + " " + sql;
     }
-
+    
     private boolean expressionExists(String expression, Map<String,Column> columns) {
         Set<String> columnsKeySet = columns.keySet();
         Iterator<String> iterator = columnsKeySet.iterator();

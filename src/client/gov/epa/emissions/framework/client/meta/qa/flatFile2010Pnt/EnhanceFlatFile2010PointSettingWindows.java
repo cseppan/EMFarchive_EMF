@@ -58,7 +58,10 @@ public class EnhanceFlatFile2010PointSettingWindows extends DisposableInteralFra
     private EditQAEmissionsPresenter presenter;
     
     public EnhanceFlatFile2010PointSettingWindows(DesktopManager desktopManager, String program, 
-            EmfSession session, DatasetVersion[] flatFile2010PointDatasetVersions, DatasetVersion[] supportingSmokeFlatFileDatasetVersions, 
+            EmfSession session, 
+            DatasetVersion[] flatFile2010PointDatasetVersions, 
+            DatasetVersion[] supportingSmokeFlatFileDatasetVersions, 
+            DatasetVersion[] supportingFlatFileDatasetVersions2,
             boolean multiNEI, boolean multiFRS, String whereFilter) {
 
         super("Emissions Inventories Editor", new Dimension(650, 600), desktopManager);
@@ -66,6 +69,7 @@ public class EnhanceFlatFile2010PointSettingWindows extends DisposableInteralFra
         this.session = session;
         this.flatFile2010PointDatasetVersions = flatFile2010PointDatasetVersions;
         this.supportingSmokeFlatFileDatasetVersions = supportingSmokeFlatFileDatasetVersions;
+        this.supportingFlatFileDatasetVersions2 = supportingFlatFileDatasetVersions2;
         this.multiNEI = multiNEI;
         this.multiFRS = multiFRS;
         this.whereFilter = whereFilter;
@@ -218,6 +222,8 @@ public class EnhanceFlatFile2010PointSettingWindows extends DisposableInteralFra
                 dataset_name|version
                 -ssff
                 dataset_name|version
+                -fac
+                dataset_name|version
                 -where
                 ann_emis=1000
                 -manyfrs
@@ -228,23 +234,28 @@ public class EnhanceFlatFile2010PointSettingWindows extends DisposableInteralFra
                 
                 StringBuilder programArguments = new StringBuilder();
                 //Flat File 2010 Point dataset
-                programArguments.append(EditQAStepWindow.FF10P_TAG + "\n");
+                programArguments.append(QAStep.FF10P_TAG + "\n");
                 for (Object datasetVersion : datasetWidgetFlatFile2010Point.getDatasetVersions()) {
                     programArguments.append(((DatasetVersion)datasetVersion).getDataset().getName() + "|" + ((DatasetVersion)datasetVersion).getVersion().getVersion() + "\n");
                 }
                 //Supporting Smoke Flat File dataset
-                programArguments.append(EditQAStepWindow.SSFF_TAG + "\n");
+                programArguments.append(QAStep.SSFF_TAG + "\n");
                 for (Object datasetVersion : datasetWidgetSupportingSmokeFlatFile.getDatasetVersions()) {
                     programArguments.append(((DatasetVersion)datasetVersion).getDataset().getName() + "|" + ((DatasetVersion)datasetVersion).getVersion().getVersion() + "\n");
                 }
+                //Supporting Flat File dataset for NEI and FRS
+                programArguments.append(QAStep.FAC_TAG + "\n");
+                for (Object datasetVersion : datasetWidgetSupportingFlatFile2.getDatasetVersions()) {
+                    programArguments.append(((DatasetVersion)datasetVersion).getDataset().getName() + "|" + ((DatasetVersion)datasetVersion).getVersion().getVersion() + "\n");
+                }
                 
-                programArguments.append(EditQAStepWindow.MANYNEIID_TAG + "\n");
+                programArguments.append(QAStep.MANYNEIID_TAG + "\n");
                 programArguments.append(chkMultiNEI_UNIQUE_ID.isSelected() + "\n");
                 
-                programArguments.append(EditQAStepWindow.MANYFRS_TAG + "\n");
+                programArguments.append(QAStep.MANYFRS_TAG + "\n");
                 programArguments.append(chkMultiFRS_ID.isSelected() + "\n");
 
-                programArguments.append(EditQAStepWindow.WHERE_FILTER_TAG + "\n");
+                programArguments.append(QAStep.WHERE_FILTER_TAG + "\n");
                 programArguments.append(whereFilterTextField.getText() + "\n");
 
                 presenter.updateProgramArguments(programArguments.toString());

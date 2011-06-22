@@ -25,6 +25,8 @@ public class QAStep implements Serializable {
     
     public static final String SSFF_TAG = "-ssff"; 
     
+    public static final String FAC_TAG = "-fac"; 
+    
     public static final String MANYNEIID_TAG = "-manyneiid"; 
     
     public static final String MANYFRS_TAG = "-manyfrs"; 

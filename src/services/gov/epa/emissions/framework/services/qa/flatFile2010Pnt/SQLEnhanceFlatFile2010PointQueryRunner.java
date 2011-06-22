@@ -19,7 +19,7 @@ public class SQLEnhanceFlatFile2010PointQueryRunner extends SQLQAProgramRunner{
     }
     
     protected String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {
-        SQLCompareDatasetsProgramQuery parser = new SQLCompareDatasetsProgramQuery(sessionFactory, dbServer.getEmissionsDatasource(), emissioDatasourceName, tableName, qaStep);
+        SQLEnhanceFlatFile2010PointQuery parser = new SQLEnhanceFlatFile2010PointQuery(sessionFactory, emissioDatasourceName, tableName, qaStep, dbServer.getEmissionsDatasource());
         String sql = "";
         try {
             sql = parser.createProgramQuery();

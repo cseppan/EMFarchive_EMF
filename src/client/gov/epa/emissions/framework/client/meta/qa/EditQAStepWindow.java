@@ -126,6 +126,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     
     private EmfDataset[] flatFile2010PointInv = null;
     private EmfDataset[] supportingSmokeFlatFileInv = null;
+    private EmfDataset[] supportingFlatFileInv2 = null;
 
     private EmfDataset[] inventories = null;
     private EmfDataset[] invBase = null;
@@ -1028,6 +1029,7 @@ substring(fips,1,2)='37'
         
         flatFile2010PointInv = null;
         supportingSmokeFlatFileInv = null;
+        supportingFlatFileInv2 = null;
 
         String programSwitches = "";
         programSwitches = programArguments.getText();
@@ -1036,12 +1038,15 @@ substring(fips,1,2)='37'
 
         String[] ff10pTokens = new String[] {};
         String[] ssffTokens = new String[] {};
+        String[] facTokens = new String[] {};
         
         List<DatasetVersion> ff10pDatasetList = new ArrayList<DatasetVersion>();
         List<DatasetVersion> ssffDatasetList = new ArrayList<DatasetVersion>();
+        List<DatasetVersion> facDatasetList = new ArrayList<DatasetVersion>();
 
         int indexFF10P = programSwitches.indexOf(QAStep.FF10P_TAG);
         int indexSSFF = programSwitches.indexOf(QAStep.SSFF_TAG);
+        int indexFAC = programSwitches.indexOf(QAStep.FAC_TAG);
         int indexMultiNEI = programSwitches.indexOf(QAStep.MANYNEIID_TAG);
         int indexMultiFRS = programSwitches.indexOf(QAStep.MANYFRS_TAG);
         int indexWhereFilter = programSwitches.indexOf(QAStep.WHERE_FILTER_TAG);
@@ -1093,6 +1098,30 @@ substring(fips,1,2)='37'
                 ssffDatasetList.add(new DatasetVersion(dataset, version));
             }
         }
+        if (indexFAC != -1) {
+            arguments = parseSwitchArguments(programSwitches, indexFAC, programSwitches.indexOf("\n-", indexFAC) != -1 ? programSwitches.indexOf("\n-", indexFAC) : programSwitches.length());
+            if (arguments != null && arguments.length > 0) facTokens = arguments;
+            for (String datasetVersion : facTokens) {
+                String[] datasetVersionToken = new String[] {};
+                if (!datasetVersion.equals("$DATASET")) { 
+                    datasetVersionToken = datasetVersion.split("\\|");
+                } else {
+                    EmfDataset qaStepDataset = presenter.getDataset(step.getDatasetId());
+                    datasetVersionToken = new String[] { qaStepDataset.getName(), qaStepDataset.getDefaultVersion() + "" };
+                }
+                EmfDataset dataset = presenter.getDataset(datasetVersionToken[0]);
+                //make sure dataset exists
+                if (dataset == null)
+                    break;
+
+                Version version = presenter.version(dataset.getId(), Integer.parseInt(datasetVersionToken[1]));
+                //make sure version exists
+                if (version == null)
+                    break;
+
+                facDatasetList.add(new DatasetVersion(dataset, version));
+            }
+        }
         
         boolean boolMultiNEI = false;
         boolean boolMultiFRS = false;
@@ -1106,7 +1135,9 @@ substring(fips,1,2)='37'
         }
         
         EnhanceFlatFile2010PointSettingWindows view = new EnhanceFlatFile2010PointSettingWindows(desktopManager, programVal, session,
-                ff10pDatasetList.toArray(new DatasetVersion[0]), ssffDatasetList.toArray(new DatasetVersion[0]),
+                ff10pDatasetList.toArray(new DatasetVersion[0]), 
+                ssffDatasetList.toArray(new DatasetVersion[0]),
+                facDatasetList.toArray(new DatasetVersion[0]),
                 boolMultiNEI, 
                 boolMultiFRS, 
                 (indexWhereFilter != -1 && (indexWhereFilter + WHERE_FILTER_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) ? programSwitches.substring(indexWhereFilter + WHERE_FILTER_TAG.length() + 1, programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) : "")

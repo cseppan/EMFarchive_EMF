@@ -68,7 +68,6 @@ public class TableToString {
             
             if (DebugLevels.DEBUG_0)
                 System.out.println("\n query: " + query);
-
             
             ResultSet rs = datasource.query().executeQuery(query);
             ResultSetMetaData md = rs.getMetaData();
