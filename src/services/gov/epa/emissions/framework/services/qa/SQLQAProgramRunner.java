@@ -81,7 +81,7 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     protected void failure(QAStep qaStep) {
         updateQAStepResult(qaStep, "Failed", null, null);
     }
-
+    
     private void updateQAStepResult(QAStep qaStep, String status, String tableName, Date date) {
         Session session = sessionFactory.getSession();
         try {

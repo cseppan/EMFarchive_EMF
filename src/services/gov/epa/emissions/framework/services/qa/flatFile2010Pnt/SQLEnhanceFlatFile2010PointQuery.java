@@ -4,15 +4,22 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.VersionedQuery;
+import gov.epa.emissions.commons.io.importer.DataTable;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DatasetVersion;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -32,27 +39,38 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
     public static final String MANYFRS_TAG = "-manyfrs";    
     
     private Datasource datasource;
-
+    
+    private StatusDAO statusDao;
+    
     public SQLEnhanceFlatFile2010PointQuery(HibernateSessionFactory sessionFactory, String emissioDatasourceName,
             String tableName, QAStep qaStep, Datasource datasource) {
         super(sessionFactory, emissioDatasourceName, tableName, qaStep);
         this.datasource = datasource;
+        this.statusDao = new StatusDAO(sessionFactory);
     }
     
     public String createProgramQuery() throws EmfException, SQLException {
 
         String programArguments = qaStep.getProgramArguments();
+
+        setStatus("Parsing program arguments...");
         
         String[] ff10pTokens = new String[] {};
         String[] ssffTokens = new String[] {};
         String[] facTokens = new String[] {};
-        String whereFilter = new String();
+        
         
         String[] arguments; 
         
         List<DatasetVersion> ff10pDatasetList = new ArrayList<DatasetVersion>();
         List<DatasetVersion> ssffDatasetList = new ArrayList<DatasetVersion>();
         List<DatasetVersion> facDatasetList = new ArrayList<DatasetVersion>();
+        boolean boolMultiNEI = false;
+        boolean boolMultiFRS = false;
+        String whereFilter = new String();
+        
+        ///////////////////////////////////////////////////
+        // parse the programArguments
         
         int indexFF10P = programArguments.indexOf(QAStep.FF10P_TAG);
         int indexSSFF = programArguments.indexOf(QAStep.SSFF_TAG);
@@ -126,6 +144,20 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
                 facDatasetList.add(dv);
             }
         }
+        String multiNEI = (indexMultiNEI != -1 ? programArguments.substring(indexMultiNEI + MANYNEIID_TAG.length() + 1, programArguments.indexOf("\n-", indexMultiNEI) != -1 ? programArguments.indexOf("\n-", indexMultiNEI) : programArguments.length()) : "");
+        if ("TRUE".equals( multiNEI.trim().toUpperCase())) {
+            boolMultiNEI = true;
+        }
+        String multiFRS = (indexMultiFRS != -1 ? programArguments.substring(indexMultiFRS + MANYFRS_TAG.length() + 1, programArguments.indexOf("\n-", indexMultiFRS) != -1 ? programArguments.indexOf("\n-", indexMultiFRS) : programArguments.length()) : "");
+        if ("TRUE".equals( multiFRS.trim().toUpperCase())) {
+            boolMultiFRS = true;
+        }
+        whereFilter = indexWhereFilter != -1 && (indexWhereFilter + QAStep.WHERE_FILTER_TAG.length() + 1) < (programArguments.indexOf("\n-", indexWhereFilter) != -1 ? programArguments.indexOf("\n-", indexWhereFilter) : programArguments.length()) ? programArguments.substring(indexWhereFilter + QAStep.WHERE_FILTER_TAG.length() + 1, programArguments.indexOf("\n-", indexWhereFilter) != -1 ? programArguments.indexOf("\n-", indexWhereFilter) : programArguments.length()) : "";
+        
+        ///////////////////////////////////////////////////
+        // validation
+        
+        setStatus("Validating program arguments...");
         
         if ( ff10pDatasetList.size() != 1) {
             throw new EmfException("One and only one Flat File 2010 Point dataset should be chosen.");
@@ -170,8 +202,6 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
         String fromClause = "from ";
         String whereClause = "where ";
         String sqlStr = "";
-        
-        // --- select clause
         
         String ff10pCols = "";
         String otherCols = "";
@@ -222,6 +252,35 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
         VersionedQuery facDatasetVersionedQuery = new VersionedQuery(dvFAC.getVersion(), facAlias);
         facVersionQuery = facDatasetVersionedQuery.query();
         
+        // validate the datasets and versions
+        this.validateDatasetVersion(ff10pTable, ff10pAlias, ff10pVersionQuery);
+        this.validateDatasetVersion(ssffTable, ssffAlias, ssffVersionQuery);
+        this.validateDatasetVersion(facTable, facAlias, facVersionQuery);
+        // validate the where filter
+        Map<String,Column> tableColumns = getDatasetColumnMap(datasource, dvFF10P.getDataset());
+        whereFilter = this.aliasExpression(whereFilter, tableColumns, ff10pAlias);
+        this.validateWhereFilter(ff10pTable, ff10pAlias, whereFilter);
+        
+        ///////////////////////////////////////////////////
+        // update ff10pVersionQuery to include the where filter
+        
+        if ( whereFilter != null && !whereFilter.trim().equals("")) {
+            ff10pVersionQuery += " and (" + whereFilter.trim() + ") ";
+        }
+        
+        ///////////////////////////////////////////////////
+        // indexing
+        this.createFF10PIndexes(dvFF10P.getDataset());
+        this.createFF10PIndexes(dvSSFF.getDataset());
+        this.createFF10PIndexes(dvFAC.getDataset());
+        
+        ///////////////////////////////////////////////////
+        // constructing query
+        
+        setStatus("Constructing query...");
+        
+        // --- select clause
+        
         //        sff10.facility_company_name,
         //        facility_source_type_codes.description as facility_type_description,
         //        sff10.facilty_status_cd,
@@ -252,7 +311,7 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
         selectClause += ff10pCols;
         selectClause += ", " + otherCols;
         
-        // from clause
+        // --- from clause
         
         fromClause += ff10pTable + " as " + ff10pAlias + " ";
         
@@ -320,11 +379,25 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
         //                group by fac_ff10.facility_id
         //        ) as fac_ff10
         //        on fac_ff10.facility_id = ff10.facility_id 
+        /*USE WHEN ONLY SHOWING ALL*/ 
+        String neiMulti = "string_agg(distinct case when " + facAlias + ".program_system_code = 'EPANEI' then alt_agency_id else null end, '&') as nei_unique_ids, ";
+        /*USE WHEN ONLY SHOWING ONE*/
+        String neiSingle = "max(distinct case when " + facAlias + ".program_system_code = 'EPANEI' then alt_agency_id else null end) as nei_unique_ids, ";
+        /*USE WHEN ONLY SHOWING ALL*/
+        String frsMulti = "string_agg(distinct case when " + facAlias + ".program_system_code = 'EPAFRS' then alt_agency_id else null end, '&') as frs_ids ";
+        /*USE WHEN ONLY SHOWING ONE*/
+        String frsSingle = "max(distinct case when " + facAlias + ".program_system_code = 'EPAFRS' then alt_agency_id else null end) as frs_ids ";
         String facSql = "select " + facAlias + ".facility_id, ";
-        /*USE WHEN ONLY SHOWING ALL*/ 
-        facSql += "string_agg(distinct case when " + facAlias + ".program_system_code = 'EPANEI' then alt_agency_id else null end, '&') as nei_unique_ids, ";
-        /*USE WHEN ONLY SHOWING ALL*/ 
-        facSql += "string_agg(distinct case when " + facAlias + ".program_system_code = 'EPAFRS' then alt_agency_id else null end, '&') as frs_ids";
+        if ( boolMultiNEI) {
+            facSql += neiMulti;
+        } else {
+            facSql += neiSingle;
+        }
+        if ( boolMultiFRS) {
+            facSql += frsMulti;
+        } else {
+            facSql += frsSingle;
+        }
         facSql += " from " + facTable + " as " + facAlias + " ";
         facSql += " where " + facAlias + ".program_system_code in ( 'EPANEI', 'EPAFRS' )";
         facSql += " and "; /*versioning query*/
@@ -334,6 +407,7 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
         facJoinStr += facSql;
         facJoinStr += ") as " + facAlias2;
         facJoinStr += " on " + facAlias2 + ".facility_id = " + ff10pAlias + ".facility_id ";
+        
         fromClause += facJoinStr + " ";          
         
         // join 6
@@ -539,6 +613,45 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
         }
     }
     
+    private void validateDatasetVersion( String qualifiedTableName, String alias, String versionQuery) throws EmfException {
+        try {
+            
+            String query = "select * from " + qualifiedTableName + " as " + alias + " where 0=1";
+            if ( versionQuery != null && !versionQuery.trim().equals("")) {
+                query += " and " + versionQuery + ";";
+            } else {
+                query += ";";
+            }
+            if (DebugLevels.DEBUG_22)
+                System.out.println("\n query: " + query);
+            datasource.query().executeQuery(query);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException("Dataset or version does not exist - " + qualifiedTableName + " : " + versionQuery + ": ", e);
+        }        
+    }
+    private void validateWhereFilter( String qualifiedTableName, String alias, String sqlWhereFilter) throws EmfException {
+        
+        try {
+            
+            String query = "select * from " + qualifiedTableName + " as " + alias + " where 0=1";
+            if ( sqlWhereFilter != null && !sqlWhereFilter.trim().equals("")) {
+                query += " and " + sqlWhereFilter.trim() + ";";
+            }else {
+                query += ";";
+            }                
+            
+            if (DebugLevels.DEBUG_22)
+                System.out.println("\n query: " + query);
+
+            datasource.query().executeQuery(query);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException("Invalid where filer for " + qualifiedTableName + ": ", e);
+        }
+    }    
+    
     private String[] parseSwitchArguments(String programSwitches, int beginIndex, int endIndex) {
         List<String> inventoryList = new ArrayList<String>();
         String value = "";
@@ -555,5 +668,99 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
         }
         return inventoryList.toArray(new String[0]);
     }
+    
+    private void setStatus(String message) {
+        Status endStatus = new Status();
+        endStatus.setUsername(qaStep.getWho());
+        endStatus.setType("RunQAStep");
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
 
+        statusDao.add(endStatus);
+
+    }
+    
+    private void createFF10PIndexes(Dataset dataset) {
+        DataTable dataTable = new DataTable(dataset, datasource);
+        String table = emissionTableName(dataset);
+        setStatus("Started creating indexes on inventory, " 
+                + dataset.getName() 
+                + ".  Depending on the size of the dataset, this could take several minutes.");
+
+        //ALWAYS create indexes for these core columns...
+        dataTable.addIndex(table, "record_id", true);
+        dataTable.addIndex(table, "dataset_id", false);
+        dataTable.addIndex(table, "version", false);
+        dataTable.addIndex(table, "delete_versions", false);
+
+        dataTable.addIndex(table, "region_cd", false);
+        dataTable.addIndex(table, "facility_id", false);
+        dataTable.addIndex(table, "unit_id", false);
+        dataTable.addIndex(table, "rel_point_id", false);
+        dataTable.addIndex(table, "process_id", false);
+        dataTable.addIndex(table, "scc", false);
+        dataTable.addIndex(table, "poll", false);
+
+        //finally analyze the table, so the indexes take affect immediately, 
+        //NOT when the SQL engine gets around to analyzing eventually
+        dataTable.analyzeTable(table);
+    
+        setStatus("Completed creating indexes on inventory, " 
+                + dataset.getName() 
+                + ".");
+    }
+    
+    private void createSSFFIndexes(Dataset dataset) {
+        DataTable dataTable = new DataTable(dataset, datasource);
+        String table = emissionTableName(dataset);
+        setStatus("Started creating indexes on inventory, " 
+                + dataset.getName() 
+                + ".  Depending on the size of the dataset, this could take several minutes.");
+
+        //ALWAYS create indexes for these core columns...
+        dataTable.addIndex(table, "record_id", true);
+        dataTable.addIndex(table, "dataset_id", false);
+        dataTable.addIndex(table, "version", false);
+        dataTable.addIndex(table, "delete_versions", false);
+
+        dataTable.addIndex(table, "region_cd", false);
+        dataTable.addIndex(table, "facility_id", false);
+        dataTable.addIndex(table, "unit_id", false);
+        dataTable.addIndex(table, "rel_point_id", false);
+        dataTable.addIndex(table, "process_id", false);
+        dataTable.addIndex(table, "scc", false);
+
+        //finally analyze the table, so the indexes take affect immediately, 
+        //NOT when the SQL engine gets around to analyzing eventually
+        dataTable.analyzeTable(table);
+    
+        setStatus("Completed creating indexes on inventory, " 
+                + dataset.getName() 
+                + ".");
+    }    
+
+    private void createFACIndexes(Dataset dataset) {
+        DataTable dataTable = new DataTable(dataset, datasource);
+        String table = emissionTableName(dataset);
+        setStatus("Started creating indexes on inventory, " 
+                + dataset.getName() 
+                + ".  Depending on the size of the dataset, this could take several minutes.");
+
+        //ALWAYS create indexes for these core columns...
+        dataTable.addIndex(table, "record_id", true);
+        dataTable.addIndex(table, "dataset_id", false);
+        dataTable.addIndex(table, "version", false);
+        dataTable.addIndex(table, "delete_versions", false);
+
+        dataTable.addIndex(table, "facility_id", false);
+        dataTable.addIndex(table, "program_system_code", false);
+
+        //finally analyze the table, so the indexes take affect immediately, 
+        //NOT when the SQL engine gets around to analyzing eventually
+        dataTable.analyzeTable(table);
+    
+        setStatus("Completed creating indexes on inventory, " 
+                + dataset.getName() 
+                + ".");
+    } 
 }

@@ -1,9 +1,13 @@
 package gov.epa.emissions.framework.services.qa.flatFile2010Pnt;
 
 import java.sql.SQLException;
+import java.util.Date;
 
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.SQLQAProgramRunner;
@@ -12,10 +16,13 @@ import gov.epa.emissions.framework.services.qa.comparedatasets.SQLCompareDataset
 public class SQLEnhanceFlatFile2010PointQueryRunner extends SQLQAProgramRunner{
     
     private String emissioDatasourceName;
-
+    
+    private StatusDAO statusDao;
+    
     public SQLEnhanceFlatFile2010PointQueryRunner(DbServer dbServer, HibernateSessionFactory sessionFactory, QAStep qaStep) {
         super(dbServer, sessionFactory, qaStep);
         this.emissioDatasourceName = dbServer.getEmissionsDatasource().getName();
+        this.statusDao = new StatusDAO(sessionFactory);
     }
     
     protected String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {
@@ -43,8 +50,10 @@ public class SQLEnhanceFlatFile2010PointQueryRunner extends SQLQAProgramRunner{
         //System.out.println("The input to tableName is: " + qaStep);
         String tableName = tableName(qaStep);
         //System.out.println("The tableName is: " + tableName);
+        //setStatus( "Constructing query...");
         String query = query(dbServer, qaStep, tableName);
         printQuery(query);
+        setStatus( "Executing query...");
         try {
             dropTable(getExistedTableName(qaStep));
             dbServer.getEmissionsDatasource().query().execute(query);
@@ -55,5 +64,17 @@ public class SQLEnhanceFlatFile2010PointQueryRunner extends SQLQAProgramRunner{
             //throw new EmfException("Check the query - " + query);
             throw new EmfException("Check the query - " + e.getMessage());
         }
+    }
+    
+    private void setStatus(String message) {
+        
+        Status endStatus = new Status();
+        endStatus.setUsername(qaStep.getWho());
+        endStatus.setType("RunQAStep");
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
+
+        statusDao.add(endStatus);
+
     }    
 }
