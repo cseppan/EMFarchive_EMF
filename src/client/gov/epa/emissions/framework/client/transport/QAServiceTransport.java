@@ -52,14 +52,15 @@ public class QAServiceTransport implements QAService {
         return (QAStepResult[]) call.requestResponse(params);
     }
 
-    public synchronized void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
+    public synchronized QAStep[] updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateWitoutCheckingConstraints");
         call.addParam("steps", mappings.qaSteps());
-        call.setVoidReturnType();
+        //call.setVoidReturnType();
+        call.setReturnType(mappings.qaSteps());
 
-        call.request(new Object[] { steps });
+        return (QAStep[]) call.requestResponse(new Object[] { steps });
     }
 
     public synchronized QAProgram[] getQAPrograms() throws EmfException {
@@ -120,14 +121,15 @@ public class QAServiceTransport implements QAService {
 
     }
 
-    public synchronized void update(QAStep step) throws EmfException {
+    public synchronized QAStep update(QAStep step) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("update");
         call.addParam("steps", mappings.qaStep());
-        call.setVoidReturnType();
+        //call.setVoidReturnType();
+        call.setReturnType(mappings.qaStep());
 
-        call.request(new Object[] { step });
+        return (QAStep) call.requestResponse(new Object[] { step });
 
     }
 

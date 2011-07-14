@@ -95,8 +95,8 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         presenter.display(step, versionName);
     }
 
-    public void addFromTemplates(QAStep[] newSteps) throws EmfException {
-        session.qaService().updateWitoutCheckingConstraints(newSteps);
+    public QAStep[] addFromTemplates(QAStep[] newSteps) throws EmfException {
+        return session.qaService().updateWitoutCheckingConstraints(newSteps);
     }
     
     public EmfSession getSession(){

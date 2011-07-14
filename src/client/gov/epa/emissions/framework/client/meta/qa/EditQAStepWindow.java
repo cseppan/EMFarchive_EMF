@@ -1933,6 +1933,7 @@ avd_emis=emis_avd
             throw new EmfException("Order should be a floating point number");
         }
         step.setName(name.getText().trim());
+        //step.setDatasetId(this.origDataset.getId());
         step.setProgram(qaPrograms.get(program.getSelectedItem()));
         step.setProgramArguments(programArguments.getText());
         step.setOrder(Float.parseFloat(order.getText()));

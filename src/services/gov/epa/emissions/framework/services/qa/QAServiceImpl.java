@@ -272,9 +272,13 @@ public class QAServiceImpl implements QAService {
             throw new EmfException("The program " + program.getName() + " cannot currently be run in the EMF");
     }
 
-    public synchronized void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
+    //public synchronized void updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
+    public synchronized QAStep[] updateWitoutCheckingConstraints(QAStep[] steps) throws EmfException {
+        
         updateIds(steps);
         updateSteps(steps);
+        
+        return steps;
     }
 
     private synchronized void updateIds(QAStep[] steps) throws EmfException {
@@ -302,13 +306,14 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public synchronized void update(QAStep step) throws EmfException {
+    public synchronized QAStep update(QAStep step) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             if (dao.exists(step, session)) {
                 throw new EmfException("The selected QA Step name is already in use");
             }
             dao.update(new QAStep[] { step }, session);
+            return step;
         } catch (RuntimeException e) {
             LOG.error("Could not update QA Step", e);
             throw new EmfException("Could not update QA Step -" + e.getMessage());

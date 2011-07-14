@@ -35,7 +35,7 @@ public class NewCustomQAStepPresenter {
 
     public void doSave() throws EmfException {
         QAStep step = stepView.save();
-        session.qaService().update(step);
+        step = session.qaService().update(step);
         parentView.addCustomQAStep(step);
     }
 

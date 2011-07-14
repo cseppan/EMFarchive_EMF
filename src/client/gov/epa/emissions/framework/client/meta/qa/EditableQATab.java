@@ -263,7 +263,7 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
     public void addFromTemplate(QAStep[] steps) {
         QAStep[] newSteps = filterDuplicates(steps);
         try {
-            presenter.addFromTemplates(newSteps);
+            newSteps = presenter.addFromTemplates(newSteps);
             addNewStepsToTable(newSteps);
         } catch (Exception e) {
             messagePanel.setError(e.getMessage());
