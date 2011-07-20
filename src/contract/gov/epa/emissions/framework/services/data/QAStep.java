@@ -47,7 +47,7 @@ public class QAStep implements Serializable {
 
     public static final String COMPARE_DATASETS_PROGRAM = "Compare Datasets";
     
-    public static final String Enhance_Flat_File_2010_Point = "Enhance Flat File 2010 Point";
+    public static final String MERGE_IN_SUPPORTING_DATA = "Merge In Supporting Data";
 
     public static final String MultiInvDifRepProgram = "Multi-inventory difference report";
     public static final String CompareControlStrategies = "Compare Control Strategies";

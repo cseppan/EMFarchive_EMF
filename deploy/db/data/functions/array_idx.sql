@@ -8,4 +8,4 @@ $$
   ) g(i)
   WHERE $1[i] = $2
   LIMIT 1;
-$$ LANGUAGE sql IMMUTABLE;
+$$ LANGUAGE sql STRICT IMMUTABLE;

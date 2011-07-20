@@ -937,7 +937,7 @@ substring(fips,1,2)='37'
                         // NOTE Auto-generated catch block
                         e1.printStackTrace();
                     }
-                } else if (QAStep.Enhance_Flat_File_2010_Point.equalsIgnoreCase(program.getSelectedItem().toString())){
+                } else if (QAStep.MERGE_IN_SUPPORTING_DATA.equalsIgnoreCase(program.getSelectedItem().toString())){
                     try {
                         showEnhanceFlatFile2010PointSettingWindows();
                     } catch (EmfException e1) {

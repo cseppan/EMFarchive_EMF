@@ -92,21 +92,21 @@ public class EnhanceFlatFile2010PointSettingWindows extends DisposableInteralFra
         JPanel content = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         
-        layoutGenerator.addLabelWidgetPair("Flat File 2010 Point:", flatFile2010PointVersionWidget(), content);
-        layoutGenerator.addLabelWidgetPair("Supporting Smoke Flat File:", supportingSmokeFlatFileVersionWidget(), content);
-        layoutGenerator.addLabelWidgetPair("Supporting Flat File 2:",supportingFlatFileVersionWidget2(), content);
+        layoutGenerator.addLabelWidgetPair(DatasetType.FLAT_FILE_2010_POINT + ":", flatFile2010PointVersionWidget(), content);
+        layoutGenerator.addLabelWidgetPair("Supporting Data:", supportingSmokeFlatFileVersionWidget(), content);
+        layoutGenerator.addLabelWidgetPair("Alternate Facility:",supportingFlatFileVersionWidget2(), content);
 
         chkMultiNEI_UNIQUE_ID = new JCheckBox();
         chkMultiNEI_UNIQUE_ID.setSelected( this.multiNEI);
-        layoutGenerator.addLabelWidgetPair("Multiple NEI Unique ID:", chkMultiNEI_UNIQUE_ID, content);
+        layoutGenerator.addLabelWidgetPair("Multiple NEI Unique IDs:", chkMultiNEI_UNIQUE_ID, content);
         
         chkMultiFRS_ID = new JCheckBox();
         chkMultiFRS_ID.setSelected( this.multiFRS);
-        layoutGenerator.addLabelWidgetPair("Multiple FRS ID:", chkMultiFRS_ID, content);
+        layoutGenerator.addLabelWidgetPair("Multiple FRS IDs:", chkMultiFRS_ID, content);
         
         this.whereFilterTextField = new TextArea("Row Filter", this.whereFilter, 40, 4);
         this.whereFilterTextField.setToolTipText("<html>Row Filter"
-                + "<br/><br/>This is a SQL WHERE clause that is used to filter only the FF10 dataset, not the newly created output -- for example don't allow to filter on newly created columns."
+                + "<br/><br/>This is a SQL WHERE clause that is used to filter only the " + DatasetType.FLAT_FILE_2010_POINT + ", not the newly created output -- for example don't allow to filter on newly created columns."
                 + "<br/>The expressions in the WHERE clause must contain valid column(s) from either the FF10 dataset."
                 + "<br/><br/>Sample Row Filter:"
                 + "<br/><br/>For example to filter on a certain state and scc codes,<br/>substring(region_cd,1,2) = '37' and scc in ('10100202','10100203')<br/>or<br/>region_cd like '37%' and  and scc like '101002%'</html>");
@@ -147,7 +147,7 @@ public class EnhanceFlatFile2010PointSettingWindows extends DisposableInteralFra
         DatasetType[] datasetTypesToInclude = new DatasetType[1];
         datasetTypesToInclude[0] = session.dataCommonsService().getDatasetType("Comma Separated Values (CSV)");
         
-        datasetWidgetSupportingSmokeFlatFile = new AddRemoveDatasetVersionWidget(false, 0, this, parentConsole, session);
+        datasetWidgetSupportingSmokeFlatFile = new AddRemoveDatasetVersionWidget(false, 1, this, parentConsole, session);
         datasetWidgetSupportingSmokeFlatFile.setPreferredSize(new Dimension(350,220));
         List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
         datasetWidgetSupportingSmokeFlatFile.setDatasetTypesToInclude(datasetTypesToInclude);
@@ -165,7 +165,7 @@ public class EnhanceFlatFile2010PointSettingWindows extends DisposableInteralFra
         DatasetType[] datasetTypesToInclude = new DatasetType[1];
         datasetTypesToInclude[0] = session.dataCommonsService().getDatasetType("Comma Separated Values (CSV)");
         
-        datasetWidgetSupportingFlatFile2 = new AddRemoveDatasetVersionWidget(false, 0, this, parentConsole, session);
+        datasetWidgetSupportingFlatFile2 = new AddRemoveDatasetVersionWidget(false, 1, this, parentConsole, session);
         datasetWidgetSupportingFlatFile2.setPreferredSize(new Dimension(350,220));
         List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
         datasetWidgetSupportingFlatFile2.setDatasetTypesToInclude(datasetTypesToInclude);

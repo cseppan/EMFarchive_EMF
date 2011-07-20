@@ -1080,10 +1080,9 @@ ALTER TABLE emissions.state ALTER COLUMN comments TYPE text;
 ALTER TABLE emissions.county ALTER COLUMN comments TYPE text;
 
 -- 06/08/2011 -- Add new 'Enhance Flat File 2010 Point' QA Program
-insert into emf.qa_programs values(DEFAULT,'Enhance Flat File 2010 Point','gov.epa.emissions.framework.services.qa.flatFile2010Pnt.SQLEnhanceFlatFile2010PointRunner');
-update emf.qa_programs set run_classname='gov.epa.emissions.framework.services.qa.flatFile2010Pnt.SQLEnhanceFlatFile2010PointQueryRunner' where name='Enhance Flat File 2010 Point';
+insert into emf.qa_programs values(DEFAULT,'Merge In Supporting Data','gov.epa.emissions.framework.services.qa.flatFile2010Pnt.SQLEnhanceFlatFile2010PointQueryRunner');
 
--- 06/09/2011 -- create a QA Step Template for QA Program Enhance Flat File 2010 Point
+-- 06/09/2011 -- create a QA Step Template for QA Program Merge In Supporting Data
 insert into emf.dataset_types_qa_step_templates (dataset_type_id, 
 	list_index, 
 	name, 
@@ -1094,8 +1093,8 @@ insert into emf.dataset_types_qa_step_templates (dataset_type_id,
 	description)
 select dt.id, 
 	(select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
-	'Enhance Flat File 2010 Point', 
-	1, 
+	'Merge In Supporting Data', 
+	(select id from emf.qa_programs where name = 'Merge In Supporting Data'), 
 	'-ff10p
 $DATASET', 
 	false, 
