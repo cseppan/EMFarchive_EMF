@@ -26,6 +26,7 @@ public class ControlStrategyResult implements Serializable {
 
     private Integer inputDatasetVersion;
 
+    //for clarity should be resultDataset don't change will cause issues hibernate 
     private Dataset detailedResultDataset;
     
     private Dataset controlledInventoryDataset;
