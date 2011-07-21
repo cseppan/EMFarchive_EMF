@@ -197,7 +197,7 @@ public class EditJobsTabPresenterImpl implements EditJobsTabPresenter {
         }
 
         System.out.println("Start running jobs");
-        service().runJobs(jobIds, caseObj.getId(), session.user());
+        service().runJobs(jobIds, caseObj.getId(), session.user()); // BUG3589
         view.refresh();
         System.out.println("Finished running jobs");
     }
