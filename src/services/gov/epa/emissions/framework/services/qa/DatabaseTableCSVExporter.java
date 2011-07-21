@@ -86,7 +86,7 @@ public class DatabaseTableCSVExporter implements Exporter {
                 String colType = md.getColumnTypeName(i).toUpperCase();
 
                 if (colType.startsWith("VARCHAR") || colType.startsWith("TEXT"))
-                    colNames += md.getColumnName(i) + ",";
+                    colNames += "\"" + md.getColumnName(i) + "\",";
                 
             }
         } catch (SQLException e) {
