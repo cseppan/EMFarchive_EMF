@@ -437,7 +437,8 @@ BEGIN
 		'er', --control_measure_efficiencyrecord_table_alias
 		'csm', --control_strategy_measure_table_alias
 		'gdplev', --gdplev_table_alias
-		'inv_ovr' --inv_override_table_alias
+		'inv_ovr', --inv_override_table_alias
+		'gdplev_incr' --gdplev_incr_table_alias
 		) as cost_expressions
 	into annual_cost_expression,
 		capital_cost_expression,
