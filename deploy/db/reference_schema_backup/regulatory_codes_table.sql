@@ -41,6 +41,8 @@ CREATE TABLE regulatory_codes (
 
 ALTER TABLE reference.regulatory_codes OWNER TO emf;
 
+
+
 --
 -- TOC entry 21362 (class 0 OID 371268)
 -- Dependencies: 21084
@@ -401,3 +403,7 @@ INSERT INTO regulatory_codes VALUES ('R63-0150', 'Sewage Sludge Incineration', '
 -- PostgreSQL database dump complete
 --
 
+CREATE INDEX idx_regulatory_codes_code
+  ON reference.regulatory_codes
+  USING btree
+  (code);
