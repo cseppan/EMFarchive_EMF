@@ -28,7 +28,7 @@ public class LoggingServiceImpl implements LoggingService {
     public synchronized void setAccessLog(AccessLog accesslog) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            dao.insertAccessLog(accesslog,session);
+            dao.insertAccessLog(accesslog,session); // BUG3589
         } catch (RuntimeException e) {
             LOG.error("Could not insert access log - " + accesslog, e);
             throw new EmfException("Could not insert access log - " + accesslog);

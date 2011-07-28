@@ -80,7 +80,7 @@ public class ExportTask extends Task {
 
     private String filterDatasetJoinCondition;
 
-    protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
+    protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog, // BUG3589 need to know where the task constructed in case job
             DbServerFactory dbFactory, HibernateSessionFactory sessionFactory, Version version) {
         super();
         createId();
@@ -171,17 +171,36 @@ public class ExportTask extends Task {
                     System.out.println(msghead + " to " + file.getAbsolutePath() + msgend + "\n"+ lineCompare );
                     setStatus("completed", msghead + " to " + file.getAbsolutePath() + msgend + "\n"+ lineCompare );
                 }
-            } // if file exists
-            // NOTE: want to check if accesslog exists for the same dataset, version, and description.
-            // If it is there, don't set accesslog.
+                
+                // for bug 3589
+                if ( DebugLevels.BUG3589Fixed) {
+                    // NOTE: want to check if accesslog exists for the same dataset, version, and description.
+                    // If it is there, don't set accesslog.
 
-            String query = "SELECT obj.id from " + AccessLog.class.getSimpleName() + " obj WHERE obj.datasetId = "
+                    String query = "SELECT obj.id from " + AccessLog.class.getSimpleName() + " obj WHERE obj.datasetId = "
                     + accesslog.getDatasetId() + " AND obj.version = '" + accesslog.getVersion() + "' "
                     + "AND obj.description = '" + accesslog.getDescription() + "'";
-            List<?> list = session.createQuery(query).list();
+                    List<?> list = session.createQuery(query).list();
 
-            if (list == null || list.size() == 0) {
-                loggingService.setAccessLog(accesslog);
+                    if (list == null || list.size() == 0) {
+                        loggingService.setAccessLog(accesslog);
+                    }
+                }
+                
+            } // else of if file exists
+            
+            if ( !DebugLevels.BUG3589Fixed) {
+                // NOTE: want to check if accesslog exists for the same dataset, version, and description.
+                // If it is there, don't set accesslog.
+
+                String query = "SELECT obj.id from " + AccessLog.class.getSimpleName() + " obj WHERE obj.datasetId = "
+                + accesslog.getDatasetId() + " AND obj.version = '" + accesslog.getVersion() + "' "
+                + "AND obj.description = '" + accesslog.getDescription() + "'";
+                List<?> list = session.createQuery(query).list();
+
+                if (list == null || list.size() == 0) {
+                    loggingService.setAccessLog(accesslog);
+                }
             }
 
             if (DebugLevels.DEBUG_4)

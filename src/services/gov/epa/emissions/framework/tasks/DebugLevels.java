@@ -25,5 +25,8 @@ public class DebugLevels {
     public static final boolean DEBUG_21 = false;
     public static final boolean DEBUG_22 = true;  //to trace enhancing flat file 2010 point QA program
     public static final boolean DEBUG_CMIMPORT = false;
+
+    // default set the following to true
+    public static final boolean BUG3589Fixed = true; // access time for some datasets are too large (in history tab)
     
 }

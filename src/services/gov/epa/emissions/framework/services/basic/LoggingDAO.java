@@ -13,7 +13,7 @@ public class LoggingDAO {
 
     private static final String GET_ACCESS_LOG_QUERY = "from AccessLog as alog where alog.datasetId=:datasetid";
 
-    public void insertAccessLog(AccessLog accesslog, Session session) {
+    public void insertAccessLog(AccessLog accesslog, Session session) { // BUG3589 root
         Transaction tx = null;
         try {
             tx = session.beginTransaction();

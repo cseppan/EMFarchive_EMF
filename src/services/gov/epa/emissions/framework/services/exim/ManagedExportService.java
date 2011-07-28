@@ -524,7 +524,7 @@ public class ManagedExportService {
         File file = validateExportFile(path, getCleanDatasetName(dataset, version), overwrite);
 
         AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset.getAccessedDateTime(),
-                "Version " + version.getVersion(), purpose, file.getAbsolutePath());
+                "Version " + version.getVersion(), purpose, file.getAbsolutePath()); // BUG3589
         accesslog.setDatasetname(dataset.getName());
 
         if (DebugLevels.DEBUG_9)
@@ -570,10 +570,11 @@ public class ManagedExportService {
     public synchronized void logExportedTask(LoggingServiceImpl logSvr, User user, String purpose, String path, CaseInput input) throws EmfException {
         EmfDataset dataset = input.getDataset();
         Version version = input.getVersion();
-        AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset.getAccessedDateTime(),
+        Date current = new Date();
+        AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), current, //dataset.getAccessedDateTime(),
                 "Version " + version.getVersion(), purpose, path);
         accesslog.setDatasetname(dataset.getName());
-        accesslog.setEnddate(new Date());
+        accesslog.setEnddate(current); //new Date()); // TODO: BUG3589 - that might be too long after the dataset accessed!
         accesslog.setLinesExported(0);
 
         DatasetType type = dataset.getDatasetType();
@@ -594,7 +595,7 @@ public class ManagedExportService {
             List<?> list = session.createQuery(query).list();
 
             if (list == null || list.size() == 0) {
-                logSvr.setAccessLog(accesslog);
+                logSvr.setAccessLog(accesslog); // BUG3589
             }
         } catch (Exception e) {
             log.error("Errror logging exported task for dataset: " + dataset.getName() + ".", e);

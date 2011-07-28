@@ -2552,7 +2552,7 @@ public class ManagedCaseService {
                 List<CaseInput> inputs = getAllJobInputs(caseJob, session);
 
                 // test inputs for which need to be exported
-                List<CaseInput> inputs2Export = getInputs2Export(expSvc, inputs, caseJob, jobCase, user, purpose);
+                List<CaseInput> inputs2Export = getInputs2Export(expSvc, inputs, caseJob, jobCase, user, purpose); // BUG3589
 
                 // if no inputs need to be exported, set job tasks exports to success and set status to waiting
                 String runStatusValue = "Exporting";
@@ -2586,7 +2586,7 @@ public class ManagedCaseService {
                 // pass the inputs to the exportService which uses an exportJobSubmitter to work with exportTaskManager
                 if (!cjt.isExportsSuccess() && !this.doNotExportJobs(session)) {
                     caseJobExportSubmitterId = expSvc.exportForJob(user, inputs2Export, cjt.getTaskId(), purpose,
-                            caseJob, jobCase);
+                            caseJob, jobCase); // BUG3589
                 } else {
                     log.warn("ManagedCaseService: case jobs related datasets are not exported.");
                 }
@@ -2703,8 +2703,13 @@ public class ManagedCaseService {
             if (needExport)
                 toExport.add(input);
 
+            // ATTENTION!
+            // The following is what we want! Do not disable that! We want to log the access EVEN if the datset not get exported,
+            // since it is used by cases - but we 0 the time required when do the access logging.
+            //if (!DebugLevels.BUG3589Fixed) { // should NOT log access from here! log the access in ExportTask
             if (!needExport)
-                exptSrv.logExportedTask(logSvr, user, purpose, fullPath, input);
+                exptSrv.logExportedTask(logSvr, user, purpose, fullPath, input); // BUG3589
+            //}
         }
 
         return toExport;
