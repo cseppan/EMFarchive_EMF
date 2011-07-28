@@ -399,6 +399,13 @@ public class EmfFileChooserPanel extends JPanel implements Runnable {
 
         updateDirSelections(fileInfo);
     }
+    
+    public void setMsg( String msg) {
+        messagePanel.setMessage(msg);
+    }
+    public void setError( String err) {
+        messagePanel.setError(err);
+    }
 
     protected void updateDirSelections(EmfFileInfo fileInfo) {
         clearMsg();

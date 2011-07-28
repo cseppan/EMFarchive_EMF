@@ -107,22 +107,29 @@ public class EmfFileChooser extends JComponent {
     }
 
     public int showDialog(Component parent, String approveButtonText) {
-        if (approveButtonText != null) {
-            setApproveButtonText(approveButtonText);
-            setDialogType(CUSTOM_DIALOG);
-        }
-
-        dialog = createDialog(parent);
-        dialog.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                returnValue = CANCEL_OPTION;
+        try {
+            if (approveButtonText != null) {
+                setApproveButtonText(approveButtonText);
+                setDialogType(CUSTOM_DIALOG);
             }
-        });
-        returnValue = ERROR_OPTION;
 
-        dialog.setVisible(true);
-        firePropertyChange("EmfFileChooserDialogIsClosingProperty", dialog, null);
+            dialog = createDialog(parent);
+            dialog.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    returnValue = CANCEL_OPTION;
+                }
+            });
+            returnValue = ERROR_OPTION;
 
+            dialog.setVisible(true);
+            firePropertyChange("EmfFileChooserDialogIsClosingProperty", dialog, null);
+
+            //return returnValue;
+        } catch ( ClassCastException e) {
+            chooserPanel.setError( "ClassCastException when choosing file: " + e.getMessage());
+        } catch ( Exception e) {
+            chooserPanel.setError( "Exception when choosing file: " + e.getMessage());
+        }
         return returnValue;
     }
 
