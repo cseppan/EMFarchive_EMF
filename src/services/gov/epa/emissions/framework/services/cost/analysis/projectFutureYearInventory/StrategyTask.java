@@ -18,13 +18,18 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Date;
 
 public class StrategyTask extends AbstractCheckMessagesStrategyTask {
 
+    gov.epa.emissions.framework.services.cost.analysis.projectFutureYearInventory.StrategyLoader projectLoader;
+    
     public StrategyTask(ControlStrategy controlStrategy, User user, DbServerFactory dbServerFactory,
             HibernateSessionFactory sessionFactory, StrategyLoader loader) throws EmfException {
         super(controlStrategy, user, dbServerFactory, sessionFactory, loader);
+        projectLoader = 
+            ((gov.epa.emissions.framework.services.cost.analysis.projectFutureYearInventory.StrategyLoader) this.getLoader());
     }
 
     public void run() throws EmfException {
@@ -51,12 +56,31 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
         try {
             //process/load each input dataset
             ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
+            String detailedResults = "";
+                                
             for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
                 ControlStrategyResult result = null;
                 try {
                     result = this.getLoader().loadStrategyResult(controlStrategyInputDatasets[i]);
                     recordCount = this.getLoader().getRecordCount();
                     result.setRecordCount(recordCount);
+                    
+                    // BUG3602 - update date time here
+
+                    Calendar cal = Calendar.getInstance();
+                    Date dateTime = result.getInputDataset().getStartDateTime();
+                    cal.setTime(dateTime);
+                    cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+                    result.getDetailedResultDataset().setStartDateTime(cal.getTime());
+                    dateTime = result.getInputDataset().getStopDateTime();
+                    cal.setTime(dateTime);
+                    cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+                    result.getDetailedResultDataset().setStopDateTime(cal.getTime());
+                    
+                    detailedResults += result.getDetailedResultDataset().getName();
+                    
+                    projectLoader.update((EmfDataset)result.getDetailedResultDataset());
+                    
                     status = "Completed.";
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -79,6 +103,11 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
                 }
             }
 //            deleteStrategyResults();
+            // update msg dataset
+            ControlStrategyResult result = ((AbstractStrategyLoader) this.getLoader()).getStrategyMessagesResult();
+            projectLoader.addKeyVal(((EmfDataset)result.getDetailedResultDataset()), "CONTROL_STRATEGY_DETAILED_RESULT_NAME", detailedResults);  
+            projectLoader.update((EmfDataset)result.getDetailedResultDataset());
+            
         } catch (Exception e) {
             status = "Failed. Error processing input dataset";
             e.printStackTrace();
@@ -131,7 +160,29 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
                 loader.makeSureInventoryDatasetHasIndexes(controlStrategyInputDataset.getInputDataset());
             }
             
-            ((AbstractStrategyLoader) this.getLoader()).createStrategyMessagesResult();
+            ControlStrategyResult result = ((AbstractStrategyLoader) this.getLoader()).createStrategyMessagesResult();
+            
+            // use which input dataset to set the start and stop date?? // BUG3602
+            // use the 1/1 ~ 12/31 target year 
+            Date start = new Date(); 
+            start.setYear(controlStrategy.getInventoryYear()-1900);
+            start.setMonth(0);
+            start.setDate(1);
+            start.setHours(0);
+            start.setMinutes(0);
+            start.setSeconds(0);
+            result.getDetailedResultDataset().setStartDateTime(start);
+            Date stop = new Date();
+            stop.setYear(controlStrategy.getInventoryYear()-1900);
+            stop.setMonth(11);
+            stop.setDate(31);
+            stop.setHours(23);
+            stop.setMinutes(59);
+            stop.setSeconds(59);
+            result.getDetailedResultDataset().setStopDateTime(stop);
+            
+            projectLoader.update((EmfDataset)result.getDetailedResultDataset());
+            
             //next lets validate the control program dataset tables, make sure format is correct, no data is missing, etc...
             setStatus("Started validating control programs.");
             validateControlPrograms(this.getLoader().getStrategyMessagesResult());

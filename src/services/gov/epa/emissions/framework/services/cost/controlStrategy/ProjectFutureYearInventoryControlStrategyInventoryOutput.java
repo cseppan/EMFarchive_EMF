@@ -65,7 +65,7 @@ public class ProjectFutureYearInventoryControlStrategyInventoryOutput extends Ab
             //create controlled inventory dataset
             EmfDataset dataset = creator.addControlledInventoryDataset(creator.createControlledInventoryDatasetName(namePrefix, inputDataset), inputDataset,
                     inputDataset.getDatasetType(), tableFormat, 
-                    desc);
+                    desc, controlStrategyResult.getDetailedResultDataset().getName()); // BUG3602
 
             String outputInventoryTableName = getDatasetTableName(dataset);
 

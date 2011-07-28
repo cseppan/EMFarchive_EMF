@@ -32,7 +32,7 @@ public class ControlStrategy implements Lockable, Serializable {
 
     private int costYear;
 
-    private int inventoryYear;
+    private int inventoryYear; // == targetYear
 
     private User creator;
 

@@ -1205,3 +1205,7 @@ and dataset_type_id in
 (select id 
 from emf.dataset_types dt
 where name in ('Flat File 2010 Nonpoint'));
+
+--7/21/2011
+insert into emf.keywords ("name") values('TARGET_YEAR');
+insert into emf.keywords ("name") values('CONTROL_STRATEGY_DETAILED_RESULT_NAME');

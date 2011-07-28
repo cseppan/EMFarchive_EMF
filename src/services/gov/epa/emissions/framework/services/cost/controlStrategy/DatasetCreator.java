@@ -168,7 +168,6 @@ public class DatasetCreator {
         return dataset;
     }
 
-
     public EmfDataset addControlledInventoryDataset(String datasetName, 
             EmfDataset inputDataset, DatasetType type, 
             TableFormat tableFormat, String description
@@ -188,6 +187,66 @@ public class DatasetCreator {
         //create dataset
         EmfDataset dataset = createDataset(outputDatasetName, description, type, inputDataset);
         // TODO: JIZHEN_0713 ADD 2 more keywords
+        
+        //update dataset start and stop date time to correct year
+        Calendar cal = Calendar.getInstance();
+        Date dateTime = inputDataset.getStartDateTime();
+        cal.setTime(dateTime);
+        cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+        dataset.setStartDateTime(cal.getTime());
+        dateTime = inputDataset.getStopDateTime();
+        cal.setTime(dateTime);
+        cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+        dataset.setStopDateTime(cal.getTime());
+        
+//        Iterator iterator = keywordValues.entrySet().iterator();
+//
+//        Map.Entry entry =  (Map.Entry)iterator.next();
+//        String keyword = (String) entry.getKey();
+//        String value = (String) entry.getValue();
+//
+//        while (iterator.hasNext()) {
+//            entry =  (Map.Entry)iterator.next();
+//            keyword = (String) entry.getKey();
+//            value = (String) entry.getValue();
+//            addKeyVal(dataset, keyword, value);
+//        }
+
+        setDatasetInternalSource(dataset, outputTableName, 
+                tableFormat, inputDataset.getName());
+
+        //persist dataset to db
+        add(dataset);
+        try {
+            addVersionZeroEntryToVersionsTable(dataset);
+        } catch (Exception e) {
+            throw new EmfException("Cannot add version zero entry to versions table for dataset: " + dataset.getName());
+        }
+
+        createTable(outputTableName, tableFormat);
+
+        return dataset;
+    }
+    
+    public EmfDataset addControlledInventoryDataset(String datasetName, 
+            EmfDataset inputDataset, DatasetType type, 
+            TableFormat tableFormat, String description, String detailedDatasetName
+//            ,Map<String,String> keywordValues
+            ) throws EmfException {
+//        return addDataset(datasetName, "DS", 
+//                inputDataset, type, 
+//                tableFormat, description);
+        
+        String outputDatasetName = datasetName;
+        //check and see if this name is already being used, if so add a timestamp.
+        if (isDatasetNameUsed(datasetName)) 
+            outputDatasetName = createDatasetName(datasetName);
+
+        String outputTableName = createTableName(datasetName);
+        
+        //create dataset
+        EmfDataset dataset = createDataset(outputDatasetName, description, type, inputDataset);
+        addKeyVal(dataset, "CONTROL_STRATEGY_DETAILED_RESULT_NAME", detailedDatasetName);
         
         //update dataset start and stop date time to correct year
         Calendar cal = Calendar.getInstance();
@@ -323,6 +382,9 @@ public class DatasetCreator {
         addKeyVal(dataset, "DISCOUNT_RATE", controlStrategy.getDiscountRate()+"%");
         addKeyVal(dataset, "USE_COST_EQUATION", (controlStrategy.getUseCostEquations()==true? "true" : "false"));
         addKeyVal(dataset, "INCLUDE_UNSPECIFIED_COSTS", (controlStrategy.getIncludeUnspecifiedCosts()==true? "true" : "false"));
+        
+        // BUG3602
+        addKeyVal(dataset, "TARGET_YEAR", "" + controlStrategy.getInventoryYear());
     }
     
     protected String getKeyValsAsHeaderString() {
@@ -352,7 +414,7 @@ public class DatasetCreator {
         return header;
     }
     
-    private void addKeyVal(EmfDataset dataset, String keywordName, String value) {
+    public void addKeyVal(EmfDataset dataset, String keywordName, String value) {
         Keyword keyword = keywordMasterList.get(keywordName);
         KeyVal keyval = new KeyVal(keyword, value); 
         dataset.addKeyVal(keyval);
@@ -605,6 +667,19 @@ public class DatasetCreator {
                 throw new EmfException("The selected dataset name is already in use.");
 
             dao.add(dataset, session);
+        } catch (Exception e) {
+            throw new EmfException("Could not add dataset: " + dataset.getName());
+        } finally {
+            session.close();
+        }
+    }
+    
+    public void update(EmfDataset dataset) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            DatasetDAO dao = new DatasetDAO(dbServerFactory);
+
+            dao.updateWithoutLocking(dataset, session);
         } catch (Exception e) {
             throw new EmfException("Could not add dataset: " + dataset.getName());
         } finally {

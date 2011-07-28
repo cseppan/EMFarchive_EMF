@@ -116,4 +116,12 @@ public class StrategyLoader extends AbstractStrategyLoader {
         // NOTE Auto-generated method stub
 
     }
+    
+    public void addKeyVal(EmfDataset dataset, String keywordName, String value) {
+        this.creator.addKeyVal(dataset, keywordName, value);
+    }
+    
+    public void update(EmfDataset dataset) throws EmfException {
+        this.creator.update(dataset);
+    }
 }
