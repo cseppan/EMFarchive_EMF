@@ -300,6 +300,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         dataTable.addIndex(table, "segment", false);
         dataTable.addIndex(table, "mact", false);
         dataTable.addIndex(table, "sic", false);
+        dataTable.addIndex(table, "naics", false);
 
         //finally analyze the table, so the indexes take affect immediately, 
         //NOT when the SQL engine gets around to analyzing eventually
