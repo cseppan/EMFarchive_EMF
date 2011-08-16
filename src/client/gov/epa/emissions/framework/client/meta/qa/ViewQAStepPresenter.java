@@ -148,5 +148,9 @@ public class ViewQAStepPresenter {
     public long getTableRecordCount(QAStepResult stepResult) throws EmfException {
         return session.dataService().getTableRecordCount("emissions." + stepResult.getTable());
     }
+    
+    public boolean checkBizzareCharInColumn(QAStep step, String colName) throws EmfException {
+        return session.dataService().checkBizzareCharInColumn(step.getDatasetId(), step.getVersion(), colName);
+    }
 
 }

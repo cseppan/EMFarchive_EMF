@@ -12,7 +12,7 @@ public class WaitDelay extends TimerTask {
     }
 
     public void run() {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("Timer timed out and invoking the CaseJobTaskManager processQueue "
                     + new Date().getTime());
         try {

@@ -6,6 +6,8 @@ import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.CaseDescriptionPresenter;
+import gov.epa.emissions.framework.client.casemanagement.CaseDescriptionWindow;
 import gov.epa.emissions.framework.client.casemanagement.history.ShowHistoryTab;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTab;
 import gov.epa.emissions.framework.client.casemanagement.jobs.EditJobsTab;
@@ -13,6 +15,8 @@ import gov.epa.emissions.framework.client.casemanagement.outputs.EditOutputsTab;
 import gov.epa.emissions.framework.client.casemanagement.parameters.EditParametersTab;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.qa.EditQAArgumentsPresenter;
+import gov.epa.emissions.framework.client.meta.qa.EditQAArgumentsWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.ui.ErrorPanel;
@@ -183,6 +187,18 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
+        Button describe = new Button("Describe", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    describe();
+                } catch (EmfException e) {
+                    showError(e.getMessage());
+                }
+            }
+        });
+        buttonsPanel.add(describe);
+        describe.setToolTipText("Show the description in a non-modal window.");
+        
         Button refresh = new Button("Refresh", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
@@ -242,6 +258,14 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         buttonsPanel.add(close);
 
         return buttonsPanel;
+    }
+
+    protected void describe() throws EmfException{ // BUG3621
+        EditableCaseSummaryTab summaryTab = (EditableCaseSummaryTab) tabbedPane.getComponentAt(0);
+        String descText = summaryTab.getDescription();
+        CaseDescriptionWindow view = new CaseDescriptionWindow(desktopManager, descText, true);
+        CaseDescriptionPresenter presenter = new CaseDescriptionPresenter(view,summaryTab);
+        presenter.display();
     }
 
     private void refreshCurrentTab() throws EmfException {

@@ -92,7 +92,7 @@ public class CaseJobTask extends Task {
     public CaseJobTask(int jobId, int caseId, User user) {
         super();
         createId();
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> " + createId());
         this.user = user;
         this.jobId = jobId;

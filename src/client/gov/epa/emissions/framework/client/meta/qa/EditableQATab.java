@@ -138,6 +138,14 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
             }
         });
         container.add(copy);
+        
+        Button delete = new BorderlessButton("Delete", new AbstractAction() { // BUG3615
+            public void actionPerformed(ActionEvent event) {
+                doDelete();
+            }
+
+        });
+        container.add(delete);
 
         Button status = new BorderlessButton("Set Status", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -254,6 +262,24 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
         } catch (Exception exp) {
             messagePanel.setError(exp.getMessage());
         }
+    }
+    
+    private void doDelete() { //BUG3615
+        clearMessage();
+
+        List selected = table.selected();
+        if (selected == null || selected.size() == 0) {
+            messagePanel.setMessage("Please select a QA step.");
+            return;
+        }
+        
+        try {
+            this.presenter.deDelete((QAStep[])selected.toArray(new QAStep[0]));
+
+        } catch (Exception exp) {
+            messagePanel.setError(exp.getMessage());
+        }
+        
     }
 
     private void clearMessage() {
@@ -397,27 +423,40 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
                 try {
                     List selected = table.selected();
                     for (Iterator iter = selected.iterator(); iter.hasNext();) {
+
                         QAStep step = (QAStep) iter.next();
-                        QAStepResult stepResult = presenter.getStepResult(step);
-                        clearMessage();
-                        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                        if (presenter.getTableRecordCount(stepResult) > 100000) {
-                            String title = "Warning";
-                            String message = "Are you sure you want to view the result, the table has over 100,000 records?  It could take several minutes to load the data.";
-                            int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
-                                    JOptionPane.QUESTION_MESSAGE);
-                    
-                            if (selection == JOptionPane.NO_OPTION) {
-                                return;
+                        try {
+                            QAStepResult stepResult = presenter.getStepResult(step);
+                            clearMessage();
+                            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                            if (presenter.getTableRecordCount(stepResult) > 100000) {
+                                String title = "Warning";
+                                String message = "Are you sure you want to view the result, the table has over 100,000 records?  It could take several minutes to load the data.";
+                                int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                                        JOptionPane.QUESTION_MESSAGE);
+
+                                if (selection == JOptionPane.NO_OPTION) {
+                                    return;
+                                }
                             }
+
+                            presenter.viewResults(step);
+                        } catch (EmfException e) {
+                            try  {
+                                if ( presenter.checkBizzareCharInColumn(step, "plant")) {
+                                    messagePanel.setError("There are bizarre characters in column PLANT of the dataset " + dataset.getName() + ", please run QA step Detect or Remove Bizarre Characters in Plant Name." );
+                                } else {
+                                    messagePanel.setError(e.getMessage());
+                                }
+                            } catch (Exception e2) {
+                                messagePanel.setError(e2.getMessage());
+                            }
+                        } finally {
+                            setCursor(Cursor.getDefaultCursor());
                         }
-    
-                        presenter.viewResults(step);
                     }
-                } catch (EmfException e) {
+                } catch ( Exception e) {
                     messagePanel.setError(e.getMessage());
-                } finally {
-                    setCursor(Cursor.getDefaultCursor());
                 }
             }
         });

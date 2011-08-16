@@ -463,5 +463,17 @@ public class DataServiceTransport implements DataService {
 
         call.request(new Object[] { locked });
     }
+    
+    public boolean checkBizzareCharInColumn(int datasetId, int version, String colName) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("checkBizzareCharInColumn");
+        call.addIntegerParam("datasetId");
+        call.addIntegerParam("version");
+        call.addStringParam("colName");
+        call.setBooleanReturnType();
+        
+        return (Boolean)call.requestResponse(new Object[]{new Integer(datasetId), new Integer(version), colName});
+    }
 
 }

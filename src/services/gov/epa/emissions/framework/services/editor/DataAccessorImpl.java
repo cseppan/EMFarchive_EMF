@@ -40,7 +40,7 @@ public class DataAccessorImpl implements DataAccessor {
 
     public void applyConstraints(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder)
             throws EmfException {
-        if (DebugLevels.DEBUG_19) {
+        if (DebugLevels.DEBUG_19()) {
             System.out.println("DataAccessorImpl:applyConstraints():token null ? " + (token == null));
             if (token != null)
                 System.out.println("\tTable: " + token.getTable() + " column filter: " + columnFilter + " row filter: " + rowFilter);
@@ -58,7 +58,7 @@ public class DataAccessorImpl implements DataAccessor {
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
-        if (DebugLevels.DEBUG_19) {
+        if (DebugLevels.DEBUG_19()) {
             System.out.println("DataAccessorImpl:getPage():token null ? " + (token == null));
             if (token != null)
                 System.out.println("\tTable: " + token.getTable() + " key: " + token.key() + " page number: " + pageNumber);

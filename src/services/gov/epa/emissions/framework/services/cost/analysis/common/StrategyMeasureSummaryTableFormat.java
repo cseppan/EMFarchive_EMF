@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
+import gov.epa.emissions.commons.CoSTConstants;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.LongFormatter;
@@ -69,7 +70,8 @@ public class StrategyMeasureSummaryTableFormat implements TableFormat {
         cols.add(new Column("FIPS", types.stringType(6), new StringFormatter(6)));
         cols.add(new Column("SCC", types.stringType(10), new StringFormatter(10)));
         cols.add(new Column("Poll", types.stringType(20), new StringFormatter(20)));
-        cols.add(new Column("Control_Measure_Abbreviation", types.stringType(10), new StringFormatter(10)));
+        //cols.add(new Column("Control_Measure_Abbreviation", types.stringType(10), new StringFormatter(10))); // JIZHEN20110727
+        cols.add(new Column("Control_Measure_Abbreviation", types.stringType(CoSTConstants.CM_ABBREV_LEN), new StringFormatter(CoSTConstants.CM_ABBREV_LEN)));
         cols.add(new Column("Control_Measure", types.stringType(255), new StringFormatter(255)));
         cols.add(new Column("Control_Technology", types.stringType(128), new StringFormatter(128)));
         cols.add(new Column("source_group", types.stringType(255), new StringFormatter(255)));

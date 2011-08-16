@@ -56,7 +56,7 @@ public abstract class ImportSubmitter implements TaskSubmitter {
         // Add this task to importTasks queue to prepare for the submit to the TaskManager
         importTasks.add(task);
 
-        if (DebugLevels.DEBUG_6) {
+        if (DebugLevels.DEBUG_6()) {
             System.out.println("Import Task id= " + tsk.getTaskId() + " to be added to submitter: "
                     + tsk.getSubmitterId());
             System.out.println("Created a new ImportTaskStatus? " + (ets != null));
@@ -69,7 +69,7 @@ public abstract class ImportSubmitter implements TaskSubmitter {
     }
 
     public synchronized void addTasksToSubmitter(ArrayList<Runnable> tasks) {
-        if (DebugLevels.DEBUG_0) {
+        if (DebugLevels.DEBUG_0()) {
             System.out.println("In submitter::addTasksToSubmitter= " + this.getSubmitterId());
             System.out.println("In submitter::addTasksToSubmitter # of elements in param array = " + tasks.size());
         }
@@ -82,13 +82,13 @@ public abstract class ImportSubmitter implements TaskSubmitter {
             this.addTaskToSubmitter(task);
         }
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("In submitter # of elements in importTasks= " + this.importTasks.size());
         this.submitTasksToTaskManager(submitterId, importTasks);
     }
 
     public synchronized void submitTasksToTaskManager(String submitterId, ArrayList<Runnable> tasks) {
-        if (DebugLevels.DEBUG_0) {
+        if (DebugLevels.DEBUG_0()) {
             System.out.println("In submitter::submitTasksToTaskManager= " + this.getSubmitterId());
             System.out.println("In submitter::submitTasksToTaskManager # of elements in param array= " + tasks.size());
             System.out.println("Submitter::importTasks before ADD: " + this.submitterId + " has task count= "
@@ -100,7 +100,7 @@ public abstract class ImportSubmitter implements TaskSubmitter {
         // Remove all tasks from importTasks and keep it available for new submissions if necessary
         importTasks.removeAll(tasks);
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("Submitter::importTasks after ADD: " + this.submitterId + " has task count= "
                     + this.importTasks.size());
     }
@@ -124,7 +124,7 @@ public abstract class ImportSubmitter implements TaskSubmitter {
     }
 
     protected synchronized void setStatus(User user, StatusDAO statusServices, String message) {
-        if (DebugLevels.DEBUG_10)
+        if (DebugLevels.DEBUG_10())
             System.out.println("Import submitter " + this.submitterId + " setting status " 
                     + "; Message: " + message + "; On thread " + Thread.currentThread().getId());
         
@@ -140,7 +140,7 @@ public abstract class ImportSubmitter implements TaskSubmitter {
     @Override
     protected void finalize() throws Throwable {
         svcCount--;
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println(">>>> Destroying object: " + myTag());
 
         super.finalize();

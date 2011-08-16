@@ -499,7 +499,15 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
                     presenter.viewResults(step, exportDir.trim());
                 } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
+                    try  {
+                        if ( presenter.checkBizzareCharInColumn(step, "plant")) {
+                            messagePanel.setError("There are bizarre characters in column PLANT of the dataset, please run QA step Detect or Remove Bizarre Characters in Plant Name." );
+                        } else {
+                            messagePanel.setError(e.getMessage());
+                        }
+                    } catch (Exception e2) {
+                        messagePanel.setError(e2.getMessage());
+                    }
                 } finally {
                     setCursor(Cursor.getDefaultCursor());
                 }

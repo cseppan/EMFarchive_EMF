@@ -59,7 +59,7 @@ public class ImportTaskManager implements TaskManager {
     }
 
     public synchronized void shutDown() {
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println("Shutdown called on Task Manager");
 
         taskQueue.clear();
@@ -80,7 +80,7 @@ public class ImportTaskManager implements TaskManager {
     }
 
     public static synchronized void deregisterSubmitter(ImportSubmitter ts) {
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println("DeREGISTERED SUBMITTER: " + ts.getSubmitterId() + " Confirm task count= "
                     + ts.getTaskCount());
 
@@ -88,7 +88,7 @@ public class ImportTaskManager implements TaskManager {
     }
 
     public synchronized void finalize() throws Throwable {
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("Finalizing TaskManager # of taskmanagers= " + refCount);
 
         shutDown();
@@ -115,7 +115,7 @@ public class ImportTaskManager implements TaskManager {
         refCount++;
         threadPool = new ThreadPoolExecutor(poolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS, threadPoolQueue);
 
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out.println("Import Task Manager created @@@@@ THREAD ID: " + Thread.currentThread().getId());
             System.out.println("Task Manager created refCount= " + refCount);
             System.out.println("Priority Blocking queue created? " + !(taskQueue == null));
@@ -135,12 +135,12 @@ public class ImportTaskManager implements TaskManager {
     }
 
     public static synchronized void processTaskQueue() {
-        if (DebugLevels.DEBUG_10)
+        if (DebugLevels.DEBUG_10())
             System.out.println("<<<>>>ImportTaskManager: processTaskQueue() called " + ++processQueueCount + " times.");
 
         int threadsAvail = -99;
         try {
-            if (DebugLevels.DEBUG_9) {
+            if (DebugLevels.DEBUG_9()) {
                 System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
                 System.out.println("*** BEGIN ImportTaskManager::processTaskQueue() *** " + new Date());
                 System.out.println("Size of PBQ taskQueue: " + taskQueue.size());
@@ -162,7 +162,7 @@ public class ImportTaskManager implements TaskManager {
             // iterate over the tasks in the waitTable and find as many that can
             // be run in all available threads
             Collection<Task> waitTasks = waitTable.values();
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("Number of waitTasks acquired from waitTable: " + waitTasks.size());
 
             Iterator<Task> iter = waitTasks.iterator();
@@ -171,12 +171,12 @@ public class ImportTaskManager implements TaskManager {
                 // number of threads available before inspecting the waiting list
                 threadsAvail = threadPool.getCorePoolSize() - runTable.size();
 
-                if (DebugLevels.DEBUG_9)
+                if (DebugLevels.DEBUG_9())
                     System.out.println("Number of threads available before waiting list-table: " + threadsAvail);
 
                 if (threadsAvail > 0) {
                     Task tsk = iter.next();
-                    if (DebugLevels.DEBUG_9)
+                    if (DebugLevels.DEBUG_9())
                         System.out
                                 .println("&&&&& In ImportTaskManager::processQueue threadsAvail so pop a task to run the type of TASK objects coming in are: "
                                         + tsk.getClass().getName());
@@ -185,7 +185,7 @@ public class ImportTaskManager implements TaskManager {
                     // to any of the tasks currently in the runTable
                     // synchronized (waitTable) {
                     if (notEqualsToAnyRunTask(tsk)) {
-                        if (DebugLevels.DEBUG_9) {
+                        if (DebugLevels.DEBUG_9()) {
                             System.out.println("WAIT TABLE Before Moving Task from WAIT to RUN: " + waitTable.size());
                             System.out.println("RUN TABLE Before Moving Task from WAIT to RUN: " + runTable.size());
                             System.out.println("#THREADS Before Moving Task from WAIT to RUN: " + threadsAvail);
@@ -200,50 +200,50 @@ public class ImportTaskManager implements TaskManager {
                         // runTask and decrement threadsAvail
                         threadPool.execute(tsk);
 
-                        if (DebugLevels.DEBUG_9) {
+                        if (DebugLevels.DEBUG_9()) {
                             System.out.println("WAITTABLE After Moving Task from WAIT to RUN: " + waitTable.size());
                             System.out.println("RUNTABLE After Moving Task from WAIT to RUN: " + runTable.size());
                             System.out.println("#THREADS After Moving Task from WAIT to RUN: " + threadsAvail);
                         }
                     }
                 } else {
-                    if (DebugLevels.DEBUG_9)
+                    if (DebugLevels.DEBUG_9())
                         System.out.println("#THREADS == 0?? Breaking out of WAIT TEST loop: " + threadsAvail);
                     break;
                 }
             }
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("SIZE OF TASKQUEUE: " + getSizeofTaskQueue());
 
             boolean done = false;
 
             while (!done) {
                 if (taskQueue.size() == 0) {
-                    if (DebugLevels.DEBUG_9)
+                    if (DebugLevels.DEBUG_9())
                         System.out.println("#tasks in taskQueue == 0?? Breaking out of taskQueue TEST loop: ");
                     done = true;
                 } else {
 
-                    if (DebugLevels.DEBUG_9)
+                    if (DebugLevels.DEBUG_9())
                         System.out.println("Before Peak into taskQueue: " + taskQueue.size());
 
                     if (taskQueue.peek() != null) {
 
-                        if (DebugLevels.DEBUG_9)
+                        if (DebugLevels.DEBUG_9())
                             System.out.println("Peak into taskQueue has an object in head: " + taskQueue.size());
 
                         try {
                             Task tp = (Task) taskQueue.peek();
 
-                            if (DebugLevels.DEBUG_9)
+                            if (DebugLevels.DEBUG_9())
                                 System.out.println("Task Class Name: " + tp.getClass().getName());
 
                             Task tt = (Task) taskQueue.take();
                             Task nextTask = tt;
                             threadsAvail = threadPool.getCorePoolSize() - runTable.size();
 
-                            if (DebugLevels.DEBUG_9) {
+                            if (DebugLevels.DEBUG_9()) {
                                 System.out.println("Task Class Name: " + tt.getClass().getName());
                                 System.out.println("Processing the PBQ taskId: " + tt.getTaskId());
                                 System.out.println("Processing the PBQ submitterId: " + tt.getSubmitterId());
@@ -275,7 +275,7 @@ public class ImportTaskManager implements TaskManager {
 
             // TODO:
 
-            if (DebugLevels.DEBUG_9) {
+            if (DebugLevels.DEBUG_9()) {
                 System.out.println("*** END ImportTaskManager::processTaskQueue() *** " + new Date());
                 System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
             }
@@ -283,13 +283,13 @@ public class ImportTaskManager implements TaskManager {
             // do nothing
             log.info("Java is complaining about a ConcurrentModificationException again");
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("Java is complaining about a ConcurrentModificationException again");
         }
     }
 
     private static synchronized boolean notEqualsToAnyRunTask(Task tsk) {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("SIZE OF RUN list-table: " + runTable.size());
 
         Collection<Task> runTasks = runTable.values();
@@ -297,7 +297,7 @@ public class ImportTaskManager implements TaskManager {
 
         while (iter.hasNext()) {
             Task runTask = iter.next();
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("In ImportTaskManager::notEqualsToAnyRunTask " + " importTask is of type= "
                         + tsk.getClass().getName() + " and runTask if of type= " + runTask.getClass().getName());
             if (runTask.isEquivalent(tsk)) {
@@ -310,7 +310,7 @@ public class ImportTaskManager implements TaskManager {
 
     public static synchronized void callBackFromThread(String taskId, String submitterId, String status, long id,
             String mesg) {
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out.println("*** BEGIN ImportTaskManager::callBackFromThread() *** " + new Date());
             System.out.println("ImportTaskManager refCount= " + refCount);
             System.out.println("Size of PBQ taskQueue: " + taskQueue.size());
@@ -327,7 +327,7 @@ public class ImportTaskManager implements TaskManager {
             ImportSubmitter submitter = getCurrentSubmitter(submitterId);
 
             if (status.equals("started")) {
-                if (DebugLevels.DEBUG_9)
+                if (DebugLevels.DEBUG_9())
                     System.out.println("%%%% ImportTaskManager reports that Task# " + taskId
                             + " that is running in thread#: " + id + " for submitter= " + submitterId + " has status= "
                             + status + " and message= " + mesg);
@@ -335,7 +335,7 @@ public class ImportTaskManager implements TaskManager {
 
             } else {
 
-                if (DebugLevels.DEBUG_9) {
+                if (DebugLevels.DEBUG_9()) {
                     System.out.println("%%%% ImportTaskManager reports that Task# " + taskId + " that ran in thread#: "
                             + id + " for submitter= " + submitterId + " completed with status= " + status
                             + " and message= " + mesg);
@@ -344,7 +344,7 @@ public class ImportTaskManager implements TaskManager {
                 }
             }
 
-            if (DebugLevels.DEBUG_10)
+            if (DebugLevels.DEBUG_10())
                 System.out.println("Submitter: " + submitterId + " now is null? " + (submitter == null));
 
             try {
@@ -355,12 +355,12 @@ public class ImportTaskManager implements TaskManager {
             }
 
             if (submitter != null && submitter.getTaskCount() == 0) {
-                if (DebugLevels.DEBUG_10)
+                if (DebugLevels.DEBUG_10())
                     System.out.println("Submitter " + submitter.getSubmitterId() + " is deregistering itself. ");
 
                 submitter.deregisterSubmitterFromRunManager(submitter);
 
-                if (DebugLevels.DEBUG_10)
+                if (DebugLevels.DEBUG_10())
                     System.out.println("After deregistering itself, the number of submitters in import task manager: "
                             + submitters.size());
             }
@@ -378,7 +378,7 @@ public class ImportTaskManager implements TaskManager {
             processTaskQueue();
         }
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("*** END ImportTaskManager::callBackFromThread() *** " + new Date());
 
     }
@@ -389,7 +389,7 @@ public class ImportTaskManager implements TaskManager {
         while (iter.hasNext()) {
             ImportSubmitter submitter = iter.next();
             if (submitterId.equals(submitter.getSubmitterId())) {
-                if (DebugLevels.DEBUG_10) {
+                if (DebugLevels.DEBUG_10()) {
                     System.out.println("Number of submitters in import task manager: " + submitters.size());
                     System.out.println("current submitter id: " + submitterId + " registered submitter id: "
                             + submitter.getSubmitterId());

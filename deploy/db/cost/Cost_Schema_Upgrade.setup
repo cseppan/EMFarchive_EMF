@@ -1476,3 +1476,5 @@ select e.id, 'Annual Operating Cost (AOC) Variable Factor', (select COALESCE(max
 from emf.equation_types as e 
 where name = 'Type 12';
 
+-- 7/27/2011 Change control measure abbreviation length limit to 20
+ALTER TABLE emf.control_measures ALTER COLUMN abbreviation TYPE character varying(20);

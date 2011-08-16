@@ -14,7 +14,7 @@ public class RecordsFilter {
             ChangeSet element = iter.next();
             page = filter(page, element);
 
-            if (DebugLevels.DEBUG_19) {
+            if (DebugLevels.DEBUG_19()) {
                 System.out.println("RecordsFilter:filter(page, change sets):ChangeSet has changes? "
                         + element.hasChanges());
                 System.out.println("Current page null? " + (page == null));
@@ -39,7 +39,7 @@ public class RecordsFilter {
         VersionedRecords results = new VersionedRecords();
         results.add(records);
 
-        if (DebugLevels.DEBUG_19) {
+        if (DebugLevels.DEBUG_19()) {
             System.out.println("RecordsFilter:filter():number of records from page: " + records.length);
         }
 
@@ -53,7 +53,7 @@ public class RecordsFilter {
     private void doNew(ChangeSet changeset, VersionedRecords results) {
         VersionedRecord[] newRecords = changeset.getNewRecords();
 
-        if (DebugLevels.DEBUG_19) {
+        if (DebugLevels.DEBUG_19()) {
             System.out.println("RecordsFilter:doNew():newRecords null? " + (newRecords == null));
             if (newRecords != null) {
                 // for (int i = 0; i < newRecords.length; i++)
@@ -67,7 +67,7 @@ public class RecordsFilter {
     private void doDeleted(ChangeSet changeset, VersionedRecords results) {
         VersionedRecord[] deleted = changeset.getDeletedRecords();
 
-        if (DebugLevels.DEBUG_19) {
+        if (DebugLevels.DEBUG_19()) {
             System.out.println("RecordsFilter:doDeleted():deleted null? " + (deleted == null));
             if (deleted != null) {
                 for (int i = 0; i < deleted.length; i++)
@@ -83,7 +83,7 @@ public class RecordsFilter {
     private void doUpdated(ChangeSet changeset, VersionedRecords results) {
         VersionedRecord[] updated = changeset.getUpdatedRecords();
 
-        if (DebugLevels.DEBUG_19) {
+        if (DebugLevels.DEBUG_19()) {
             System.out.println("RecordsFilter:doUpdated():updated null? " + (updated == null));
             if (updated != null) {
                 for (int i = 0; i < updated.length; i++)

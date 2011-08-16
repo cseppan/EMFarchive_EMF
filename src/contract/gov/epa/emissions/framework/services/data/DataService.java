@@ -81,4 +81,6 @@ public interface DataService {
 //    void importRemoteEMFDataset(int externalDatasetAccessId, User user) throws EmfException;
 
     String[] getTableColumnDistinctValues(int datasetId, int datasetVersion, String columnName, String whereFilter, String sortOrder) throws EmfException;
+    
+    boolean checkBizzareCharInColumn(int datasetId, int version, String colName) throws EmfException;
 }

@@ -269,7 +269,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
                     try {
                         dsDao.remove(user, dataset, session);
                     } catch (EmfException e) {
-                        if (DebugLevels.DEBUG_12)
+                        if (DebugLevels.DEBUG_12())
                             System.out.println(e.getMessage());
 
                         throw new EmfException(e.getMessage());

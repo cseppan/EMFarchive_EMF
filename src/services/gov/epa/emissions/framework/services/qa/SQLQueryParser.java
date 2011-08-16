@@ -15,7 +15,6 @@ import java.util.Hashtable;
 import org.hibernate.Session;
 
 public class SQLQueryParser {
-
     // Made extensive changes to this class to handle multiple versioned datasets.
 
     private QAStep qaStep;
@@ -75,7 +74,7 @@ public class SQLQueryParser {
         qaServiceImpl = new QAServiceImpl(sessionFactory);
     }
 
-    public String parse() throws EmfException {
+    public String parse() throws EmfException { // BUG3621
         return createTableQuery() + userQuery(qaStep.getProgramArguments());
     }
 
@@ -95,7 +94,7 @@ public class SQLQueryParser {
                 && query.indexOf(startQAstepVersQueryTag) == -1)
             return query;
 
-        return expandTag(query);
+        return expandTag(query); // BUG3621
     }
 
     // SELECT - REQUIRED to STARTS WITH
@@ -648,7 +647,7 @@ public class SQLQueryParser {
         }
     }
 
-    private String versioned(String partQuery) {
+    private String versioned(String partQuery) {  //BUG 3618
         String versionClause = versionClause();
         // For debugging purposes
         // System.out.println("The version clause part of the query is " + versionClause);

@@ -315,7 +315,7 @@ public class RemoteCommand {
                 // process is not finished wait -- don't wait
             }
 
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 LOG.warn("Started command on the local EMF machine: " + localCmd);
 
             if (errorLevel > 0) {

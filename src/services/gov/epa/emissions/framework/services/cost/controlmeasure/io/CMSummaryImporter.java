@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost.controlmeasure.io;
 
+import gov.epa.emissions.commons.CoSTConstants;
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.io.csv.CSVReader;
 import gov.epa.emissions.commons.io.importer.ImporterException;
@@ -53,8 +54,8 @@ public class CMSummaryImporter {
                 if (abbreviations.contains(cm.getAbbreviation()))
                     addStatus("Error: Duplicate abbreviation: "+cm.getAbbreviation());
                 
-                if (cm.getAbbreviation().length()>10)
-                    addStatus("Error: abbreviation exceeds 10 characters: "+cm.getAbbreviation());
+                if (cm.getAbbreviation().length()>CoSTConstants.CM_ABBREV_LEN) //10)
+                    addStatus("Error: abbreviation exceeds " + CoSTConstants.CM_ABBREV_LEN + " characters: "+cm.getAbbreviation());
                 
                 controlMeasures.put(cm.getAbbreviation(), cm);
                 abbreviations.add(cm.getAbbreviation());

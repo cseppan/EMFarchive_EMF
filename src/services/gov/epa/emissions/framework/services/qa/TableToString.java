@@ -66,7 +66,7 @@ public class TableToString {
              
             String query = "select * from " + qualifiedTableName + (recordLimit != 0 ? " order by " + this.columnNameList + " LIMIT " + recordLimit + " OFFSET " + recordOffset: "");
             
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("\n query: " + query);
             
             ResultSet rs = datasource.query().executeQuery(query);

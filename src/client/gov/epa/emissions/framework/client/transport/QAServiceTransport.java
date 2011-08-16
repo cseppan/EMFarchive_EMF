@@ -175,4 +175,18 @@ public class QAServiceTransport implements QAService {
         return (Boolean)call.requestResponse(new Object[]{step});
     }
 
+    public void deleteQASteps(User user, QAStep[] steps, int datasetId) throws EmfException { // BUG3615
+
+        EmfCall call = call();
+        
+        call.setOperation("deleteQASteps");
+        call.addParam("user", mappings.user());
+        call.addParam("steps", mappings.qaSteps());
+        call.addParam("datasetId", mappings.integer());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, steps, datasetId });
+        
+    }
+
 }

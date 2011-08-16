@@ -116,7 +116,7 @@ public class CMImportTask implements Runnable {
                     cmMsg += "Measures Deleted: " + numCMToBeDeleted + "\n";
                     cmMsg += "Control Technolgies Affected: \n";
                     cmMsg += this.getControlTechnologiesAffected(s, ids);
-                    if ( DebugLevels.DEBUG_CMIMPORT) {
+                    if ( DebugLevels.DEBUG_23()) {
                         setDetailStatus( "  " + s.getName() + ": \n" + cmMsg + "\n"); // for debug
                     }
                     //s.setDescription( desc);
@@ -124,7 +124,7 @@ public class CMImportTask implements Runnable {
                     csDAO.finalizeControlStrategy(s.getId(), cmMsg, session);
                 }
                 
-                if ( DebugLevels.DEBUG_CMIMPORT) {
+                if ( DebugLevels.DEBUG_23()) {
                     System.out.println("===== 1 =====");
                 }
                 
@@ -150,7 +150,7 @@ public class CMImportTask implements Runnable {
                     cmMsg += "Measures Deleted: " + numCMToBeDeleted + "\n";
                     cmMsg += "Control Technolgies Affected: \n";
                     cmMsg += this.getControlTechnologiesAffected(p, ids);
-                    if ( DebugLevels.DEBUG_CMIMPORT) {
+                    if ( DebugLevels.DEBUG_23()) {
                         setDetailStatus( ">>> " + p.getName() + ": \n" + cmMsg + "\n"); // for debug
                     }
                     //s.setDescription( desc);
@@ -158,18 +158,18 @@ public class CMImportTask implements Runnable {
                     cpDAO.updateControlProgram(p.getId(), cmMsg, session);
                 } 
                 
-                if ( DebugLevels.DEBUG_CMIMPORT) {
+                if ( DebugLevels.DEBUG_23()) {
                     System.out.println("===== 2 =====");
                 }
 
                 new ControlMeasureDAO().remove(sectorIds, sessionFactory, dbServer);
                 
-                if ( DebugLevels.DEBUG_CMIMPORT) {
+                if ( DebugLevels.DEBUG_23()) {
                     System.out.println("===== 3 =====");
                 }
                 
             } catch (Exception e) {
-                if ( DebugLevels.DEBUG_CMIMPORT) {
+                if ( DebugLevels.DEBUG_23()) {
                     System.out.println("Exception occured: " + e.getMessage());
                 }
                 e.printStackTrace();
@@ -300,7 +300,7 @@ public class CMImportTask implements Runnable {
             }
         }
         
-        if ( DebugLevels.DEBUG_CMIMPORT) {
+        if ( DebugLevels.DEBUG_23()) {
             System.out.println( techNames);        
         }
         
@@ -358,7 +358,7 @@ public class CMImportTask implements Runnable {
             }
         }
         
-        if ( DebugLevels.DEBUG_CMIMPORT) {
+        if ( DebugLevels.DEBUG_23()) {
             System.out.println( techNames);        
         }
         

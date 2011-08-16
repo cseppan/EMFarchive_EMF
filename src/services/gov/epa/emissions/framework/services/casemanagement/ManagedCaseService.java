@@ -158,13 +158,13 @@ public class ManagedCaseService {
         this.sessionFactory = sessionFactory;
         this.dao = new CaseDAO(sessionFactory);
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("In ManagedCaseService constructor: Is the session Factory null? "
                     + (sessionFactory == null));
 
         myTag();
 
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> " + myTag());
 
         log.info("ManagedCaseService");
@@ -322,7 +322,7 @@ public class ManagedCaseService {
             int id = dataset.getId();
             Version[] vers = versions.getLaterVersions(id, version, session);
 
-            if (DebugLevels.DEBUG_14 && vers.length > 0)
+            if (DebugLevels.DEBUG_14() && vers.length > 0)
                 System.out.println("There are " + vers.length + " later versions for dataset: " + dataset.getName());
 
             return vers;
@@ -559,7 +559,7 @@ public class ManagedCaseService {
         Session session = sessionFactory.getSession();
 
         try {
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Started removing case: " + new Date());
 
             setStatus(caseObj.getLastModifiedBy(), "Started removing case " + caseObj.getName() + ".", "Remove Case");
@@ -567,13 +567,13 @@ public class ManagedCaseService {
             List<CaseJob> jobs = dao.getCaseJobs(caseObj.getId(), session);
             checkJobsStatuses(jobs, caseObj);
 
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Removing case: finished checking job statuses: " + new Date());
 
             List<CaseInput> inputs = dao.getCaseInputs(caseObj.getId(), session);
             dao.removeCaseInputs(inputs.toArray(new CaseInput[0]), session);
 
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Removing case: finished removing case inputs: " + new Date());
 
             PersistedWaitTask[] persistedJobs = getPersistedJobs(jobs, session);
@@ -593,7 +593,7 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove persisted jobs from db table.");
             }
 
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Removing case: finished removing persisted jobs: " + new Date());
 
             try {
@@ -602,7 +602,7 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove job keys from db table.");
             }
 
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Removing case: finished removing job keys from job-key table: " + new Date());
 
             try {
@@ -611,7 +611,7 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove job messages from db table.");
             }
 
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Removing case: finished removing job messages: " + new Date());
 
             try {
@@ -620,7 +620,7 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove case outputs from db table.");
             }
 
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Removing case: finished removing outputs: " + new Date());
 
             try {
@@ -637,7 +637,7 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove jobs from db table.");
             }
 
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Removing case: finished removing jobs: " + new Date());
 
             List<CaseParameter> parameters = dao.getCaseParameters(caseObj.getId(), session);
@@ -647,7 +647,7 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove case parameters from db table.");
             }
 
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Removing case: finished removing case parameters: " + new Date());
 
             try {
@@ -656,7 +656,7 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove case: " + e.getMessage());
             }
 
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Removing case: finished removing items from parent-sensitivity cases table: " + new Date());
 
             try {
@@ -665,7 +665,7 @@ public class ManagedCaseService {
                 throw new EmfException("Cannot remove case objects: " + caseObj.getName() + " from db table.");
             }
 
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Removing case: finished removing case objects: " + new Date());
 
             try {
@@ -677,7 +677,7 @@ public class ManagedCaseService {
 
             setStatus(caseObj.getLastModifiedBy(), "Finished removing case " + caseObj.getName() + ".", "Remove Case");
 
-            if (DebugLevels.DEBUG_18)
+            if (DebugLevels.DEBUG_18())
                 log.warn("Removing case: finished removing case abbreviation: " + new Date());
         } catch (Exception e) {
             log.error("Could not remove Case: " + caseObj, e);
@@ -1343,7 +1343,7 @@ public class ManagedCaseService {
         // select the inputs based on 3 criteria
         try {
             List<CaseInput> inputs = dao.getJobInputs(caseId, jobId, sector, region, session);
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("Are inputs null?" + (inputs == null));
             Iterator<CaseInput> iter = inputs.iterator();
 
@@ -1356,7 +1356,7 @@ public class ManagedCaseService {
                 if (cipDataset == null) {
 
                     if (cip.isRequired()) {
-                        if (DebugLevels.DEBUG_9)
+                        if (DebugLevels.DEBUG_9())
                             System.out.println("CIP DATASET IS NULL AND IS REQD FOR CIP INPUT " + cip.getName());
                         badCipName = cip.getName();
                         // emf exception
@@ -1389,54 +1389,54 @@ public class ManagedCaseService {
 
         // append all the job inputs to the inputsAll list
         if ((inputsAAA != null) && (inputsAAA.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("Number of AAA inputs = " + inputsAAA.size());
             inputsAll.addAll(inputsAAA);
         }
 
         if ((inputsASA != null) && (inputsASA.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("Number of ASA inputs = " + inputsASA.size());
             inputsAll.addAll(inputsASA);
         }
 
         if ((inputsAAJ != null) && (inputsAAJ.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("Number of AAJ inputs = " + inputsAAJ.size());
             inputsAll.addAll(inputsAAJ);
         }
 
         if ((inputsASJ != null) && (inputsASJ.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("Number of ASJ inputs = " + inputsASJ.size());
             inputsAll.addAll(inputsASJ);
         }
 
         if ((inputsRSA != null) && (inputsRSA.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("Number of RSA inputs = " + inputsRSA.size());
             inputsAll.addAll(inputsRSA);
         }
 
         if ((inputsRAJ != null) && (inputsRAJ.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("Number of RAJ inputs = " + inputsRAJ.size());
             inputsAll.addAll(inputsRAJ);
         }
 
         if ((inputsRAA != null) && (inputsRAA.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("Number of RAA inputs = " + inputsRAA.size());
             inputsAll.addAll(inputsRAA);
         }
 
         if ((inputsRSJ != null) && (inputsRSJ.size() > 0)) {
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("Number of RSJ inputs = " + inputsRSJ.size());
             inputsAll.addAll(inputsRSJ);
         }
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("Total number of inputs = " + inputsAll.size());
 
         return (inputsAll);
@@ -1526,7 +1526,7 @@ public class ManagedCaseService {
 //            Case caseToCopy = getCase(toCopy[i]);
   
             String submitterID = getCopyService().copyCases(user, toCopy, this);
-            if (DebugLevels.DEBUG_4)
+            if (DebugLevels.DEBUG_4())
                 System.out.println("In ExImServiceImpl:CopyCase() SUBMITTERID = " + submitterID);
         
         
@@ -2246,18 +2246,18 @@ public class ManagedCaseService {
             String query = "DELETE " + CaseJobKey.class.getSimpleName() + " obj WHERE obj.jobId = "
                     + getAndOrClause(jobs, "obj.jobId");
 
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 System.out.println("hql delete string: " + query);
 
             updatedItems = session.createQuery(query).executeUpdate();
             tx.commit();
 
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 System.out.println(updatedItems + " items updated.");
         } catch (HibernateException e) {
             throw new EmfException(e.getMessage());
         } finally {
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 log.warn(updatedItems + " items updated from " + CaseJobKey.class.getName() + " table.");
         }
     }
@@ -2378,7 +2378,7 @@ public class ManagedCaseService {
      * 
      */
     public synchronized String submitJobs(Integer[] jobIds, int caseId, User user) throws EmfException {
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("ManagedCaseService::submitJobs size: " + jobIds.length + " for caseId= " + caseId);
 
         // create a new caseJobSubmitter for each client call in a session
@@ -2392,7 +2392,7 @@ public class ManagedCaseService {
 
         Case jobCase = this.getCase(caseId);
 
-        if (DebugLevels.DEBUG_15) {
+        if (DebugLevels.DEBUG_15()) {
             // logNumDBConn("beginning of job submitter");
         }
 
@@ -2407,7 +2407,7 @@ public class ManagedCaseService {
             if ((jobCase.getInputFileDir() == null) || (jobCase.getInputFileDir().equals(""))) {
                 throw new EmfException("Input directory must be set to run job(s).");
             }
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("Is CaseJobSubmitterId null? " + (caseJobSubmitterId == null));
             // FIXME: Does this need to be done in a new DAO method???
             // Get the CaseJobs for each jobId
@@ -2417,13 +2417,13 @@ public class ManagedCaseService {
             for (Integer jobId : jobIds) {
                 int jid = jobId.intValue();
 
-                if (DebugLevels.DEBUG_15) {
+                if (DebugLevels.DEBUG_15()) {
                     // logNumDBConn("beginning of job submitter loop (jobID: " + jid + ")");
                 }
 
                 String jobKey = null;
 
-                if (DebugLevels.DEBUG_0)
+                if (DebugLevels.DEBUG_0())
                     System.out.println("The jobId= " + jid);
 
                 CaseJob caseJob = this.getCaseJob(jid, session);
@@ -2448,7 +2448,7 @@ public class ManagedCaseService {
 
                 // FIXME: Is this still needed?????
                 // caseJob.setRunStartDate(new Date());
-                if (DebugLevels.DEBUG_15) {
+                if (DebugLevels.DEBUG_15()) {
                     logNumDBConn("beginning of job task creation (jobID: " + jid + ")");
                 }
 
@@ -2459,36 +2459,36 @@ public class ManagedCaseService {
                 // get or create the reference to the Managed Export Service for this casejobtask
                 expSvc = this.getExportService();
 
-                if (DebugLevels.DEBUG_6)
+                if (DebugLevels.DEBUG_6())
                     System.out.println("set the casejobsubmitter id = " + caseJobSubmitterId);
 
                 cjt.setSubmitterId(caseJobSubmitterId);
 
-                if (DebugLevels.DEBUG_9)
+                if (DebugLevels.DEBUG_9())
                     System.out.println("before getJobFileName");
 
                 String jobFileName = this.getJobFileName(caseJob, session);
                 String jobLogFile = this.getLog(jobFileName);
 
-                if (DebugLevels.DEBUG_6)
+                if (DebugLevels.DEBUG_6())
                     System.out.println("setJobFileContent");
 
-                if (DebugLevels.DEBUG_9)
+                if (DebugLevels.DEBUG_9())
                     System.out.println("before setJobFileContent");
 
                 cjt.setJobFileContent(this.createJobFileContent(caseJob, user, jobFileName, jobLogFile, expSvc, session));
 
-                if (DebugLevels.DEBUG_15) {
+                if (DebugLevels.DEBUG_15()) {
                     logNumDBConn("after creation of job file (jobID: " + jid + ")");
                 }
 
                 cjt.setJobFile(jobFileName);
                 cjt.setLogFile(jobLogFile);
                 cjt.setJobName(caseJob.getName());
-                if (DebugLevels.DEBUG_6)
+                if (DebugLevels.DEBUG_6())
                     System.out.println("set Host Name");
                 cjt.setHostName(caseJob.getHost().getName());
-                if (DebugLevels.DEBUG_6)
+                if (DebugLevels.DEBUG_6())
                     System.out.println("getQueOptions");
 
                 String queueOptions = caseJob.getQueOptions();
@@ -2505,11 +2505,11 @@ public class ManagedCaseService {
                     System.out.println(e);
                     throw new EmfException("Job (" + cjt.getJobName() + "): " + e.getMessage());
                 }
-                if (DebugLevels.DEBUG_6)
+                if (DebugLevels.DEBUG_6())
                     System.out.println("Queue options: " + queueOptions);
                 cjt.setQueueOptions(queueOptions);
 
-                if (DebugLevels.DEBUG_6)
+                if (DebugLevels.DEBUG_6())
                     System.out.println("Completed setting the CaseJobTask");
 
                 // Now add the CaseJobTask to the caseJobsTasksList
@@ -2527,14 +2527,14 @@ public class ManagedCaseService {
 
             for (CaseJobTask cjt : caseJobsTasksInSubmission) {
 
-                if (DebugLevels.DEBUG_15) {
+                if (DebugLevels.DEBUG_15()) {
                     logNumDBConn("beginning of job task loop (jobID: " + cjt.getJobId() + ")");
                 }
 
                 // get the caseJob out of the hashtable
                 CaseJob caseJob = caseJobsTable.get(cjt.getTaskId());
 
-                if (DebugLevels.DEBUG_0)
+                if (DebugLevels.DEBUG_0())
                     System.out.println("Is the caseJob for this jobId null? " + (caseJob == null));
 
                 // now get the Case (called jobCase since case is a reserved word in Java) using
@@ -2543,10 +2543,10 @@ public class ManagedCaseService {
                 cjt.setCaseName(jobCase.getName());
 
                 String purpose = "Used by job: " + caseJob.getName() + " of Case: " + jobCase.getName();
-                if (DebugLevels.DEBUG_6)
+                if (DebugLevels.DEBUG_6())
                     System.out.println("Purpose= " + purpose);
 
-                if (DebugLevels.DEBUG_0)
+                if (DebugLevels.DEBUG_0())
                     System.out.println("caseId= " + caseId + " Is the Case for this job null? " + (jobCase == null));
 
                 List<CaseInput> inputs = getAllJobInputs(caseJob, session);
@@ -2561,20 +2561,20 @@ public class ManagedCaseService {
                     runStatusValue = "Waiting";
                 }
 
-                if (DebugLevels.DEBUG_9)
+                if (DebugLevels.DEBUG_9())
                     System.out.println("Number of inputs for this job: " + inputs.size());
 
-                if (DebugLevels.DEBUG_9)
+                if (DebugLevels.DEBUG_9())
                     System.out.println("Number of inputs to be exported for this job: " + inputs2Export.size());
 
-                if (DebugLevels.DEBUG_15) {
+                if (DebugLevels.DEBUG_15()) {
                     logNumDBConn("beginning of adding job task (jobID: " + cjt.getJobId() + ")");
                 }
 
                 // send the casejobtask to the CJTM priority queue and then to wait queue
                 TaskManagerFactory.getCaseJobTaskManager(sessionFactory).addTask(cjt);
 
-                if (DebugLevels.DEBUG_15) {
+                if (DebugLevels.DEBUG_15()) {
                     logNumDBConn("before submitting to export (jobID: " + cjt.getJobId() + ")");
                 }
 
@@ -2591,14 +2591,14 @@ public class ManagedCaseService {
                     log.warn("ManagedCaseService: case jobs related datasets are not exported.");
                 }
 
-                if (DebugLevels.DEBUG_15) {
+                if (DebugLevels.DEBUG_15()) {
                     logNumDBConn("after submitted to export (jobID: " + cjt.getJobId() + ")");
                 }
 
-                if (DebugLevels.DEBUG_6)
+                if (DebugLevels.DEBUG_6())
                     System.out.println("Added caseJobTask to collection");
 
-                if (DebugLevels.DEBUG_0)
+                if (DebugLevels.DEBUG_0())
                     System.out.println("Case Job Export Submitter Id for case job:" + caseJobExportSubmitterId);
 
             }// for cjt
@@ -2608,7 +2608,7 @@ public class ManagedCaseService {
             // process it
             TaskManagerFactory.getCaseJobTaskManager(sessionFactory).processTaskQueue();
 
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("Case Job Submitter Id for case job:" + caseJobSubmitterId);
 
             return caseJobSubmitterId;
@@ -2616,7 +2616,7 @@ public class ManagedCaseService {
             ex.printStackTrace();
             throw new EmfException(ex.getMessage());
         } finally {
-            if (DebugLevels.DEBUG_15) {
+            if (DebugLevels.DEBUG_15()) {
                 logNumDBConn("finished job submission");
             }
 
@@ -2908,7 +2908,7 @@ public class ManagedCaseService {
 
     public synchronized void export(User user, String dirName, String purpose, boolean overWrite, int caseId)
             throws EmfException {
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("ManagedCaseService::export for caseId: " + caseId);
 
         EmfDataset[] datasets = getInputDatasets(caseId);
@@ -3892,7 +3892,7 @@ public class ManagedCaseService {
     }
 
     public synchronized String restoreTaskManagers() throws EmfException {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("ManagedCaseService::restoreTaskManagers");
 
         String mesg;
@@ -3925,23 +3925,23 @@ public class ManagedCaseService {
     }
 
     private synchronized void resubmitPersistedTasksForUser(int uid) throws EmfException {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("Start ManagedCaseService::resubmitPersistedTasksForUser uid= " + uid);
         Integer[] jobIds = null;
         int caseId = -9;
         User user = getUser(uid);
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("Incoming userid= " + uid + " acquired userName= " + user.getName());
 
         // Get All persisted wait jobs for this user
         List<PersistedWaitTask> allPersistedTasks = getPersistedTasksForUser(uid);
         if (allPersistedTasks == null) {
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("allPersistedTasks is null WHY?");
 
         } else {
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("Size of list returned from Persist wait table= " + allPersistedTasks.size());
             jobIds = new Integer[allPersistedTasks.size()];
 
@@ -3956,22 +3956,22 @@ public class ManagedCaseService {
             // Task has been acquired so delete from persisted wait task table
             dao.removePersistedTasks(allPersistedTasks.toArray(new PersistedWaitTask[0]));
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("After the loop jobId array of ints size= " + jobIds.length);
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("After the loop CaseId= " + caseId);
 
         }
 
         if (allGood(user, jobIds, caseId)) {
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("ManagedCaseService::resubmitPersistedTasksForUser Everything is good so resubmit");
             this.submitJobs(jobIds, caseId, user);
         } else {
             throw new EmfException("Failed to restore persisted wait tasks for user= " + user.getName());
         }
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("End ManagedCaseService::resubmitPersistedTasksForUser uid= " + uid);
     }
 
@@ -3981,7 +3981,7 @@ public class ManagedCaseService {
         if ((caseId != -9) && (user != null) && (jobIds != null) && (jobIds.length > 0)) {
             allGewd = true;
         }
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("END ManagedCaseService::allGood status= " + allGewd);
 
         return allGewd;
@@ -4021,7 +4021,7 @@ public class ManagedCaseService {
 
             }
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println(statMsg);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -4055,7 +4055,7 @@ public class ManagedCaseService {
     }
 
     public synchronized String validateJobs(Integer[] jobIDs) throws EmfException {
-        if (DebugLevels.DEBUG_14)
+        if (DebugLevels.DEBUG_14())
             System.out.println("Start validating jobs on server side. " + new Date());
 
         String ls = System.getProperty("line.separator");
@@ -4075,7 +4075,7 @@ public class ManagedCaseService {
             session.close();
         }
 
-        if (DebugLevels.DEBUG_14)
+        if (DebugLevels.DEBUG_14())
             System.out.println("Finished validating jobs on server side. " + new Date());
 
         TreeSet<CaseInput> set = new TreeSet<CaseInput>(allInputs);
@@ -4098,7 +4098,7 @@ public class ManagedCaseService {
         String inputsList = "";
         String ls = System.getProperty("line.separator");
 
-        if (DebugLevels.DEBUG_14)
+        if (DebugLevels.DEBUG_14())
             System.out.println("Start listing non-final inputs. " + new Date());
 
         for (Iterator<CaseInput> iter = inputs.iterator(); iter.hasNext();) {
@@ -4110,7 +4110,7 @@ public class ManagedCaseService {
                 inputsList += "Input: " + input.getName() + ";  Dataset: " + dataset + ls;
         }
 
-        if (DebugLevels.DEBUG_14)
+        if (DebugLevels.DEBUG_14())
             System.out.println("Finished listing non-final inputs. " + new Date());
 
         if (inputsList.isEmpty())
@@ -5059,7 +5059,7 @@ public class ManagedCaseService {
                 + getAndOrClause(jobIds, "obj.caseJobID", getSectorIds(jobs), "obj.sector.id", getRegionIds(jobs),
                         "obj.region.id") + ")";
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             log.warn(query);
 
         List<?> ids = session.createQuery(query).list();
@@ -5083,7 +5083,7 @@ public class ManagedCaseService {
                 + getAndOrClause(jobIds, "obj.jobId", getSectorIds(jobs), "obj.sector.id", getRegionIds(jobs),
                         "obj.region.id") + ")";
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             log.warn(query);
 
         List<?> ids = session.createQuery(query).list();
@@ -5203,7 +5203,7 @@ public class ManagedCaseService {
     @SuppressWarnings("unchecked")
     private CaseParameter getParentCaseParameters4SensitivityCase(int parentcaseId, CaseParameter templateparam, GeoRegion selectedRegion, Session session) {
 
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out.println("Trying to find match for " + templateparam.getName());
         }
         
@@ -5278,12 +5278,12 @@ public class ManagedCaseService {
 
         query += suffix;
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             log.warn(query);
 
         List<Integer> ids = session.createQuery(query).list();
 
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out.println("#IDs returned by query: " + ids == null ? 0 : ids.size());
         }        
 
@@ -5295,7 +5295,7 @@ public class ManagedCaseService {
             parameters.add(dao.getCaseParameter(id, session));
         }
         
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out.println("Attempting to match: " + Utils.stringify(templateparam));
         }
         
@@ -5310,11 +5310,11 @@ public class ManagedCaseService {
             Utils.sortParameters(parameters);
             matchedParameter = parameters.get(0);
 
-            if (DebugLevels.DEBUG_9) {
+            if (DebugLevels.DEBUG_9()) {
                 System.out.println("Matched with: " + Utils.stringify(matchedParameter));
             }
         } else {
-            if (DebugLevels.DEBUG_9) {
+            if (DebugLevels.DEBUG_9()) {
                 System.out.println("No match found: list empty");
             }
         }
@@ -5325,7 +5325,7 @@ public class ManagedCaseService {
     @SuppressWarnings("unchecked")
     private CaseInput getParentCaseInputs4SensitivityCase(int parentcaseId, CaseInput templateinput, GeoRegion selectedRegion, Session session) {
 
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out.println("Trying to find match for " + templateinput.getName());
         }
         
@@ -5398,12 +5398,12 @@ public class ManagedCaseService {
         }
 
         query += suffix;
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             log.warn(query);
 
         List<Integer> ids = session.createQuery(query).list();
 
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out.println("#IDs returned by query: " + ids == null ? 0 : ids.size());
         }
         
@@ -5415,7 +5415,7 @@ public class ManagedCaseService {
             inputs.add(dao.getCaseInput(id, session));
         }
         
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out.println("Attempting to match: " + Utils.stringify(templateinput));
         }
         
@@ -5430,11 +5430,11 @@ public class ManagedCaseService {
             Utils.sortInputs(inputs);
             matchedInput = inputs.get(0);
 
-            if (DebugLevels.DEBUG_9) {
+            if (DebugLevels.DEBUG_9()) {
                 System.out.println("Matched with: " + Utils.stringify(matchedInput));
             }
         } else {
-            if (DebugLevels.DEBUG_9) {
+            if (DebugLevels.DEBUG_9()) {
                 System.out.println("No match found: list empty");
             }
         }

@@ -1209,3 +1209,96 @@ where name in ('Flat File 2010 Nonpoint'));
 --7/21/2011
 insert into emf.keywords ("name") values('TARGET_YEAR');
 insert into emf.keywords ("name") values('CONTROL_STRATEGY_DETAILED_RESULT_NAME');
+
+-- 8/15/2011
+
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, 
+(select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
+'Detect Bizarre Characters in column PLANT', 
+1, 
+'select fips,plantid, pointid, stackid, segment from $TABLE[1] i where plant ~* ''[[:cntrl:]]''', 
+false, 
+1, 
+''
+from emf.dataset_types dt
+where name in ('ORL Point Inventory (PTINV)'); 
+
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select fips,plantid, pointid, stackid, segment from $TABLE[1] i where plant ~* ''[[:cntrl:]]'''
+where name = 'Detect Bizarre Characters in column PLANT'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('ORL Point Inventory (PTINV)'));
+
+CREATE OR REPLACE FUNCTION public.RemoveBizarreChar(tableName text)
+  RETURNS SETOF text AS
+$BODY$
+DECLARE
+	sql text;
+	r record;
+BEGIN
+	update ' || $1 || 'set plant=regexp_replace(plant, '[[:cntrl:]]', '') where plant ~* '[[:cntrl:]]';
+	sql = 'SELECT * from ' || $1 || ' where plant ~* ''[[:cntrl:]]'';'
+	FOR r IN EXECUTE sql LOOP
+	  RETURN NEXT r;
+	END LOOP;
+	return;
+END;
+$BODY$
+  LANGUAGE 'plpgsql';
+ALTER FUNCTION public.RemoveBizarreChar(text) OWNER TO emf;
+
+insert into emf.properties values(DEFAULT, 'DEBUG_0', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_1', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_2', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_3', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_4', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_5', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_6', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_7', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_8', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_9', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_10', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_11', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_12', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_13', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_14', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_15', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_16', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_17', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_18', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_19', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_20', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_21', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_22', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_23', 'false');
+insert into emf.properties values(DEFAULT, 'DEBUG_24', 'false');
+
+update emf.properties set value = 'false' where name = 'DEBUG_0';
+update emf.properties set value = 'false' where name = 'DEBUG_1';
+update emf.properties set value = 'false' where name = 'DEBUG_2';
+update emf.properties set value = 'false' where name = 'DEBUG_3';
+update emf.properties set value = 'false' where name = 'DEBUG_4';
+update emf.properties set value = 'false' where name = 'DEBUG_5';
+update emf.properties set value = 'false' where name = 'DEBUG_6';
+update emf.properties set value = 'false' where name = 'DEBUG_7';
+update emf.properties set value = 'false' where name = 'DEBUG_8';
+update emf.properties set value = 'false' where name = 'DEBUG_9';
+update emf.properties set value = 'false' where name = 'DEBUG_10';
+update emf.properties set value = 'false' where name = 'DEBUG_11';
+update emf.properties set value = 'false' where name = 'DEBUG_12';
+update emf.properties set value = 'false' where name = 'DEBUG_13';
+update emf.properties set value = 'false' where name = 'DEBUG_14';
+update emf.properties set value = 'false' where name = 'DEBUG_15';
+update emf.properties set value = 'false' where name = 'DEBUG_16';
+update emf.properties set value = 'false' where name = 'DEBUG_17';
+update emf.properties set value = 'false' where name = 'DEBUG_18';
+update emf.properties set value = 'false' where name = 'DEBUG_19';
+update emf.properties set value = 'false' where name = 'DEBUG_20';
+update emf.properties set value = 'false' where name = 'DEBUG_21';
+update emf.properties set value = 'false' where name = 'DEBUG_22';
+update emf.properties set value = 'false' where name = 'DEBUG_23';
+update emf.properties set value = 'false' where name = 'DEBUG_24';
+

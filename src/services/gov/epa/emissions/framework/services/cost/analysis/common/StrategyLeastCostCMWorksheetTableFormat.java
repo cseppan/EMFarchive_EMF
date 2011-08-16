@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost.analysis.common;
 
+import gov.epa.emissions.commons.CoSTConstants;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.IntegerFormatter;
@@ -8,6 +9,7 @@ import gov.epa.emissions.commons.io.NullFormatter;
 import gov.epa.emissions.commons.io.RealFormatter;
 import gov.epa.emissions.commons.io.StringFormatter;
 import gov.epa.emissions.commons.io.TableFormat;
+import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 
 import java.util.ArrayList;
@@ -65,7 +67,7 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
         List<Column> cols = new ArrayList<Column>();
 
         cols.add(new Column("Disable", types.booleanType(), new StringFormatter(5)));
-        cols.add(new Column("CM_Abbrev", types.stringType(10), new StringFormatter(10), "DEFAULT ''"));
+        cols.add(new Column("CM_Abbrev", types.stringType(CoSTConstants.CM_ABBREV_LEN), new StringFormatter(CoSTConstants.CM_ABBREV_LEN), "DEFAULT ''"));
         cols.add(new Column("Poll", types.stringType(20), new StringFormatter(20)));
         cols.add(new Column("SCC", types.stringType(10), new StringFormatter(10)));
         cols.add(new Column("FIPS", types.stringType(6), new StringFormatter(6))); //after fips will add 4 more cols plantid, etc.
@@ -124,7 +126,8 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
         cols.add(new Column("YLOC", types.realType(), new RealFormatter()));
         cols.add(new Column("PLANT", types.stringType(255), 255, new StringFormatter(255)));
         cols.add(new Column("REPLACEMENT_ADDON", types.stringType(1), 1, new StringFormatter(1)));
-        cols.add(new Column("EXISTING_MEASURE_ABBREVIATION", types.stringType(10), 10, new StringFormatter(10)));
+        //cols.add(new Column("EXISTING_MEASURE_ABBREVIATION", types.stringType(10), 10, new StringFormatter(10))); // JIZHEN20110727
+        cols.add(new Column("EXISTING_MEASURE_ABBREVIATION", types.stringType(CoSTConstants.CM_ABBREV_LEN), CoSTConstants.CM_ABBREV_LEN, new StringFormatter(CoSTConstants.CM_ABBREV_LEN)));
         cols.add(new Column("EXISTING_PRIMARY_DEVICE_TYPE_CODE", types.stringType(4), 4, new StringFormatter(4)));
         cols.add(new Column("Comment", types.stringType(128), new StringFormatter(128)));
 

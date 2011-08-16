@@ -71,13 +71,13 @@ public class CaseAssistanceService {
         this.dataDao = new DataCommonsDAO();
         this.dsDao = new DatasetDAO();
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("In CaseAssistanceService constructor: Is the session Factory null? "
                     + (sessionFactory == null));
 
         myTag();
 
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> " + myTag());
 
         log.info("CaseAssistanceService");
@@ -1348,16 +1348,16 @@ public class CaseAssistanceService {
     public synchronized ModelToRun addModelToRun(ModelToRun model) throws EmfException {
         Session session = sessionFactory.getSession();
         
-        if (DebugLevels.DEBUG_20)
+        if (DebugLevels.DEBUG_20())
             System.out.println("Before insert ModelToRun: " + model.getName());
         
         try {
-            if (DebugLevels.DEBUG_20)
+            if (DebugLevels.DEBUG_20())
                 System.out.println("ModelToRun: " + model.getName() + " existed? " + (caseDao.load(ModelToRun.class, model.getName(), session) == null));
             
             ModelToRun temp = caseDao.loadModelTorun(model.getName(), session);
             
-            if (DebugLevels.DEBUG_20)
+            if (DebugLevels.DEBUG_20())
                 System.out.println("Does " + model.getName() + " have a similar one in DB? " + (temp != null));
 
             if (temp != null)
@@ -1365,7 +1365,7 @@ public class CaseAssistanceService {
 
             caseDao.add(model, session);
 
-            if (DebugLevels.DEBUG_20)
+            if (DebugLevels.DEBUG_20())
                 System.out.println(model.getName() + " has been added into DB.");
 
             return (ModelToRun) caseDao.load(ModelToRun.class, model.getName(), session);

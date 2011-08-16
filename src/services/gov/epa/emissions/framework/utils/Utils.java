@@ -81,7 +81,7 @@ public class Utils {
 
             int retval = 0;
 
-            if (DebugLevels.DEBUG_9) {
+            if (DebugLevels.DEBUG_9()) {
                 
                 System.out.println("Comparing:");
                 String o1String = "o1=" + stringify(o1);
@@ -118,7 +118,7 @@ public class Utils {
                 }
             }
 
-            if (DebugLevels.DEBUG_9) {
+            if (DebugLevels.DEBUG_9()) {
                 
                 if (retval == 1) {
                     System.out.println("o1>o2");
@@ -178,7 +178,7 @@ public class Utils {
 
             int retval = 0;
 
-            if (DebugLevels.DEBUG_9) {
+            if (DebugLevels.DEBUG_9()) {
                 
                 System.out.println("Comparing:");
                 String o1String = "o1=" + stringify(o1);
@@ -215,7 +215,7 @@ public class Utils {
                 }
             }
 
-            if (DebugLevels.DEBUG_9) {
+            if (DebugLevels.DEBUG_9()) {
                 
                 if (retval == 1) {
                     System.out.println("o1>o2");

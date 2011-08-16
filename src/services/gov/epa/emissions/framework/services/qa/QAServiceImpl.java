@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.qa;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
+import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
@@ -24,7 +25,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -477,5 +482,133 @@ public class QAServiceImpl implements QAService {
                 e.printStackTrace();
             }
         }
+    }
+
+    public synchronized void deleteQASteps(User user, QAStep[] steps, int datasetId) throws EmfException { //BUG3615
+        
+        StatusDAO statusDAO = new StatusDAO(sessionFactory);
+        Status status = new Status();
+        status.setUsername(user.getUsername());
+        status.setType("DeleteQASteps");
+        status.setMessage("Start to delete QA Steps.");
+        status.setTimestamp(new Date());
+        statusDAO.add(status);
+        
+        Session session = sessionFactory.getSession();
+        DatasetDAO datasetDAO = new DatasetDAO();
+        EmfDataset dataset = datasetDAO.obtainLocked(user, datasetDAO.getDataset(session, datasetId), session);
+        
+        DbServer dbServer = dbServerFactory.getDbServer();
+        Datasource emfDatasource = dbServer.getEmfDatasource();
+        List<QAStep> stepsToBeDeleted = new ArrayList<QAStep>();
+        String stepsReferenced = "";
+        String sql = "";
+        try {
+            for ( QAStep step : steps) {
+                sql = "select s.id, s.dataset_id, s.name from emf.qa_steps s where ";
+                sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"CURRENT_DATASET\\\"(\\s*),(\\s*)\""; 
+                sql += step.getName();
+                sql += "\\\"(\\s*)[[.].]](.*)' and s.dataset_id = ";
+                sql += step.getDatasetId() + ") ";
+                sql += " or ";
+                sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"";
+                sql += dataset.getName();
+                sql += "\\\"(\\s*),(\\s*)\""; 
+                sql += step.getName();
+                sql += "\\\"(\\s*)[[.].]](.*)') ";
+                sql += " or ";
+                sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP_VERSION[[.[.]](\\s*)\\\"CURRENT_DATASET\\\"(\\s*),(\\s*)\""; 
+                sql += step.getName();
+                sql += "\\\"(\\s*),(\\s*)([0-9]+)[[.].]](.*)' and s.dataset_id = ";
+                sql += step.getDatasetId() + ") ";
+                sql += " or ";
+                sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"";
+                sql += dataset.getName();
+                sql += "\\\"(\\s*),(\\s*)\"";
+                sql += step.getName();
+                sql += "\\\"(\\s*),(\\s*)([0-9]+)[[.].]](.*)') ";
+                sql += ";";
+
+                ResultSet rs = emfDatasource.query().executeQuery(sql);
+                
+                if ( rs.next()) { // not empty
+                    stepsReferenced += "\"" + step.getName() + "\" referenced by QA step \"" + rs.getString("name") + "\" for dataset \""; 
+                    EmfDataset qaDataset = datasetDAO.obtainLocked(user, datasetDAO.getDataset(session, rs.getInt("dataset_id")), session);
+                    stepsReferenced += qaDataset.getName() + "\'";
+                    while ( rs.next()) {
+                        stepsReferenced += ", ";
+                        stepsReferenced += " \"" + rs.getString("name") + "\" for dataset \""; 
+                        qaDataset = datasetDAO.obtainLocked(user, datasetDAO.getDataset(session, rs.getInt("dataset_id")), session);
+                        stepsReferenced += qaDataset.getName() + "\"";
+                    }
+                    stepsReferenced +=". ";
+                } else { //empty
+                    stepsToBeDeleted.add(step);
+                }
+            }
+        } catch (SQLException e) {
+            LOG.error("Error when run query - " + sql + ": ", e);
+            status = new Status();
+            status.setUsername(user.getUsername());
+            status.setType("DeleteQASteps");
+            status.setMessage("Failed to delete QA Steps: " + "error when run query - " + sql + ": " + e.getMessage());
+            status.setTimestamp(new Date());
+            statusDAO.add(status);
+            throw new EmfException("Error when run query - " + sql + ": " + e.getMessage());
+        }
+        
+        if ( !stepsReferenced.equals("")) {
+            status = new Status();
+            status.setUsername(user.getUsername());
+            status.setType("DeleteQASteps");
+            status.setMessage("The following steps are referenced by some other QA steps and can not be deleted: " + stepsReferenced);
+            status.setTimestamp(new Date());
+            statusDAO.add(status);
+        }
+        
+        if ( stepsToBeDeleted.size() > 0) {
+            status = new Status();
+            status.setUsername(user.getUsername());
+            status.setType("DeleteQASteps");
+            status.setMessage("Start to remove the result tables...");
+            status.setTimestamp(new Date());
+            statusDAO.add(status);
+        }
+        
+        for ( QAStep step : stepsToBeDeleted) {
+            try {
+                this.removeQAResultTable(step, dbServer);
+            } catch (EmfException e) {
+                status = new Status();
+                status.setUsername(user.getUsername());
+                status.setType("DeleteQASteps");
+                status.setMessage("Failed to remove result tables for QA Step " + step.getName() + ": " + e.getMessage());
+                status.setTimestamp(new Date());
+                statusDAO.add(status);
+                throw e;
+            }
+        }
+
+        try {
+            dao.deleteQASteps(stepsToBeDeleted.toArray(new QAStep[0]), session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not set QA Steps", e);
+            status = new Status();
+            status.setUsername(user.getUsername());
+            status.setType("DeleteQASteps");
+            status.setMessage("Failed to delete QA Steps: " + e.getMessage());
+            status.setTimestamp(new Date());
+            statusDAO.add(status);
+            throw new EmfException("Could not delete QA Steps: " + e.getMessage());
+        } finally {
+            session.close();
+        }
+
+        status = new Status();
+        status.setUsername(user.getUsername());
+        status.setType("DeleteQASteps");
+        status.setMessage("Complete deleting the QA steps - number of steps deleted: " + stepsToBeDeleted.size());
+        status.setTimestamp(new Date());
+        statusDAO.add(status);
     }
 }

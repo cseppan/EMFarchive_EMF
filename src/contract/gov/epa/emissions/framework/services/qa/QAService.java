@@ -39,4 +39,6 @@ public interface QAService {
 
     void copyQAStepsToDatasets(User user, QAStep[] steps, int[] datasetIds, boolean replace) throws EmfException;
 
+    void deleteQASteps(User user, QAStep[] steps, int datasetId) throws EmfException; //BUG3615
+
 }

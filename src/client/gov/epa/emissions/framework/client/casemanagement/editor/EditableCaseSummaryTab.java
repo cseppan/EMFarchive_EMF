@@ -702,4 +702,16 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         this.desktopManager = dm;
     }
 
+    public void updateDescriptionTextArea(String descText) { // BUG3621
+        // NOTE Auto-generated method stub
+        this.description.setText( descText);
+    }
+
+    public String getDescription() {
+        return description.getText();
+    }
+
+    public void setDescription(String description) {
+        this.description.setText( description);
+    }
 }

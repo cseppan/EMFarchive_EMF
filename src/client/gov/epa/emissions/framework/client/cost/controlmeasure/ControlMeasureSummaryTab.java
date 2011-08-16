@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.CoSTConstants;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
@@ -519,8 +520,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         }
 
         //make sure its not longer than 10 characters
-        if (abbreviation.getText().trim().length() > 10) {
-            throw new EmfException("Summary tab: An abbreviation must not be longer than 10 characters");
+        if (abbreviation.getText().trim().length() > CoSTConstants.CM_ABBREV_LEN) { //10) { 
+            throw new EmfException("Summary tab: An abbreviation must not be longer than " + CoSTConstants.CM_ABBREV_LEN + " characters");
         }
 
         //make sure its does not contain a space

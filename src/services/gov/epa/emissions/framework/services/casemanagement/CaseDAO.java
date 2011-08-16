@@ -899,7 +899,7 @@ public class CaseDAO {
     }
 
     public JobRunStatus getJobRunStatuse(String status) {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out
                     .println("In CaseDAO::getJobRunStatuse: Is the session Factory null? " + (sessionFactory == null));
 
@@ -1287,7 +1287,7 @@ public class CaseDAO {
     }
 
     public synchronized List<PersistedWaitTask> getPersistedWaitTasksByUser(int userId) {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("CaseDAO::getPersistedWaitTasks Start method");
 
         Session session = sessionFactory.getSession();
@@ -1302,7 +1302,7 @@ public class CaseDAO {
             session.close();
         }
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("CaseDAO::getPersistedWaitTasks End method");
         return null;
     }
@@ -1332,7 +1332,7 @@ public class CaseDAO {
     }
 
     public void removePersistedTasks(PersistedWaitTask[] pwTasks) {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out
                     .println("CaseDAO::removePersistedTasks BEFORE num of tasks is pwTask null? " + (pwTasks == null));
 
@@ -1352,12 +1352,12 @@ public class CaseDAO {
             session.close();
         }
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("CaseDAO::removePersistedTasks AFTER num of tasks= ");
     }
 
     public void addPersistedTask(PersistedWaitTask persistedWaitTask) {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("CaseDAO::addPersistedTask BEFORE num of tasks= ");
         Session session = sessionFactory.getSession();
 
@@ -1372,7 +1372,7 @@ public class CaseDAO {
                 hibernateFacade.remove(existedTask, session);
 
             hibernateFacade.add(persistedWaitTask, session);
-            if (DebugLevels.DEBUG_15)
+            if (DebugLevels.DEBUG_15())
                 System.out.println("Adding job to persisted table, jobID: " + persistedWaitTask.getJobId());
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -1380,13 +1380,13 @@ public class CaseDAO {
             session.close();
         }
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("CaseDAO::addPersistedTask AFTER num of tasks= ");
 
     }
 
     public void removePersistedTask(PersistedWaitTask persistedWaitTask) {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("CaseDAO::removePersistedTask (from CJTM) BEFORE num of tasks is pwTask null "
                     + (persistedWaitTask == null));
 
@@ -1402,7 +1402,7 @@ public class CaseDAO {
             if (object != null) {
                 hibernateFacade.deleteTask(object, session);
             } else {
-                if (DebugLevels.DEBUG_15) {
+                if (DebugLevels.DEBUG_15()) {
                     System.out.println("Removing from persisted table a job currently not there, jobID: "
                             + persistedWaitTask.getJobId());
                     int numberPersistedTasks = hibernateFacade.getAll(PersistedWaitTask.class, session).size();
@@ -1416,7 +1416,7 @@ public class CaseDAO {
             session.close();
         }
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("CaseDAO::removePersistedTasks  (from CJTM) AFTER num of tasks= ");
 
     }
@@ -1519,7 +1519,7 @@ public class CaseDAO {
                 try {
                     dsDao.remove(user, dataset, session);
                 } catch (EmfException e) {
-                    if (DebugLevels.DEBUG_12)
+                    if (DebugLevels.DEBUG_12())
                         System.out.println(e.getMessage());
 
                     throw new EmfException(e.getMessage());

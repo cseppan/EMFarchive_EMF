@@ -74,7 +74,7 @@ public class ImportCaseOutputTask extends Task {
         super();
         createId();
 
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> " + createId());
 
         this.user = user;
@@ -91,14 +91,14 @@ public class ImportCaseOutputTask extends Task {
     }
 
     public void run() {
-        if (DebugLevels.DEBUG_1) {
+        if (DebugLevels.DEBUG_1()) {
             System.out.println(">>## ImportTask:run() " + taskId + " for dataset: " + this.dataset.getName());
         }
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println("Task#" + taskId + " RUN @@@@@ THREAD ID: " + Thread.currentThread().getId());
 
-        if (DebugLevels.DEBUG_1)
-            if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
+            if (DebugLevels.DEBUG_1())
                 System.out.println("Task# " + taskId + " running");
 
         DbServer dbServer = null;
@@ -326,7 +326,7 @@ public class ImportCaseOutputTask extends Task {
         output.setStatus(status);
         output.setMessage(message);
 
-        if (DebugLevels.DEBUG_4) {
+        if (DebugLevels.DEBUG_4()) {
             System.out.println("ImportTaskManager = " + ImportTaskManager.getImportTaskManager());
             System.out.println("taskId = " + taskId);
             System.out.println("submitterId = " + submitterId);
@@ -408,7 +408,7 @@ public class ImportCaseOutputTask extends Task {
     @Override
     protected void finalize() throws Throwable {
         taskCount--;
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> Destroying object: " + createId());
         super.finalize();
     }

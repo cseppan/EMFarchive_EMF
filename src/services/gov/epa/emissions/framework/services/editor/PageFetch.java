@@ -34,7 +34,7 @@ public class PageFetch {
     }
 
     void setRange(Page page, DataAccessToken token, Session session) throws Exception {
-        if (DebugLevels.DEBUG_19) {
+        if (DebugLevels.DEBUG_19()) {
             System.out.println("PageFetch:setRange():Page null ? " + (page == null));
             if (page != null)
                 System.out.println("\tPage number: " + page.getNumber() + " max: " + page.getMax() + " min: " + page.getMin());
@@ -58,7 +58,7 @@ public class PageFetch {
         
         ChangeSets changesets = cache.changesets(token, pageNumber, session);
         
-        if (DebugLevels.DEBUG_19) {
+        if (DebugLevels.DEBUG_19()) {
             System.out.println("PageFetch:filteredPage():Page null from PageReader? " + (page == null));
             if (page != null)
                 System.out.println("\tPage number: " + page.getNumber());

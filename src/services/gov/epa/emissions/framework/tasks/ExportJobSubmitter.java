@@ -30,10 +30,10 @@ public class ExportJobSubmitter extends ExportSubmitter {
     public ExportJobSubmitter() {
         super();
         myTag();
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(">>>> For label: " + myTag());
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("Export Job Submitter @@@@@ THREAD ID: " + Thread.currentThread().getId());
     }
 
@@ -49,7 +49,7 @@ public class ExportJobSubmitter extends ExportSubmitter {
     }
 
     public synchronized void callbackFromTaskManager(String taskId, String status, String mesg) {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out
                     .println(">>>>>>>> ExportJobSubmitter::callbackFromTaskManager id= " + submitterId
                             + " got callback from TaskManager for Task: " + taskId + " status= " + status
@@ -64,16 +64,16 @@ public class ExportJobSubmitter extends ExportSubmitter {
         user = task.getUser();
         statusServices = task.getStatusServices();
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("STATUS = " + status);
         if (status.equals("started")) {
             statis = TaskStatus.RUNNING;
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("STATIS set = " + statis);
         }
         if (status.equals("completed")) {
             statis = TaskStatus.COMPLETED;
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("STATIS set = " + statis);
         }
         if (status.equals("failed")) {
@@ -82,11 +82,11 @@ public class ExportJobSubmitter extends ExportSubmitter {
             // Set the status in the EMF Status messages table corresponding the callback message received
             this.setStatus(user, statusServices, mesg);
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("STATIS set = " + statis);
         }
 
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out.println("STATIS VALUE after switch= " + statis);
             System.out.println("SubmittedTable STATIS for this taskId before setStatus= "
                     + (submittedTable.get(taskId).getStatus()));
@@ -95,7 +95,7 @@ public class ExportJobSubmitter extends ExportSubmitter {
         // Set the status of the TastStatus object for this taskId
         submittedTable.get(taskId).setStatus(statis);
 
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out.println("SubmittedTable STATIS for this taskId after setStatus= "
                     + (submittedTable.get(taskId).getStatus()));
             System.out.println("DID THE STATUS GET SET IN THE TABLE? "
@@ -104,7 +104,7 @@ public class ExportJobSubmitter extends ExportSubmitter {
 
         // remove completed and failed export tasks from the submitted list
         if (!(status.equals("started"))) {
-            if (DebugLevels.DEBUG_9) {
+            if (DebugLevels.DEBUG_9()) {
                 System.out.println("In submitter staus of task was : " + status);
                 System.out.println("In submitter: " + submitterId);
                 System.out.println("$$$$ Size of export tasks list before remove: " + exportTasks.size());
@@ -139,17 +139,17 @@ public class ExportJobSubmitter extends ExportSubmitter {
                 canned++;
         }
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(" RUN Count: " + start);
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(" COMPLETED Count: " + done);
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(" Failed Count: " + fail);
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(" Canceled Count: " + canned);
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(" Total Count: " + (start + done + fail + canned));
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(" Size of submittedTable: " + submittedTable.size());
 
         // jobName) are completed:
@@ -177,7 +177,7 @@ public class ExportJobSubmitter extends ExportSubmitter {
             }
         }
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from TaskManager for Task: "
                     + taskId + " status= " + status + " message= " + message);
     }

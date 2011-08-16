@@ -105,7 +105,7 @@ public class ManagedImportService {
         if (System.getProperty("MASS_STORAGE_ROOT") == null)
             setMassStorageProperties();
 
-        if (DebugLevels.DEBUG_17)
+        if (DebugLevels.DEBUG_17())
             System.out.println("ManagedImportService: At the class initialization -- numOfRunningThread: "
                     + numOfRunningThread);
     }
@@ -200,7 +200,7 @@ public class ManagedImportService {
     }
 
     private void logStartMessages(String task, String folderPath, String[] filenames) {
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out.println("ManagedImportService: " + task);
             System.out.println("ManagedImportService:import() called at: " + new Date());
             System.out.println(">>## In import service:import() " + myTag() + " for datasets: " + filenames.toString());
@@ -209,7 +209,7 @@ public class ManagedImportService {
     }
 
     private synchronized void addTasksToSubmitter(TaskSubmitter submitter, ArrayList<Runnable> importTasksList) {
-        if (DebugLevels.DEBUG_11)
+        if (DebugLevels.DEBUG_11())
             System.out.println("Before importTaskSubmitter.addTasksToSubmitter # of elements in importTasks array= "
                     + importTasksList.size());
 
@@ -222,7 +222,7 @@ public class ManagedImportService {
         log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + submitter.getTaskCount());
         log.info("ManagedImportService:import() submitted all importTasks dropping out of loop");
 
-        if (DebugLevels.DEBUG_9) {
+        if (DebugLevels.DEBUG_9()) {
             System.out
                     .println("After importTaskSubmitter.addTasksToSubmitter and importTasks cleanout # of elements in eximTasks array= "
                             + importTasks.size());
@@ -303,7 +303,7 @@ public class ManagedImportService {
 
         EmfDataset dataset = createDataset(path.getAbsolutePath(), files[0], datasetName, user, type, true);
 
-        if (DebugLevels.DEBUG_11) {
+        if (DebugLevels.DEBUG_11()) {
             System.out
                     .println("Output name before create import task: " + (localOuput == null ? "" : output.getName()));
             System.out.println("Dataset name before create import task: " + dataset.getName());
@@ -530,7 +530,7 @@ public class ManagedImportService {
             if (fileNamesForImport.length > 0)
                 return fileNamesForImport;
 
-            if (DebugLevels.DEBUG_11) {
+            if (DebugLevels.DEBUG_11()) {
                 System.out.println("ManagedImportService: File patterns passed: " + pattern);
 
                 for (String file : fileNamesForImport)
@@ -597,7 +597,7 @@ public class ManagedImportService {
                 Session session = null;
 
                 try {
-                    if (DebugLevels.DEBUG_17)
+                    if (DebugLevels.DEBUG_17())
                         System.out.println("Current thread running the case output registration (id): "
                                 + Thread.currentThread().getId());
 
@@ -610,7 +610,7 @@ public class ManagedImportService {
                     while (numOutputs > 0) {
 
                         for (int i = 0; i < numOutputs; i++) {
-                            if (DebugLevels.DEBUG_17)
+                            if (DebugLevels.DEBUG_17())
                                 System.out.println("Currently running the queued case output (id): "
                                         + caseOutputs.get(i).getId());
 
@@ -633,7 +633,7 @@ public class ManagedImportService {
             } // end of run()
         }); // enf of new Thread
 
-        if (DebugLevels.DEBUG_17) {
+        if (DebugLevels.DEBUG_17()) {
             System.out.println("Ready to kick off the case output registration thread -- numOfRunningThread: "
                     + numOfRunningThread);
         }
@@ -641,7 +641,7 @@ public class ManagedImportService {
         runningThread.start();
         numOfRunningThread++;
 
-        if (DebugLevels.DEBUG_17)
+        if (DebugLevels.DEBUG_17())
             System.out.println("After kicking off the case output registration thread -- numOfRunningThread: "
                     + numOfRunningThread);
     }
@@ -663,7 +663,7 @@ public class ManagedImportService {
     private void removeQedOutput(QueueCaseOutput qOutput, CaseDAO caseDao, Session session) {
         caseDao.removeQedOutput(qOutput, session);
 
-        if (DebugLevels.DEBUG_17)
+        if (DebugLevels.DEBUG_17())
             System.out.println("qedOutput (id = " + qOutput.getId() + ") removed from QueueCaseOutput table.");
 
         session.flush();

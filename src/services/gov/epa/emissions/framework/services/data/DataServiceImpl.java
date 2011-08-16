@@ -612,7 +612,7 @@ public class DataServiceImpl implements DataService {
             updateVersionNReleaseLock(lockedVersion);
             
             dao.releaseLocked(user, locked, session);
-            if (DebugLevels.DEBUG_17) {
+            if (DebugLevels.DEBUG_17()) {
                 LOG.warn("Update version : "+ lockedVersion.getName());
                 LOG.warn("Table name : "+ datasource.getName() + "." + targetSources[0].getTable());
                 LOG.warn("Table row count : "+ num);
@@ -663,14 +663,14 @@ public class DataServiceImpl implements DataService {
                 + getLineBasedSrcColString(targetDSid, targetDSVersion, srcColumns, startLineNum, increatment,
                         srcTable, filter, dsQuery) + ")";
 
-        if (DebugLevels.DEBUG_17) {
+        if (DebugLevels.DEBUG_17()) {
             LOG.warn("Append data query: " + query);
             LOG.warn("Query starts at: " + new Date());
         }
 
         dataModifier.execute(query);
 
-        if (DebugLevels.DEBUG_17)
+        if (DebugLevels.DEBUG_17())
             LOG.warn("Query ends at: " + new Date());
     }
 
@@ -692,14 +692,14 @@ public class DataServiceImpl implements DataService {
                         getSrcColString(targetDSid, targetDSVersion, srcColumns, targetColumns), srcTable, filter)
                 + ")";
 
-        if (DebugLevels.DEBUG_17) {
+        if (DebugLevels.DEBUG_17()) {
             LOG.warn("Append data query: " + query);
             LOG.warn("Query starts at: " + new Date());
         }
 
         dataModifier.execute(query);
 
-        if (DebugLevels.DEBUG_17)
+        if (DebugLevels.DEBUG_17())
             LOG.warn("Query ends at: " + new Date());
     }
 
@@ -957,7 +957,7 @@ public class DataServiceImpl implements DataService {
 
             }
             
-            if (DebugLevels.DEBUG_16) {
+            if (DebugLevels.DEBUG_16()) {
                 System.out.println("Query to select records: " + selectQuery);
                 System.out.println("Query to select records in current version: " + selectCurVerQuery);
                 System.out.println("Query to insert records: " + insertQuery);
@@ -1359,7 +1359,7 @@ public class DataServiceImpl implements DataService {
             String updateDelVersions = "UPDATE " + table + " SET delete_versions = coalesce(delete_versions,'')||',"
                     + vNum + "'" + whereClause + " AND version <> " + vNum;
 
-            if (DebugLevels.DEBUG_16) {
+            if (DebugLevels.DEBUG_16()) {
                 System.out.println("Query to delete records: " + deleteCurVerQuery);
                 System.out.println("Query to update previous delete_versions: " + updateDelVersions);
             }
@@ -1444,6 +1444,26 @@ public class DataServiceImpl implements DataService {
             throw new EmfException(e.getMessage());
         } finally {
             session.close();
+        }
+    }
+    
+    public boolean checkBizzareCharInColumn(int datasetId, int version, String colName) throws EmfException {
+        Session session = sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
+        
+        EmfDataset ds = null;
+
+        try {
+            ds = dao.getDataset(session, datasetId);
+            return dao.checkBizzareCharInColumn(dbServer, session, datasetId, version, colName);
+        } catch (Exception e) {
+            LOG.error("Could not checkBizzareChar for dataset "
+                    + (ds == null ? "(id=" + datasetId + ")." : ds.getName() + "."), e);
+            throw new EmfException("Could not checkBizzareChar for dataset "
+                    + (ds == null ? "(id=" + datasetId + ")." : ds.getName() + "."));
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
         }
     }
     

@@ -56,7 +56,7 @@ public class CopyCaseSubmitter implements TaskSubmitter {
         // Add this task to Tasks queue to prepare for the submit to the TaskManager
         copyTasks.add(task);
 
-        if (DebugLevels.DEBUG_6) {
+        if (DebugLevels.DEBUG_6()) {
             System.out.println(" Task id= " + tsk.getTaskId() + " to be added to submitter: "
                     + tsk.getSubmitterId());
             System.out.println("Created a new CopyTaskStatus? " + (ets != null));
@@ -69,7 +69,7 @@ public class CopyCaseSubmitter implements TaskSubmitter {
     }
 
     public synchronized void addTasksToSubmitter(ArrayList<Runnable> tasks) {
-        if (DebugLevels.DEBUG_0) {
+        if (DebugLevels.DEBUG_0()) {
             System.out.println("In submitter::addTasksToSubmitter= " + this.getSubmitterId());
             System.out.println("In submitter::addTasksToSubmitter # of elements in param array = " + tasks.size());
         }
@@ -82,13 +82,13 @@ public class CopyCaseSubmitter implements TaskSubmitter {
             this.addTaskToSubmitter(task);
         }
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("In submitter # of elements in Tasks= " + this.copyTasks.size());
         this.submitTasksToTaskManager(submitterId, copyTasks);
     }
 
     public synchronized void submitTasksToTaskManager(String submitterId, ArrayList<Runnable> tasks) {
-        if (DebugLevels.DEBUG_0) {
+        if (DebugLevels.DEBUG_0()) {
             System.out.println("In submitter::submitTasksToTaskManager= " + this.getSubmitterId());
             System.out.println("In submitter::submitTasksToTaskManager # of elements in param array= " + tasks.size());
             System.out.println("Submitter::Tasks before ADD: " + this.submitterId + " has task count= "
@@ -100,7 +100,7 @@ public class CopyCaseSubmitter implements TaskSubmitter {
         // Remove all tasks from importTasks and keep it available for new submissions if necessary
         copyTasks.removeAll(tasks);
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("Submitter::CaseCopyTasks after ADD: " + this.submitterId + " has task count= "
                     + this.copyTasks.size());
     }
@@ -124,7 +124,7 @@ public class CopyCaseSubmitter implements TaskSubmitter {
     }
 
     private synchronized void setStatus(User user, StatusDAO statusServices, String message) {
-        if (DebugLevels.DEBUG_10)
+        if (DebugLevels.DEBUG_10())
             System.out.println("Copy submitter " + this.submitterId + " setting status " 
                     + "; Message: " + message + "; On thread " + Thread.currentThread().getId());
         
@@ -140,14 +140,14 @@ public class CopyCaseSubmitter implements TaskSubmitter {
     @Override
     protected void finalize() throws Throwable {
         svcCount--;
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println(">>>> Destroying object: " + myTag());
 
         super.finalize();
     }
 
     public void callbackFromTaskManager(String taskId, String status, String mesg) {
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out
             .println(">>>>>>>> CopyClientSubmitter::callbackFromTaskManager id= " + submitterId
                     + " got callback from TaskManager for Task: " + taskId + " status= " + status
@@ -165,12 +165,12 @@ public class CopyCaseSubmitter implements TaskSubmitter {
 //        int statis = -99; 
 //        if (status.equals("started")) {
 //            statis = TaskStatus.RUNNING;
-//            if (DebugLevels.DEBUG_9)
+//            if (DebugLevels.DEBUG_9())
 //                System.out.println("STATIS set = " + statis);
 //        }
 //        if (status.equals("completed")) {
 //            statis = TaskStatus.COMPLETED;
-//            if (DebugLevels.DEBUG_9)
+//            if (DebugLevels.DEBUG_9())
 //                System.out.println("STATIS set = " + statis);
 //        }
 //        if (status.equals("failed")) {
@@ -179,29 +179,29 @@ public class CopyCaseSubmitter implements TaskSubmitter {
 //            // Set the status in the EMF Status messages table corresponding the callback message received
 //            this.setStatus(user, statusServices, mesg);
 //
-//            if (DebugLevels.DEBUG_9)
+//            if (DebugLevels.DEBUG_9())
 //                System.out.println("STATIS set = " + statis);
 //        }       
 //        submittedTable.get(taskId).setStatus(statis);
 //        
         if (!(status.equals("started"))) {
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("In submitter staus of task was : " + status);
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("In submitter: " + submitterId);
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("$$$$ Size of export tasks list before remove: " + copyTasks.size());
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("$$$$ Size of submitted tasks table before remove: " + submittedTable.size());
 
             // Since this is the Export Client Submitter, remove the taskstatus form the submitted Table
             // after the status has been logged and sent for completed or failed task statuses
-            if (DebugLevels.DEBUG_6)
+            if (DebugLevels.DEBUG_6())
                 System.out.println("Size of submitted table before ETS removed= " + submittedTable.size());
 
             //Remove the taskstatus form the submittedTable
             submittedTable.remove(taskId);
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from TaskManager for Task: "
                         + taskId + " status= " + status + " message= " + mesg);
         }

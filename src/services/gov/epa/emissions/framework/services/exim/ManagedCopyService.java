@@ -66,7 +66,7 @@ public class ManagedCopyService {
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
 
-        if (DebugLevels.DEBUG_17)
+        if (DebugLevels.DEBUG_17())
             System.out.println("ManagedCopyService: At the class initialization -- numOfRunningThread: "
                     + numOfRunningThread);
     }

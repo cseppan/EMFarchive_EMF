@@ -84,7 +84,7 @@ public class ExportTask extends Task {
             DbServerFactory dbFactory, HibernateSessionFactory sessionFactory, Version version) {
         super();
         createId();
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> " + createId());
         this.user = user;
         this.file = file;
@@ -116,13 +116,13 @@ public class ExportTask extends Task {
         this.sleepAfterExport = sleepAfterExport(session);
         extSrcs = getExternalSrcs(session);
 
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>## ExportTask:run() " + createId() + " for datasetId: " + this.dataset.getId());
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println("Task#" + taskId + " RUN @@@@@ THREAD ID: " + Thread.currentThread().getId());
 
-        if (DebugLevels.DEBUG_1)
-            if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
+            if (DebugLevels.DEBUG_1())
                 System.out.println("Task# " + taskId + " running");
         
         Date start = new Date();
@@ -150,7 +150,7 @@ public class ExportTask extends Task {
 
                 exportedLineCount = exporter.getExportedLinesCount();
                 String lineCompare=compareDatasetRecordsNumbers(exportedLineCount, session, dbServer);
-                if (DebugLevels.DEBUG_1)
+                if (DebugLevels.DEBUG_1())
                     printLogInfo(accesslog);               
                 if (exportedLineCount == 0){
                     throw new Exception("ERROR: "+dataset.getName()+
@@ -173,7 +173,7 @@ public class ExportTask extends Task {
                 }
                 
                 // for bug 3589
-                if ( DebugLevels.BUG3589Fixed) {
+                if ( !DebugLevels.DEBUG_24()) {
                     // NOTE: want to check if accesslog exists for the same dataset, version, and description.
                     // If it is there, don't set accesslog.
 
@@ -189,7 +189,7 @@ public class ExportTask extends Task {
                 
             } // else of if file exists
             
-            if ( !DebugLevels.BUG3589Fixed) {
+            if ( DebugLevels.DEBUG_24()) {
                 // NOTE: want to check if accesslog exists for the same dataset, version, and description.
                 // If it is there, don't set accesslog.
 
@@ -203,7 +203,7 @@ public class ExportTask extends Task {
                 }
             }
 
-            if (DebugLevels.DEBUG_4)
+            if (DebugLevels.DEBUG_4())
                 System.out.println("#### Task #" + taskId
                         + " has completed processing making the callback to ExportTaskManager THREAD ID: "
                         + Thread.currentThread().getId());
@@ -241,13 +241,13 @@ public class ExportTask extends Task {
         extSrcs = getExternalSrcs(session);
         String[] sts = new String[2];
 
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>## ExportTask:run() " + createId() + " for datasetId: " + this.dataset.getId());
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println("Task#" + taskId + " RUN @@@@@ THREAD ID: " + Thread.currentThread().getId());
 
-        if (DebugLevels.DEBUG_1)
-            if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
+            if (DebugLevels.DEBUG_1())
                 System.out.println("Task# " + taskId + " running");
 
         Date start = new Date();
@@ -269,7 +269,7 @@ public class ExportTask extends Task {
 
             exportedLineCount = exporter.getExportedLinesCount();
 
-            if (DebugLevels.DEBUG_1)
+            if (DebugLevels.DEBUG_1())
                 printLogInfo(accesslog);
 
             accesslog.setEnddate(new Date());
@@ -392,7 +392,7 @@ public class ExportTask extends Task {
     @Override
     protected void finalize() throws Throwable {
         taskCount--;
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> Destroying object: " + createId());
         super.finalize();
     }

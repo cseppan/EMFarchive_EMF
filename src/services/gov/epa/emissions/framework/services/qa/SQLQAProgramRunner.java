@@ -57,7 +57,7 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     }
 
     public void printQuery(String query) {
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("\nQA Step '" + qaStep.getName() + "' query: " + query);
     }
 

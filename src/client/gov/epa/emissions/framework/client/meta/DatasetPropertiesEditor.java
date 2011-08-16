@@ -147,7 +147,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private JPanel createQATab() {
-        EditableQATab view = new EditableQATab(session, parentConsole, desktopManager, messagePanel);
+        EditableQATab view = new EditableQATab(session, parentConsole, desktopManager, messagePanel); //BUG3615
         try {
             presenter.set(view);
         } catch (EmfException e) {

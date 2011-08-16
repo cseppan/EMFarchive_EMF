@@ -42,13 +42,13 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     protected void finalize() throws Throwable {
         svcCount--;
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_4())
             System.out.println(">>>> Destroying object: " + myTag());
         super.finalize();
     }
 
     public ExImServiceImpl(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws Exception {
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_4())
             System.out.println(myTag());
         
         init(dbServerFactory, sessionFactory);
@@ -80,7 +80,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String dirName, boolean overwrite,
             String rowFilters, EmfDataset filterDataset, Version filterDatasetVersion,
             String filterDatasetJoinCondition, String colOrders, String purpose) throws EmfException {
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_4())
             System.out.println(">>## calling export datasets in eximSvcImp: " + myTag() + " for datasets: "
                     + datasets.toString());
         String submitterId;
@@ -90,16 +90,16 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         submitterId = exportService.exportForClient(user, datasets, versions, dirName, 
                     rowFilters, filterDataset, filterDatasetVersion,
                     filterDatasetJoinCondition, colOrders, purpose, overwrite);
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_4())
             System.out.println("In ExImServiceImpl:exportDatasets() SUBMITTERID= " + submitterId);
-        if (DebugLevels.DEBUG_21)
+        if (DebugLevels.DEBUG_21())
             System.out.println("rowFilters: "+rowFilters+" colOrders: "+colOrders);
     }
 
     public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType) throws EmfException {
         try {
             String submitterID = managedImportService.importDatasetsForClient(user, folderPath, filenames, datasetType);
-            if (DebugLevels.DEBUG_4)
+            if (DebugLevels.DEBUG_4())
                 System.out.println("In ExImServiceImpl:importDatasets() SUBMITTERID = " + submitterID);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
@@ -110,7 +110,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             String datasetName) throws EmfException {
         try {
             String submitterID = managedImportService.importDatasetForClient(user, folderPath, filenames, datasetType, datasetName);
-            if (DebugLevels.DEBUG_4)
+            if (DebugLevels.DEBUG_4())
                 System.out.println("In ExImServiceImpl:importDataset() SUBMITTERID = " + submitterID);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
@@ -169,10 +169,10 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     public void exportDatasetids(User user, Integer[] datasetIds, String folder, 
             boolean overwrite, String rowFilters, String colOrders, String purpose) throws EmfException {
         // if Vservion[] is not specified, get the default versions from datasets themselves
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_4())
             System.out.println("ExImService:exportDatasetids() called.");
         exportDatasetids(user, datasetIds, null, folder, overwrite, rowFilters, null, null, null, colOrders, purpose);
-        if (DebugLevels.DEBUG_4)
+        if (DebugLevels.DEBUG_4())
             System.out.println("ExImService:exportDatasetids() exited.");
     }
 

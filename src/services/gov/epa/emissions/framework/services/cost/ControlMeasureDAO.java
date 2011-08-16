@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.CoSTConstants;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Reference;
 import gov.epa.emissions.commons.data.Sector;
@@ -109,8 +110,8 @@ public class ControlMeasureDAO {
             throw new EmfException("An abbreviation must be specified");
         }
         //make sure its not longer than 10 characters
-        if (measure.getAbbreviation().trim().length() > 10) {
-            throw new EmfException("An abbreviation must not be longer than 10 characters");
+        if (measure.getAbbreviation().trim().length() > CoSTConstants.CM_ABBREV_LEN) { //10) { // JIZHEN20110727
+            throw new EmfException("An abbreviation must not be longer than " + CoSTConstants.CM_ABBREV_LEN + " characters");
         }
         //make sure its does not contain a space
         if (measure.getAbbreviation().trim().indexOf(" ") > 0) {
@@ -347,8 +348,8 @@ public class ControlMeasureDAO {
             throw new EmfException("An abbreviation must be specified");
         }
         // make sure its not longer than 10 characters
-        if (locked.getAbbreviation().trim().length() > 10) {
-            throw new EmfException("An abbreviation must not be longer than 10 characters");
+        if (locked.getAbbreviation().trim().length() > CoSTConstants.CM_ABBREV_LEN) { //10) {
+            throw new EmfException("An abbreviation must not be longer than " + CoSTConstants.CM_ABBREV_LEN + " characters");
         }
         // make sure its does not contain a space
         if (locked.getAbbreviation().trim().indexOf(" ") > 0) {
@@ -586,14 +587,14 @@ public class ControlMeasureDAO {
             String queryStr = "delete from emf.control_program_measures " +
             "where control_measure_id in (" + cmIdList + ");";
             
-            if ( DebugLevels.DEBUG_CMIMPORT) {
+            if ( DebugLevels.DEBUG_23()) {
                 System.out.println( queryStr);
             }
             
             dbServer.getEmfDatasource().query().execute( queryStr);
             } catch (SQLException e) {
                 
-                if ( DebugLevels.DEBUG_CMIMPORT) {
+                if ( DebugLevels.DEBUG_23()) {
                     System.out.println( e.getMessage());
                 }
                 
@@ -613,14 +614,14 @@ public class ControlMeasureDAO {
             String queryStr = "delete from emf.control_strategy_measures " +
             "where control_measure_id in (" + cmIdList + ");";
             
-            if ( DebugLevels.DEBUG_CMIMPORT) {
+            if ( DebugLevels.DEBUG_23()) {
                 System.out.println( queryStr);
             }
             
             dbServer.getEmfDatasource().query().execute( queryStr);
         } catch (SQLException e) {
             
-            if ( DebugLevels.DEBUG_CMIMPORT) {
+            if ( DebugLevels.DEBUG_23()) {
                 System.out.println( e.getMessage());
             }
             

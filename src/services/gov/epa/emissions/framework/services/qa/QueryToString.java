@@ -54,7 +54,7 @@ public class QueryToString {
     private void writeToString() throws Exception {
         try {
             
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("\n query: " + sqlQuery);
 
             

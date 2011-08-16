@@ -167,7 +167,7 @@ public class EditQAStepPresenter {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // BUG3588
             throw new EmfException(e.getMessage());
         }
         
@@ -224,6 +224,10 @@ public class EditQAStepPresenter {
 
     public QAStepResult getStepResult(QAStep step) throws EmfException {
         return session.qaService().getQAStepResult(step);
+    }
+    
+    public boolean checkBizzareCharInColumn(QAStep step, String colName) throws EmfException {
+        return session.dataService().checkBizzareCharInColumn(step.getDatasetId(), step.getVersion(), colName);
     }
 
     public EmfDataset getDataset(String datasetName ) throws EmfException {

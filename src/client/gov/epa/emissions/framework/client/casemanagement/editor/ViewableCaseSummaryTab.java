@@ -570,5 +570,9 @@ public class ViewableCaseSummaryTab extends JPanel implements RefreshObserver {
         setLayout();
         viewOnly();
     }
+    
+    public String getDescription(){ // BUG3621
+        return this.description.getText();
+    }
 
 }

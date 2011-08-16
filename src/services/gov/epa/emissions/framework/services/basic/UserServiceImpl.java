@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
         this(HibernateSessionFactory.get());
         myTag();
 
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> " + myTag());
     }
 
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
         this.dao = new UserDAO();
         myTag();
 
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> " + myTag());
     }
 

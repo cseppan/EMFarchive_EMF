@@ -8,15 +8,15 @@ public class ExportClientSubmitter extends ExportSubmitter {
     public ExportClientSubmitter() {
         super();
         myTag();
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> For label: " + myTag());
 
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println("Export Client @@@@@ THREAD ID: " + Thread.currentThread().getId());
     }
 
     public synchronized void callbackFromTaskManager(String taskId, String status, String mesg) {
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out
                     .println(">>>>>>>> ExportClientSubmitter::callbackFromTaskManager id= " + submitterId
                             + " got callback from TaskManager for Task: " + taskId + " status= " + status
@@ -24,35 +24,35 @@ public class ExportClientSubmitter extends ExportSubmitter {
 
 //        int statis = -99;
 //
-//        if (DebugLevels.DEBUG_6)
+//        if (DebugLevels.DEBUG_6())
 //            System.out.println("STATUS = " + status);
 //        if (status.equals("started")) {
 //            statis = TaskStatus.RUNNING;
-//            if (DebugLevels.DEBUG_6)
+//            if (DebugLevels.DEBUG_6())
 //                System.out.println("STATIS set = " + statis);
 //        }
 //        if (status.equals("completed")) {
 //            statis = TaskStatus.COMPLETED;
-//            if (DebugLevels.DEBUG_6)
+//            if (DebugLevels.DEBUG_6())
 //                System.out.println("STATIS set = " + statis);
 //        }
 //        if (status.equals("failed")) {
 //            statis = TaskStatus.FAILED;
-//            if (DebugLevels.DEBUG_6)
+//            if (DebugLevels.DEBUG_6())
 //                System.out.println("STATIS set = " + statis);
 //        }
 
-//        if (DebugLevels.DEBUG_6)
+//        if (DebugLevels.DEBUG_6())
 //            System.out.println("STATIS VALUE after switch= " + statis);
-//        if (DebugLevels.DEBUG_6)
+//        if (DebugLevels.DEBUG_6())
 //            System.out.println("SubmittedTable STATIS for this taskId before setStatus= "
 //                    + (submittedTable.get(taskId).getStatus()));
 //        submittedTable.get(taskId).setStatus(statis);
-//        if (DebugLevels.DEBUG_6)
+//        if (DebugLevels.DEBUG_6())
 //            System.out.println("SubmittedTable STATIS for this taskId after setStatus= "
 //                    + (submittedTable.get(taskId).getStatus()));
 //
-//        if (DebugLevels.DEBUG_6)
+//        if (DebugLevels.DEBUG_6())
 //            System.out.println("DID THE STATUS GET SET IN THE TABLE? "
 //                    + (submittedTable.get(taskId).getStatus() == statis));
 
@@ -73,24 +73,24 @@ public class ExportClientSubmitter extends ExportSubmitter {
 
         // remove completed and failed export tasks from the submitted list
         if (!(status.equals("started"))) {
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("In submitter staus of task was : " + status);
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("In submitter: " + submitterId);
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("$$$$ Size of export tasks list before remove: " + exportTasks.size());
-            if (DebugLevels.DEBUG_0)
+            if (DebugLevels.DEBUG_0())
                 System.out.println("$$$$ Size of submitted tasks table before remove: " + submittedTable.size());
 
             // Since this is the Export Client Submitter, remove the taskstatus form the submitted Table
             // after the status has been logged and sent for completed or failed task statuses
-            if (DebugLevels.DEBUG_6)
+            if (DebugLevels.DEBUG_6())
                 System.out.println("Size of submitted table before ETS removed= " + submittedTable.size());
 
             //Remove the taskstatus form the submittedTable
             submittedTable.remove(taskId);
 
-            if (DebugLevels.DEBUG_6)
+            if (DebugLevels.DEBUG_6())
                 System.out.println("Size of submitted table after ETS removed= " + submittedTable.size());
 
 
@@ -117,12 +117,12 @@ public class ExportClientSubmitter extends ExportSubmitter {
 //                canned++;
 //        }
 //
-//        if (DebugLevels.DEBUG_6) System.out.println(" RUN Count: " + start);
-//        if (DebugLevels.DEBUG_6) System.out.println(" COMPLETED Count: " + done);
-//        if (DebugLevels.DEBUG_6) System.out.println(" Failed Count: " + fail);
-//        if (DebugLevels.DEBUG_6) System.out.println(" Canceled Count: " + canned);
-//        if (DebugLevels.DEBUG_6) System.out.println(" Total Count: " + (start + done + fail + canned));
-//        if (DebugLevels.DEBUG_6) System.out.println(" Size of submittedTable: " + submittedTable.size());
+//        if (DebugLevels.DEBUG_6()) System.out.println(" RUN Count: " + start);
+//        if (DebugLevels.DEBUG_6()) System.out.println(" COMPLETED Count: " + done);
+//        if (DebugLevels.DEBUG_6()) System.out.println(" Failed Count: " + fail);
+//        if (DebugLevels.DEBUG_6()) System.out.println(" Canceled Count: " + canned);
+//        if (DebugLevels.DEBUG_6()) System.out.println(" Total Count: " + (start + done + fail + canned));
+//        if (DebugLevels.DEBUG_6()) System.out.println(" Size of submittedTable: " + submittedTable.size());
 //
 //        if (submittedTable.size() == (done + fail + canned)) {
 //            String message = "%%% Submitted job completed. Total exports submitted=" + submittedTable.size()
@@ -131,7 +131,7 @@ public class ExportClientSubmitter extends ExportSubmitter {
 //            this.setStatus(user, statusServices, message);
 //        }
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println(">>>>>>>> Submitter: " + submitterId + " EXITING callback from TaskManager for Task: "
                     + taskId + " status= " + status + " message= " + mesg);
 

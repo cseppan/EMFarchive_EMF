@@ -67,7 +67,7 @@ public class CopyTask extends Task {
         super();
         createId();
         
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> " + createId());
         
         this.user = user;
@@ -81,13 +81,13 @@ public class CopyTask extends Task {
     }
 
     public void run() {
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>## CopyTask:run() " + taskId + " for case: " + this.copyToCase.getName());
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println("Task#" + taskId + " RUN @@@@@ THREAD ID: " + Thread.currentThread().getId());
 
-        if (DebugLevels.DEBUG_1)
-            if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
+            if (DebugLevels.DEBUG_1())
                 System.out.println("Task# " + taskId + " running");
         
         Session session = null;
@@ -218,7 +218,7 @@ public class CopyTask extends Task {
     @Override
     protected void finalize() throws Throwable {
         taskCount--;
-        if (DebugLevels.DEBUG_1)
+        if (DebugLevels.DEBUG_1())
             System.out.println(">>>> Destroying object: " + createId());
         super.finalize();
     }

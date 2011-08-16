@@ -207,7 +207,7 @@ public class DatasetDAO {
     }
 
     public void remove(EmfDataset dataset, Session session) {
-        if (DebugLevels.DEBUG_12)
+        if (DebugLevels.DEBUG_12())
             System.out.println("dataset dao remove(dataset, session) called: " + dataset.getId() + " "
                     + dataset.getName());
 
@@ -224,7 +224,7 @@ public class DatasetDAO {
 
     // FIXME: change this method name to indicate mark deleted
     public void remove(User user, EmfDataset dataset, Session session) throws EmfException {
-        if (DebugLevels.DEBUG_14)
+        if (DebugLevels.DEBUG_14())
             System.out.println("DatasetDAO starts removing dataset " + dataset.getName() + " " + new Date());
 
         // NOTE: method to be modified to really remove dataset. It is only rename it for now.
@@ -237,7 +237,7 @@ public class DatasetDAO {
             throw new EmfException("Could not remove dataset " + datasetName + ". It is locked by "
                     + dataset.getLockOwner());
 
-        if (DebugLevels.DEBUG_12) {
+        if (DebugLevels.DEBUG_12()) {
             System.out.println("dataset dao remove(user, dataset, session) called: " + dataset.getId() + " "
                     + datasetName);
             System.out.println("Dataset status: " + dataset.getStatus() + " dataset retrieved null? "
@@ -286,7 +286,7 @@ public class DatasetDAO {
             throw new EmfException("Could not remove dataset " + datasetName + ". Reason: " + e.getMessage());
         }
 
-        if (DebugLevels.DEBUG_14)
+        if (DebugLevels.DEBUG_14())
             System.out.println("DatasetDAO has finished removing dataset " + dataset.getName() + " " + new Date());
     }
 
@@ -318,7 +318,7 @@ public class DatasetDAO {
         } catch (Exception e) {
             LOG.error("Can not rename emission table: " + locked.getInternalSources()[0].getTable(), e);
         } finally { // to ignore if the rename fails
-            if (DebugLevels.DEBUG_12)
+            if (DebugLevels.DEBUG_12())
                 System.out.println("Update dataset " + locked.getName() + " with id: " + locked.getId());
 
             toReturn = (EmfDataset) lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
@@ -329,16 +329,16 @@ public class DatasetDAO {
 
     private void updateToRemove(EmfDataset locked, EmfDataset oldDataset, Session session) throws Exception {
         try {
-            if (DebugLevels.DEBUG_14)
+            if (DebugLevels.DEBUG_14())
                 System.out.println("DatasetDAO starts renaming emission table for dataset: " + oldDataset.getName());
             renameEmissionTable(locked, oldDataset, session);
-            if (DebugLevels.DEBUG_14)
+            if (DebugLevels.DEBUG_14())
                 System.out.println("DatasetDAO has finished renaming emission table for dataset: "
                         + oldDataset.getName());
         } catch (Exception e) {
             LOG.error("Can not rename emission table: " + locked.getInternalSources()[0].getTable(), e);
         } finally { // to ignore if the rename fails
-            if (DebugLevels.DEBUG_12)
+            if (DebugLevels.DEBUG_12())
                 System.out.println("Update to remove " + locked.getName() + " with id: " + locked.getId());
 
             lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
@@ -581,7 +581,7 @@ public class DatasetDAO {
     }
 
     private void renameEmissionTable(EmfDataset dataset, EmfDataset oldDataset, Session session) throws Exception {
-        if (DebugLevels.DEBUG_0) {
+        if (DebugLevels.DEBUG_0()) {
             System.out.println("Check to rename. Dataset name: " + dataset.getName() + " Status: "
                     + dataset.getStatus() + " id: " + dataset.getId());
             System.out.println("Old dataset is null? " + (oldDataset == null));
@@ -593,16 +593,16 @@ public class DatasetDAO {
         if (!continueToRename(dataset, oldDataset))
             return;
 
-        if (DebugLevels.DEBUG_12)
+        if (DebugLevels.DEBUG_12())
             System.out.println("Dataset ok to rename.");
 
         DbServer dbServer = getDbServer();
 
         try {
-            if (DebugLevels.DEBUG_14)
+            if (DebugLevels.DEBUG_14())
                 System.out.println("DatasetDAO starts renaming dataset table for dataset: " + dataset.getName());
             renameTable(dataset, oldDataset, dbServer);
-            if (DebugLevels.DEBUG_14)
+            if (DebugLevels.DEBUG_14())
                 System.out.println("DatasetDAO has finished renaming dataset table for dataset: " + dataset.getName());
         } finally {
             dbServer.disconnect();
@@ -646,7 +646,7 @@ public class DatasetDAO {
         String oldTableName = oldDataset.getInternalSources()[0].getTable();
         String newTableName = table.createName(dataset.getName());
 
-        if (DebugLevels.DEBUG_12)
+        if (DebugLevels.DEBUG_12())
             System.out.println("new table name: " + newTableName + " old table name:" + oldTableName);
 
         table.rename(oldTableName, newTableName);
@@ -1251,7 +1251,7 @@ public class DatasetDAO {
             String hqlDelete = "DELETE FROM " + clazz.getSimpleName() + " obj WHERE obj." + attrName + " = "
                     + getAndOrClause(datasetIDs, "obj." + attrName);
 
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 System.out.println("hql delete string: " + hqlDelete);
 
             deletedEntities = session.createQuery(hqlDelete).executeUpdate();
@@ -1262,7 +1262,7 @@ public class DatasetDAO {
             LOG.error(e);
             return 0;
         } finally {
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 LOG.warn(deletedEntities + " items deleted from " + clazz.getName() + " table.");
         }
     }
@@ -1277,19 +1277,19 @@ public class DatasetDAO {
             String secondPart = " WHERE obj.datasetId = " + getAndOrClause(datasetIDs, "obj.datasetId");
             String updateQuery = firstPart + "obj.message = :msg, obj.datasetId = :id" + secondPart;
 
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 System.out.println("hql update string: " + updateQuery);
 
             updatedItems = session.createQuery(updateQuery).setString("msg", "Associated dataset deleted").setInteger(
                     "id", 0).executeUpdate();
             tx.commit();
 
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 System.out.println(updatedItems + " items updated.");
         } catch (HibernateException e) {
             throw new EmfException(e.getMessage());
         } finally {
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 LOG.warn(updatedItems + " items updated from " + CaseOutput.class.getName() + " table.");
         }
     }
@@ -1337,12 +1337,12 @@ public class DatasetDAO {
                     || importerclass.equals("gov.epa.emissions.commons.io.generic.LineImporter"))
                 tableTool.deleteRecords(table, source.getCols()[1], "integer", "" + dsID); // 2nd column: dataset_id
             else {
-                if (DebugLevels.DEBUG_16)
+                if (DebugLevels.DEBUG_16())
                     System.out.println("Dropping data table  " + table);
 
                 tableTool.drop(table);
 
-                if (DebugLevels.DEBUG_16)
+                if (DebugLevels.DEBUG_16())
                     System.out.println("Data table  " + table + " dropped.");
             }
         } catch (Exception e) {
@@ -1364,7 +1364,7 @@ public class DatasetDAO {
             try {
                 tableTool.drop(table);
 
-                if (DebugLevels.DEBUG_16)
+                if (DebugLevels.DEBUG_16())
                     System.out.println("QA step result table " + table + " dropped.");
             } catch (Exception e) {
                 LOG.error(e);
@@ -1534,18 +1534,18 @@ public class DatasetDAO {
             String secondPart = " WHERE obj.dataset.id = " + getAndOrClause(dsIDsWithNoEmisData, "obj.dataset.id");
             String updateQuery = firstPart + secondPart;
 
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 System.out.println("hql update string: " + updateQuery);
 
             updatedItems = session.createQuery(updateQuery).executeUpdate();
             tx.commit();
 
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 System.out.println(updatedItems + " items updated.");
         } catch (HibernateException e) {
             throw new EmfException(e.getMessage());
         } finally {
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 LOG.warn(updatedItems + " items updated from " + CaseInput.class.getName() + " table.");
         }
     }
@@ -1560,18 +1560,18 @@ public class DatasetDAO {
             String secondPart = " WHERE obj.id = " + getAndOrClause(dsIDsWithNoEmisData, "obj.id");
             String updateQuery = firstPart + "obj.status = :sts" + secondPart;
 
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 System.out.println("hql update string: " + updateQuery);
 
             updatedItems = session.createQuery(updateQuery).setString("sts", "Deleted").executeUpdate();
             tx.commit();
 
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 System.out.println(updatedItems + " items updated.");
         } catch (HibernateException e) {
             throw new EmfException(e.getMessage());
         } finally {
-            if (DebugLevels.DEBUG_16)
+            if (DebugLevels.DEBUG_16())
                 LOG.warn(updatedItems + " items updated from " + EmfDataset.class.getName() + " table.");
         }
     }
@@ -1671,7 +1671,7 @@ public class DatasetDAO {
             + checkBackSlash(descStr)
             + dsProjStr
             + " ORDER BY DS.name";
-    if ( DebugLevels.DEBUG_12)
+    if ( DebugLevels.DEBUG_12())
         System.out.print(dsquery+ "\n");
     
     List<EmfDataset> ds1 = session.createQuery(dsquery).list();
@@ -1691,7 +1691,7 @@ public class DatasetDAO {
             + dsNameStr
             + dsCreatorStr    
             + checkBackSlash(descStr) + dsProjStr + " ORDER BY DS.name";
-    if ( DebugLevels.DEBUG_12)
+    if ( DebugLevels.DEBUG_12())
         System.out.print(dstypequery);
     
     List<EmfDataset> ds2 = session.createQuery(dstypequery).list();
@@ -1765,6 +1765,36 @@ public class DatasetDAO {
         endStatus.setTimestamp(new Date());
 
         hibernateFacade.add(endStatus, session);
+    }
+
+    public boolean checkBizzareCharInColumn(DbServer dbServer, Session session, int datasetId, int version, String colName) throws SQLException { 
+        // only for dataset that has column PLANT BUG3588
+        EmfDataset dataset = this.getDataset(session, datasetId);
+        DatasetType type = dataset.getDatasetType();
+
+        if (type.getExporterClassName().endsWith("ExternalFilesExporter"))
+            return false; // set it as false for external files for now BUG3588
+
+        Datasource datasource = dbServer.getEmissionsDatasource();
+        InternalSource source = dataset.getInternalSources()[0];
+        String qualifiedTable = datasource.getName() + "." + source.getTable();
+        String countQuery = "SELECT count(*) FROM " + qualifiedTable + getWhereClause(version(session,datasetId,version), session) + " and " + colName + " ~* '[[:cntrl:]]'"; //consider unicode?? |chr(127)-chr(65535)]'";
+        long totalCount = 0;
+
+        try {
+            Connection connection = datasource.getConnection();
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(countQuery);
+            resultSet.next();
+            totalCount = resultSet.getInt(1);
+
+            resultSet.close();
+        } catch (SQLException e) {
+            throw new SQLException("Cannot check bizzare cahracters in column " + colName + " on dataset: " + dataset.getName() + " Reason: "
+                    + e.getMessage());
+        }
+
+        return totalCount > 0;
     }
 
 }

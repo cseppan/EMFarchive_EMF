@@ -406,7 +406,7 @@ public class SectorScenarioDAO {
                 deleteDatasets(datasets, user, session);
                 datasetDao.deleteDatasets(datasets, dbServer, session);
             } catch (EmfException e) {
-                if (DebugLevels.DEBUG_12)
+                if (DebugLevels.DEBUG_12())
                     System.out.println(e.getMessage());
                 
                 throw new EmfException(e.getMessage());
@@ -470,7 +470,7 @@ public class SectorScenarioDAO {
 //                    session.flush();
 //                    session.clear();
 //                } catch (EmfException e) {
-//                    if (DebugLevels.DEBUG_12)
+//                    if (DebugLevels.DEBUG_12())
 //                        System.out.println(e.getMessage());
 //                    
 //                    throw new EmfException(e.getMessage());

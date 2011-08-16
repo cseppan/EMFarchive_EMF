@@ -12,5 +12,7 @@ public interface EditableCaseSummaryTabView {
     void addSector(Sector sector); 
     
     void addRegion(GeoRegion region);
+    
+    void updateDescriptionTextArea(String descText); // BUG3621
 
 }

@@ -591,7 +591,11 @@ substring(fips,1,2)='37'
         Button view = new Button("View Results", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clear();
-                viewResults();
+                try {
+                    viewResults();
+                } catch ( Exception ex) {
+                    messagePanel.setError( ex.getMessage());
+                }
             }
         });
         view.setToolTipText(
@@ -1880,7 +1884,16 @@ avd_emis=emis_avd
 
                     presenter.viewResults(step, exportDir.trim());
                 } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
+                    try  {
+                        if ( presenter.checkBizzareCharInColumn(step, "plant")) {
+                            messagePanel.setError("There are bizarre characters in column PLANT of the dataset, please run QA step Detect or Remove Bizarre Characters in Plant Name." );
+                        } else {
+                            messagePanel.setError(e.getMessage());
+                        }
+                    } catch (Exception e2) {
+                        messagePanel.setError(e2.getMessage());
+                    }
+             
                 } finally {
                     setCursor(Cursor.getDefaultCursor());
                 }

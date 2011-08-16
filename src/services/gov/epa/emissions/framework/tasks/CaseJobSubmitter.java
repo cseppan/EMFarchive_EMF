@@ -30,7 +30,7 @@ public class CaseJobSubmitter implements TaskSubmitter {
     public CaseJobSubmitter(HibernateSessionFactory sessionFactory) {
         myTag();
         submitterId = svcLabel;
-        if (DebugLevels.DEBUG_0) System.out.println("CaseJobSubmitter myTag called: " + submitterId);
+        if (DebugLevels.DEBUG_0()) System.out.println("CaseJobSubmitter myTag called: " + submitterId);
         caseJobTasks = new ArrayList<Runnable>();
         this.sessionFactory=sessionFactory;
     }
@@ -42,7 +42,7 @@ public class CaseJobSubmitter implements TaskSubmitter {
 //            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobSubmitter::addTasksToSubmitter the types of TASK objects coming in are: " + tsk.getClass().getName());
 //        }
 
-        if (DebugLevels.DEBUG_0) System.out.println("CaseJobSubmitter::addTasksToSubmitter Total number of tasks= " + tasksForSubmitter.size());
+        if (DebugLevels.DEBUG_0()) System.out.println("CaseJobSubmitter::addTasksToSubmitter Total number of tasks= " + tasksForSubmitter.size());
         this.submitTasksToTaskManager(submitterId, tasksForSubmitter);
     }
 
@@ -74,18 +74,18 @@ public class CaseJobSubmitter implements TaskSubmitter {
         Iterator iter = tasks.iterator();
         while (iter.hasNext()){
             Task tsk = (Task) iter.next();
-            if (DebugLevels.DEBUG_9) System.out.println("&&&&& In CaseJobSubmitter::submitTasksToTaskManager the types of TASK objects coming in are: " + tsk.getClass().getName());
+            if (DebugLevels.DEBUG_9()) System.out.println("&&&&& In CaseJobSubmitter::submitTasksToTaskManager the types of TASK objects coming in are: " + tsk.getClass().getName());
         }
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("In submitter::submitTasksToTaskManager= " + this.getSubmitterId());
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("In submitter::submitTasksToTaskManager # of elements in param array= " + tasks.size());
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("Submitter::caseJobTasks size before ADD: " + this.submitterId + " has task count= "
                     + this.caseJobTasks.size());
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("#### SUBMITTER:: incoming tasks size before ADD: " + this.submitterId + " has task count= "
                     + tasks.size());
 
@@ -102,7 +102,7 @@ public class CaseJobSubmitter implements TaskSubmitter {
         // Remove all tasks from  and keep it available for new submissions if necessary
         caseJobTasks.removeAll(tasks);
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("CaseJobSubmitter::submitTasksToRunManager after ADD: " + this.submitterId + " has task count= "
                     + this.caseJobTasks.size());
 

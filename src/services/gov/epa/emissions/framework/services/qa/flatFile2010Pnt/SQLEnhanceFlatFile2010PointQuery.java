@@ -578,7 +578,7 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
             
             String query = "select * from " + qualifiedTableName + " where 1=0;";
             
-            if (DebugLevels.DEBUG_22)
+            if (DebugLevels.DEBUG_22())
                 System.out.println("\n query: " + query);
 
             ResultSet rs = datasource.query().executeQuery(query);
@@ -622,7 +622,7 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
             } else {
                 query += ";";
             }
-            if (DebugLevels.DEBUG_22)
+            if (DebugLevels.DEBUG_22())
                 System.out.println("\n query: " + query);
             datasource.query().executeQuery(query);
         } catch (Exception e) {
@@ -641,7 +641,7 @@ public class SQLEnhanceFlatFile2010PointQuery extends SQLQAProgramQuery {
                 query += ";";
             }                
             
-            if (DebugLevels.DEBUG_22)
+            if (DebugLevels.DEBUG_22())
                 System.out.println("\n query: " + query);
 
             datasource.query().executeQuery(query);

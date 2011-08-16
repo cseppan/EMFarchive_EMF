@@ -213,4 +213,13 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         return session.dataService().getTableAsString("emissions." + stepResult.getTable(), recordLimit, recordOffset);
     }
 
+    public void deDelete(QAStep[] steps) throws EmfException { //BUG3615
+        // NOTE Auto-generated method stub
+        session.qaService().deleteQASteps(session.user(), steps, dataset.getId());
+    }
+    
+    public boolean checkBizzareCharInColumn(QAStep step, String colName) throws EmfException {
+        return session.dataService().checkBizzareCharInColumn(step.getDatasetId(), step.getVersion(), colName);
+    }
+
 }

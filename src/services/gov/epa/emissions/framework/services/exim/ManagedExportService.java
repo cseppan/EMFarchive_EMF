@@ -76,7 +76,7 @@ public class ManagedExportService {
 
     public ManagedExportService(DbServerFactory dbFactory, HibernateSessionFactory sessionFactory) {
         myTag();
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(">>>> " + myTag());
         this.sessionFactory = sessionFactory;
         this.dbFactory = dbFactory;
@@ -241,7 +241,7 @@ public class ManagedExportService {
 
             String fullPath = getCleanDatasetName(dataset, version);
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("CleanDataset Name: " + fullPath);
             if ((subdir != null) && !(subdir.toString()).equals("")) {
                 fullPath = inputDirExpanded + fileSeparator + subdir + System.getProperty("file.separator");
@@ -251,7 +251,7 @@ public class ManagedExportService {
 
             // FIXME: Verify at team meeting Test if subpath exists. If not create subpath
             File toSubDir = null;
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("FULL PATH= " + fullPath);
 
             toSubDir = new File(fullPath);
@@ -279,7 +279,7 @@ public class ManagedExportService {
 
         }// while
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("Before exportTaskSubmitter.addTasksToSubmitter # of elements in eximTasks array= "
                     + eximTasks.size());
 
@@ -288,19 +288,19 @@ public class ManagedExportService {
 
         // now that all tasks have been submitted remove them from from eximTasks
         eximTasks.removeAll(eximTasks);
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out
                     .println("After exportTaskSubmitter.addTasksToSubmitter and eximTasks cleanout # of elements in eximTasks array= "
                             + eximTasks.size());
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: "
                     + exportJobTaskSubmitter.getTaskCount());
 
         log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportJobTaskSubmitter.getTaskCount());
         log.info("ManagedExportService:export() submitted all exportTasks dropping out of loop");
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("ManagedExportService:export() exiting at: " + new Date());
 
         return exportJobTaskSubmitter.getSubmitterId();
@@ -330,10 +330,10 @@ public class ManagedExportService {
         // FIXME: always overwrite
         // FIXME: hardcode overwite=true until verified with Alison
         //overwrite = true;
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("ManagedExportService:export() called at: " + new Date());
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(">>## In export service:export() " + myTag() + " for datasets: " + datasets.toString());
 
         // The service instance (one per session) will have only one submitter for the type of service
@@ -346,7 +346,7 @@ public class ManagedExportService {
 
         // FIXME: Verify at team meeting Test if subpath exists. If not create subpath
         // File toSubDir = null;
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("FULL PATH= " + dirName);
 
         // toSubDir = new File(dirName);
@@ -361,7 +361,7 @@ public class ManagedExportService {
             throw new EmfException("Export failed: version numbers do not match " + "those for specified datasets.");
         }
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("# of datasets= " + datasets.length);
 
         // FIXME: Moved here to see if session problem is solved.
@@ -382,7 +382,7 @@ public class ManagedExportService {
                 }
             }
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("Before exportTaskSubmitter.addTasksToSubmitter # of elements in eximTasks array= "
                         + eximTasks.size());
 
@@ -391,19 +391,19 @@ public class ManagedExportService {
 
             // now that all tasks have been submitted remove them from from eximTasks
             eximTasks.removeAll(eximTasks);
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out
                         .println("After exportTaskSubmitter.addTasksToSubmitter and eximTasks cleanout # of elements in eximTasks array= "
                                 + eximTasks.size());
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: "
                         + exportTaskSubmitter.getTaskCount());
 
             log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportTaskSubmitter.getTaskCount());
             log.info("ManagedExportService:export() submitted all exportTasks dropping out of loop");
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("ManagedExportService:export() exiting at: " + new Date());
 
         } catch (Exception e) {
@@ -423,10 +423,10 @@ public class ManagedExportService {
         // FIXME: always overwrite
         // FIXME: hardcode overwite=true until verified with Alison
         //overwrite = true;
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("ManagedExportService:export() called at: " + new Date());
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(">>## In export service:export() " + myTag() + " for datasets: " + datasets.toString());
 
         // The service instance (one per session) will have only one submitter for the type of service
@@ -439,7 +439,7 @@ public class ManagedExportService {
 
         // FIXME: Verify at team meeting Test if subpath exists. If not create subpath
         // File toSubDir = null;
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("FULL PATH= " + dirName);
 
         // toSubDir = new File(dirName);
@@ -454,7 +454,7 @@ public class ManagedExportService {
             throw new EmfException("Export failed: version numbers do not match " + "those for specified datasets.");
         }
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("# of datasets= " + datasets.length);
 
         // FIXME: Moved here to see if session problem is solved.
@@ -475,7 +475,7 @@ public class ManagedExportService {
                 }
             }
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("Before exportTaskSubmitter.addTasksToSubmitter # of elements in eximTasks array= "
                         + eximTasks.size());
 
@@ -484,19 +484,19 @@ public class ManagedExportService {
 
             // now that all tasks have been submitted remove them from from eximTasks
             eximTasks.removeAll(eximTasks);
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out
                         .println("After exportTaskSubmitter.addTasksToSubmitter and eximTasks cleanout # of elements in eximTasks array= "
                                 + eximTasks.size());
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: "
                         + exportTaskSubmitter.getTaskCount());
 
             log.info("THE NUMBER OF TASKS LEFT IN SUBMITTER FOR RUN: " + exportTaskSubmitter.getTaskCount());
             log.info("ManagedExportService:export() submitted all exportTasks dropping out of loop");
 
-            if (DebugLevels.DEBUG_9)
+            if (DebugLevels.DEBUG_9())
                 System.out.println("ManagedExportService:export() exiting at: " + new Date());
 
         } catch (Exception e) {
@@ -512,7 +512,7 @@ public class ManagedExportService {
 
     private synchronized ExportTask createExportTask(User user, String purpose, boolean overwrite, File path,
             EmfDataset dataset, Version version) throws Exception {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(">>## In export service:doExport() " + myTag() + " for datasetId: " + dataset.getId());
 
         // Match version in dataset
@@ -527,7 +527,7 @@ public class ManagedExportService {
                 "Version " + version.getVersion(), purpose, file.getAbsolutePath()); // BUG3589
         accesslog.setDatasetname(dataset.getName());
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("ManagedExportService: right before creating export task: dbFactory null? "
                     + (dbFactory == null) + " dataset: " + dataset.getName());
         ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, dbFactory, sessionFactory,
@@ -541,7 +541,7 @@ public class ManagedExportService {
             String rowFilters, String colOrders, File path,
             EmfDataset dataset, Version version, EmfDataset filterDataset, Version filterDatasetVersion,
             String filterDatasetJoinCondition) throws Exception {
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(">>## In export service:doExport() " + myTag() + " for datasetId: " + dataset.getId());
 
         // Match version in dataset
@@ -556,7 +556,7 @@ public class ManagedExportService {
                 "Version " + version.getVersion(), purpose, file.getAbsolutePath());
         accesslog.setDatasetname(dataset.getName());
 
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println("ManagedExportService: right before creating export task: dbFactory null? "
                     + (dbFactory == null) + " dataset: " + dataset.getName());
         ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, 
@@ -644,7 +644,7 @@ public class ManagedExportService {
     protected void finalize() throws Throwable {
         svcCount--;
         exportTaskSubmitter = null;
-        if (DebugLevels.DEBUG_9)
+        if (DebugLevels.DEBUG_9())
             System.out.println(">>>> Destroying object: " + myTag());
         super.finalize();
     }

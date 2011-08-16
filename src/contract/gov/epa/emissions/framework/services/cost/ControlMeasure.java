@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.List;
 
 public class ControlMeasure implements Lockable, Serializable {
+    
+    public static int ABBREV_LEN = 20; 
 
     private int id;
 

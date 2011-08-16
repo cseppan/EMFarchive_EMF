@@ -146,4 +146,8 @@ public class QADAO {
         Criterion criterion = Restrictions.eq("name", name);
         return hibernateFacade.load(clazz, criterion, session);
     }
+
+    public void deleteQASteps(QAStep[] steps, Session session) { // BUG3615
+        hibernateFacade.remove(steps, session);
+    }
 }

@@ -30,4 +30,8 @@ public interface EditableQATabPresenter extends PropertiesEditorTabPresenter {
     long getTableRecordCount(QAStepResult stepResult) throws EmfException;
 
     void viewResults(QAStep qaStep) throws EmfException;
+
+    void deDelete(QAStep[] array) throws EmfException; //BUG3615
+    
+    boolean checkBizzareCharInColumn(QAStep step, String colName) throws EmfException; // BUG3588
 }

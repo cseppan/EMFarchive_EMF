@@ -50,7 +50,7 @@ public abstract class EmfServiceImpl {
             dbServer.disconnect();
 
         new PerformanceMetrics().gc("Shutting down " + name + "(" + this.hashCode() + ")");
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("Shutting down  " + name + "(" + this.hashCode() + "): "
                     + CustomDateFormat.format_YYYY_MM_DD_HH_MM(new Date()));
         super.finalize();

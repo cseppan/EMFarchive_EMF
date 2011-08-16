@@ -54,12 +54,12 @@ public class CaseAssistServiceImpl implements CaseAssistService {
         this.sessionFactory = sessionFactory;
         this.dbFactory = dbFactory;
         this.dao = new CaseDAO(sessionFactory);
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("CaseAsistServiceImpl::getCaseService  Is sessionFactory null? "
                     + (sessionFactory == null));
 
         myTag();
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println(myTag());
 
         this.useTaskMangerForCaseOutputs = useTaskManagerToRegisterOutputs(sessionFactory.getSession());
@@ -69,7 +69,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
     protected void finalize() throws Throwable {
         this.sessionFactory = null;
 
-        if (DebugLevels.DEBUG_0)
+        if (DebugLevels.DEBUG_0())
             System.out.println("CaseAssistService: garbage collected. sessionFactory = null? "
                     + (sessionFactory == null));
 
@@ -81,7 +81,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
     }
 
     public void registerOutputs(CaseOutput[] outputs, String[] jobKeys) throws EmfException {
-        if (DebugLevels.DEBUG_14)
+        if (DebugLevels.DEBUG_14())
             System.out.println("Start registering case outputs. " + new Date());
         try {
             CaseJob job = null;
@@ -103,7 +103,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
             throw new EmfException("Error registering output: " + e.getMessage());
         }
 
-        if (DebugLevels.DEBUG_14)
+        if (DebugLevels.DEBUG_14())
             System.out.println("Finished registering case outputs. " + new Date());
     }
 
@@ -135,7 +135,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
     }
 
     public void recordJobMessage(JobMessage message, String jobKey) throws EmfException {
-        if (DebugLevels.DEBUG_14)
+        if (DebugLevels.DEBUG_14())
             System.out.println("Start recording job messages. " + message.getMessage() + " " + new Date());
         try {
             CaseJob job = getJobFromKey(jobKey);
@@ -188,7 +188,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
             throw new EmfException("Error recording job messages: " + e.getMessage());
         }
 
-        if (DebugLevels.DEBUG_14)
+        if (DebugLevels.DEBUG_14())
             System.out.println("Finished record job message. " + message.getMessage() + " " + new Date());
     }
 
@@ -211,7 +211,7 @@ public class CaseAssistServiceImpl implements CaseAssistService {
             log.error(e);
         }
 
-        if (DebugLevels.DEBUG_17)
+        if (DebugLevels.DEBUG_17())
             System.out.println("Use import task manager for case output registration? " + value);
         
         return value.toUpperCase().equals("TRUE") || value.toUpperCase().equals("YES");
