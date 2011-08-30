@@ -172,10 +172,10 @@ raise notice '%', remaining_emis_sql;
 raise notice '%', emis_reduction_sql;
 */
 	-- prepare annual_cost_expression 
-	annual_cost_expression := 
+	annual_cost_expression := '(' ||
 	case 
 		when use_cost_equations then 
-			'(case 
+			'case 
 				' || case when not has_design_capacity_columns then '' else '
 				--Equation Type 1 
 				when coalesce(' || equation_type_table_alias || '.name,'''') = ''Type 1'' and coalesce(' || convert_design_capacity_expression || ', 0) <> 0 then '
@@ -598,21 +598,21 @@ raise notice '%', emis_reduction_sql;
 				-- Filler when clause, just in case no when part shows up from conditional logic
 				when 1 = 0 then null::double precision
 				else 
-			' else '
-		' end || '
-					' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end)
+		' else '
+	' end || '
+				' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end)
 
-		' || case 
-			when use_cost_equations then '
+	' || case 
+		when use_cost_equations then '
 			end 
-			' else '
-		' end || ')';
+		' else '
+	' end || ')';
 
 	-- prepare capital_cost_expression 
-	capital_cost_expression := 
+	capital_cost_expression := '(' ||
 	case 
 		when use_cost_equations then 
-			'(case 
+			'case 
 
 				' || case when not has_design_capacity_columns then '' else '
 				--Equation Type 1 
@@ -997,8 +997,8 @@ raise notice '%', emis_reduction_sql;
 				-- Filler when clause, just in case no when part shows up from conditional logic
 				when 1 = 0 then null::double precision
 				else 
-			' else '
-		' end || '
+		' else '
+	' end || '
 					/*
 						-- calculate annual cost
 						annual_cost := emis_reduction * ref_yr_cost_per_ton;
@@ -1010,17 +1010,17 @@ raise notice '%', emis_reduction_sql;
 						operation_maintenance_cost := annual_cost - coalesce(annualized_capital_cost, 0);
 					*/
 					' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end) * ' || control_measure_efficiencyrecord_table_alias || '.cap_ann_ratio::double precision
-		' || case 
-			when use_cost_equations then '
+	' || case 
+		when use_cost_equations then '
 			end 
-			' else '
-		' end || ')';
+		' else '
+	' end || ')';
 
 	-- prepare operation_maintenance_cost_expression 
-	operation_maintenance_cost_expression := 
+	operation_maintenance_cost_expression := '(' ||
 	case 
 		when use_cost_equations then 
-			'(case 
+			'case 
 
 				' || case when not has_design_capacity_columns then '' else '
 				--Equation Type 1 
@@ -1399,8 +1399,8 @@ raise notice '%', emis_reduction_sql;
 				when 1 = 0 then null::double precision
 				-- Default Approach
 				else 
-			' else '
-		' end || '
+		' else '
+	' end || '
 					/*
 						-- calculate annual cost
 						annual_cost := emis_reduction * case when coalesce(ceff, 0.0) <> 0.0 and coalesce(ref_yr_incremental_cost_per_ton, 0.0) <> 0.0 then ref_yr_incremental_cost_per_ton else ref_yr_cost_per_ton end;
@@ -1413,17 +1413,17 @@ raise notice '%', emis_reduction_sql;
 					*/
 					' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end)
 					 - coalesce(' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end) * ' || control_measure_efficiencyrecord_table_alias || '.cap_ann_ratio::double precision * ' || capital_recovery_factor_expression || ', 0)
-		' || case 
-			when use_cost_equations then '
+	' || case 
+		when use_cost_equations then '
 			end 
-			' else '
-		' end || ')';
+		' else '
+	' end || ')';
 
 	-- prepare fixed_operation_maintenance_cost_expression 
-	fixed_operation_maintenance_cost_expression := 
+	fixed_operation_maintenance_cost_expression := '(' ||
 	case 
 		when use_cost_equations then 
-			'(case 
+			'case 
 
 				' || case when not has_design_capacity_columns then '' else '
 				--Equation Type 1 
@@ -1754,20 +1754,20 @@ raise notice '%', emis_reduction_sql;
 				-- Filler when clause, just in case no when part shows up from conditional logic
 				when 1 = 0 then null::double precision
 				else 
-			' else '
-		' end || '
+		' else '
+	' end || '
 					null::double precision
-		' || case 
-			when use_cost_equations then '
+	' || case 
+		when use_cost_equations then '
 			end 
-			' else '
-		' end || ')';
+		' else '
+	' end || ')';
 
 	-- prepare variable_operation_maintenance_cost_expression 
-	variable_operation_maintenance_cost_expression := 
+	variable_operation_maintenance_cost_expression := '(' ||
 	case 
 		when use_cost_equations then 
-			'(case 
+			'case 
 
 				' || case when not has_design_capacity_columns then '' else '
 				--Equation Type 1 
@@ -2114,10 +2114,10 @@ raise notice '%', emis_reduction_sql;
 		' end || ')';
 
 	-- prepare annualized_capital_cost_expression 
-	annualized_capital_cost_expression := 
+	annualized_capital_cost_expression := '(' ||
 	case 
 		when use_cost_equations then 
-			'(case 
+			'case 
 
 				' || case when not has_design_capacity_columns then '' else '
 				--Equation Type 1 
@@ -2513,8 +2513,8 @@ raise notice '%', emis_reduction_sql;
 				-- Filler when clause, just in case no when part shows up from conditional logic
 				when 1 = 0 then null::double precision
 				else 
-			' else '
-		' end || '
+		' else '
+	' end || '
 					/*
 						-- calculate annual cost
 						annual_cost := emis_reduction * ref_yr_cost_per_ton;
@@ -2527,11 +2527,11 @@ raise notice '%', emis_reduction_sql;
 					*/
 					' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end) * ' || control_measure_efficiencyrecord_table_alias || '.cap_ann_ratio::double precision
 					* (' || capital_recovery_factor_expression || ')
-		' || case 
-			when use_cost_equations then '
+	' || case 
+		when use_cost_equations then '
 			end 
-			' else '
-		' end || ')';
+		' else '
+	' end || ')';
 
 	computed_cost_per_ton_expression := 
 	'case 
@@ -2544,10 +2544,10 @@ raise notice '%', emis_reduction_sql;
 
 
 	-- prepare annualized_capital_cost_expression 
-	actual_equation_type_expression := 
+	actual_equation_type_expression := '(' ||
 	case 
 		when use_cost_equations then 
-			'(case 
+			'case 
 
 				' || case when not has_design_capacity_columns then '' else '
 				--Equation Type 1 
@@ -2668,14 +2668,14 @@ raise notice '%', emis_reduction_sql;
 				-- Filler when clause, just in case no when part shows up from conditional logic
 				when 1 = 0 then null::character varying
 				else 
-			' else '
-		' end || '
+		' else '
+	' end || '
 					''''
-		' || case 
-			when use_cost_equations then '
+	' || case 
+		when use_cost_equations then '
 			end 
-			' else '
-		' end || ')';
+		' else '
+	' end || ')';
 
 END;
 $$ LANGUAGE plpgsql STRICT IMMUTABLE;
@@ -2684,7 +2684,6 @@ $$ LANGUAGE plpgsql STRICT IMMUTABLE;
 select (public.get_cost_expressions(
 	141, -- int_control_strategy_id
 	7778, -- int_input_dataset_id
-	true, --use_cost_equations
 	false, --use_override_dataset
 	'inv', --inv_table_alias character varying(64), 
 	'm', --control_measure_table_alias character varying(64), 
@@ -2692,12 +2691,12 @@ select (public.get_cost_expressions(
 	'eq', --control_measure_equation_table_alias
 	'ef', --control_measure_efficiencyrecord_table_alias
 	'csm', --control_strategy_measure_table_alias
-	'inv_ovr' --inv_override_table_alias
+	'inv_ovr', --inv_override_table_alias
+	'gdplev_incr' --gdplev_incr_table_alias
 	)).annual_cost_expression, 
 	(public.get_cost_expressions(
 	141, -- int_control_strategy_id
 	7778, -- int_input_dataset_id
-	true, --use_cost_equations
 	false, --use_override_dataset
 	'inv', --inv_table_alias character varying(64), 
 	'm', --control_measure_table_alias character varying(64), 
@@ -2705,12 +2704,12 @@ select (public.get_cost_expressions(
 	'eq', --control_measure_equation_table_alias
 	'ef', --control_measure_efficiencyrecord_table_alias
 	'csm', --control_strategy_measure_table_alias
-	'inv_ovr' --inv_override_table_alias
+	'inv_ovr', --inv_override_table_alias
+	'gdplev_incr' --gdplev_incr_table_alias
 	)).capital_cost_expression, 
 	(public.get_cost_expressions(
 	141, -- int_control_strategy_id
 	7778, -- int_input_dataset_id
-	true, --use_cost_equations
 	false, --use_override_dataset
 	'inv', --inv_table_alias character varying(64), 
 	'm', --control_measure_table_alias character varying(64), 
@@ -2718,12 +2717,25 @@ select (public.get_cost_expressions(
 	'eq', --control_measure_equation_table_alias
 	'ef', --control_measure_efficiencyrecord_table_alias
 	'csm', --control_strategy_measure_table_alias
-	'inv_ovr' --inv_override_table_alias
+	'inv_ovr', --inv_override_table_alias
+	'gdplev_incr' --gdplev_incr_table_alias
+	)).annualized_capital_cost_expression, 
+	(public.get_cost_expressions(
+	141, -- int_control_strategy_id
+	7778, -- int_input_dataset_id
+	false, --use_override_dataset
+	'inv', --inv_table_alias character varying(64), 
+	'm', --control_measure_table_alias character varying(64), 
+	'et', --equation_type_table_alias character varying(64), 
+	'eq', --control_measure_equation_table_alias
+	'ef', --control_measure_efficiencyrecord_table_alias
+	'csm', --control_strategy_measure_table_alias
+	'inv_ovr', --inv_override_table_alias
+	'gdplev_incr' --gdplev_incr_table_alias
 	)).operation_maintenance_cost_expression, 
 	(public.get_cost_expressions(
 	141, -- int_control_strategy_id
 	7778, -- int_input_dataset_id
-	true, --use_cost_equations
 	false, --use_override_dataset
 	'inv', --inv_table_alias character varying(64), 
 	'm', --control_measure_table_alias character varying(64), 
@@ -2731,12 +2743,12 @@ select (public.get_cost_expressions(
 	'eq', --control_measure_equation_table_alias
 	'ef', --control_measure_efficiencyrecord_table_alias
 	'csm', --control_strategy_measure_table_alias
-	'inv_ovr' --inv_override_table_alias
+	'inv_ovr', --inv_override_table_alias
+	'gdplev_incr' --gdplev_incr_table_alias
 	)).fixed_operation_maintenance_cost_expression, 
 	(public.get_cost_expressions(
 	141, -- int_control_strategy_id
 	7778, -- int_input_dataset_id
-	true, --use_cost_equations
 	false, --use_override_dataset
 	'inv', --inv_table_alias character varying(64), 
 	'm', --control_measure_table_alias character varying(64), 
@@ -2744,12 +2756,12 @@ select (public.get_cost_expressions(
 	'eq', --control_measure_equation_table_alias
 	'ef', --control_measure_efficiencyrecord_table_alias
 	'csm', --control_strategy_measure_table_alias
-	'inv_ovr' --inv_override_table_alias
+	'inv_ovr', --inv_override_table_alias
+	'gdplev_incr' --gdplev_incr_table_alias
 	)).variable_operation_maintenance_cost_expression, 
 	(public.get_cost_expressions(
 	141, -- int_control_strategy_id
 	7778, -- int_input_dataset_id
-	true, --use_cost_equations
 	false, --use_override_dataset
 	'inv', --inv_table_alias character varying(64), 
 	'm', --control_measure_table_alias character varying(64), 
@@ -2757,6 +2769,7 @@ select (public.get_cost_expressions(
 	'eq', --control_measure_equation_table_alias
 	'ef', --control_measure_efficiencyrecord_table_alias
 	'csm', --control_strategy_measure_table_alias
-	'inv_ovr' --inv_override_table_alias
+	'inv_ovr', --inv_override_table_alias
+	'gdplev_incr' --gdplev_incr_table_alias
 	)).computed_cost_per_ton_expression;
 */
