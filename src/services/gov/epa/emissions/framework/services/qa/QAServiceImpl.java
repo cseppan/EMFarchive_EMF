@@ -46,6 +46,8 @@ public class QAServiceImpl implements QAService {
     private DbServerFactory dbServerFactory;
 
     private QADAO dao;
+    
+    private StatusDAO statusDAO; // = new StatusDAO(sessionFactory);
 
     private PooledExecutor threadPool;
 
@@ -62,6 +64,7 @@ public class QAServiceImpl implements QAService {
         this.dbServerFactory = dbServerFactory;
         this.threadPool = createThreadPool();
         dao = new QADAO();
+        statusDAO = new StatusDAO(sessionFactory);
     }
 
     private synchronized PooledExecutor createThreadPool() {
@@ -501,36 +504,41 @@ public class QAServiceImpl implements QAService {
         DbServer dbServer = dbServerFactory.getDbServer();
         Datasource emfDatasource = dbServer.getEmfDatasource();
         List<QAStep> stepsToBeDeleted = new ArrayList<QAStep>();
+        int total = 0;
         String stepsReferenced = "";
+        int numStepsReferenced = 0;
+        String stepsFailedDependencyCheck = "";
+        int numStepsFailedDependencyCheck = 0;
         String sql = "";
-        try {
-            for ( QAStep step : steps) {
-                sql = "select s.id, s.dataset_id, s.name from emf.qa_steps s where ";
-                sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"CURRENT_DATASET\\\"(\\s*),(\\s*)\""; 
-                sql += step.getName();
-                sql += "\\\"(\\s*)[[.].]](.*)' and s.dataset_id = ";
-                sql += step.getDatasetId() + ") ";
-                sql += " or ";
-                sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"";
-                sql += dataset.getName();
-                sql += "\\\"(\\s*),(\\s*)\""; 
-                sql += step.getName();
-                sql += "\\\"(\\s*)[[.].]](.*)') ";
-                sql += " or ";
-                sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP_VERSION[[.[.]](\\s*)\\\"CURRENT_DATASET\\\"(\\s*),(\\s*)\""; 
-                sql += step.getName();
-                sql += "\\\"(\\s*),(\\s*)([0-9]+)[[.].]](.*)' and s.dataset_id = ";
-                sql += step.getDatasetId() + ") ";
-                sql += " or ";
-                sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"";
-                sql += dataset.getName();
-                sql += "\\\"(\\s*),(\\s*)\"";
-                sql += step.getName();
-                sql += "\\\"(\\s*),(\\s*)([0-9]+)[[.].]](.*)') ";
-                sql += ";";
+        for ( QAStep step : steps) {
+            total++;
+            sql = "select s.id, s.dataset_id, s.name from emf.qa_steps s where ";
+            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"CURRENT_DATASET\\\"(\\s*),(\\s*)\""; 
+            sql += step.getName();
+            sql += "\\\"(\\s*)[[.].]](.*)' and s.dataset_id = ";
+            sql += step.getDatasetId() + ") ";
+            sql += " or ";
+            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"";
+            sql += dataset.getName();
+            sql += "\\\"(\\s*),(\\s*)\""; 
+            sql += step.getName();
+            sql += "\\\"(\\s*)[[.].]](.*)') ";
+            sql += " or ";
+            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP_VERSION[[.[.]](\\s*)\\\"CURRENT_DATASET\\\"(\\s*),(\\s*)\""; 
+            sql += step.getName();
+            sql += "\\\"(\\s*),(\\s*)([0-9]+)[[.].]](.*)' and s.dataset_id = ";
+            sql += step.getDatasetId() + ") ";
+            sql += " or ";
+            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"";
+            sql += dataset.getName();
+            sql += "\\\"(\\s*),(\\s*)\"";
+            sql += step.getName();
+            sql += "\\\"(\\s*),(\\s*)([0-9]+)[[.].]](.*)') ";
+            sql += ";";
 
+            try {
                 ResultSet rs = emfDatasource.query().executeQuery(sql);
-                
+
                 if ( rs.next()) { // not empty
                     stepsReferenced += "\"" + step.getName() + "\" referenced by QA step \"" + rs.getString("name") + "\" for dataset \""; 
                     EmfDataset qaDataset = datasetDAO.obtainLocked(user, datasetDAO.getDataset(session, rs.getInt("dataset_id")), session);
@@ -542,72 +550,92 @@ public class QAServiceImpl implements QAService {
                         stepsReferenced += qaDataset.getName() + "\"";
                     }
                     stepsReferenced +=". ";
+                    numStepsReferenced++;
                 } else { //empty
                     stepsToBeDeleted.add(step);
                 }
+            }catch (SQLException e) {
+                LOG.error( "Error when running query - " + sql + " - to check QA Step " + step.getName() + "'s dependences: ", e); 
+                setStatus( user, "Error when running query - " + sql + " - to check QA Step " + step.getName() + "'s dependences: " + e.getMessage() + ". This step won't be deleted.");
+                stepsFailedDependencyCheck += (numStepsFailedDependencyCheck==0 ? "" : ",") + step.getName();
+                numStepsFailedDependencyCheck++;
+            } catch (Exception e) {
+                LOG.error( "Error when checking QA Step " + step.getName() + "'s dependences: ", e); 
+                setStatus( user, "Error when checking QA Step " + step.getName() + "'s dependences: " + e.getMessage() + ". This step won't be deleted.");
+                stepsFailedDependencyCheck += (numStepsFailedDependencyCheck==0 ? "" : ",") + step.getName();
+                numStepsFailedDependencyCheck++;
             }
-        } catch (SQLException e) {
-            LOG.error("Error when run query - " + sql + ": ", e);
-            status = new Status();
-            status.setUsername(user.getUsername());
-            status.setType("DeleteQASteps");
-            status.setMessage("Failed to delete QA Steps: " + "error when run query - " + sql + ": " + e.getMessage());
-            status.setTimestamp(new Date());
-            statusDAO.add(status);
-            throw new EmfException("Error when run query - " + sql + ": " + e.getMessage());
         }
         
-        if ( !stepsReferenced.equals("")) {
-            status = new Status();
-            status.setUsername(user.getUsername());
-            status.setType("DeleteQASteps");
-            status.setMessage("The following steps are referenced by some other QA steps and can not be deleted: " + stepsReferenced);
-            status.setTimestamp(new Date());
-            statusDAO.add(status);
-        }
+        String msg = "";
+        msg += stepsFailedDependencyCheck.equals("") ? "" : 
+            "Failed to check " + numStepsFailedDependencyCheck + " steps' dependences - they will not be deleted: " + 
+            stepsFailedDependencyCheck + ".";
+        msg += msg.equals("") ? "" : "\n";
+        msg += stepsReferenced.equals("") ? "" : 
+            "" + numStepsReferenced + " steps are referenced by some other QA steps and will not be deleted: " + 
+            stepsReferenced;
+        msg += msg.equals("") ? "" : "\n";
+        msg += stepsToBeDeleted.size() > 0 ? 
+               "Start to delete QA steps..." :
+               "No QA steps will be deleted.";
+        setStatus( user, msg);
         
-        if ( stepsToBeDeleted.size() > 0) {
-            status = new Status();
-            status.setUsername(user.getUsername());
-            status.setType("DeleteQASteps");
-            status.setMessage("Start to remove the result tables...");
-            status.setTimestamp(new Date());
-            statusDAO.add(status);
+        int succeeded=0;
+        int failed = 0;
+        try {
+            if (dbServer!=null && dbServer.isConnected()) {
+                dbServer.disconnect();
+            }
+        } catch (Exception e1) {
+            // NOTE Auto-generated catch block
+            e1.printStackTrace();
         }
-        
         for ( QAStep step : stepsToBeDeleted) {
             try {
+                dbServer = dbServerFactory.getDbServer();
                 this.removeQAResultTable(step, dbServer);
+                try {
+                    dao.deleteQAStep(step, session);
+                    succeeded++;
+                } catch (RuntimeException e) {
+                    failed++;
+                    LOG.error("Failed to delete QA Step " + step.getName(), e);
+                    setStatus(user,"Failed to delete QA Step " + step.getName() + ": " + e.getMessage());
+                }
             } catch (EmfException e) {
-                status = new Status();
-                status.setUsername(user.getUsername());
-                status.setType("DeleteQASteps");
-                status.setMessage("Failed to remove result tables for QA Step " + step.getName() + ": " + e.getMessage());
-                status.setTimestamp(new Date());
-                statusDAO.add(status);
-                throw e;
+                failed++;
+                LOG.error("Failed to remove result tables for QA Step " + step.getName(), e);
+                setStatus(user,"Failed to remove result tables for QA Step " + step.getName() + ": " + e.getMessage());
+            } catch ( Exception e) {
+                failed++;
+                LOG.error("Failed to delete QA Step " + step.getName(), e);
+                setStatus(user,"Failed to delete " + step.getName() + ": " + e.getMessage());
             }
+            
         }
-
-        try {
-            dao.deleteQASteps(stepsToBeDeleted.toArray(new QAStep[0]), session);
-        } catch (RuntimeException e) {
-            LOG.error("Could not set QA Steps", e);
-            status = new Status();
-            status.setUsername(user.getUsername());
-            status.setType("DeleteQASteps");
-            status.setMessage("Failed to delete QA Steps: " + e.getMessage());
-            status.setTimestamp(new Date());
-            statusDAO.add(status);
-            throw new EmfException("Could not delete QA Steps: " + e.getMessage());
-        } finally {
-            session.close();
-        }
-
-        status = new Status();
+        
+        session.close();
+        
+        msg = "Completed deleting the QA steps: \n";
+        msg += "Total number of steps: " + total + "\n"; 
+        msg += numStepsFailedDependencyCheck==0 ? "" : 
+               "Failed to check dependences for " + numStepsFailedDependencyCheck + " QA steps - not deleted.\n";
+        msg += numStepsReferenced==0 ? "" :
+               "" + numStepsReferenced + " QA Steps referenced by other QA steps - not deleted.\n";
+        msg += succeeded==0 ? "" : 
+               "Successfully deleted " + succeeded + " QA Steps\n";
+        msg += failed==0 ? "" :
+               "Failed to delete " + failed + " QA Steps\n";
+        setStatus(user,msg);
+        
+    }
+    
+    private void setStatus( User user, String msg) {
+        Status status = new Status();
         status.setUsername(user.getUsername());
         status.setType("DeleteQASteps");
-        status.setMessage("Complete deleting the QA steps - number of steps deleted: " + stepsToBeDeleted.size());
+        status.setMessage(msg);
         status.setTimestamp(new Date());
         statusDAO.add(status);
     }

@@ -1217,7 +1217,7 @@ select dt.id,
 (select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
 'Detect Bizarre Characters in column PLANT', 
 1, 
-'select fips,plantid, pointid, stackid, segment from $TABLE[1] i where plant ~* ''[[:cntrl:]]''', 
+'select fips,plantid, pointid, stackid, segment from $TABLE[1] i where plant ~* ''[[:cntrl:]\\u0080-\\uFFFF]''', 
 false, 
 1, 
 ''
@@ -1225,7 +1225,7 @@ from emf.dataset_types dt
 where name in ('ORL Point Inventory (PTINV)'); 
 
 update emf.dataset_types_qa_step_templates 
-set program_arguments = 'select fips,plantid, pointid, stackid, segment from $TABLE[1] i where plant ~* ''[[:cntrl:]]'''
+set program_arguments = 'select fips,plantid, pointid, stackid, segment from $TABLE[1] i where plant ~* ''[[:cntrl:]\\u0080-\\uFFFF]'''
 where name = 'Detect Bizarre Characters in column PLANT'
 and dataset_type_id in 
 (select id 
@@ -1239,8 +1239,8 @@ DECLARE
 	sql text;
 	r record;
 BEGIN
-	update ' || $1 || 'set plant=regexp_replace(plant, '[[:cntrl:]]', '') where plant ~* '[[:cntrl:]]';
-	sql = 'SELECT * from ' || $1 || ' where plant ~* ''[[:cntrl:]]'';'
+	-- 'update ' || $1 || 'set plant=regexp_replace(plant, '[[:cntrl:]\\u0080-\\uFFFF]', '') where plant ~* '[[:cntrl:]\\u0080-\\uFFFF]';
+	sql = 'SELECT * from ' || $1 || ' where plant ~* ''[[:cntrl:]\\u0080-\\uFFFF]'';';
 	FOR r IN EXECUTE sql LOOP
 	  RETURN NEXT r;
 	END LOOP;
@@ -1302,3 +1302,27 @@ update emf.properties set value = 'false' where name = 'DEBUG_22';
 update emf.properties set value = 'false' where name = 'DEBUG_23';
 update emf.properties set value = 'false' where name = 'DEBUG_24';
 
+-- 09/13/2011
+
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, 
+(select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
+'Detect Bizarre Characters in column FACILITY_NAME', 
+1, 
+'select COUNTRY_CD,REGION_CD,FACILITY_ID, UNIT_ID, REL_POINT_ID, PROCESS_ID, AGY_FACILITY_ID, AGY_UNIT_ID, AGY_REL_POINT_ID, AGY_PROCESS_ID, SCC from $TABLE[1] i where FACILITY_NAME ~* ''[[:cntrl:]\\u0080-\\uFFFF]''', 
+false, 
+1, 
+''
+from emf.dataset_types dt
+where name in ('Flat File 2010 Point'); 
+
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select COUNTRY_CD,REGION_CD,FACILITY_ID, UNIT_ID, REL_POINT_ID, PROCESS_ID, AGY_FACILITY_ID, AGY_UNIT_ID, AGY_REL_POINT_ID, AGY_PROCESS_ID, SCC from $TABLE[1] i where FACILITY_NAME ~* ''[[:cntrl:]\\u0080-\\uFFFF]'''
+where name = 'Detect Bizarre Characters in column FACILITY_NAME'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('Flat File 2010 Point'));
+
+insert into emf.properties values(DEFAULT, 'DEBUG_LEVEL_REFRESH_RATE', '12'); -- minutes
+update emf.properties set value = '12' where name = 'DEBUG_LEVEL_REFRESH_RATE'; -- minutes

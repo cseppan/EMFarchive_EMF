@@ -150,4 +150,8 @@ public class QADAO {
     public void deleteQASteps(QAStep[] steps, Session session) { // BUG3615
         hibernateFacade.remove(steps, session);
     }
+    
+    public void deleteQAStep(QAStep step, Session session) { // BUG3615
+        hibernateFacade.remove(step, session);
+    }
 }

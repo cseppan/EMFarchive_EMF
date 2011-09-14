@@ -33,6 +33,7 @@ import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.util.XMLChar;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
@@ -516,13 +517,22 @@ public class DataServiceImpl implements DataService {
     public synchronized String getTableAsString(String qualifiedTableName) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            return new TableToString(dbServer, qualifiedTableName, ",").toString();
+            String str =  new TableToString(dbServer, qualifiedTableName, ",").toString();
+            int invalidInx = this.detectFirstInvalidChar(str);
+            if ( invalidInx >= 0) {
+                LOG.error("Invalid XML character detected: " + Integer.toHexString(str.charAt(invalidInx)) + " at " + invalidInx + " in the returned string.");
+                throw new EmfException("Invalid XML character detected: " + Integer.toHexString(str.charAt(invalidInx)) + " at " + invalidInx + " in the returned string.");
+            }
+            return str;
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve table: " + qualifiedTableName, e);
             throw new EmfException("Could not retrieve table: " + qualifiedTableName);
         } catch (ExporterException e) {
             LOG.error("Could not retrieve table: " + qualifiedTableName, e);
             throw new EmfException("Could not retrieve table: " + qualifiedTableName);
+        } catch (Exception e) {
+            LOG.error("Could not retrieve table: " + qualifiedTableName, e);
+            throw new EmfException("Could not retrieve table: " + qualifiedTableName + ". " + e.getMessage());
         } finally {
             closeDB(dbServer);
         }
@@ -531,13 +541,22 @@ public class DataServiceImpl implements DataService {
     public synchronized String getTableAsString(String qualifiedTableName, long recordLimit, long recordOffset) throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            return new TableToString(dbServer, qualifiedTableName, ",").toString(recordLimit, recordOffset);
+            String str = new TableToString(dbServer, qualifiedTableName, ",").toString(recordLimit, recordOffset);
+            int invalidInx = this.detectFirstInvalidChar(str);
+            if ( invalidInx >= 0) {
+                LOG.error("Invalid XML character detected: " + Integer.toHexString(str.charAt(invalidInx)) + " at " + invalidInx + " in the returned string.");
+                throw new EmfException("Invalid XML character detected: " + Integer.toHexString(str.charAt(invalidInx)) + " at " + invalidInx + " in the returned string.");
+            }
+            return str;
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve table: " + qualifiedTableName, e);
             throw new EmfException("Could not retrieve table: " + qualifiedTableName);
         } catch (ExporterException e) {
             LOG.error("Could not retrieve table: " + qualifiedTableName, e);
             throw new EmfException("Could not retrieve table: " + qualifiedTableName);
+        } catch (Exception e) {
+            LOG.error("Could not retrieve table: " + qualifiedTableName, e);
+            throw new EmfException("Could not retrieve table: " + qualifiedTableName  + ". " + e.getMessage());
         } finally {
             closeDB(dbServer);
         }
@@ -1465,6 +1484,17 @@ public class DataServiceImpl implements DataService {
             if (session != null && session.isConnected())
                 session.close();
         }
+    }
+    
+    private int detectFirstInvalidChar( String xmlStr) {
+        if ( xmlStr == null || xmlStr.equals(""))
+            return -1;
+        for ( int i=0; i<xmlStr.length(); i++) {
+            int ch = xmlStr.charAt(i);
+            if ( XMLChar.isInvalid( ch)) 
+                return i;
+        }
+        return -2;
     }
     
 }

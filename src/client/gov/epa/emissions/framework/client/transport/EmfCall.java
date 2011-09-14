@@ -54,6 +54,8 @@ public class EmfCall {
         try {
             return call.invoke(params);
         } catch (AxisFault fault) {
+            System.out.println(fault.toString());
+            fault.printStackTrace();
             throw new EmfServiceException(fault);
         } catch (Exception e) {
             throw new EmfException("Unable to connect to " + service);

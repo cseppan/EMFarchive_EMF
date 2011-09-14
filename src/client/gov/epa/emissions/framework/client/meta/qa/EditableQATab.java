@@ -443,8 +443,13 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
                             presenter.viewResults(step);
                         } catch (EmfException e) {
                             try  {
-                                if ( presenter.checkBizzareCharInColumn(step, "plant")) {
-                                    messagePanel.setError("There are bizarre characters in column PLANT of the dataset " + dataset.getName() + ", please run QA step Detect or Remove Bizarre Characters in Plant Name." );
+                                //dataset.
+                                //if ( presenter.checkBizzareCharInColumn(step, "plant")) { // sniff the msg to see if xml related, then check column name, then check
+                                if ( e.getMessage().contains("Invalid XML character")) {
+                                    messagePanel.setError("There are bizarre characters in the dataset." + 
+                                            ((dataset.getDatasetType().getName().equals(DatasetType.FLAT_FILE_2010_POINT) || 
+                                              dataset.getDatasetType().getName().equals(DatasetType.orlPointInventory)) 
+                                              ? ", please run a QA step Detect Bizarre Characters." : "."));                                    
                                 } else {
                                     messagePanel.setError(e.getMessage());
                                 }

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.db.version.Version;
@@ -1884,9 +1885,15 @@ avd_emis=emis_avd
 
                     presenter.viewResults(step, exportDir.trim());
                 } catch (EmfException e) {
+                    e.printStackTrace();
                     try  {
-                        if ( presenter.checkBizzareCharInColumn(step, "plant")) {
-                            messagePanel.setError("There are bizarre characters in column PLANT of the dataset, please run QA step Detect or Remove Bizarre Characters in Plant Name." );
+                        //if ( presenter.checkBizzareCharInColumn(step, "plant")) {
+                        if ( e.getMessage().contains("Invalid XML character")) {    
+                            
+                            messagePanel.setError("There are bizarre characters in the dataset." + 
+                                    ((origDataset.getDatasetType().getName().equals(DatasetType.FLAT_FILE_2010_POINT) || 
+                                      origDataset.getDatasetType().getName().equals(DatasetType.orlPointInventory)) 
+                                      ? ", please run a QA step Detect Bizarre Characters." : ".")); 
                         } else {
                             messagePanel.setError(e.getMessage());
                         }
@@ -1896,6 +1903,8 @@ avd_emis=emis_avd
              
                 } finally {
                     setCursor(Cursor.getDefaultCursor());
+                    
+                    //javax.xm
                 }
             }
         });

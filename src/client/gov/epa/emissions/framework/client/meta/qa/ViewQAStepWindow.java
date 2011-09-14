@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAProgram;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
@@ -101,6 +102,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     private EmfConsole parentConsole;
 
     private EmfSession session;
+    
+    private EmfDataset origDataset;
 
     public ViewQAStepWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("View QA Step", new Dimension(680, 580), desktopManager);
@@ -113,6 +116,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         this.step = step;
         this.user = user;
         this.qaPrograms = new QAPrograms(null, programs);
+        this.origDataset = dataset;
         super.setLabel(super.getTitle() + ": " + step.getName() + " - " + dataset.getName() + " (v" + step.getVersion()
                 + ")");
 
@@ -500,8 +504,12 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
                     presenter.viewResults(step, exportDir.trim());
                 } catch (EmfException e) {
                     try  {
-                        if ( presenter.checkBizzareCharInColumn(step, "plant")) {
-                            messagePanel.setError("There are bizarre characters in column PLANT of the dataset, please run QA step Detect or Remove Bizarre Characters in Plant Name." );
+                        //if ( presenter.checkBizzareCharInColumn(step, "plant")) {
+                        if ( e.getMessage().contains("Invalid XML character")) {
+                            messagePanel.setError("There are bizarre characters in the dataset." + 
+                                    ((origDataset.getDatasetType().getName().equals(DatasetType.FLAT_FILE_2010_POINT) || 
+                                      origDataset.getDatasetType().getName().equals(DatasetType.orlPointInventory)) 
+                                      ? ", please run a QA step Detect Bizarre Characters." : ".")); 
                         } else {
                             messagePanel.setError(e.getMessage());
                         }
