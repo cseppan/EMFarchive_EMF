@@ -299,7 +299,6 @@ public class QAServiceImpl implements QAService {
         } finally {
             session.close();
         }
-
     }
 
     private synchronized void updateSteps(QAStep[] steps) throws EmfException {
@@ -328,7 +327,6 @@ public class QAServiceImpl implements QAService {
         } finally {
             session.close();
         }
-
     }
     
     public boolean getSameAsTemplate(QAStep step) throws EmfException{
@@ -489,6 +487,15 @@ public class QAServiceImpl implements QAService {
 
     public synchronized void deleteQASteps(User user, QAStep[] steps, int datasetId) throws EmfException { //BUG3615
         
+        try {
+            DeleteQASteps task = new DeleteQASteps(steps, datasetId, dbServerFactory, user, sessionFactory, threadPool);
+            task.delete();
+        } catch (Exception e) {
+            LOG.error("Could not delete QA steps", e);
+            throw new EmfException("Could not delete QA steps: " + e.getMessage());
+        }
+        
+        /*
         StatusDAO statusDAO = new StatusDAO(sessionFactory);
         Status status = new Status();
         status.setUsername(user.getUsername());
@@ -628,15 +635,15 @@ public class QAServiceImpl implements QAService {
         msg += failed==0 ? "" :
                "Failed to delete " + failed + " QA Steps\n";
         setStatus(user,msg);
-        
+        */
     }
     
-    private void setStatus( User user, String msg) {
-        Status status = new Status();
-        status.setUsername(user.getUsername());
-        status.setType("DeleteQASteps");
-        status.setMessage(msg);
-        status.setTimestamp(new Date());
-        statusDAO.add(status);
-    }
+//    private void setStatus( User user, String msg) {
+//        Status status = new Status();
+//        status.setUsername(user.getUsername());
+//        status.setType("DeleteQASteps");
+//        status.setMessage(msg);
+//        status.setTimestamp(new Date());
+//        statusDAO.add(status);
+//    }
 }
