@@ -274,7 +274,8 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
         }
         
         try {
-            this.presenter.deDelete((QAStep[])selected.toArray(new QAStep[0]));
+            this.presenter.doDelete((QAStep[])selected.toArray(new QAStep[0]));
+            messagePanel.setMessage("Deleting the QA steps, please watch status windows for detailed information.");
 
         } catch (Exception exp) {
             messagePanel.setError(exp.getMessage());
