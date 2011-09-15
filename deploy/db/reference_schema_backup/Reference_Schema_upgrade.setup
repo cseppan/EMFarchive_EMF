@@ -4,3 +4,15 @@
 
 -6/14/11 -- create new regulatory_codes table
 -- run the regulatory_codes_table.sql
+
+
+-- 8/3/2011 -- added new columns to naics_code table -- naics_code_l3 and naics_description_l3 
+alter table reference.naics_codes 
+add column naics_code_l3 character varying(6),
+add column naics_description_l3 character varying(255);
+
+update reference.naics_codes as nc
+set naics_code_l3 = substring(nc.naics_code,1,3),
+naics_description_l3 = (select naics_description from reference.naics_codes where naics_code = substring(nc.naics_code,1,3))
+where length(nc.naics_code) >=3;
+
