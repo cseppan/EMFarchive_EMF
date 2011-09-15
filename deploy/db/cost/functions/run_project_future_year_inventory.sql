@@ -1,3 +1,13 @@
+/*
+select public.run_project_future_year_inventory(
+	153, --int_control_strategy_id, 
+	349, --input_dataset_id, 
+	1, --input_dataset_version, 
+	6117 --strategy_result_id
+	);
+SELECT public.run_project_future_year_inventory(137, 5048, 0, 6147);
+*/
+
 DROP FUNCTION public.run_project_future_year_inventory(integer, integer, integer, integer);
 
 CREATE OR REPLACE FUNCTION public.run_project_future_year_inventory(
@@ -26,7 +36,7 @@ DECLARE
 	county_dataset_filter_sql text := '';
 	control_program_dataset_filter_sql text := '';
 	cost_year integer := null;
-	inventory_year integer := null;
+	inventory_year smallint := null;
 	is_point_table boolean := false;
 	use_cost_equations boolean := false;
 	gimme_count integer := 0;
@@ -105,7 +115,8 @@ BEGIN
 
 	-- get target pollutant, inv filter, and county dataset info if specified
 	SELECT cs.pollutant_id,
-		case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
+		case when length(trim(cs.filter)) > 0 then '(' || cs.filter || ')' else null end,
+--		case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
 		cs.cost_year,
 		cs.analysis_year,
 		cs.county_dataset_id,
@@ -180,31 +191,8 @@ BEGIN
 	select public.get_dataset_month(input_dataset_id)
 	into dataset_month;
 
-	IF dataset_month = 1 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 2 THEN
-		no_days_in_month := 29;
-	ELSIF dataset_month = 3 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 4 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 5 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 6 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 7 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 8 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 9 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 10 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 11 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 12 THEN
-		no_days_in_month := 31;
-	END IF;
+	select public.get_days_in_month(dataset_month, inventory_year)
+	into no_days_in_month;
 
 	-- get gdp chained values
 	SELECT chained_gdp
@@ -264,7 +252,10 @@ BEGIN
 			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
 	END IF;
 	-- build version info into where clause filter
-	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
+--	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
+
+
+--	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version) || ')' || coalesce(' and ' || inv_filter, '');
 
 	raise notice '%', 'first lets do plant closures ' || clock_timestamp();
 
@@ -294,7 +285,7 @@ BEGIN
 	LOOP
 		-- apply plant closure control program
 		IF control_program.type = 'Plant Closure' THEN
-
+raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::character varying(64));
 			execute
 			--raise notice '%',
 			 'insert into emissions.' || detailed_result_table_name || ' 
@@ -338,7 +329,8 @@ BEGIN
 				plant,
 				"comment"
 				)
-			select 
+			-- add distinct to limit to only one closure record, that is all that is needed...
+			select distinct on (record_id)
 				' || detailed_result_dataset_id || '::integer,
 				''PLTCLOSURE'' as abbreviation,
 				inv.poll,
@@ -396,7 +388,7 @@ BEGIN
 				on fipscode.state_county_fips = inv.fips
 				and fipscode.country_num = ''0''' else '' end || '
 
-			where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+			where 	' || '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || public.alias_filter(inv_filter, inv_table_name, 'inv'::character varying(64)), '') || coalesce(county_dataset_filter_sql, '') || '
 				' || case when not is_point_table then '
 				and pc.plantid is null
 				and pc.pointid is null
@@ -456,12 +448,26 @@ BEGIN
 				record_id,proj_factor,
 				' || quote_literal(control_program.control_program_name) || ' as control_program_name, ranking
 			from (
-				--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
-				select 
-					null::integer as record_id, null::double precision as proj_factor, null::integer as ranking
-				where 1 = 0
 
-				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.proj_factor,',control_program_dataset_filter_sql || ' and ' || inv_filter || coalesce(county_dataset_filter_sql, '')) || '
+				' || public.build_project_future_year_inventory_matching_hierarchy_sql(
+				input_dataset_id, --inv_dataset_id integer, 
+				input_dataset_version, --inv_dataset_version integer, 
+				control_program.dataset_id, --control_program_dataset_id integer, 
+				control_program.dataset_version, --control_program_dataset_version integer, 
+				'proj_factor', --select_columns varchar, 
+				inv_filter, --inv_filter text, --not aliased
+				county_dataset_id, --1279 county_dataset_id integer,
+				county_dataset_version, --county_dataset_version integer,
+				case 
+					when control_program.type = 'Control' then 
+						'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone and application_control = ''Y''' 
+					when control_program.type = 'Allowable' then 
+						'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone' 
+					else 
+						null::text 
+				end,
+				1 --match_type integer	-- 1 = include only Matched Sources, 2 = Include packet records that didn't affect a source, 3 = ?
+				) || '
 				order by record_id, ranking
 			) tbl';
 
@@ -586,10 +592,10 @@ BEGIN
 			on fipscode.state_county_fips = inv.fips
 			and fipscode.country_num = ''0''' else '' end || '
 
-		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+		where 	
 
 			--remove plant closures from consideration
-			and inv.record_id not in (select source_id from emissions.' || detailed_result_table_name || ' where apply_order = 0)';
+			inv.record_id not in (select source_id from emissions.' || detailed_result_table_name || ' where apply_order = 0)';
 	END IF;
 
 
@@ -661,13 +667,23 @@ BEGIN
 				' || control_program.control_program_technologies_count || ' as control_program_technologies_count, ' || control_program.control_program_measures_count || ' as control_program_measures_count, 
 				ranking
 			from (
-				--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
-				select 
-					null::integer as record_id, null::double precision as ceff, null::double precision as rpen,
-					null::double precision as reff, null::character varying(10) as pri_cm_abbrev, null::character varying(1) as replacement, null::timestamp without time zone as compliance_date, null::integer as ranking
-				where 1 = 0
 
-				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.ceff,proj.rpen,proj.reff,proj.pri_cm_abbrev,proj.replacement,proj.compliance_date,',control_program_dataset_filter_sql || ' and proj.application_control = ''Y'' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone') || '
+				' || 
+		public.build_project_future_year_inventory_matching_hierarchy_sql(
+			input_dataset_id, --inv_dataset_id integer, 
+			input_dataset_version, --inv_dataset_version integer, 
+			control_program.dataset_id, --control_program_dataset_id integer, 
+			control_program.dataset_version, --control_program_dataset_version integer, 
+			'ceff,rpen,reff,pri_cm_abbrev,replacement,compliance_date', --select_columns varchar, 
+			inv_filter, --inv_filter text,
+			county_dataset_id, --1279 county_dataset_id integer,
+			county_dataset_version, --county_dataset_version integer,
+			'application_control = ''Y'' and coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone',
+			1 --match_type integer	-- 1 = include only Matched Sources, 2 = Include packet records that didn't affect a source, 3 = ?
+			)
+
+
+				|| '
 
 				--order by record_id, replacement, ranking, coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) desc
 			 ) tbl';
@@ -923,8 +939,7 @@ BEGIN
 			left outer join reference.gdplev
 			on gdplev.annual = eq.cost_year
 
-		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-			and (
+		where 	(
 				(cont.replacement = ''R'' 
 					and (
 						(' || cont_packet_percent_reduction_sql || ' >= ' || inv_percent_reduction_sql || ')
@@ -1029,12 +1044,27 @@ BEGIN
 				' || control_program.control_program_technologies_count || ' as control_program_technologies_count, ' || control_program.control_program_measures_count || ' as control_program_measures_count, 
 				ranking
 			from (
-				--placeholder helps dealing with point vs non-point inventories, i dont have to worry about the union all statements
-				select 
-					null::integer as record_id, null::double precision as cap, null::double precision as replacement, null::varchar(1) as allowable_type, null::timestamp without time zone as compliance_date, null::integer as ranking
-				where 1 = 0
+				' || public.build_project_future_year_inventory_matching_hierarchy_sql(
+				input_dataset_id, --inv_dataset_id integer, 
+				input_dataset_version, --inv_dataset_version integer, 
+				control_program.dataset_id, --control_program_dataset_id integer, 
+				control_program.dataset_version, --control_program_dataset_version integer, 
+				'cap,replacement,case when replacement is not null then ''R'' when cap is not null then ''C'' end as allowable_type,compliance_date', --select_columns varchar, 
+				inv_filter, --inv_filter text, --not aliased
+				county_dataset_id, --1279 county_dataset_id integer,
+				county_dataset_version, --county_dataset_version integer,
+				case 
+					when control_program.type = 'Control' then 
+						'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone and application_control = ''Y''' 
+					when control_program.type = 'Allowable' then 
+						'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone' 
+					else 
+						null::text 
+				end,
+				1 --match_type integer	-- 1 = include only Matched Sources, 2 = Include packet records that didn't affect a source, 3 = ?
+				) || '
 
-				' || public.build_project_future_year_inventory_matching_hierarchy_sql(control_program.table_name, inv_table_name, 'proj.cap,proj.replacement,case when replacement is not null then ''R'' when cap is not null then ''C'' end as allowable_type,proj.compliance_date,',control_program_dataset_filter_sql || ' and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || ' and coalesce(proj.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone') || '
+
 				--order by record_id, allowable_type, ranking, compliance_date desc
 			) tbl';
 		END IF;
@@ -1188,13 +1218,16 @@ BEGIN
 			inner join (' || sql || ') cont
 			on cont.record_id = inv.record_id
 
-
-
+			-- tables for predicting measure
+			left outer join emf.control_measure_sccs sccs
+			-- scc filter
+			on sccs."name" = inv.scc
 
 			-- tables for predicting measure
 			left outer join emf.control_measure_efficiencyrecords er
+			on er.control_measures_id = sccs.control_measures_id
 			-- poll filter
-			on er.pollutant_id = p.id
+			and er.pollutant_id = p.id
 			-- min and max emission filter
 			and coalesce(cont.replacement, cont.cap) * 365 between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
 			-- locale filter
@@ -1228,7 +1261,7 @@ BEGIN
 			left outer join reference.gdplev
 			on gdplev.annual = eq.cost_year
 
-		where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+		where 	
 --			and (
 --				(allowable_type = ''C'' and ' || emis_sql || ' >= cont.cap * 365)
 --				or (allowable_type = ''R'')
@@ -1238,7 +1271,7 @@ BEGIN
 --			and ' || emis_sql || ' <> 0
 
 			--remove plant closures from consideration
-			and inv.record_id not in (select source_id from emissions.' || detailed_result_table_name || ' where apply_order = 0)
+			inv.record_id not in (select source_id from emissions.' || detailed_result_table_name || ' where apply_order = 0)
 
 		order by inv.record_id, 
 			--makes sure we get the highest ranking control packet record

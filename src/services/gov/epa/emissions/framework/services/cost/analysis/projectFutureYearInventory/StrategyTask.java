@@ -184,9 +184,9 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
             projectLoader.update((EmfDataset)result.getDetailedResultDataset());
             
             //next lets validate the control program dataset tables, make sure format is correct, no data is missing, etc...
-            setStatus("Started validating control programs.");
+            setStatus("Started pre-run validation of control programs (i.e., duplicate packet records).");
             validateControlPrograms(this.getLoader().getStrategyMessagesResult());
-            setStatus("Finished validating control programs.");
+            setStatus("Finished pre-run validation of control programs.");
             boolean hasErrors = checkMessagesForErrors();
             if (hasErrors) throw new EmfException("Multiple error messages were detected while running control strategy. See " + StrategyResultType.strategyMessages + " output.");
         } catch (EmfException e) {

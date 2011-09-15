@@ -1,4 +1,4 @@
---select public.validate_project_future_year_inventory_control_programs(137, 6030);
+--select public.validate_project_future_year_inventory_control_programs(137, 6097);
 
 CREATE OR REPLACE FUNCTION public.validate_project_future_year_inventory_control_programs(
 	control_strategy_id integer,
@@ -109,13 +109,13 @@ BEGIN
 				 'insert into emissions.' || strategy_messages_table_name || ' 
 					(
 					dataset_id, 
-					fips, 
+/*					fips, 
 					scc, 
 					plantid, 
 					pointid, 
 					stackid, 
 					segment, 
-					poll, 
+					poll, */
 					status,
 					control_program,
 					message_type,
@@ -124,13 +124,13 @@ BEGIN
 					)
 				select 
 					' || strategy_messages_dataset_id || '::integer,
-					null::character varying(6) as fips, 
+/*					null::character varying(6) as fips, 
 					null::character varying(10) as scc, 
 					null::character varying(15) as plantid, 
 					null::character varying(15) as pointid, 
 					null::character varying(15) as stackid, 
 					null::character varying(15) as segment, 
-					null::character varying(16) as poll, 
+					null::character varying(16) as poll, */
 					''Error''::character varying(11) as status,
 					''' || control_program.control_program_name || '''::character varying(255) as control_program,
 					''Packet Level''::character varying(255) as message_type,
@@ -140,7 +140,7 @@ BEGIN
 			END IF;
 
 			-- make sure the plant closure effective date is in the right format
-			execute 'select count(1) from emissions.' || control_program.table_name || ' where not public.isdate(effective_date) and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version)
+			execute 'select count(1) from emissions.' || control_program.table_name || ' where not public.isdate(effective_date) and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version) || ' limit 1'
 			into count;
 			IF count > 0 THEN
 				--RAISE EXCEPTION 'Control program, %, plant closure dataset has % effective date(s) that are not in the correct date format.', control_program.control_program_name, count;
@@ -149,13 +149,13 @@ BEGIN
 				 'insert into emissions.' || strategy_messages_table_name || ' 
 					(
 					dataset_id, 
-					fips, 
-					scc, 
-					plantid, 
-					pointid, 
-					stackid, 
-					segment, 
-					poll, 
+					packet_fips, 
+					packet_scc, 
+					packet_plantid, 
+					packet_pointid, 
+					packet_stackid, 
+					packet_segment, 
+					packet_poll, 
 					status,
 					control_program,
 					message_type,
@@ -183,7 +183,7 @@ BEGIN
 			END IF;
 
 			-- make sure there aren't missing fips codes
-			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(fips), '''') = ''''' || '  and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version)
+			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(fips), '''') = ''''' || '  and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version) || ' limit 1'
 			into count;
 			IF count > 0 THEN
 --				RAISE EXCEPTION 'Control program, %, plant closure dataset has % missing fip(s) codes.', control_program.control_program_name, count;
@@ -192,13 +192,13 @@ BEGIN
 				 'insert into emissions.' || strategy_messages_table_name || ' 
 					(
 					dataset_id, 
-					fips, 
-					scc, 
-					plantid, 
-					pointid, 
-					stackid, 
-					segment, 
-					poll, 
+					packet_fips, 
+					packet_scc, 
+					packet_plantid, 
+					packet_pointid, 
+					packet_stackid, 
+					packet_segment, 
+					packet_poll, 
 					status,
 					control_program,
 					message_type,
@@ -226,7 +226,7 @@ BEGIN
 			END IF;
 
 			-- make sure there aren't missing plant ids
-			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(plantid), '''') = ''''' || '  and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version)
+			execute 'select count(1) from emissions.' || control_program.table_name || ' where coalesce(trim(plantid), '''') = ''''' || '  and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version) || ' limit 1'
 			into count;
 			IF count > 0 THEN
 --				RAISE EXCEPTION 'Control program, %, plant closure dataset has % missing plant Id(s).', control_program.control_program_name, count;
@@ -235,13 +235,13 @@ BEGIN
 				 'insert into emissions.' || strategy_messages_table_name || ' 
 					(
 					dataset_id, 
-					fips, 
-					scc, 
-					plantid, 
-					pointid, 
-					stackid, 
-					segment, 
-					poll, 
+					packet_fips, 
+					packet_scc, 
+					packet_plantid, 
+					packet_pointid, 
+					packet_stackid, 
+					packet_segment, 
+					packet_poll, 
 					status,
 					control_program,
 					message_type,
@@ -250,6 +250,7 @@ BEGIN
 					)
 				select 
 					' || strategy_messages_dataset_id || '::integer,
+					fips,
 					scc, 
 					plantid, 
 					pointid, 
@@ -328,80 +329,80 @@ BEGIN
 			
 		LOOP
 
-			If prev_cp <> control_program.dataset_type THEN
-		IF length(sql) > 0 THEN
-			--raise notice '%',
-			execute 
-			'select count(1)
-				from (' || sql || ') tbl
-				group by fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,naics,compliance_date
-				having count(1) >= 2
-				limit 1'
-			into count;
-			IF count > 0 THEN
---				RAISE EXCEPTION 'Inventory, %, has source(s) with duplicate matching hierarchy packet records.  See the Strategy Messages output dataset for more detailed information on identifying the matching hierarchy records.', inventory_record.dataset_name;
-
-
-
-				execute
+		If prev_cp <> control_program.dataset_type THEN
+			IF length(sql) > 0 THEN
 				--raise notice '%',
-				 'insert into emissions.' || strategy_messages_table_name || ' 
-					(
-					dataset_id, 
-					fips, 
-					scc, 
-					plantid, 
-					pointid, 
-					stackid, 
-					segment, 
-					poll, 
-					status,
-					control_program,
-					message_type,
-					message,
-					inventory,
-					sic,
-					mact,
-					naics,
-					--replacement,
-					compliance_date
-					)
-				select 
-					' || strategy_messages_dataset_id || '::integer,
-					fips, 
-					scc, 
-					plantid, 
-					pointid, 
-					stackid, 
-					segment, 
-					poll, 
-					''Error''::character varying(11) as status,
-					null::character varying(255) as control_program,
-					''Packet Level''::character varying(255) as message_type,
-					''Control programs, '' || string_agg(distinct control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'', '','' order by control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'') || '', have duplicate matching hierarchy packet records.'' as "message",
-					null::character varying(255) as inventory,
-					sic,
-					mact,
-					naics,
-					--replacement,
-					compliance_date
-				from (
-
-			select *, count(1) OVER w as packet_record_count
-			from (' || sql || ') tbl
-			WINDOW w AS (PARTITION BY fips,scc,plantid,pointid,stackid,segment,poll,sic,naics,mact,compliance_date,control_program_name)
+				execute 
+				'select count(1)
+					from (' || sql || ') tbl
+					group by fips,scc,plantid,pointid,stackid,segment,poll,sic,mact,naics,compliance_date
+					having count(1) >= 2
+					limit 1'
+				into count;
+				IF count > 0 THEN
+	--				RAISE EXCEPTION 'Inventory, %, has source(s) with duplicate matching hierarchy packet records.  See the Strategy Messages output dataset for more detailed information on identifying the matching hierarchy records.', inventory_record.dataset_name;
 
 
-				) tbl
-				group by fips,scc,plantid,pointid,stackid,segment,poll,sic,naics,mact,compliance_date
-				having count(1) >= 2
-				';
-				has_error := true;
+
+					execute
+					--raise notice '%',
+					 'insert into emissions.' || strategy_messages_table_name || ' 
+						(
+						dataset_id, 
+						packet_fips, 
+						packet_scc, 
+						packet_plantid, 
+						packet_pointid, 
+						packet_stackid, 
+						packet_segment, 
+						packet_poll, 
+						status,
+						control_program,
+						message_type,
+						message,
+						inventory,
+						packet_sic,
+						packet_mact,
+						packet_naics,
+						--replacement,
+						packet_compliance_date
+						)
+					select 
+						' || strategy_messages_dataset_id || '::integer,
+						fips, 
+						scc, 
+						plantid, 
+						pointid, 
+						stackid, 
+						segment, 
+						poll, 
+						''Error''::character varying(11) as status,
+						null::character varying(255) as control_program,
+						''Packet Level''::character varying(255) as message_type,
+						''Control program'' || case when count(distinct control_program_name) = 1 then '''' else ''s'' end || '', '' || string_agg(distinct control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'', '','' order by control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'') || '', has duplicate matching hierarchy packet records.'' as "message",
+						null::character varying(255) as inventory,
+						sic,
+						mact,
+						naics,
+						--replacement,
+						compliance_date
+					from (
+
+						select *, count(1) OVER w as packet_record_count
+						from (' || sql || ') tbl
+						WINDOW w AS (PARTITION BY fips,scc,plantid,pointid,stackid,segment,poll,sic,naics,mact,compliance_date,control_program_name)
+
+
+					) tbl
+					group by fips,scc,plantid,pointid,stackid,segment,poll,sic,naics,mact,compliance_date
+					having count(1) >= 2
+					';
+					has_error := true;
+				END IF;
+
 			END IF;
-
+			sql := '';
 		END IF;
-				sql := '';
-			END IF;
 		
 			If length(sql) > 0 THEN 
 				sql := sql || ' union all ';
@@ -417,7 +418,7 @@ BEGIN
 				fips,scc,plantid,pointid,stackid,segment,poll,sic,
 			' || case 
 				when control_program.type = 'Control' then 
-				'mact,null::character varying(6) as naics,compliance_date,'
+				'mact,naics,compliance_date,'
 				when control_program.type = 'Allowable' then 
 				'null::character varying(6) as mact,naics,compliance_date,'
 				when control_program.type = 'Projection' then 
@@ -461,23 +462,23 @@ BEGIN
 				 'insert into emissions.' || strategy_messages_table_name || ' 
 					(
 					dataset_id, 
-					fips, 
-					scc, 
-					plantid, 
-					pointid, 
-					stackid, 
-					segment, 
-					poll, 
+					packet_fips, 
+					packet_scc, 
+					packet_plantid, 
+					packet_pointid, 
+					packet_stackid, 
+					packet_segment, 
+					packet_poll, 
 					status,
 					control_program,
 					message_type,
 					message,
 					inventory,
-					sic,
-					mact,
-					naics,
+					packet_sic,
+					packet_mact,
+					packet_naics,
 					--replacement,
-					compliance_date
+					packet_compliance_date
 					)
 				select 
 					' || strategy_messages_dataset_id || '::integer,
@@ -491,7 +492,7 @@ BEGIN
 					''Error''::character varying(11) as status,
 					null::character varying(255) as control_program,
 					''Packet Level''::character varying(255) as message_type,
-					''Control programs, '' || string_agg(distinct control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'', '','' order by control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'') || '', have duplicate matching hierarchy packet records.'' as "message",
+					''Control program'' || case when count(distinct control_program_name) = 1 then '''' else ''s'' end || '', '' || string_agg(distinct control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'', '','' order by control_program_name || '' ['' || packet_record_count || '' record'' || case when packet_record_count = 1 then '''' else ''s'' end || '']'') || '', has duplicate matching hierarchy packet records.'' as "message",
 					null::character varying(255) as inventory,
 					sic,
 					mact,
@@ -500,9 +501,9 @@ BEGIN
 					compliance_date
 				from (
 
-			select *, count(1) OVER w as packet_record_count
-			from (' || sql || ') tbl
-			WINDOW w AS (PARTITION BY fips,scc,plantid,pointid,stackid,segment,poll,sic,naics,mact,compliance_date,control_program_name)
+					select *, count(1) OVER w as packet_record_count
+					from (' || sql || ') tbl
+					WINDOW w AS (PARTITION BY fips,scc,plantid,pointid,stackid,segment,poll,sic,naics,mact,compliance_date,control_program_name)
 
 
 				) tbl

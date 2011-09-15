@@ -174,7 +174,8 @@ vacuum analyze emissions.ds_deletions_2005_1050880615;
 					or trim(scc) in (''0'',''-9'','''')
 					or trim(poll) in (''0'',''-9'','''')
 --					or trim(mact) in (''0'',''-9'','''')
-					or trim(sic) in (''0'',''-9'','''');';
+					or trim(sic) in (''0'',''-9'','''')
+					or trim(naics) in (''0'',''-9'','''');';
 
 
 		-- look at the projection control program table format (make sure all the right columns are in the table)

@@ -27,12 +27,12 @@ public class ControlProgramTableData extends AbstractTableData {
     }
 
     private Row row(ControlProgram controlTechnology) {
-        String[] values = { controlTechnology.getName(), controlTechnology.getDescription() };
+        String[] values = { controlTechnology.getName(), controlTechnology.getControlProgramType() != null ? controlTechnology.getControlProgramType().getName() : "", controlTechnology.getDescription() };
         return new ViewableRow(controlTechnology, values);
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Description" };
+        return new String[] { "Name", "Type", "Description" };
     }
 
     public Class getColumnClass(int col) {

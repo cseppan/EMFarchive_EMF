@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.cost.analysis.projectFutureYearInventory;
 
+import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -35,7 +37,9 @@ public class StrategyLoader extends AbstractStrategyLoader {
         // create detailed strategy result
         ControlStrategyResult result = createStrategyResult(inputDataset, controlStrategyInputDataset.getVersion());
 
-        populateInventory(controlStrategyInputDataset, result);
+        createDetailedResultIndexes(result.getDetailedResultDataset());
+        
+        applyControlPrograms(controlStrategyInputDataset, result);
 
         // //create strategy messages result
         // strategyMessagesResult = createStrategyMessagesResult(inputDataset,
@@ -62,8 +66,30 @@ public class StrategyLoader extends AbstractStrategyLoader {
         return result;
     }
 
+    private void createDetailedResultIndexes(Dataset dataset) {
+        DataTable dataTable = new DataTable(dataset, datasource);
+        String table = emissionTableName(dataset);
+
+        //ALWAYS create indexes for these core columns...
+        dataTable.addIndex(table, "record_id", true);
+        dataTable.addIndex(table, "dataset_id", false);
+        dataTable.addIndex(table, "version", false);
+        dataTable.addIndex(table, "delete_versions", false);
+
+        dataTable.addIndex(table, "source_id", false);
+        dataTable.addIndex(table, "input_ds_id", false);
+        dataTable.addIndex(table, "apply_order", false);
+
+        //finally analyze the table, so the indexes take affect immediately, 
+        //NOT when the SQL engine gets around to analyzing eventually
+        dataTable.analyzeTable(table);
+    
+    }
+
     protected void populateMessageOutput() throws Exception {
+        setStatus("Started post-run validation of control programs (i.e., identify unused packet records).");
         populateStrategyMessagesDataset(strategyMessagesResult);
+        setStatus("Finished post-run validation of control programs.");
         setResultCount(strategyMessagesResult);
 
         // if the messages dataset is empty (no records) then remove the dataset and strategy result, there
@@ -79,7 +105,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
         }
     }
 
-    private void populateInventory(ControlStrategyInputDataset controlStrategyInputDataset,
+    private void applyControlPrograms(ControlStrategyInputDataset controlStrategyInputDataset,
             ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "";
         query = "SELECT public.run_project_future_year_inventory(" + controlStrategy.getId() + ", "
@@ -87,7 +113,13 @@ public class StrategyLoader extends AbstractStrategyLoader {
                 + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
         System.out.println(System.currentTimeMillis() + " " + query);
         try {
+            setStatus("Started applying control programs on inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
             datasource.query().execute(query);
+            setStatus("Finished applying control programs on inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
         } catch (SQLException e) {
             System.out.println("SQLException runStrategyUsingSQLApproach");
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
