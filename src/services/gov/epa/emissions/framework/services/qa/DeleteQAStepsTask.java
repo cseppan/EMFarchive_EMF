@@ -92,27 +92,27 @@ public class DeleteQAStepsTask implements Runnable {
         for ( QAStep step : steps) {
             total++;
             sql = "select s.id, s.dataset_id, s.name from emf.qa_steps s where ";
-            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"CURRENT_DATASET\\\"(\\s*),(\\s*)\""; 
+            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]]([[:space:]]*)\\\"CURRENT_DATASET\\\"([[:space:]]*),([[:space:]]*)\""; 
             sql += step.getName();
-            sql += "\\\"(\\s*)[[.].]](.*)' and s.dataset_id = ";
+            sql += "\\\"([[:space:]]*)[[.].]](.*)' and s.dataset_id = ";
             sql += step.getDatasetId() + ") ";
             sql += " or ";
-            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"";
+            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]]([[:space:]]*)\\\"";
             sql += dataset.getName();
-            sql += "\\\"(\\s*),(\\s*)\""; 
+            sql += "\\\"([[:space:]]*),([[:space:]]*)\""; 
             sql += step.getName();
-            sql += "\\\"(\\s*)[[.].]](.*)') ";
+            sql += "\\\"([[:space:]]*)[[.].]](.*)') ";
             sql += " or ";
-            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP_VERSION[[.[.]](\\s*)\\\"CURRENT_DATASET\\\"(\\s*),(\\s*)\""; 
+            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP_VERSION[[.[.]]([[:space:]]*)\\\"CURRENT_DATASET\\\"([[:space:]]*),([[:space:]]*)\""; 
             sql += step.getName();
-            sql += "\\\"(\\s*),(\\s*)([0-9]+)[[.].]](.*)' and s.dataset_id = ";
+            sql += "\\\"([[:space:]]*),([[:space:]]*)([0-9]+)[[.].]](.*)' and s.dataset_id = ";
             sql += step.getDatasetId() + ") ";
             sql += " or ";
-            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP[[.[.]](\\s*)\\\"";
+            sql += "(s.program_arguments ~* '(.*[[.$.]])DATASET_QASTEP_VERSION[[.[.]]([[:space:]]*)\\\"";
             sql += dataset.getName();
-            sql += "\\\"(\\s*),(\\s*)\"";
+            sql += "\\\"([[:space:]]*),([[:space:]]*)\"";
             sql += step.getName();
-            sql += "\\\"(\\s*),(\\s*)([0-9]+)[[.].]](.*)') ";
+            sql += "\\\"([[:space:]]*),([[:space:]]*)([0-9]+)[[.].]](.*)') ";
             sql += ";";
 
             try {
@@ -120,12 +120,12 @@ public class DeleteQAStepsTask implements Runnable {
 
                 if ( rs.next()) { // not empty
                     stepsReferenced += "\"" + step.getName() + "\" referenced by QA step \"" + rs.getString("name") + "\" for dataset \""; 
-                    EmfDataset qaDataset = datasetDAO.obtainLocked(user, datasetDAO.getDataset(session, rs.getInt("dataset_id")), session);
+                    EmfDataset qaDataset = datasetDAO.getDataset(session, rs.getInt("dataset_id"));
                     stepsReferenced += qaDataset.getName() + "\'";
                     while ( rs.next()) {
                         stepsReferenced += ", ";
                         stepsReferenced += " \"" + rs.getString("name") + "\" for dataset \""; 
-                        qaDataset = datasetDAO.obtainLocked(user, datasetDAO.getDataset(session, rs.getInt("dataset_id")), session);
+                        qaDataset = datasetDAO.getDataset(session, rs.getInt("dataset_id"));
                         stepsReferenced += qaDataset.getName() + "\"";
                     }
                     stepsReferenced +=". ";
