@@ -17,7 +17,7 @@
 		<property name="existingMeasureAbbr" column="existing_measure_abbr" type="java.lang.String" not-null="false"/>
 		<property name="existingDevCode" column="existing_dev_code" type="integer" not-null="false"/>
 		<property name="locale" column="locale" type="java.lang.String" not-null="false"/>
-		<property name="efficiency" column="efficiency" type="float" not-null="false"/>
+		<property name="efficiency" column="efficiency" type="double" not-null="false"/>
 		<property name="costYear" column="cost_year" type="integer" not-null="false"/>
 		<property name="costPerTon" column="cost_per_ton" type="double" not-null="false"/>
 	    <property name="ruleEffectiveness" column="rule_effectiveness" type="float" not-null="false"/>
