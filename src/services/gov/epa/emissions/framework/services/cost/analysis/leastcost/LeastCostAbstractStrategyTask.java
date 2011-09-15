@@ -122,9 +122,15 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
         TableFormat tableFormat = new VersionedTableFormat(new ORLMergedFileFormat(dbServer.getSqlDataTypes()),
                 dbServer.getSqlDataTypes());
         // "MergedORL_",
-        return creator.addDataset("DS", DatasetCreator.createDatasetName(controlStrategy.getName() + "_MergedORL"),
+        EmfDataset mergedDataset = creator.addDataset("DS", DatasetCreator.createDatasetName(controlStrategy.getName() + "_MergedORL"),
                 getORLMergedInventoryDatasetType(), tableFormat, getORLMergedInventoryDatasetDescription(tableFormat,
                         country));
+
+        //auto - update sector with the all sector
+        mergedDataset.addSector(getSector("All Sectors"));
+        creator.update(mergedDataset);
+        
+        return mergedDataset;
     }
 
     protected String getORLMergedInventoryDatasetDescription(TableFormat tableFormat, String country) {
@@ -318,14 +324,17 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
                             mergedDataset);
                     controlStrategy.addControlStrategyInputDatasets(controlStrategyInputDataset);
                     updateControlStrategyWithLock(controlStrategy);
-                } else {
-                    if (controlStrategy.getDeleteResults() || results.length == 0)
-                        truncateORLMergedDataset(mergedDataset);
-                }
-                if (controlStrategy.getDeleteResults() || results.length == 0) {
-                    populateORLMergedDataset(mergedDataset);
-                    leastCostAbstractStrategyLoader.makeSureInventoryDatasetHasIndexes(mergedDataset);
-                }
+                } 
+//                else {
+//                    if (controlStrategy.getDeleteResults() || results.length == 0)
+//                }
+//                if (controlStrategy.getDeleteResults() || results.length == 0) {
+                //always truncate and repopulate this merged dataset, something could have changed
+                //from prior run...
+                truncateORLMergedDataset(mergedDataset);
+                populateORLMergedDataset(mergedDataset);
+                leastCostAbstractStrategyLoader.makeSureInventoryDatasetHasIndexes(mergedDataset);
+//                }
 
             }
         }

@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.QAStepTemplate;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.version.Version;
@@ -28,6 +29,7 @@ import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.SectorsDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.ResultSet;
@@ -718,6 +720,20 @@ public abstract class AbstractStrategyTask implements Strategy {
             session.close();
         }
         return resultType;
+    }
+
+    protected Sector getSector(String name) throws EmfException {
+        Sector sector = null;
+        Session session = sessionFactory.getSession();
+        try {
+            sector = new SectorsDAO().getSector(name, session);
+
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not get sector");
+        } finally {
+            session.close();
+        }
+        return sector;
     }
 
     private DatasetType getDatasetType(String name) {
