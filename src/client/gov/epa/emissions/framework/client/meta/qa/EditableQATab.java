@@ -273,6 +273,14 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
             return;
         }
         
+        String message = "Are you sure you want to remove the selected " + selected.size() + " QA step(s)?";
+        int selection = JOptionPane.showConfirmDialog(parentConsole, message, "Warning", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection != JOptionPane.YES_OPTION) {
+            return;
+        }
+        
         try {
             this.presenter.doDelete((QAStep[])selected.toArray(new QAStep[0]));
             messagePanel.setMessage("Deleting the QA steps, please watch status windows for detailed information.");
