@@ -1115,13 +1115,42 @@ select dt.id,
 (select id from emf.qa_programs where name = 'SQL') as qa_program_id, 
 'select 
 	REGION_CD::varchar(6) as FIPS, FACILITY_ID::varchar(15) as PLANTID, 
-	UNIT_ID::varchar(15) as POINTID, REL_POINT_ID::varchar(15) as STACKID, PROCESS_ID::varchar(15) as SEGMENT, FACILITY_NAME::varchar(40) as PLANT, SCC::varchar(10) as SCC, ERPTYPE::varchar(2) as ERPTYPE, FAC_SOURCE_TYPE::varchar(2) as SRCTYPE, STKHGT as STKHGT, STKDIAM as STKDIAM, STKTEMP as STKTEMP, STKFLOW as STKFLOW, STKVEL as STKVEL, null as SIC, null as MACT, NAICS::varchar(6) as NAICS, null as CTYPE, LONGITUDE as XLOC, LATITUDE as YLOC, null as UTMZ, POLL::varchar(16) as POLL, ANN_VALUE as ANN_EMIS, null as AVD_EMIS, ANN_PCT_RED as CEFF, 100 as REFF, 
+	UNIT_ID::varchar(15) as POINTID, REL_POINT_ID::varchar(15) as STACKID, 
+	PROCESS_ID::varchar(15) as SEGMENT, FACILITY_NAME::varchar(40) as PLANT, 
+	SCC::varchar(10) as SCC, ERPTYPE::varchar(2) as ERPTYPE, 
+	FAC_SOURCE_TYPE::varchar(2) as SRCTYPE, STKHGT as STKHGT, 
+	STKDIAM as STKDIAM, STKTEMP as STKTEMP, 
+	STKFLOW as STKFLOW, STKVEL as STKVEL, 
+	null::varchar(4) as SIC, null::varchar(6) as MACT, 
+	NAICS::varchar(6) as NAICS, null::varchar(1) as CTYPE, 
+	LONGITUDE as XLOC, LATITUDE as YLOC, 
+	null::smallint as UTMZ, POLL::varchar(16) as POLL, 
+	ANN_VALUE as ANN_EMIS, null::double precision as AVD_EMIS, 
+	ANN_PCT_RED as CEFF, 100::double precision as REFF, 
 	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 1 then (string_to_array(CONTROL_IDS,''&''))[1] else null end as CPRI, 
 	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 2 then (string_to_array(CONTROL_IDS,''&''))[2] else null end as CSEC, 
-	null as NEI_UNIQUE_ID, ORIS_FACILITY_CODE::varchar(6) as ORIS_FACILITY_CODE, ORIS_BOILER_ID::varchar(6) as ORIS_BOILER_ID, IPM_YN::varchar(1) as IPM_YN, DATA_SET_ID::varchar(10) as DATA_SOURCE, null as STACK_DEFAULT_FLAG, null as LOCATION_DEFAULT_FLAG, CALC_YEAR::varchar(4) as YEAR, TRIBAL_CODE::varchar(3) as TRIBAL_CODE, FUG_WIDTH_YDIM*FUG_LENGTH_XDIM as HORIZONTAL_AREA_FUGITIVE, FUG_HEIGHT as RELEASE_HEIGHT_FUGITIVE, ZIPCODE::varchar(14) as ZIPCODE, null as NAICS_FLAG, null as SIC_FLAG, null as MACT_FLAG, null as PROCESS_MACT_COMPLIANCE_STATUS, null as IPM_FACILITY, null as IPM_UNIT, null as BART_SOURCE, null as BART_UNIT, null as CONTROL_STATUS, null as START_DATE, null as END_DATE, null as WINTER_THROUGHPUT_PCT, null as SPRING_THROUGHPUT_PCT, null as SUMMER_THROUGHPUT_PCT, null as FALL_THROUGHPUT_PCT, null as ANNUAL_AVG_DAYS_PER_WEEK, null as ANNUAL_AVG_WEEKS_PER_YEAR, null as ANNUAL_AVG_HOURS_PER_DAY, ANNUAL_AVG_HOURS_PER_YEAR as ANNUAL_AVG_HOURS_PER_YEAR, null as PERIOD_DAYS_PER_WEEK, null as PERIOD_WEEKS_PER_PERIOD, null as PERIOD_HOURS_PER_DAY, null as PERIOD_HOURS_PER_PERIOD, DESIGN_CAPACITY as DESIGN_CAPACITY, 
+	null::varchar(20) as NEI_UNIQUE_ID, ORIS_FACILITY_CODE::varchar(6) as ORIS_FACILITY_CODE, 
+	ORIS_BOILER_ID::varchar(6) as ORIS_BOILER_ID, IPM_YN::varchar(1) as IPM_YN, 
+	DATA_SET_ID::varchar(10) as DATA_SOURCE, null::varchar(10) as STACK_DEFAULT_FLAG, 
+	null::varchar(10) as LOCATION_DEFAULT_FLAG, CALC_YEAR::varchar(4) as YEAR, 
+	TRIBAL_CODE::varchar(3) as TRIBAL_CODE, FUG_WIDTH_YDIM*FUG_LENGTH_XDIM as HORIZONTAL_AREA_FUGITIVE, 
+	FUG_HEIGHT as RELEASE_HEIGHT_FUGITIVE, ZIPCODE::varchar(14) as ZIPCODE, 
+	null::varchar(3) as NAICS_FLAG, null::varchar(3) as SIC_FLAG, 
+	null::varchar(15) as MACT_FLAG, null::varchar(6) as PROCESS_MACT_COMPLIANCE_STATUS, 
+	null::varchar(3) as IPM_FACILITY, null::varchar(3) as IPM_UNIT, 
+	null::varchar(10) as BART_SOURCE, null::varchar(10) as BART_UNIT, 
+	null::varchar(12) as CONTROL_STATUS, null::varchar(10) as START_DATE, 
+	null::varchar(10) as END_DATE, null::double precision as WINTER_THROUGHPUT_PCT, 
+	null::double precision as SPRING_THROUGHPUT_PCT, null::double precision as SUMMER_THROUGHPUT_PCT, 
+	null::double precision as FALL_THROUGHPUT_PCT, null::double precision as ANNUAL_AVG_DAYS_PER_WEEK, 
+	null::double precision as ANNUAL_AVG_WEEKS_PER_YEAR, null::double precision as ANNUAL_AVG_HOURS_PER_DAY, 
+	ANNUAL_AVG_HOURS_PER_YEAR as ANNUAL_AVG_HOURS_PER_YEAR, null::double precision as PERIOD_DAYS_PER_WEEK, 
+	null::double precision as PERIOD_WEEKS_PER_PERIOD, null::double precision as PERIOD_HOURS_PER_DAY, 
+	null::double precision as PERIOD_HOURS_PER_PERIOD, DESIGN_CAPACITY as DESIGN_CAPACITY, 
 	case when array_length(string_to_array(DESIGN_CAPACITY_UNITS,''/''), 1) >= 1 then (string_to_array(DESIGN_CAPACITY_UNITS,''/''))[1] else null end as DESIGN_CAPACITY_UNIT_NUMERATOR, 
 	case when array_length(string_to_array(DESIGN_CAPACITY_UNITS,''/''), 1) >= 2 then (string_to_array(DESIGN_CAPACITY_UNITS,''/''))[2] else null end as DESIGN_CAPACITY_UNIT_DENOMINATOR, 
-	CONTROL_MEASURES as CONTROL_MEASURES, null as PCT_REDUCTION, CURRENT_COST as CURRENT_COST, CUMULATIVE_COST as CUMULATIVE_COST
+	CONTROL_MEASURES as CONTROL_MEASURES, null::double precision as PCT_REDUCTION, 
+	CURRENT_COST as CURRENT_COST, CUMULATIVE_COST as CUMULATIVE_COST
 FROM $TABLE[1] e', false, 1, ''
 from emf.dataset_types dt
 where name in ('Flat File 2010 Point')
@@ -1130,13 +1159,42 @@ where name in ('Flat File 2010 Point')
 update emf.dataset_types_qa_step_templates 
 set program_arguments = 'select 
 	REGION_CD::varchar(6) as FIPS, FACILITY_ID::varchar(15) as PLANTID, 
-	UNIT_ID::varchar(15) as POINTID, REL_POINT_ID::varchar(15) as STACKID, PROCESS_ID::varchar(15) as SEGMENT, FACILITY_NAME::varchar(40) as PLANT, SCC::varchar(10) as SCC, ERPTYPE::varchar(2) as ERPTYPE, FAC_SOURCE_TYPE::varchar(2) as SRCTYPE, STKHGT as STKHGT, STKDIAM as STKDIAM, STKTEMP as STKTEMP, STKFLOW as STKFLOW, STKVEL as STKVEL, null as SIC, null as MACT, NAICS::varchar(6) as NAICS, null as CTYPE, LONGITUDE as XLOC, LATITUDE as YLOC, null as UTMZ, POLL::varchar(16) as POLL, ANN_VALUE as ANN_EMIS, null as AVD_EMIS, ANN_PCT_RED as CEFF, 100 as REFF, 
+	UNIT_ID::varchar(15) as POINTID, REL_POINT_ID::varchar(15) as STACKID, 
+	PROCESS_ID::varchar(15) as SEGMENT, FACILITY_NAME::varchar(40) as PLANT, 
+	SCC::varchar(10) as SCC, ERPTYPE::varchar(2) as ERPTYPE, 
+	FAC_SOURCE_TYPE::varchar(2) as SRCTYPE, STKHGT as STKHGT, 
+	STKDIAM as STKDIAM, STKTEMP as STKTEMP, 
+	STKFLOW as STKFLOW, STKVEL as STKVEL, 
+	null::varchar(4) as SIC, null::varchar(6) as MACT, 
+	NAICS::varchar(6) as NAICS, null::varchar(1) as CTYPE, 
+	LONGITUDE as XLOC, LATITUDE as YLOC, 
+	null::smallint as UTMZ, POLL::varchar(16) as POLL, 
+	ANN_VALUE as ANN_EMIS, null::double precision as AVD_EMIS, 
+	ANN_PCT_RED as CEFF, 100::double precision as REFF, 
 	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 1 then (string_to_array(CONTROL_IDS,''&''))[1] else null end as CPRI, 
 	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 2 then (string_to_array(CONTROL_IDS,''&''))[2] else null end as CSEC, 
-	null as NEI_UNIQUE_ID, ORIS_FACILITY_CODE::varchar(6) as ORIS_FACILITY_CODE, ORIS_BOILER_ID::varchar(6) as ORIS_BOILER_ID, IPM_YN::varchar(1) as IPM_YN, DATA_SET_ID::varchar(10) as DATA_SOURCE, null as STACK_DEFAULT_FLAG, null as LOCATION_DEFAULT_FLAG, CALC_YEAR::varchar(4) as YEAR, TRIBAL_CODE::varchar(3) as TRIBAL_CODE, FUG_WIDTH_YDIM*FUG_LENGTH_XDIM as HORIZONTAL_AREA_FUGITIVE, FUG_HEIGHT as RELEASE_HEIGHT_FUGITIVE, ZIPCODE::varchar(14) as ZIPCODE, null as NAICS_FLAG, null as SIC_FLAG, null as MACT_FLAG, null as PROCESS_MACT_COMPLIANCE_STATUS, null as IPM_FACILITY, null as IPM_UNIT, null as BART_SOURCE, null as BART_UNIT, null as CONTROL_STATUS, null as START_DATE, null as END_DATE, null as WINTER_THROUGHPUT_PCT, null as SPRING_THROUGHPUT_PCT, null as SUMMER_THROUGHPUT_PCT, null as FALL_THROUGHPUT_PCT, null as ANNUAL_AVG_DAYS_PER_WEEK, null as ANNUAL_AVG_WEEKS_PER_YEAR, null as ANNUAL_AVG_HOURS_PER_DAY, ANNUAL_AVG_HOURS_PER_YEAR as ANNUAL_AVG_HOURS_PER_YEAR, null as PERIOD_DAYS_PER_WEEK, null as PERIOD_WEEKS_PER_PERIOD, null as PERIOD_HOURS_PER_DAY, null as PERIOD_HOURS_PER_PERIOD, DESIGN_CAPACITY as DESIGN_CAPACITY, 
+	null::varchar(20) as NEI_UNIQUE_ID, ORIS_FACILITY_CODE::varchar(6) as ORIS_FACILITY_CODE, 
+	ORIS_BOILER_ID::varchar(6) as ORIS_BOILER_ID, IPM_YN::varchar(1) as IPM_YN, 
+	DATA_SET_ID::varchar(10) as DATA_SOURCE, null::varchar(10) as STACK_DEFAULT_FLAG, 
+	null::varchar(10) as LOCATION_DEFAULT_FLAG, CALC_YEAR::varchar(4) as YEAR, 
+	TRIBAL_CODE::varchar(3) as TRIBAL_CODE, FUG_WIDTH_YDIM*FUG_LENGTH_XDIM as HORIZONTAL_AREA_FUGITIVE, 
+	FUG_HEIGHT as RELEASE_HEIGHT_FUGITIVE, ZIPCODE::varchar(14) as ZIPCODE, 
+	null::varchar(3) as NAICS_FLAG, null::varchar(3) as SIC_FLAG, 
+	null::varchar(15) as MACT_FLAG, null::varchar(6) as PROCESS_MACT_COMPLIANCE_STATUS, 
+	null::varchar(3) as IPM_FACILITY, null::varchar(3) as IPM_UNIT, 
+	null::varchar(10) as BART_SOURCE, null::varchar(10) as BART_UNIT, 
+	null::varchar(12) as CONTROL_STATUS, null::varchar(10) as START_DATE, 
+	null::varchar(10) as END_DATE, null::double precision as WINTER_THROUGHPUT_PCT, 
+	null::double precision as SPRING_THROUGHPUT_PCT, null::double precision as SUMMER_THROUGHPUT_PCT, 
+	null::double precision as FALL_THROUGHPUT_PCT, null::double precision as ANNUAL_AVG_DAYS_PER_WEEK, 
+	null::double precision as ANNUAL_AVG_WEEKS_PER_YEAR, null::double precision as ANNUAL_AVG_HOURS_PER_DAY, 
+	ANNUAL_AVG_HOURS_PER_YEAR as ANNUAL_AVG_HOURS_PER_YEAR, null::double precision as PERIOD_DAYS_PER_WEEK, 
+	null::double precision as PERIOD_WEEKS_PER_PERIOD, null::double precision as PERIOD_HOURS_PER_DAY, 
+	null::double precision as PERIOD_HOURS_PER_PERIOD, DESIGN_CAPACITY as DESIGN_CAPACITY, 
 	case when array_length(string_to_array(DESIGN_CAPACITY_UNITS,''/''), 1) >= 1 then (string_to_array(DESIGN_CAPACITY_UNITS,''/''))[1] else null end as DESIGN_CAPACITY_UNIT_NUMERATOR, 
 	case when array_length(string_to_array(DESIGN_CAPACITY_UNITS,''/''), 1) >= 2 then (string_to_array(DESIGN_CAPACITY_UNITS,''/''))[2] else null end as DESIGN_CAPACITY_UNIT_DENOMINATOR, 
-	CONTROL_MEASURES as CONTROL_MEASURES, null as PCT_REDUCTION, CURRENT_COST as CURRENT_COST, CUMULATIVE_COST as CUMULATIVE_COST
+	CONTROL_MEASURES as CONTROL_MEASURES, null::double precision as PCT_REDUCTION, 
+	CURRENT_COST as CURRENT_COST, CUMULATIVE_COST as CUMULATIVE_COST
 FROM $TABLE[1] e'
 where name = 'Convert to ORL Point'
 and dataset_type_id in 
@@ -1153,24 +1211,24 @@ select dt.id,
 (select id from emf.qa_programs where name = 'SQL') as qa_program_id, 
 'select 
 	REGION_CD::varchar(6) as FIPS, SCC::varchar(10) as SCC, 
-	null as SIC, null as MACT, 
-	EMIS_TYPE::varchar(2) as SRCTYPE, null as NAICS, 
+	null::varchar(4) as SIC, null::varchar(6) as MACT, 
+	EMIS_TYPE::varchar(2) as SRCTYPE, null::varchar(6) as NAICS, 
 	POLL::varchar(16) as POLL, ANN_VALUE as ANN_EMIS, 
-	null as AVD_EMIS, ANN_PCT_RED as CEFF, 
-	100 as REFF, 100 as RPEN, 
+	null::double precision as AVD_EMIS, ANN_PCT_RED as CEFF, 
+	100::double precision as REFF, 100::double precision as RPEN, 
 	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 1 then (string_to_array(CONTROL_IDS,''&''))[1] else null end as PRIMARY_DEVICE_TYPE_CODE, 
 	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 2 then (string_to_array(CONTROL_IDS,''&''))[2] else null end as SECONDARY_DEVICE_TYPE_CODE, 
 	DATA_SET_ID::varchar(10) as DATA_SOURCE, CALC_YEAR::varchar(4) as YEAR, 
-	TRIBAL_CODE::varchar(3) as TRIBAL_CODE, null as MACT_FLAG, 
-	null as PROCESS_MACT_COMPLIANCE_STATUS, null as START_DATE, 
-	null as END_DATE, null as WINTER_THROUGHPUT_PCT, 
-	null as SPRING_THROUGHPUT_PCT, null as SUMMER_THROUGHPUT_PCT, 
-	null as FALL_THROUGHPUT_PCT, null as ANNUAL_AVG_DAYS_PER_WEEK, 
-	null as ANNUAL_AVG_WEEKS_PER_YEAR, null as ANNUAL_AVG_HOURS_PER_DAY, 
-	null as ANNUAL_AVG_HOURS_PER_YEAR, null as PERIOD_DAYS_PER_WEEK, 
-	null as PERIOD_WEEKS_PER_PERIOD, null as PERIOD_HOURS_PER_DAY, 
-	null as PERIOD_HOURS_PER_PERIOD, CONTROL_MEASURES as CONTROL_MEASURES, 
-	null as PCT_REDUCTION, CURRENT_COST as CURRENT_COST, 
+	TRIBAL_CODE::varchar(3) as TRIBAL_CODE, null::varchar(15) as MACT_FLAG, 
+	null::varchar(6) as PROCESS_MACT_COMPLIANCE_STATUS, null::varchar(10) as START_DATE, 
+	null::varchar(10) as END_DATE, null::double precision as WINTER_THROUGHPUT_PCT, 
+	null::double precision as SPRING_THROUGHPUT_PCT, null::double precision as SUMMER_THROUGHPUT_PCT, 
+	null::double precision as FALL_THROUGHPUT_PCT, null::double precision as ANNUAL_AVG_DAYS_PER_WEEK, 
+	null::double precision as ANNUAL_AVG_WEEKS_PER_YEAR, null::double precision as ANNUAL_AVG_HOURS_PER_DAY, 
+	null::double precision as ANNUAL_AVG_HOURS_PER_YEAR, null::double precision as PERIOD_DAYS_PER_WEEK, 
+	null::double precision as PERIOD_WEEKS_PER_PERIOD, null::double precision as PERIOD_HOURS_PER_DAY, 
+	null::double precision as PERIOD_HOURS_PER_PERIOD, CONTROL_MEASURES as CONTROL_MEASURES, 
+	null::double precision as PCT_REDUCTION, CURRENT_COST as CURRENT_COST, 
 	CUMULATIVE_COST as CUMULATIVE_COST
 FROM $TABLE[1] e', false, 1, ''
 from emf.dataset_types dt
@@ -1180,24 +1238,24 @@ where name in ('Flat File 2010 Nonpoint')
 update emf.dataset_types_qa_step_templates 
 set program_arguments = 'select 
 	REGION_CD::varchar(6) as FIPS, SCC::varchar(10) as SCC, 
-	null as SIC, null as MACT, 
-	EMIS_TYPE::varchar(2) as SRCTYPE, null as NAICS, 
+	null::varchar(4) as SIC, null::varchar(6) as MACT, 
+	EMIS_TYPE::varchar(2) as SRCTYPE, null::varchar(6) as NAICS, 
 	POLL::varchar(16) as POLL, ANN_VALUE as ANN_EMIS, 
-	null as AVD_EMIS, ANN_PCT_RED as CEFF, 
-	100 as REFF, 100 as RPEN, 
+	null::double precision as AVD_EMIS, ANN_PCT_RED as CEFF, 
+	100::double precision as REFF, 100::double precision as RPEN, 
 	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 1 then (string_to_array(CONTROL_IDS,''&''))[1] else null end as PRIMARY_DEVICE_TYPE_CODE, 
 	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 2 then (string_to_array(CONTROL_IDS,''&''))[2] else null end as SECONDARY_DEVICE_TYPE_CODE, 
 	DATA_SET_ID::varchar(10) as DATA_SOURCE, CALC_YEAR::varchar(4) as YEAR, 
-	TRIBAL_CODE::varchar(3) as TRIBAL_CODE, null as MACT_FLAG, 
-	null as PROCESS_MACT_COMPLIANCE_STATUS, null as START_DATE, 
-	null as END_DATE, null as WINTER_THROUGHPUT_PCT, 
-	null as SPRING_THROUGHPUT_PCT, null as SUMMER_THROUGHPUT_PCT, 
-	null as FALL_THROUGHPUT_PCT, null as ANNUAL_AVG_DAYS_PER_WEEK, 
-	null as ANNUAL_AVG_WEEKS_PER_YEAR, null as ANNUAL_AVG_HOURS_PER_DAY, 
-	null as ANNUAL_AVG_HOURS_PER_YEAR, null as PERIOD_DAYS_PER_WEEK, 
-	null as PERIOD_WEEKS_PER_PERIOD, null as PERIOD_HOURS_PER_DAY, 
-	null as PERIOD_HOURS_PER_PERIOD, CONTROL_MEASURES as CONTROL_MEASURES, 
-	null as PCT_REDUCTION, CURRENT_COST as CURRENT_COST, 
+	TRIBAL_CODE::varchar(3) as TRIBAL_CODE, null::varchar(15) as MACT_FLAG, 
+	null::varchar(6) as PROCESS_MACT_COMPLIANCE_STATUS, null::varchar(10) as START_DATE, 
+	null::varchar(10) as END_DATE, null::double precision as WINTER_THROUGHPUT_PCT, 
+	null::double precision as SPRING_THROUGHPUT_PCT, null::double precision as SUMMER_THROUGHPUT_PCT, 
+	null::double precision as FALL_THROUGHPUT_PCT, null::double precision as ANNUAL_AVG_DAYS_PER_WEEK, 
+	null::double precision as ANNUAL_AVG_WEEKS_PER_YEAR, null::double precision as ANNUAL_AVG_HOURS_PER_DAY, 
+	null::double precision as ANNUAL_AVG_HOURS_PER_YEAR, null::double precision as PERIOD_DAYS_PER_WEEK, 
+	null::double precision as PERIOD_WEEKS_PER_PERIOD, null::double precision as PERIOD_HOURS_PER_DAY, 
+	null::double precision as PERIOD_HOURS_PER_PERIOD, CONTROL_MEASURES as CONTROL_MEASURES, 
+	null::double precision as PCT_REDUCTION, CURRENT_COST as CURRENT_COST, 
 	CUMULATIVE_COST as CUMULATIVE_COST
 FROM $TABLE[1] e'
 where name = 'Convert to ORL Nonpoint'
@@ -1209,6 +1267,192 @@ where name in ('Flat File 2010 Nonpoint'));
 --7/21/2011
 insert into emf.keywords ("name") values('TARGET_YEAR');
 insert into emf.keywords ("name") values('CONTROL_STRATEGY_DETAILED_RESULT_NAME');
+
+-- 8/3/2011
+-- added some qa template for previos deploy
+-- Template for QA Program "Convert to ORL Onroad" - 'Flat File 2010 Nonpoint'
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, 
+(select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
+'Convert to ORL Onroad' as name, 
+(select id from emf.qa_programs where name = 'SQL') as qa_program_id, 
+'select 
+	REGION_CD::varchar(6) as FIPS, SCC::varchar(10) as SCC, 
+	POLL::varchar(16) as POLL, ANN_VALUE as ANN_EMIS, 
+	null::double precision as AVD_EMIS, EMIS_TYPE::varchar(2) as SRCTYPE, 
+	DATA_SET_ID::varchar(6) as DATA_SOURCE, CALC_YEAR::varchar(4) as YEAR, 
+	TRIBAL_CODE::varchar(3) as TRIBAL_CODE, ANN_PCT_RED as CEFF, 
+	100::double precision as REFF, 100::double precision as RPEN, 
+	CONTROL_MEASURES as CONTROL_MEASURES, null::double precision as PCT_REDUCTION, 
+	CURRENT_COST as CURRENT_COST, CUMULATIVE_COST as CUMULATIVE_COST
+FROM $TABLE[1] e', false, 1, ''
+from emf.dataset_types dt
+where name in ('Flat File 2010 Nonpoint')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Convert to ORL Onroad');
+
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select 
+	REGION_CD::varchar(6) as FIPS, SCC::varchar(10) as SCC, 
+	POLL::varchar(16) as POLL, ANN_VALUE as ANN_EMIS, 
+	null::double precision as AVD_EMIS, EMIS_TYPE::varchar(2) as SRCTYPE, 
+	DATA_SET_ID::varchar(6) as DATA_SOURCE, CALC_YEAR::varchar(4) as YEAR, 
+	TRIBAL_CODE::varchar(3) as TRIBAL_CODE, ANN_PCT_RED as CEFF, 
+	100::double precision as REFF, 100::double precision as RPEN, 
+	CONTROL_MEASURES as CONTROL_MEASURES, null::double precision as PCT_REDUCTION, 
+	CURRENT_COST as CURRENT_COST, CUMULATIVE_COST as CUMULATIVE_COST
+FROM $TABLE[1] e'
+where name = 'Convert to ORL Onroad'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('Flat File 2010 Nonpoint'));
+
+
+-- Template for QA Program "Convert to ORL Nonroad" - 'Flat File 2010 Nonpoint'
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, 
+(select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
+'Convert to ORL Nonroad' as name, 
+(select id from emf.qa_programs where name = 'SQL') as qa_program_id, 
+'select 
+	REGION_CD::varchar(6) as FIPS, SCC::varchar(10) as SCC, 
+	POLL::varchar(16) as POLL, ANN_VALUE as ANN_EMIS, 
+	null::double precision as AVD_EMIS, ANN_PCT_RED as CEFF, 
+	100::double precision as REFF, 100::double precision as RPEN, 
+	EMIS_TYPE::varchar(2) as SRCTYPE, DATA_SET_ID::varchar(10) as DATA_SOURCE, 
+	CALC_YEAR::varchar(4) as YEAR, TRIBAL_CODE::varchar(3) as TRIBAL_CODE, 
+	null::varchar(10) as START_DATE, null::varchar(10) as END_DATE, 
+	null::double precision as WINTER_THROUGHPUT_PCT, null::double precision as SPRING_THROUGHPUT_PCT, 
+	null::double precision as SUMMER_THROUGHPUT_PCT, null::double precision as FALL_THROUGHPUT_PCT, 
+	null::double precision as ANNUAL_AVG_DAYS_PER_WEEK, null::double precision as ANNUAL_AVG_WEEKS_PER_YEAR, 
+	null::double precision as ANNUAL_AVG_HOURS_PER_DAY, null::double precision as ANNUAL_AVG_HOURS_PER_YEAR, 
+	null::double precision as PERIOD_DAYS_PER_WEEK, null::double precision as PERIOD_WEEKS_PER_PERIOD, 
+	null::double precision as PERIOD_HOURS_PER_DAY, null::double precision as PERIOD_HOURS_PER_PERIOD, 
+	CONTROL_MEASURES as CONTROL_MEASURES, null::double precision as PCT_REDUCTION, 
+	CURRENT_COST as CURRENT_COST, CUMULATIVE_COST as CUMULATIVE_COST
+FROM $TABLE[1] e', false, 1, ''
+from emf.dataset_types dt
+where name in ('Flat File 2010 Nonpoint')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Convert to ORL Nonroad');
+
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select 
+	REGION_CD::varchar(6) as FIPS, SCC::varchar(10) as SCC, 
+	POLL::varchar(16) as POLL, ANN_VALUE as ANN_EMIS, 
+	null::double precision as AVD_EMIS, ANN_PCT_RED as CEFF, 
+	100::double precision as REFF, 100::double precision as RPEN, 
+	EMIS_TYPE::varchar(2) as SRCTYPE, DATA_SET_ID::varchar(10) as DATA_SOURCE, 
+	CALC_YEAR::varchar(4) as YEAR, TRIBAL_CODE::varchar(3) as TRIBAL_CODE, 
+	null::varchar(10) as START_DATE, null::varchar(10) as END_DATE, 
+	null::double precision as WINTER_THROUGHPUT_PCT, null::double precision as SPRING_THROUGHPUT_PCT, 
+	null::double precision as SUMMER_THROUGHPUT_PCT, null::double precision as FALL_THROUGHPUT_PCT, 
+	null::double precision as ANNUAL_AVG_DAYS_PER_WEEK, null::double precision as ANNUAL_AVG_WEEKS_PER_YEAR, 
+	null::double precision as ANNUAL_AVG_HOURS_PER_DAY, null::double precision as ANNUAL_AVG_HOURS_PER_YEAR, 
+	null::double precision as PERIOD_DAYS_PER_WEEK, null::double precision as PERIOD_WEEKS_PER_PERIOD, 
+	null::double precision as PERIOD_HOURS_PER_DAY, null::double precision as PERIOD_HOURS_PER_PERIOD, 
+	CONTROL_MEASURES as CONTROL_MEASURES, null::double precision as PCT_REDUCTION, 
+	CURRENT_COST as CURRENT_COST, CUMULATIVE_COST as CUMULATIVE_COST
+FROM $TABLE[1] e'
+where name = 'Convert to ORL Nonroad'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('Flat File 2010 Nonpoint'));
+
+-- Template for QA Program "Convert to ORL Point using Agency Ids" - 'Flat File 2010 Point'
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, 
+(select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
+'Convert to ORL Point using Agency Ids' as name, 
+(select id from emf.qa_programs where name = 'SQL') as qa_program_id, 
+'select 
+	REGION_CD::varchar(6) as FIPS, AGY_FACILITY_ID::varchar(15) as PLANTID, 
+	AGY_UNIT_ID::varchar(15) as POINTID, AGY_REL_POINT_ID::varchar(15) as STACKID, 
+	AGY_PROCESS_ID::varchar(15) as SEGMENT, FACILITY_NAME::varchar(40) as PLANT, 
+	SCC::varchar(10) as SCC, ERPTYPE::varchar(2) as ERPTYPE, 
+	FAC_SOURCE_TYPE::varchar(2) as SRCTYPE, STKHGT as STKHGT, 
+	STKDIAM as STKDIAM, STKTEMP as STKTEMP, 
+	STKFLOW as STKFLOW, STKVEL as STKVEL, 
+	null::varchar(4) as SIC, null::varchar(6) as MACT, 
+	NAICS::varchar(6) as NAICS, null::varchar(1) as CTYPE, 
+	LONGITUDE as XLOC, LATITUDE as YLOC, 
+	null::smallint as UTMZ, POLL::varchar(16) as POLL, 
+	ANN_VALUE as ANN_EMIS, null::double precision as AVD_EMIS, 
+	ANN_PCT_RED as CEFF, 100::double precision as REFF, 
+	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 1 then (string_to_array(CONTROL_IDS,''&''))[1] else null end as CPRI, 
+	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 2 then (string_to_array(CONTROL_IDS,''&''))[2] else null end as CSEC, 
+	null::varchar(20) as NEI_UNIQUE_ID, ORIS_FACILITY_CODE::varchar(6) as ORIS_FACILITY_CODE, 
+	ORIS_BOILER_ID::varchar(6) as ORIS_BOILER_ID, IPM_YN::varchar(1) as IPM_YN, 
+	DATA_SET_ID::varchar(10) as DATA_SOURCE, null::varchar(10) as STACK_DEFAULT_FLAG, 
+	null::varchar(10) as LOCATION_DEFAULT_FLAG, CALC_YEAR::varchar(4) as YEAR, 
+	TRIBAL_CODE::varchar(3) as TRIBAL_CODE, FUG_WIDTH_YDIM*FUG_LENGTH_XDIM as HORIZONTAL_AREA_FUGITIVE, 
+	FUG_HEIGHT as RELEASE_HEIGHT_FUGITIVE, ZIPCODE::varchar(14) as ZIPCODE, 
+	null::varchar(3) as NAICS_FLAG, null::varchar(3) as SIC_FLAG, 
+	null::varchar(15) as MACT_FLAG, null::varchar(6) as PROCESS_MACT_COMPLIANCE_STATUS, 
+	null::varchar(3) as IPM_FACILITY, null::varchar(3) as IPM_UNIT, 
+	null::varchar(10) as BART_SOURCE, null::varchar(10) as BART_UNIT, 
+	null::varchar(12) as CONTROL_STATUS, null::varchar(10) as START_DATE, 
+	null::varchar(10) as END_DATE, null::double precision as WINTER_THROUGHPUT_PCT, 
+	null::double precision as SPRING_THROUGHPUT_PCT, null::double precision as SUMMER_THROUGHPUT_PCT, 
+	null::double precision as FALL_THROUGHPUT_PCT, null::double precision as ANNUAL_AVG_DAYS_PER_WEEK, 
+	null::double precision as ANNUAL_AVG_WEEKS_PER_YEAR, null::double precision as ANNUAL_AVG_HOURS_PER_DAY, 
+	ANNUAL_AVG_HOURS_PER_YEAR as ANNUAL_AVG_HOURS_PER_YEAR, null::double precision as PERIOD_DAYS_PER_WEEK, 
+	null::double precision as PERIOD_WEEKS_PER_PERIOD, null::double precision as PERIOD_HOURS_PER_DAY, 
+	null::double precision as PERIOD_HOURS_PER_PERIOD, DESIGN_CAPACITY as DESIGN_CAPACITY, 
+	case when array_length(string_to_array(DESIGN_CAPACITY_UNITS,''/''), 1) >= 1 then (string_to_array(DESIGN_CAPACITY_UNITS,''/''))[1] else null end as DESIGN_CAPACITY_UNIT_NUMERATOR, 
+	case when array_length(string_to_array(DESIGN_CAPACITY_UNITS,''/''), 1) >= 2 then (string_to_array(DESIGN_CAPACITY_UNITS,''/''))[2] else null end as DESIGN_CAPACITY_UNIT_DENOMINATOR, 
+	CONTROL_MEASURES as CONTROL_MEASURES, null::double precision as PCT_REDUCTION, 
+	CURRENT_COST as CURRENT_COST, CUMULATIVE_COST as CUMULATIVE_COST
+FROM $TABLE[1] e', false, 1, ''
+from emf.dataset_types dt
+where name in ('Flat File 2010 Point')
+	and not exists (select 1 from emf.dataset_types_qa_step_templates qatemp where qatemp.dataset_type_id = dt.id and qatemp.name = 'Convert to ORL Point using Agency Ids');
+
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select 
+	REGION_CD::varchar(6) as FIPS, AGY_FACILITY_ID::varchar(15) as PLANTID, 
+	AGY_UNIT_ID::varchar(15) as POINTID, AGY_REL_POINT_ID::varchar(15) as STACKID, 
+	AGY_PROCESS_ID::varchar(15) as SEGMENT, FACILITY_NAME::varchar(40) as PLANT, 
+	SCC::varchar(10) as SCC, ERPTYPE::varchar(2) as ERPTYPE, 
+	FAC_SOURCE_TYPE::varchar(2) as SRCTYPE, STKHGT as STKHGT, 
+	STKDIAM as STKDIAM, STKTEMP as STKTEMP, 
+	STKFLOW as STKFLOW, STKVEL as STKVEL, 
+	null::varchar(4) as SIC, null::varchar(6) as MACT, 
+	NAICS::varchar(6) as NAICS, null::varchar(1) as CTYPE, 
+	LONGITUDE as XLOC, LATITUDE as YLOC, 
+	null::smallint as UTMZ, POLL::varchar(16) as POLL, 
+	ANN_VALUE as ANN_EMIS, null::double precision as AVD_EMIS, 
+	ANN_PCT_RED as CEFF, 100::double precision as REFF, 
+	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 1 then (string_to_array(CONTROL_IDS,''&''))[1] else null end as CPRI, 
+	case when array_length(string_to_array(CONTROL_IDS,''&''), 1) >= 2 then (string_to_array(CONTROL_IDS,''&''))[2] else null end as CSEC, 
+	null::varchar(20) as NEI_UNIQUE_ID, ORIS_FACILITY_CODE::varchar(6) as ORIS_FACILITY_CODE, 
+	ORIS_BOILER_ID::varchar(6) as ORIS_BOILER_ID, IPM_YN::varchar(1) as IPM_YN, 
+	DATA_SET_ID::varchar(10) as DATA_SOURCE, null::varchar(10) as STACK_DEFAULT_FLAG, 
+	null::varchar(10) as LOCATION_DEFAULT_FLAG, CALC_YEAR::varchar(4) as YEAR, 
+	TRIBAL_CODE::varchar(3) as TRIBAL_CODE, FUG_WIDTH_YDIM*FUG_LENGTH_XDIM as HORIZONTAL_AREA_FUGITIVE, 
+	FUG_HEIGHT as RELEASE_HEIGHT_FUGITIVE, ZIPCODE::varchar(14) as ZIPCODE, 
+	null::varchar(3) as NAICS_FLAG, null::varchar(3) as SIC_FLAG, 
+	null::varchar(15) as MACT_FLAG, null::varchar(6) as PROCESS_MACT_COMPLIANCE_STATUS, 
+	null::varchar(3) as IPM_FACILITY, null::varchar(3) as IPM_UNIT, 
+	null::varchar(10) as BART_SOURCE, null::varchar(10) as BART_UNIT, 
+	null::varchar(12) as CONTROL_STATUS, null::varchar(10) as START_DATE, 
+	null::varchar(10) as END_DATE, null::double precision as WINTER_THROUGHPUT_PCT, 
+	null::double precision as SPRING_THROUGHPUT_PCT, null::double precision as SUMMER_THROUGHPUT_PCT, 
+	null::double precision as FALL_THROUGHPUT_PCT, null::double precision as ANNUAL_AVG_DAYS_PER_WEEK, 
+	null::double precision as ANNUAL_AVG_WEEKS_PER_YEAR, null::double precision as ANNUAL_AVG_HOURS_PER_DAY, 
+	ANNUAL_AVG_HOURS_PER_YEAR as ANNUAL_AVG_HOURS_PER_YEAR, null::double precision as PERIOD_DAYS_PER_WEEK, 
+	null::double precision as PERIOD_WEEKS_PER_PERIOD, null::double precision as PERIOD_HOURS_PER_DAY, 
+	null::double precision as PERIOD_HOURS_PER_PERIOD, DESIGN_CAPACITY as DESIGN_CAPACITY, 
+	case when array_length(string_to_array(DESIGN_CAPACITY_UNITS,''/''), 1) >= 1 then (string_to_array(DESIGN_CAPACITY_UNITS,''/''))[1] else null end as DESIGN_CAPACITY_UNIT_NUMERATOR, 
+	case when array_length(string_to_array(DESIGN_CAPACITY_UNITS,''/''), 1) >= 2 then (string_to_array(DESIGN_CAPACITY_UNITS,''/''))[2] else null end as DESIGN_CAPACITY_UNIT_DENOMINATOR, 
+	CONTROL_MEASURES as CONTROL_MEASURES, null::double precision as PCT_REDUCTION, 
+	CURRENT_COST as CURRENT_COST, CUMULATIVE_COST as CUMULATIVE_COST
+FROM $TABLE[1] e'
+where name = 'Convert to ORL Point using Agency Ids'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('Flat File 2010 Point'));
 
 -- 8/15/2011
 
