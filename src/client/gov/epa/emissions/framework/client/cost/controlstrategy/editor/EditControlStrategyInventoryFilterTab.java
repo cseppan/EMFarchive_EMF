@@ -276,7 +276,7 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         super.validate();
     }
 
-    private void fillVersions(EmfDataset dataset) throws EmfException{
+    private void fillVersions(EmfDataset dataset, Integer versionNumber) throws EmfException{
         version.setEnabled(true);
 
         if (dataset != null && dataset.getName().equals("None")) dataset = null;
@@ -284,17 +284,19 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         version.removeAllItems();
         version.setModel(new DefaultComboBoxModel(versions));
         version.revalidate();
-        if (versions.length > 0)
-            version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
+        if (versions.length > 0) 
+            version.setSelectedIndex(getVersionIndex(versions, dataset, versionNumber));
 
     }
     
-    private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
-        int defaultversion = dataset.getDefaultVersion();
-
-        for (int i = 0; i < versions.length; i++)
-            if (defaultversion == versions[i].getVersion())
-                return i;
+    private int getVersionIndex(Version[] versions, EmfDataset dataset, Integer version) {
+//        int defaultversion = dataset.getDefaultVersion();
+        
+        if (version != null) {
+            for (int i = 0; i < versions.length; i++)
+                if (version == versions[i].getVersion())
+                    return i;
+        }
 
         return 0;
     }
@@ -393,7 +395,10 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         dataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    fillVersions((EmfDataset) dataset.getSelectedItem());
+                    EmfDataset countyDataset = (EmfDataset)dataset.getSelectedItem();
+                    Integer versionNumber = (countyDataset != null ? countyDataset.getDefaultVersion() : null);
+
+                    fillVersions(countyDataset, versionNumber);
                 } catch (EmfException e1) {
                     // NOTE Auto-generated catch block
                     e1.printStackTrace();
@@ -404,12 +409,14 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
         version =new ComboBox(new Version[0]);           
 //        version.setPrototypeDisplayValue(width);
         try {
-            fillVersions((EmfDataset) dataset.getSelectedItem());
+            EmfDataset countyDataset = controlStrategy.getCountyDataset();
+            Integer versionNumber = (countyDataset != null ? controlStrategy.getCountyDatasetVersion() : null);
+            fillVersions(countyDataset, versionNumber);
         } catch (EmfException e1) {
             // NOTE Auto-generated catch block
             e1.printStackTrace();
         }
-        if (controlStrategy.getCountyDataset() != null) version.setSelectedItem(controlStrategy.getCountyDatasetVersion());
+//        if (controlStrategy.getCountyDataset() != null) version.setSelectedItem(controlStrategy.getCountyDatasetVersion());
         
         layoutGenerator.addLabelWidgetPair("County Dataset:", datasetPanel(), middlePanel);
         layoutGenerator.addLabelWidgetPair("County Dataset Version:", version, middlePanel);
