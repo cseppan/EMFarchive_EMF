@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.cost.analysis.common.AbstractStrateg
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -70,9 +71,16 @@ public class StrategyLoader extends AbstractStrategyLoader {
     private void runStrategy(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "";
         query = "SELECT public.run_max_emis_red_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
-        System.out.println(query);
+        if (DebugLevels.DEBUG_25())
+            System.out.println(query);
         try {
+            setStatus("Started populating Strategy Detailed Result from inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
             datasource.query().execute(query);
+            setStatus("Completed populating Strategy Detailed Result from inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {

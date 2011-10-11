@@ -25,6 +25,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -530,9 +531,6 @@ public class DatasetCreator {
         Calendar cal = Calendar.getInstance();
         dataset.setStartDateTime(cal.getTime());
         dataset.setStopDateTime(cal.getTime());
-        System.out.println("zero based month = " + dataset.applicableMonth());
-        System.out.println("no days in month = " + DateUtil.daysInZeroBasedMonth(2020, dataset.applicableMonth()));
-        System.out.println(dc.createControlledInventoryDatasetName("asdad", dataset));
     }
     
     public String createControlledInventoryDatasetName(String datasetNamePrefix, EmfDataset inputDataset) {

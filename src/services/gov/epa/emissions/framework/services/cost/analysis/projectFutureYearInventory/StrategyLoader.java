@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.cost.analysis.common.AbstractStrateg
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -111,17 +112,19 @@ public class StrategyLoader extends AbstractStrategyLoader {
         query = "SELECT public.run_project_future_year_inventory(" + controlStrategy.getId() + ", "
                 + controlStrategyInputDataset.getInputDataset().getId() + ", "
                 + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
-        System.out.println(System.currentTimeMillis() + " " + query);
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
         try {
             setStatus("Started applying control programs on inventory, " 
                     + controlStrategyInputDataset.getInputDataset().getName() 
                     + ".");
             datasource.query().execute(query);
-            setStatus("Finished applying control programs on inventory, " 
+            setStatus("Completed applying control programs on inventory, " 
                     + controlStrategyInputDataset.getInputDataset().getName() 
                     + ".");
         } catch (SQLException e) {
-            System.out.println("SQLException runStrategyUsingSQLApproach");
+            if (DebugLevels.DEBUG_25())
+                System.out.println("SQLException runStrategyUsingSQLApproach");
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
             //
@@ -132,11 +135,13 @@ public class StrategyLoader extends AbstractStrategyLoader {
         String query = "";
         query = "SELECT public.populate_project_future_year_inventory_strategy_messages(" + controlStrategy.getId()
                 + ", " + controlStrategyResult.getId() + ");";
-        System.out.println(System.currentTimeMillis() + " " + query);
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
-            System.out.println("SQLException runStrategyUsingSQLApproach");
+            if (DebugLevels.DEBUG_25())
+                System.out.println("SQLException runStrategyUsingSQLApproach");
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
             //

@@ -10,7 +10,7 @@
  	</id>
 	<property name="controlStrategyId" column="control_strategy_id" type="integer" not-null="true" />
 	<property name="inputDatasetVersion" column="dataset_version" type="integer" not-null="false"  />
-	<property name="totalCost" column="total_cost" not-null="false"/>
+	<property name="totalCost" column="total_cost" type="double" not-null="false"/>
 	<property name="totalReduction" column="total_reduction" type="double"  not-null="false" />
 	<property name="runStatus" column="run_status"	type="java.lang.String"	/>
 	<property name="completionTime" column="completion_time" type="java.util.Date" not-null="false" length="4"/>

@@ -42,6 +42,7 @@ public class DebugLevels {
     private static boolean debug_22 = getProperty("DEBUG_22");
     private static boolean debug_23 = getProperty("DEBUG_23");
     private static boolean debug_24 = getProperty("DEBUG_24");
+    private static boolean debug_25 = getProperty("DEBUG_25");
     
     
     private static synchronized void refresh() {
@@ -74,6 +75,7 @@ public class DebugLevels {
             debug_22 = getProperty("DEBUG_22");
             debug_23 = getProperty("DEBUG_23");
             debug_24 = getProperty("DEBUG_24");
+            debug_25 = getProperty("DEBUG_25");
             refreshRate = Integer.parseInt(propDAO.getProperty("DEBUG_LEVEL_REFRESH_RATE").getValue().trim());
         }
     }
@@ -103,5 +105,6 @@ public class DebugLevels {
     public static final boolean DEBUG_22() { refresh(); return debug_22; }  //to trace enhancing flat file 2010 point QA program
     public static final boolean DEBUG_23() { refresh(); return debug_23; } // DEBUG_CMIMPORT
     public static final boolean DEBUG_24() { refresh(); return debug_24; } // debug ExportTask
+    public static final boolean DEBUG_25() { refresh(); return debug_25; } // debug ControlStrategy operations
 
 }

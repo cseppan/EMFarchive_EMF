@@ -188,7 +188,10 @@ public class TargetPollutantEditorDialog extends JDialog implements TargetPollut
         dataset.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    fillVersions((EmfDataset) dataset.getSelectedItem());
+                    EmfDataset countyDataset = (EmfDataset)dataset.getSelectedItem();
+                    Integer versionNumber = (countyDataset != null ? countyDataset.getDefaultVersion() : null);
+
+                    fillVersions(countyDataset, versionNumber);
                 } catch (EmfException e1) {
                     // NOTE Auto-generated catch block
                     e1.printStackTrace();
@@ -199,12 +202,14 @@ public class TargetPollutantEditorDialog extends JDialog implements TargetPollut
         version =new ComboBox(new Version[0]);           
 //        version.setPrototypeDisplayValue(width);
         try {
-            fillVersions((EmfDataset) dataset.getSelectedItem());
+            EmfDataset countyDataset = controlStrategyTargetPollutant.getCountyDataset();
+            Integer versionNumber = (countyDataset != null ? controlStrategyTargetPollutant.getCountyDatasetVersion() : null);
+            fillVersions(countyDataset, versionNumber);
         } catch (EmfException e1) {
             // NOTE Auto-generated catch block
             e1.printStackTrace();
         }
-        if (controlStrategyTargetPollutant.getCountyDataset() != null) version.setSelectedItem(controlStrategyTargetPollutant.getCountyDatasetVersion());
+//        if (controlStrategyTargetPollutant.getCountyDataset() != null) version.setSelectedItem(controlStrategyTargetPollutant.getCountyDatasetVersion());
         
         layoutGenerator.addLabelWidgetPair("County Dataset:", dataset, panel);
         layoutGenerator.addLabelWidgetPair("County Dataset Version:", version, panel);
@@ -216,7 +221,7 @@ public class TargetPollutantEditorDialog extends JDialog implements TargetPollut
         return panel;
     }
 
-    private void fillVersions(EmfDataset dataset) throws EmfException{
+    private void fillVersions(EmfDataset dataset, Integer versionNumber) throws EmfException{
         version.setEnabled(true);
 
         if (dataset != null && dataset.getName().equals("None")) dataset = null;
@@ -224,17 +229,19 @@ public class TargetPollutantEditorDialog extends JDialog implements TargetPollut
         version.removeAllItems();
         version.setModel(new DefaultComboBoxModel(versions));
         version.revalidate();
-        if (versions.length > 0)
-            version.setSelectedIndex(getDefaultVersionIndex(versions, dataset));
+        if (versions.length > 0) 
+            version.setSelectedIndex(getVersionIndex(versions, dataset, versionNumber));
 
     }
     
-    private int getDefaultVersionIndex(Version[] versions, EmfDataset dataset) {
-        int defaultversion = dataset.getDefaultVersion();
-
-        for (int i = 0; i < versions.length; i++)
-            if (defaultversion == versions[i].getVersion())
-                return i;
+    private int getVersionIndex(Version[] versions, EmfDataset dataset, Integer version) {
+//        int defaultversion = dataset.getDefaultVersion();
+        
+        if (version != null) {
+            for (int i = 0; i < versions.length; i++)
+                if (version == versions[i].getVersion())
+                    return i;
+        }
 
         return 0;
     }

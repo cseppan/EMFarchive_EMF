@@ -22,6 +22,9 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
 
     public void afterRun() throws EmfException {
 
+        if (controlStrategy.getApplyCAPMeasuresOnHAPPollutants())
+            applyCAPMeasuresOnHAPPollutants(strategyResultList.toArray(new ControlStrategyResult[0]));
+        
         // now create the county summary result based on the results from the strategy run...
         generateStrategyCountySummaryResult(strategyResultList.toArray(new ControlStrategyResult[0]));
 

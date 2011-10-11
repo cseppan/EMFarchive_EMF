@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -214,7 +215,8 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
                             + "from " + tableName + " e "
                             + "where " + versionedQuery.query()
                             + leastCostAbstractStrategyLoader.getFilterForSourceQuery();
-                        System.out.println(System.currentTimeMillis() + " " + sql);
+                        if (DebugLevels.DEBUG_25())
+                            System.out.println(System.currentTimeMillis() + " " + sql);
                         setStatus("Started populating ORL Merged inventory, " 
                                 + mergedDataset.getName() 
                                 + ", with the inventory, " 
@@ -258,7 +260,8 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
     protected ResultSetMetaData getDatasetResultSetMetaData(String qualifiedTableName) throws EmfException {
         ResultSet rs = null;
         ResultSetMetaData md = null;
-        System.out.println(System.currentTimeMillis() + " get ResultSetMetaData");
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " get ResultSetMetaData");
         try {
             rs = datasource.query().executeQuery("select * from " + qualifiedTableName + " where 1 = 0");
             md = rs.getMetaData();

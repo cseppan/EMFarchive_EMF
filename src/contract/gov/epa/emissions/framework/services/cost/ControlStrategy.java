@@ -87,6 +87,8 @@ public class ControlStrategy implements Lockable, Serializable {
     private String copiedFrom;
     
     private Boolean isFinal;
+
+    private Boolean applyCAPMeasuresOnHAPPollutants;
     
     public ControlStrategy() {
         this.lock = new Mutex();
@@ -459,5 +461,13 @@ public class ControlStrategy implements Lockable, Serializable {
 
     public Boolean getIsFinal() {
         return isFinal;
+    }
+
+    public void setApplyCAPMeasuresOnHAPPollutants(Boolean applyCAPMeasuresOnHAPPollutants) {
+        this.applyCAPMeasuresOnHAPPollutants = applyCAPMeasuresOnHAPPollutants;
+    }
+
+    public Boolean getApplyCAPMeasuresOnHAPPollutants() {
+        return this.applyCAPMeasuresOnHAPPollutants;
     }
 }

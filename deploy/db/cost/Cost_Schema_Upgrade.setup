@@ -1478,3 +1478,8 @@ where name = 'Type 12';
 
 -- 7/27/2011 Change control measure abbreviation length limit to 20
 ALTER TABLE emf.control_measures ALTER COLUMN abbreviation TYPE character varying(20);
+
+--9/29/2011 Add new column about applying cap mesures on hap pollutants
+-- Add new control measure class id to control_measures table..
+ALTER TABLE emf.control_strategies ADD COLUMN apply_cap_measures_on_hap_pollutants boolean default false;
+

@@ -18,6 +18,8 @@ public interface StrategyLoader {
     ControlStrategyResult[] getControlStrategyResults();
 
     ControlStrategyResult getStrategyMessagesResult();
+
+    ControlStrategyResult[] getStrategyMessagesResults();
     
     void makeSureInventoryDatasetHasIndexes(Dataset dataset);
 }

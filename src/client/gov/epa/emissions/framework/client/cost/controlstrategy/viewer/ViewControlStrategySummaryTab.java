@@ -105,6 +105,8 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
 
     private ViewControlStrategyPresenter presenter;
 
+    private JCheckBox applyCAPMeasureOnHAPPollCheck;
+
     public ViewControlStrategySummaryTab(ControlStrategy controlStrategy,
             ControlStrategyResult[] controlStrategyResults, CostYearTable costYearTable, MessagePanel messagePanel,
             EmfConsole parentConsole, DesktopManager desktopManager, ViewControlStrategyPresenter presenter)
@@ -244,7 +246,9 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
 
         SpringLayoutGenerator middleLeftLayoutGenerator = new SpringLayoutGenerator();
         middleLeftLayoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), middleLeftPanel);
-        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 1, 2, // rows, cols
+        middleLeftLayoutGenerator.addLabelWidgetPair("<html>Apply CAP measures<br/>on HAP Pollutants:</html>:", applyCAPMeasureOnHAPPoll(), middleLeftPanel);
+
+        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -285,6 +289,13 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
         this.discountRate.setEditable(false);
 
         return discountRate;
+    }
+
+    private JCheckBox applyCAPMeasureOnHAPPoll() {
+
+        applyCAPMeasureOnHAPPollCheck = new JCheckBox(" ", null, controlStrategy.getApplyCAPMeasuresOnHAPPollutants() != null ? controlStrategy.getApplyCAPMeasuresOnHAPPollutants() : false);
+        this.applyCAPMeasureOnHAPPollCheck.setEnabled(false);
+        return applyCAPMeasureOnHAPPollCheck;
     }
 
     private JComponent useCostEquation() {

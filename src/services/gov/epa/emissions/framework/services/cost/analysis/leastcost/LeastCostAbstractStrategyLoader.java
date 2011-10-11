@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultT
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -191,16 +192,19 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
                     + controlStrategyInputDataset.getInputDataset().getName() 
                     + ".");
             datasource.query().execute(query);
-            System.out.println(System.currentTimeMillis() + " finished " + query);
+            if (DebugLevels.DEBUG_25())
+                System.out.println(System.currentTimeMillis() + " finished " + query);
             setStatus("Completed populating Least Cost Worksheet with inventory, " 
                     + controlStrategyInputDataset.getInputDataset().getName() 
                     + ".");
             datasource.query().execute(query2);
-            System.out.println(System.currentTimeMillis() + " finished " + query2);
+            if (DebugLevels.DEBUG_25())
+                System.out.println(System.currentTimeMillis() + " finished " + query2);
             setStatus("Started eliminating unqualified measures from the Least Cost Worksheet.");
             datasource.query().execute(query3);
             setStatus("Completed eliminating unqualified measures from the Least Cost Worksheet.");
-            System.out.println(System.currentTimeMillis() + " finished " + query3);
+            if (DebugLevels.DEBUG_25())
+                System.out.println(System.currentTimeMillis() + " finished " + query3);
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
@@ -217,11 +221,12 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
             + " FROM " + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) 
             + " where status is null " 
             + "    and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "
-            + " ORDER BY source, marginal desc, emis_reduction, record_id desc "
+            + " ORDER BY source, emis_reduction desc "
             + " ) tbl";
 
         ResultSet rs = null;
-        System.out.println(System.currentTimeMillis() + " " + query);
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
         try {
             rs = datasource.query().executeQuery(query);
             while (rs.next()) {
@@ -245,7 +250,8 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
         String query = "";
         //, " + rnd.nextInt() + "::integer
         query = "SELECT public.populate_least_cost_strategy_detailed_result("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ", " + emisReduction + "::double precision);";
-        System.out.println(System.currentTimeMillis() + " " + query);
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
         try {
             setStatus("Started populating Strategy Detailed Result from inventory, " 
                     + controlStrategyInputDataset.getInputDataset().getName() 
@@ -263,7 +269,8 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
 
     public void createLeastCostCMWorksheetIndexes(EmfDataset leastCostCMWorksheetDataset) {
         String query = "SELECT public.create_least_cost_worksheet_table_indexes('" + emissionTableName(leastCostCMWorksheetDataset).toLowerCase() + "')";
-        System.out.println(System.currentTimeMillis() + " " + query);
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
@@ -292,7 +299,8 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
             + "FROM " + qualifiedEmissionTableName(dataset)
             + " where poll='" + controlStrategy.getTargetPollutant().getName() + "'"
             + " group by poll";
-//        System.out.println(System.currentTimeMillis() + " " + query);
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
         ResultSet rs = null;
         DecimalFormat decFormat = new DecimalFormat("#,##0");
         try {

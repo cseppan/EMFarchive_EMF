@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,69 +32,71 @@ public abstract class AbstractCheckMessagesStrategyTask extends AbstractStrategy
 
         List<StatusMessage> messages = new ArrayList<StatusMessage>();
 
-        ControlStrategyResult strategyMessagesResult = this.getLoader().getStrategyMessagesResult();
-        //check nothing if no result exists
-        if (strategyMessagesResult == null) return false;
-        InternalSource[] internalSources = strategyMessagesResult.getDetailedResultDataset().getInternalSources();
-        if (internalSources.length > 0) {
+        ControlStrategyResult[] strategyMessagesResults = this.getLoader().getStrategyMessagesResults();
 
-            try {
-
-                String tableName = internalSources[0].getTable();
-                if (tableName != null) {
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("select distinct ");
-                    sb.append(STATUS_COLUMN_LABEL);
-                    sb.append(", ");
-                    sb.append(MESSAGE_COLUMN_LABEL);
-                    sb.append(" from emissions.");
-                    sb.append(tableName);
-                    sb.append(" where ");
-                    sb.append(STATUS_COLUMN_LABEL);
-                    sb.append("='Error';");
-
-                    String sql = sb.toString();
-                    System.out.println(sql);
-
-                    ResultSet rs = datasource.query().executeQuery(sql);
-
-                    String status = null;
-                    String message = null;
-                    while (rs.next()) {
-
-                        status = rs.getString(STATUS_COLUMN_LABEL);
-                        message = rs.getString(MESSAGE_COLUMN_LABEL);
+        for (ControlStrategyResult strategyMessagesResult : strategyMessagesResults) {
+            //check nothing if no result exists
+            if (strategyMessagesResult == null) break;
+            messages.clear();
+            String messageDatasetName = strategyMessagesResult.getDetailedResultDataset().getName();
+            InternalSource[] internalSources = strategyMessagesResult.getDetailedResultDataset().getInternalSources();
+            if (internalSources.length > 0) {
+    
+                try {
+    
+                    String tableName = internalSources[0].getTable();
+                    if (tableName != null) {
+    
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("select distinct ");
+                        sb.append(STATUS_COLUMN_LABEL);
+                        sb.append(", ");
+                        sb.append(MESSAGE_COLUMN_LABEL);
+                        sb.append(" from emissions.");
+                        sb.append(tableName);
+                        sb.append(" where ");
+                        sb.append(STATUS_COLUMN_LABEL);
+                        sb.append("='Error';");
+    
+                        String sql = sb.toString();
+                        if (DebugLevels.DEBUG_25())
+                            System.out.println(sql);
+    
+                        ResultSet rs = datasource.query().executeQuery(sql);
+    
+                        String status = null;
+                        String message = null;
+                        while (rs.next()) {
+    
+                            status = rs.getString(STATUS_COLUMN_LABEL);
+                            message = rs.getString(MESSAGE_COLUMN_LABEL);
+                        }
+    
+                        if (status != null && message != null) {
+                            messages.add(new StatusMessage(status, message, messageDatasetName, 2));
+                        }
+    
                     }
-
-                    if (status != null && message != null) {
-                        messages.add(new StatusMessage(status, message, 2));
-                    }
-
+                } catch (SQLException e) {
+                    throw new EmfException("Error occured while retreiving strategy messages for control strategy '"
+                            + this.getControlStrategy().getName() + "':" + "\n" + e.getMessage());
                 }
-            } catch (SQLException e) {
-                throw new EmfException("Error occured while retreiving strategy messages for control strategy '"
-                        + this.getControlStrategy().getName() + "':" + "\n" + e.getMessage());
             }
-        }
-
-        if (messages.size() < 10) {
-
-            Collections.sort(messages);
-            for (StatusMessage statusMessage : messages) {
-                this.setStatus(statusMessage.createMessage());
+    
+            if (messages.size() < 10) {
+    
+                Collections.sort(messages);
+                for (StatusMessage statusMessage : messages) {
+                    this.setStatus(statusMessage.createMessage());
+                }
+            } else {
+    
+                this.setStatus("Multiple error messages were detected while running control strategy '"
+                        + this.getControlStrategy().getName() + "'. See '" + StrategyResultType.strategyMessages
+                        + "', " + messageDatasetName + ",  output for details.");
             }
-        } else {
-
-            this.setStatus("Multiple error messages were detected while running control strategy '"
-                    + this.getControlStrategy().getName() + "'. See '" + StrategyResultType.strategyMessages
-                    + "' output for details.");
+            
         }
-        
-        
-        //go ahead and update the strategy result count info.
-        setSummaryResultCount(strategyMessagesResult);
-        saveControlStrategyResult(strategyMessagesResult);
         
         return messages.size() > 0;
     }
@@ -102,61 +105,68 @@ public abstract class AbstractCheckMessagesStrategyTask extends AbstractStrategy
 
         List<StatusMessage> messages = new ArrayList<StatusMessage>();
 
-        ControlStrategyResult strategyMessagesResult = this.getLoader().getStrategyMessagesResult();
-        //check nothing if no result exists
-        if (strategyMessagesResult == null) return;
-        InternalSource[] internalSources = strategyMessagesResult.getDetailedResultDataset().getInternalSources();
-        if (internalSources.length > 0) {
+//        ControlStrategyResult strategyMessagesResult = this.getLoader().getStrategyMessagesResult();
+        ControlStrategyResult[] strategyMessagesResults = this.getLoader().getStrategyMessagesResults();
 
-            try {
+        for (ControlStrategyResult strategyMessagesResult : strategyMessagesResults) {
+            //check nothing if no result exists
+            if (strategyMessagesResult == null) break;
+            messages.clear();
+            String messageDatasetName = strategyMessagesResult.getDetailedResultDataset().getName();
+            InternalSource[] internalSources = strategyMessagesResult.getDetailedResultDataset().getInternalSources();
+            if (internalSources.length > 0) {
 
-                String tableName = internalSources[0].getTable();
-                if (tableName != null) {
+                try {
 
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("select distinct ");
-                    sb.append(STATUS_COLUMN_LABEL);
-                    sb.append(", ");
-                    sb.append(MESSAGE_COLUMN_LABEL);
-                    sb.append(" from emissions.");
-                    sb.append(tableName);
-                    sb.append(";");
+                    String tableName = internalSources[0].getTable();
+                    if (tableName != null) {
 
-                    String sql = sb.toString();
-                    System.out.println(sql);
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("select distinct ");
+                        sb.append(STATUS_COLUMN_LABEL);
+                        sb.append(", ");
+                        sb.append(MESSAGE_COLUMN_LABEL);
+                        sb.append(" from emissions.");
+                        sb.append(tableName);
+                        sb.append(";");
 
-                    ResultSet rs = datasource.query().executeQuery(sql);
+                        String sql = sb.toString();
+                        if (DebugLevels.DEBUG_25())
+                            System.out.println(sql);
 
-                    String status = null;
-                    String message = null;
-                    while (rs.next()) {
+                        ResultSet rs = datasource.query().executeQuery(sql);
 
-                        status = rs.getString(STATUS_COLUMN_LABEL);
-                        message = rs.getString(MESSAGE_COLUMN_LABEL);
+                        String status = null;
+                        String message = null;
+                        while (rs.next()) {
+
+                            status = rs.getString(STATUS_COLUMN_LABEL);
+                            message = rs.getString(MESSAGE_COLUMN_LABEL);
+                        }
+
+                        if (status != null && message != null) {
+                            messages.add(new StatusMessage(status, message, messageDatasetName, 2));
+                        }
+
                     }
-
-                    if (status != null && message != null) {
-                        messages.add(new StatusMessage(status, message, 2));
-                    }
-
+                } catch (SQLException e) {
+                    throw new EmfException("Error occured while retreiving strategy messages for control strategy '"
+                            + this.getControlStrategy().getName() + "':" + "\n" + e.getMessage());
                 }
-            } catch (SQLException e) {
-                throw new EmfException("Error occured while retreiving strategy messages for control strategy '"
-                        + this.getControlStrategy().getName() + "':" + "\n" + e.getMessage());
             }
-        }
 
-        if (messages.size() < 10) {
+            if (messages.size() < 10) {
 
-            Collections.sort(messages);
-            for (StatusMessage statusMessage : messages) {
-                this.setStatus(statusMessage.createMessage());
+                Collections.sort(messages);
+                for (StatusMessage statusMessage : messages) {
+                    this.setStatus(statusMessage.createMessage());
+                }
+            } else {
+
+                this.setStatus("Multiple warning messages were detected while running control strategy '"
+                        + this.getControlStrategy().getName() + "'. See '" + StrategyResultType.strategyMessages
+                        + "', " + messageDatasetName + ", output for details.");
             }
-        } else {
-
-            this.setStatus("Multiple warning messages were detected while running control strategy '"
-                    + this.getControlStrategy().getName() + "'. See '" + StrategyResultType.strategyMessages
-                    + "' output for details.");
         }
     }
 
@@ -166,12 +176,15 @@ public abstract class AbstractCheckMessagesStrategyTask extends AbstractStrategy
 
         private String message;
 
+        private String messageDatasetName;
+        
         private int priority;
 
-        public StatusMessage(String status, String message, int priority) {
+        public StatusMessage(String status, String message, String messageDatasetName, int priority) {
 
             this.status = status;
             this.message = message;
+            this.messageDatasetName = messageDatasetName;
             this.priority = priority;
         }
 
@@ -183,13 +196,17 @@ public abstract class AbstractCheckMessagesStrategyTask extends AbstractStrategy
             return message;
         }
 
+        public String getMessageDatasetName() {
+            return messageDatasetName;
+        }
+
         public int getPriority() {
             return priority;
         }
 
         public String createMessage() {
             return this.status + ": " + this.message + " See '" + StrategyResultType.strategyMessages
-                    + "' output for details.";
+                    + "', " + this.messageDatasetName + ", output for details.";
         }
 
         public int compareTo(StatusMessage o) {

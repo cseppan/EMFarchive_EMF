@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.Date;
 import java.util.List;
@@ -57,9 +58,11 @@ public class StrategyTask implements Runnable {
         if (runningCount < poolSize) {
             try {
                 prepare();
-                log.warn("Started to run strategy");
+                if (DebugLevels.DEBUG_25())
+                    log.warn("Started to run strategy, " + strategy.getControlStrategy().getName());
                 strategy.run();
-                log.warn("Finished to run strategy");
+                if (DebugLevels.DEBUG_25())
+                    log.warn("Finished to run strategy, " + strategy.getControlStrategy().getName());
                 completeStatus = "Finished";
                 addCompletedStatus();
             } catch (EmfException e) {

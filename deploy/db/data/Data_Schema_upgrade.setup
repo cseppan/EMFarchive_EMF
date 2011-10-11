@@ -1570,3 +1570,7 @@ where name in ('Flat File 2010 Point'));
 
 insert into emf.properties values(DEFAULT, 'DEBUG_LEVEL_REFRESH_RATE', '12'); -- minutes
 update emf.properties set value = '12' where name = 'DEBUG_LEVEL_REFRESH_RATE'; -- minutes
+
+-- 9/22/2011 -- added a new debug level for debugging control strategy operations
+insert into emf.properties values(DEFAULT, 'DEBUG_25', 'false');
+update emf.properties set value = 'false' where name = 'DEBUG_25';

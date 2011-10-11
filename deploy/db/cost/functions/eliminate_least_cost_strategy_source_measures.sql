@@ -32,6 +32,8 @@ BEGIN
 		on srt.id = sr.strategy_result_type_id
 	where sr.control_strategy_id = int_control_strategy_id 
 		and srt.name = 'Least Cost Control Measure Worksheet'
+	-- get the most recent worksheet
+	order by sr.id desc
 	into worksheet_dataset_id,
 		worksheet_table_name;
 
@@ -59,12 +61,12 @@ BEGIN
 		then tbl.record_id else null::integer 
 		end
 		from (
-		select source, record_id, emis_reduction, marginal
+		select source, record_id, emis_reduction, marginal, source_poll_cnt
 		from emissions.' || worksheet_table_name || '
 		where poll = ' || quote_literal(target_pollutant) || '
-		order by source, marginal, emis_reduction desc
+		order by source, marginal, emis_reduction desc, source_poll_cnt desc, record_id		
 		) tbl
-		order by tbl.source, tbl.marginal, tbl.emis_reduction desc
+		order by tbl.source, tbl.marginal, tbl.emis_reduction desc, tbl.source_poll_cnt desc, tbl.record_id
 	)';
 
 	if not include_unspecified_costs then 

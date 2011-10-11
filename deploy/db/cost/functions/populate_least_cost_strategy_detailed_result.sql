@@ -217,7 +217,7 @@ BEGIN
 			FROM emissions.' || worksheet_table_name || '
 			where status is null 
 				and poll = ' || quote_literal(target_pollutant) || '
-			ORDER BY source, marginal desc, emis_reduction, record_id desc
+			ORDER BY source, emis_reduction desc
 		) tbl'
 	into emis_reduction;
 	get diagnostics gimme_count = row_count;
@@ -246,15 +246,16 @@ BEGIN
 					-- get sources measure for tp
 					SELECT distinct on (source) source, cm_id
 					from (
-						SELECT emis_reduction, marginal, record_id, source, cm_id
+						SELECT emis_reduction, marginal, record_id, source, source_poll_cnt, cm_id
 						FROM emissions.' || worksheet_table_name || '
 						where status is null 
 							and poll = ' || quote_literal(target_pollutant) || '
-						ORDER BY marginal, emis_reduction desc, record_id
+						ORDER BY marginal, emis_reduction desc, source_poll_cnt desc, record_id
 --						limit ' || (apply_order) || '
 						limit ' || (apply_order + 1) || '
 					) tbl
-					ORDER BY source, marginal desc, emis_reduction, record_id desc
+					ORDER BY source, marginal desc, emis_reduction, source_poll_cnt, record_id desc
+--					source, marginal, emis_reduction desc, source_poll_cnt desc, record_id
 				) tp
 				on tp.source = ap.source
 				and tp.cm_id = ap.cm_id
@@ -273,14 +274,14 @@ BEGIN
 			run_sum(emis_reduction::numeric, ''emis_reduction' || counter || '''::text) as cum_emis_reduction, 
 			run_sum(source_annual_cost::numeric, ''annual_cost' || counter || '''::text) as cum_annual_cost
 		from (
-			SELECT marginal, emis_reduction, record_id, source_annual_cost, 1::integer as cnt --sum(emis_reduction)
+			SELECT marginal, emis_reduction, record_id, source_annual_cost, source_poll_cnt, 1::integer as cnt --sum(emis_reduction)
 			from emissions.' || worksheet_table_name || '
 			where status is null 
 				and poll = ' || quote_literal(target_pollutant) || '
-			order by marginal, emis_reduction desc, record_id
+			order by marginal, emis_reduction desc, source_poll_cnt desc, record_id
 --			limit ' || (apply_order) || '
 			limit ' || (apply_order + 1) || '
-		) tbl order by marginal, emis_reduction desc, record_id
+		) tbl order by marginal, emis_reduction desc, source_poll_cnt desc, record_id
 	) tbl
 	where tbl.record_id = detailed_result.record_id';
 

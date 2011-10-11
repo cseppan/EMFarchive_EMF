@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyTargetPollutant;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -114,7 +115,8 @@ public class StrategyLoader extends AbstractStrategyLoader {
     private void runStrategyFinalize(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "SELECT public.run_multi_pollutant_max_emis_red_strategy_finalize("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
         
-        System.out.println(System.currentTimeMillis() + " " + query);
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
@@ -127,7 +129,8 @@ public class StrategyLoader extends AbstractStrategyLoader {
     private void runStrategy(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult, Pollutant targetPollutant) throws EmfException {
         String query = "";
         query = "SELECT public.run_multi_pollutant_max_emis_red_strategy("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ", " + targetPollutant.getId() + ");";
-        System.out.println(System.currentTimeMillis() + " " + query);
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {

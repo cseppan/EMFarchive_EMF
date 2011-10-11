@@ -330,7 +330,7 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 				"comment"
 				)
 			-- add distinct to limit to only one closure record, that is all that is needed...
-			select distinct on (record_id)
+			select distinct on (inv.record_id)
 				' || detailed_result_dataset_id || '::integer,
 				''PLTCLOSURE'' as abbreviation,
 				inv.poll,

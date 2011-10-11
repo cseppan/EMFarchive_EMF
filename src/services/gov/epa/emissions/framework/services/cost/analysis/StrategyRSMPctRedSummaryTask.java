@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -222,7 +223,8 @@ public class StrategyRSMPctRedSummaryTask extends AbstractStrategySummaryTask {
                     }
                 }
             
-            System.out.println(sql);
+            if (DebugLevels.DEBUG_25())
+                System.out.println(sql);
             try {
                 datasource.query().execute(sql);
             } catch (SQLException e) {

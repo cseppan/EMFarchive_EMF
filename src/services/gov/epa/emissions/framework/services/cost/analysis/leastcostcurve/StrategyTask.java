@@ -46,7 +46,7 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
                 status = "Failed. Error processing input dataset: " + controlStrategyInputDataset.getInputDataset().getName() + ". " + e.getMessage();
                 setStatus(status);
             } finally {
-                addStatus(controlStrategyInputDataset);
+                //
             }
             
         } catch (Exception e) {
@@ -74,6 +74,9 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
         super.finalizeCMWorksheetResult();
 
         super.finalizeCostCuveSummaryResult();
+        
+        if (controlStrategy.getApplyCAPMeasuresOnHAPPollutants())
+            applyCAPMeasuresOnHAPPollutants(strategyResultList.toArray(new ControlStrategyResult[0]));
         
         this.checkMessagesForWarnings();
     }

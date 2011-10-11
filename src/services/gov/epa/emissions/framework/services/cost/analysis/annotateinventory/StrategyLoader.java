@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.FileFormatFacto
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,7 +43,8 @@ public class StrategyLoader extends AbstractStrategyLoader {
         
         populateInventory(controlStrategyInputDataset, result);
 
-        System.out.println(System.currentTimeMillis() + " done with");
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " done with");
 
         //still need to set the record count...
         setResultCount(result);
@@ -52,11 +54,13 @@ public class StrategyLoader extends AbstractStrategyLoader {
     private void populateInventory(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult controlStrategyResult) throws EmfException {
         String query = "";
         query = "SELECT public.run_annotate_inventory("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
-        System.out.println(System.currentTimeMillis() + " " + query);
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
-            System.out.println("SQLException runStrategyUsingSQLApproach");
+            if (DebugLevels.DEBUG_25())
+                System.out.println("SQLException runStrategyUsingSQLApproach");
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
             //3

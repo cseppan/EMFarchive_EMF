@@ -129,6 +129,7 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
         //cols.add(new Column("EXISTING_MEASURE_ABBREVIATION", types.stringType(10), 10, new StringFormatter(10))); // JIZHEN20110727
         cols.add(new Column("EXISTING_MEASURE_ABBREVIATION", types.stringType(CoSTConstants.CM_ABBREV_LEN), CoSTConstants.CM_ABBREV_LEN, new StringFormatter(CoSTConstants.CM_ABBREV_LEN)));
         cols.add(new Column("EXISTING_PRIMARY_DEVICE_TYPE_CODE", types.stringType(4), 4, new StringFormatter(4)));
+        cols.add(new Column("source_poll_cnt", types.intType(), new IntegerFormatter()));
         cols.add(new Column("Comment", types.stringType(128), new StringFormatter(128)));
 
         return cols.toArray(new Column[0]);

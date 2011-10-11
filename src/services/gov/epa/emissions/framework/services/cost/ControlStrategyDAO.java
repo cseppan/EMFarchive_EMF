@@ -407,7 +407,6 @@ public class ControlStrategyDAO {
         List<ControlStrategyResult> results = getControlStrategyResults(controlStrategyId, session);
         List<Integer> datasetLists = new ArrayList<Integer>();
         if(results != null){
-            System.out.println(results.size());
             for (int i=0; i<results.size(); i++){
                 if (results.get(i).getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
                     if (results.get(i).getDetailedResultDataset() != null)

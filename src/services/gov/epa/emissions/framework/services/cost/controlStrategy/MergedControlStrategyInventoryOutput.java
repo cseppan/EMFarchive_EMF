@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.FileFormatFacto
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -217,7 +218,8 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
         + "on inv.record_id = b.source_id"
         + " WHERE " + invVersionedQuery.query();
         sql = "INSERT INTO " + qualifiedTable(contInvTableName, datasource) + " (" + columnList + ") " + sql;
-        System.out.println(sql);
+        if (DebugLevels.DEBUG_25()) 
+            System.out.println(sql);
         return sql;
     }
 
@@ -267,7 +269,8 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
         String query = "SELECT count(1) as record_count "
             + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
         ResultSet rs = null;
-        System.out.println(System.currentTimeMillis() + " " + query);
+        if (DebugLevels.DEBUG_25()) 
+            System.out.println(System.currentTimeMillis() + " " + query);
         try {
             rs = datasource.query().executeQuery(query);
             while (rs.next()) {

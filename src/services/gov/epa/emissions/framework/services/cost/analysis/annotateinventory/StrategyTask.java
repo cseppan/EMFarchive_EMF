@@ -56,7 +56,6 @@ public class StrategyTask extends AbstractStrategyTask {
                         result.setRunStatus(status);
                         saveControlStrategyResult(result);
                         strategyResultList.add(result);
-                        addStatus(controlStrategyInputDatasets[i]);
                     }
                     //make sure somebody hasn't cancelled this run.
                     if (isRunStatusCancelled()) {

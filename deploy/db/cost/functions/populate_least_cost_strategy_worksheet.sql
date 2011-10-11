@@ -487,6 +487,7 @@ BEGIN
 			cm_id,
 			marginal,
 			source_annual_cost,
+			source_poll_cnt,
 			equation_type,
 			original_dataset_id,
 			sector,
@@ -534,6 +535,7 @@ select
 	control_measures_id,
 	marginal,
 	source_annual_cost,
+	source_poll_cnt,
 	equation_type,
 	original_dataset_id,
 	sector,
@@ -556,6 +558,7 @@ select
 	sum(ann_cost) OVER w as source_annual_cost,
 	case when pollutant_id = ' ||  target_pollutant_id || '::integer and coalesce(emis_reduction, 0) != 0 then coalesce(sum(ann_cost) OVER w / emis_reduction, 0.0) else null::double precision end as marginal,
 	sum( case when pollutant_id = ' ||  target_pollutant_id || '::integer then 1 else 0 end ) OVER w as source_tp_count,
+	sum( 1 ) OVER w as source_poll_cnt,
 	sum(case when pollutant_id = ' ||  target_pollutant_id || '::integer then final_emissions else null::double precision end) OVER w  as source_tp_remaining_emis
 from (
 

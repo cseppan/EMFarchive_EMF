@@ -109,6 +109,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     
     private EditControlStrategyPresenter presenter;
 
+    private JCheckBox applyCAPMeasureOnHAPPollCheck;
+
     public EditControlStrategySummaryTab(ControlStrategy controlStrategy,
             ControlStrategyResult[] controlStrategyResults, EmfSession session, ManageChangeables changeablesList,
             MessagePanel messagePanel, EmfConsole parentConsole, CostYearTable costYearTable, EditControlStrategyPresenter presenter) throws EmfException {
@@ -264,7 +266,9 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         // panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator middleLeftLayoutGenerator = new SpringLayoutGenerator();
         middleLeftLayoutGenerator.addLabelWidgetPair("Use Cost Equations:", useCostEquation(), middleLeftPanel);
-        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 1, 2, // rows, cols
+        middleLeftLayoutGenerator.addLabelWidgetPair("<html>Apply CAP measures<br/>on HAP Pollutants:</html>:", applyCAPMeasureOnHAPPoll(), middleLeftPanel);
+
+        middleLeftLayoutGenerator.makeCompactGrid(middleLeftPanel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -300,6 +304,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         useCostEquationCheck = new JCheckBox(" ", null, controlStrategy.getUseCostEquations() != null ? controlStrategy.getUseCostEquations() : true);
         return useCostEquationCheck;
+    }
+
+    private JCheckBox applyCAPMeasureOnHAPPoll() {
+
+        applyCAPMeasureOnHAPPollCheck = new JCheckBox(" ", null, controlStrategy.getApplyCAPMeasuresOnHAPPollutants() != null ? controlStrategy.getApplyCAPMeasuresOnHAPPollutants() : false);
+        return applyCAPMeasureOnHAPPollCheck;
     }
 
     private JCheckBox includeUnspecifiedCostsCheckBox() {
@@ -502,6 +512,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
             controlStrategy.setTargetPollutants(list.toArray(new ControlStrategyTargetPollutant[0]));
         }
         controlStrategy.setUseCostEquations(useCostEquationCheck.isSelected());
+        controlStrategy.setApplyCAPMeasuresOnHAPPollutants(applyCAPMeasureOnHAPPollCheck.isSelected());
         controlStrategy.setIncludeUnspecifiedCosts(includeUnspecifiedCostsCheck.isSelected());
         
         Boolean isFinal = makeFinalCheck.isSelected();

@@ -25,6 +25,7 @@ import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
@@ -33,11 +34,14 @@ import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.Session;
 
@@ -84,6 +88,8 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     private StatusDAO statusDAO;
     
     protected ControlStrategyResult[] results;
+
+    protected List<ControlStrategyResult> strategyMessageResultList = new ArrayList<ControlStrategyResult>();
 
     protected ControlStrategyDAO controlStrategyDAO;
     
@@ -143,7 +149,8 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     protected void saveControlStrategyResult(ControlStrategyResult strategyResult) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
-            System.out.println("Strategy Result Type: " + strategyResult.getStrategyResultType());
+            if (DebugLevels.DEBUG_25())
+                System.out.println("Strategy Result Type: " + strategyResult.getStrategyResultType());
             controlStrategyDAO.updateControlStrategyResult(strategyResult, session);
         } catch (RuntimeException e) {
             throw new EmfException("Could not save control strategy results: " + e.getMessage());
@@ -342,8 +349,11 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     protected void setResultTotalCostTotalReductionAndCount(ControlStrategyResult controlStrategyResult) throws EmfException {
-        String query = "SELECT count(1) as record_count, sum(Annual_Cost) as total_cost, " + (controlStrategy.getTargetPollutant() != null ? "sum(case when poll = '" + controlStrategy.getTargetPollutant().getName() 
-            + "' then Emis_Reduction else null end)" : "null::double precision") + " as total_reduction "
+        String query = "SELECT count(1) as record_count, sum(Annual_Cost) as total_cost, " 
+            + (controlStrategy.getTargetPollutant() == null || controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)
+                    ? "null::double precision" 
+                    : "sum(case when poll = '" + controlStrategy.getTargetPollutant().getName() + "' then Emis_Reduction else null::double precision end)"
+            ) + " as total_reduction "
             + " FROM " + qualifiedEmissionTableName(controlStrategyResult.getDetailedResultDataset());
         ResultSet rs = null;
         //System.out.println(System.currentTimeMillis() + " " + query);
@@ -352,8 +362,12 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
             while (rs.next()) {
                 recordCount = rs.getInt(1);
                 controlStrategyResult.setRecordCount(recordCount);
-                controlStrategyResult.setTotalCost(rs.getDouble(2));
-                controlStrategyResult.setTotalReduction(rs.getDouble(3));
+                Double totalCost = rs.getDouble(2);
+                if (!rs.wasNull())
+                    controlStrategyResult.setTotalCost(totalCost);
+                Double totalTargetPollutantReduction = rs.getDouble(3);
+                if (!rs.wasNull())
+                    controlStrategyResult.setTotalReduction(totalTargetPollutantReduction);
             }
         } catch (SQLException e) {
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
@@ -539,6 +553,10 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return strategyMessagesResult;
     }
 
+    public ControlStrategyResult[] getStrategyMessagesResults() {
+        return strategyMessageResultList.toArray(new ControlStrategyResult[0]);
+    }
+
     private StrategyResultType getStrategyMessagesResultType() throws EmfException {
         StrategyResultType resultType = null;
         Session session = sessionFactory.getSession();
@@ -576,6 +594,9 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         //persist result
         saveControlStrategyResult(strategyMessagesResult);
 
+        //add to list for later use...
+        strategyMessageResultList.add(strategyMessagesResult);
+
         return strategyMessagesResult;
     }
 
@@ -593,6 +614,9 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
 
         //persist result
         saveControlStrategyResult(strategyMessagesResult);
+
+        //add to list for later use...
+        strategyMessageResultList.add(strategyMessagesResult);
 
         return strategyMessagesResult;
     }
@@ -612,6 +636,9 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         //persist result
         saveControlStrategyResult(strategyMessagesResult);
 
+        //add to list for later use...
+        strategyMessageResultList.add(strategyMessagesResult);
+
         return strategyMessagesResult;
     }
     
@@ -625,6 +652,10 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
             controlStrategyDAO.removeControlStrategyResult(controlStrategy.getId(), strategyMessagesResult.getId(), session);
             //delete and purge datasets
             controlStrategyDAO.removeResultDatasets(ds, user, session, dbServer);
+
+            //remove from list so its perused for later use...
+            strategyMessageResultList.remove(strategyMessagesResult);
+
         } catch (RuntimeException e) {
             e.printStackTrace();
             throw new EmfException("Could not remove control strategy message result.");
@@ -635,8 +666,9 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
 
     protected void populateStrategyMessagesDataset(ControlStrategyInputDataset controlStrategyInputDataset, ControlStrategyResult strategyMessagesResult, ControlStrategyResult detailedResult) throws EmfException {
         String query = "";
-        query = "SELECT public.populate_max_emis_red_strategy_messages("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + strategyMessagesResult.getId() + ", " + detailedResult.getId() + ");";
-        System.out.println(System.currentTimeMillis() + " " + query);
+        query = "SELECT public.populate_strategy_messages("  + controlStrategy.getId() + ", " + controlStrategyInputDataset.getInputDataset().getId() + ", " + controlStrategyInputDataset.getVersion() + ", " + strategyMessagesResult.getId() + ", " + detailedResult.getId() + ");";
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
         try {
             setStatus("Started populating Strategy Messages Output from inventory, " 
                     + controlStrategyInputDataset.getInputDataset().getName() 
@@ -646,7 +678,8 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
                     + controlStrategyInputDataset.getInputDataset().getName() 
                     + ".");
         } catch (SQLException e) {
-            System.out.println("SQLException runStrategyUsingSQLApproach");
+            if (DebugLevels.DEBUG_25())
+                System.out.println("SQLException runStrategyUsingSQLApproach");
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
             //

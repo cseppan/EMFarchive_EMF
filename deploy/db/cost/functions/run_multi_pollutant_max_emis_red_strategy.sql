@@ -527,12 +527,13 @@ select
 from (
 select 
 	*	, rank() OVER (PARTITION BY fips,scc,plantid,pointid,stackid,segment
-			order by fips,scc,plantid,pointid,stackid,segment,source_tp_remaining_emis,coalesce(source_annual_cost,0.0),control_measures_id) as winner
+			order by fips,scc,plantid,pointid,stackid,segment,source_tp_remaining_emis,coalesce(source_annual_cost,0.0),source_poll_count desc,abbreviation) as winner
 from (
 -- did sum over window here, becuase REQUIRED inner distinct clause was causing the windowing functions to not aggregrate correclty!!!!
 select 
 	*	, sum(ann_cost) OVER w as source_annual_cost,
 			sum( case when pollutant_id = ' ||  intTargetPollutantId || '::integer then 1 else 0 end ) OVER w as source_tp_count,
+			sum( 1 ) OVER w as source_poll_count,
 			sum(case when pollutant_id = ' ||  intTargetPollutantId || '::integer then final_emissions else null::double precision end) OVER w  as source_tp_remaining_emis			
 	from (
 

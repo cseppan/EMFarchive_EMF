@@ -53,7 +53,6 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
                     result.setRunStatus(status);
                     saveControlStrategyResult(result);
                     strategyResultList.add(result);
-                    addStatus(controlStrategyInputDataset);
                 }
             }
             
@@ -84,6 +83,9 @@ public class StrategyTask extends LeastCostAbstractStrategyTask {
     public void afterRun() throws EmfException {
         super.finalizeCMWorksheetResult();
 
+        if (controlStrategy.getApplyCAPMeasuresOnHAPPollutants())
+            applyCAPMeasuresOnHAPPollutants(strategyResultList.toArray(new ControlStrategyResult[0]));
+        
         //now create the county summary result based on the results from the strategy run...
         generateStrategyCountySummaryResult(strategyResultList.toArray(new ControlStrategyResult[0]));
 

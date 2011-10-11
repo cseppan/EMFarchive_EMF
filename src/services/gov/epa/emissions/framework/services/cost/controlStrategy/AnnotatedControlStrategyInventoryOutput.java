@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.SQLException;
 
@@ -153,7 +154,8 @@ public class AnnotatedControlStrategyInventoryOutput extends AbstractControlStra
         + "on inv.record_id = b.record_id"
         + " WHERE " + versionedQuery.query();
         sql = "INSERT INTO " + qualifiedTable(outputTable, datasource) + " (" + columnList + ") " + sql;
-        System.out.println(sql);
+        if (DebugLevels.DEBUG_25()) 
+            System.out.println(sql);
         return sql;
     }
 }

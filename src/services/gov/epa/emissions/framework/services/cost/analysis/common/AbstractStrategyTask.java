@@ -31,6 +31,7 @@ import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.SectorsDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -136,7 +137,6 @@ public abstract class AbstractStrategyTask implements Strategy {
                         result.setRunStatus(status);
                         saveControlStrategyResult(result);
                         strategyResultList.add(result);
-                        addStatus(controlStrategyInputDatasets[i]);
                     }
                     //see if there was an error, if so, make sure and propogate to the calling method.
                     if (status.startsWith("Failed"))
@@ -203,7 +203,8 @@ public abstract class AbstractStrategyTask implements Strategy {
         
         try {
             controlStrategyDAO.updateWithLock(controlStrategy, session); //NOTE: user should have lock at this time
-            System.out.println("totalCost: " + totalCost + "  totalReduciton: " + totalReduction);
+            if (DebugLevels.DEBUG_25())
+                System.out.println("totalCost: " + totalCost + "  totalReduciton: " + totalReduction);
         } catch (Exception e) {
             e.printStackTrace();
             throw new EmfException("Error updating control strategy's total cost and reduction. " + e.getMessage());
@@ -296,6 +297,35 @@ public abstract class AbstractStrategyTask implements Strategy {
             saveControlStrategySummaryResult(measureSummaryResult);
             strategyResultList.add(measureSummaryResult);
 //            runSummaryQASteps((EmfDataset)measureSummaryResult.getDetailedResultDataset(), 0);
+        }
+    }
+    
+    protected void applyCAPMeasuresOnHAPPollutants(ControlStrategyResult[] results) throws EmfException {
+        String detailedStrategyResultIdList = "";
+        if (results.length > 0) {
+            for (int j = 0; j < results.length; j++) {
+                if (results[j].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+                    detailedStrategyResultIdList += (detailedStrategyResultIdList.length() > 0 ? "," : "") + results[j].getId();
+                }
+            }
+        }
+        
+        if (detailedStrategyResultIdList.length() > 0) {
+            String sql = "select public.apply_cap_measures_on_hap_pollutants(" + controlStrategy.getId() + ", '{ " + detailedStrategyResultIdList + " }');";
+            if (DebugLevels.DEBUG_25())
+                System.out.println(sql);
+            try {
+                datasource.query().execute(sql);
+            } catch (SQLException e) {
+                throw new EmfException("Error occured when applying CAP measures on HAP pollutants:" + "\n" + e.getMessage());
+            }
+            //update the record count for the result
+            for (int j = 0; j < results.length; j++) {
+                if (results[j].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+                    setSummaryResultCount(results[j]);
+                    saveControlStrategySummaryResult(results[j]);
+                }
+            }
         }
     }
     
@@ -461,7 +491,8 @@ public abstract class AbstractStrategyTask implements Strategy {
                 + "on sg.id = cm.source_group "
                 + "group by summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name, sg.name "
                 + "order by summary.sector, summary.fips, summary.scc, summary.poll, cm.abbreviation, cm.name, ct.name, sg.name";
-            System.out.println(sql);
+            if (DebugLevels.DEBUG_25())
+                System.out.println(sql);
             try {
                 datasource.query().execute(sql);
             } catch (SQLException e) {
@@ -588,7 +619,8 @@ public abstract class AbstractStrategyTask implements Strategy {
                 + "group by sector, fips, poll ";
             sql += "order by sector, fips, poll ";
             
-            System.out.println(sql);
+            if (DebugLevels.DEBUG_25())
+                System.out.println(sql);
             try {
                 datasource.query().execute(sql);
             } catch (SQLException e) {
@@ -611,7 +643,8 @@ public abstract class AbstractStrategyTask implements Strategy {
 //                makeSureInventoryDatasetHasIndexes(datasets[i]);
                 loader.makeSureInventoryDatasetHasIndexes(datasets[i].getInputDataset());
                 String sql = "select public.populate_sources_table('" + emissionTableName(datasets[i].getInputDataset()) + "'," + (filter.length() == 0 ? "null::text" : "'" + filter.replaceAll("'", "''").substring(5) + "'") + ");";
-                System.out.println( sql);
+                if (DebugLevels.DEBUG_25())
+                    System.out.println( sql);
                 try {
                     //populate source table...
                     datasource.query().execute(sql);
@@ -930,12 +963,6 @@ public abstract class AbstractStrategyTask implements Strategy {
     
     public long getRecordCount() {
         return recordCount;
-    }
-
-    protected void addStatus(ControlStrategyInputDataset controlStrategyInputDataset) {
-        setStatus("Completed processing control strategy input dataset: " 
-                + controlStrategyInputDataset.getInputDataset().getName() 
-                + ".");
     }
 
     protected void setStatus(String message) {

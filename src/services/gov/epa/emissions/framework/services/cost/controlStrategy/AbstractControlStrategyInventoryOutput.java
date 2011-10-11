@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -266,13 +267,10 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
             Dataset dataset, Datasource datasource, boolean missingColumns) {
         VersionedQuery versionedQuery = new VersionedQuery(version);
         int month = inputDataset.applicableMonth();
-        System.out.println("Input dataset name: " + inputDataset.getName());
-        System.out.println("Month from input dataset: " + month);
         int noOfDaysInMonth = 31;
         boolean isMonthlyInventory = false;
         if (month != -1) {
             noOfDaysInMonth = getDaysInMonth(month);
-            System.out.println("Number of days in month: " + noOfDaysInMonth);
             isMonthlyInventory = true;
         }
         String sql = "select ";
@@ -344,7 +342,8 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
         + "on inv.record_id = b.source_id"
         + " WHERE " + versionedQuery.query();
         sql = "INSERT INTO " + qualifiedTable(outputTable, datasource) + " (" + columnList + ") " + sql;
-        System.out.println(sql);
+        if (DebugLevels.DEBUG_25()) 
+            System.out.println(sql);
         return sql;
     }
 

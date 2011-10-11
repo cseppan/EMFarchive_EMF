@@ -61,7 +61,7 @@ public class ViewControlStrategyWindow extends DisposableInteralFrame implements
 
     public ViewControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
         
-        super("View Control Strategy", new Dimension(810, 620), desktopManager);
+        super("View Control Strategy", new Dimension(810, 640), desktopManager);
 
         this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;

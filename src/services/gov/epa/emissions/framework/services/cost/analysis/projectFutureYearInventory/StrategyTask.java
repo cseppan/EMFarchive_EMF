@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.SQLException;
 import java.util.Calendar;
@@ -92,7 +93,6 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
                         result.setRunStatus(status);
                         saveControlStrategyResult(result);
                         strategyResultList.add(result);
-                        addStatus(controlStrategyInputDatasets[i]);
                     }
                     //make sure somebody hasn't cancelled this run.
                     if (isRunStatusCancelled()) {
@@ -188,7 +188,13 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
             validateControlPrograms(this.getLoader().getStrategyMessagesResult());
             setStatus("Finished pre-run validation of control programs.");
             boolean hasErrors = checkMessagesForErrors();
-            if (hasErrors) throw new EmfException("Multiple error messages were detected while running control strategy. See " + StrategyResultType.strategyMessages + " output.");
+            if (hasErrors) {
+                //go ahead and update the strategy result count info.
+                setSummaryResultCount(this.getLoader().getStrategyMessagesResult());
+                saveControlStrategyResult(this.getLoader().getStrategyMessagesResult());
+                
+                throw new EmfException("Multiple error messages were detected while running control strategy. See " + StrategyResultType.strategyMessages + " output.");
+            }
         } catch (EmfException e) {
             throw e;
         } catch (Exception e) {
@@ -221,7 +227,8 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
         EmfDataset dataset = controlProgram.getDataset();
         query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
         
-        System.out.println(System.currentTimeMillis() + " " + query);
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
         try {
             datasource.query().execute(query);
         } catch (SQLException e) {
