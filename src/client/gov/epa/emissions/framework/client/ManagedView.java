@@ -18,4 +18,6 @@ public interface ManagedView extends EmfView {
 
     /* Should release the locks if any and call disposeView() */
     void windowClosing();
+    
+    void windowHiding();
 }

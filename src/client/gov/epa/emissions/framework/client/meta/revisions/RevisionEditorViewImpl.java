@@ -276,4 +276,9 @@ public class RevisionEditorViewImpl extends Dialog implements RevisionEditorView
         return this.getWidth();
     }
 
+    public void hideMe() {
+        // NOTE Auto-generated method stub
+        setVisible(false);
+    }
+
 }

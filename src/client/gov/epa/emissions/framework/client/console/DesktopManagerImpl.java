@@ -55,6 +55,10 @@ public class DesktopManagerImpl implements DesktopManager {
         windowMenu.unregister(manageView);
         layout.remove(manageView);
     }
+    
+    public void hideWindow(ManagedView manageView) {
+        manageView.hideMe();
+    }
 
     public ManagedView getWindow(String windowName) {
         return (ManagedView) windowNames.get(windowName);
@@ -71,6 +75,16 @@ public class DesktopManagerImpl implements DesktopManager {
         }
         // check for windows with unsaved changes
         return checkForUnSavedWindows(windowNames);
+    }
+    
+    public boolean hideAll() {
+        List list = new ArrayList(windowNames.keySet());
+        for (int i = 0; i < list.size(); i++) {
+            Object key = list.get(i);
+            ManagedView view = (ManagedView) windowNames.get(key);
+            view.windowHiding();// hideWindow is called inside this method
+        }
+        return true;
     }
 
     private boolean checkForUnSavedWindows(Map windowNames) {

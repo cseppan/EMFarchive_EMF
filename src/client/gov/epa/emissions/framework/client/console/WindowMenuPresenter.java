@@ -23,6 +23,10 @@ public class WindowMenuPresenter {
     public void closeAll() {
         desktopManager.closeAll();
     }
+    
+    public void hideAll() {
+        desktopManager.hideAll();
+    }
 
     public void addPermanently(ManagedView managedView) {
         view.addPermanently(managedView);

@@ -12,6 +12,8 @@ public interface EmfView {
     void disposeView();
 
     void display();
+    
+    void hideMe();
 
     Position getPosition();
 

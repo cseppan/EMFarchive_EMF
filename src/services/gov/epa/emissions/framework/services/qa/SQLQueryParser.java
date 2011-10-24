@@ -94,7 +94,7 @@ public class SQLQueryParser {
                 && query.indexOf(startQAstepVersQueryTag) == -1)
             return query;
 
-        return expandTag(query); // BUG3621
+        return expandTag(query); // BUG3621 //BUG3618
     }
 
     // SELECT - REQUIRED to STARTS WITH
@@ -170,9 +170,19 @@ public class SQLQueryParser {
         String[] ds1 = { dataSetName, suffixTokens[0], ds1version, dsId, versionCompletePath };
         tableValuesAliasesVersions.clear();
         tableValuesAliasesVersions.put("ds1", ds1);
+        
+        String versionClause = versionClause();
+        String keywordReplaced = " (SELECT * from ";
+        keywordReplaced += tableNameFromDataset(suffixTokens[1], dataset);
+        keywordReplaced += " " + suffixTokens[0]; 
+        keywordReplaced += " where " + versionClause;
+        keywordReplaced += ") ";
+        
+        String rtnStr = prefix + keywordReplaced + suffixTokens[2];
 
+        return rtnStr;
         // The table name from the dataset is derived from the method below off of the second token.
-        return prefix + versioned(tableNameFromDataset(suffixTokens[1], dataset) + suffixTokens[2]);
+        // return prefix + versioned(tableNameFromDataset(suffixTokens[1], dataset) + suffixTokens[2]);
     }
 
     // Added this method to handle new tag $DATASET_TABLE[ datasetname, tablenum ]
@@ -260,6 +270,17 @@ public class SQLQueryParser {
             tableValuesAliasesVersions.clear();
             tableValuesAliasesVersions.put("ds2", ds2);
 
+            String versionClause = versionClause();
+            String keywordReplaced = " (SELECT * from ";
+            keywordReplaced += tableNameFromDataset(tableNum, dataSet2);
+            keywordReplaced += " " + suffixTokens[0]; 
+            keywordReplaced += " where " + versionClause;
+            keywordReplaced += ") ";
+            
+            String rtnStr = prefix + keywordReplaced + suffixTokens[2];
+
+            return rtnStr;
+            
             /*
              * System.out.println("prefix: " + prefix); System.out.println("Table number: " + tableNum);
              * System.out.println("dataset of 2: " + dataSetName); System.out.println("version of 2: " + ds2version);
@@ -268,7 +289,7 @@ public class SQLQueryParser {
              */
 
             // The table name from the dataset is derived from the method below off of the second token.
-            return prefix + versioned(tableNameFromDataset(tableNum, dataSet2) + suffixTokens[2]);
+            // return prefix + versioned(tableNameFromDataset(tableNum, dataSet2) + suffixTokens[2]);
         } catch (RuntimeException e) {
             // NOTE Auto-generated catch block
             System.out.println("Could not parse query: "+query);
@@ -398,8 +419,19 @@ public class SQLQueryParser {
         tableValuesAliasesVersions.clear();
         tableValuesAliasesVersions.put("ds3", ds3);
 
+        String versionClause = versionClause();
+        String keywordReplaced = " (SELECT * from ";
+        keywordReplaced += tableNameFromDataset(tableNum, dataSet3);
+        keywordReplaced += " " + suffixTokens[0]; 
+        keywordReplaced += " where " + versionClause;
+        keywordReplaced += ") ";
+        
+        String rtnStr = prefix + keywordReplaced + suffixTokens[2];
+
+        return rtnStr;
+        
         // The table name from the dataset is derived from the method below off of the second token.
-        return prefix + versioned(tableNameFromDataset(tableNum, dataSet3) + suffixTokens[2]);
+        // return prefix + versioned(tableNameFromDataset(tableNum, dataSet3) + suffixTokens[2]);
         // return "OK";
     }
     
@@ -495,6 +527,7 @@ public class SQLQueryParser {
                 QAStepResult qaStepResult = qaServiceImpl.getQAStepResult(qaSteps[r]);
                 
                 outputTable = qaStepResult.getTable();
+                break;
             //System.out.println("The output table for the next step: " + outputTable);
             }
         }
@@ -622,7 +655,8 @@ public class SQLQueryParser {
             //System.out.println("The id of the next step: " + qaName);
             if (qaSteps[r].toString().equals(qaStepName) && qaSteps[r].getVersion()== ds5IntVersion) {
                 QAStepResult qaStepResult = qaServiceImpl.getQAStepResult(qaSteps[r]);
-            outputTable = qaStepResult.getTable();
+                outputTable = qaStepResult.getTable();
+                break;
             //System.out.println("The output table for the next step: " + outputTable);
             }
         }

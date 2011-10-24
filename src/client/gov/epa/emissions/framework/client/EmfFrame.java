@@ -66,4 +66,7 @@ public abstract class EmfFrame extends JFrame implements EmfView {
         getRootPane().setDefaultButton(button);
     }
     
+    public void hideMe() {
+        setVisible(false);
+    }
 }

@@ -149,6 +149,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
                 doNew(tableData.getValues());
             }
         });
+        newButton.setText("New Version");
         newButton.setToolTipText("Create a new version");
         newButton.setMargin(new Insets(2, 2, 2, 2));
         panel.add(newButton);
@@ -156,7 +157,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             newButton.setEnabled(false);
         }
 
-        Button renameButton = new Button("Edit", new AbstractAction() {
+        Button renameButton = new Button("Edit Version", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     doEdit();
@@ -321,6 +322,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
                   dataset.getInternalSources().length == 0)) { 
             view.setEnabled(false);
         }
+        view.setText("View Data");
         panel.add(view);
 
         Button edit = editButton(tableCombo);
@@ -329,6 +331,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
                   dataset.getInternalSources().length == 0)) { 
             edit.setEnabled(false);
         }
+        edit.setText("Edit Data");
         panel.add(edit);
 
         Button copy = copyButton(tableCombo);

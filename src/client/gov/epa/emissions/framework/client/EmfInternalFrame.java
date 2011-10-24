@@ -100,6 +100,10 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     public void disposeView() {
         desktopManager.closeWindow(this);
     }
+    
+    public void windowHiding() {
+        desktopManager.hideWindow(this);
+    }
 
     protected void dimensions(Dimension size) {
         super.setSize(size);
@@ -150,4 +154,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
         getRootPane().setDefaultButton(button);
     }
     
+    public void hideMe() {
+        setVisible(false);
+    }
 }

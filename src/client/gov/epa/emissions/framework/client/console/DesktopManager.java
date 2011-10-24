@@ -8,11 +8,15 @@ public interface DesktopManager {
 
     public void closeWindow(ManagedView manageView);
     
+    public void hideWindow(ManagedView manageView);
+    
     public ManagedView getWindow(String windowName);
     
     public int numberOfOpenWindows();
 
     public boolean closeAll();
+    
+    public boolean hideAll();
 
     public void ensurePresence(ManagedView frame);
 

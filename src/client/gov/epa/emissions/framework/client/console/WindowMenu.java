@@ -37,6 +37,11 @@ public class WindowMenu extends JMenu implements WindowMenuView {
         closeAllMenuItem.addActionListener(closeAll());
         permanentMenuItems.add(closeAllMenuItem);
         refreshMenuItems();
+        
+        JMenuItem hideAllMenuItem = new JMenuItem("Hide All");
+        hideAllMenuItem.addActionListener(hideAll());
+        permanentMenuItems.add(hideAllMenuItem);
+        refreshMenuItems();
     }
 
     public void setWindowMenuViewPresenter(WindowMenuPresenter presenter) {
@@ -53,6 +58,17 @@ public class WindowMenu extends JMenu implements WindowMenuView {
         };
         return listener;
     }
+    
+    private ActionListener hideAll() {
+        ActionListener listener = new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (confirmHideAll())
+                    presenter.hideAll();
+            }
+        };
+        return listener;
+    }
 
     protected boolean confirmCloseAll() {
         if (presenter.numberOfOpenWindows() == 0)
@@ -60,6 +76,12 @@ public class WindowMenu extends JMenu implements WindowMenuView {
         ConfirmDialog dialog = new ConfirmDialog("Do you want to close all the windows?", "Close All Confirmation",
                 parent);
         return dialog.confirm();
+    }
+    
+    protected boolean confirmHideAll() {
+        if (presenter.numberOfOpenWindows() == 0)
+            return false;
+        return true;
     }
 
     public void addPermanently(ManagedView managedView) {

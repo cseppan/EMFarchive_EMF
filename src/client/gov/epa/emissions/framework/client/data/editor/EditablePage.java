@@ -150,7 +150,49 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
 
         return (VersionedRecord[]) selected.toArray(new VersionedRecord[0]);
     }
+    
+    public VersionedRecord[] getSelected(int [] selectedIndices) {
+        if ( selectedIndices==null || selectedIndices.length==0) {
+            return null;
+        }
+        List selected = new ArrayList();
+        for (int i : selectedIndices) {
+            EditableRow row = (EditableRow) rows.get(i);
+            EditablePageRowSource rowSource = (EditablePageRowSource) row.rowSource();
+            selected.add(rowSource.source());
+        }
+        return (VersionedRecord[]) selected.toArray(new VersionedRecord[0]);
+    }
 
+    public void pasteSelected(int [] selectedIndices, int row) {
+        if ( selectedIndices==null || selectedIndices.length==0 || row<0 || row>rows.size()) {
+            return;
+        }
+        
+        VersionedRecord[] selectedRecords = getSelected(selectedIndices);
+        ColumnMetaData[] colMetaData = tableMetadata.getCols();
+        
+        int inx = row;
+        for (VersionedRecord record : selectedRecords) {
+            VersionedRecord newRecord = new VersionedRecord();
+            newRecord.setDatasetId(datasetId);
+            newRecord.setVersion(version.getVersion());
+            newRecord.setDeleteVersions("");
+            List newTokens = new ArrayList();
+            // 0-3 are record id and version related columns
+            Object[] tokens = record.getTokens();
+            for (int i = 4; i < colMetaData.length; i++) {
+                newTokens.add(tokens[i-4]);
+            }
+            newRecord.setTokens(newTokens.toArray());
+
+            rows.add(inx, row(newRecord));
+            changeset.addNew(newRecord);
+            
+            inx++;
+        }
+    }
+    
     public void remove(VersionedRecord[] values) {
         for (int i = 0; i < values.length; i++)
             remove(values[i]);
@@ -186,6 +228,25 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
 
         rows.add(row, row(record));
         changeset.addNew(record);
+    }
+    
+    public VersionedRecord addAndReturnBlankRow(int row) {
+        VersionedRecord record = new VersionedRecord();
+        record.setDatasetId(datasetId);
+        record.setVersion(version.getVersion());
+        record.setDeleteVersions("");
+        List tokens = new ArrayList();
+        // 0-3 are record id and version related columns
+        for (int i = 4; i < tableMetadata.getCols().length; i++) {
+            tokens.add(null);
+        }
+        record.setTokens(tokens.toArray());
+
+        rows.add(row, row(record));
+        changeset.addNew(record);
+        
+        
+        return record;
     }
 
     public void removeSelected() {

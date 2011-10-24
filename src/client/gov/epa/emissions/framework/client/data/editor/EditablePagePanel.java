@@ -24,6 +24,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -40,6 +42,8 @@ import javax.swing.JToolBar;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
+import com.google.common.primitives.Ints;
+
 public class EditablePagePanel extends JPanel {
 
     private EditableEmfTableModel tableModel;
@@ -51,6 +55,8 @@ public class EditablePagePanel extends JPanel {
     private ManageChangeables listOfChangeables;
 
     private DataEditorTable editableTable;
+    
+    private int[] rowsCopied;
 
     private JTextArea rowFilter;
 
@@ -77,7 +83,12 @@ public class EditablePagePanel extends JPanel {
         this.messagePanel = messagePanel;
         this.tableData = page; 
         this.observer = observer;
+        this.rowsCopied = null;
         setupLayout();
+    }
+    
+    public void clearCopied() {
+        this.rowsCopied = null;
     }
     
     private void setupLayout(){
@@ -99,6 +110,7 @@ public class EditablePagePanel extends JPanel {
 
     private JToolBar toolBar() {
         JToolBar toolbar = new JToolBar();
+        
         String insertAbove = "/toolbarButtonGraphics/table/RowInsertBefore" + 24 + ".gif";
         ImageIcon iconAbove = createImageIcon(insertAbove);
         String nameAbove = "Insert Above";
@@ -116,6 +128,19 @@ public class EditablePagePanel extends JPanel {
         String nameDelete = "Delete";
         JButton buttonDelete = toolbar.add(deleteAction(nameDelete, iconDelete));
         buttonDelete.setToolTipText(nameDelete);
+        
+        
+        String copy = "/toolbarButtonGraphics/general/Copy" + 24 + ".gif";
+        ImageIcon iconCopy = createImageIcon(copy);
+        String nameCopy = "Copy Selected Rows";
+        JButton buttonCopy = toolbar.add(copyRowsAction(nameCopy, iconCopy));
+        buttonCopy.setToolTipText(nameCopy);
+        
+        String paste = "/toolbarButtonGraphics/general/Paste" + 24 + ".gif";
+        ImageIcon iconPaste = createImageIcon(paste);
+        String namePaste = "Insert Copied Rows Below";
+        JButton buttonPaste = toolbar.add(pasteRowsAction(false, namePaste, iconPaste));
+        buttonPaste.setToolTipText(namePaste);
 
         String selectAll = "/selectAll.jpeg";
         ImageIcon iconSelectAll = createImageIcon(selectAll);
@@ -199,6 +224,62 @@ public class EditablePagePanel extends JPanel {
         return new AbstractAction(name, icon) {
             public void actionPerformed(ActionEvent e) {
                 doAdd(editableTable, above);
+            }
+        };
+    }
+    
+
+    private Action pasteRowsAction(final boolean above, String name, ImageIcon icon) {
+        return new AbstractAction(name, icon) {
+            public void actionPerformed(ActionEvent e) {
+                
+                doPast(editableTable, above);
+
+                //refresh();
+            }
+
+        };
+    }
+    
+    private void doPast(DataEditorTable editableTable, boolean above) {
+        if ( rowsCopied == null || rowsCopied.length==0) {
+            messagePanel.setError("Please copy row(s) before click the copy button");
+            return; 
+        }
+        int selectedRow = Ints.max(rowsCopied);
+        messagePanel.clear();
+        if (selectedRow != -1 || editableTable.getRowCount() == 0) {
+            int insertRowNo = insertRowNumber(above, selectedRow, editableTable);
+            tableData.pasteSelected(rowsCopied, insertRowNo);
+            refresh();
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( rowsCopied != null) {
+                editableTable.setRowSelectionInterval(insertRowNo, insertRowNo+rowsCopied.length-1);
+            }
+        } else {
+            messagePanel.setError("Please highlight row(s) before clicking the paste button");
+            return; 
+        }
+
+        this.observer.update(1);
+        
+    }
+
+    private Action copyRowsAction(String name, ImageIcon icon) {
+        return new AbstractAction(name, icon) {
+            public void actionPerformed(ActionEvent e) {
+                //TODO: copy selected rows - tableData.selectAll();
+                rowsCopied = null;
+                int numRowsSelected = editableTable.getSelectedRowCount();
+                if ( numRowsSelected<= 0 ) {
+                    return;
+                }
+                rowsCopied = editableTable.getSelectedRows();
             }
         };
     }
