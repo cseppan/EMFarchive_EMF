@@ -315,7 +315,9 @@ public abstract class AbstractStrategyTask implements Strategy {
             if (DebugLevels.DEBUG_25())
                 System.out.println(sql);
             try {
+                setStatus("Started applying CAP measures on hap pollutants.");
                 datasource.query().execute(sql);
+                setStatus("Completed applying CAP measures on hap pollutants.");
             } catch (SQLException e) {
                 throw new EmfException("Error occured when applying CAP measures on HAP pollutants:" + "\n" + e.getMessage());
             }
