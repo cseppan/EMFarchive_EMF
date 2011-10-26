@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.tasks;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.exim.ImportTask;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -119,6 +120,10 @@ public abstract class ImportSubmitter implements TaskSubmitter {
         return this.submittedTable.size();
     }
 
+    public synchronized int getTaskManagerRunCount() {
+        return TaskManagerFactory.getImportTaskManager().getSizeofRunTable();
+    }
+    
     public synchronized void deregisterSubmitterFromRunManager(TaskSubmitter ts) {
         ImportTaskManager.deregisterSubmitter((ImportSubmitter)ts);
     }

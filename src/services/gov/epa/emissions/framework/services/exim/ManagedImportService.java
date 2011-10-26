@@ -151,6 +151,14 @@ public class ManagedImportService {
             for (int i = 0; i < filenames.length; i++)
                 addTasks(folderPath, path, new String[] { filenames[i] }, filenames[i], user, datasetType, services);
 
+            //if items are already being executed in the queue, then display a queue status message
+            if (importClientSubmitter.getTaskManagerRunCount() > 0) {
+                for (Runnable task : importTasks) {
+//                for (int i = 0; i < tasks.size(); i++) {
+                    ((ImportTask)task).setWaitingStatus();
+                }
+            }
+
             addTasksToSubmitter(importClientSubmitter, importTasks);
         } catch (Exception e) {
             setErrorMsgs(folderPath, e);
@@ -168,6 +176,16 @@ public class ManagedImportService {
 
         try {
             addTasks(folderPath, path, filenames, datasetName, user, datasetType, services);
+
+            //if items are already being executed in the queue, then display a queue status message
+            if (importClientSubmitter.getTaskManagerRunCount() > 0) {
+                for (Runnable task : importTasks) {
+//                for (int i = 0; i < tasks.size(); i++) {
+                    ((ImportTask)task).setWaitingStatus();
+                }
+            }
+
+
             addTasksToSubmitter(importClientSubmitter, importTasks);
         } catch (Exception e) {
             e.printStackTrace();

@@ -12,6 +12,8 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -302,6 +304,17 @@ public class ImportTask extends Task {
     protected void setStatus(String status, String message) {
         ImportTaskManager.callBackFromThread(taskId, this.submitterId, status, Thread.currentThread().getId(), message);
     }
+
+    public void setWaitingStatus() {
+
+        Status endStatus = new Status();
+        endStatus.setUsername(user.getUsername());
+        endStatus.setType("Import");
+        endStatus.setMessage("Dataset, " + dataset.getName() + ", has been added to the Dataset Import Queue.  There queue is currently busy importing other datasets.");
+        endStatus.setTimestamp(new Date());
+
+        statusServices.add(endStatus);
+}
 
     protected void logError(String messge, Exception e) {
         log.error(messge, e);
