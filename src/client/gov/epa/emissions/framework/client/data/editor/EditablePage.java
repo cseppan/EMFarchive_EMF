@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import cern.colt.list.IntArrayList;
+
 public class EditablePage extends AbstractEditableTableData implements SelectableTableData {
 
     private List rows;
@@ -151,12 +153,27 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
         return (VersionedRecord[]) selected.toArray(new VersionedRecord[0]);
     }
     
-    public VersionedRecord[] getSelected(int [] selectedIndices) {
-        if ( selectedIndices==null || selectedIndices.length==0) {
+    public int[] getSelectedIndices() {
+        IntArrayList selected = new IntArrayList();
+        int i=0;
+        EditableRow row;
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            row = (EditableRow) iter.next();
+            EditablePageRowSource rowSource = (EditablePageRowSource) row.rowSource();
+            if (rowSource.isSelected())
+                selected.add(i);
+            i++;
+        }
+        selected.trimToSize();
+        return selected.elements();
+    }
+    
+    public VersionedRecord[] getHighlighted(int [] highlightedIndices) {
+        if ( highlightedIndices==null || highlightedIndices.length==0) {
             return null;
         }
         List selected = new ArrayList();
-        for (int i : selectedIndices) {
+        for (int i : highlightedIndices) {
             EditableRow row = (EditableRow) rows.get(i);
             EditablePageRowSource rowSource = (EditablePageRowSource) row.rowSource();
             selected.add(rowSource.source());
@@ -164,16 +181,21 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
         return (VersionedRecord[]) selected.toArray(new VersionedRecord[0]);
     }
 
-    public void pasteSelected(int [] selectedIndices, int row) {
-        if ( selectedIndices==null || selectedIndices.length==0 || row<0 || row>rows.size()) {
+    public void pasteHighlighted(int [] highlightedIndices, int row) {
+        if ( highlightedIndices==null || highlightedIndices.length==0 || row<0 || row>rows.size()) {
             return;
         }
         
-        VersionedRecord[] selectedRecords = getSelected(selectedIndices);
+        VersionedRecord[] selectedRecords = getHighlighted(highlightedIndices);
+        pasteCopied( selectedRecords, row);
+    }
+    
+    public void pasteCopied(VersionedRecord[] copiedRecords, int row) {
+        
         ColumnMetaData[] colMetaData = tableMetadata.getCols();
         
         int inx = row;
-        for (VersionedRecord record : selectedRecords) {
+        for (VersionedRecord record : copiedRecords) {
             VersionedRecord newRecord = new VersionedRecord();
             newRecord.setDatasetId(datasetId);
             newRecord.setVersion(version.getVersion());

@@ -32,6 +32,7 @@ import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -279,6 +280,7 @@ public class RevisionEditorViewImpl extends Dialog implements RevisionEditorView
     public void hideMe() {
         // NOTE Auto-generated method stub
         setVisible(false);
+        //setState(JFrame.ICONIFIED);
     }
 
 }

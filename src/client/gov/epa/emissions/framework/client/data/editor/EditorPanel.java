@@ -128,6 +128,7 @@ public class EditorPanel extends JPanel implements EditorPanelView {
             editablePage = new EditablePage(dataset.getId(), version, page, tableMetadata);
             editablePage.setDatasetName(dataset.getName());
             editablePagePanel.clearCopied();
+            editablePagePanel.clearCopiedRecords();
             editablePagePanel.refresh(editablePage);
         }
 

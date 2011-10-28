@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.beans.PropertyVetoException;
 
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
@@ -71,9 +72,10 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
 
     public void bringToFront() {
         super.toFront();
+        super.moveToFront();
         try {
-            super.setSelected(true);
-            super.setIcon(false);
+                super.setSelected(true);
+                super.setIcon(false);
         } catch (PropertyVetoException e) {
             throw new RuntimeException("could not bring the window - " + super.getTitle() + " to front of the desktop");
         }
@@ -155,6 +157,13 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     }
     
     public void hideMe() {
-        setVisible(false);
+        //setVisible(false);
+        //setState(JFrame.ICONIFIED);
+        try {
+            setIcon(true);
+        } catch (PropertyVetoException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.ClipBoardCopy;
@@ -56,7 +57,11 @@ public class EditablePagePanel extends JPanel {
 
     private DataEditorTable editableTable;
     
-    private int[] rowsCopied;
+    private int[] rowsCopiedHighlighted;
+    
+    private int[] rowsCopiedSelected;
+    
+    private VersionedRecord[] selectedRecords;
 
     private JTextArea rowFilter;
 
@@ -83,12 +88,19 @@ public class EditablePagePanel extends JPanel {
         this.messagePanel = messagePanel;
         this.tableData = page; 
         this.observer = observer;
-        this.rowsCopied = null;
+        this.rowsCopiedHighlighted = null;
+        this.rowsCopiedSelected = null;
+        this.selectedRecords = null;
         setupLayout();
     }
     
     public void clearCopied() {
-        this.rowsCopied = null;
+        this.rowsCopiedHighlighted = null;
+    }
+    
+    public void clearCopiedRecords() {
+        this.rowsCopiedSelected = null;
+        this.selectedRecords = null;
     }
     
     private void setupLayout(){
@@ -233,24 +245,24 @@ public class EditablePagePanel extends JPanel {
         return new AbstractAction(name, icon) {
             public void actionPerformed(ActionEvent e) {
                 
-                doPast(editableTable, above);
+                doPastSelected(editableTable, above);
 
-                //refresh();
             }
 
         };
     }
     
-    private void doPast(DataEditorTable editableTable, boolean above) {
-        if ( rowsCopied == null || rowsCopied.length==0) {
-            messagePanel.setError("Please copy row(s) before click the copy button");
+    private void doPastHighlighted(DataEditorTable editableTable, boolean above) {
+        messagePanel.clear();
+        if ( rowsCopiedHighlighted == null || rowsCopiedHighlighted.length==0) {
+            messagePanel.setError("Please copy row(s) before click the paste button");
             return; 
         }
-        int selectedRow = Ints.max(rowsCopied);
+        int selectedRow = Ints.max(rowsCopiedHighlighted);
         messagePanel.clear();
         if (selectedRow != -1 || editableTable.getRowCount() == 0) {
             int insertRowNo = insertRowNumber(above, selectedRow, editableTable);
-            tableData.pasteSelected(rowsCopied, insertRowNo);
+            tableData.pasteHighlighted(rowsCopiedHighlighted, insertRowNo);
             refresh();
             try {
                 Thread.sleep(200);
@@ -258,8 +270,8 @@ public class EditablePagePanel extends JPanel {
                 // NOTE Auto-generated catch block
                 e.printStackTrace();
             }
-            if ( rowsCopied != null) {
-                editableTable.setRowSelectionInterval(insertRowNo, insertRowNo+rowsCopied.length-1);
+            if ( rowsCopiedHighlighted != null) {
+                editableTable.setRowSelectionInterval(insertRowNo, insertRowNo+rowsCopiedHighlighted.length-1);
             }
         } else {
             messagePanel.setError("Please highlight row(s) before clicking the paste button");
@@ -269,19 +281,80 @@ public class EditablePagePanel extends JPanel {
         this.observer.update(1);
         
     }
+    
+    private void doPastSelected(DataEditorTable editableTable, boolean above) {
+        messagePanel.clear();
+        if ( selectedRecords == null || selectedRecords.length==0) {
+            messagePanel.setError("Please copy row(s) before click the paste button");
+            return; 
+        }
+        int [] rowsHighlightedOrSelected;
+        rowsHighlightedOrSelected = tableData.getSelectedIndices();
+//        if ( rowsHighlightedOrSelected == null || rowsHighlightedOrSelected.length == 0) {
+//            rowsHighlightedOrSelected = this.rowsCopiedSelected;
+//        }
+        if ( rowsHighlightedOrSelected == null || rowsHighlightedOrSelected.length == 0) {
+            rowsHighlightedOrSelected = this.editableTable.getSelectedRows();
+        }
+        if ( rowsHighlightedOrSelected == null || rowsHighlightedOrSelected.length == 0) {
+            messagePanel.setError("Please select or highlight row(s) before click the paste button");
+            return; 
+        }
+        
+        int selectedRow = Ints.max(rowsHighlightedOrSelected);
+        messagePanel.clear();
+        if (selectedRow >= 0) {
+            int insertRowNo = above ? selectedRow : selectedRow+1;
+            tableData.pasteCopied(this.selectedRecords, insertRowNo);
+            refresh();
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+            }
+            if ( this.selectedRecords != null) {
+                editableTable.setRowSelectionInterval(insertRowNo, insertRowNo+selectedRecords.length-1);
+            }
+        } else {
+            messagePanel.setError("Please select or highlight row(s) before clicking the paste button");
+            return; 
+        }
+
+        this.observer.update(1);
+        
+    }
+
 
     private Action copyRowsAction(String name, ImageIcon icon) {
         return new AbstractAction(name, icon) {
             public void actionPerformed(ActionEvent e) {
-                //TODO: copy selected rows - tableData.selectAll();
-                rowsCopied = null;
-                int numRowsSelected = editableTable.getSelectedRowCount();
-                if ( numRowsSelected<= 0 ) {
-                    return;
-                }
-                rowsCopied = editableTable.getSelectedRows();
+                doCopySelected(); 
             }
         };
+    }
+    
+    private void doCopyHilighted() {
+        messagePanel.clear();
+        int numRowshighlighted = editableTable.getSelectedRowCount();
+        if ( numRowshighlighted<= 0 ) {
+            messagePanel.setError("Please highlight at least one row to copy.");
+            return;
+        }
+        rowsCopiedHighlighted = editableTable.getSelectedRows();
+    }
+    
+    private void doCopySelected() {
+        messagePanel.clear();
+        int selected = tableData.getSelected().length;
+
+        if (selected == 0) {
+            messagePanel.setError("Please select at least one row to copy.");
+            return;
+        }
+        
+        this.rowsCopiedSelected = tableData.getSelectedIndices();
+        this.selectedRecords = tableData.getSelected();
     }
 
     private Action selectAction(final boolean select, String name, ImageIcon icon) {

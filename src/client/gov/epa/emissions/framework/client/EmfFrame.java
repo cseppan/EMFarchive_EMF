@@ -67,6 +67,7 @@ public abstract class EmfFrame extends JFrame implements EmfView {
     }
     
     public void hideMe() {
-        setVisible(false);
+        //setVisible(false);
+        setState(JFrame.ICONIFIED);
     }
 }

@@ -24,11 +24,15 @@ public class EmfDesktopImpl implements EmfDesktop {
 
     public void ensurePresence(ManagedView view) {
         EmfInternalFrame window = (EmfInternalFrame) view;// unfortunate class-cast
+        if (window.isIcon())
+            return;
         if (!isPresent(window))
             desktop.add(window);
     }
 
     private boolean isPresent(EmfInternalFrame window) {
+        if (window.isIcon())
+            return true;
         List componentsList = Arrays.asList(desktop.getAllFrames());
         return componentsList.contains(window);
     }
