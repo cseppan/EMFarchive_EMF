@@ -57,11 +57,11 @@ public class ExportShapeFileQAStep {
         this.pollutant = pollutant;
     }
 
-    public void export(String dirName, ProjectionShapeFile projectionShapeFile) throws EmfException {
-        ExportShapeFileQAStepTask task = new ExportShapeFileQAStepTask(dirName, step, 
-                user, sessionFactory, 
-                dbServerFactory, projectionShapeFile,
-                verboseStatusLogging, pollutant);
+    public void export(String dirName, String fileName, ProjectionShapeFile projectionShapeFile, boolean overide) throws EmfException {
+        ExportShapeFileQAStepTask task = new ExportShapeFileQAStepTask(dirName, fileName, 
+                overide, step, 
+                user, sessionFactory,
+                dbServerFactory, projectionShapeFile, verboseStatusLogging, pollutant);
         try {
             threadPool.execute(new GCEnforcerTask("Export QA Step : " + step.getProgram().getName(), task));
         } catch (InterruptedException e) {

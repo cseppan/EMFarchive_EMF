@@ -40,12 +40,18 @@ public class ExportQAStepTask implements Runnable {
     
     private String dirName;
     
+    private String fileName;
+    
+    private boolean overide;
+    
     private boolean verboseStatusLogging = true;
 
-    public ExportQAStepTask(String dirName, QAStep qaStep, 
-            User user, HibernateSessionFactory sessionFactory, 
-            DbServerFactory dbServerFactory) {
+    public ExportQAStepTask(String dirName, String fileName, 
+            boolean overide, QAStep qaStep, 
+            User user, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.dirName = dirName;
+        this.fileName = fileName;
+        this.overide = overide;
         this.qastep = qaStep;
         this.user = user;
         this.sessionFactory = sessionFactory;
@@ -53,12 +59,12 @@ public class ExportQAStepTask implements Runnable {
         this.statusDao = new StatusDAO(sessionFactory);
     }
 
-    public ExportQAStepTask(String dirName, QAStep qaStep, 
-            User user, HibernateSessionFactory sessionFactory, 
-            DbServerFactory dbServerFactory, boolean verboseStatusLogging) {
-        this(dirName, qaStep, 
-                user, sessionFactory, 
-                dbServerFactory);
+    public ExportQAStepTask(String dirName, String fileName, 
+            boolean overide, QAStep qaStep, 
+            User user, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory, boolean verboseStatusLogging) {
+        this(dirName, fileName, 
+                overide, qaStep, 
+                user, sessionFactory, dbServerFactory);
         this.verboseStatusLogging = verboseStatusLogging;
     }
 
@@ -152,11 +158,17 @@ public class ExportQAStepTask implements Runnable {
     }
 
     private File exportFile(String dirName) throws EmfException {
-        return new File(validateDir(dirName), fileName());
+        File f = new File(validateDir(dirName), fileName());
+        if (!overide && f.exists()) {
+            throw new EmfException("The file " + f.getAbsolutePath() + " already exists.");
+        }
+        return f;
     }
 
     private String fileName() {
-        return result.getTable() + ".csv";
+        if ( fileName == null || fileName.trim().length() == 0)
+            return result.getTable() + ".csv";
+        return fileName + ".csv";
     }
 
     private File validateDir(String dirName) throws EmfException {

@@ -655,7 +655,7 @@ public class FastRunTask {
             String[] qaStepTemplateNames = new String[qaStepTemplates.length];
             for (int i = 0; i < qaStepTemplates.length; i++)
                 qaStepTemplateNames[i] = qaStepTemplates[i].getName();
-            qaTask.runSummaryQAStepsAndExport(qaStepTemplateNames, ""/* fastRun.getExportDirectory() */);
+            qaTask.runSummaryQAStepsAndExport(qaStepTemplateNames, ""/* fastRun.getExportDirectory() */, null);
         }
     }
 

@@ -102,7 +102,7 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
                     prepare(suffix, dataset);
                     String sql = prepareSQLStatement(dataset, datasetVersion, grid, pollutant, sector);
                     exporter.create(getProperty("postgres-bin-dir"), getProperty("postgres-db"), getProperty("postgres-user"),
-                            getProperty("pgsql2shp-info"), file.getAbsolutePath(), sql, null);
+                            getProperty("pgsql2shp-info"), file.getAbsolutePath(), true, sql, null);
                     complete(suffix, dataset);
                 }
             }

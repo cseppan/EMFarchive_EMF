@@ -49,6 +49,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -92,6 +93,10 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     private QAPrograms qaPrograms;
 
     private JTextField exportFolder;
+    
+    private JTextField exportName;
+    
+    private JCheckBox overide;
 
     private JLabel creationStatusLabel;
     
@@ -224,13 +229,35 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
 
         layoutGenerator.addLabelWidgetPair("Folder:", exportFolderPanel(step), panel);
+        layoutGenerator.addLabelWidgetPair("Export Name:", exportNamePanel(step), panel);
+        layoutGenerator.addLabelWidgetPair("", overideChkboxPanel(step), panel);
+        
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
 
+    }
+
+    private JPanel exportNamePanel(QAStep step) {
+        exportName = new JTextField(40);
+        exportName.setToolTipText("The name of the file to which the step results will be exported");
+        exportName.setName("exportName");
+        exportName.setText("");
+        JPanel namePanel = new JPanel(new BorderLayout(2, 10));
+        namePanel.add(exportName, BorderLayout.LINE_START);
+        return namePanel;
+    }
+    
+    private JPanel overideChkboxPanel(QAStep step) {
+        overide = new JCheckBox("Overwrite files if they exist?");
+        overide.setToolTipText("If the box checked, the files with the same names will be overiden if they already exist in the folder.");
+        overide.setName("overid");
+        JPanel overidePanel = new JPanel(new BorderLayout(2, 10));
+        overidePanel.add(overide, BorderLayout.LINE_START);
+        return overidePanel;
     }
 
     private JPanel exportFolderPanel(QAStep step) {
@@ -449,7 +476,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
             resetRunStatus(result);
             messagePanel.setMessage("Started Export. Please monitor the Status window "
                     + "to track your export request.");
-            presenter.doExport(step, result, exportFolder.getText());
+            presenter.doExport(step, result, exportFolder.getText(), exportName.getText(), overide.isSelected());
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

@@ -32,15 +32,17 @@ public class RunQAStepTask {
     private PooledExecutor threadPool;
 
     private String exportDirectory;
+    private String []exportFiles = null;
 
     private boolean verboseStatusLogging = true;
 
     public RunQAStepTask(QAStep[] qaStep, User user, 
             DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory,
-            String exportDirectory, boolean verboseStatusLogging) {
+            String exportDirectory, boolean verboseStatusLogging, String[] exportFiles) {
         this(qaStep, user, 
             dbServerFactory, sessionFactory);
         this.exportDirectory = exportDirectory;
+        this.exportFiles = exportFiles;
         this.verboseStatusLogging = verboseStatusLogging;
     }
 
@@ -64,10 +66,12 @@ public class RunQAStepTask {
 
     public void run() throws EmfException {
         QAStep qaStep = null;
+        String exportFile = null;
         try {
             for (int i = 0; i < qasteps.length; i++) {
                 qaStep = qasteps[i];
-                runSteps(qaStep);
+                exportFile = exportFiles==null ? null : exportFiles[i];
+                runSteps(qaStep, exportFile);
             }
         } catch (Exception e) {
             // need to catch the general exception in case there is a 
@@ -78,7 +82,7 @@ public class RunQAStepTask {
         }
     }
 
-    private void runSteps(QAStep qaStep) throws EmfException {
+    private void runSteps(QAStep qaStep, String exportFile) throws EmfException {
         String suffix = suffix(qaStep);
         prepare(suffix, qaStep);
         DbServer dbServer = dbServerFactory.getDbServer();
@@ -100,7 +104,7 @@ public class RunQAStepTask {
             ExportQAStep exportQATask = new ExportQAStep(qaStep, dbServerFactory, 
                     user, sessionFactory, 
                     threadPool, verboseStatusLogging);
-            exportQATask.export(exportDirectory);
+            exportQATask.export(exportDirectory, exportFile, true);
             endTime = System.currentTimeMillis();
             System.out.println("Exported QA step, " + qaStep.getName() + ", in " + ((endTime - startTime) / (1000))  + " secs");
         }

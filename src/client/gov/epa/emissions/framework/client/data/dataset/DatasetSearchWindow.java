@@ -13,9 +13,13 @@ import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.casemanagement.CaseSearchPresenter;
+import gov.epa.emissions.framework.client.casemanagement.CaseSearchWindow;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -35,6 +39,8 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 public class DatasetSearchWindow extends ReusableInteralFrame {
@@ -60,14 +66,24 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     private TextField qaStep;
     private TextField qaStepArguments;
     
+    private boolean selectSingleCase = true;
+    private Case[] usedByCases = null;
+    private int[] usedByCasesID = null;
+    private TextField caseName;
+    private JTextArea dataValueFilter;
+    
     private String preText;
     
     private DatasetType[] allDSTypes;
     
+    private CaseCategory[] allCaseCategories;
+    
     private EmfConsole parent;
     
+    static final private Dimension frameDim = new Dimension(680, 560);
+    
     public DatasetSearchWindow(String title, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super(title, new Dimension(580, 400), desktopManager);
+        super(title, frameDim, desktopManager);
         parent = parentConsole;
     }
 
@@ -87,6 +103,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
             messagePanel.setError(e.getMessage());
         }
         panel.add(createControlPanel(), BorderLayout.SOUTH);
+        panel.setPreferredSize(frameDim);
 
         return panel;
     }
@@ -130,9 +147,11 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         layoutGen.addLabelWidgetPair("QA name contains:", qaStep, panel);
         layoutGen.addLabelWidgetPair("Search QA arguments:", datasetPanel(), panel);
         layoutGen.addLabelWidgetPair("Project:", projectsCombo, panel);
+        layoutGen.addLabelWidgetPair("Used by Case:", casePanel(), panel);
+        layoutGen.addLabelWidgetPair("Data Value Filter:", dataValueFilterPanel(dim), panel);
 
         // Lay out the panel.
-        layoutGen.makeCompactGrid(panel, 9, 2, // rows, cols
+        layoutGen.makeCompactGrid(panel, 11, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 10);// xPad, yPad
 
@@ -154,15 +173,91 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         return invPanel;
     }
     
+    private JPanel casePanel() {
+
+        caseName = new TextField("caseName", 30);
+        caseName.setToolTipText("Choose a case that uses the datasets");
+        
+        Button findCaseButton = new AddButton("Find Case", findCaseAction());
+        findCaseButton.setMargin(new Insets(1, 2, 1, 2));
+
+        JPanel invPanel = new JPanel(new BorderLayout(5, 0));
+         
+        invPanel.add(caseName, BorderLayout.LINE_START);
+        invPanel.add(findCaseButton);
+        return invPanel;
+    }
+    
+    private JPanel dataValueFilterPanel(Dimension dim) {
+
+        dataValueFilter = new JTextArea();
+        dataValueFilter.setToolTipText("Set data value filter in free SQL format e.g. FIPE='12345' and SCC='32148'");
+
+        dataValueFilter.setWrapStyleWord(true);
+        dataValueFilter.setLineWrap(true);
+        JScrollPane scrollPane = new JScrollPane( dataValueFilter);
+        scrollPane.setMinimumSize(new Dimension(100,50));
+        scrollPane.setPreferredSize(dim);
+        
+        JPanel p = new JPanel(new BorderLayout(5, 0));
+         
+        p.add(scrollPane, BorderLayout.LINE_START);
+        return p;
+    }
+    
+    private Action findCaseAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                findCaseWindow();
+            }
+        };
+    }
+
     protected Action selectAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doAddWindow();
+                datasetSelectionWindow();
             }
         };
     }
     
-    protected void doAddWindow() {
+    protected void findCaseWindow() {
+        
+        try {
+            
+            CaseSearchWindow view = new CaseSearchWindow( parent);
+
+            CaseSearchPresenter caseSearchPresenter = new CaseSearchPresenter(view, presenter.getSession(), allCaseCategories);
+            
+            caseSearchPresenter.display(null, selectSingleCase);
+            if (view.shouldCreate())
+                setCases(caseSearchPresenter.getCases());
+
+        } catch (Exception e) {
+             messagePanel.setError(e.getMessage());
+        }
+    }
+    
+    private void setCases(Case[] cases) {
+        usedByCases = cases;
+        if (usedByCases == null || usedByCases.length == 0) {
+            return;
+        }
+        if (usedByCases != null && usedByCases.length > 0) {
+            caseName.setText(usedByCases[0].getName());
+            if ( selectSingleCase) {
+                usedByCasesID = new int[usedByCases.length];
+                for (int i=0; i<usedByCases.length; i++) {
+                    usedByCasesID[i]=usedByCases[i].getId();
+                }
+            } else {
+                usedByCasesID = new int[1];
+                usedByCasesID[0]=usedByCases[0].getId();
+            }
+        }
+    }
+    
+    protected void datasetSelectionWindow() {
         
         try {
             
@@ -199,9 +294,9 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                     if (!checkFields())
                         return;
 
-                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)); 
 
-                    datasets = search(getDataset(),qaStep.getText(), qaStepArguments.getText(), false);
+                    datasets = search(getDataset(),qaStep.getText(), qaStepArguments.getText(), usedByCasesID, dataValueFilter.getText(), false);
 
                     if (datasets.length == 1 && datasets[0].getName().startsWith("Alert!!! More than 300 datasets selected.")) {
                         String msg = "Number of datasets > 300. Would you like to continue?";
@@ -210,7 +305,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                         if (option == JOptionPane.NO_OPTION)
                             return;
 
-                        datasets = search(getDataset(),qaStep.getText(),qaStepArguments.getText(), true);
+                        datasets = search(getDataset(),qaStep.getText(),qaStepArguments.getText(), usedByCasesID, dataValueFilter.getText(), true);
                     }
 
                     DatasetType type = (DatasetType)dsTypesBox.getSelectedItem();
@@ -276,9 +371,18 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                 && keyword.getSelectedItem() == null
                 && (qaStep.getText() == null || qaStep.getText().trim().isEmpty())
                 && (qaStepArguments.getText() == null || qaStepArguments.getText().trim().isEmpty())
-                && projectsCombo.getSelectedItem() == null)
+                && projectsCombo.getSelectedItem() == null
+                && (caseName.getText() == null || caseName.getText().trim().isEmpty())
+                && (dataValueFilter.getText()==null || dataValueFilter.getText().trim().isEmpty())) {
+            messagePanel.setError("Please specify at least one criteria for advanced search.");
             return false;
-        
+        }
+        if ( dataValueFilter.getText()!=null 
+                && !dataValueFilter.getText().trim().isEmpty()
+                && dsTypesBox.getSelectedItem() == null) {
+            messagePanel.setError("Please select a Dataset Type if you want to use Data Value Filter.");
+            return false;
+        }
         return true;
     }
 
@@ -342,8 +446,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         return selected;
     }
     
-    private EmfDataset[] search(EmfDataset dataset, String qaStep,String qaArgument, boolean unconditional) throws EmfException {
-        return presenter.advSearch4Datasets(dataset, qaStep, qaArgument, unconditional);
+    private EmfDataset[] search(EmfDataset dataset, String qaStep,String qaArgument, int[] usedByCasesId, String dataValueFilter, boolean unconditional) throws EmfException {
+        return presenter.advSearch4Datasets(dataset, qaStep, qaArgument, usedByCasesID, dataValueFilter, unconditional);
     }
 
     public void observe(DatasetsBrowserPresenter presenter) {

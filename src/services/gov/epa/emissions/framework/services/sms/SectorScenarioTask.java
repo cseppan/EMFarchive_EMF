@@ -1966,7 +1966,7 @@ public class SectorScenarioTask {
         if (qaStepTemplates != null) {
             String[] qaStepTemplateNames = new String[qaStepTemplates.length];
             for (int i = 0; i < qaStepTemplates.length; i++) qaStepTemplateNames[i] = qaStepTemplates[i].getName();
-            qaTask.runSummaryQAStepsAndExport(qaStepTemplateNames, sectorScenario.getExportDirectory());
+            qaTask.runSummaryQAStepsAndExport(qaStepTemplateNames, sectorScenario.getExportDirectory(), null);
         }
     }
 

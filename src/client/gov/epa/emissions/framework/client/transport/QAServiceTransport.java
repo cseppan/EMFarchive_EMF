@@ -84,30 +84,34 @@ public class QAServiceTransport implements QAService {
 
     }
 
-    public synchronized void exportQAStep(QAStep step, User user, String dirName) throws EmfException {
+    public synchronized void exportQAStep(QAStep step, User user, String dirName, String fileName, boolean overide) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("exportQAStep");
         call.addParam("step", mappings.qaStep());
         call.addParam("user", mappings.user());
         call.addStringParam("dirName");
+        call.addStringParam("fileName");
+        call.addBooleanParameter("overide");
         call.setVoidReturnType();
 
-        call.request(new Object[] { step, user, dirName });
+        call.request(new Object[] { step, user, dirName, fileName, new Boolean(overide) });
     }
 
-    public synchronized void exportShapeFileQAStep(QAStep step, User user, String dirName, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
+    public synchronized void exportShapeFileQAStep(QAStep step, User user, String dirName, String fileName, boolean overide, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("exportShapeFileQAStep");
         call.addParam("step", mappings.qaStep());
         call.addParam("user", mappings.user());
         call.addStringParam("dirName");
+        call.addStringParam("fileName");
+        call.addBooleanParameter("overide");
         call.addParam("projectionShapeFile", mappings.projectionShapeFile());
         call.addParam("pollutant", mappings.pollutant());
         call.setVoidReturnType();
 
-        call.request(new Object[] { step, user, dirName, projectionShapeFile, pollutant });
+        call.request(new Object[] { step, user, dirName, fileName, new Boolean(overide), projectionShapeFile, pollutant });
     }
 
     public synchronized QAStepResult getQAStepResult(QAStep step) throws EmfException {

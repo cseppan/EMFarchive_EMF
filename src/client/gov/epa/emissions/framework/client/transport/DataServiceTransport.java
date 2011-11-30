@@ -441,17 +441,19 @@ public class DataServiceTransport implements DataService {
         
     }
 
-    public EmfDataset[] findDatasets(EmfDataset dataset, String qaStep, String qaArgument, boolean unconditional) throws EmfException {
+    public EmfDataset[] findDatasets(EmfDataset dataset, String qaStep, String qaArgument, int[] usedByCasesID, String dataValueFilter, boolean unconditional) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("findDatasets");
         call.addParam("dataset", mappings.dataset());
         call.addStringParam("qaStep");
         call.addStringParam("qaArgument");
+        call.addIntArrayParam();
+        call.addStringParam("dataValueFilter");
         call.addBooleanParameter("unconditional");
         call.setReturnType(mappings.datasets());
         
-        return (EmfDataset[]) call.requestResponse(new Object[]{ dataset, qaStep, qaArgument, new Boolean(unconditional) });
+        return (EmfDataset[]) call.requestResponse(new Object[]{ dataset, qaStep, qaArgument, usedByCasesID, dataValueFilter, new Boolean(unconditional) });
     }
 
     public void updateVersion(Version locked) throws EmfException {

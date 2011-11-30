@@ -106,6 +106,10 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private QAPrograms qaPrograms;
 
     private JTextField exportFolder;
+    
+    private JTextField exportName;
+    
+    private JCheckBox overide;
 
     private QAStepResult qaStepResult;
 
@@ -354,8 +358,10 @@ substring(fips,1,2)='37'
         comments.setToolTipText("Enter any notes of interest that you found when performing the step");
 
         layoutGenerator.addLabelWidgetPair("Export Folder:", exportFolderPanel(step), panel);
+        layoutGenerator.addLabelWidgetPair("Export Name:", exportNamePanel(step), panel);
+        layoutGenerator.addLabelWidgetPair("", overideChkboxPanel(step), panel);
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -378,6 +384,25 @@ substring(fips,1,2)='37'
         folderPanel.add(exportFolder, BorderLayout.LINE_START);
         folderPanel.add(button, BorderLayout.LINE_END);
         return folderPanel;
+    }
+    
+    private JPanel exportNamePanel(QAStep step) {
+        exportName = new JTextField(40);
+        exportName.setToolTipText("The name of the file to which the step results will be exported");
+        exportName.setName("exportName");
+        exportName.setText("");
+        JPanel namePanel = new JPanel(new BorderLayout(2, 10));
+        namePanel.add(exportName, BorderLayout.LINE_START);
+        return namePanel;
+    }
+    
+    private JPanel overideChkboxPanel(QAStep step) {
+        overide = new JCheckBox("Overwrite files if they exist?");
+        overide.setToolTipText("If the box checked, the files with the same names will be overiden if they already exist in the folder.");
+        overide.setName("overid");
+        JPanel overidePanel = new JPanel(new BorderLayout(2, 10));
+        overidePanel.add(overide, BorderLayout.LINE_START);
+        return overidePanel;
     }
 
     private void selectFolder() {
@@ -773,6 +798,24 @@ substring(fips,1,2)='37'
     private void checkExportFolder() throws EmfException{
         if (exportFolder.getText().trim().isEmpty())
             throw new EmfException (" Please specify the export folder. ");
+    }
+    
+    private boolean checkExportName() {
+        
+        if (exportName.getText().trim().isEmpty())
+        {
+            // show a dialog to remind user that the name will be default
+            int n = JOptionPane.showConfirmDialog(
+                    this,
+                    "You did not specify the Export Name. It will be generated automatically. Would you like to continue?",
+                    "Export Name not Specified",
+                    JOptionPane.YES_NO_OPTION);
+            if ( n == JOptionPane.YES_OPTION) 
+                return true;
+            return false;
+        }
+
+        return true;
     }
 
     private void getInventories(String programSwitches, int beginIndex, int endIndex) throws EmfException {
@@ -1840,17 +1883,19 @@ avd_emis=emis_avd
     protected void doExport() {
         try {
             checkExportFolder();
+            if ( !checkExportName()) 
+                return;
             ExportSelectionDialog dialog = new ExportSelectionDialog(parentConsole, presenter.getProjectionShapeFiles(), presenter.getPollutants());
             dialog.display();
             if(dialog.shouldCreateCSV()) {
                 messagePanel.setMessage("Started Export. Please monitor the Status window "
                         + "to track your export request.");
-                presenter.export(step, qaStepResult, exportFolder.getText());
+                presenter.export(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected()); // pass in fileName
             }
             if (dialog.shouldCreateShapeFile()){
                 messagePanel.setMessage("Started Exporting Shape File. Please monitor the Status window "
                         + "to track your export request.");
-                presenter.exportToShapeFile(step, qaStepResult, exportFolder.getText(), dialog.getProjectionShapeFile(), dialog.getPollutant());
+                presenter.exportToShapeFile(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected(), dialog.getProjectionShapeFile(), dialog.getPollutant());
             }
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());

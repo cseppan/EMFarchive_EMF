@@ -81,7 +81,7 @@ public class EditQAStepPresenter {
         //view.resetChanges();
     }
 
-    public void export(QAStep qaStep, QAStepResult stepResult, String dirName) throws EmfException {
+    public void export(QAStep qaStep, QAStepResult stepResult, String dirName, String fileName, boolean overide) throws EmfException {
         lastFolder = dirName;
 
         if (stepResult == null || stepResult.getTable() == null)
@@ -89,7 +89,7 @@ public class EditQAStepPresenter {
 
         qaStep.setOutputFolder(dirName);
         qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
-        qaService().exportQAStep(qaStep, session.user(), dirName);
+        qaService().exportQAStep(qaStep, session.user(), dirName, fileName, overide);
     }
     
     public boolean getSameAsTemplate(QAStep qaStep) throws EmfException{       
@@ -99,7 +99,7 @@ public class EditQAStepPresenter {
     public void exportToShapeFile(QAStep qaStep, 
             QAStepResult stepResult, 
             String dirName, 
-            ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
+            String fileName, boolean overide, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
         lastFolder = dirName;
 
         if (stepResult == null || stepResult.getTable() == null)
@@ -108,7 +108,7 @@ public class EditQAStepPresenter {
         qaStep.setOutputFolder(dirName);
         session.qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
 //        ProjectionShapeFile projectionShapeFile = session.qaService().getProjectionShapeFiles()[1];
-        session.qaService().exportShapeFileQAStep(qaStep, session.user(), dirName, projectionShapeFile, pollutant);
+        session.qaService().exportShapeFileQAStep(qaStep, session.user(), dirName, fileName, overide, projectionShapeFile, pollutant);
     }
 
     private String getFolder() {

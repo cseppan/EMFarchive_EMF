@@ -25,9 +25,9 @@ public interface QAService {
 
     void runQAStep(QAStep step, User user) throws EmfException;
 
-    public void exportQAStep(QAStep step, User user, String dirName) throws EmfException;
+    public void exportQAStep(QAStep step, User user, String dirName, String fileName, boolean overide) throws EmfException;
 
-    public void exportShapeFileQAStep(QAStep step, User user, String dirName, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException;
+    public void exportShapeFileQAStep(QAStep step, User user, String dirName, String fileName, boolean overide, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException;
 
     QAStepResult getQAStepResult(QAStep step) throws EmfException;
     

@@ -39,6 +39,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -1636,32 +1637,41 @@ public class DatasetDAO {
         //
     }
     
-    public List<EmfDataset> findSimilarDatasets(EmfDataset ds, String qaStep, String qaArgument, boolean unconditional, Session session) {
+    public List<EmfDataset> findSimilarDatasets(EmfDataset ds, String qaStep, String qaArgument, int[] usedByCasesId, String dataValueFilter, boolean unconditional, Session session) throws Exception {
+    
+        if (ds.getDatasetType() == null && dataValueFilter != null && !dataValueFilter.trim().isEmpty()) {
+            throw new Exception("Dataset Type must be set if you want to use Data Value Filter.");
+        }
+        
         String dsTypeStr = (ds.getDatasetType() == null ? "" : " AND DS.datasetType.id = "
             + ds.getDatasetType().getId());
-    String name = ds.getName();
-    String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE "
+        String name = ds.getName();
+        String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE "
             + Utils.getPattern(name.toLowerCase().trim()));
-    String creator = ds.getCreator();
-    String dsCreatorStr = (creator == null || creator.trim().isEmpty() ? "" : " AND lower(DS.creator) LIKE "
-        + Utils.getPattern(creator.toLowerCase().trim()));
-    String dsKeyStr = getDSKeyStr(ds.getKeyVals());
-    String desc = ds.getDescription(); 
-    String qaStr = "";
-//    String qaArgStr = "";
-    if ( !( qaStep==null || qaStep.length()==0) )
-        qaStr = " AND lower(QS.name) LIKE "+ Utils.getPattern(qaStep.toLowerCase().trim())+ " AND DS.id=QS.datasetId" ;
-    if ( !( qaArgument==null || qaArgument.length()==0) )
-        qaStr += " AND lower(QS.programArguments) LIKE "+ Utils.getPattern(qaArgument.toLowerCase().trim());
-    if ( !qaStr.isEmpty())
-        qaStr += " AND DS.id=QS.datasetId" ;
-    String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE "
+        String creator = ds.getCreator();
+        String dsCreatorStr = (creator == null || creator.trim().isEmpty() ? "" : " AND lower(DS.creator) LIKE "
+            + Utils.getPattern(creator.toLowerCase().trim()));
+        String dsKeyStr = getDSKeyStr(ds.getKeyVals());
+        String desc = ds.getDescription(); 
+        String qaStr = "";
+
+        if ( !( qaStep==null || qaStep.length()==0) )
+            qaStr = " AND lower(QS.name) LIKE "+ Utils.getPattern(qaStep.toLowerCase().trim())+ " AND DS.id=QS.datasetId" ;
+        if ( !( qaArgument==null || qaArgument.length()==0) )
+            qaStr += " AND lower(QS.programArguments) LIKE "+ Utils.getPattern(qaArgument.toLowerCase().trim());
+        if ( !qaStr.isEmpty())
+            qaStr += " AND DS.id=QS.datasetId" ;
+        String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE "
             + Utils.getPattern(desc.toLowerCase().trim()));
-    String dsProjStr = (ds.getProject() == null ? "" : " AND DS.project.id = " + ds.getProject().getId());
-    String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
+        String dsProjStr = (ds.getProject() == null ? "" : " AND DS.project.id = " + ds.getProject().getId());
+        String caseStr = ( usedByCasesId == null || usedByCasesId.length==0) ? "" : " AND CI.caseID in " 
+            + Arrays.toString(usedByCasesId).replace('[', '(').replace(']', ')') + " AND DS.id=CI.dataset.id";
+               
+        String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
             + " DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
             + " FROM EmfDataset AS DS LEFT JOIN DS.intendedUse as IU LEFT JOIN DS.project as P LEFT JOIN DS.region as R "
             + (qaStr.isEmpty() ? "" : ", QAStep as QS ")
+            + ( ( usedByCasesId == null || usedByCasesId.length==0 ) ? "" : ", CaseInput as CI ")
             + dsKeyStr
             + " WHERE DS.status <> 'Deleted'"
             + dsTypeStr
@@ -1670,19 +1680,21 @@ public class DatasetDAO {
             + dsCreatorStr
             + checkBackSlash(descStr)
             + dsProjStr
+            + caseStr
             + " ORDER BY DS.name";
-    if ( DebugLevels.DEBUG_12())
-        System.out.print(dsquery+ "\n");
-    
-    List<EmfDataset> ds1 = session.createQuery(dsquery).list();
-    
-    String dsTypeKeyStr = getDSTypeKeyStr(ds.getKeyVals());
-    String dstypequery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
+        if ( DebugLevels.DEBUG_12())
+            System.out.print(dsquery+ "\n");
+
+        List<EmfDataset> ds1 = session.createQuery(dsquery).list();
+
+        String dsTypeKeyStr = getDSTypeKeyStr(ds.getKeyVals());
+        String dstypequery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
             + " DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
             + " FROM EmfDataset AS DS "
             + (dsTypeKeyStr.isEmpty() ? "" : ", DatasetType AS TYPE")
             + (qaStr.isEmpty() ? "" : ", QAStep as QS ")
             + " LEFT JOIN DS.intendedUse as IU LEFT JOIN DS.project as P LEFT JOIN DS.region as R "
+            + ( ( usedByCasesId == null || usedByCasesId.length==0 ) ? "" : ", CaseInput as CI ")
             + dsTypeKeyStr
             + " WHERE DS.status <> 'Deleted'"
             + dsTypeStr
@@ -1690,24 +1702,57 @@ public class DatasetDAO {
             + (dsTypeKeyStr.isEmpty() ? "" : " AND TYPE.id = DS.datasetType.id")
             + dsNameStr
             + dsCreatorStr    
-            + checkBackSlash(descStr) + dsProjStr + " ORDER BY DS.name";
-    if ( DebugLevels.DEBUG_12())
-        System.out.print(dstypequery);
-    
-    List<EmfDataset> ds2 = session.createQuery(dstypequery).list();
-    List<EmfDataset> all = new ArrayList<EmfDataset>();
-    all.addAll(ds1);
-    all.addAll(ds2);
+            + checkBackSlash(descStr) 
+            + dsProjStr 
+            + caseStr
+            + " ORDER BY DS.name";
+        if ( DebugLevels.DEBUG_12())
+            System.out.print(dstypequery);
 
-    TreeSet<EmfDataset> set = new TreeSet<EmfDataset>(all);
-    List<EmfDataset> total = new ArrayList<EmfDataset>(set);
+        List<EmfDataset> ds2 = session.createQuery(dstypequery).list();
+        List<EmfDataset> all = new ArrayList<EmfDataset>();
+        all.addAll(ds1);
+        all.addAll(ds2);
 
-    if (total.size() > 300 && !unconditional) {
-        total.get(0).setName("Alert!!! More than 300 datasets selected.");
-        return total.subList(0, 1);
+        TreeSet<EmfDataset> set = new TreeSet<EmfDataset>(all);
+        List<EmfDataset> total = new ArrayList<EmfDataset>(set);
+        
+        total = filter(total, dataValueFilter, session );
+
+        if (total.size() > 300 && !unconditional) {
+            total.get(0).setName("Alert!!! More than 300 datasets selected.");
+            return total.subList(0, 1);
+        }
+
+        return total;
     }
-
-    return total;
+    
+    private List<EmfDataset> filter( List<EmfDataset> datasets, String dataValueFilter, Session session) throws SQLException {
+        if ( datasets == null || dataValueFilter==null || dataValueFilter.trim().isEmpty()) {
+            return datasets;
+        }
+        
+        DbServer dbServer = this.dbServerFactory.getDbServer();
+        Datasource datasource = dbServer.getEmissionsDatasource();
+        Connection connection = datasource.getConnection();
+        
+        List<EmfDataset> filteredDatasets = new ArrayList<EmfDataset>();
+        for ( EmfDataset dataset : datasets) {
+            EmfDataset ds = this.getDataset(session, dataset.getId());
+            String sqlStr = "SELECT * FROM " + this.qualifiedEmissionTableName(ds) + " WHERE " + dataValueFilter + " LIMIT 1;";
+            try {
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sqlStr);
+                if ( resultSet != null && resultSet.next()) {
+                    filteredDatasets.add(dataset);
+                }
+                resultSet.close();
+            } catch (SQLException e) {
+                throw new SQLException("Error when excecute Data Value Filter - " + dataValueFilter + ": " + e);
+            }
+        }
+       
+        return filteredDatasets;
     }
 
     private String getDSKeyStr(KeyVal[] keyVals) {

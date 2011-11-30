@@ -195,7 +195,7 @@ public abstract class AbstractStrategySummaryTask implements IStrategySummaryTas
             String[] qaStepTemplateNames = new String[qaStepTemplates.length];
             for (int i = 0; i < qaStepTemplates.length; i++)
                 qaStepTemplateNames[i] = qaStepTemplates[i].getName();
-            qaTask.runSummaryQAStepsAndExport(qaStepTemplateNames, controlStrategy.getExportDirectory());
+            qaTask.runSummaryQAStepsAndExport(qaStepTemplateNames, controlStrategy.getExportDirectory(), null);
         }
     }
 

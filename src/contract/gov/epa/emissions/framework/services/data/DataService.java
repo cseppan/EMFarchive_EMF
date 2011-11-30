@@ -9,7 +9,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.DoubleValue;
 
 public interface DataService {
 
-    EmfDataset[] findDatasets(EmfDataset dataset, String qaStep, String qaArgument, boolean unconditional) throws EmfException;
+    EmfDataset[] findDatasets(EmfDataset dataset, String qaStep, String qaArgument, int[] usedByCasesID, String dataValueFilter, boolean unconditional) throws EmfException;
     
     EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException;
 

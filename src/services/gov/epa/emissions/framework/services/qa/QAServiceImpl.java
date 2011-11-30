@@ -249,10 +249,10 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public synchronized void exportQAStep(QAStep step, User user, String dirName) throws EmfException {
+    public synchronized void exportQAStep(QAStep step, User user, String dirName, String fileName, boolean overide) throws EmfException {
         try {
             ExportQAStep exportQATask = new ExportQAStep(step, dbServerFactory, user, sessionFactory, threadPool);
-            exportQATask.export(dirName);
+            exportQATask.export(dirName, fileName, overide);
         } catch (Exception e) {
             LOG.error("Could not export QA step", e);
             throw new EmfException("Could not export QA step: " + e.getMessage());
@@ -260,11 +260,11 @@ public class QAServiceImpl implements QAService {
     }
 
     public synchronized void exportShapeFileQAStep(QAStep step, User user, String dirName,
-            ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
+            String fileName, boolean overide, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
         try {
             ExportShapeFileQAStep exportQATask = new ExportShapeFileQAStep(step, dbServerFactory, user, sessionFactory,
                     threadPool, true, pollutant);
-            exportQATask.export(dirName, projectionShapeFile);
+            exportQATask.export(dirName, fileName, projectionShapeFile, overide);
         } catch (Exception e) {
             LOG.error("Could not export QA step", e);
             throw new EmfException("Could not export QA step: " + e.getMessage());

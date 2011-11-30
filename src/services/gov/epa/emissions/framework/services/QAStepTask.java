@@ -66,10 +66,10 @@ public class QAStepTask {
         runQASteps(summarySteps);
     }
 
-    public void runSummaryQAStepsAndExport(String[] qaStepNames, String exportDirectory) throws EmfException {
+    public void runSummaryQAStepsAndExport(String[] qaStepNames, String exportDirectory, String[] exportFiles) throws EmfException {
         QAStepTemplate[] summaryTemplates = loadQASummaryTemplates(qaStepNames);
         QAStep[] summarySteps = addQASteps(summaryTemplates, dataset, version);
-        runQAStepsAndExport(summarySteps, exportDirectory);
+        runQAStepsAndExport(summarySteps, exportDirectory, exportFiles); // qa step export
     }
 
     private QAStepTemplate[] loadQASummaryTemplates(String[] qaStepNames) throws EmfException {
@@ -91,11 +91,11 @@ public class QAStepTask {
         }
     }
 
-    private void runQAStepsAndExport(QAStep[] summarySteps, String exportDirectory) throws EmfException {
+    private void runQAStepsAndExport(QAStep[] summarySteps, String exportDirectory, String[] exportFiles) throws EmfException {
         try {
             RunQAStepTask runner = new RunQAStepTask(removeUpToDateSteps(summarySteps), user, 
                     dbServerFactory, sessionFactory, 
-                    exportDirectory, false);
+                    exportDirectory, false, exportFiles);
             runner.run();
         } catch (Exception e) {
             e.printStackTrace();

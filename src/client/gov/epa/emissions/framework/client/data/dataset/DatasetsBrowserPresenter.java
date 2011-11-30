@@ -205,8 +205,8 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         return dataService().getDatasetsWithFilter(type.getId(), nameContains);
     }
     
-    public EmfDataset[] advSearch4Datasets(EmfDataset ds, String qaStep, String qaArgument, boolean unconditional) throws EmfException {
-        return dataService().findDatasets(ds, qaStep, qaArgument,unconditional);
+    public EmfDataset[] advSearch4Datasets(EmfDataset ds, String qaStep, String qaArgument, int[] usedByCasesId, String dataValueFilter, boolean unconditional) throws EmfException {
+        return dataService().findDatasets(ds, qaStep, qaArgument, usedByCasesId, dataValueFilter, unconditional);
     }
 
     public void purgeDeletedDatasets() throws EmfException {

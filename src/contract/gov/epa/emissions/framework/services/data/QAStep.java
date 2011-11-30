@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class QAStep implements Serializable {
+
     public static final String invTag = "-inventories";
     
     public static final String invBaseTag = "-inv_base";

@@ -47,10 +47,10 @@ public class ExportQAStep {
         this.verboseStatusLogging = verboseStatusLogging;
     }
 
-    public void export(String dirName) throws EmfException {
-        ExportQAStepTask task = new ExportQAStepTask(dirName, step, 
-                user, sessionFactory, 
-                dbServerFactory, verboseStatusLogging);
+    public void export(String dirName, String fileName, boolean overide) throws EmfException {
+        ExportQAStepTask task = new ExportQAStepTask(dirName, fileName, 
+                overide, step, 
+                user, sessionFactory, dbServerFactory, verboseStatusLogging);
         try {
             threadPool.execute(new GCEnforcerTask("Export QA Step : " + step.getProgram().getName(), task));
         } catch (InterruptedException e) {

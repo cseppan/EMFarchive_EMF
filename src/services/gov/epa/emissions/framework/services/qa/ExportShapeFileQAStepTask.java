@@ -47,6 +47,10 @@ public class ExportShapeFileQAStepTask implements Runnable {
     private QAStepResult result;
 
     private String dirName;
+    
+    private String fileName;
+    
+    private boolean overide;
 
     private boolean verboseStatusLogging = true;
 
@@ -56,11 +60,13 @@ public class ExportShapeFileQAStepTask implements Runnable {
 
     private Pollutant pollutant;
     
-    public ExportShapeFileQAStepTask(String dirName, QAStep qaStep, 
-            User user, HibernateSessionFactory sessionFactory,
-            DbServerFactory dbServerFactory, ProjectionShapeFile projectionShapeFile, 
-            boolean verboseStatusLogging, Pollutant pollutant) {
+    public ExportShapeFileQAStepTask(String dirName, String fileName, 
+            boolean overide, QAStep qaStep,
+            User user, HibernateSessionFactory sessionFactory, 
+            DbServerFactory dbServerFactory, ProjectionShapeFile projectionShapeFile, boolean verboseStatusLogging, Pollutant pollutant) {
         this.dirName = dirName;
+        this.fileName = fileName;
+        this.overide = overide;
         this.qastep = qaStep;
         this.user = user;
         this.sessionFactory = sessionFactory;
@@ -85,7 +91,7 @@ public class ExportShapeFileQAStepTask implements Runnable {
             if (projectionShapeFile == null)
                 throw new ExporterException("The projection/shape file is missing.");
             exporter.create(getProperty("postgres-bin-dir"), getProperty("postgres-db"), getProperty("postgres-user"),
-                    getProperty("pgsql2shp-info"), file.getAbsolutePath(), prepareSQLStatement(), projectionShapeFile);
+                    getProperty("pgsql2shp-info"), file.getAbsolutePath(), overide, prepareSQLStatement(), projectionShapeFile);
             complete(suffix);
         } catch (Exception e) {
             logError("Failed to export QA step : " + qastep.getName() + suffix, e);
@@ -315,7 +321,9 @@ public class ExportShapeFileQAStepTask implements Runnable {
     }
 
     private String fileName() {
-        return result.getTable();
+        if ( fileName == null || fileName.trim().length()==0)
+            return result.getTable();
+        return fileName;
     }
 
     private File validateDir(String dirName) throws EmfException {

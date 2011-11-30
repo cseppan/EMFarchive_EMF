@@ -49,13 +49,13 @@ public class ViewQAStepPresenter {
         view.disposeView();
     }
 
-    public void doExport(QAStep qaStep, QAStepResult stepResult, String dirName) throws EmfException {
+    public void doExport(QAStep qaStep, QAStepResult stepResult, String dirName, String fileName, boolean overide) throws EmfException {
         if (stepResult == null || stepResult.getTable() == null)
             throw new EmfException("You have to run the QA step successfully before exporting ");
 
         qaStep.setOutputFolder(dirName);
         session.qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
-        session.qaService().exportQAStep(qaStep, session.user(), dirName);
+        session.qaService().exportQAStep(qaStep, session.user(), dirName, fileName, overide);
 
     }
 
