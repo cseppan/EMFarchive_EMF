@@ -168,7 +168,7 @@ raise notice '%', intInputDatasetId || ' ' || intInputDatasetVersion || ' ' || i
 --			on inv.record_id = dr.source_id
 
 			-- get hap pollutants from inventory based on mapping (i.e., PM2_5 --> 100027 "4-Nitrophenol")
-			inner join emissions.DS_cap_measure_to_hap_mapping_1970862123 chm
+			inner join reference.cap_measure_to_hap_mapping chm
 			on chm.pollutant = dr.poll
 			and chm.eis_pollutant_code = inv.poll
 
@@ -176,7 +176,7 @@ raise notice '%', intInputDatasetId || ' ' || intInputDatasetVersion || ' ' || i
 		where ' || public.build_version_where_filter(intInputDatasetId, intInputDatasetVersion, 'inv') || '
 
 			-- target only detailed result sources that have a mapped pollutant
-			and dr.poll in (select distinct pollutant from emissions.DS_cap_measure_to_hap_mapping_1970862123 chm)
+			and dr.poll in (select distinct pollutant from reference.cap_measure_to_hap_mapping chm)
 
 			-- disinclude inventory source records that have already been controlled
 			and inv.record_id not in 
@@ -303,7 +303,7 @@ raise notice '%', intInputDatasetId || ' ' || intInputDatasetVersion || ' ' || i
 --			on inv.record_id = dr.source_id
 
 		-- get hap pollutants from inventory based on mapping (i.e., PM2_5 --> 100027 "4-Nitrophenol")
-		inner join emissions.DS_cap_measure_to_hap_mapping_1970862123 chm
+		inner join reference.cap_measure_to_hap_mapping chm
 		on chm.pollutant = dr.poll
 		and chm.eis_pollutant_code = inv.poll
 
@@ -315,7 +315,7 @@ raise notice '%', intInputDatasetId || ' ' || intInputDatasetVersion || ' ' || i
 	where ' || public.build_version_where_filter(intInputDatasetId, intInputDatasetVersion, 'inv') || '
 
 		-- target only detailed result sources that have a mapped pollutant
-		and dr.poll in (select distinct pollutant from emissions.DS_cap_measure_to_hap_mapping_1970862123 chm)
+		and dr.poll in (select distinct pollutant from reference.cap_measure_to_hap_mapping chm)
 
 		-- disinclude inventory source records that have already been controlled
 		and inv.record_id not in 
@@ -348,16 +348,16 @@ $$ LANGUAGE plpgsql;
 		and dr.input_ds_id = ' || intInputDatasetId || '
 
 select *
-from emissions.DS_cap_measure_to_hap_mapping_1970862123
+from reference.cap_measure_to_hap_mapping
 
 CREATE INDEX DS_cap_measure_to_hap_mapping_1970862123_poll
-	ON emissions.DS_cap_measure_to_hap_mapping_1970862123
+	ON reference.cap_measure_to_hap_mapping
 	USING btree
 	(pollutant);
 
 CREATE INDEX DS_cap_measure_to_hap_mapping_1970862123_eispoll
-	ON emissions.DS_cap_measure_to_hap_mapping_1970862123
+	ON reference.cap_measure_to_hap_mapping
 	USING btree
 	(eis_pollutant_code);
-vacuum analyze emissions.DS_cap_measure_to_hap_mapping_1970862123;
+vacuum analyze reference.cap_measure_to_hap_mapping;
 */
