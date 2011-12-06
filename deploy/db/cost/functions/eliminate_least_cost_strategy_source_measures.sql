@@ -1,4 +1,4 @@
-drop FUNCTION public.eliminate_least_cost_strategy_source_measures(integer, 
+﻿drop FUNCTION public.eliminate_least_cost_strategy_source_measures(integer, 
 	integer, 
 	integer);
 	
@@ -55,18 +55,22 @@ BEGIN
 	execute 'update emissions.' || worksheet_table_name || '
 	set status = 0
 	where record_id in (
-		select case when 
-		coalesce(tbl.emis_reduction, 0.0) <> 0.0 and (tbl.emis_reduction - public.running_max_previous_value(tbl.emis_reduction, ''s'' || tbl.source)) / tbl.emis_reduction <= 0.001
---		tbl.emis_reduction <= public.running_max_previous_value(tbl.emis_reduction, ''s'' || tbl.source) 
-		then tbl.record_id else null::integer 
-		end
+		select 
+			case 
+				when 
+					coalesce(tbl.emis_reduction, 0.0) <> 0.0 and (tbl.emis_reduction - LAG(grp_max, 1)  over(partition by tbl.source order by tbl.source, tbl.marginal, tbl.emis_reduction desc, tbl.record_id)) / tbl.emis_reduction <= 0.001
+					then record_id else null::integer 
+			end as record_id
 		from (
-		select source, record_id, emis_reduction, marginal, source_poll_cnt
-		from emissions.' || worksheet_table_name || '
-		where poll = ' || quote_literal(target_pollutant) || '
-		order by source, marginal, emis_reduction desc, source_poll_cnt desc, record_id		
+			select source, 
+				record_id, 
+				emis_reduction, 
+				marginal, 
+				source_poll_cnt, 
+				max(emis_reduction) over(partition by source order by source, marginal, emis_reduction desc, record_id) as grp_max
+			from emissions.' || worksheet_table_name || '
+			where poll = ' || quote_literal(target_pollutant) || '
 		) tbl
-		order by tbl.source, tbl.marginal, tbl.emis_reduction desc, tbl.source_poll_cnt desc, tbl.record_id
 	)';
 
 	if not include_unspecified_costs then 

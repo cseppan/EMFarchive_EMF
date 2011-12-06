@@ -270,14 +270,22 @@ BEGIN
 		cum_annual_cost = tbl.cum_annual_cost
 	from (
 		SELECT record_id, 
-			run_sum(cnt::numeric, ''apply_order' || counter || '''::text) as apply_order, 
-			run_sum(emis_reduction::numeric, ''emis_reduction' || counter || '''::text) as cum_emis_reduction, 
-			run_sum(source_annual_cost::numeric, ''annual_cost' || counter || '''::text) as cum_annual_cost
+			apply_order, 
+			cum_emis_reduction, 
+			cum_annual_cost
+
 		from (
 			SELECT marginal, emis_reduction, record_id, source_annual_cost, source_poll_cnt, 1::integer as cnt --sum(emis_reduction)
+			,	sum(1) over w as apply_order, 
+				sum(emis_reduction) over w as cum_emis_reduction, 
+				sum(source_annual_cost) over w as cum_annual_cost
+
 			from emissions.' || worksheet_table_name || '
 			where status is null 
 				and poll = ' || quote_literal(target_pollutant) || '
+
+			WINDOW w AS (ORDER BY marginal, emis_reduction desc, source_poll_cnt desc, record_id)
+
 			order by marginal, emis_reduction desc, source_poll_cnt desc, record_id
 --			limit ' || (apply_order) || '
 			limit ' || (apply_order + 1) || '
