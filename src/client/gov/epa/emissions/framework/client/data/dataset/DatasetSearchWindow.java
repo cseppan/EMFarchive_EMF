@@ -76,15 +76,18 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     
     private DatasetType[] allDSTypes;
     
+    private DatasetType dsType;
+    
     private CaseCategory[] allCaseCategories;
     
     private EmfConsole parent;
     
     static final private Dimension frameDim = new Dimension(680, 560);
     
-    public DatasetSearchWindow(String title, EmfConsole parentConsole, DesktopManager desktopManager) {
+    public DatasetSearchWindow(String title, EmfConsole parentConsole, DesktopManager desktopManager, DatasetType dsType) {
         super(title, frameDim, desktopManager);
         parent = parentConsole;
+        this.dsType = dsType;
     }
 
     public void display() {
@@ -117,6 +120,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         allDSTypes=getAllDSTypes();
         dsTypesBox = new ComboBox("Select one", allDSTypes);
         dsTypesBox.setPreferredSize(dim);
+        dsTypesBox.setSelectedItem(this.dsType);
          
         keyword = new ComboBox("Select one", presenter.getKeywords());
         keyword.setPreferredSize(dim);
