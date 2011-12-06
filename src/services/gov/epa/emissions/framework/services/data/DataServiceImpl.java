@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
@@ -7,7 +8,9 @@ import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
+import gov.epa.emissions.commons.db.TableMetaData;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.DeepCopy;
 import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.io.VersionedDatasetQuery;
@@ -29,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.logging.Log;
@@ -876,7 +880,8 @@ public class DataServiceImpl implements DataService {
 
         for (int i = 4; i < numOfCols; i++) {
             if (cols[i].equals("line_number"))
-                colString += ", public.run_sum(" + startLineNum + ", incrementor, 'line_no'::text) AS line_number";
+                colString += ", row_number() over w  + " + startLineNum + " AS line_number";
+//                colString += ", public.run_sum(" + startLineNum + ", incrementor, 'line_no'::text) AS line_number";
             else {
                 colString += ", " + cols[i];
                 colsOtherThanLineNumber += cols[i] + ", ";
@@ -884,7 +889,8 @@ public class DataServiceImpl implements DataService {
         }
 
         colString += " FROM (SELECT " + colsOtherThanLineNumber + " " + increatment + " AS incrementor " + "FROM "
-                + srcTable + " WHERE " + dsQuery.getVersionQuery() + filter + " ORDER BY line_number) AS srctbl";
+                + srcTable + " WHERE " + dsQuery.getVersionQuery() + filter + " ORDER BY line_number) AS srctbl "
+                + " WINDOW w AS (ORDER BY 1)";
 
         return colString;
     }
@@ -922,7 +928,24 @@ public class DataServiceImpl implements DataService {
             Datasource datasource = dbServer.getEmissionsDatasource();
             DataModifier dataModifier = datasource.dataModifier();
             VersionedQuery versionedQuery = new VersionedQuery(version);
+            Map<String,Column> columnMap = getColumnMap(table.replace("emissions.", ""));
+
+            //make sure we are only finding and replacing onm the following data types;
+            //due to precision issues with floats, doubles, timestamp we won't allow these to be replaced... 
+            String sqlType = columnMap.get(col).getSqlType();
+            if (!(
+                    sqlType.startsWith("VARCHAR")
+                    || sqlType.startsWith("TEXT")
+                    || sqlType.startsWith("INTEGER")
+                    || sqlType.startsWith("INT2")
+                    || sqlType.startsWith("BIGINT")
+                    )
+            ) throw new EmfException("Only these data types; varchar, text, smallint, integer, bigint; can be replaced.");
+                
+            
             String[] cols = getTableColumns(dataModifier, table, "");
+
+            
             int vNum = version.getVersion();
             String whereClause = "";
             String selectQuery = "";
@@ -954,7 +977,7 @@ public class DataServiceImpl implements DataService {
             }
             
             else {
-                whereClause = " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")"
+                whereClause = " WHERE coalesce(" + col + "::text,'')='" + find + "' AND (" + versionedQuery.query() + ")"
                 + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
                 + " AND dataset_id = " + version.getDatasetId() + " AND version <> " + vNum;
 
@@ -962,13 +985,13 @@ public class DataServiceImpl implements DataService {
                 + table + whereClause;
 
                 selectCurVerQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols)
-                + " FROM " + table + " WHERE " + col + "='" + find + "' AND (" + versionedQuery.query() + ")"
+                + " FROM " + table + " WHERE coalesce(" + col + "::text,'')='" + find + "' AND (" + versionedQuery.query() + ")"
                 + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
                 + " AND dataset_id = " + version.getDatasetId() + " AND version = " + vNum;
 
                 insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")" + selectQuery;
 
-                updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith + "' WHERE " + col + "='"
+                updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith + "' WHERE coalesce(" + col + "::text,'')='"
                 + find + "' AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ;
 
                 updateDelVersions = "UPDATE " + table + " SET delete_versions = trim(both ',' from coalesce(delete_versions,'')||'," 
@@ -1000,6 +1023,24 @@ public class DataServiceImpl implements DataService {
 
             // NOTE: if no records found in previous version and current version, throw exception
             throw new EmfException("No record found for column = '" + col + "' and value  LIKE '" + find + "'.");
+        } catch (SQLException e) {
+            LOG.error("Could not query table : ", e);
+            throw new EmfException("Could not query table.");
+        } catch (Exception e) {
+            LOG.error("Error : ", e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            closeDB(dbServer);
+        }
+    }
+
+    private Map<String,Column> getColumnMap(String table) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+
+        try {
+            Datasource datasource = dbServer.getEmissionsDatasource();
+
+            return new TableMetaData(datasource).getColumnMap(table);
         } catch (SQLException e) {
             LOG.error("Could not query table : ", e);
             throw new EmfException("Could not query table.");

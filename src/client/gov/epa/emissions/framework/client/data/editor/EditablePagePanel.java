@@ -554,6 +554,13 @@ public class EditablePagePanel extends JPanel {
         List<String> newCols = new ArrayList<String>();
 
         for (int i = 1; i < cols.length; i++)
+            //exclude the key primary key and versioning columns
+            if (!(
+                    cols[i].equals("record_id")
+                    || cols[i].equals("dataset_id")
+                    || cols[i].equals("version")
+                    || cols[i].equals("delete_versions")
+                ))
             newCols.add(cols[i]);
 
         return newCols.toArray(new String[0]);
