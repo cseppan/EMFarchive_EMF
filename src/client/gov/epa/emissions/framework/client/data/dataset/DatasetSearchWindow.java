@@ -147,7 +147,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         layoutGen.addLabelWidgetPair("QA name contains:", qaStep, panel);
         layoutGen.addLabelWidgetPair("Search QA arguments:", datasetPanel(), panel);
         layoutGen.addLabelWidgetPair("Project:", projectsCombo, panel);
-        layoutGen.addLabelWidgetPair("Used by Case:", casePanel(), panel);
+        layoutGen.addLabelWidgetPair("Used by Case Inputs:", casePanel(), panel);
         layoutGen.addLabelWidgetPair("Data Value Filter:", dataValueFilterPanel(dim), panel);
 
         // Lay out the panel.
@@ -176,7 +176,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     private JPanel casePanel() {
 
         caseName = new TextField("caseName", 30);
-        caseName.setToolTipText("Choose a case that uses the datasets");
+        caseName.setToolTipText("Choose a case that uses the dataset as an input");
         
         Button findCaseButton = new AddButton("Find Case", findCaseAction());
         findCaseButton.setMargin(new Insets(1, 2, 1, 2));
