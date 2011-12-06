@@ -136,7 +136,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
                 
         if (preText != null)
             name.setText(preText);
-        creatorsBox.setSelectedItem(presenter.getUser());
+//        creatorsBox.setSelectedItem(presenter.getUser());
 
         layoutGen.addLabelWidgetPair("Name contains:", name, panel);
         layoutGen.addLabelWidgetPair("Description contains:", desc, panel);
@@ -191,7 +191,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     private JPanel dataValueFilterPanel(Dimension dim) {
 
         dataValueFilter = new JTextArea();
-        dataValueFilter.setToolTipText("Set data value filter in free SQL format e.g. FIPE='12345' and SCC='32148'");
+        dataValueFilter.setToolTipText("Set data value filter in free SQL format e.g. FIPS='37001' and SCC like '102005%'");
 
         dataValueFilter.setWrapStyleWord(true);
         dataValueFilter.setLineWrap(true);
@@ -357,6 +357,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         qaStep.setText("");
         qaStepArguments.setText("");
         projectsCombo.setSelectedIndex(0);
+        dataValueFilter.setText("");
     }
     
     public void setNameText(String name) {

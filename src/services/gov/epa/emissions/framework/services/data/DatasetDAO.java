@@ -1748,7 +1748,7 @@ public class DatasetDAO {
                 }
                 resultSet.close();
             } catch (SQLException e) {
-                throw new SQLException("Error when excecute Data Value Filter - " + dataValueFilter + ": " + e);
+                throw new SQLException("Error with Data Value Filter, incorrect filter SQL syntax: " + dataValueFilter);
             }
         }
        
