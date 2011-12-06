@@ -188,7 +188,7 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
             throw new EmfException(e.getMessage());
         }
         
-        view.displayCaseComparisonResult("Some Name", localFile.getAbsolutePath());
+        view.displayCaseComparisonResult("Case Comparison", localFile.getAbsolutePath());
     }
     
     private String getCaseComparisonResult(int[] caseIds) throws EmfException {
