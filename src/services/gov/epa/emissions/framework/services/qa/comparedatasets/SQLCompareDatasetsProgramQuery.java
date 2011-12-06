@@ -426,9 +426,19 @@ poll|poll
             //make sure aggregate expression exists
             if (!baseColumnExists && !compareColumnExists)
                 throw new EmfException("Where Filter contains expressions that don't exist as a column in either the base or compare datasets.");
+            
+            //evaluate each part of where clause to make sure there is mapping, if needed...
+//            try {
+//                getBaseExpression(whereFilter, matchingExpressionMap, baseColumns, "b");
+//                getCompareExpression(whereFilter, matchingExpressionMap, compareColumns, "c");
+//            } catch (EmfException ex) {
+//                if (ex.getMessage().equals("Unknown compare dataset expression") || ex.getMessage().equals("Unknown base dataset expression"))
+//                throw new EmfException("Where Filter contains expression that needs a mapping entry specified, the column doesn't exist in either the base or compare datasets.");
+//            }
+            
             //if either one of the dataset types doesn't contain the column, then make sure we have a mapping for it...
             if (!baseColumnExists || !compareColumnExists) {
-                if (matchingExpressionMap.get(whereFilter.toLowerCase()) == null)
+                if (!expressionExists(whereFilter, baseColumns, matchingExpressionMap) || !expressionExists(whereFilter, compareColumns, matchingExpressionMap))
                     throw new EmfException("Where Filter contains expression that needs a mapping entry specified, the column doesn't exist in either the base or compare datasets.");
           }
         } 
@@ -673,8 +683,10 @@ poll|poll
     private Map<String,Pattern> patternMap = new HashMap<String,Pattern> ();
     
     private Pattern getPattern(String columnName) {
-        if (!patternMap.containsValue(columnName))
-            patternMap.put(columnName, Pattern.compile("\\b(?i)" + columnName + "\\b"));
+        if (!patternMap.containsValue(columnName)) {
+            patternMap.put(columnName, Pattern.compile("(?i)" + columnName.replaceAll("\\(", "\\\\(").replaceAll("\\)", "\\\\)") + ""));
+//            patternMap.put(columnName, Pattern.compile("\\s\\b(?i)" + columnName + "\\b\\s"));
+        }
         return patternMap.get(columnName);
     }
     
