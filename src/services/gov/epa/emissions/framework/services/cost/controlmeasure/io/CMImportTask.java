@@ -121,7 +121,7 @@ public class CMImportTask implements Runnable {
                     }
                     //s.setDescription( desc);
                     //s.setIsFinal( true);
-                    csDAO.finalizeControlStrategy(s.getId(), cmMsg, session);
+                    csDAO.finalizeControlStrategy(s.getId(), cmMsg, session, ids);
                 }
                 
                 if ( DebugLevels.DEBUG_23()) {
@@ -155,7 +155,7 @@ public class CMImportTask implements Runnable {
                     }
                     //s.setDescription( desc);
                     //s.setIsFinal( true);
-                    cpDAO.updateControlProgram(p.getId(), cmMsg, session);
+                    cpDAO.updateControlProgram(p.getId(), cmMsg, session, ids);
                 } 
                 
                 if ( DebugLevels.DEBUG_23()) {

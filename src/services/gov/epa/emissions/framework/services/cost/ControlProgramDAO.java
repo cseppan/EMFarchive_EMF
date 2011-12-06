@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -159,7 +160,7 @@ public class ControlProgramDAO {
         return list;
     }
     
-    public void updateControlProgram(int controlProgramId, String msg, Session session) {
+    public void updateControlProgram(int controlProgramId, String msg, Session session, int[] measureIdsToDelete) throws EmfException {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
@@ -170,8 +171,29 @@ public class ControlProgramDAO {
             .setInteger("id", controlProgramId)
             .executeUpdate();
             tx.commit();
+            session.clear();
+            
+            //also need to purge measures that are being deleted...this is needed to keep hibernate list_index in synch...
+            ControlProgram cs = getControlProgram(controlProgramId, session);
+            List<ControlMeasure> measures = new ArrayList<ControlMeasure>();
+            measures.addAll(Arrays.asList(cs.getControlMeasures()));
+            for (ControlMeasure m : cs.getControlMeasures()) {
+                for (int id : measureIdsToDelete) {
+                    if (id == m.getId()) {
+                        measures.remove(m);
+                    }
+                }
+            }
+            cs.setControlMeasures(measures.toArray(new ControlMeasure[0]));
+            updateWithLock(cs, session);
+
+            
         } catch (HibernateException e) {
             tx.rollback();
+            throw e;
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
             throw e;
         }
     }

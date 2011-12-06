@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -501,7 +502,7 @@ public class ControlStrategyDAO {
         return list;
     }
     
-    public void finalizeControlStrategy(int controlStrategyId, String msg, Session session) {
+    public void finalizeControlStrategy(int controlStrategyId, String msg, Session session, int[] measureIdsToDelete) throws EmfException {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
@@ -513,8 +514,28 @@ public class ControlStrategyDAO {
             .setInteger("id", controlStrategyId)
             .executeUpdate();
             tx.commit();
+            session.clear();
+            
+            //also need to purge measures that are being deleted...this is needed to keep hibernate list_index in synch...
+            ControlStrategy cs = getById(controlStrategyId, session);
+            List<ControlStrategyMeasure> measures = new ArrayList<ControlStrategyMeasure>();
+            measures.addAll(Arrays.asList(cs.getControlMeasures()));
+            for (ControlStrategyMeasure m : cs.getControlMeasures()) {
+                for (int id : measureIdsToDelete) {
+                    if (id == m.getControlMeasure().getId()) {
+                        measures.remove(m);
+                    }
+                }
+            }
+            cs.setControlMeasures(measures.toArray(new ControlStrategyMeasure[0]));
+            updateWithLock(cs, session);
+            
         } catch (HibernateException e) {
             tx.rollback();
+            throw e;
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
             throw e;
         }
     }
