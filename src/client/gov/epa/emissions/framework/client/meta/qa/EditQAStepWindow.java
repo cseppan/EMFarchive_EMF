@@ -31,6 +31,7 @@ import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTab
 import gov.epa.emissions.framework.client.data.QAPrograms;
 import gov.epa.emissions.framework.client.meta.qa.comparedatasetsprogram.CompareDatasetsQAProgamWindow;
 import gov.epa.emissions.framework.client.meta.qa.flatFile2010Pnt.EnhanceFlatFile2010PointSettingWindows;
+import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
@@ -38,6 +39,7 @@ import gov.epa.emissions.framework.services.data.DatasetVersion;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
+import gov.epa.emissions.framework.services.editor.DataEditorService;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -102,6 +104,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private TextField config;
     
     private TextField name; 
+    
+    private ComboBox versionsSelection;
 
     private QAPrograms qaPrograms;
 
@@ -462,6 +466,28 @@ substring(fips,1,2)='37'
     private String statusValue(QAStep step) {
         return step.getStatus() != null ? step.getStatus() : QAProperties.initialStatus();
     }
+    
+    private Version[] dsVersions(QAStep step) throws EmfException {
+        DataEditorService service = session.dataEditorService();
+        return service.getVersions(step.getDatasetId());
+    }
+    
+    private void setVersions(QAStep step) {
+        Version[] dsVersions = null;
+        try {
+            dsVersions = this.dsVersions(step);
+        } catch (EmfException e1) {
+            // NOTE Auto-generated catch block
+            e1.printStackTrace();
+        }
+        VersionsSet versionsSet = new VersionsSet(dsVersions);
+        versionsSelection.setModel(new ComboBox("Select one", versionsSet.nameAndNumbers()).getModel());
+        if (versionsSelection.getModel().getSize()==2)
+        {
+            versionsSelection.setSelectedIndex(1);
+        }
+        
+    }
 
     private JPanel upperPanel(String versionName, boolean astemplate) {
         JPanel panel = new JPanel(new SpringLayout());
@@ -487,10 +513,24 @@ substring(fips,1,2)='37'
             }
         });
 
+        Version[] dsVersions = null;
+        try {
+            dsVersions = this.dsVersions(step);
+        } catch (EmfException e1) {
+            // NOTE Auto-generated catch block
+            e1.printStackTrace();
+        }
+        VersionsSet versionsSet = new VersionsSet(dsVersions);
+        versionsSelection = new ComboBox("Select one", versionsSet.nameAndNumbers());
+        if (versionsSelection.getModel().getSize()==2)
+        {
+            versionsSelection.setSelectedIndex(1);
+        }
         JPanel prgpanel = new JPanel();
-        prgpanel.add(new Label(versionName + " (" + step.getVersion() + ")"));
-        prgpanel.add(new JLabel(EmptyStrings.create(37)));
-        prgpanel.add(new JLabel("Program:  "));
+//        prgpanel.add(new Label(versionName + " (" + step.getVersion() + ")"));
+//        prgpanel.add(new JLabel(EmptyStrings.create(37)));
+//        prgpanel.add(new JLabel("Program:  "));
+        prgpanel.add(versionsSelection);
         prgpanel.add(program);
 
         layoutGenerator.addLabelWidgetPair("Version:", prgpanel, panel);

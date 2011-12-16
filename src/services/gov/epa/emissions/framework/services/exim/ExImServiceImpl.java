@@ -77,9 +77,9 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         }
     }
 
-    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String dirName, boolean overwrite,
-            String rowFilters, EmfDataset filterDataset, Version filterDatasetVersion,
-            String filterDatasetJoinCondition, String colOrders, String purpose) throws EmfException {
+    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String dirName, String prefix,
+            boolean overwrite, String rowFilters, EmfDataset filterDataset,
+            Version filterDatasetVersion, String filterDatasetJoinCondition, String colOrders, String purpose) throws EmfException {
         if (DebugLevels.DEBUG_4())
             System.out.println(">>## calling export datasets in eximSvcImp: " + myTag() + " for datasets: "
                     + datasets.toString());
@@ -88,8 +88,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 //            submitterId = exportService.exportForClient(user, datasets, versions, dirName, purpose, overwrite);
 //        else
         submitterId = exportService.exportForClient(user, datasets, versions, dirName, 
-                    rowFilters, filterDataset, filterDatasetVersion,
-                    filterDatasetJoinCondition, colOrders, purpose, overwrite);
+                    prefix, rowFilters, filterDataset,
+                    filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose, overwrite);
         if (DebugLevels.DEBUG_4())
             System.out.println("In ExImServiceImpl:exportDatasets() SUBMITTERID= " + submitterId);
         if (DebugLevels.DEBUG_21())
@@ -125,9 +125,9 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return exportService.getVersion(dataset, version);
     }
 
-    public void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, boolean overwrite,
-            String rowFilters, EmfDataset filterDataset, Version filterDatasetVersion, String filterDatasetJoinCondition, String colOrders,
-            String purpose) throws EmfException {
+    public void exportDatasetids(User user, Integer[] datasetIds, Version[] versions, String folder, String prefix,
+            boolean overwrite, String rowFilters, EmfDataset filterDataset, Version filterDatasetVersion, String filterDatasetJoinCondition,
+            String colOrders, String purpose) throws EmfException {
         int numOfDS = datasetIds.length;
         EmfDataset[] datasets = new EmfDataset[numOfDS];
         DataServiceImpl ds = new DataServiceImpl();
@@ -153,12 +153,12 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 for (int j = 0; j < numOfDS; j++)
                     defaultVersions[j] = getVersion(datasets[j], datasets[j].getDefaultVersion());
 
-                exportDatasets(user, datasets, defaultVersions, folder, overwrite, rowFilters, filterDataset, filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose);
+                exportDatasets(user, datasets, defaultVersions, folder, prefix, overwrite, rowFilters, filterDataset, filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose);
                 return;
             }
 
             // Invoke the local method that uses the datasets
-            exportDatasets(user, datasets, versions, folder, overwrite, rowFilters, filterDataset, filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose);
+            exportDatasets(user, datasets, versions, folder, prefix, overwrite, rowFilters, filterDataset, filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose);
         } catch (RuntimeException e) {
             // NOTE Auto-generated catch block
             //e.printStackTrace();
@@ -171,7 +171,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         // if Vservion[] is not specified, get the default versions from datasets themselves
         if (DebugLevels.DEBUG_4())
             System.out.println("ExImService:exportDatasetids() called.");
-        exportDatasetids(user, datasetIds, null, folder, overwrite, rowFilters, null, null, null, colOrders, purpose);
+        exportDatasetids(user, datasetIds, null, folder, null, overwrite, rowFilters, null, null, null, colOrders, purpose);
         if (DebugLevels.DEBUG_4())
             System.out.println("ExImService:exportDatasetids() exited.");
     }

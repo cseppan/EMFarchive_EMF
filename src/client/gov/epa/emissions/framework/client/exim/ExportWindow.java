@@ -51,6 +51,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private SingleLineMessagePanel messagePanel;
 
     private JTextField folder;
+    
+    private JTextField prefix;
 
     private ExportPresenter presenter;
 
@@ -141,6 +143,12 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         chooser.add(browseFileButton(), BorderLayout.EAST);
         layoutGenerator.addLabelWidgetPair("Folder  ",chooser, panel);
         
+        JPanel prefixPanel = new JPanel(new BorderLayout(10, 10));
+        prefix = new TextField("prefix", width);
+        prefix.setToolTipText("Prefix to be added to the names of the exported files");
+        prefixPanel.add(prefix);
+        layoutGenerator.addLabelWidgetPair("File Name Prefix",prefixPanel, panel);
+        
         //Sort Order
         colOrder = new TextArea("colOrder", colOrders, width+10, 2);
         colOrder.setToolTipText(colOrder.getText());
@@ -206,11 +214,11 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         //overwritePanel.setVisible(false);
         layoutGenerator.addLabelWidgetPair(" ",overwritePanel, panel);
         if (datasets.length == 1)    
-            layoutGenerator.makeCompactGrid(panel, 8, 2, // rows, cols
+            layoutGenerator.makeCompactGrid(panel, 9, 2, // rows, cols
                     10, 10, // initialX, initialY
                     5, 10);// xPad, yPad
         else
-            layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
+            layoutGenerator.makeCompactGrid(panel, 8, 2, // rows, cols
                     10, 10, // initialX, initialY
                     5, 10);// xPad, yPad
 
@@ -311,9 +319,9 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
                 versions=new Version[]{(Version) version.getSelectedItem()};
             
             if (!overwrite.isSelected())
-                presenter.doExport(datasets, versions, folder.getText(), rowFilters, (filterDatasetVersionWidget.getDatasetVersions().length > 0 ? (DatasetVersion)filterDatasetVersionWidget.getDatasetVersions()[0] : null), filterDatasetJoinCondition.getText(), colOrders, purpose.getText(), false);
+                presenter.doExport(datasets, versions, folder.getText(), prefix.getText(), rowFilters, (filterDatasetVersionWidget.getDatasetVersions().length > 0 ? (DatasetVersion)filterDatasetVersionWidget.getDatasetVersions()[0] : null), filterDatasetJoinCondition.getText(), colOrders, purpose.getText(), false);
             else
-                presenter.doExport(datasets, versions, folder.getText(), rowFilters, (filterDatasetVersionWidget.getDatasetVersions().length > 0 ? (DatasetVersion)filterDatasetVersionWidget.getDatasetVersions()[0] : null), filterDatasetJoinCondition.getText(), colOrders, purpose.getText(), true);
+                presenter.doExport(datasets, versions, folder.getText(), prefix.getText(), rowFilters, (filterDatasetVersionWidget.getDatasetVersions().length > 0 ? (DatasetVersion)filterDatasetVersionWidget.getDatasetVersions()[0] : null), filterDatasetJoinCondition.getText(), colOrders, purpose.getText(), true);
 
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");

@@ -55,7 +55,6 @@ public class ManagedExportService {
 
     private final int ALL_JOB_ID = 0;
 
-
     public synchronized String myTag() {
         if (svcLabel == null) {
             svcCount++;
@@ -91,7 +90,7 @@ public class ManagedExportService {
         if (!overwrite) {
             if (file.exists() && file.isFile()) {
                 // log.error("File exists and cannot be overwritten");
-                throw new EmfException("Cannot export to existing file.  Choose overwrite option");
+                throw new EmfException("Cannot export to existing file.  Select overwrite option");
             }
         }
         return file;
@@ -324,8 +323,8 @@ public class ManagedExportService {
     }
 
     public synchronized String exportForClient(User user, EmfDataset[] datasets, Version[] versions, String dirName,
-            String rowFilters, EmfDataset filterDataset, Version filterDatasetVersion,
-            String filterDatasetJoinCondition, String colOrders, String purpose, boolean overwrite) throws EmfException {
+            String prefix, String rowFilters, EmfDataset filterDataset,
+            Version filterDatasetVersion, String filterDatasetJoinCondition, String colOrders, String purpose, boolean overwrite) throws EmfException {
 
         // FIXME: always overwrite
         // FIXME: hardcode overwite=true until verified with Alison
@@ -375,7 +374,7 @@ public class ManagedExportService {
 
                 // FIXME: Investigate if services reference needs to be unique for each dataset in this call
                 if (isExportable(dataset, version, services, user)) {
-                    ExportTask tsk = createExportTask(user, purpose, overwrite,rowFilters, colOrders,path, dataset, version, filterDataset, filterDatasetVersion, filterDatasetJoinCondition);
+                    ExportTask tsk = createExportTask(user, purpose, overwrite,rowFilters, colOrders, path, prefix, dataset, version, filterDataset, filterDatasetVersion, filterDatasetJoinCondition);
 
                     eximTasks.add(tsk);
 
@@ -539,8 +538,8 @@ public class ManagedExportService {
     
     private synchronized ExportTask createExportTask(User user, String purpose, boolean overwrite, 
             String rowFilters, String colOrders, File path,
-            EmfDataset dataset, Version version, EmfDataset filterDataset, Version filterDatasetVersion,
-            String filterDatasetJoinCondition) throws Exception {
+            String prefix, EmfDataset dataset, Version version, EmfDataset filterDataset,
+            Version filterDatasetVersion, String filterDatasetJoinCondition) throws Exception {
         if (DebugLevels.DEBUG_9())
             System.out.println(">>## In export service:doExport() " + myTag() + " for datasetId: " + dataset.getId());
 
@@ -550,7 +549,9 @@ public class ManagedExportService {
                     + " but version shows dataset id=" + version.getDatasetId() + ")");
 
         Services services = services();
-        File file = validateExportFile(path, getCleanDatasetName(dataset, version), overwrite);
+        File file = validateExportFile(path, "" + (prefix==null ? "" : prefix.trim())  + 
+                ( (prefix==null || prefix.trim().isEmpty() || prefix.trim().endsWith("_")) ? "" : "_") + 
+                getCleanDatasetName(dataset, version), overwrite);
 
         AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset.getAccessedDateTime(),
                 "Version " + version.getVersion(), purpose, file.getAbsolutePath());

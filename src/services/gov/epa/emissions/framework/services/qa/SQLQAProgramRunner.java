@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.util.CustomDateFormat;
+import gov.epa.emissions.commons.util.UniqueID;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -128,10 +129,13 @@ public class SQLQAProgramRunner implements QAProgramRunner {
     }
 
     protected String tableName(QAStep qaStep) {
-        // System.out.println("The input is:" + qaStep);
-        String formattedDate = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
-        String table = "QA_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion() + "_" + formattedDate;
 
+        // System.out.println("The input is:" + qaStep);
+        // String formattedDate = CustomDateFormat.format_YYYYMMDDHHMMSS(new Date());
+        String uID = UniqueID.getUniqueID();
+        String table = "QA_DSID" + qaStep.getDatasetId() + "_V" + qaStep.getVersion() + "_" + uID; //formattedDate;
+
+        
         if (table.length() < 64) { // postgresql table name max length is 64
             String name = qaStep.getName();
             int space = name.length() + table.length() - 64;

@@ -15,7 +15,7 @@ public interface ExportPresenter {
 //            String rowFilters, String colOrders, String purpose, boolean overwrite) throws EmfException;
 
     void doExport(EmfDataset[] datasets, Version[] versions, String folder, 
-            String rowFilters, DatasetVersion filterDatasetVersion, String filterDatasetJoinCondition, String colOrders, String purpose, boolean overwrite) throws EmfException;
+            String prefix, String rowFilters, DatasetVersion filterDatasetVersion, String filterDatasetJoinCondition, String colOrders, String purpose, boolean overwrite) throws EmfException;
 
     void setLastFolder( String lastfolder);
     
