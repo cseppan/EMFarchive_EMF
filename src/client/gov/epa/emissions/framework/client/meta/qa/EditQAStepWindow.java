@@ -49,6 +49,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -232,6 +233,8 @@ substring(fips,1,2)='37'
     
     
     private String lineFeeder = System.getProperty("line.separator");
+    
+    private ActionListener versionSelectionActionListener = null; 
 
     public EditQAStepWindow(DesktopManager desktopManager, EmfConsole parentConsole) {
         super("Edit QA Step", new Dimension(680, 580), desktopManager);
@@ -239,6 +242,11 @@ substring(fips,1,2)='37'
         this.desktopManager = desktopManager;
         // inventoryList = new ArrayList<EmfDataset>();
         // invTableList = new ArrayList<EmfDataset>();
+//        versionSelectionActionListener = new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                onVersionSelectionChange();
+//            }
+//        };
     }
 
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset,
@@ -486,7 +494,26 @@ substring(fips,1,2)='37'
         {
             versionsSelection.setSelectedIndex(1);
         }
-        
+        String vStr = "(" + step.getVersion() + ")";
+        for (int i=0; i<versionsSelection.getItemCount(); i++) {
+            String itemString = (String) versionsSelection.getItemAt(i);
+            if ( itemString.contains(vStr)) {
+                versionsSelection.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+    
+    private void onVersionSelectionChange() {
+        String nameAndVersion = (String) versionsSelection.getSelectedItem();
+        int pos1 = nameAndVersion.lastIndexOf("(");
+        int pos2 = nameAndVersion.lastIndexOf(")");
+        String vStr = nameAndVersion.substring(pos1+1, pos2);
+        String oldName = super.getTitle();
+        String newName = "Edit QA Step: " + step.getName() + " - " + this.origDataset.getName() + " (v" + Integer.parseInt(vStr.trim()) + ")";
+        if (oldName.endsWith(" *"))
+            newName += " *";
+        super.setLabel(newName);
     }
 
     private JPanel upperPanel(String versionName, boolean astemplate) {
@@ -526,6 +553,16 @@ substring(fips,1,2)='37'
         {
             versionsSelection.setSelectedIndex(1);
         }
+        String vStr = "(" + step.getVersion() + ")";
+        for (int i=0; i<versionsSelection.getItemCount(); i++) {
+            String itemString = (String) versionsSelection.getItemAt(i);
+            if ( itemString.contains(vStr)) {
+                versionsSelection.setSelectedIndex(i);
+                break;
+            }
+        }
+        versionsSelection.addActionListener( this.versionSelectionActionListener);
+        addChangeable(versionsSelection);
         JPanel prgpanel = new JPanel();
 //        prgpanel.add(new Label(versionName + " (" + step.getVersion() + ")"));
 //        prgpanel.add(new JLabel(EmptyStrings.create(37)));
@@ -2030,8 +2067,10 @@ avd_emis=emis_avd
     }
 
     protected void doClose() {
-        if (super.shouldDiscardChanges())
+        if (super.shouldDiscardChanges()) {
+            this.versionsSelection.removeActionListener(this.versionSelectionActionListener);
             presenter.close();
+        }
     }
 
     public QAStep save() throws EmfException {
@@ -2040,6 +2079,13 @@ avd_emis=emis_avd
             throw new EmfException("Order should be a floating point number");
         }
         step.setName(name.getText().trim());
+        String nameAndVersion = (String) versionsSelection.getSelectedItem();
+        int pos1 = nameAndVersion.lastIndexOf("(");
+        int pos2 = nameAndVersion.lastIndexOf(")");
+        String vStr = nameAndVersion.substring(pos1+1, pos2);
+        if ( vStr != null && !vStr.trim().isEmpty() ) {
+            step.setVersion( Integer.parseInt(vStr.trim()));
+        }
         //step.setDatasetId(this.origDataset.getId());
         step.setProgram(qaPrograms.get(program.getSelectedItem()));
         step.setProgramArguments(programArguments.getText());
@@ -2140,5 +2186,10 @@ avd_emis=emis_avd
 
     public void updateProgramArguments(String programArguments) {
         updateArgumentsTextArea(programArguments);
+    }
+
+    public void actionPerformed(ActionEvent arg0) {
+        // NOTE Auto-generated method stub
+        
     }
 }
