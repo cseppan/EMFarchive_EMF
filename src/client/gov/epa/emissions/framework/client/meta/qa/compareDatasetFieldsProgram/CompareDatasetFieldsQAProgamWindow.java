@@ -116,13 +116,14 @@ public class CompareDatasetFieldsQAProgamWindow extends DisposableInteralFrame i
 
         this.joinExpressionsTextField = new TextArea("Join Expressions", this.joinExpressions, 40, 4);
         this.joinExpressionsTextField.setToolTipText("<html>Join Expressions"
-                + "<br/><br/>This is a new line character delimited list of expressions that will be part of the group by expression when performing the comparison analysis."
-                + "<br/>The expressions must contain valid column(s) from either the base or comparison datasets.  If the aggregate expression exists only in the base"
+                + "<br/><br/>This is a new line character delimited list of expressions that will define the join expressions between datasets when performing the comparison analysis."
+                + "<br/>The expressions must contain valid column(s) from either the base or comparison datasets.  If the join expression exists only in the base"
                 + "<br/>or compare dataset, then a Mapping Expression must be specified in order for a proper mapping can happen for the comparison analysis (i.e., substring(fips,1,2)=substring(region_cd,1,2))."
-                + "<br/>Also, when an aggregrate expression contains any sort of functional operation (i.e., string concatenation --> fipsst || fipscounty),"
-                + "<br/>then this expression will also need to be mapped as part of the mapping expressions.  The group by expressions can be aliased by adding the \"AS ALIAS\" clause to the expression."
+                + "<br/>Also, when an join expression contains any sort of functional operation (i.e., string concatenation --> fipsst || fipscounty),"
+                + "<br/>then this expression will also need to be mapped as part of the mapping expressions.  The join expressions can be aliased by adding the \"AS ALIAS\" clause to the expression."
                 + "<br/>The expression can also contain SQL functions such as substring."
-                + "<br/><br/>Sample Group By Expressions:"
+                + "<br/><br/>NOTE:  Duplicate rows will show up if the join expressions doesn't have the fully defined primary key identifiers as part of the expressions definition (i.e., must use all source nonpoint identifiers--fips, scc, poll)."
+                + "<br/><br/>Sample Join Expressions:"
                 + "<br/><br/>scc AS scc_code<br/>substring(fips,1,2) as fipsst<br/>"
                 + "<br/>or"
                 + "<br/><br/>fipsst || fipscounty as fips<br/>substring(scc,1,5) as scc_lv5</html>");
@@ -132,11 +133,11 @@ public class CompareDatasetFieldsQAProgamWindow extends DisposableInteralFrame i
 
         this.comparisonExpressionsTextField = new TextArea("Comparison Expressions", this.comparisonExpressions, 40, 4);
         this.comparisonExpressionsTextField.setToolTipText("<html>Comparison Expressions"
-                + "<br/><br/>This is a new line character delimited list of expressions that will be aggregated across the specified above group by expressions."
-                + "<br/>The expressions must contain valid column(s) from either the base or comparison datasets.  If the aggregate expression exists only"
+                + "<br/><br/>This is a new line character delimited list of expressions that will be compared during the analysis."
+                + "<br/>The expressions must contain valid column(s) from either the base or comparison datasets.  If the comparison expression exists only"
                 + "<br/>in the base or compare dataset, then a Mapping Expression must be specified in order for a proper mapping to happen during the comparison"
                 + "<br/>analysis."
-                + "<br/><br/>Sample Aggregate Expression:"
+                + "<br/><br/>Sample Comparison Expression:"
                 + "<br/>ann_emis<br/>avd_emis</html>");
         ScrollableComponent scrollableComment2 = ScrollableComponent.createWithVerticalScrollBar(this.comparisonExpressionsTextField);
         scrollableComment2.setPreferredSize(new Dimension(450, 105));
