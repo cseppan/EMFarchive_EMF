@@ -139,7 +139,8 @@ public class SQLQAProgramRunner implements QAProgramRunner {
         if (table.length() < 64) { // postgresql table name max length is 64
             String name = qaStep.getName();
             int space = name.length() + table.length() - 64;
-            table += name.substring((space < 0) ? 0 : space + 1);
+//            table += name.substring((space < 0) ? 0 : space + 1);
+            table += name.substring(0, (space < 0) ? name.length() : 64 - table.length() - 1);
         }
 
         for (int i = 0; i < table.length(); i++) {
