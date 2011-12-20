@@ -1463,10 +1463,10 @@ avd_emis=emis_avd
 
                 int indexBase = programSwitches.indexOf(BASE_TAG);
                 int indexCompare = programSwitches.indexOf(COMPARE_TAG);
-                int indexJoin = programSwitches.indexOf(JOIN_EXPRESSIONS_TAG);
+                int indexJoin = programSwitches.indexOf(JOIN_EXPRESSIONS_TAG + "\n");
                 int indexComparison = programSwitches.indexOf(COMPARISON_EXPRESSIONS_TAG);
                 int indexMatching = programSwitches.indexOf(MATCHING_EXPRESSIONS_TAG);
-                int indexJoinType     = programSwitches.indexOf(JOIN_TYPE_TAG);
+                int indexJoinType     = programSwitches.indexOf(JOIN_TYPE_TAG + "\n");
                 int indexWhereFilter = programSwitches.indexOf(WHERE_FILTER_TAG);
 
 
@@ -2235,6 +2235,8 @@ avd_emis=emis_avd
         }
         step.setName(name.getText().trim());
         String nameAndVersion = (String) versionsSelection.getSelectedItem();
+        if (nameAndVersion == null)
+            throw new EmfException("Missing version");
         int pos1 = nameAndVersion.lastIndexOf("(");
         int pos2 = nameAndVersion.lastIndexOf(")");
         String vStr = nameAndVersion.substring(pos1+1, pos2);
