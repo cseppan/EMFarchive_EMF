@@ -10,7 +10,9 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategy
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
+import java.sql.SQLException;
 import java.util.Date;
 
 public class StrategyLoader extends LeastCostAbstractStrategyLoader {
@@ -85,6 +87,11 @@ public class StrategyLoader extends LeastCostAbstractStrategyLoader {
             populateStrategyMessagesDataset(controlStrategyInputDataset, strategyMessagesResult, result);
             setResultCount(strategyMessagesResult);
             
+            if (controlStrategy.getApplyCAPMeasuresOnHAPPollutants())
+                applyCAPMeasuresOnHAPPollutants(new ControlStrategyResult[] { result });
+            
+
+            
             //if the messages dataset is empty (no records) then remove the dataset and strategy result, there
             //is no point and keeping it around.
             if (strategyMessagesResult.getRecordCount() == 0) {
@@ -100,5 +107,36 @@ public class StrategyLoader extends LeastCostAbstractStrategyLoader {
         }
         
         return null;
+    }
+    
+    protected void applyCAPMeasuresOnHAPPollutants(ControlStrategyResult[] results) throws EmfException {
+        String detailedStrategyResultIdList = "";
+        if (results.length > 0) {
+            for (int j = 0; j < results.length; j++) {
+                if (results[j].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+                    detailedStrategyResultIdList += (detailedStrategyResultIdList.length() > 0 ? "," : "") + results[j].getId();
+                }
+            }
+        }
+        
+        if (detailedStrategyResultIdList.length() > 0) {
+            String sql = "select public.apply_cap_measures_on_hap_pollutants(" + controlStrategy.getId() + ", '{ " + detailedStrategyResultIdList + " }');";
+            if (DebugLevels.DEBUG_25())
+                System.out.println(sql);
+            try {
+                setStatus("Started applying CAP measures on hap pollutants.");
+                datasource.query().execute(sql);
+                setStatus("Completed applying CAP measures on hap pollutants.");
+            } catch (SQLException e) {
+                throw new EmfException("Error occured when applying CAP measures on HAP pollutants:" + "\n" + e.getMessage());
+            }
+            //update the record count for the result
+            for (int j = 0; j < results.length; j++) {
+                if (results[j].getStrategyResultType().getName().equals(StrategyResultType.detailedStrategyResult)) {
+                    setResultCount(results[j]);
+                    saveControlStrategyResult(results[j]);
+                }
+            }
+        }
     }
 }
