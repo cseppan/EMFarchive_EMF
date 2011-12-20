@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -123,8 +124,12 @@ public class CaseSearchWindow extends JDialog implements CaseSearchView {
     
     private void refresh(){
         try {
-            if (caseCategoryCombo.getSelectedItem() == null ){
-                refreshCases(new Case[] {});
+            if (caseCategoryCombo.getSelectedItem() == null || ((CaseCategory)caseCategoryCombo.getSelectedItem()).getName().equals("All")) {
+                if (caseCategoryCombo.getSelectedItem() == null) {
+                    refreshCases(new Case[] {});
+                } else {
+                    refreshCases(new Case[] { new Case("All") });
+                }
                 return; 
             }
             presenter.refreshCases((CaseCategory) caseCategoryCombo.getSelectedItem(), nameFilter.getText());
@@ -212,7 +217,7 @@ public class CaseSearchWindow extends JDialog implements CaseSearchView {
 
     public void refreshCases(Case[] cases) {
         // NOTE Auto-generated method stub
-        caseList.setListData( cases);
+        caseList.setListData(cases);
     }
 
     public Case[] getCases() {

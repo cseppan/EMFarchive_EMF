@@ -1,5 +1,9 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -11,20 +15,12 @@ public class CaseSearchPresenter {
 
     private CaseSearchView view;
     
-    private CaseCategory[] caseCategoriesToInclude;
-    
     private static CaseCategory lastCaseCategory = null;
     
     private static String lastNameContains = null;
     
     private static Case[] lastCases = null;
 
-    public CaseSearchPresenter(CaseSearchView view, EmfSession session,
-            CaseCategory[] categoriesToInclude) {
-        this(view, session);
-        this.caseCategoriesToInclude = categoriesToInclude;
-    }
-    
     public CaseSearchPresenter(CaseSearchView view, EmfSession session) {
         this.session = session;
         this.view = view;
@@ -34,13 +30,12 @@ public class CaseSearchPresenter {
         view.observe(this);
 
         //get data...
-        CaseCategory[] caseCategories = new CaseCategory[] {};
-        if (caseCategoriesToInclude == null)
-            caseCategories = session.caseService().getCaseCategories(); 
-        else
-            caseCategories = caseCategoriesToInclude;
+        List<CaseCategory> categories = new ArrayList<CaseCategory>();;
+//        CaseCategory[] caseCategories = new CaseCategory[] {};
+        categories.add(new CaseCategory("All"));
+        categories.addAll(Arrays.asList(session.caseService().getCaseCategories())); 
 
-        view.display(caseCategories, defaultCategory, selectSingle);
+        view.display(categories.toArray(new CaseCategory[0]), defaultCategory, selectSingle);
     }
 
     public void refreshCases(CaseCategory caseCategory, String nameContaining) throws EmfException {
@@ -52,7 +47,11 @@ public class CaseSearchPresenter {
         else 
         {
             lastCases = session.caseService().getCases(caseCategory, nameContaining);
-            view.refreshCases(lastCases);      
+            List<Case> caseArrayList = new ArrayList<Case>();;
+//          CaseCategory[] caseCategories = new CaseCategory[] {};
+            caseArrayList.add(new Case("All"));
+            caseArrayList.addAll(Arrays.asList(lastCases)); 
+            view.refreshCases(caseArrayList.toArray(new Case[0]));      
         }
         lastCaseCategory = caseCategory;
         lastNameContains = nameContaining;        

@@ -78,8 +78,6 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
     
     private DatasetType dsType;
     
-    private CaseCategory[] allCaseCategories;
-    
     private EmfConsole parent;
     
     static final private Dimension frameDim = new Dimension(680, 560);
@@ -231,7 +229,7 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
             
             CaseSearchWindow view = new CaseSearchWindow( parent);
 
-            CaseSearchPresenter caseSearchPresenter = new CaseSearchPresenter(view, presenter.getSession(), allCaseCategories);
+            CaseSearchPresenter caseSearchPresenter = new CaseSearchPresenter(view, presenter.getSession());
             
             caseSearchPresenter.display(null, selectSingleCase);
             if (view.shouldCreate())
@@ -300,6 +298,9 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
 
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)); 
 
+                    if (caseName.getText().trim().isEmpty())
+                        usedByCasesID = new int[] {};
+
                     datasets = search(getDataset(),qaStep.getText(), qaStepArguments.getText(), usedByCasesID, dataValueFilter.getText(), false);
 
                     if (datasets.length == 1 && datasets[0].getName().startsWith("Alert!!! More than 300 datasets selected.")) {
@@ -362,6 +363,8 @@ public class DatasetSearchWindow extends ReusableInteralFrame {
         qaStepArguments.setText("");
         projectsCombo.setSelectedIndex(0);
         dataValueFilter.setText("");
+        caseName.setText("");
+        usedByCasesID = new int[] {};
     }
     
     public void setNameText(String name) {

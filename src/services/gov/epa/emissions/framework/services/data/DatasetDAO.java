@@ -1664,8 +1664,9 @@ public class DatasetDAO {
         String descStr = (desc == null || desc.trim().isEmpty() ? "" : " AND lower(DS.description) LIKE "
             + Utils.getPattern(desc.toLowerCase().trim()));
         String dsProjStr = (ds.getProject() == null ? "" : " AND DS.project.id = " + ds.getProject().getId());
-        String caseStr = ( usedByCasesId == null || usedByCasesId.length==0) ? "" : " AND CI.caseID in " 
-            + Arrays.toString(usedByCasesId).replace('[', '(').replace(']', ')') + " AND DS.id=CI.dataset.id";
+        String caseStr = ( usedByCasesId == null || usedByCasesId.length==0) ? "" : 
+            (Arrays.toString(usedByCasesId).equals("[0]") ? "" : " AND CI.caseID in " + Arrays.toString(usedByCasesId).replace('[', '(').replace(']', ')')) 
+            + " AND DS.id=CI.dataset.id";
                
         String dsquery = "SELECT new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status,"
             + " DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution)"
