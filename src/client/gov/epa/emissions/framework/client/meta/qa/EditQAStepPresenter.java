@@ -266,5 +266,12 @@ public class EditQAStepPresenter {
         }
     }
 
-
+    public boolean ignoreShapeFileFunctionality() throws EmfException {
+        try {
+            String value = session.userService().getPropertyValue("IGNORE_SHAPEFILE_FUNCTIONALITY");
+            return (value != null || value.equalsIgnoreCase("true") ? true : false);
+        } finally {
+            //
+        }
+    }
 }

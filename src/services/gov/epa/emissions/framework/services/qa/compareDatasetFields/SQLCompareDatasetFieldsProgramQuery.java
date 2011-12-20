@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.qa.comparedatasets;
+package gov.epa.emissions.framework.services.qa.compareDatasetFields;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.Datasource;
@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 
 import org.hibernate.Session;
 
-public class SQLCompareDatasetsProgramQuery extends SQLQAProgramQuery{
+public class SQLCompareDatasetFieldsProgramQuery extends SQLQAProgramQuery{
     
     public static final String BASE_TAG = "-base"; 
     //Sample:
@@ -51,7 +51,7 @@ dataset name2|5
 dataset name3|3
 */
     
-    public static final String GROUP_BY_EXPRESSIONS_TAG = "-groupby";
+    public static final String JOIN_EXPRESSIONS_TAG = "-join_expressions";
     //Sample:
 /*
 scc
@@ -63,7 +63,7 @@ segment
 poll
 */
     
-    public static final String AGGREGATE_EXPRESSIONS_TAG = "-aggregate";
+    public static final String COMPARISON_EXPRESSIONS_TAG = "-comparison_expressions";
     //Sample:
 /*
 ann_emis
@@ -93,7 +93,7 @@ poll|poll
         
     private Datasource datasource;
     
-    public SQLCompareDatasetsProgramQuery(HibernateSessionFactory sessionFactory, Datasource datasource, String emissioDatasourceName, String tableName, QAStep qaStep) {
+    public SQLCompareDatasetFieldsProgramQuery(HibernateSessionFactory sessionFactory, Datasource datasource, String emissioDatasourceName, String tableName, QAStep qaStep) {
         super(sessionFactory,emissioDatasourceName,tableName,qaStep);
         this.datasource = datasource;    
     }
@@ -160,8 +160,8 @@ poll|poll
         //get applicable tables from the program arguments
         String[] baseTokens = new String[] {};
         String[] compareTokens = new String[] {};
-        String[] groupByExpressions = new String[] {};
-        String[] aggregateExpressions = new String[] {};
+        String[] joinExpressions = new String[] {};
+        String[] comparisonExpressions = new String[] {};
         String[] matchingExpressionTokens = new String[] {};
         String whereFilter = new String();
         String baseWhereFilter = new String();
@@ -174,7 +174,7 @@ poll|poll
         List<DatasetVersion> baseDatasetList = new ArrayList<DatasetVersion>();
         List<DatasetVersion> compareDatasetList = new ArrayList<DatasetVersion>();
         Map<String, ColumnMatchingMap> matchingExpressionMap = new HashMap<String, ColumnMatchingMap>();
-        Map<String, String> expressionAliasMap = new TreeMap<String, String>();
+        Map<String, String> joinExpressionsAliasMap = new TreeMap<String, String>(); //use treemap so the map stays sorted in the order the columns names are specified
         
         String[] arguments;
         
@@ -183,14 +183,15 @@ poll|poll
         //Load up arguments into local variables...
         
         
-        int indexBase = programArguments.indexOf(BASE_TAG);
-        int indexCompare = programArguments.indexOf(COMPARE_TAG);
-        int indexGroupBy = programArguments.indexOf(GROUP_BY_EXPRESSIONS_TAG);
-        int indexAggregate = programArguments.indexOf(AGGREGATE_EXPRESSIONS_TAG);
-        int indexMatching = programArguments.indexOf(MATCHING_EXPRESSIONS_TAG);
-        int indexJoin = programArguments.indexOf(JOIN_TYPE_TAG);
-        int indexWhereFilter = programArguments.indexOf(WHERE_FILTER_TAG);
+        int indexBase = programArguments.indexOf(BASE_TAG +"\n");
+        int indexCompare = programArguments.indexOf(COMPARE_TAG +"\n");
+        int indexJoinExpressions = programArguments.indexOf(JOIN_EXPRESSIONS_TAG +"\n");
+        int indexComparisonExpressions = programArguments.indexOf(COMPARISON_EXPRESSIONS_TAG +"\n");
+        int indexMatching = programArguments.indexOf(MATCHING_EXPRESSIONS_TAG +"\n");
+        int indexJoinType = programArguments.indexOf(JOIN_TYPE_TAG +"\n");
+        int indexWhereFilter = programArguments.indexOf(WHERE_FILTER_TAG +"\n");
         
+        //parse base and compare dataset name and version
         if (indexBase != -1) {
             arguments = parseSwitchArguments(programArguments, indexBase, programArguments.indexOf("\n-", indexBase) != -1 ? programArguments.indexOf("\n-", indexBase) : programArguments.length());
             if (arguments != null && arguments.length > 0) baseTokens = arguments;
@@ -224,20 +225,25 @@ poll|poll
         
 //        checkDataset();
         
+        //parse SQL join type
         String joinSQL="";       
-        if (indexJoin != -1
-                && (indexJoin + JOIN_TYPE_TAG.length() + 1) < (programArguments.indexOf("\n-", indexJoin) != -1 ? programArguments.indexOf("\n-", indexJoin) : programArguments.length())) 
-            joinSQL = programArguments.substring(indexJoin + JOIN_TYPE_TAG.length() + 1, programArguments.indexOf("\n-", indexJoin) != -1 ? programArguments.indexOf("\n-", indexJoin) : programArguments.length());          
+        if (indexJoinType != -1
+                && (indexJoinType + JOIN_TYPE_TAG.length() + 1) < (programArguments.indexOf("\n-", indexJoinType) != -1 ? programArguments.indexOf("\n-", indexJoinType) : programArguments.length())) 
+            joinSQL = programArguments.substring(indexJoinType + JOIN_TYPE_TAG.length() + 1, programArguments.indexOf("\n-", indexJoinType) != -1 ? programArguments.indexOf("\n-", indexJoinType) : programArguments.length());          
         if (joinSQL.trim().isEmpty())
             joinSQL = " full outer join ";
-        if (indexGroupBy != -1) {
-            arguments = parseSwitchArguments(programArguments, indexGroupBy, programArguments.indexOf("\n-", indexGroupBy) != -1 ? programArguments.indexOf("\n-", indexGroupBy) : programArguments.length());
-            if (arguments != null && arguments.length > 0) groupByExpressions = arguments;
+        if (indexJoinExpressions != -1) {
+            arguments = parseSwitchArguments(programArguments, indexJoinExpressions, programArguments.indexOf("\n-", indexJoinExpressions) != -1 ? programArguments.indexOf("\n-", indexJoinExpressions) : programArguments.length());
+            if (arguments != null && arguments.length > 0) joinExpressions = arguments;
         }
-        if (indexAggregate != -1) {
-            arguments = parseSwitchArguments(programArguments, indexAggregate, programArguments.indexOf("\n-", indexAggregate) != -1 ? programArguments.indexOf("\n-", indexAggregate) : programArguments.length());
-            if (arguments != null && arguments.length > 0) aggregateExpressions = arguments;
+
+        //parse Comparison Expressions
+        if (indexComparisonExpressions != -1) {
+            arguments = parseSwitchArguments(programArguments, indexComparisonExpressions, programArguments.indexOf("\n-", indexComparisonExpressions) != -1 ? programArguments.indexOf("\n-", indexComparisonExpressions) : programArguments.length());
+            if (arguments != null && arguments.length > 0) comparisonExpressions = arguments;
         }
+
+        //parse Matching Expressions
         if (indexMatching != -1) {
             arguments = parseSwitchArguments(programArguments, indexMatching, programArguments.indexOf("\n-", indexMatching) != -1 ? programArguments.indexOf("\n-", indexMatching) : programArguments.length());
             if (arguments != null && arguments.length > 0) matchingExpressionTokens = arguments;
@@ -249,11 +255,15 @@ poll|poll
                 matchingExpressionMap.put(dataset2Expression, new ColumnMatchingMap(dataset1Expression, dataset2Expression));
             }
         }
+
+        //parse Where Filter Expressions
         if (indexWhereFilter != -1 
                 && (indexWhereFilter + WHERE_FILTER_TAG.length() + 1) < (programArguments.indexOf("\n-", indexWhereFilter) != -1 ? programArguments.indexOf("\n-", indexWhereFilter) : programArguments.length())) 
             whereFilter = programArguments.substring(indexWhereFilter + WHERE_FILTER_TAG.length() + 1, programArguments.indexOf("\n-", indexWhereFilter) != -1 ? programArguments.indexOf("\n-", indexWhereFilter) : programArguments.length());
         //strip off any unnecessary characters
         whereFilter = whereFilter.replaceAll("\n","").trim();
+
+        
         //Validate program arguments (i.e., does dataset and version exist, does mapping make sense, etc...)
        
         
@@ -336,33 +346,33 @@ poll|poll
 //            throw new EmfException("There are no matching expressions specified.");
 //        }
 
-        //see if there are issues with the group by expressions
-        if (groupByExpressions.length > 0 ) {
+        //see if there are issues with the join expressions
+        if (joinExpressions.length > 0 ) {
             //make sure these expressions exists
-            for (String groupByExpression : groupByExpressions) {
+            for (String joinExpression : joinExpressions) {
 
                 //parse group by token and put in a map for later use...
-                String[] groupByExpressionParts = groupByExpression.split(" (?i)as ");
+                String[] joinExpressionParts = joinExpression.split(" (?i)as ");
 //                StringTokenizer tokenizer = new StringTokenizer(groupByExpression.toLowerCase(), "\\ as ");
-                int count = groupByExpressionParts.length;
+                int count = joinExpressionParts.length;
                 String expression = "";
                 String alias = "";
                 //has no alias
                 if (count == 1) {
-                    expression = groupByExpressionParts[0];//tokenizer.nextToken();
+                    expression = joinExpressionParts[0];//tokenizer.nextToken();
                     alias = expression;
                 //has alias
                 } else if (count == 2) {
-                    expression = groupByExpressionParts[0];//tokenizer.nextToken();
-                    alias = groupByExpressionParts[1];//tokenizer.nextToken();
+                    expression = joinExpressionParts[0];//tokenizer.nextToken();
+                    alias = joinExpressionParts[1];//tokenizer.nextToken();
                 //unkown number of tokens, throw an error
                 } else if (count > 2) {
-                    throw new EmfException("Invalid formatted GROUP BY expression, " + groupByExpression + ". Should be formatted as: expression AS alias (i.e., subtring(fips,1,2) as fipsst).");
+                    throw new EmfException("Invalid formatted Join Expression, " + joinExpression + ". Should be formatted as: expression AS alias (i.e., subtring(fips,1,2) as fipsst).");
                 }
-                if (expressionAliasMap.containsKey(alias))
-                    throw new EmfException("GROUP BY expression, " + groupByExpression + ", has already been specified.  Only specify the expression once.");
+                if (joinExpressionsAliasMap.containsKey(alias))
+                    throw new EmfException("Join expression, " + joinExpression + ", has already been specified.  Only specify the expression once.");
                 //add to map, will be used to help build sql statement
-                expressionAliasMap.put(alias, expression);
+                joinExpressionsAliasMap.put(alias, expression);
             
             
                 //ignoring mappings for now, just see if expression is appropriate for dataset(s)
@@ -371,35 +381,35 @@ poll|poll
 
                 //make sure group by expression exists
                 if (!baseExpressionExists && !compareExpressionExists)
-                    throw new EmfException("GROUP BY expression, " + expression + ", doesn't exist as a column in either the base or compare datasets.");
+                    throw new EmfException("Join expression, " + expression + ", doesn't exist as a column in either the base or compare datasets.");
 
                 //if either one of the dataset types doesn't contain the column, then make sure we have a mapping for it...
                 baseExpressionExists = expressionExists(expression, baseColumns, matchingExpressionMap);
                 compareExpressionExists = expressionExists(expression, compareColumns, matchingExpressionMap);
                 if (!baseExpressionExists || !compareExpressionExists) {
                     if (matchingExpressionMap.get(expression.toLowerCase()) == null)
-                        throw new EmfException("GROUP BY expression, " + expression + ", needs a mapping entry specified, the column doesn't exist in either the base or compare datasets.");
+                        throw new EmfException("Join expression, " + expression + ", needs a mapping entry specified, the column doesn't exist in either the base or compare datasets.");
                 }
             }
         } else {
-            throw new EmfException("There are no GROUP BY expressions specified.");
+            throw new EmfException("There are no Join expressions specified.");
         }
 
-        //see if there are issues with the aggregate expressions
-        if (aggregateExpressions.length > 0 ) {
+        //see if there are issues with the Comparison expressions
+        if (comparisonExpressions.length > 0 ) {
             //make sure these expressions returns a number
-            for (String aggregateExpression : aggregateExpressions) {
-                boolean baseColumnExists = expressionExists(aggregateExpression, baseColumns, matchingExpressionMap);
+            for (String comparisonExpression : comparisonExpressions) {
+                boolean baseColumnExists = expressionExists(comparisonExpression, baseColumns, matchingExpressionMap);
 //                Column baseColumn = baseColumns.get(aggregateExpression.toLowerCase());
-                boolean compareColumnExists = expressionExists(aggregateExpression, compareColumns, matchingExpressionMap);
+                boolean compareColumnExists = expressionExists(comparisonExpression, compareColumns, matchingExpressionMap);
 //                Column compareColumn = compareColumns.get(aggregateExpression.toLowerCase());
                 //make sure aggregate expression exists
                 if (!baseColumnExists && !compareColumnExists)
-                    throw new EmfException("Aggregate expression, " + aggregateExpression + ", doesn't exist as a column in either the base or compare datasets.");
+                    throw new EmfException("Comparison expression, " + comparisonExpression + ", doesn't exist as a column in either the base or compare datasets.");
                 //if either one of the dataset types doesn't contain the column, then make sure we have a mapping for it...
                 if (!baseColumnExists || !compareColumnExists) {
-                    if (matchingExpressionMap.get(aggregateExpression.toLowerCase()) == null)
-                        throw new EmfException("Aggregate expression, " + aggregateExpression + ", needs a mapping entry specified, the column doesn't exist in either the base or compare datasets.");
+                    if (matchingExpressionMap.get(comparisonExpression.toLowerCase()) == null)
+                        throw new EmfException("Comparison expression, " + comparisonExpression + ", needs a mapping entry specified, the column doesn't exist in either the base or compare datasets.");
                 }
 //                
 //                Column column = (baseColumn != null ? baseColumn : (compareColumn != null ? compareColumn : null));
@@ -415,7 +425,7 @@ poll|poll
                 
             }
         } else {
-            throw new EmfException("There are no AGGREGATE expressions specified.");
+            throw new EmfException("There are no Comparison expressions specified.");
         }
 
         //see if there are issues with the where filter expression
@@ -451,66 +461,63 @@ poll|poll
         String compareSelectSQL = "select ";
         String baseUnionSelectSQL = "select ";
         String compareUnionSelectSQL = "select ";
-        String groupBySQL = "group by ";
-        String baseGroupBySQL = "group by ";
-        String compareGroupBySQL = "group by ";
-        String baseUnionGroupBySQL = "group by ";
-        String compareUnionGroupBySQL = "group by ";
+//        String groupBySQL = "group by ";
+//        String baseGroupBySQL = "group by ";
+//        String compareGroupBySQL = "group by ";
+//        String baseUnionGroupBySQL = "group by ";
+//        String compareUnionGroupBySQL = "group by ";
         String fullJoinClauseSQL = "on ";
 
         //build core group by expressions into SELECT statement 
         int counter = 0;
         
-        Set<String> expressionAliasKeySet = expressionAliasMap.keySet();
+        Set<String> expressionAliasKeySet = joinExpressionsAliasMap.keySet();
         Iterator<String> expressionAliasKeySetIterator = expressionAliasKeySet.iterator();
-        Iterator<String> expressionAliasValuesIterator = expressionAliasMap.values().iterator();
+        Iterator<String> expressionAliasValuesIterator = joinExpressionsAliasMap.values().iterator();
         while (expressionAliasKeySetIterator.hasNext()) {
-            String groupByExpression = expressionAliasValuesIterator.next();
-            String groupByExpressionAlias = expressionAliasKeySetIterator.next();
+            String joinExpression = expressionAliasValuesIterator.next();
+            String joinExpressionAlias = expressionAliasKeySetIterator.next();
             
             
             
 //        for (int counter = 0; counter < expressionAliasMap.size(); ++counter) {
         //String groupByExpression : groupByExpressions) {
-            String baseExpression = getBaseExpression(groupByExpression, matchingExpressionMap, baseColumns, "b");
+            String baseExpression = getBaseExpression(joinExpression, matchingExpressionMap, baseColumns, "b");
 //            Column baseColumn = getBaseColumn(groupByExpression, matchingExpressionMap, baseColumns);
-            String compareExpression = getCompareExpression(groupByExpression, matchingExpressionMap, compareColumns, "c");
+            String compareExpression = getCompareExpression(joinExpression, matchingExpressionMap, compareColumns, "c");
 //            Column compareColumn = getCompareColumn(groupByExpression, matchingExpressionMap, compareColumns);
             
 //            selectSQL += (!selectSQL.equals("select ") ? ", " : "") + "coalesce(b." + baseColumn.getName() + ",c." + compareColumn.getName() + ") as " + groupByExpression + "";
 //            baseSelectSQL += (!baseSelectSQL.equals("select ") ? ", " : "") + "b." + baseColumn.getName();
 //            compareSelectSQL += (!compareSelectSQL.equals("select ") ? ", " : "") + "c." + compareColumn.getName();
 
-            selectSQL += (!selectSQL.equals("select ") ? ", " : "") + "coalesce(b.expr" + counter + ",c.expr" + counter + ") as \"" + groupByExpressionAlias + "\"";
+            selectSQL += (!selectSQL.equals("select ") ? ", " : "") + "coalesce(b.expr" + counter + ",c.expr" + counter + ") as \"" + joinExpressionAlias + "\"";
             baseSelectSQL += (!baseSelectSQL.equals("select ") ? ", " : "") + baseExpression + " as expr" + counter;
             compareSelectSQL += (!compareSelectSQL.equals("select ") ? ", " : "") + compareExpression + " as expr" + counter;
             baseUnionSelectSQL += (!baseUnionSelectSQL.equals("select ") ? ", " : "") + " expr" + counter;
             compareUnionSelectSQL += (!compareUnionSelectSQL.equals("select ") ? ", " : "") + " expr" + counter;
             
-            groupBySQL += (!groupBySQL.equals("group by ") ? ", " : "") + "coalesce(b.expr" + counter + ",c.expr" + counter + ")";
-            baseGroupBySQL += (!baseGroupBySQL.equals("group by ") ? ", " : "") + baseExpression;
-            compareGroupBySQL += (!compareGroupBySQL.equals("group by ") ? ", " : "") + compareExpression;
-            baseUnionGroupBySQL += (!baseUnionGroupBySQL.equals("group by ") ? ", " : "") + " expr" + counter;
-            compareUnionGroupBySQL += (!compareUnionGroupBySQL.equals("group by ") ? ", " : "") + " expr" + counter;
+//            groupBySQL += (!groupBySQL.equals("group by ") ? ", " : "") + "coalesce(b.expr" + counter + ",c.expr" + counter + ")";
+//            baseGroupBySQL += (!baseGroupBySQL.equals("group by ") ? ", " : "") + baseExpression;
+//            compareGroupBySQL += (!compareGroupBySQL.equals("group by ") ? ", " : "") + compareExpression;
+//            baseUnionGroupBySQL += (!baseUnionGroupBySQL.equals("group by ") ? ", " : "") + " expr" + counter;
+//            compareUnionGroupBySQL += (!compareUnionGroupBySQL.equals("group by ") ? ", " : "") + " expr" + counter;
 
             fullJoinClauseSQL += (!fullJoinClauseSQL.equals("on ") ? " and " : "") + "c.expr" + counter + " = b.expr" + counter + " ";
             ++counter;
         }
         
-        //build aggregrate expressions into SELECT statement 
-//        selectSQL += ",count(1) as cnt";
-//        baseSelectSQL += ",count(1) as cnt";
-//        compareSelectSQL += ",count(1) as cnt";
-        for (String aggregateExpression : aggregateExpressions) {
+        //build comparison expressions into SELECT statement 
+        for (String comparisonExpression : comparisonExpressions) {
 //            Column baseColumn = getBaseColumn(aggregateExpression, matchingExpressionMap, baseColumns);
-            String baseAggregateExpression = getBaseExpression(aggregateExpression, matchingExpressionMap, baseColumns, "b");
+            String baseAggregateExpression = getBaseExpression(comparisonExpression, matchingExpressionMap, baseColumns, "b");
 //            Column compareColumn = getCompareColumn(aggregateExpression, matchingExpressionMap, compareColumns);
-            String compareAggregateExpression = getCompareExpression(aggregateExpression, matchingExpressionMap, compareColumns, "c");
-            selectSQL += ",sum(b.\"" + aggregateExpression + "\") as \"" + aggregateExpression + "_b\", sum(c.\"" + aggregateExpression + "\") as \"" + aggregateExpression + "_c\", sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\") as \"" + aggregateExpression + "_diff\", abs(sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) as \"" + aggregateExpression + "_absdiff\", case when coalesce(sum(b.\"" + aggregateExpression + "\"),0.0) <> 0.0 then (sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) / sum(b.\"" + aggregateExpression + "\") * 100.0 else null::double precision end as \"" + aggregateExpression + "_pctdiff\", case when coalesce(sum(b.\"" + aggregateExpression + "\"),0.0) <> 0.0 then abs((sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) / sum(b.\"" + aggregateExpression + "\") * 100.0) else null::double precision end as \"" + aggregateExpression + "_abspctdiff\"";
-            baseSelectSQL += ",sum(" + baseAggregateExpression + ") as \"" + aggregateExpression + "\"";
-            compareSelectSQL += ",sum(" + compareAggregateExpression + ") as \"" + aggregateExpression + "\"";
-            baseUnionSelectSQL += ",sum(\"" + aggregateExpression + "\") as \"" + aggregateExpression + "\"";
-            compareUnionSelectSQL += ",sum(\"" + aggregateExpression + "\") as \"" + aggregateExpression + "\"";
+            String compareAggregateExpression = getCompareExpression(comparisonExpression, matchingExpressionMap, compareColumns, "c");
+            selectSQL += ",b.\"" + comparisonExpression + "\" as \"" + comparisonExpression + "_b\", c.\"" + comparisonExpression + "\" as \"" + comparisonExpression + "_c\"";
+            baseSelectSQL += "," + baseAggregateExpression + " as \"" + comparisonExpression + "\"";
+            compareSelectSQL += "," + compareAggregateExpression + " as \"" + comparisonExpression + "\"";
+            baseUnionSelectSQL += ",\"" + comparisonExpression + "\" as \"" + comparisonExpression + "\"";
+            compareUnionSelectSQL += ",\"" + comparisonExpression + "\" as \"" + comparisonExpression + "\"";
         }
 
         //alias where filter for use in the base and compare datasets
@@ -521,49 +528,33 @@ poll|poll
       //build inner sql statement with the datasets specified, make sure and unionize (append) the tables together
          String innerSQLBase = "";
          if (baseDatasetList.size() > 1) 
-             innerSQLBase = baseUnionSelectSQL + ", sum(b.cnt) as cnt from (";
+             innerSQLBase = baseUnionSelectSQL + " from (";
          for (int j = 0; j < baseDatasetList.size(); j++) {
              DatasetVersion datasetVersion = baseDatasetList.get(j);
              EmfDataset dataset = datasetVersion.getDataset();
              VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion.getVersion(), "b");
 
-             innerSQLBase += (j > 0 ? " \nunion all " : "") + baseSelectSQL + ", count(1) as cnt from emissions." + dataset.getInternalSources()[0].getTable() + " as b where " + datasetVersionedQuery.query() + (baseWhereFilter.length() > 0 ? " and (" + baseWhereFilter + ")": "") + " " + baseGroupBySQL;
+             innerSQLBase += (j > 0 ? " \nunion all " : "") + baseSelectSQL + " from emissions." + dataset.getInternalSources()[0].getTable() + " as b where " + datasetVersionedQuery.query() + (baseWhereFilter.length() > 0 ? " and (" + baseWhereFilter + ")" : "");
          }
          if (baseDatasetList.size() > 1) 
-             innerSQLBase += ") b " + baseUnionGroupBySQL;
-
-//         //replace #base symbol with the unionized fire datasets query
-//         diffQuery = diffQuery.replaceAll("#base", innerSQLBase);
+             innerSQLBase += ") b ";
 
          String innerSQLCompare = "";
 
          if (compareDatasetList.size() > 1) 
-             innerSQLCompare = compareUnionSelectSQL + ", sum(c.cnt) as cnt from (";
+             innerSQLCompare = compareUnionSelectSQL + " from (";
          for (int j = 0; j < compareDatasetList.size(); j++) {
              DatasetVersion datasetVersion = compareDatasetList.get(j);
              EmfDataset dataset = datasetVersion.getDataset();
              VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion.getVersion(), "c");
-             innerSQLCompare += (j > 0 ? " \nunion all " : "") + compareSelectSQL + ", count(1) as cnt from emissions." + dataset.getInternalSources()[0].getTable() + " as c where " + datasetVersionedQuery.query() + (compareWhereFilter.length() > 0 ? " and (" + compareWhereFilter + ")": "") + " " + compareGroupBySQL;
+             innerSQLCompare += (j > 0 ? " \nunion all " : "") + compareSelectSQL + " from emissions." + dataset.getInternalSources()[0].getTable() + " as c where " + datasetVersionedQuery.query() + (compareWhereFilter.length() > 0 ? " and (" + compareWhereFilter + ")": "");
          }
          if (compareDatasetList.size() > 1) 
-             innerSQLCompare += ") c " + compareUnionGroupBySQL;
+             innerSQLCompare += ") c ";
          
-         String sql = selectSQL + ", sum(b.cnt) as count_b, sum(c.cnt) as count_c from (" + innerSQLBase + ") as b " +joinSQL+" (" + innerSQLCompare + ") as c ";
-//         for (int j = 0; j < fullJoinExpressionList.size(); j++) {
-//             
-//             ColumnMatchingMap columnMatchingMap = fullJoinExpressionList.get(j);
-//             sql += (j == 0 ? " on " : " and ") + "c." + columnMatchingMap.getDataset2Expression() + " = b." + columnMatchingMap.getDataset1Expression();
-//         }
-//         for (int j = 0; j < groupByExpressions.length; j++) {
-//             //String groupByExpression : groupByExpressions
-//             String groupByExpression = groupByExpressions[j];
-//             Column baseColumn = getBaseColumn(groupByExpression, matchingExpressionMap, baseColumns);
-//             Column compareColumn = getCompareColumn(groupByExpression, matchingExpressionMap, compareColumns);
-//             sql += (j == 0 ? " on " : " and ") + "c." + compareColumn.getName() + " = b." + baseColumn.getName();
-//         }
-
+         String sql = selectSQL + " from (" + innerSQLBase + ") as b " + joinSQL + " (" + innerSQLCompare + ") as c ";
          
-         sql += fullJoinClauseSQL + " " + groupBySQL + " " + groupBySQL.replace("group by", "order by");
+         sql += fullJoinClauseSQL;// + " " + groupBySQL.replace("group by", "order by");
 
 //        System.out.println(sql);
 

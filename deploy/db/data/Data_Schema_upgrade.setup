@@ -1574,3 +1574,276 @@ update emf.properties set value = '12' where name = 'DEBUG_LEVEL_REFRESH_RATE'; 
 -- 9/22/2011 -- added a new debug level for debugging control strategy operations
 insert into emf.properties values(DEFAULT, 'DEBUG_25', 'false');
 update emf.properties set value = 'false' where name = 'DEBUG_25';
+
+-- 12/07/2011 -- Add new Compare Dataset Fields QA Program
+insert into emf.qa_programs values(DEFAULT,'Compare Dataset Fields','gov.epa.emissions.framework.services.qa.compareDatasetFields.SQLCompareDSFieldsProgramQueryRunner');
+
+-- 12/10/2011 -- added a properties to help determine when to show more advanced EMF features, this will be useful when distributing CoST to the states
+insert into emf.properties values(DEFAULT, 'SHOW_MP_SDT_MENU', 'true');
+insert into emf.properties values(DEFAULT, 'SHOW_SECTOR_SCENARIO_MENU', 'true');
+insert into emf.properties values(DEFAULT, 'SHOW_CASES_MENU', 'true');
+
+
+-- 12/19/2011 -- new qa steps to help with add toxicity weighting factors to Flat File 2010 Point and Nonpoint DS Types
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, 
+(select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
+'Toxicity Weighted Inventory', 
+1, 
+'select distinct on (i.record_id) 
+country_cd,region_cd,tribal_code,
+facility_id,unit_id,rel_point_id,
+process_id,agy_facility_id,agy_unit_id,
+agy_rel_point_id,agy_process_id,scc,
+poll,ann_value,ann_pct_red,
+facility_name,erptype,stkhgt,
+stkdiam,stktemp,stkflow,
+stkvel,naics,longitude,
+latitude,ll_datum,horiz_coll_mthd,
+design_capacity,design_capacity_units,reg_codes,
+fac_source_type,unit_type_code,control_ids
+,control_measures,current_cost,cumulative_cost,
+projection_factor,submitter_id,calc_method,
+data_set_id,facil_category_code,oris_facility_code,
+oris_boiler_id,ipm_yn,calc_year,
+date_updated,fug_height,fug_width_ydim,
+fug_length_xdim,fug_angle,zipcode,
+annual_avg_hours_per_year,i.comment,i.comments,
+t.pollutant_code_desc, 
+case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+  i.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) * t.ure
+else
+  null::double precision
+end
+as cancer_weight,
+case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+  case when coalesce(t.rfc, 0.0) <> 0.0 then 
+    i.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) / t.rfc
+  else 0.0 
+  end 
+else
+  null::double precision
+end
+as noncancer_weight, 
+t.rfc_target_system1,
+t.rfc_target_system2,
+t.rfc_target_system3 
+from $TABLE[1] i
+left outer join $DATASET_TABLE_VERSION["toxicity_weights",1,0] t
+on t.pollutant_code = i.poll', 
+false, 
+1, 
+''
+from emf.dataset_types dt
+where name in ('Flat File 2010 Point'); 
+
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select distinct on (i.record_id) 
+country_cd,region_cd,tribal_code,
+facility_id,unit_id,rel_point_id,
+process_id,agy_facility_id,agy_unit_id,
+agy_rel_point_id,agy_process_id,scc,
+poll,ann_value,ann_pct_red,
+facility_name,erptype,stkhgt,
+stkdiam,stktemp,stkflow,
+stkvel,naics,longitude,
+latitude,ll_datum,horiz_coll_mthd,
+design_capacity,design_capacity_units,reg_codes,
+fac_source_type,unit_type_code,control_ids
+,control_measures,current_cost,cumulative_cost,
+projection_factor,submitter_id,calc_method,
+data_set_id,facil_category_code,oris_facility_code,
+oris_boiler_id,ipm_yn,calc_year,
+date_updated,fug_height,fug_width_ydim,
+fug_length_xdim,fug_angle,zipcode,
+annual_avg_hours_per_year,i.comment,i.comments,
+t.pollutant_code_desc, 
+case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+  i.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) * t.ure
+else
+  null::double precision
+end
+as cancer_weight,
+case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+  case when coalesce(t.rfc, 0.0) <> 0.0 then 
+    i.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) / t.rfc
+  else 0.0 
+  end 
+else
+  null::double precision
+end
+as noncancer_weight, 
+t.rfc_target_system1,
+t.rfc_target_system2,
+t.rfc_target_system3 
+from $TABLE[1] i
+left outer join $DATASET_TABLE_VERSION["toxicity_weights",1,0] t
+on t.pollutant_code = i.poll'
+where name = 'Toxicity Weighted Inventory'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('Flat File 2010 Point'));
+
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, 
+(select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
+'Toxicity Weighted Inventory', 
+1, 
+'select distinct on (i.record_id) 
+i.country_cd,i.region_cd,i.tribal_code,
+i.census_tract_cd,i.shape_id,i.scc,
+i.emis_type,i.poll,i.ann_value,
+i.ann_pct_red,i.control_ids,i.control_measures,
+i.current_cost,i.cumulative_cost,i.projection_factor,
+i.reg_codes,i.calc_method,i.calc_year,
+i.date_updated,i.data_set_id,
+i.comment,i.comments,
+t.pollutant_code_desc, 
+case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+  i.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) * t.ure
+else
+  null::double precision
+end
+as cancer_weight,
+case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+  case when coalesce(t.rfc, 0.0) <> 0.0 then 
+    i.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) / t.rfc
+  else 0.0 
+  end 
+else
+  null::double precision
+end
+as noncancer_weight, 
+t.rfc_target_system1,
+t.rfc_target_system2,
+t.rfc_target_system3 
+from $TABLE[1] i
+left outer join $DATASET_TABLE_VERSION["toxicity_weights",1,0] t
+on t.pollutant_code = i.poll', 
+false, 
+1, 
+''
+from emf.dataset_types dt
+where name in ('Flat File 2010 Nonpoint'); 
+
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select distinct on (i.record_id) 
+i.country_cd,i.region_cd,i.tribal_code,
+i.census_tract_cd,i.shape_id,i.scc,
+i.emis_type,i.poll,i.ann_value,
+i.ann_pct_red,i.control_ids,i.control_measures,
+i.current_cost,i.cumulative_cost,i.projection_factor,
+i.reg_codes,i.calc_method,i.calc_year,
+i.date_updated,i.data_set_id,
+i.comment,i.comments,
+t.pollutant_code_desc, 
+case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+  i.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) * t.ure
+else
+  null::double precision
+end
+as cancer_weight,
+case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+  case when coalesce(t.rfc, 0.0) <> 0.0 then 
+    i.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) / t.rfc
+  else 0.0 
+  end 
+else
+  null::double precision
+end
+as noncancer_weight, 
+t.rfc_target_system1,
+t.rfc_target_system2,
+t.rfc_target_system3 
+from $TABLE[1] i
+left outer join $DATASET_TABLE_VERSION["toxicity_weights",1,0] t
+on t.pollutant_code = i.poll'
+where name = 'Toxicity Weighted Inventory'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('Flat File 2010 Nonpoint'));
+
+-- QA Step -- Summarize by U.S. State and Pollutant with Toxicity Weighting
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, 
+(select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
+'Summarize by U.S. State and Pollutant with Toxicity Weighting', 
+1, 
+'select fips.state_name, 
+	fips.state_abbr, 
+	fips.fipsst, 
+	e.poll, 
+	t.pollutant_code_desc, 
+	sum(e.ann_value) as ann_value,
+	sum(case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+		e.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) * t.ure
+	else
+		null::double precision
+	end) as cancer_weight,
+	sum(case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+		case when coalesce(t.rfc, 0.0) <> 0.0 then 
+			e.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) / t.rfc
+		else 
+			0.0 
+		end 
+	else
+		null::double precision
+	end) as noncancer_weight
+from $TABLE[1] e 
+	left outer join reference.fips 
+	on fips.state_county_fips = e.region_cd
+	and fips.country_num = ''0'' 
+	left outer join (
+		select distinct on (t.pollutant_code)
+			*
+		from $DATASET_TABLE_VERSION["toxicity_weights",1,0] t
+	) t
+	on t.pollutant_code = e.poll
+group by fips.state_name, fips.state_abbr, fips.fipsst, e.poll, t.pollutant_code_desc
+order by fips.state_name, e.poll', 
+false, 
+1, 
+''
+from emf.dataset_types dt
+where name in ('Flat File 2010 Point','Flat File 2010 Nonpoint'); 
+
+update emf.dataset_types_qa_step_templates 
+set program_arguments = 'select fips.state_name, 
+	fips.state_abbr, 
+	fips.fipsst, 
+	e.poll, 
+	t.pollutant_code_desc, 
+	sum(e.ann_value) as ann_value,
+	sum(case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+		e.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) * t.ure
+	else
+		null::double precision
+	end) as cancer_weight,
+	sum(case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+		case when coalesce(t.rfc, 0.0) <> 0.0 then 
+			e.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) / t.rfc
+		else 
+			0.0 
+		end 
+	else
+		null::double precision
+	end) as noncancer_weight
+from $TABLE[1] e 
+	left outer join reference.fips 
+	on fips.state_county_fips = e.region_cd
+	and fips.country_num = ''0'' 
+	left outer join (
+		select distinct on (t.pollutant_code)
+			*
+		from $DATASET_TABLE_VERSION["toxicity_weights",1,0] t
+	) t
+	on t.pollutant_code = e.poll
+group by fips.state_name, fips.state_abbr, fips.fipsst, e.poll, t.pollutant_code_desc
+order by fips.state_name, e.poll'
+where name = 'Summarize by U.S. State and Pollutant with Toxicity Weighting'
+and dataset_type_id in 
+(select id 
+from emf.dataset_types dt
+where name in ('Flat File 2010 Point','Flat File 2010 Nonpoint'));

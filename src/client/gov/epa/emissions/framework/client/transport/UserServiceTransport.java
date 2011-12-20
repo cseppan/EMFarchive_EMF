@@ -177,4 +177,14 @@ public class UserServiceTransport implements UserService {
         return (Boolean) call.requestResponse(new Object[] { user, host });
     }
 
+    public String getPropertyValue(String name) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getPropertyValue");
+        call.addStringParam("name");
+        call.setStringReturnType();
+        
+        return (String) call.requestResponse(new Object[] { name });
+    }
+
 }

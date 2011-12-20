@@ -268,4 +268,18 @@ public class UserServiceImpl implements UserService {
         return SecurityManager.getInstance().passwordRegistered(user, host);
     }
 
+    public String getPropertyValue(String name) throws EmfException {
+        Session session = sessionFactory.getSession();
+
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty(name, session);
+            return property != null ? property.getValue() : null;
+        } catch (Exception e) {
+            LOG.error("Could not get EMF property.", e);
+            throw new EmfException("Could not get EMF property.");
+        } finally {
+            session.close();
+        }
+    }
+
 }

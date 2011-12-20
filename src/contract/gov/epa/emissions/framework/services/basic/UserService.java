@@ -42,4 +42,6 @@ public interface UserService extends EMFService {
 
     boolean passwordRegistered(String smokeUser, String host) throws EmfException;
 
+    String getPropertyValue(String name) throws EmfException;
+
 }

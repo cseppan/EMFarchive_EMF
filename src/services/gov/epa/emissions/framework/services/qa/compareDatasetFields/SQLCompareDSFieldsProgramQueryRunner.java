@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.qa.comparedatasets;
+package gov.epa.emissions.framework.services.qa.compareDatasetFields;
 
 import java.sql.SQLException;
 
@@ -8,17 +8,17 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.SQLQAProgramRunner;
 
-public class SQLCompareDatasetsProgramQueryRunner extends SQLQAProgramRunner {
+public class SQLCompareDSFieldsProgramQueryRunner extends SQLQAProgramRunner {
     
     private String emissioDatasourceName;
 
-    public SQLCompareDatasetsProgramQueryRunner(DbServer dbServer, HibernateSessionFactory sessionFactory, QAStep qaStep) {
+    public SQLCompareDSFieldsProgramQueryRunner(DbServer dbServer, HibernateSessionFactory sessionFactory, QAStep qaStep) {
         super(dbServer, sessionFactory, qaStep);
         this.emissioDatasourceName = dbServer.getEmissionsDatasource().getName();
     }
     
     protected String query(DbServer dbServer, QAStep qaStep, String tableName) throws EmfException {
-        SQLCompareDatasetsProgramQuery parser = new SQLCompareDatasetsProgramQuery(sessionFactory, dbServer.getEmissionsDatasource(), emissioDatasourceName, tableName, qaStep);
+        SQLCompareDatasetFieldsProgramQuery parser = new SQLCompareDatasetFieldsProgramQuery(sessionFactory, dbServer.getEmissionsDatasource(), emissioDatasourceName, tableName, qaStep);
         String sql = "";
         try {
             sql = parser.createProgramQuery();
@@ -36,7 +36,7 @@ public class SQLCompareDatasetsProgramQueryRunner extends SQLQAProgramRunner {
         
         String programArguments = qaStep.getProgramArguments();
         if (programArguments == null || programArguments.trim().length() == 0) {
-            throw new EmfException("Please specify the QA Program \"Compare Datasets\" configuration settings in the program argument.");
+            throw new EmfException("Please specify the QA Program \"Compare Dataset Ascii Values\" configuration settings in the program argument.");
         }
         
         //System.out.println("The input to tableName is: " + qaStep);
