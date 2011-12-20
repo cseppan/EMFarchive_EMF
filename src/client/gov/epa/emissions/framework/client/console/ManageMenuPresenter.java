@@ -91,4 +91,7 @@ public class ManageMenuPresenter {
         presenter.doDisplay();
     }
 
+    public String getPropertyValue(String name) throws EmfException {
+        return session.userService().getPropertyValue(name);
+    }
 }

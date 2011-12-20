@@ -4,4 +4,6 @@ public interface ManageMenuView {
 
     void observe(ManageMenuPresenter presenter);
 
+    void display();
+
 }

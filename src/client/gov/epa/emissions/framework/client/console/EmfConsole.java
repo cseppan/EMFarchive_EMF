@@ -154,7 +154,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         manageMenu = new ManageMenu(session, this, messagePanel, desktopManager);
         addClearAction(manageMenu);
         new ManageMenuPresenter(manageMenu, session).observe();
-
+        manageMenu.display();
         return manageMenu;
     }
     

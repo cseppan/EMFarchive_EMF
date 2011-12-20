@@ -36,6 +36,8 @@ public class ControlMeasureSelectionPresenter {
         try {
             User currentUser = controlStrategy.getCreator(); // session.user();
             String costSUs = session.controlStrategyService().getCoSTSUs(); //presenter.getCoSTSUs();
+            //if this is found, then every one is considered an SU (really used for State Installations....)
+            if (costSUs.equals("ALL_USERS")) return true;
             StringTokenizer st = new StringTokenizer(costSUs,"|");
             while ( st.hasMoreTokens()) {
                 String token = st.nextToken();

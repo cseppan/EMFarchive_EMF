@@ -48,32 +48,22 @@ public class ManageMenu extends JMenu implements ManageMenuView {
     private DesktopManager desktopManager;
 
     private ManageMenuPresenter presenter;
+    
+    private MessagePanel messagePanel;
 
+    private static final String SHOW_MP_SDT_MENU = "SHOW_MP_SDT_MENU";
+    
+    private static final String SHOW_SECTOR_SCENARIO_MENU = "SHOW_SECTOR_SCENARIO_MENU";
+    
+    private static final String SHOW_CASES_MENU = "SHOW_CASES_MENU";
+    
     // FIXME: where's the associated Presenter ?
     public ManageMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel) {
         super("Manage");
         super.setName("manage");
-
         this.session = session;
         this.parent = parent;
-
-        super.add(createDatasets(parent, messagePanel));
-        super.add(createCases(parent, messagePanel));
-        super.addSeparator();
-        super.add(createDatasetTypes(parent, messagePanel));
-        super.add(createSectors(parent, messagePanel));
-        super.addSeparator();
-        super.add(createControlMeasures(parent, messagePanel));
-        super.add(createControlStrategies(parent, messagePanel));
-        super.add(createControlPrograms(parent, messagePanel));
-        super.addSeparator();
-        super.add(createSectorScenario(parent, messagePanel));
-        super.addSeparator();
-        super.add(createMPSDT(parent, messagePanel));
-        super.addSeparator();
-
-        manageUsers(session.user(), messagePanel);
-        super.add(createMyProfile(session, messagePanel));
+        this.messagePanel = messagePanel;
     }
 
     public ManageMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, DesktopManager desktopManager) {
@@ -324,6 +314,44 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+    }
+
+    public void display() {
+        String showMPSDTMenu = null;
+        String showSectorScenarioMenu = null;
+        String showCasesMenu = null;
+        try {
+            showMPSDTMenu = presenter.getPropertyValue(SHOW_MP_SDT_MENU);
+            showSectorScenarioMenu = presenter.getPropertyValue(SHOW_SECTOR_SCENARIO_MENU);
+            showCasesMenu = presenter.getPropertyValue(SHOW_CASES_MENU);
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        super.add(createDatasets(parent, messagePanel));
+        if ((showCasesMenu == null) || (!showCasesMenu.equalsIgnoreCase("false"))) {
+            super.add(createCases(parent, messagePanel));
+        }
+        super.addSeparator();
+        super.add(createDatasetTypes(parent, messagePanel));
+        super.add(createSectors(parent, messagePanel));
+        super.addSeparator();
+        super.add(createControlMeasures(parent, messagePanel));
+        super.add(createControlStrategies(parent, messagePanel));
+        super.add(createControlPrograms(parent, messagePanel));
+        super.addSeparator();
+        if ((showSectorScenarioMenu == null) || (!showSectorScenarioMenu.equalsIgnoreCase("false"))) {
+            super.add(createSectorScenario(parent, messagePanel));
+            super.addSeparator();
+        }
+        if ((showMPSDTMenu == null) || (!showMPSDTMenu.equalsIgnoreCase("false"))) {
+            super.add(createMPSDT(parent, messagePanel));
+            super.addSeparator();
+        }
+
+        manageUsers(session.user(), messagePanel);
+        super.add(createMyProfile(session, messagePanel));
     }
 
 }

@@ -116,11 +116,13 @@ public class ExportSelectionDialog extends Dialog {
 
         pollutant = new ComboBox(pollutants);
         pollutant.setEnabled(false);
-        pollutant.setSelectedIndex(0);
+        if (pollutant.getItemCount() > 0)
+            pollutant.setSelectedIndex(0);
         layoutGenerator.addLabelWidgetPair("Pollutant to Include: ", pollutant, panel);
         projectionShapeFile = new ComboBox(projectionShapeFiles);
         projectionShapeFile.setEnabled(false);
-        projectionShapeFile.setSelectedIndex(0);
+        if (projectionShapeFile.getItemCount() > 0)
+            projectionShapeFile.setSelectedIndex(0);
         layoutGenerator.addLabelWidgetPair("Output Shapefile Template:", projectionShapeFile, panel);
 
         // Lay out the panel.
