@@ -11,4 +11,6 @@ public interface ControlStrategyManagerView extends ManagedView {
     void observe(ControlStrategiesManagerPresenterImpl presenter);
 
     void refresh(ControlStrategy[] controlStrategies) throws EmfException;
+
+    void displayControlStrategyComparisonResult(String string, String absolutePath);
 }

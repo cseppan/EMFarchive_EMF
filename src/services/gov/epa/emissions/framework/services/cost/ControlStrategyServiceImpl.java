@@ -1,21 +1,27 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.DeepCopy;
+import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
+import gov.epa.emissions.framework.services.casemanagement.SQLCompareCasesQuery;
 import gov.epa.emissions.framework.services.cost.analysis.SummarizeStrategy;
 import gov.epa.emissions.framework.services.cost.analysis.StrategySummaryFactory;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyConstraint;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.SQLCompareControlStrategiesQuery;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.qa.QueryToString;
+import gov.epa.emissions.framework.services.qa.SQLCompareControlStrategyQuery;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.io.File;
@@ -599,4 +605,21 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         return true;
     }
     
+    public String getControlStrategyComparisonResult(int[] controlStrategyIds) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        try {
+            return new QueryToString(dbServer, new SQLCompareControlStrategiesQuery().createCompareQuery(controlStrategyIds), ",").toString();
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not retrieve control strategy comparison result: " + e.getMessage(), e);
+        } catch (ExporterException e) {
+            throw new EmfException("Could not retrieve control strategy comparison result: " + e.getMessage(), e);
+        } finally {
+            try {
+                if (dbServer != null && dbServer.isConnected())
+                    dbServer.disconnect();
+            } catch (Exception e) {
+                throw new EmfException("ControlStrategyService: error closing db server. " + e.getMessage());
+            }
+        }
+    }
 }

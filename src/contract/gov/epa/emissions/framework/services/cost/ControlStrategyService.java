@@ -66,5 +66,7 @@ public interface ControlStrategyService extends EMFService {
     public String getStrategyRunStatus(int id) throws EmfException;
     
     public String getCoSTSUs() throws EmfException;
+
+    String getControlStrategyComparisonResult(int[] controlStrategyIds) throws EmfException;
     
 }

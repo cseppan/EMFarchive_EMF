@@ -32,4 +32,6 @@ public interface ControlStrategiesManagerPresenter {
     LightControlMeasure[] getControlMeasures();
 
     void loadControlMeasures() throws EmfException;
+
+    void viewControlStrategyComparisonResult(int[] ids, String string) throws EmfException;
 }

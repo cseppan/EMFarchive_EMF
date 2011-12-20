@@ -1,5 +1,11 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.util.UUID;
+
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyPresenter;
@@ -8,6 +14,8 @@ import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditContro
 import gov.epa.emissions.framework.client.cost.controlstrategy.viewer.ViewControlStrategyPresenter;
 import gov.epa.emissions.framework.client.cost.controlstrategy.viewer.ViewControlStrategyPresenterImpl;
 import gov.epa.emissions.framework.client.cost.controlstrategy.viewer.ViewControlStrategyView;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
@@ -106,4 +114,54 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
     public void loadControlMeasures() throws EmfException {
         controlMeasures = session.controlMeasureService().getLightControlMeasures();
     }
+
+    public void viewControlStrategyComparisonResult(int[] controlStrategyIds, String exportDir) throws EmfException {
+        if (controlStrategyIds == null || controlStrategyIds.length == 0)
+            throw new EmfException("No cases to compare.");
+        
+        File localFile = new File(tempQAStepFilePath(exportDir));
+        try {
+            if (!localFile.exists()) {
+                Writer output = new BufferedWriter(new FileWriter(localFile));
+                try {
+                    output.write(  
+//                            writerHeader(qaStep, qaResult, dataset.getName())
+                            ""+ getControlStrategyComparisonResult(controlStrategyIds) 
+                            );
+                }
+                finally {
+                    output.close();
+                }
+            }
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+        
+        view.displayControlStrategyComparisonResult("Control Strategy Comparison", localFile.getAbsolutePath());
+    }
+    
+    private String tempQAStepFilePath(String exportDir) throws EmfException {
+        String separator = File.separator; 
+        UserPreference preferences = new DefaultUserPreferences();
+        String tempDir = preferences.localTempDir();
+//        String separator = exportDir.length() > 0 ? (exportDir.charAt(0) == '/') ? "/" : "\\" : "\\";
+//        String tempDir = System.getProperty("IMPORT_EXPORT_TEMP_DIR"); 
+
+        if (tempDir == null || tempDir.isEmpty())
+            tempDir = System.getProperty("java.io.tmpdir");
+
+        File tempDirFile = new File(tempDir);
+
+        if (!(tempDirFile.exists() && tempDirFile.isDirectory() && tempDirFile.canWrite() && tempDirFile.canRead()))
+            throw new EmfException("Import-export temporary folder does not exist or lacks write permissions: "
+                    + tempDir);
+
+
+        return tempDir + separator + (UUID.randomUUID()).toString().replaceAll("-", "") + ".csv"; // this is how exported file name was
+    }
+
+    private String getControlStrategyComparisonResult(int[] caseIds) throws EmfException {
+        return service().getControlStrategyComparisonResult(caseIds);
+    }
+
 }

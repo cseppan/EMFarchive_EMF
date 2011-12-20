@@ -314,4 +314,13 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (String) call.requestResponse(new Object[] { });
     }
 
+    public String getControlStrategyComparisonResult(int[] controlStrategyIds) throws EmfException {
+        EmfCall call = call();
+        call.setOperation("getControlStrategyComparisonResult");
+        call.addParam("controlStrategyIds", mappings.integers());
+        call.setStringReturnType();
+        
+        return (String) call.requestResponse(new Object[] { controlStrategyIds });
+    }
+
 }

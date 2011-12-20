@@ -263,6 +263,19 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         });
         crudPanel.add(copyButton);
 
+        Button compareButton = new Button("Compare", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
+                try {
+                    compareControlStrategies();
+                } catch (EmfException e1) {
+                    // NOTE Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        crudPanel.add(compareButton);
+        
 
         return crudPanel;
     }
@@ -382,6 +395,22 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         }
     }
     
+    private void compareControlStrategies() throws EmfException {
+        List strategies = selected();
+
+        if (strategies.isEmpty()) {
+            messagePanel.setMessage("Please select at least one control strategy to compare");
+            return;
+        }
+
+        int[] ids = new int[strategies.size()];
+        
+        for (int i = 0; i < strategies.size(); ++i) {
+            ids[i] = ((ControlStrategy)strategies.get(i)).getId();
+        }
+        presenter.viewControlStrategyComparisonResult(ids, "");
+    }
+
     private void copySelectedStrategy() throws EmfException {
         boolean error = false;
         messagePanel.clear();
@@ -422,4 +451,10 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     public EmfConsole getParentConsole() {
         return parentConsole;
     }
+    
+    public void displayControlStrategyComparisonResult(String qaStepName, String exportedFileName) {
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp("View QA Step Results: " + qaStepName, new Dimension(500, 500), desktopManager, parentConsole);
+        app.display(new String[] { exportedFileName });
+    }   
+
 }
