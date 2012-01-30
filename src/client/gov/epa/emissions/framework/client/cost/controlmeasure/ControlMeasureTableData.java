@@ -116,7 +116,7 @@ public class ControlMeasureTableData extends AbstractTableData {
                 }
             }
             if (!found) {
-                Object[] values = { measure.getName(), measure.getAbbreviation(), getPollutantName(pollutant),
+                Object[] values = { measure.getName(), measure.getAbbreviation(), (majorPollutant ? getPollutantName(measure) : getPollutantName(pollutant)),
                         NAN_VALUE, NAN_VALUE, NAN_VALUE, 
                         NAN_VALUE, NAN_VALUE, NAN_VALUE, 
                         NAN_VALUE, NAN_VALUE, getControlTechnology(measure), 
