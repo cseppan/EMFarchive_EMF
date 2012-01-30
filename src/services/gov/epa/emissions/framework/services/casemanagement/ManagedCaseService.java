@@ -3756,6 +3756,15 @@ public class ManagedCaseService {
         // Check if logs dir (jobpath/logs) exists, if not create
         File logDir = new File(file.getParent() + System.getProperty("file.separator") + "logs");
 
+        //first find root parent directory that don't exist
+        List<File> missingDirectoryList = new ArrayList<File>();
+        File missingParentDirectory = logDir.getParentFile();
+        while (!missingParentDirectory.exists()) {
+            missingDirectoryList.add(missingParentDirectory);
+            missingParentDirectory = missingParentDirectory.getParentFile();
+        }
+        
+        //now create the log directory and make it readable, writable, and executable by everyone
         if (!(logDir.isDirectory())) {
             // Need to create the directory
             if (!(logDir.mkdirs())) {
@@ -3766,8 +3775,24 @@ public class ManagedCaseService {
             if (!logDir.setWritable(true, false)) {
                 throw new EmfException("Error changing job log directory's write permissions: " + logDir);
             }
+
+            // Make directory writable by everyone
+            if (!logDir.setExecutable(true, false)) {
+                throw new EmfException("Error changing job log directory's executable permissions: " + logDir);
+            }
+
+            // Make directory writable by everyone
+            if (!logDir.setReadable(true, false)) {
+                throw new EmfException("Error changing job log directory's readable permissions: " + logDir);
+            }
         }
-        logDir.getParentFile().setWritable(true, false);
+
+        //next give each parent directory the appropriate permission
+        for (File missingParentDir : missingDirectoryList) {
+            missingParentDir.setWritable(true, false);
+            missingParentDir.setExecutable(true, false);
+            missingParentDir.setReadable(true, false);
+        }
 
         // Create the logFile full name
         logFileName = logDir + System.getProperty("file.separator") + logFileName;

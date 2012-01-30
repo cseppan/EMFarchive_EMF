@@ -212,6 +212,19 @@ public class ManagedExportService {
         if ((inputDir == null) || (inputDir.length() == 0))
             throw new EmfException("Please specify an Input Folder on the Inputs tab");
 
+//        if (!file.getParentFile().isDirectory()) {
+//            // Need to create the directory
+//            if (!file.getParentFile().mkdirs()) {
+//                throw new EmfException("Error creating job log parent directory: " + file.getParentFile());
+//            }
+//
+//            // Make directory writable by everyone
+//            if (!file.getParentFile().setWritable(true, false)) {
+//                throw new EmfException("Error changing job log directory's write permissions: " + file.getParentFile());
+//            }
+//        }
+        
+        
         String inputDirExpanded;
         try {
             // input Dir is case general, therefore don't pass job, sector, or region
@@ -224,11 +237,30 @@ public class ManagedExportService {
 
         File inputsDir = new File(inputDirExpanded);
 
+        //recursively give parent directories appropriate permissions
+        //first find root parent directory
+        List<File> missingDirectoryList = new ArrayList<File>();
+        File missingParentDirectory = inputsDir.getParentFile();
+        while (!missingParentDirectory.exists()) {
+            missingDirectoryList.add(missingParentDirectory);
+            missingParentDirectory = missingParentDirectory.getParentFile();
+        }
+        
+        //now create ALL the directories and make it writable
         if (!inputsDir.exists()) {
             inputsDir.mkdirs();
             inputsDir.setWritable(true, false);
+            inputsDir.setExecutable(true, false);
+            inputsDir.setReadable(true, false);
         }
 
+        //next give each parent directory the appropriate permission
+        for (File missingParentDir : missingDirectoryList) {
+            missingParentDir.setWritable(true, false);
+            missingParentDir.setExecutable(true, false);
+            missingParentDir.setReadable(true, false);
+        }
+        
         Iterator<CaseInput> iter = inputs.iterator();
 
         // Make parent directory if doesn't exist
@@ -309,6 +341,8 @@ public class ManagedExportService {
         while (dir != null) {
             try {
                 dir.setWritable(true, false);
+                dir.setExecutable(true, false);
+                dir.setReadable(true, false);
                 if (dir.compareTo(base) == 0)
                     return;
             } catch (Exception e) {
