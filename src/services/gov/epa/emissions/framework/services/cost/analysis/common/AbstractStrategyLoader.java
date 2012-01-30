@@ -298,17 +298,29 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         dataTable.addIndex(table, "version", false);
         dataTable.addIndex(table, "delete_versions", false);
 
+        //for orl inventories
         dataTable.addIndex(table, "fips", false);
-        dataTable.addIndex(table, "poll", false);
-        dataTable.addIndex(table, "scc", false);
         dataTable.addIndex(table, "plantid", false);
         dataTable.addIndex(table, "pointid", false);
         dataTable.addIndex(table, "stackid", false);
         dataTable.addIndex(table, "segment", false);
         dataTable.addIndex(table, "mact", false);
         dataTable.addIndex(table, "sic", false);
-        dataTable.addIndex(table, "naics", false);
 
+        dataTable.addIndex(table, "poll", false);
+        dataTable.addIndex(table, "scc", false);
+        dataTable.addIndex(table, "naics", false);
+        
+        //for flat file inventories
+        dataTable.addIndex(table, "country_cd", false);
+        dataTable.addIndex(table, "region_cd", false);
+        dataTable.addIndex(table, "tribal_code", false);
+        dataTable.addIndex(table, "facility_id", false);
+        dataTable.addIndex(table, "unit_id", false);
+        dataTable.addIndex(table, "rel_point_id", false);
+        dataTable.addIndex(table, "process_id", false);
+        dataTable.addIndex(table, "reg_codes", false);
+        
         //finally analyze the table, so the indexes take affect immediately, 
         //NOT when the SQL engine gets around to analyzing eventually
         dataTable.analyzeTable(table);
@@ -679,7 +691,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
                     + ".");
         } catch (SQLException e) {
             if (DebugLevels.DEBUG_25())
-                System.out.println("SQLException runStrategyUsingSQLApproach");
+                System.out.println("SQLException populateStrategyMessagesDataset\n"  + e.getMessage());
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
             //

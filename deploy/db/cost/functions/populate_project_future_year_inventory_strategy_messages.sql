@@ -1,4 +1,4 @@
-/*
+﻿/*
 
 select * from emf.control_strategies where strategy_type_id = 10;
 select * from emf.strategy_results where control_strategy_id = 137;
@@ -12,6 +12,7 @@ SELECT public.validate_project_future_year_inventory_control_programs(137);
 SELECT public.populate_project_future_year_inventory_strategy_messages(137, 5583)
 SELECT public.populate_project_future_year_inventory_strategy_messages(137, 5589)
 SELECT public.populate_project_future_year_inventory_strategy_messages(137, 6109)
+SELECT public.populate_project_future_year_inventory_strategy_messages(137, 6464);
 */
 
 
@@ -33,41 +34,12 @@ DECLARE
 	strategy_messages_table_name varchar(64) := '';
 	county_dataset_id integer := null;
 	county_dataset_version integer := null;
-	region RECORD;
 	control_program RECORD;
 	inventory_record RECORD;
-	target_pollutant_id integer := 0;
-	measures_count integer := 0;
-	measure_with_region_count integer := 0;
-	measure_classes_count integer := 0;
 	county_dataset_filter_sql text := '';
 	control_program_dataset_filter_sql text := '';
-	cost_year integer := null;
 	inventory_year integer := null;
 	is_point_table boolean := false;
-	use_cost_equations boolean := false;
-	gimme_count integer := 0;
-	min_emis_reduction_constraint real := null;
-	min_control_efficiency_constraint real := null;
-	max_cost_per_ton_constraint real := null;
-	max_ann_cost_constraint real := null;
-	has_constraints boolean := null;
-	ref_cost_year integer := 2006;
-	cost_year_chained_gdp double precision := null;
-	ref_cost_year_chained_gdp double precision := null;
-	chained_gdp_adjustment_factor double precision := null;
-	discount_rate double precision;
-	has_design_capacity_columns boolean := false; 
-	has_sic_column boolean := false; 
-	has_naics_column boolean := false;
-	has_mact_column boolean := false;
-	has_target_pollutant integer := 0;
-	has_rpen_column boolean := false;
-	has_cpri_column boolean := false;
-	has_primary_device_type_code_column boolean := false;
-	column_name character varying;
-	has_control_measures_col boolean := false;
-	has_pct_reduction_col boolean := false;
 	sql character varying := '';
 	compliance_date_cutoff_daymonth varchar(256) := '';
 	effective_date_cutoff_daymonth varchar(256) := '';
@@ -75,6 +47,14 @@ DECLARE
 	unused_plant_closure_packet_records_sql text := '';
 	unused_control_packet_records_sql text := '';
 	inventory_count integer := 0;
+	
+	--support for flat file ds types...
+	dataset_type_name character varying(255) = '';
+	fips_expression character varying(64) = 'fips';
+	plantid_expression character varying(64) = 'plantid';
+	pointid_expression character varying(64) = 'pointid';
+	stackid_expression character varying(64) = 'stackid';
+	segment_expression character varying(64) = 'segment';
 BEGIN
 
 	-- get the detailed result dataset info
@@ -87,71 +67,17 @@ BEGIN
 	into strategy_messages_dataset_id,
 		strategy_messages_table_name;
 
-	-- see if control strategy has only certain measures specified
-	SELECT count(id), 
-		count(case when region_dataset_id is not null then 1 else null end)
-	FROM emf.control_strategy_measures 
-	where control_strategy_measures.control_strategy_id = int_control_strategy_id 
-	INTO measures_count, 
-		measure_with_region_count;
-
-	-- see if measure classes were specified
-	IF measures_count = 0 THEN
-		SELECT count(1)
-		FROM emf.control_strategy_classes 
-		where control_strategy_classes.control_strategy_id = int_control_strategy_id
-		INTO measure_classes_count;
-	END IF;
-
 	-- get target pollutant, inv filter, and county dataset info if specified
-	SELECT cs.pollutant_id,
-		case when length(trim(cs.filter)) > 0 then '(' || cs.filter || ')' else null end,
-		cs.cost_year,
+	SELECT case when length(trim(cs.filter)) > 0 then '(' || cs.filter || ')' else null end,
 		cs.analysis_year,
 		cs.county_dataset_id,
-		cs.county_dataset_version,
-		cs.use_cost_equations,
-		cs.discount_rate / 100
+		cs.county_dataset_version
 	FROM emf.control_strategies cs
 	where cs.id = int_control_strategy_id
-	INTO target_pollutant_id,
-		strat_inv_filter,
-		cost_year,
+	INTO strat_inv_filter,
 		inventory_year,
 		county_dataset_id,
-		county_dataset_version,
-		use_cost_equations,
-		discount_rate;
-
-	-- get strategy constraints
-	SELECT max_emis_reduction,
-		max_control_efficiency,
-		min_cost_per_ton,
-		min_ann_cost
-	FROM emf.control_strategy_constraints csc
-	where csc.control_strategy_id = int_control_strategy_id
-	INTO min_emis_reduction_constraint,
-		min_control_efficiency_constraint,
-		max_cost_per_ton_constraint,
-		max_ann_cost_constraint;
-
-	select case when min_emis_reduction_constraint is not null 
-		or min_control_efficiency_constraint is not null 
-		or max_cost_per_ton_constraint is not null 
-		or max_ann_cost_constraint is not null then true else false end
-	into has_constraints;
-
-	-- get gdp chained values
-	SELECT chained_gdp
-	FROM reference.gdplev
-	where annual = cost_year
-	INTO cost_year_chained_gdp;
-	SELECT chained_gdp
-	FROM reference.gdplev
-	where annual = ref_cost_year
-	INTO ref_cost_year_chained_gdp;
-
-	chained_gdp_adjustment_factor := cost_year_chained_gdp / ref_cost_year_chained_gdp;
+		county_dataset_version;
 
 	-- load the Compliance and Effective Date Cutoff Day/Month (Stored as properties)
 	select value
@@ -165,13 +91,6 @@ BEGIN
 	into effective_date_cutoff_daymonth;
 	effective_date_cutoff_daymonth := coalesce(effective_date_cutoff_daymonth, '07/01');	--default just in case
 	
-	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
-	IF county_dataset_id is not null THEN
-		county_dataset_filter_sql := ' and inv.fips in (SELECT fips
-			FROM emissions.' || (SELECT table_name FROM emf.internal_sources where dataset_id = county_dataset_id) || '
-			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
-	END IF;
-
 
 	-- setup temp table -- it will help track issues...
 	EXECUTE '
@@ -202,7 +121,8 @@ BEGIN
 		'select lower(i.table_name) as table_name, 
 			inv.dataset_id, 
 			inv.dataset_version,
-			d.name as dataset_name
+			d.name as dataset_name,
+			dt.name as dataset_type_name
 		 from emf.input_datasets_control_strategies inv
 
 			inner join emf.internal_sources i
@@ -211,37 +131,41 @@ BEGIN
 			inner join emf.datasets d
 			on d.id = inv.dataset_id
 
+			inner join emf.dataset_types dt
+			on d.dataset_type = dt.id
+
 		where inv.control_strategy_id = ' || int_control_strategy_id
 	LOOP
 
 		-- get the input dataset info
-		select inventory_record.table_name
-		into inv_table_name;
+		select inventory_record.table_name, inventory_record.dataset_type_name
+		into inv_table_name, dataset_type_name;
+
+		--if Flat File 2010 Types then change primary key field expression variables...
+		IF dataset_type_name = 'Flat File 2010 Point' or dataset_type_name = 'Flat File 2010 Nonpoint' THEN
+			fips_expression = 'region_cd';
+			plantid_expression = 'facility_id';
+			pointid_expression = 'unit_id';
+			stackid_expression = 'rel_point_id';
+			segment_expression = 'process_id';
+		ELSE
+			fips_expression = 'fips';
+			plantid_expression = 'plantid';
+			pointid_expression = 'pointid';
+			stackid_expression = 'stackid';
+			segment_expression = 'segment';
+		END If;
+
+		-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
+		IF county_dataset_id is not null THEN
+			county_dataset_filter_sql := ' and inv.' || fips_expression || ' in (SELECT fips
+				FROM emissions.' || (SELECT table_name FROM emf.internal_sources where dataset_id = county_dataset_id) || '
+				where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
+		END IF;
 
 		-- see if there are point specific columns in the inventory
-		is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
+		is_point_table := public.check_table_for_columns(inv_table_name, '' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '', ',');
 		
-		-- see if there is a mact column in the inventory
-		has_mact_column := public.check_table_for_columns(inv_table_name, 'mact', ',');
-
-		-- see if there is a sic column in the inventory
-		has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
-
-		-- see if there is a naics column in the inventory
-		has_naics_column := public.check_table_for_columns(inv_table_name, 'naics', ',');
-
-		-- see if there is a rpen column in the inventory
-		has_rpen_column := public.check_table_for_columns(inv_table_name, 'rpen', ',');
-
-		-- see if there is a cpri column in the inventory
-		has_cpri_column := public.check_table_for_columns(inv_table_name, 'cpri', ',');
-
-		-- see if there is a primary_device_type_code column in the inventory
-		has_primary_device_type_code_column := public.check_table_for_columns(inv_table_name, 'primary_device_type_code', ',');
-
-		-- see if there is design capacity columns in the inventory
-		has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',');
-
 		-- build version info into where clause filter
 		inv_filter := '(' || public.build_version_where_filter(inventory_record.dataset_id, inventory_record.dataset_version, 'inv') || ')' || coalesce(' and ' || public.alias_filter(strat_inv_filter, inv_table_name, 'inv'), '');
 
@@ -299,12 +223,12 @@ raise notice '%', 'now lets evaluate each packet and see what we find' || clock_
 				FROM emissions.' || inv_table_name || ' inv
 
 					inner join emissions.' || control_program.table_name || ' pc
-					on pc.fips = inv.fips
+					on pc.fips = inv.' || fips_expression || '
 					' || case when is_point_table then '
-					and pc.plantid = inv.plantid
-					and coalesce(pc.pointid, inv.pointid) = inv.pointid
-					and coalesce(pc.stackid, inv.stackid) = inv.stackid
-					and coalesce(pc.segment, inv.segment) = inv.segment
+					and pc.plantid = inv.' || plantid_expression || '
+					and coalesce(pc.pointid, inv.' || pointid_expression || ') = inv.' || pointid_expression || '
+					and coalesce(pc.stackid, inv.' || stackid_expression || ') = inv.' || stackid_expression || '
+					and coalesce(pc.segment, inv.' || segment_expression || ') = inv.' || segment_expression || '
 					' else '' end || '
 
 					-- only keep if before cutoff date
@@ -343,17 +267,17 @@ raise notice '%', 'now lets evaluate each packet and see what we find' || clock_
 					FROM emissions.' || control_program.table_name || ' pc
 
 						left outer join emissions.' || inv_table_name || ' inv
-						on pc.fips = inv.fips
+						on pc.fips = inv.' || fips_expression || '
 						' || case when not is_point_table then '
 						and pc.plantid is null
 						and pc.pointid is null
 						and pc.stackid is null
 						and pc.segment is null
 						' else '
-						and pc.plantid = inv.plantid
-						and coalesce(pc.pointid, inv.pointid) = inv.pointid
-						and coalesce(pc.stackid, inv.stackid) = inv.stackid
-						and coalesce(pc.segment, inv.segment) = inv.segment
+						and pc.plantid = inv.' || plantid_expression || '
+						and coalesce(pc.pointid, inv.' || pointid_expression || ') = inv.' || pointid_expression || '
+						and coalesce(pc.stackid, inv.' || stackid_expression || ') = inv.' || stackid_expression || '
+						and coalesce(pc.segment, inv.' || segment_expression || ') = inv.' || segment_expression || '
 						' end || '
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 						and inv.record_id is null
@@ -569,7 +493,7 @@ raise notice '%', 'check inventory ' || inventory_record.dataset_name || ' again
 		)
 		and applies_to_inventory = false';
 
-	-- report issues where packet didn't any sources...
+	-- report issues where packet didn't affect any sources...
 	if length(unused_control_packet_records_sql) > 0 then
 
 

@@ -1,4 +1,4 @@
-/*
+﻿/*
 select public.run_project_future_year_inventory(
 	153, --int_control_strategy_id, 
 	349, --input_dataset_id, 
@@ -6,6 +6,7 @@ select public.run_project_future_year_inventory(
 	6117 --strategy_result_id
 	);
 SELECT public.run_project_future_year_inventory(137, 5048, 0, 6147);
+SELECT public.run_project_future_year_inventory(137, 8292, 0, 6469);
 */
 
 DROP FUNCTION public.run_project_future_year_inventory(integer, integer, integer, integer);
@@ -60,10 +61,11 @@ DECLARE
 	has_mact_column boolean := false;
 	has_target_pollutant integer := 0;
 	has_rpen_column boolean := false;
-	has_cpri_column boolean := false;
+	has_' || segment_expression || '_column boolean := false;
 	has_primary_device_type_code_column boolean := false;
 	has_latlong_columns boolean := false;
 	has_plant_column boolean := false;
+	has_facility_name_column boolean := false;
 	annualized_uncontrolled_emis_sql character varying;
 	uncontrolled_emis_sql character varying;
 	emis_sql character varying;
@@ -79,6 +81,16 @@ DECLARE
 	sql character varying := '';
 	compliance_date_cutoff_daymonth varchar(256) := '';
 	effective_date_cutoff_daymonth varchar(256) := '';
+
+	--support for flat file ds types...
+	dataset_type_name character varying(255) := '';
+	fips_expression character varying(64) := 'fips';
+	plantid_expression character varying(64) := 'plantid';
+	pointid_expression character varying(64) := 'pointid';
+	stackid_expression character varying(64) := 'stackid';
+	segment_expression character varying(64) := 'segment';
+	is_flat_file_inventory boolean := false;
+	is_flat_file_point_inventory boolean := false;
 BEGIN
 
 	-- get the input dataset info
@@ -86,6 +98,33 @@ BEGIN
 	from emf.internal_sources i
 	where i.dataset_id = input_dataset_id
 	into inv_table_name;
+
+	--get dataset type name
+	select dataset_types."name"
+	from emf.datasets
+	inner join emf.dataset_types
+	on datasets.dataset_type = dataset_types.id
+	where datasets.id = input_dataset_id
+	into dataset_type_name;
+
+	--if Flat File 2010 Types then change primary key field expression variables...
+	IF dataset_type_name = 'Flat File 2010 Point' or dataset_type_name = 'Flat File 2010 Nonpoint' THEN
+		fips_expression := 'region_cd';
+		plantid_expression := 'facility_id';
+		pointid_expression := 'unit_id';
+		stackid_expression := 'rel_point_id';
+		segment_expression := 'process_id';
+		is_flat_file_inventory := true;
+		IF dataset_type_name = 'Flat File 2010 Point' THEN
+			is_flat_file_point_inventory := true;
+		END IF;
+	ELSE
+		fips_expression := 'fips';
+		plantid_expression := 'plantid';
+		pointid_expression := 'pointid';
+		stackid_expression := 'stackid';
+		segment_expression := 'segment';
+	END If;
 
 	-- get the detailed result dataset info
 	select sr.detailed_result_dataset_id,
@@ -135,7 +174,7 @@ BEGIN
 		discount_rate;
 
 	-- see if there are point specific columns in the inventory
-	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
+	is_point_table := public.check_table_for_columns(inv_table_name, '' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '', ',');
 
 	-- see if there is a mact column in the inventory
 	has_mact_column := public.check_table_for_columns(inv_table_name, 'mact', ',');
@@ -156,14 +195,15 @@ BEGIN
 	has_primary_device_type_code_column := public.check_table_for_columns(inv_table_name, 'primary_device_type_code', ',');
 
 	-- see if there is design capacity columns in the inventory
-	has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',');
+	has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',')
+		or public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_units', ',');
 
 	-- see if there is lat & long columns in the inventory
 	has_latlong_columns := public.check_table_for_columns(inv_table_name, 'xloc,yloc', ',');
 
-	-- see if there is lat & long columns in the inventory
+	-- see if there is plant column in the inventory
 	has_plant_column := public.check_table_for_columns(inv_table_name, 'plant', ',');
-
+	has_facility_name_column := public.check_table_for_columns(inv_table_name, 'facility_name', ',');
 
 	-- get strategy constraints
 	SELECT max_emis_reduction,
@@ -187,12 +227,15 @@ BEGIN
 		or max_ann_cost_constraint is not null then true else false end
 	into has_constraints;
 
-	-- get month of the dataset, 0 (Zero) indicates an annual inventory
-	select public.get_dataset_month(input_dataset_id)
-	into dataset_month;
+	--if Flat File 2010 Types then change primary key field expression variables...
+	IF  Not (dataset_type_name = 'Flat File 2010 Point' or dataset_type_name = 'Flat File 2010 Nonpoint') THEN
+		-- get month of the dataset, 0 (Zero) indicates an annual inventory
+		select public.get_dataset_month(input_dataset_id)
+		into dataset_month;
 
-	select public.get_days_in_month(dataset_month, inventory_year)
-	into no_days_in_month;
+		select public.get_days_in_month(dataset_month, inventory_year)
+		into no_days_in_month;
+	END IF;
 
 	-- get gdp chained values
 	SELECT chained_gdp
@@ -219,26 +262,32 @@ BEGIN
 	effective_date_cutoff_daymonth := coalesce(effective_date_cutoff_daymonth, '07/01');	--default just in case
 	
 	uncontrolled_emis_sql := 
-			case 
-				when dataset_month != 0 then 
-					'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
-				else 
-					'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
-			end;
+		case 
+			when is_flat_file_inventory then 
+				'case when (1 - coalesce(case when inv.ann_pct_red = 100.0 and inv.ann_value > 0.0 then 0.0 else inv.ann_pct_red end / 100 , 0)) != 0 then inv.ann_value / (1 - coalesce(case when inv.ann_pct_red = 100.0 and inv.ann_value > 0.0 then 0.0 else inv.ann_pct_red end / 100 , 0)) else 0.0::double precision end' 
+			when dataset_month != 0 then 
+				'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+			else 
+				'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+		end;
 	emis_sql := 
-			case 
-				when dataset_month != 0 then 
-					'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' 
-				else 
-					'inv.ann_emis' 
-			end;
+		case 
+			when is_flat_file_inventory then 
+				'inv.ann_value' 
+			when dataset_month != 0 then 
+				'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' 
+			else 
+				'inv.ann_emis' 
+		end;
 	annualized_uncontrolled_emis_sql := 
-			case 
-				when dataset_month != 0 then 
-					'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * 365, inv.ann_emis) / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
-				else 
-					'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
-			end;
+		case 
+			when is_flat_file_inventory then 
+				'case when (1 - coalesce(case when inv.ann_pct_red = 100.0 and inv.ann_value > 0.0 then 0.0 else inv.ann_pct_red end / 100 , 0)) != 0 then inv.ann_value / (1 - coalesce(case when inv.ann_pct_red = 100.0 and inv.ann_value > 0.0 then 0.0 else inv.ann_pct_red end / 100 , 0)) else 0.0::double precision end' 
+			when dataset_month != 0 then 
+				'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then coalesce(inv.avd_emis * 365, inv.ann_emis) / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+			else 
+				'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then inv.ann_emis / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+		end;
 
 
 
@@ -247,7 +296,7 @@ BEGIN
 
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
-		county_dataset_filter_sql := ' and inv.fips in (SELECT fips
+		county_dataset_filter_sql := ' and inv.' || fips_expression || ' in (SELECT fips
 			FROM emissions.' || (SELECT table_name FROM emf.internal_sources where dataset_id = county_dataset_id) || '
 			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
 	END IF;
@@ -335,8 +384,8 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 				''PLTCLOSURE'' as abbreviation,
 				inv.poll,
 				inv.scc,
-				inv.fips,
-				' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
+				inv.' || fips_expression || ',
+				' || case when is_point_table = false then '' else 'inv.' || plantid_expression || ', inv.' || pointid_expression || ', inv.' || stackid_expression || ', inv.' || segment_expression || ', ' end || '
 				null::double precision as operation_maintenance_cost,
 				null::double precision as annualized_capital_cost,
 				null::double precision as capital_cost,
@@ -346,17 +395,17 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 				null::double precision as rule_pen,
 				null::double precision as rule_eff,
 				null::double precision as percent_reduction,
-				inv.ceff,
-				' || case when is_point_table = false then 'case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end' else '100' end || ',
-				case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end,
+				' || case when is_flat_file_inventory then 'inv.ann_pct_red' else 'inv.ceff' end || ',
+				' || case when is_flat_file_inventory then '100.0' when is_point_table = false then 'case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end' else '100' end || ',
+				' || case when is_flat_file_inventory then '100.0' else 'case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end' end || ',
 				0.0 as final_emissions,
 				' || emis_sql || ' as emis_reduction,
 				' || emis_sql || ' as inv_emissions,
 --				' || emis_sql || ' as input_emis,
 --				0.0 as output_emis,
 				0,
-				substr(inv.fips, 1, 2),
-				substr(inv.fips, 3, 3),
+				substr(inv.' || fips_expression || ', 1, 2),
+				substr(inv.' || fips_expression || ', 3, 3),
 				' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
 				' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 				inv.record_id::integer as source_id,
@@ -365,18 +414,18 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 				null::integer as control_measures_id,
 				null::varchar(255) as equation_type,
 				' || quote_literal(control_program.control_program_name) || ',
-				' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
-				' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
+				' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' when is_flat_file_point_inventory then 'inv.longitude,inv.latitude,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
+				' || case when has_plant_column then 'inv.plant' when has_facility_name_column then 'inv.facility_name' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
 				''''
 			FROM emissions.' || inv_table_name || ' inv
 
 				inner join emissions.' || control_program.table_name || ' pc
-				on pc.fips = inv.fips
+				on pc.fips = inv.' || fips_expression || '
 				' || case when is_point_table then '
-				and pc.plantid = inv.plantid
-				and coalesce(pc.pointid, inv.pointid) = inv.pointid
-				and coalesce(pc.stackid, inv.stackid) = inv.stackid
-				and coalesce(pc.segment, inv.segment) = inv.segment
+				and pc.plantid = inv.' || plantid_expression || '
+				and coalesce(pc.pointid, inv.' || pointid_expression || ') = inv.' || pointid_expression || '
+				and coalesce(pc.stackid, inv.' || stackid_expression || ') = inv.' || stackid_expression || '
+				and coalesce(pc.segment, inv.' || segment_expression || ') = inv.' || segment_expression || '
 				' else '' end || '
 
 				-- only keep if before cutoff date
@@ -385,7 +434,7 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 				and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'pc') || '
 
 				' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
-				on fipscode.state_county_fips = inv.fips
+				on fipscode.state_county_fips = inv.' || fips_expression || '
 				and fipscode.country_num = ''0''' else '' end || '
 
 			where 	' || '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || public.alias_filter(inv_filter, inv_table_name, 'inv'::character varying(64)), '') || coalesce(county_dataset_filter_sql, '') || '
@@ -549,8 +598,8 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			''PROJECTION'' as abbreviation,
 			inv.poll,
 			inv.scc,
-			inv.fips,
-			' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
+			inv.' || fips_expression || ',
+			' || case when is_point_table = false then '' else 'inv.' || plantid_expression || ', inv.' || pointid_expression || ', inv.' || stackid_expression || ', inv.' || segment_expression || ', ' end || '
 			null::double precision as operation_maintenance_cost,
 			null::double precision as annualized_capital_cost,
 			null::double precision as capital_cost,
@@ -561,17 +610,17 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			null::double precision as rule_eff,
 			null::double precision as percent_reduction,
 			proj.PROJ_FACTOR as adj_factor,
-			inv.ceff,
-			' || case when is_point_table = false then 'case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end' else '100' end || ',
-			case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end,
+			' || case when is_flat_file_inventory then 'inv.ann_pct_red' else 'inv.ceff' end || ',
+			' || case when is_flat_file_inventory then '100.0' when is_point_table = false then 'case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end' else '100' end || ',
+			' || case when is_flat_file_inventory then '100.0' else 'case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end' end || ',
 			' || emis_sql || ' * proj.proj_factor as final_emissions,
 			' || emis_sql || ' - ' || emis_sql || ' * proj.proj_factor as emis_reduction,
 			' || emis_sql || ' as inv_emissions,
 	--				' || emis_sql || ' as input_emis,
 	--				0.0 as output_emis,
 			1,
-			substr(inv.fips, 1, 2),
-			substr(inv.fips, 3, 3),
+			substr(inv.' || fips_expression || ', 1, 2),
+			substr(inv.' || fips_expression || ', 3, 3),
 			' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 			inv.record_id::integer as source_id,
@@ -580,8 +629,8 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			null::integer as control_measures_id,
 			null::varchar(255) as equation_type,
 			proj.control_program_name,
-			' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
-			' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
+			' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' when is_flat_file_point_inventory then 'inv.longitude,inv.latitude,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
+			' || case when has_plant_column then 'inv.plant' when has_facility_name_column then 'inv.facility_name' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
 			''''
 		FROM emissions.' || inv_table_name || ' inv
 
@@ -589,7 +638,7 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			on proj.record_id = inv.record_id
 
 			' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
-			on fipscode.state_county_fips = inv.fips
+			on fipscode.state_county_fips = inv.' || fips_expression || '
 			and fipscode.country_num = ''0''' else '' end || '
 
 		where 	
@@ -704,29 +753,41 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			from (' || sql;
 		sql := sql || ') tbl order by record_id, ranking, replacement, coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) desc';
 
-		inv_percent_reduction_sql := '(coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end, 0.0) * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end, 100) / 100 ' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end, 100.0) / 100.0 ' else '' end || ')';
+		inv_percent_reduction_sql := 
+			case 
+				when is_flat_file_inventory then 
+					'(coalesce(case when inv.ann_pct_red = 100.0 and inv.ann_value > 0.0 then 0.0 else inv.ann_pct_red end, 0.0) / 100.0)'
+				else 
+					'(coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end, 0.0) * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end, 100) / 100 ' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end, 100.0) / 100.0 ' else '' end || ')'
+			end;
 		cont_packet_percent_reduction_sql := '(cont.ceff * coalesce(cont.reff, 100) / 100 * coalesce(cont.rpen, 100) / 100)';
 		uncontrolled_emis_sql := 
-				case 
-					when dataset_month != 0 then 
-						'case when (1 - ' || inv_percent_reduction_sql || ' / 100) != 0 then case when dr.record_id is not null then dr.final_emissions else coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end' 
-					else 
-						'case when (1 - ' || inv_percent_reduction_sql || ' / 100) != 0 then case when dr.record_id is not null then dr.final_emissions else inv.ann_emis end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end' 
-				end;
+			case 
+				when is_flat_file_inventory then 
+					'case when (1 - ' || inv_percent_reduction_sql || ' / 100) != 0 then case when dr.record_id is not null then dr.final_emissions else inv.ann_value end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end' 
+				when dataset_month != 0 then 
+					'case when (1 - ' || inv_percent_reduction_sql || ' / 100) != 0 then case when dr.record_id is not null then dr.final_emissions else coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end' 
+				else 
+					'case when (1 - ' || inv_percent_reduction_sql || ' / 100) != 0 then case when dr.record_id is not null then dr.final_emissions else inv.ann_emis end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end' 
+			end;
 		emis_sql := 
-				case 
-					when dataset_month != 0 then 
-						'case when dr.record_id is not null then dr.final_emissions else coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) end' 
-					else 
-						'case when dr.record_id is not null then dr.final_emissions else inv.ann_emis end' 
-				end;
+			case 
+				when is_flat_file_inventory then 
+					'case when dr.record_id is not null then dr.final_emissions else inv.ann_value end' 
+				when dataset_month != 0 then 
+					'case when dr.record_id is not null then dr.final_emissions else coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) end' 
+				else 
+					'case when dr.record_id is not null then dr.final_emissions else inv.ann_emis end' 
+			end;
 		annualized_uncontrolled_emis_sql := 
-				case 
-					when dataset_month != 0 then 
-						'case when (1 - coalesce(' || inv_percent_reduction_sql || ' / 100, 0)) != 0 then case when dr.record_id is not null then dr.final_emissions else coalesce(inv.avd_emis * 365, inv.ann_emis) end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end'
-					else 
-						'case when (1 - coalesce(' || inv_percent_reduction_sql || ' / 100, 0)) != 0 then case when dr.record_id is not null then dr.final_emissions else inv.ann_emis end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end'
-				end;
+			case 
+				when is_flat_file_inventory then 
+					'case when (1 - coalesce(' || inv_percent_reduction_sql || ' / 100, 0)) != 0 then case when dr.record_id is not null then dr.final_emissions else inv.ann_value end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end'
+				when dataset_month != 0 then 
+					'case when (1 - coalesce(' || inv_percent_reduction_sql || ' / 100, 0)) != 0 then case when dr.record_id is not null then dr.final_emissions else coalesce(inv.avd_emis * 365, inv.ann_emis) end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end'
+				else 
+					'case when (1 - coalesce(' || inv_percent_reduction_sql || ' / 100, 0)) != 0 then case when dr.record_id is not null then dr.final_emissions else inv.ann_emis end / (1 - coalesce(' || inv_percent_reduction_sql || ' / 100.0, 0)) else 0.0::double precision end'
+			end;
 
 
 
@@ -747,7 +808,7 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 				eq.value7, eq.value8, 
 				eq.value9, eq.value10, 
 				' || case when not is_point_table then 'null' else 'inv.stkflow' end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity' end end || ', 
-				' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_numerator' end end || ', ' || case when not is_point_table then 'null' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_denominator' end end 
+				' || case when not is_point_table then 'null' when is_flat_file_point_inventory then '(string_to_array(inv.design_capacity_units, ''/''))[1]' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_numerator' end end || ', ' || case when not is_point_table then 'null' when is_flat_file_point_inventory then '(string_to_array(inv.design_capacity_units, ''/''))[2]' else case when not has_design_capacity_columns then 'null' else 'inv.design_capacity_unit_denominator' end end 
 				else
 				'null, 
 				null, null, 
@@ -758,7 +819,7 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 				null, null, 
 				null, null'
 				end
-				|| ',inv.ceff, ' || ref_cost_year_chained_gdp || '::double precision / gdplev_incr.chained_gdp::double precision * er.incremental_cost_per_ton))';
+				|| ',' || case when is_flat_file_inventory then 'inv.ann_pct_red' else 'inv.ceff' end || ', ' || ref_cost_year_chained_gdp || '::double precision / gdplev_incr.chained_gdp::double precision * er.incremental_cost_per_ton))';
 
 
 		-- make sure the apply order is 1, this should be the first thing happening to a source....this is important when the controlled inventpory is created.
@@ -812,8 +873,8 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			coalesce(cont.pri_cm_abbrev, case when cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0 then m.abbreviation else null::character varying end, ''UNKNOWNMSR'') as abbreviation,
 			inv.poll,
 			inv.scc,
-			inv.fips,
-			' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
+			inv.' || fips_expression || ',
+			' || case when is_point_table = false then '' else 'inv.' || plantid_expression || ', inv.' || pointid_expression || ', inv.' || stackid_expression || ', inv.' || segment_expression || ', ' end || '
 			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0 then ' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.operation_maintenance_cost else null::double precision end as operation_maintenance_cost,
 			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0 then ' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.annualized_capital_cost else null::double precision end as annualized_capital_cost,
 			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0 then ' || chained_gdp_adjustment_factor || ' * ' || get_strategt_cost_sql || '.capital_cost else null::double precision end as capital_cost,
@@ -835,9 +896,9 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 				when cont.replacement = ''R'' then ' || cont_packet_percent_reduction_sql || '
 				when cont.replacement = ''A'' then ' || inv_percent_reduction_sql || ' + ' || cont_packet_percent_reduction_sql || ' * ( 100.0 - ' || inv_percent_reduction_sql || ') / 100.0
 			end as percent_reduction,
-			inv.ceff as inv_ceff,
-			' || case when is_point_table = false then 'case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end' else '100' end || ' as inv_rpen,
-			case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end as inv_reff,
+			' || case when is_flat_file_inventory then 'inv.ann_pct_red' else 'inv.ceff' end || ' as inv_ceff,
+			' || case when is_flat_file_inventory then '100.0' when is_point_table = false then 'case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end' else '100' end || ' as inv_rpen,
+			' || case when is_flat_file_inventory then '100.0' else 'case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end' end || ' as inv_reff,
 			' || inv_percent_reduction_sql || ' / 100 as inv_pct_red,
 			case 
 				when cont.replacement = ''R'' then 
@@ -860,8 +921,8 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 --				' || uncontrolled_emis_sql || ' as input_emis,
 --				0.0 as output_emis,
 			2,
-			substr(inv.fips, 1, 2),
-			substr(inv.fips, 3, 3),
+			substr(inv.' || fips_expression || ', 1, 2),
+			substr(inv.' || fips_expression || ', 3, 3),
 			' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 			inv.record_id::integer as source_id,
@@ -870,8 +931,8 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			null::integer as control_measures_id,
 			case when cont.pri_cm_abbrev is null and er.id is not null and cont.ceff <> 0 and abs(' || cont_packet_percent_reduction_sql || ' - er.efficiency * coalesce(er.rule_effectiveness, 100) / 100.0 * coalesce(er.rule_penetration, 100) / 100.0) / ' || cont_packet_percent_reduction_sql || ' <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision / 100.0  then ' || get_strategt_cost_sql || '.actual_equation_type else null::varchar(255) end as equation_type,
 			cont.control_program_name,
-			' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
-			' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
+			' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' when is_flat_file_point_inventory then 'inv.longitude,inv.latitude,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
+			' || case when has_plant_column then 'inv.plant' when has_facility_name_column then 'inv.facility_name' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
 			''''
 		FROM emissions.' || inv_table_name || ' inv
 
@@ -885,7 +946,7 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			on p.name = inv.poll
 			
 			' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
-			on fipscode.state_county_fips = inv.fips
+			on fipscode.state_county_fips = inv.' || fips_expression || '
 			and fipscode.country_num = ''0''' else '' end || '
 
 			inner join (' || sql || ') cont
@@ -903,7 +964,7 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			-- min and max emission filter
 			and ' || annualized_uncontrolled_emis_sql || ' between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
 			-- locale filter
-			and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
+			and (er.locale = inv.' || fips_expression || ' or er.locale = substr(inv.' || fips_expression || ', 1, 2) or er.locale = '''')
 			-- effecive date filter
 			and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)		
 			and abs(er.efficiency - cont.ceff) <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision
@@ -1084,26 +1145,32 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 		sql := sql || ') tbl order by record_id, allowable_type, ranking, coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) desc';
 
 		uncontrolled_emis_sql := 
-				case 
-					when dataset_month != 0 then 
-						'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
-					else 
-						'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else inv.ann_emis end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
-				end;
+			case 
+				when is_flat_file_inventory then 
+					'case when (1 - coalesce(case when inv.ann_pct_red = 100.0 and inv.ann_value > 0.0 then 0.0 else inv.ann_pct_red end / 100, 0)) != 0 then case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else inv.ann_value end / (1 - coalesce(case when inv.ann_pct_red = 100.0 and inv.ann_value > 0.0 then 0.0 else inv.ann_pct_red end / 100, 0)) else 0.0::double precision end' 
+				when dataset_month != 0 then 
+					'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+				else 
+					'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else inv.ann_emis end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end' 
+			end;
 		emis_sql := 
-				case 
-					when dataset_month != 0 then 
-						'case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) end' 
-					else 
-						'case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else inv.ann_emis end' 
-				end;
+			case 
+				when is_flat_file_inventory then 
+					'case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else inv.ann_value end' 
+				when dataset_month != 0 then 
+					'case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis) end' 
+				else 
+					'case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else inv.ann_emis end' 
+			end;
 		annualized_uncontrolled_emis_sql := 
-				case 
-					when dataset_month != 0 then 
-						'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else coalesce(inv.avd_emis * 365, inv.ann_emis) end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
-					else 
-						'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else inv.ann_emis end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
-				end;
+			case 
+				when is_flat_file_inventory then 
+					'case when (1 - coalesce(case when inv.ann_pct_red = 100.0 and inv.ann_value > 0.0 then 0.0 else inv.ann_pct_red end / 100, 0)) != 0 then case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else inv.ann_value end / (1 - coalesce(case when inv.ann_pct_red = 100.0 and inv.ann_value > 0.0 then 0.0 else inv.ann_pct_red end / 100 , 0)) else 0.0::double precision end'
+				when dataset_month != 0 then 
+					'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else coalesce(inv.avd_emis * 365, inv.ann_emis) end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+				else 
+					'case when (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) != 0 then case when cdr.record_id is not null then cdr.final_emissions when pdr.record_id is not null then pdr.final_emissions else inv.ann_emis end / (1 - coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end / 100 * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end / 100, 1.0)' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end / 100, 1.0)' else '' end || ', 0)) else 0.0::double precision end'
+			end;
 
 
 		-- make sure the apply order is 4,....this is important when the controlled inventpory is created.
@@ -1159,8 +1226,8 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 --			case when allowable_type = ''C'' then ''C'' || substring(m.abbreviation,2,length(m.abbreviation)) when allowable_type = ''R'' then ''R'' || substring(m.abbreviation,2,length(m.abbreviation)) end as abbreviation,
 			inv.poll,
 			inv.scc,
-			inv.fips,
-			' || case when is_point_table = false then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
+			inv.' || fips_expression || ',
+			' || case when is_point_table = false then '' else 'inv.' || plantid_expression || ', inv.' || pointid_expression || ', inv.' || stackid_expression || ', inv.' || segment_expression || ', ' end || '
 			null::double precision as operation_maintenance_cost,
 			null::double precision as annualized_capital_cost,
 			null::double precision as capital_cost,
@@ -1170,9 +1237,9 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			null::double precision as rule_pen,
 			null::double precision as rule_eff,
 			null::double precision as percent_reduction,
-			inv.ceff,
-			' || case when is_point_table = false then 'case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end' else '100' end || ',
-			case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end,
+			' || case when is_flat_file_inventory then 'inv.ann_pct_red' else 'inv.ceff' end || ' as inv_ceff,
+			' || case when is_flat_file_inventory then '100.0' when is_point_table = false then 'case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end' else '100' end || ' as inv_rpen,
+			' || case when is_flat_file_inventory then '100.0' else 'case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end' end || ' as inv_reff,
 			case when ' || emis_sql || ' <> 0 then coalesce(cont.replacement, cont.cap) * 365 / ' || emis_sql || ' else null::double precision end as adj_factor,
 			case when allowable_type = ''C'' then cont.cap * 365 when allowable_type = ''R'' then cont.replacement * 365 end as final_emissions,
 			' || emis_sql || ' - (case when allowable_type = ''C'' then cont.cap * 365 when allowable_type = ''R'' then cont.replacement * 365 end) as emis_reduction,
@@ -1180,8 +1247,8 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 	--				' || emis_sql || ' as input_emis,
 	--				0.0 as output_emis,
 			case when allowable_type = ''C'' then 3 when allowable_type = ''R'' then 4 end as apply_order,
-			substr(inv.fips, 1, 2),
-			substr(inv.fips, 3, 3),
+			substr(inv.' || fips_expression || ', 1, 2),
+			substr(inv.' || fips_expression || ', 3, 3),
 			' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ',
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ',
 			inv.record_id::integer as source_id,
@@ -1190,8 +1257,8 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			null::integer as control_measures_id,
 			null::varchar(255) as equation_type,
 			cont.control_program_name,
-			' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
-			' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
+			' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' when is_flat_file_point_inventory then 'inv.longitude,inv.latitude,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
+			' || case when has_plant_column then 'inv.plant' when has_facility_name_column then 'inv.facility_name' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
 			''''
 
 		FROM emissions.' || inv_table_name || ' inv
@@ -1212,7 +1279,7 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			on p.name = inv.poll
 			
 			' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
-			on fipscode.state_county_fips = inv.fips
+			on fipscode.state_county_fips = inv.' || fips_expression || '
 			and fipscode.country_num = ''0''' else '' end || '
 
 			inner join (' || sql || ') cont
@@ -1231,7 +1298,7 @@ raise notice '%', public.alias_filter(inv_filter, inv_table_name, 'inv'::charact
 			-- min and max emission filter
 			and coalesce(cont.replacement, cont.cap) * 365 between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
 			-- locale filter
-			and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
+			and (er.locale = inv.' || fips_expression || ' or er.locale = substr(inv.' || fips_expression || ', 1, 2) or er.locale = '''')
 			-- effecive date filter
 			and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)
 			and abs(er.efficiency - case when ' || emis_sql || ' <> 0 then coalesce(cont.replacement, cont.cap) * 365 / ' || emis_sql || ' else 0.0::double precision end) <= ' || control_program_measure_min_pct_red_diff_constraint || '::double precision

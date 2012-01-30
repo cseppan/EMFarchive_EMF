@@ -73,6 +73,7 @@ public class StrategyLoader extends LeastCostAbstractStrategyLoader {
             strategyMessagesResult.setCompletionTime(new Date());
             strategyMessagesResult.setRunStatus("Completed.");
             saveControlStrategyResult(strategyMessagesResult);
+            creator.updateVersionZeroRecordCount((EmfDataset)strategyMessagesResult.getDetailedResultDataset());
         }
 
         

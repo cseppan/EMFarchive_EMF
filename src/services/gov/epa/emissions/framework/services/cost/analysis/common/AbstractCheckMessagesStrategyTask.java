@@ -70,10 +70,10 @@ public abstract class AbstractCheckMessagesStrategyTask extends AbstractStrategy
     
                             status = rs.getString(STATUS_COLUMN_LABEL);
                             message = rs.getString(MESSAGE_COLUMN_LABEL);
-                        }
-    
-                        if (status != null && message != null) {
-                            messages.add(new StatusMessage(status, message, messageDatasetName, 2));
+                            if (status != null && message != null) {
+                                messages.add(new StatusMessage(status, message, messageDatasetName, 2));
+                            }
+        
                         }
     
                     }
@@ -142,10 +142,10 @@ public abstract class AbstractCheckMessagesStrategyTask extends AbstractStrategy
 
                             status = rs.getString(STATUS_COLUMN_LABEL);
                             message = rs.getString(MESSAGE_COLUMN_LABEL);
-                        }
+                            if (status != null && message != null) {
+                                messages.add(new StatusMessage(status, message, messageDatasetName, 2));
+                            }
 
-                        if (status != null && message != null) {
-                            messages.add(new StatusMessage(status, message, messageDatasetName, 2));
                         }
 
                     }

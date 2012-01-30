@@ -203,12 +203,25 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
     private void addAction() throws EmfException {
         InputDatasetSelectionView view = new InputDatasetSelectionDialog(parentConsole);
         InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session,
-                new DatasetType[] { 
-                    editControlStrategyPresenter.getDatasetType(DatasetType.orlPointInventory),
-                    editControlStrategyPresenter.getDatasetType(DatasetType.orlNonpointInventory),
-                    editControlStrategyPresenter.getDatasetType(DatasetType.orlNonroadInventory),
-                    editControlStrategyPresenter.getDatasetType(DatasetType.orlOnroadInventory)
-                });
+                (controlStrategy.getStrategyType() != null && controlStrategy.getStrategyType().getName().equals(StrategyType.projectFutureYearInventory) 
+                        ?
+                        new DatasetType[] { 
+                            editControlStrategyPresenter.getDatasetType(DatasetType.orlPointInventory),
+                            editControlStrategyPresenter.getDatasetType(DatasetType.orlNonpointInventory),
+                            editControlStrategyPresenter.getDatasetType(DatasetType.orlNonroadInventory),
+                            editControlStrategyPresenter.getDatasetType(DatasetType.orlOnroadInventory),
+                            editControlStrategyPresenter.getDatasetType(DatasetType.FLAT_FILE_2010_POINT),
+                            editControlStrategyPresenter.getDatasetType(DatasetType.FLAT_FILE_2010_NONPOINT)
+                        }
+                        :
+                        new DatasetType[] { 
+                            editControlStrategyPresenter.getDatasetType(DatasetType.orlPointInventory),
+                            editControlStrategyPresenter.getDatasetType(DatasetType.orlNonpointInventory),
+                            editControlStrategyPresenter.getDatasetType(DatasetType.orlNonroadInventory),
+                            editControlStrategyPresenter.getDatasetType(DatasetType.orlOnroadInventory)
+                        }
+                )
+            );
         try {
             presenter.display(null, false);
             if (view.shouldCreate()){

@@ -153,6 +153,10 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
                         .getControlStrategyInputDatasets();
                 //insert one table at a time...
                 for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
+                    if (!controlStrategyInputDatasets[i].getInputDataset().getDatasetType().getName().contains("ORL")) {
+                        setStatus("The inventory, " + controlStrategyInputDatasets[i].getInputDataset().getName() + ", won't be processed only ORL Inventores are currently supported.");
+                        break;
+                    }
                     String sql = "INSERT INTO " + qualifiedEmissionTableName(mergedDataset) + " (dataset_id, "
                     + columnDelimitedList + ") ";
                     EmfDataset inputDataset = controlStrategyInputDatasets[i].getInputDataset();

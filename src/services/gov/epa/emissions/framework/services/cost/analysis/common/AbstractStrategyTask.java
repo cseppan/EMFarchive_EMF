@@ -121,6 +121,10 @@ public abstract class AbstractStrategyTask implements Strategy {
             //process/load each input dataset
             ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
             for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
+                if (!controlStrategyInputDatasets[i].getInputDataset().getDatasetType().getName().contains("ORL")) {
+                    setStatus("The inventory, " + controlStrategyInputDatasets[i].getInputDataset().getName() + ", won't be processed only ORL Inventores are currently supported.");
+                    break;
+                }
                 ControlStrategyResult result = null;
                 try {
                     result = loader.loadStrategyResult(controlStrategyInputDatasets[i]);
@@ -640,6 +644,10 @@ public abstract class AbstractStrategyTask implements Strategy {
         String filter = getFilterForSourceQuery();
         if (datasets.length > 0) {
             for (int i = 0; i < datasets.length; i++) {
+                //ignore non ORL inventories
+                if (!datasets[i].getInputDataset().getDatasetType().getName().contains("ORL")) {
+                    break;
+                }
 
                 //make sure inventory has indexes created...
 //                makeSureInventoryDatasetHasIndexes(datasets[i]);

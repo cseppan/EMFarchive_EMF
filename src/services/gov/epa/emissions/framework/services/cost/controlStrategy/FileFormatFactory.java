@@ -38,6 +38,12 @@ public class FileFormatFactory {
 
         if (type.getName().equals(DatasetType.orlMergedInventory))
             return new VersionedTableFormat(new ORLMergedFileFormat(types), types);
+        
+        if (type.getName().equals(DatasetType.FLAT_FILE_2010_POINT))
+            return new VersionedTableFormat(type.getFileFormat(), types);
+
+        if (type.getName().equals(DatasetType.FLAT_FILE_2010_NONPOINT))
+            return new VersionedTableFormat(type.getFileFormat(), types);
 
         if (!suppressException)
             throw new Exception("The dataset type '" + type.getName() + "' is not supported for inventory output");

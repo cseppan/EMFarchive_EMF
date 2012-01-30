@@ -103,6 +103,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
             strategyMessagesResult.setCompletionTime(new Date());
             strategyMessagesResult.setRunStatus("Completed.");
             saveControlStrategyResult(strategyMessagesResult);
+            creator.updateVersionZeroRecordCount((EmfDataset)strategyMessagesResult.getDetailedResultDataset());
         }
     }
 

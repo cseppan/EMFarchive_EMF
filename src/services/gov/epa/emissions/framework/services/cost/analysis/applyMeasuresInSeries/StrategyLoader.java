@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost.analysis.applyMeasuresInSeries;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -59,6 +60,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
             strategyMessagesResult.setCompletionTime(new Date());
             strategyMessagesResult.setRunStatus("Completed.");
             saveControlStrategyResult(strategyMessagesResult);
+            creator.updateVersionZeroRecordCount((EmfDataset)strategyMessagesResult.getDetailedResultDataset());
         }
 
         //still need to calculate the total cost and reduction...

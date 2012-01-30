@@ -57,6 +57,7 @@ public class StrategyLoader extends AbstractStrategyLoader {
             strategyMessagesResult.setCompletionTime(new Date());
             strategyMessagesResult.setRunStatus("Completed.");
             saveControlStrategyResult(strategyMessagesResult);
+            creator.updateVersionZeroRecordCount((EmfDataset)strategyMessagesResult.getDetailedResultDataset());
         }
 
         //do this after updating the previous result, else it will override it...

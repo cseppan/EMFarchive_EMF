@@ -40,6 +40,10 @@ public class StrategyTask extends AbstractStrategyTask {
             //process/load each input dataset
             ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
             for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
+                if (!controlStrategyInputDatasets[i].getInputDataset().getDatasetType().getName().contains("ORL")) {
+                    setStatus("The inventory, " + controlStrategyInputDatasets[i].getInputDataset().getName() + ", won't be processed only ORL Inventores are currently supported.");
+                    break;
+                }
                 ControlStrategyResult result = null;
                 try {
                     result = this.getLoader().loadStrategyResult(controlStrategyInputDatasets[i]);

@@ -1,6 +1,5 @@
-
+﻿
 --select public.create_projected_future_year_inventory(81, 399, 0, 2750, 2822)
-
 CREATE OR REPLACE FUNCTION public.create_projected_future_year_inventory(
 	int_control_strategy_id integer, 
 	input_dataset_id integer, 
@@ -44,7 +43,33 @@ DECLARE
 	has_pct_reduction_col boolean := false;
 	has_current_cost_col boolean := false;
 	has_cumulative_cost_col boolean := false;
+
+	dataset_type_name character varying(255) := '';
+	fips_expression character varying(64) := 'inv.fips';
+	plantid_expression character varying(64) := 'inv.plantid';
+	pointid_expression character varying(64) := 'inv.pointid';
+	stackid_expression character varying(64) := 'inv.stackid';
+	segment_expression character varying(64) := 'inv.segment';
+	mact_expression character varying(64) := 'inv.mact';
+
 BEGIN
+	--get dataset type name
+	select dataset_types."name"
+	from emf.datasets
+	inner join emf.dataset_types
+	on datasets.dataset_type = dataset_types.id
+	where datasets.id = input_dataset_id
+	into dataset_type_name;
+
+	--if Flat File 2010 Types then change primary key field expression variables...
+	IF dataset_type_name = 'Flat File 2010 Point' or  dataset_type_name = 'Flat File 2010 Nonpoint' THEN
+		fips_expression := 'inv.region_cd';
+		plantid_expression := 'inv.facility_id';
+		pointid_expression := 'inv.unit_id';
+		stackid_expression := 'inv.rel_point_id';
+		segment_expression := 'inv.process_id';
+		mact_expression := 'inv.reg_codes';
+	END If;
 
 	-- get the input dataset info
 	select lower(i.table_name)
@@ -124,31 +149,8 @@ BEGIN
 	select public.get_dataset_month(input_dataset_id)
 	into dataset_month;
 
-	IF dataset_month = 1 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 2 THEN
-		no_days_in_month := 29;
-	ELSIF dataset_month = 3 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 4 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 5 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 6 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 7 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 8 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 9 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 10 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 11 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 12 THEN
-		no_days_in_month := 31;
-	END IF;
+	select public.get_days_in_month(dataset_month::smallint, inventory_year::smallint)
+	into no_days_in_month;
 
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
@@ -157,7 +159,7 @@ BEGIN
 			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
 	END IF;
 	-- build version info into where clause filter
-	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version) || ')' || coalesce(' and ' || inv_filter, '');
+	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version, 'inv') || ')' || coalesce(' and ' || inv_filter, '');
 
 	raise notice '%', 'start ' || clock_timestamp();
 
@@ -187,19 +189,19 @@ BEGIN
 			select_column_list_sql := select_column_list_sql || ',0 as version';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'design_capacity' THEN
-			select_column_list_sql := select_column_list_sql || ',' || case when has_design_capacity_columns then 'design_capacity' else 'null::double precision as design_capacity' end;
+			select_column_list_sql := select_column_list_sql || ',' || case when has_design_capacity_columns then 'inv.design_capacity' else 'null::double precision as design_capacity' end;
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'design_capacity_unit_numerator' THEN
-			select_column_list_sql := select_column_list_sql || ',' || case when has_design_capacity_columns then 'design_capacity_unit_numerator' else 'null::character varying(10) as design_capacity_unit_numerator' end;
+			select_column_list_sql := select_column_list_sql || ',' || case when has_design_capacity_columns then 'inv.design_capacity_unit_numerator' else 'null::character varying(10) as design_capacity_unit_numerator' end;
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'design_capacity_unit_denominator' THEN
-			select_column_list_sql := select_column_list_sql || ',' || case when has_design_capacity_columns then 'design_capacity_unit_denominator' else 'null::character varying(10) as design_capacity_unit_denominator' end;
+			select_column_list_sql := select_column_list_sql || ',' || case when has_design_capacity_columns then 'inv.design_capacity_unit_denominator' else 'null::character varying(10) as design_capacity_unit_denominator' end;
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'current_cost' THEN
-			select_column_list_sql := select_column_list_sql || ',' || case when has_current_cost_col then 'current_cost' else 'null::double precision as current_cost' end;
+			select_column_list_sql := select_column_list_sql || ',' || case when has_current_cost_col then 'inv.current_cost' else 'null::double precision as current_cost' end;
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'cumulative_cost' THEN
-			select_column_list_sql := select_column_list_sql || ',' || case when has_cumulative_cost_col then 'cumulative_cost' else 'null::double precision as cumulative_cost' end;
+			select_column_list_sql := select_column_list_sql || ',' || case when has_cumulative_cost_col then 'inv.cumulative_cost' else 'null::double precision as cumulative_cost' end;
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'control_measures' THEN
 			select_column_list_sql := select_column_list_sql || ',' || case when has_control_measures_col then '
@@ -210,7 +212,7 @@ BEGIN
 						when proj.cm_abbrev is not null and cont.cm_abbrev is not null then proj.cm_abbrev || ''&'' || cont.cm_abbrev 
 						when proj.cm_abbrev is null and cont.cm_abbrev is not null then cont.cm_abbrev 
 						when proj.cm_abbrev is not null and cont.cm_abbrev is null then proj.cm_abbrev 
-						else ''''::character varying 
+						else null::character varying 
 					end 
 				else control_measures || coalesce(''&'' || cr.cm_abbrev, '''')  || coalesce(''&'' || proj.cm_abbrev, '''') || coalesce(''&'' || cont.cm_abbrev, '''') 
 			end' else '
@@ -219,7 +221,7 @@ BEGIN
 				when proj.cm_abbrev is not null and cont.cm_abbrev is not null then proj.cm_abbrev || ''&'' || cont.cm_abbrev 
 				when proj.cm_abbrev is null and cont.cm_abbrev is not null then cont.cm_abbrev 
 				when proj.cm_abbrev is not null and cont.cm_abbrev is null then proj.cm_abbrev 
-				else ''''::character varying 
+				else null::character varying 
 			end ' end || ' as control_measures';
 --			select_column_list_sql := select_column_list_sql || ', case when control_measures is null or length(control_measures) = 0 then abbreviation else control_measures || ''&'' || abbreviation end as control_measures';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
@@ -251,7 +253,7 @@ BEGIN
 				when cr.source_id is not null then cr.final_emissions / ' || case when dataset_month <> 0 then no_days_in_month else '365' end || ' 
 				when cont.source_id is not null then cont.final_emissions / ' || case when dataset_month <> 0 then no_days_in_month else '365' end || ' 
 				when proj.source_id is not null then proj.final_emissions / ' || case when dataset_month <> 0 then no_days_in_month else '365' end || ' 
-				else avd_emis 
+				else inv.avd_emis 
 			end as avd_emis';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'ann_emis' THEN
@@ -264,24 +266,41 @@ BEGIN
 						when cr.source_id is not null then cr.final_emissions 
 						when cont.source_id is not null then cont.final_emissions 
 						when proj.source_id is not null then proj.final_emissions 
-						else ann_emis 
+						else inv.ann_emis 
 					end as ann_emis'
 			end;
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'ann_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.final_emissions 
+				when cont.source_id is not null then cont.final_emissions 
+				when proj.source_id is not null then proj.final_emissions 
+				else inv.ann_value 
+			end as ann_value';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'ceff' THEN
 			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
 			select_column_list_sql := select_column_list_sql || ', 
 			case 
 				when cr.source_id is null and cont.source_id is not null and cont.percent_reduction <> 0.0 then cont.percent_reduction
-				else ceff 
+				else inv.ceff 
 			end as ceff';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'ann_pct_red' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.percent_reduction <> 0.0 then cont.percent_reduction
+				else inv.ann_pct_red 
+			end as ann_pct_red';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'reff' THEN
 			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
 			select_column_list_sql := select_column_list_sql || ', 
 			case 
 				when cr.source_id is null and cont.source_id is not null and cont.percent_reduction <> 0.0 then 100.0::double precision 
-				else reff 
+				else inv.reff 
 			end as reff';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'rpen' THEN
@@ -289,11 +308,11 @@ BEGIN
 			select_column_list_sql := select_column_list_sql || ', 
 			case 
 				when cr.source_id is null and cont.source_id is not null and cont.percent_reduction <> 0.0 then 100.0::double precision 
-				else rpen 
+				else inv.rpen 
 			end as rpen';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSE
-			select_column_list_sql := select_column_list_sql || ',' || column_name;
+			select_column_list_sql := select_column_list_sql || ',inv.' || column_name;
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		END IF;
 --            } else if (columnName.equalsIgnoreCase("avd_emis")) {
@@ -304,7 +323,7 @@ BEGIN
 --                columnList += "," + columnName;
 	END LOOP;
 
-	select_column_list_sql := replace(
+/*	select_column_list_sql := replace(
 	replace(
 	replace(
 	replace(
@@ -325,6 +344,7 @@ BEGIN
 	'naics', 'inv.naics'), 
 	'sic', 'inv.sic'), 
 	'plant', 'inv.plant');
+*/
 
 	-- populate the new inventory...work off of new data
 
@@ -386,7 +406,7 @@ BEGIN
 		) cr
 		on inv.record_id = cr.source_id
 
-	where ' || replace(replace(replace(inv_filter, '(version', '(inv.version'), 'dataset_id', 'inv.dataset_id'), 'delete_versions', 'inv.delete_versions') || coalesce(county_dataset_filter_sql, '') || '
+	where ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
 		-- get rid of plant closures records
 		and not exists (
