@@ -1483,3 +1483,8 @@ ALTER TABLE emf.control_measures ALTER COLUMN abbreviation TYPE character varyin
 -- Add new control measure class id to control_measures table..
 ALTER TABLE emf.control_strategies ADD COLUMN apply_cap_measures_on_hap_pollutants boolean default false;
 
+-- 01/18/2012 Made Test Case measure temporary so there not used during production strategy runs
+update emf.control_measures
+set cm_class_id = (select id from emf.control_measure_classes where name = 'Temporary')
+where id in (select id from emf.control_measures where abbreviation like 'TC%');
+
