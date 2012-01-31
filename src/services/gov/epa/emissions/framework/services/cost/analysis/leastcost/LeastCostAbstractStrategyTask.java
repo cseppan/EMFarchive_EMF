@@ -341,6 +341,7 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
                 truncateORLMergedDataset(mergedDataset);
                 populateORLMergedDataset(mergedDataset);
                 leastCostAbstractStrategyLoader.makeSureInventoryDatasetHasIndexes(mergedDataset);
+                creator.updateVersionZeroRecordCount(mergedDataset);
 //                }
 
             }
