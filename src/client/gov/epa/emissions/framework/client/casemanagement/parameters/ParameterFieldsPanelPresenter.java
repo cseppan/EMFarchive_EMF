@@ -81,7 +81,7 @@ public class ParameterFieldsPanelPresenter {
     }
 
     public DatasetType[] getDSTypes() throws EmfException {
-        return dataCommonsService().getDatasetTypes();
+        return dataCommonsService().getDatasetTypes(session.user().getId());
     }
 
     public EmfDataset[] getDatasets(DatasetType type) throws EmfException {

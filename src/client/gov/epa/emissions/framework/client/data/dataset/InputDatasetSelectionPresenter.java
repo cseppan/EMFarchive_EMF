@@ -38,7 +38,7 @@ public class InputDatasetSelectionPresenter {
         //get data...
         DatasetType[] datasetTypes = new DatasetType[] {};
         if (datasetTypesToInclude == null)
-            datasetTypes = session.dataCommonsService().getDatasetTypes();
+            datasetTypes = session.dataCommonsService().getDatasetTypes(session.user().getId());
         else
             datasetTypes = datasetTypesToInclude;
 

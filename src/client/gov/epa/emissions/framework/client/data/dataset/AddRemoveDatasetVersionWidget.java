@@ -224,7 +224,7 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
 //        boolean selectSingle = false; 
         try {
             // FIXME: really, we don't want to contact the server to get the dataset types - could be slow
-            DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes();
+            DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes(session.user().getId());
             if ( this.datasetTypesToInclude == null) {
                 this.datasetTypesToInclude = allDatasetTypes;
             }

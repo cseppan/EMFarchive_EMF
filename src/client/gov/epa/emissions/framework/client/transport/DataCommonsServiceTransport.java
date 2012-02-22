@@ -29,7 +29,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
     private CallFactory callFactory;
     
     private EmfCall call;
-
+    
     public DataCommonsServiceTransport(String endPoint) {
         callFactory = new CallFactory(endPoint);
         mappings = new DataMappings();
@@ -108,6 +108,17 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.setReturnType(mappings.datasetTypes());
 
         return (DatasetType[]) call.requestResponse(new Object[] {});
+    }
+
+    // DatasetType (limit to viewable dataset types)
+    public synchronized DatasetType[] getDatasetTypes(int userId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getDatasetTypes");
+        call.addIntegerParam("userId");
+        call.setReturnType(mappings.datasetTypes());
+
+        return (DatasetType[]) call.requestResponse(new Object[] { new Integer(userId) });
     }
 
     public synchronized DatasetType[] getLightDatasetTypes() throws EmfException {

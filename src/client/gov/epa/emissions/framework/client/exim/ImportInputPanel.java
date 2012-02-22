@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.BrowseButton;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
@@ -60,12 +61,15 @@ public class ImportInputPanel extends JPanel {
 
     private EmfConsole parent;
 
-    public ImportInputPanel(DataCommonsService service, MessagePanel messagePanel, EmfConsole parent, DatasetType dsType)
+    private EmfSession session;
+
+    public ImportInputPanel(EmfSession session, DataCommonsService service, MessagePanel messagePanel, EmfConsole parent, DatasetType dsType)
             throws EmfException {
         this.messagePanel = messagePanel;
         this.service = service;
         this.parent = parent;
         this.defaultDSType = dsType;
+        this.session = session;
 
         initialize();
     }
@@ -131,7 +135,7 @@ public class ImportInputPanel extends JPanel {
     }
 
     private JComboBox typesComboBox() throws EmfException {
-        DatasetType[] allDatasetTypes = service.getDatasetTypes();
+        DatasetType[] allDatasetTypes = service.getDatasetTypes(session.user().getId());
         DatasetType[] allTypesWithMessage = new DatasetType[allDatasetTypes.length + 1];
         copyDatasetTypes(allDatasetTypes, allTypesWithMessage);
         datasetTypesModel = new DefaultComboBoxModel(allTypesWithMessage);

@@ -129,7 +129,7 @@ public class AddRemoveDatasetWidget extends JPanel {
         boolean selectSingle = false; 
         try {
             // FIXME: really, we don't want to contact the server to get the dataset types - could be slow
-            DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes();
+            DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes(session.user().getId());
             
             if (program.toLowerCase().startsWith("fire data summary")){
                 for (int i = 0; i < allDatasetTypes.length; i++) {

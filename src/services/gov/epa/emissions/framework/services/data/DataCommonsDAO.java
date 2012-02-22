@@ -93,6 +93,18 @@ public class DataCommonsDAO {
         return datasetTypesDAO.getAll(session);
     }
 
+    public List<DatasetType> getDatasetTypes(int userId, Session session) {
+        return session
+            .createQuery(
+                    "select DT from DatasetType as DT " 
+                    + "where "
+                    + " DT.id not in (select EDT.id from User as U "
+                    + " inner join U.excludedDatasetTypes as EDT where U.id = "
+                    + userId + ")" 
+                    + " order by DT.name") 
+            .list();
+    }
+
     public List<DatasetType> getLightDatasetTypes(Session session) {
         return datasetTypesDAO.getLightAll(session);
     }

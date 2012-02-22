@@ -246,7 +246,7 @@ public class EditQAEmissionsWindow extends DisposableInteralFrame implements Edi
     protected void doAddWindow() {
         List<DatasetType> datasetTypeList = new ArrayList<DatasetType>();
         try {
-            DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes();
+            DatasetType[] allDatasetTypes = session.dataCommonsService().getDatasetTypes(session.user().getId());
             for (int i = 0; i < allDatasetTypes.length; i++) {
              // Only get the dataset type INVTABLE
                 if (allDatasetTypes[i].getName().equals("Inventory Table Data (INVTABLE)"))

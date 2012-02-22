@@ -34,7 +34,7 @@ public class QAStepTemplatesPanelPresenter {
     }
 
     public DatasetType[] getDatasetTypes() throws EmfException {
-        return session.dataCommonsService().getDatasetTypes();
+        return session.dataCommonsService().getDatasetTypes(session.user().getId());
     }
     
     public DatasetType obtainLockedDatasetType(User user, DatasetType datasetType) throws EmfException {

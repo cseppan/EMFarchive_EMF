@@ -27,6 +27,7 @@ import gov.epa.emissions.framework.services.basic.EmfFileSerializer;
 import gov.epa.emissions.framework.services.basic.EmfServerFileSystemView;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.cost.controlStrategy.FileFormatFactory;
 import gov.epa.emissions.framework.services.editor.Revision;
@@ -162,6 +163,21 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
             List list = dao.getDatasetTypes(session);
+            session.close();
+
+            return (DatasetType[]) list.toArray(new DatasetType[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all DatasetTypes", e);
+            throw new EmfException("Could not get all DatasetTypes ");
+        }
+    }
+
+    // DatasetType (limit to viewable dataset types)
+    public synchronized DatasetType[] getDatasetTypes(int userId) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List list = dao.getDatasetTypes(userId, session);
+
             session.close();
 
             return (DatasetType[]) list.toArray(new DatasetType[0]);

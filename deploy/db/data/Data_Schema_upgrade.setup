@@ -1847,3 +1847,20 @@ and dataset_type_id in
 (select id 
 from emf.dataset_types dt
 where name in ('Flat File 2010 Point','Flat File 2010 Nonpoint'));
+
+
+
+
+-- add ds type keyword for indexing ff10 point and nonpoint datsets 
+
+-- nonpt - region_cd|country_cd|tribal_code|poll|scc|emis_type|census_tract_cd|shape_id
+-- pt -- region_cd|country_cd|tribal_code|poll|scc|facility_id|unit_id|rel_point_id|process_id
+
+-- 2/22/2012 -- added table to help exclude user viewable ds types
+CREATE TABLE emf.user_excluded_dataset_types
+(
+  id serial NOT NULL PRIMARY KEY,
+  list_index integer,
+  user_id int4 NOT NULL REFERENCES emf.users(id),
+  dataset_type_id int4 NOT NULL REFERENCES emf.dataset_types(id)
+);

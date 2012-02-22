@@ -32,7 +32,7 @@ public class ControlProgramSummaryTabPresenter {
     }
 
     public DatasetType[] getDatasetTypes() throws EmfException {
-        return session.dataCommonsService().getDatasetTypes();
+        return session.dataCommonsService().getDatasetTypes(session.user().getId());
     }
 
     public EmfDataset[] getDatasets(DatasetType type) throws EmfException {

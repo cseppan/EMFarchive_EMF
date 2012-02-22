@@ -157,7 +157,7 @@ public class CaseObjectManager {
 
     public synchronized DatasetType[] getDatasetTypes() throws EmfException {
         if (datasetTypes == null)
-            datasetTypes = dataCommonsService.getDatasetTypes();
+            datasetTypes = dataCommonsService.getDatasetTypes(session.user().getId());
 
         return datasetTypes;
     }

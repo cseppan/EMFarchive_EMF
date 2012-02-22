@@ -84,7 +84,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     }
 
     public DatasetType[] getDSTypes() throws EmfException {
-        return session.dataCommonsService().getDatasetTypes();
+        return session.dataCommonsService().getDatasetTypes(session.user().getId());
     }
     
     public User[] getUsers() throws EmfException {
