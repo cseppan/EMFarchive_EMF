@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.XFileFormat;
@@ -16,7 +17,9 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
+import gov.epa.emissions.framework.tasks.DebugLevels;
 
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -181,6 +184,25 @@ public class DataCommonsDAO {
 
     public void removeDatasetTypes(DatasetType type, Session session) {
         hibernateFacade.remove(type, session);
+    }
+    
+    public void removeUserExcludedDatasetType(DatasetType type, DbServer dbServer) throws EmfException {
+        //remove dataset types from the user_excluded_dataset_types table
+        try {
+            dbServer.getEmfDatasource().query().execute("delete from emf.user_excluded_dataset_types where dataset_type_id = "
+                    + type.getId() + "");
+        } catch (SQLException e) {
+            
+            if ( DebugLevels.DEBUG_23()) {
+                System.out.println( e.getMessage());
+            }
+            
+            throw new EmfException(e.getMessage(), e);
+        } 
+//        dbServer
+//        .createSQLQuery(
+//                "delete from emf.user_excluded_dataset_types where dataset_type_id = "
+//                + type.getId() + "").executeUpdate();
     }
     
     public void removeXFileFormat(XFileFormat fileFormat, Session session) {

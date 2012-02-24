@@ -283,6 +283,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     
     public void deleteDatasetTypes(User owner, DatasetType[] types) throws EmfException {
         Session session = this.sessionFactory.getSession();
+        DbServer dbServer = dbServerFactory.getDbServer();
         
         try {
             if (owner.isAdmin()){
@@ -290,6 +291,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
                     checkIfUsedByCases(types[i], session); 
                     checkIfUsedByDeletedDS(types[i], session);
                     checkIfUsedByDatasets(types[i], session); 
+                    dao.removeUserExcludedDatasetType(types[i], dbServer);
                     dao.removeDatasetTypes(types[i], session);
                     
                     if (types[i].getFileFormat()!= null )
@@ -301,6 +303,12 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             throw new EmfException("Error deleting dataset types. \n" + e.getMessage());
         } finally {
             session.close(); 
+            try {
+                dbServer.disconnect();
+            } catch (Exception e) {
+                // NOTE Auto-generated catch block
+//                e.printStackTrace();
+            }
         }
     }
     
