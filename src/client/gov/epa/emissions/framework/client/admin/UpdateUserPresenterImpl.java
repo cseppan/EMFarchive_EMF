@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -40,6 +41,10 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
         service.checkDuplicatesByEmail(user);
         service.updateUser(user);
         this.userDataChanged = false;// reset
+    }
+    
+    public DatasetType[] getDatasetTypes(int userID) throws EmfException {
+        return session.dataCommonsService().getDatasetTypes(userID);
     }
 
     public void doClose() throws EmfException {

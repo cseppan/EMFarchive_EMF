@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.framework.services.EmfException;
 
 public interface UpdateUserPresenter {
@@ -7,6 +8,8 @@ public interface UpdateUserPresenter {
     void doSave() throws EmfException;
 
     void doClose() throws EmfException;
+    
+    DatasetType[] getDatasetTypes(int userId) throws EmfException;
 
     void onChange();
 

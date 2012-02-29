@@ -1,24 +1,16 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.PasswordField;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.Widget;
-import gov.epa.emissions.commons.gui.buttons.CloseButton;
-import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.Border;
-import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -42,59 +34,29 @@ public class EditableUserProfilePanel extends JPanel {
 
     private TextField email;
 
-    private MessagePanel messagePanel;
-
     private AdminOption adminOption;
     
     private JCheckBox wantEmails;
-
-    private PopulateUserStrategy populateUserStrategy;
 
     private ManageChangeables changeablesList;
 
     private User user;
 
     // FIXME: one to many params ?
-    public EditableUserProfilePanel(User user, Widget usernameWidget, Action saveAction, Action cancelAction,
-            AdminOption adminOption, PopulateUserStrategy populateUserStrategy, ManageChangeables changeableList) {
+    public EditableUserProfilePanel(User user, Widget usernameWidget, AdminOption adminOption, 
+            ManageChangeables changeableList) {
         this.user = user;
         this.adminOption = adminOption;
-        this.populateUserStrategy = populateUserStrategy;
         this.changeablesList = changeableList;
 
-        createLayout(usernameWidget, saveAction, cancelAction, adminOption);
+        createLayout(usernameWidget, adminOption);
         this.setSize(new Dimension(380, 540));
     }
 
-    private void createLayout(Widget usernameWidget, Action saveAction, Action cancelAction,
-            AdminOption adminOption) {
+    private void createLayout(Widget usernameWidget, AdminOption adminOption) {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        messagePanel = new SingleLineMessagePanel();
-        this.add(messagePanel);
         this.add(createProfilePanel(adminOption));
-
         this.add(createLoginPanel(usernameWidget));
-        this.add(createButtonsPanel(saveAction, cancelAction));
-    }
-
-    private JPanel createButtonsPanel(Action saveButton, Action cancelAction) {
-        JPanel panel = new JPanel(new BorderLayout());
-
-        JPanel container = new JPanel();
-        FlowLayout layout = new FlowLayout();
-        layout.setHgap(10);
-        layout.setVgap(15);
-        container.setLayout(layout);
-
-        Button okButton = new SaveButton(saveButton);
-        container.add(okButton);
-        CloseButton closeButton = new CloseButton(cancelAction);
-        container.add(closeButton);
-
-        panel.add(container, BorderLayout.CENTER);
-
-        return panel;
     }
 
     private JPanel createLoginPanel(Widget usernameWidget) {
@@ -205,18 +167,33 @@ public class EditableUserProfilePanel extends JPanel {
         return panel;
     }
 
-    protected void populateUser() throws EmfException {
-        populateUserStrategy.populate(name.getText(), affiliation.getText(), phone.getText(), email.getText(), username
-                .value(), password.getPassword(), confirmPassword.getPassword(), wantEmails.isSelected());
-        adminOption.isAdmin(user);
+    public Boolean getWantEmails() {
+        return wantEmails.isSelected();
+    }
+    public String getUsername() {
+        return username.value();
     }
     
-    protected void checkNewPwd() throws EmfException {
-        populateUserStrategy.checkNewPwd( password.getPassword());
+    public char[] getPassword() {
+        return password.getPassword();
     }
-
-    void setError(String message) {
-        messagePanel.setError(message);
+    
+    public char[] getConfirmPassword() {
+        return confirmPassword.getPassword();
     }
-
+    
+    public String getEmail() {
+        return email.getText();
+    }
+    public String getName(){
+        return name.getText();
+    }
+   
+    public String getAffi() {
+        return affiliation.getText();
+    }
+       
+    public String getPhone(){
+        return phone.getText();
+    }
 }
