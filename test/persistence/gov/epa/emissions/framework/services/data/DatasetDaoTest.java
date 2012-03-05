@@ -383,7 +383,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         dataset3.setStatus("Deleted");
         
         try {
-            EmfDataset[] loadedFromDb = (EmfDataset[])dao.allNonDeleted(session).toArray(new EmfDataset[0]);
+            EmfDataset[] loadedFromDb = (EmfDataset[])dao.allNonDeleted(session, 1).toArray(new EmfDataset[0]);
             assertEquals(1, loadedFromDb.length);
             assertEquals("dataset-dao-test", loadedFromDb[0].getName());
         } finally {

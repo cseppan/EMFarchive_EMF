@@ -128,7 +128,7 @@ public class LoggingServiceTest extends ServiceTestCase {
     private EmfDataset getDataset(EmfDataset dataset) throws EmfException {
         EmfDataset datasetFromDB = null;
 
-        EmfDataset[] allDatasets = dataService.getDatasets("");
+        EmfDataset[] allDatasets = dataService.getDatasets("", 1);
 
         for (int i = 0; i < allDatasets.length; i++) {
             datasetFromDB = allDatasets[i];

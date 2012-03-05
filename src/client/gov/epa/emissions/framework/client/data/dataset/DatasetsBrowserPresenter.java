@@ -59,7 +59,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     }
 
     public void doRefresh() throws EmfException {
-        view.refresh(getDatasets(view.getNameContains()));
+        view.refresh(getDatasets(view.getNameContains(), session.user().getId()));
         view.clearMessage();
     }
     
@@ -91,8 +91,8 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         return session.userService().getUsers();
     }
     
-    private EmfDataset[] getDatasets(String nameContains) throws EmfException {
-        return dataService().getDatasets(nameContains);
+    private EmfDataset[] getDatasets(String nameContains, int userId) throws EmfException {
+        return dataService().getDatasets(nameContains, userId);
     }
 
     private DataService dataService() {
@@ -200,13 +200,14 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
             return new EmfDataset[0];
         
         if (type.getName().equalsIgnoreCase("All"))
-            return getDatasets(nameContains);
+            return getDatasets(nameContains, session.user().getId());
         
         return dataService().getDatasetsWithFilter(type.getId(), nameContains);
     }
     
     public EmfDataset[] advSearch4Datasets(EmfDataset ds, String qaStep, String qaArgument, int[] usedByCasesId, String dataValueFilter, boolean unconditional) throws EmfException {
-        return dataService().findDatasets(ds, qaStep, qaArgument, usedByCasesId, dataValueFilter, unconditional);
+        return dataService().findDatasets(ds, qaStep, qaArgument, usedByCasesId, 
+                dataValueFilter, unconditional, session.user().getId());
     }
 
     public void purgeDeletedDatasets() throws EmfException {
@@ -226,7 +227,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
             return 0;
         
         if (type.getName().equalsIgnoreCase("All"))
-            return dataService().getNumOfDatasets(nameContains);
+            return dataService().getNumOfDatasets(nameContains, session.user().getId());
         
         return dataService().getNumOfDatasets(type.getId(), nameContains);
     }

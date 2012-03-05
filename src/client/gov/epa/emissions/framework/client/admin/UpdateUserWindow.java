@@ -91,7 +91,8 @@ public class UpdateUserWindow extends DisposableInteralFrame implements Updatabl
         Action closeAction = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    presenter.doClose();
+                    if ( shouldDiscardChanges())
+                        presenter.doClose();
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
                 }

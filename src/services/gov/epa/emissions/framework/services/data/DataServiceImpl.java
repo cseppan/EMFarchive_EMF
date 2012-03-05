@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.data;
 
-import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
@@ -35,9 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.axis.utils.XMLChar;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xerces.util.XMLChar;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
@@ -68,14 +67,14 @@ public class DataServiceImpl implements DataService {
         dao = new DatasetDAO(dbServerFactory);
     }
 
-    public synchronized EmfDataset[] getDatasets(String nameContains) throws EmfException {
+    public synchronized EmfDataset[] getDatasets(String nameContains, int userId) throws EmfException {
         Session session = sessionFactory.getSession();
         List datasets;
         try {
             if (nameContains == null || nameContains.trim().length() == 0 || nameContains.trim().equals("*"))
-                datasets = dao.allNonDeleted(session);
+                datasets = dao.allNonDeleted(session, userId);
             else
-                datasets = dao.allNonDeleted(session, nameContains);
+                datasets = dao.allNonDeleted(session, nameContains, userId);
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets", e);
@@ -214,13 +213,13 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public synchronized int getNumOfDatasets(String nameContains) throws EmfException {
+    public synchronized int getNumOfDatasets(String nameContains, int userId) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             if (nameContains == null || nameContains.trim().length() == 0)
-                return dao.getNumOfDatasets(session);
+                return dao.getNumOfDatasets(userId, session);
             
-            return dao.getNumOfDatasets(session, nameContains);
+            return dao.getNumOfDatasets(session, nameContains, userId);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets", e);
             throw new EmfException("Could not get all Datasets");
@@ -1482,11 +1481,13 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public EmfDataset[] findDatasets(EmfDataset dataset, String qaStep, String qaArgument, int[] usedByCasesID, String dataValueFilter, boolean unconditional) throws EmfException {
+    public EmfDataset[] findDatasets(EmfDataset dataset, String qaStep, String qaArgument, 
+            int[] usedByCasesID, String dataValueFilter, boolean unconditional, int userId) throws EmfException {
         Session session = sessionFactory.getSession();
         
         try {
-            return dao.findSimilarDatasets(dataset, qaStep, qaArgument, usedByCasesID, dataValueFilter, unconditional, session).toArray(new EmfDataset[0]);
+            return dao.findSimilarDatasets(dataset, qaStep, qaArgument, usedByCasesID, 
+                    dataValueFilter, unconditional, userId, session).toArray(new EmfDataset[0]);
         } catch (Exception e) {
             LOG.error("Could not find similar datasets.", e);
             throw new EmfException("Could not find similar datasets: " + e.getMessage());
@@ -1537,5 +1538,4 @@ public class DataServiceImpl implements DataService {
         }
         return -2;
     }
-    
 }

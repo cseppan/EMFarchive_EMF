@@ -96,7 +96,7 @@ public class EditCaseInputWindow extends DisposableInteralFrame implements EditC
 
             disposeView();
         } catch (EmfException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             messagePanel.setError(e.getMessage());
         }
     }

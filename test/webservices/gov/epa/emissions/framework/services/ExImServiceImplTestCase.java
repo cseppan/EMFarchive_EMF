@@ -74,7 +74,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
                 .getDatasetType());
         Thread.sleep(20000); // so that import thread has enough time to run
 
-        EmfDataset[] imported = dataService.getDatasets("");
+        EmfDataset[] imported = dataService.getDatasets("",1);
         EmfDataset localdataset = imported[0];
         assertEquals(filename, imported[0].getName());
         assertEquals(1, imported.length);
@@ -91,7 +91,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
         eximService.importDataset(user, repository.getAbsolutePath(), files, getDatasetType("External File (External)"), files[0]);
         Thread.sleep(60000); // so that import thread has enough time to run
         
-        EmfDataset[] imported = dataService.getDatasets("");
+        EmfDataset[] imported = dataService.getDatasets("",1);
         EmfDataset localdataset = imported[0];
         assertEquals(files[0], imported[0].getName());
         assertEquals(1, imported.length);
@@ -110,7 +110,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
                 .getDatasetType(), "small-nonpoint1.txt");
         Thread.sleep(2000); // so that import thread has enough time to run
 
-        EmfDataset[] imported = dataService.getDatasets("");
+        EmfDataset[] imported = dataService.getDatasets("",1);
         EmfDataset localdataset = imported[0];
         assertEquals(filename, imported[0].getName());
         assertEquals(1, imported.length);
@@ -137,7 +137,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             eximService.importDatasets(user, repository.getAbsolutePath(), files, dataset.getDatasetType());
             Thread.sleep(240000); // so that import thread has enough time to run
 
-            imported = dataService.getDatasets("");
+            imported = dataService.getDatasets("",1);
             List<String> importedNames = new ArrayList<String>();
 
             for (int i = 0; i < imported.length; i++)
@@ -178,7 +178,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             eximService.importDatasets(user, repository.getAbsolutePath(), files, getDatasetType("Text file (Line-based)"));
             Thread.sleep(240000); // so that import thread has enough time to run
             
-            imported = dataService.getDatasets("");
+            imported = dataService.getDatasets("", 1);
             List<String> importedNames = new ArrayList<String>();
 
             for (int i = 0; i < imported.length; i++)
@@ -225,7 +225,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             eximService.importDatasets(user, repository.getAbsolutePath(), files, type);
             Thread.sleep(240000); // so that import thread has enough time to run
             
-            imported = dataService.getDatasets("");
+            imported = dataService.getDatasets("",1);
             List<String> importedNames = new ArrayList<String>();
             
             for (int i = 0; i < imported.length; i++) {
@@ -283,7 +283,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             importService.importDatasetForCaseOutput(user, output, services());
             Thread.sleep(10000); // so that import thread has enough time to run
             
-            imported = dataService.getDatasets("");
+            imported = dataService.getDatasets("",1);
             
             assertEquals(filename, imported[0].getName());
             assertEquals(1, imported.length);
@@ -327,7 +327,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             importService.importDatasetForCaseOutput(user, output, services());
             Thread.sleep(10000); // so that import thread has enough time to run
             
-            imported = dataService.getDatasets("");
+            imported = dataService.getDatasets("", 1);
             
             assertEquals("nonpoint1", imported[0].getName());
             assertEquals(1, imported.length);
@@ -365,7 +365,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             importService.importDatasetForCaseOutput(user, output, services());
             Thread.sleep(2000); // so that import thread has enough time to run
             
-            imported = dataService.getDatasets("");
+            imported = dataService.getDatasets("",1);
             
             assertEquals(1, imported.length);
         } catch (RuntimeException e) {
@@ -399,7 +399,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
             importService.importDatasetForCaseOutput(user, output, services());
             Thread.sleep(180000); // so that import thread has enough time to run
             
-            imported = dataService.getDatasets("");
+            imported = dataService.getDatasets("", 1);
             assertEquals(4, imported.length);
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -452,7 +452,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
 
         Thread.sleep(2000); // so that import thread has enough time to run
 
-        EmfDataset[] imported = dataService.getDatasets("");
+        EmfDataset[] imported = dataService.getDatasets("", 1);
         assertEquals(filename, imported[0].getName());
 
         Version version = new Version();
@@ -487,7 +487,7 @@ public class ExImServiceImplTestCase extends ExImServiceTestCase {
 
         Thread.sleep(2000); // so that import thread has enough time to run
 
-        EmfDataset[] imported = dataService.getDatasets("");
+        EmfDataset[] imported = dataService.getDatasets("", user.getId());
         assertEquals(filename, imported[0].getName());
 
         Version version = new Version();

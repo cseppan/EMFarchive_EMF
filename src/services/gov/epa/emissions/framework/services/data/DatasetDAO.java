@@ -119,17 +119,32 @@ public class DatasetDAO {
         return hibernateFacade.getAll(EmfDataset.class, session);
     }
 
-    public int getNumOfDatasets(Session session) {
-        List<?> num = session.createQuery("SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted'")
+    public int getNumOfDatasets(int userId, Session session) {
+        String dsts = "( select DT from DatasetType as DT " 
+            + "where "
+            + " DT.id not in (select EDT.id from User as U "
+            + " inner join U.excludedDatasetTypes as EDT where U.id = "
+            + userId + ")" 
+            + " order by DT.name )";
+        
+        List<?> num = session.createQuery("SELECT COUNT(ds.id) from EmfDataset as ds " 
+                + " where ds.status <> 'Deleted' and ds.datasetType.id in " + dsts )
                 .list();
         return Integer.parseInt(num.get(0).toString());
     }
 
-    public int getNumOfDatasets(Session session, String name) {
+    public int getNumOfDatasets(Session session, String name, int userId) {
         String ns = Utils.getPattern(name.toLowerCase().trim());
+        String dsts = "( select DT from DatasetType as DT " 
+            + "where "
+            + " DT.id not in (select EDT.id from User as U "
+            + " inner join U.excludedDatasetTypes as EDT where U.id = "
+            + userId + ")" 
+            + " order by DT.name )";
+      
         List<?> num = session.createQuery(
                 "SELECT COUNT(ds.id) from EmfDataset as ds where ds.status <> 'Deleted' " + " AND lower(ds.name) like "
-                        + ns).list();
+                        + ns + " and ds.datasetType.id in " + dsts ).list();
         return Integer.parseInt(num.get(0).toString());
     }
 
@@ -151,23 +166,35 @@ public class DatasetDAO {
     }
 
     // FIXME: to be deleted after dataset removed from db
-    public List allNonDeleted(Session session) {
+    public List allNonDeleted(Session session, int userId) {
+        String dsts = "( select DT from DatasetType as DT " 
+            + "where "
+            + " DT.id not in (select EDT.id from User as U "
+            + " inner join U.excludedDatasetTypes as EDT where U.id = "
+            + userId + ")" 
+            + " order by DT.name )";
         return session
                 .createQuery(
                         "select new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse as IU left join DS.project as P left join DS.region as R "
-                                + " where DS.status <> 'Deleted' order by DS.name").list();
+                                + " where DS.status <> 'Deleted' and DS.datasetType.id in " + dsts + "order by DS.name").list();
     }
 
-    public List allNonDeleted(Session session, String nameContains) {
+    public List allNonDeleted(Session session, String nameContains, int userId) {
         String ns = Utils.getPattern(nameContains.toLowerCase().trim());
+        String dsts = " (select DT from DatasetType as DT " 
+            + "where "
+            + " DT.id not in (select EDT.id from User as U "
+            + " inner join U.excludedDatasetTypes as EDT where U.id = "
+            + userId + ")" 
+            + " order by DT.name ) ";
         return session
                 .createQuery(
                         "select new EmfDataset(DS.id, DS.name, DS.defaultVersion, DS.modifiedDateTime, DS.datasetType.id, DS.datasetType.name, DS.status, DS.creator, DS.creatorFullName, IU.name, P.name, R.name, DS.startDateTime, DS.stopDateTime, DS.temporalResolution) "
                                 + " from EmfDataset as DS left join DS.intendedUse as IU left join DS.project as P left join DS.region as R "
                                 + " where lower(DS.name) like "
                                 + ns
-                                + " and DS.status <> 'Deleted' "
+                                + " and DS.status <> 'Deleted' and DS.datasetType.id in " + dsts 
                                 + " order by DS.name").list();
     }
 
@@ -1637,13 +1664,21 @@ public class DatasetDAO {
         //
     }
     
-    public List<EmfDataset> findSimilarDatasets(EmfDataset ds, String qaStep, String qaArgument, int[] usedByCasesId, String dataValueFilter, boolean unconditional, Session session) throws Exception {
+    public List<EmfDataset> findSimilarDatasets(EmfDataset ds, String qaStep, String qaArgument, 
+            int[] usedByCasesId, String dataValueFilter, boolean unconditional, int userId, Session session) throws Exception {
     
         if (ds.getDatasetType() == null && dataValueFilter != null && !dataValueFilter.trim().isEmpty()) {
             throw new Exception("Dataset Type must be set if you want to use Data Value Filter.");
         }
         
-        String dsTypeStr = (ds.getDatasetType() == null ? "" : " AND DS.datasetType.id = "
+        String dsts = "( select DT from DatasetType as DT " 
+            + "where "
+            + " DT.id not in (select EDT.id from User as U "
+            + " inner join U.excludedDatasetTypes as EDT where U.id = "
+            + userId + ")" 
+            + " order by DT.name )";
+        
+        String dsTypeStr = (ds.getDatasetType() == null ? "AND DS.datasetType.id in " + dsts : " AND DS.datasetType.id = "
             + ds.getDatasetType().getId());
         String name = ds.getName();
         String dsNameStr = (name == null || name.trim().isEmpty() ? "" : " AND lower(DS.name) LIKE "

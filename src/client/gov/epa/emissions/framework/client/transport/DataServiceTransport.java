@@ -31,14 +31,15 @@ public class DataServiceTransport implements DataService {
         return call;
     }
 
-    public synchronized EmfDataset[] getDatasets(String nameContains) throws EmfException {
+    public synchronized EmfDataset[] getDatasets(String nameContains, int userId ) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getDatasets");
         call.addStringParam("nameContains");
+        call.addIntegerParam("userId");
         call.setReturnType(mappings.datasets());
 
-        return (EmfDataset[]) call.requestResponse(new Object[] {nameContains});
+        return (EmfDataset[]) call.requestResponse(new Object[] {nameContains, userId});
         
     }
 
@@ -50,7 +51,7 @@ public class DataServiceTransport implements DataService {
         call.addParam("dataset", mappings.dataset());
         call.setReturnType(mappings.dataset());
 
-        return (EmfDataset) call.requestResponse(new Object[] { owner, dataset });
+        return (EmfDataset) call.requestResponse(new Object[] { owner, dataset});
     }
 
     public synchronized EmfDataset updateDataset(EmfDataset dataset) throws EmfException {
@@ -216,14 +217,15 @@ public class DataServiceTransport implements DataService {
         return (Integer) call.requestResponse(new Object[] {new Integer(datasetTypeId), nameContains });
     }
     
-    public int getNumOfDatasets(String nameContains) throws EmfException {
+    public int getNumOfDatasets(String nameContains, int userId) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getNumOfDatasets");
         call.addStringParam("nameContains");
+        call.addIntegerParam("userId");
         call.setIntegerReturnType();
         
-        return (Integer) call.requestResponse(new Object[] {nameContains });
+        return (Integer) call.requestResponse(new Object[] {nameContains, userId});
     }
 
     public String getTableAsString(String qualifiedTableName) throws EmfException {
@@ -441,7 +443,8 @@ public class DataServiceTransport implements DataService {
         
     }
 
-    public EmfDataset[] findDatasets(EmfDataset dataset, String qaStep, String qaArgument, int[] usedByCasesID, String dataValueFilter, boolean unconditional) throws EmfException {
+    public EmfDataset[] findDatasets(EmfDataset dataset, String qaStep, String qaArgument, 
+            int[] usedByCasesID, String dataValueFilter, boolean unconditional, int userId) throws EmfException {
         EmfCall call = call();
         
         call.setOperation("findDatasets");
@@ -451,9 +454,10 @@ public class DataServiceTransport implements DataService {
         call.addIntArrayParam();
         call.addStringParam("dataValueFilter");
         call.addBooleanParameter("unconditional");
+        call.addIntegerParam("userId");
         call.setReturnType(mappings.datasets());
         
-        return (EmfDataset[]) call.requestResponse(new Object[]{ dataset, qaStep, qaArgument, usedByCasesID, dataValueFilter, new Boolean(unconditional) });
+        return (EmfDataset[]) call.requestResponse(new Object[]{ dataset, qaStep, qaArgument, usedByCasesID, dataValueFilter, new Boolean(unconditional), userId });
     }
 
     public void updateVersion(Version locked) throws EmfException {
