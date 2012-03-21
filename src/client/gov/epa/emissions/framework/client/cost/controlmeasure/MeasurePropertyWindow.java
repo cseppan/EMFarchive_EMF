@@ -239,8 +239,8 @@ public class MeasurePropertyWindow extends DisposableInteralFrame {
         if (propertyCategory.length() == 0)
             exception += "Missing category. ";
         String propertyUnits = units.getText().trim();
-        if (propertyUnits.length() == 0)
-            exception += "Missing units. ";
+//        if (propertyUnits.length() == 0)
+//            exception += "Missing units. ";
         String propertyDataType = dataType.getText().trim();
         if (propertyDataType.length() == 0)
             exception += "Missing data type. ";

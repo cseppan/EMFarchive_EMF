@@ -1,8 +1,10 @@
+﻿--select public.delete_measure(622);
+
 -- delete_measure
 CREATE OR REPLACE FUNCTION public.delete_measure(
-	control_measure_id integer) RETURNS void AS $$
+	cm_id integer) RETURNS void AS $$
 DECLARE
-	cm_id int := control_measure_id;
+--	cm_id int := control_measure_id;
 BEGIN
 	delete from emf.control_measure_sccs
 	where control_measures_id 

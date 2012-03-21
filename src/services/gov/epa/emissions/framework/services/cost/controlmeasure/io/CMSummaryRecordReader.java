@@ -281,6 +281,7 @@ public class CMSummaryRecordReader {
         if (date == null || date.trim().length() == 0)
             return;
         try {
+            if (date.length() != 4) throw new ParseException("Invalid year format.", 5);
             Date dateReviewed = CustomDateFormat.parse_YYYY(date);
             cm.setDateReviewed(dateReviewed);
         } catch (ParseException e) {

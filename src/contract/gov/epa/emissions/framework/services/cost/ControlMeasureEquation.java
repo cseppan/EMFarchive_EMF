@@ -17,7 +17,7 @@ public class ControlMeasureEquation implements Serializable {
     private Double value1, value2, value3;
     private Double value4, value5, value6;
     private Double value7, value8, value9;
-    private Double value10;
+    private Double value10, value11;
     
     public ControlMeasureEquation() {// persistence/bean
     }
@@ -160,6 +160,14 @@ public class ControlMeasureEquation implements Serializable {
 
     public Double getValue10() {
         return value10;
+    }
+
+    public void setValue11(Double value11) {
+        this.value11 = value11;
+    }
+
+    public Double getValue11() {
+        return value11;
     }
 
     public void setCostYear(int costYear) {

@@ -15,7 +15,9 @@ public class CMEquationFileFormat implements CMFileFormat {
                 "Var3", "Var4", 
                 "Var5", "Var6", 
                 "Var7", "Var8", 
-                "Var9", "Var10"};
+                "Var9", "Var10", 
+                "Var11"
+                };
         return cols;
     }
 

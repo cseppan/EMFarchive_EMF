@@ -30,12 +30,12 @@ public class CMReferenceTableData extends AbstractEditableTableData {
 
     private ViewableRow<Reference> row(Reference reference) {
 
-        Object[] values = { reference.getId(), reference.getDescription() };
+        Object[] values = { reference.getDescription() };
         return new ViewableRow<Reference>(reference, values);
     }
 
     public String[] columns() {
-        return new String[] { "ID", "Description" };
+        return new String[] { "Description" };
     }
 
     public Class<?> getColumnClass(int col) {

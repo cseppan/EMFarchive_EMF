@@ -38,8 +38,10 @@ import java.util.StringTokenizer;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTabView {
@@ -78,7 +80,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private AddRemoveMonthWidget monthsWidget;
     
-    protected TextField dataSources;
+//    protected TextField dataSources;
 
     protected MessagePanel messagePanel;
 
@@ -133,7 +135,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         lastModifiedBy.setText(measure.getLastModifiedBy() + "");
         abbreviation.setText(getText(measure.getAbbreviation()));
         dateReviewed.setText(formatDateReviewed());
-        dataSources.setText(getText(measure.getDataSouce()));
+//        dataSources.setText(getText(measure.getDataSouce()));
         sectorsWidget.setSectors(measure.getSectors());
         monthsWidget.setMonths(measure.getMonths());
     }
@@ -342,10 +344,10 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         changeablesList.addChangeable(dateReviewed);
         layoutGenerator.addLabelWidgetPair("Date Reviewed:", dateReviewed, panel);
 
-        dataSources = new TextField("Data Sources:", 15);
-        layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
+//        dataSources = new TextField("Data Sources:", 15);
+//        layoutGenerator.addLabelWidgetPair("Data Sources:", dataSources, panel);
         
-        widgetLayout(4, 2, 5, 5, 5, 8, layoutGenerator, panel);
+        widgetLayout(3, 2, 5, 5, 5, 8, layoutGenerator, panel);
 
         container.add(panel, BorderLayout.NORTH);
         return container;
@@ -424,7 +426,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         measure.setLastModifiedTime(new Date());
         measure.setLastModifiedBy(session.user().getName());
         measure.setAbbreviation(abbreviation.getText());
-        measure.setDataSouce(dataSources.getText());
+//        measure.setDataSouce(dataSources.getText());
         measure.setSectors(sectorsWidget.getSectors());
         if (monthsWidget.getMonths() == null || monthsWidget.getMonths().length == 0)
             throw new EmfException("Summary tab: The months for the measure is missing.");
@@ -590,7 +592,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         majorPollutant.setEditable(false);
         controlTechnology.setEditable(false);
         equipmentLife.setEditable(false);
-        dataSources.setEditable(false);
+//        dataSources.setEditable(false);
         dateReviewed.setEditable(false);
         sourceGroup.setEditable(false);
         cmClass.setEditable(false);
@@ -598,6 +600,13 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         monthsWidget.viewOnly();
     
         this.disableComboBoxChanges();
+    }
+    
+    protected void setTextFieldCaretPosition() {
+        name.setCaretPosition(0);
+        ((JTextField)((JComboBox)sourceGroup).getEditor().getEditorComponent()).setCaretPosition(0);
+        ((JTextField)((JComboBox)controlTechnology).getEditor().getEditorComponent()).setCaretPosition(0);
+        description.setCaretPosition(0);
     }
     
     private void disableComboBoxChanges() {

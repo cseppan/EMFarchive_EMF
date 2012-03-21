@@ -104,7 +104,7 @@ public class ControlMeasureEquationTab extends JPanel implements ControlMeasureT
         layoutGenerator.addLabelWidgetPair("Name:", new JLabel(currentEqType == null ? "" : currentEqType.getName()), panel);
         layoutGenerator.addLabelWidgetPair("Description:", new JLabel(currentEqType == null ? "" : currentEqType.getDescription()), panel);
         layoutGenerator.addLabelWidgetPair("Inventory Fields:", new JLabel(currentEqType == null ? "" : currentEqType.getInventoryFields()), panel);
-        layoutGenerator.addLabelWidgetPair("Equation:", getEquation(), panel);
+        layoutGenerator.addLabelWidgetPair("Equations:", getEquation(), panel);
         layoutGenerator.makeCompactGrid(panel, 5, 2, 10, 10, 5, 10);
 
         return panel;

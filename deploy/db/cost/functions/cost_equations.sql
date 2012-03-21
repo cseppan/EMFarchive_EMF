@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.get_cost_expressions(
+﻿CREATE OR REPLACE FUNCTION public.get_cost_expressions(
 	int_control_strategy_id integer,
 	int_input_dataset_id integer,
 	use_override_dataset boolean,
@@ -496,7 +496,7 @@ raise notice '%', emis_reduction_sql;
 						annual_cost :=  annualized_capital_cost + operation_maintenance_cost;
 					*/|| chained_gdp_adjustment_factor_expression || ' * 
 					(
-					((((' || control_measure_equation_table_alias || '.value1/*total_equipment_cost_factor*/ * ' || stkflow_expression || ') + ' || control_measure_equation_table_alias || '.value2/*total_equipment_cost_constant*/) * ' || control_measure_equation_table_alias || '.value3/*equipment_to_capital_cost_multiplier*/)/*capital_cost*/ * ' || capital_recovery_factor_expression || ')/*annualized_capital_cost*/ 
+					((((' || control_measure_equation_table_alias || '.value1/*total_equipment_cost_factor*/ * ' || stkflow_expression || ') + ' || control_measure_equation_table_alias || '.value2/*total_equipment_cost_constant*/) * ' || control_measure_equation_table_alias || '.value3/*equipment_to_capital_cost_multiplier*/)/*capital_cost*/ * (' || capital_recovery_factor_expression || '))/*annualized_capital_cost*/ 
 					+ (((' || control_measure_equation_table_alias || '.value4/*electricity_factor*/ * ' || stkflow_expression || ') + ' || control_measure_equation_table_alias || '.value5/*electricity_constant*/) + ((' || control_measure_equation_table_alias || '.value6/*dust_disposal_factor*/ * ' || stkflow_expression || ') + ' || control_measure_equation_table_alias || '.value7/*dust_disposal_constant*/) + ((' || control_measure_equation_table_alias || '.value8/*bag_replacement_factor*/ * ' || stkflow_expression || ') + ' || control_measure_equation_table_alias || '.value9/*bag_replacement_constant*/))/*operation_maintenance_cost*/
 					)
 
@@ -528,7 +528,7 @@ raise notice '%', emis_reduction_sql;
 						annual_cost := annualized_capital_cost + operation_maintenance_cost;
 					*/|| chained_gdp_adjustment_factor_expression || ' * 
 					(
-					((' || public.get_convert_design_capacity_expression('inv', 'MW', '') || ' * ' || control_measure_equation_table_alias || '.value1/*capital_cost_multiplier*/ * 1000 * (250.0 / ' || public.get_convert_design_capacity_expression('inv', 'MW', '') || ') ^ ' || control_measure_equation_table_alias || '.value2/*capital_cost_exponent*/)/*capital_cost*/ * ' || capital_recovery_factor_expression || ')/*annualized_capital_cost*/ 
+					((' || public.get_convert_design_capacity_expression('inv', 'MW', '') || ' * ' || control_measure_equation_table_alias || '.value1/*capital_cost_multiplier*/ * 1000 * (250.0 / ' || public.get_convert_design_capacity_expression('inv', 'MW', '') || ') ^ ' || control_measure_equation_table_alias || '.value2/*capital_cost_exponent*/)/*capital_cost*/ * (' || capital_recovery_factor_expression || '))/*annualized_capital_cost*/ 
 					+ ((' || control_measure_equation_table_alias || '.value3/*variable_operation_maintenance_cost_multiplier*/ * ' || public.get_convert_design_capacity_expression('inv', 'MW', '') || ' * 0.85 * ' || inv_table_alias || '.annual_avg_hours_per_year)/*variable_operation_maintenance_cost*/ + (' || public.get_convert_design_capacity_expression('inv', 'MW', '') || ' * 1000 * ' || control_measure_equation_table_alias || '.value4/*fixed_operation_maintenance_cost_multiplier*/ * (250 / ' || public.get_convert_design_capacity_expression('inv', 'MW', '') || ') ^ ' || control_measure_equation_table_alias || '.value5/*fixed_operation_maintenance_cost_exponent*/)/*fixed_operation_maintenance_cost*/)/*operation_maintenance_cost*/
 
 					)
@@ -595,6 +595,38 @@ raise notice '%', emis_reduction_sql;
 					+ (coalesce(' || control_measure_equation_table_alias || '.value1/*total_capital_investment_fixed_factor*/, 0.0) + coalesce(' || control_measure_equation_table_alias || '.value2/*total_capital_investment_variable_factor*/, 0.0)) * ((' || stkflow_expression || '/*stack_flow_rate*/ * 520 / (' || inv_table_alias || '.stktemp/*stack_temperature*/ + 460.0)) / 150000) ^ 0.6 * ' || capital_recovery_factor_expression || '/*annualized_capital_cost*/
 					)
 				' end || '
+
+				' || case when not has_design_capacity_columns then '' else '
+				-- Equation Type 13
+				when coalesce(' || equation_type_table_alias || '.name,'''') = ''Type 13'' and coalesce(' || convert_design_capacity_expression || ', 0) <> 0 and coalesce(' || stkflow_expression || ', 0) <> 0 then '
+					/*
+						Capital Cost = var1*input1^var2+var3*input1^var4 
+						O&M Cost = var5+var6*input1^var7+var8*input1^var9+var10*input3+var11*input2
+						Annual Cost = Capital Cost * capital_recovery_factor + O&M Cost
+
+
+						where
+
+						input1 = boiler size in MMBtu/hr
+						input2 = boiler emissions in ton/yr
+						input3 = boiler exhaust flowrate in ft3/sec
+						var1 = Capital cost size multiplier No.1
+						var2 = Capital cost exponent No. 1
+						var3 = Capital cost size multiplier No.2
+						var4 = Capital cost exponent No. 2
+						var5 = O&M known costs
+						var6 = O&M cost size multiplier No.1
+						var7 = O&M cost size exponent No. 1
+						var8 = O&M cost size multiplier No. 2
+						var9 = O&M cost size exponent No. 2
+						var10 = O&M cost flowrate multiplier
+						var11 = O&M cost emissions multiplier
+					*/|| chained_gdp_adjustment_factor_expression || ' * 
+					(' || control_measure_equation_table_alias || '.value1 * 3.412 * ' || convert_design_capacity_expression || ' ^ ' || control_measure_equation_table_alias || '.value2 + ' || control_measure_equation_table_alias || '.value3 * 3.412 * ' || convert_design_capacity_expression || ' ^ ' || control_measure_equation_table_alias || '.value4)/*capital_cost*/ * (' || capital_recovery_factor_expression || ') 
+					+ (' || control_measure_equation_table_alias || '.value5 + ' || control_measure_equation_table_alias || '.value6 * 3.412 * ' || convert_design_capacity_expression || ' ^ ' || control_measure_equation_table_alias || '.value7 + ' || control_measure_equation_table_alias || '.value8 * 3.412 * ' || convert_design_capacity_expression || ' ^ ' || control_measure_equation_table_alias || '.value9 + ' || control_measure_equation_table_alias || '.value10 * (' || stkflow_expression || ' / 60.0) + ' || control_measure_equation_table_alias || '.value11 * ' || emis_reduction_sql || ')/*operation_maintenance_cost*/
+					
+				' end || '
+
 				-- Filler when clause, just in case no when part shows up from conditional logic
 				when 1 = 0 then null::double precision
 				else 
@@ -994,6 +1026,37 @@ raise notice '%', emis_reduction_sql;
 					)
 
 				' end || '
+
+				' || case when not has_design_capacity_columns then '' else '
+				-- Equation Type 13
+				when coalesce(' || equation_type_table_alias || '.name,'''') = ''Type 13'' and coalesce(' || convert_design_capacity_expression || ', 0) <> 0 and coalesce(' || stkflow_expression || ', 0) <> 0 then '
+					/*
+						Capital Cost = var1*input1^var2+var3*input1^var4 
+						O&M Cost = var5+var6*input1^var7+var8*input1^var9+var10*input3+var11*input2
+						Annual Cost = Capital Cost * capital_recovery_factor + O&M Cost
+
+
+						where
+
+						input1 = boiler size in MMBtu/hr
+						input2 = boiler emissions in ton/yr
+						input3 = boiler exhaust flowrate in ft3/sec
+						var1 = Capital cost size multiplier No.1
+						var2 = Capital cost exponent No. 1
+						var3 = Capital cost size multiplier No.2
+						var4 = Capital cost exponent No. 2
+						var5 = O&M known costs
+						var6 = O&M cost size multiplier No.1
+						var7 = O&M cost size exponent No. 1
+						var8 = O&M cost size multiplier No. 2
+						var9 = O&M cost size exponent No. 2
+						var10 = O&M cost flowrate multiplier
+						var11 = O&M cost emissions multiplier
+					*/|| chained_gdp_adjustment_factor_expression || ' * 
+					(' || control_measure_equation_table_alias || '.value1 * 3.412 * ' || convert_design_capacity_expression || ' ^ ' || control_measure_equation_table_alias || '.value2 + ' || control_measure_equation_table_alias || '.value3 * 3.412 * ' || convert_design_capacity_expression || ' ^ ' || control_measure_equation_table_alias || '.value4)/*capital_cost*/ 
+					
+				' end || '
+
 				-- Filler when clause, just in case no when part shows up from conditional logic
 				when 1 = 0 then null::double precision
 				else 
@@ -1395,6 +1458,38 @@ raise notice '%', emis_reduction_sql;
 					+ (coalesce(' || control_measure_equation_table_alias || '.value4/*annual_operating_cost_variable_factor*/, 0.0)) * ((' || stkflow_expression || '/*stack_flow_rate*/ * 520 / (' || inv_table_alias || '.stktemp/*stack_temperature*/ + 460.0)) / 150000)
 					)
 				' end || '
+
+
+				' || case when not has_design_capacity_columns then '' else '
+				-- Equation Type 13
+				when coalesce(' || equation_type_table_alias || '.name,'''') = ''Type 13'' and coalesce(' || convert_design_capacity_expression || ', 0) <> 0 and coalesce(' || stkflow_expression || ', 0) <> 0 then '
+					/*
+						Capital Cost = var1*input1^var2+var3*input1^var4 
+						O&M Cost = var5+var6*input1^var7+var8*input1^var9+var10*input3+var11*input2
+						Annual Cost = Capital Cost * capital_recovery_factor + O&M Cost
+
+
+						where
+
+						input1 = boiler size in MMBtu/hr
+						input2 = boiler emissions in ton/yr
+						input3 = boiler exhaust flowrate in ft3/sec
+						var1 = Capital cost size multiplier No.1
+						var2 = Capital cost exponent No. 1
+						var3 = Capital cost size multiplier No.2
+						var4 = Capital cost exponent No. 2
+						var5 = O&M known costs
+						var6 = O&M cost size multiplier No.1
+						var7 = O&M cost size exponent No. 1
+						var8 = O&M cost size multiplier No. 2
+						var9 = O&M cost size exponent No. 2
+						var10 = O&M cost flowrate multiplier
+						var11 = O&M cost emissions multiplier
+					*/|| chained_gdp_adjustment_factor_expression || ' * 
+					(' || control_measure_equation_table_alias || '.value5 + ' || control_measure_equation_table_alias || '.value6 * 3.412 * ' || convert_design_capacity_expression || ' ^ ' || control_measure_equation_table_alias || '.value7 + ' || control_measure_equation_table_alias || '.value8 * 3.412 * ' || convert_design_capacity_expression || ' ^ ' || control_measure_equation_table_alias || '.value9 + ' || control_measure_equation_table_alias || '.value10 * (' || stkflow_expression || ' / 60.0) + ' || control_measure_equation_table_alias || '.value11 * ' || emis_reduction_sql || ')/*operation_maintenance_cost*/
+					
+				' end || '
+
 				-- Filler when clause, just in case no when part shows up from conditional logic
 				when 1 = 0 then null::double precision
 				-- Default Approach
@@ -1751,6 +1846,12 @@ raise notice '%', emis_reduction_sql;
 					(coalesce(' || control_measure_equation_table_alias || '.value3/*annual_operating_cost_fixed_factor*/, 0.0)) * ((' || stkflow_expression || '/*stack_flow_rate*/ * 520 / (' || inv_table_alias || '.stktemp/*stack_temperature*/ + 460.0)) / 150000)
 					)
 				' end || '
+				' || case when not has_design_capacity_columns then '' else '
+				-- Equation Type 13
+				when coalesce(' || equation_type_table_alias || '.name,'''') = ''Type 13'' and coalesce(' || convert_design_capacity_expression || ', 0) <> 0 and coalesce(' || stkflow_expression || ', 0) <> 0 then '
+					|| chained_gdp_adjustment_factor_expression || ' * 
+					null::double precision
+				' end || '
 				-- Filler when clause, just in case no when part shows up from conditional logic
 				when 1 = 0 then null::double precision
 				else 
@@ -2100,6 +2201,12 @@ raise notice '%', emis_reduction_sql;
 					(
 					(coalesce(' || control_measure_equation_table_alias || '.value4/*annual_operating_cost_variable_factor*/, 0.0)) * ((' || stkflow_expression || '/*stack_flow_rate*/ * 520 / (' || inv_table_alias || '.stktemp/*stack_temperature*/ + 460.0)) / 150000)
 					)
+				' end || '
+				' || case when not has_design_capacity_columns then '' else '
+				-- Equation Type 13
+				when coalesce(' || equation_type_table_alias || '.name,'''') = ''Type 13'' and coalesce(' || convert_design_capacity_expression || ', 0) <> 0 and coalesce(' || stkflow_expression || ', 0) <> 0 then '
+					|| chained_gdp_adjustment_factor_expression || ' * 
+					null::double precision
 				' end || '
 				-- Filler when clause, just in case no when part shows up from conditional logic
 				when 1 = 0 then null::double precision
@@ -2510,6 +2617,37 @@ raise notice '%', emis_reduction_sql;
 					)
 
 				' end || '
+
+				' || case when not has_design_capacity_columns then '' else '
+				-- Equation Type 13
+				when coalesce(' || equation_type_table_alias || '.name,'''') = ''Type 13'' and coalesce(' || convert_design_capacity_expression || ', 0) <> 0 and coalesce(' || stkflow_expression || ', 0) <> 0 then '
+					/*
+						Capital Cost = var1*input1^var2+var3*input1^var4 
+						O&M Cost = var5+var6*input1^var7+var8*input1^var9+var10*input3+var11*input2
+						Annual Cost = Capital Cost * capital_recovery_factor + O&M Cost
+
+
+						where
+
+						input1 = boiler size in MMBtu/hr
+						input2 = boiler emissions in ton/yr
+						input3 = boiler exhaust flowrate in ft3/sec
+						var1 = Capital cost size multiplier No.1
+						var2 = Capital cost exponent No. 1
+						var3 = Capital cost size multiplier No.2
+						var4 = Capital cost exponent No. 2
+						var5 = O&M known costs
+						var6 = O&M cost size multiplier No.1
+						var7 = O&M cost size exponent No. 1
+						var8 = O&M cost size multiplier No. 2
+						var9 = O&M cost size exponent No. 2
+						var10 = O&M cost flowrate multiplier
+						var11 = O&M cost emissions multiplier
+					*/|| chained_gdp_adjustment_factor_expression || ' * 
+					(' || control_measure_equation_table_alias || '.value1 * 3.412 * ' || convert_design_capacity_expression || ' ^ ' || control_measure_equation_table_alias || '.value2 + ' || control_measure_equation_table_alias || '.value3 * 3.412 * ' || convert_design_capacity_expression || ' ^ ' || control_measure_equation_table_alias || '.value4)/*capital_cost*/ * (' || capital_recovery_factor_expression || ') 
+					
+				' end || '
+
 				-- Filler when clause, just in case no when part shows up from conditional logic
 				when 1 = 0 then null::double precision
 				else 
@@ -2662,6 +2800,18 @@ raise notice '%', emis_reduction_sql;
 							''Type 12''
 						else
 							''-Type 12''
+					end
+
+				' end || '
+
+				' || case when not has_design_capacity_columns then '' else '
+				-- Equation Type 13
+				when coalesce(' || equation_type_table_alias || '.name,'''') = ''Type 13'' then
+					case 
+						when coalesce(' || convert_design_capacity_expression || ', 0) <> 0 and coalesce(' || stkflow_expression || ', 0) <> 0 then 
+							''Type 13''
+						else
+							''-Type 13''
 					end
 
 				' end || '

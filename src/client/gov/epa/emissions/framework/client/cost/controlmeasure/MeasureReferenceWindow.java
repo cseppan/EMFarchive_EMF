@@ -61,7 +61,8 @@ public class MeasureReferenceWindow extends DisposableInteralFrame implements Me
 
         messagePanel.clear();
 
-        if (this.presenter.checkIfExists(this.descriptionField.getText().trim(), this.controlMeasure)) {
+        if (!reference.getDescription().equalsIgnoreCase(this.descriptionField.getText().trim())
+                && this.presenter.checkIfExists(this.descriptionField.getText().trim(), this.controlMeasure)) {
             this.messagePanel.setMessage("Control Measure already contains reference with the same description.");
         } else {
 

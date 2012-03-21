@@ -1488,3 +1488,77 @@ update emf.control_measures
 set cm_class_id = (select id from emf.control_measure_classes where name = 'Temporary')
 where id in (select id from emf.control_measures where abbreviation like 'TC%');
 
+-- 2/7/2012 -- added another value column (now up to 11) to the cost equations
+alter TABLE emf.control_measure_equations
+add column value11 double precision;
+
+
+insert into emf.equation_types (name, description, inventory_fields, equation)
+select 'Type 13', 'ICI Boiler Cost Equations', 'design_capacity, design_capacity_unit_numerator, design_capacity_unit_denominator, stack_flow_rate, stack_velocity, stack_diameter','Capital Cost = var1*input1^var2+var3*input1^var4 
+O&M Cost = var5+var6*input1^var7+var8*input1^var9+var10*input3+var11*input2
+
+where
+
+input1 = boiler size in MMBtu/hr
+input2 = boiler emissions in ton/yr
+input3 = boiler exhaust flowrate in ft3/sec
+var1 = Capital cost size multiplier No.1
+var2 = Capital cost exponent No. 1
+var3 = Capital cost size multiplier No.2
+var4 = Capital cost exponent No. 2
+var5 = O&M known costs
+var6 = O&M cost size multiplier No.1
+var7 = O&M cost size exponent No. 1
+var8 = O&M cost size multiplier No. 2
+var9 = O&M cost size exponent No. 2
+var10 = O&M cost flowrate multiplier
+var11 = O&M cost emissions multiplier';
+
+
+-- Add Equation Variables
+
+-- Type 13
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Capital Cost Size Multiplier No. 1', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 13';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Capital Cost Exponent No. 1', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 13';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Capital Cost Size Multiplier No. 2', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 13';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'Capital Cost Exponent No. 2', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 13';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'O&M Known Costs', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 13';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'O&M Cost Size Multiplier No. 1', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 13';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'O&M Cost Exponent No. 1', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 13';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'O&M Cost Size Multiplier No. 2', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 13';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'O&M Cost Exponent No. 2', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 13';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'O&M Flowrate Multiplier', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 13';
+insert into emf.equation_type_variables (equation_type_id, name, file_col_position, list_index)
+select e.id, 'O&M Emissions Multiplier', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
+from emf.equation_types as e 
+where name = 'Type 13';

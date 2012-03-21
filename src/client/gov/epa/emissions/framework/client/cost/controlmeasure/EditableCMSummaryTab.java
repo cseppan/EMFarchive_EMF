@@ -36,13 +36,6 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab{
         
     }
 
-    public void setTextFieldCaretPosition() {
-        name.setCaretPosition(0);
-        ((JTextField)((JComboBox)sourceGroup).getEditor().getEditorComponent()).setCaretPosition(0);
-        ((JTextField)((JComboBox)controlTechnology).getEditor().getEditorComponent()).setCaretPosition(0);
-        dataSources.setCaretPosition(0);
-    }
-    
     public void save(ControlMeasure measure) throws EmfException {
         super.save(measure);
     }
