@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.casemanagement.jobs.ExportSelectionDialog;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
@@ -110,6 +111,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     
     private EmfDataset origDataset;
 
+    private QAStepResult qaStepResult;
+
     public ViewQAStepWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("View QA Step", new Dimension(680, 580), desktopManager);
         this.parentConsole = parentConsole;
@@ -119,6 +122,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     public void display(QAStep step, QAStepResult qaStepResult, QAProgram[] programs, EmfDataset dataset, User user,
             String versionName, boolean asTemplate) {
         this.step = step;
+        this.qaStepResult = qaStepResult;
         this.user = user;
         this.qaPrograms = new QAPrograms(null, programs);
         this.origDataset = dataset;
@@ -469,19 +473,65 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         return export;
     }
 
+//    protected void doExport() {
+//        try {
+//            checkExportFolder();
+//            QAStepResult result = presenter.getStepResult(step);
+//            resetRunStatus(result);
+//            messagePanel.setMessage("Started Export. Please monitor the Status window "
+//                    + "to track your export request.");
+//            presenter.doExport(step, result, exportFolder.getText(), exportName.getText(), overide.isSelected());
+//        } catch (EmfException e) {
+//            messagePanel.setError(e.getMessage());
+//        }
+//    }
+    
     protected void doExport() {
         try {
             checkExportFolder();
-            QAStepResult result = presenter.getStepResult(step);
-            resetRunStatus(result);
-            messagePanel.setMessage("Started Export. Please monitor the Status window "
-                    + "to track your export request.");
-            presenter.doExport(step, result, exportFolder.getText(), exportName.getText(), overide.isSelected());
+            if ( !checkExportName()) 
+                return;
+            if (!presenter.ignoreShapeFileFunctionality()) {
+                ExportSelectionDialog dialog = new ExportSelectionDialog(parentConsole, presenter.getProjectionShapeFiles(), presenter.getPollutants());
+                dialog.display();
+                if (dialog.shouldCreateShapeFile()){
+                    messagePanel.setMessage("Started Exporting Shape File. Please monitor the Status window "
+                            + "to track your export request.");
+                    presenter.exportToShapeFile(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected(), dialog.getProjectionShapeFile(), dialog.getPollutant());
+                }
+                if(dialog.shouldCreateCSV()) {
+                    messagePanel.setMessage("Started Export. Please monitor the Status window "
+                            + "to track your export request.");
+                    presenter.doExport(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected()); // pass in fileName
+                }
+            } else {
+                messagePanel.setMessage("Started Export. Please monitor the Status window "
+                        + "to track your export request.");
+                presenter.doExport(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected()); // pass in fileName
+            }
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
     }
-    
+
+    private boolean checkExportName() {
+        
+        if (exportName.getText().trim().isEmpty())
+        {
+            // show a dialog to remind user that the name will be default
+            int n = JOptionPane.showConfirmDialog(
+                    this,
+                    "You did not specify the Export Name. It will be generated automatically. Would you like to continue?",
+                    "Export Name not Specified",
+                    JOptionPane.YES_NO_OPTION);
+            if ( n == JOptionPane.YES_OPTION) 
+                return true;
+            return false;
+        }
+
+        return true;
+    }
+
     private void checkExportFolder() throws EmfException{
         if (exportFolder.getText().trim().isEmpty())
             throw new EmfException (" Please specify the export folder. ");
