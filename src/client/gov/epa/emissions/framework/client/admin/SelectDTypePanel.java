@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -44,10 +45,14 @@ public class SelectDTypePanel extends JPanel {
 
     private void createLayout(DatasetType[] eDatasetTypes, DatasetType[] iDatasetTypes) {
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-
+        
+        this.add(Box.createRigidArea(new Dimension(10,0)));
         this.add(createIncludePanel(iDatasetTypes));
+        this.add(Box.createRigidArea(new Dimension(10,0)));
         this.add(createButtonsPanel());
+        this.add(Box.createRigidArea(new Dimension(10,0)));
         this.add(createExcludePanel(eDatasetTypes));  
+        this.add(Box.createRigidArea(new Dimension(10,0)));
     }
     
     private JPanel createExcludePanel(DatasetType[] eDatasetTypes) {  
@@ -85,12 +90,24 @@ public class SelectDTypePanel extends JPanel {
     private JPanel createButtonsPanel() {
         JPanel buttonPanel =  new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        Button includeButton = new AddButton("<<Add", includeAction());
-        includeButton.setMargin(new Insets(1, 2, 1, 2));
-        Button excludeButton = new AddButton("Remove>>", excludeAction());
-        excludeButton.setMargin(new Insets(1, 2, 1, 2));
-        buttonPanel.add(includeButton);
-        buttonPanel.add(excludeButton);
+        JPanel includeButtonPanel =  new JPanel();
+        includeButtonPanel.setLayout(new BorderLayout(0, 0));
+        includeButtonPanel.setPreferredSize(new Dimension(80, 45));
+        includeButtonPanel.setMinimumSize(new Dimension(80, 45));
+        JPanel excludeButtonPanel =  new JPanel();
+        excludeButtonPanel.setLayout(new BorderLayout(0, 0));
+        excludeButtonPanel.setPreferredSize(new Dimension(80, 45));
+        excludeButtonPanel.setMinimumSize(new Dimension(80, 45));
+        Button includeButton = new AddButton("<<Show", includeAction());
+        includeButtonPanel.add(includeButton, BorderLayout.SOUTH);
+//        JPanel excludeButtonPanel =  new JPanel();
+//        excludeButtonPanel.setLayout(new BorderLayout(0, 0));
+//        excludeButtonPanel.setPreferredSize(new Dimension(80, 45));
+        Button excludeButton = new AddButton("Hide>>", excludeAction());
+        excludeButtonPanel.add(excludeButton, BorderLayout.NORTH);
+        buttonPanel.add(includeButtonPanel);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0,10)));
+        buttonPanel.add(excludeButtonPanel);
         return buttonPanel;
     }
     

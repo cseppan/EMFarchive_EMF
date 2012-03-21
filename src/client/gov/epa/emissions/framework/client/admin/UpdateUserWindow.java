@@ -40,7 +40,7 @@ public class UpdateUserWindow extends DisposableInteralFrame implements Updatabl
     private PopulateUserOnUpdateStrategy populateUserStrategy;
 
     public UpdateUserWindow(AdminOption adminOption, DesktopManager desktopManager) {
-        super("Edit User", new Dimension(800, 425), desktopManager);
+        super("Edit User", new Dimension(820, 425), desktopManager);
         this.adminOption = adminOption;
     }
 
