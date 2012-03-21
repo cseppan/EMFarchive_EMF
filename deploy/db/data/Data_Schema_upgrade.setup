@@ -1864,3 +1864,6 @@ CREATE TABLE emf.user_excluded_dataset_types
   user_id int4 NOT NULL REFERENCES emf.users(id),
   dataset_type_id int4 NOT NULL REFERENCES emf.dataset_types(id)
 );
+
+-- Added new 
+insert into emf.properties values(DEFAULT, 'SHOW_CASES_MENU', 'true');

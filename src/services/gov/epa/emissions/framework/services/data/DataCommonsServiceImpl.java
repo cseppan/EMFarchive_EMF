@@ -2,7 +2,9 @@ package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.data.Country;
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
@@ -245,8 +247,19 @@ public class DataCommonsServiceImpl implements DataCommonsService {
                 TableFormat tableFormat = new FileFormatFactory(dbServer).tableFormat(type, true);
                 if (tableFormat != null) cols = tableFormat.cols();
             }
+            
+            //validate indexes specified in keyword actually exist.
             if (cols != null) 
                 dao.validateDatasetTypeIndicesKeyword(type, cols);
+            
+            //validate inline_comment_char keyword doesn't use a typical delimiter character -- comma or semi-colon
+            for (KeyVal keyVal : type.getKeyVals()) {
+                if (keyVal.getName().equals(Dataset.inline_comment_char))
+                    if (keyVal.getValue() != null && !keyVal.getValue().trim().isEmpty() 
+                            && (keyVal.getValue().trim().equals(",") || keyVal.getValue().trim().equals(";"))
+                ) 
+                            throw new EmfException("DatasetType keyword, " + Dataset.inline_comment_char + ", contains an invalid inline comment delimiter, comma (,) or semi-colon (;).");
+            }
             
             DatasetType locked = dao.updateDatasetType(type, session);
 
