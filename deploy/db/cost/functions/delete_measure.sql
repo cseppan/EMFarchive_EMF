@@ -1,4 +1,8 @@
-﻿--select public.delete_measure(622);
+--select public.delete_measure(622);
+
+-- the script below drop statement does not work if the previous parameter is control_measure_id
+-- postgres prompt to delete the function first -- by Jizhen
+drop function if exists public.delete_measure(integer);
 
 -- delete_measure
 CREATE OR REPLACE FUNCTION public.delete_measure(
