@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.data.UserFeature;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.commons.io.Column;
@@ -78,6 +79,10 @@ public class DataCommonsDAO {
 
     public List getRegions(Session session) {
         return session.createCriteria(Region.class).addOrder(Order.asc("name")).list();
+    }
+    
+    public List getUserFeatures(Session session) {
+        return session.createCriteria(UserFeature.class).addOrder(Order.asc("name")).list();
     }
 
     public List getProjects(Session session) {

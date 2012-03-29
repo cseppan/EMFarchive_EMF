@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.data.UserFeature;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.security.User;
@@ -199,6 +200,16 @@ public class DataCommonsServiceTransport implements DataCommonsService {
 
         return (Region[]) call.requestResponse(new Object[] {});
     }
+    
+    public synchronized UserFeature[] getUserFeatures() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getUserFeatures");
+        call.setReturnType(mappings.userFeatures());
+
+        return (UserFeature[]) call.requestResponse(new Object[] {});
+    }
+
 
     public synchronized IntendedUse[] getIntendedUses() throws EmfException {
         EmfCall call = call();

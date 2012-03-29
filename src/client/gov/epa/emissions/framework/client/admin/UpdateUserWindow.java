@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.YesNoDialog;
@@ -37,11 +38,14 @@ public class UpdateUserWindow extends DisposableInteralFrame implements Updatabl
 
     private AdminOption adminOption;
     
+    private EmfConsole parentConsole;
+    
     private PopulateUserOnUpdateStrategy populateUserStrategy;
 
-    public UpdateUserWindow(AdminOption adminOption, DesktopManager desktopManager) {
-        super("Edit User", new Dimension(820, 425), desktopManager);
+    public UpdateUserWindow(AdminOption adminOption, DesktopManager desktopManager, EmfConsole console) {
+        super("Edit User", new Dimension(820, 560), desktopManager);
         this.adminOption = adminOption;
+        this.parentConsole = console;
     }
 
     public void display(User user) throws EmfException {
@@ -119,8 +123,15 @@ public class UpdateUserWindow extends DisposableInteralFrame implements Updatabl
 
     private EditableUserProfilePanel createUserProfilePanel(Widget username,
             AdminOption adminOption) {
-        EditableUserProfilePanel panel = new EditableUserProfilePanel(user, username,
-                adminOption, this);
+        EditableUserProfilePanel panel=null;
+        try {
+            panel = new EditableUserProfilePanel(user, username, presenter, 
+                    adminOption, parentConsole, this );
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+            messagePanel.setError(e.getMessage());
+        }
 
         return panel;
     }
@@ -139,7 +150,8 @@ public class UpdateUserWindow extends DisposableInteralFrame implements Updatabl
     
     protected void populateUser() throws EmfException {
         populateUserStrategy.populate(panel.getName(), panel.getAffi(), panel.getPhone(), panel.getEmail(), panel.getUsername(),
-                panel.getPassword(), panel.getConfirmPassword(), panel.getWantEmails(), sPanel.getExcludedDTs());
+                panel.getPassword(), panel.getConfirmPassword(), panel.getWantEmails(), sPanel.getExcludedDTs(),
+                panel.getExcludedFeatures());
         adminOption.isAdmin(user);
     }
 

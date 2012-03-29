@@ -16,6 +16,7 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SectorCriteria;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.data.UserFeature;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.commons.db.version.ChangeSet;
@@ -94,6 +95,7 @@ public class DataMappings extends Mappings {
 
     private void registerBeans(Call call) {
         bean(call, User.class, user());
+        bean(call, UserFeature.class, userFeature());
 
         bean(call, EmfDataset.class, dataset());
         bean(call, DatasetType.class, datasetType());
@@ -199,6 +201,7 @@ public class DataMappings extends Mappings {
 
     private void registerArrays(Call call) {
         array(call, User[].class, users());
+        array(call, UserFeature[].class, userFeatures());
 
         array(call, EmfDataset[].class, datasets());
         array(call, DatasetType[].class, datasetTypes());
@@ -348,9 +351,17 @@ public class DataMappings extends Mappings {
     public QName user() {
         return qname("User");
     }
+    
+    public QName userFeature() {
+        return qname("UserFeature");
+    }
 
     public QName users() {
         return qname("Users");
+    }
+    
+    public QName userFeatures() {
+        return qname("UserFeatures");
     }
 
     public QName keywords() {

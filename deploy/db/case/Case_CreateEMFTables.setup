@@ -416,3 +416,29 @@ CREATE TABLE cases.cases_sens
 WITHOUT OIDS;
 -- cases.cases_sens
 
+CREATE TABLE emf.user_excluded_dataset_types
+(
+  id serial NOT NULL PRIMARY KEY,
+  list_index integer,
+  user_id int4 NOT NULL REFERENCES emf.users(id),
+  dataset_type_id int4 NOT NULL REFERENCES emf.dataset_types(id)
+);
+
+ 
+-- emf.user_features
+CREATE TABLE emf.user_features
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+
+CREATE TABLE emf.user_excluded_features
+(
+  id serial NOT NULL PRIMARY KEY,
+  list_index integer,
+  user_id int4 NOT NULL REFERENCES emf.users(id),
+  user_feature_id int4 NOT NULL REFERENCES emf.user_features(id)
+);
+
+

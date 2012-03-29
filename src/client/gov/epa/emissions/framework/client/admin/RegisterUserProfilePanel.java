@@ -1,20 +1,16 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.commons.data.UserFeature;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.PasswordField;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.AddRemoveWidget;
-import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.Border;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -23,7 +19,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class EditableUserProfilePanel extends JPanel {
+public class RegisterUserProfilePanel extends JPanel {
 
     private Widget username;
 
@@ -47,31 +43,24 @@ public class EditableUserProfilePanel extends JPanel {
     
     private AddRemoveWidget featureWidget;
     
-    private UpdateUserPresenter parentPresenter;
-    
-    private EmfConsole parentConsole;
-
     private User user;
 
     // FIXME: one to many params ?
-    public EditableUserProfilePanel(User user, Widget usernameWidget, UpdateUserPresenter presenter, 
-            AdminOption adminOption, EmfConsole parentConsole,
-            ManageChangeables changeableList) throws EmfException {
+    public RegisterUserProfilePanel(User user, Widget usernameWidget,
+            AdminOption adminOption,
+            ManageChangeables changeableList) {  
         this.user = user;
-        this.adminOption = adminOption;
-        this.parentPresenter = presenter;
+        this.adminOption = adminOption;        
         this.changeablesList = changeableList;
-        this.parentConsole = parentConsole;
 
         createLayout(usernameWidget, adminOption);
-        this.setSize(new Dimension(380, 500));
+        this.setSize(new Dimension(380, 540));
     }
 
-    private void createLayout(Widget usernameWidget, AdminOption adminOption) throws EmfException {
+    private void createLayout(Widget usernameWidget, AdminOption adminOption) {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(createProfilePanel(adminOption));
         this.add(createLoginPanel(usernameWidget));
-        this.add(createHideFeaturePanel());
     }
 
     private JPanel createLoginPanel(Widget usernameWidget) {
@@ -182,29 +171,26 @@ public class EditableUserProfilePanel extends JPanel {
         return panel;
     }
     
-    private JPanel createHideFeaturePanel() throws EmfException {
+    private JPanel createHideFeaturePanel() {
         JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new Border("Hide Feature"));
        
-        JPanel featurePanel = new JPanel(new BorderLayout(10,0));
+        JPanel checkPanel = new JPanel(new BorderLayout(10,0));
+        wantEmails = new JCheckBox("Receives EMF update emails? ");
+        wantEmails.setSelected(user.getWantEmails());    
+        checkPanel.add(wantEmails, BorderLayout.NORTH);
+        checkPanel.setBorder(BorderFactory.createEmptyBorder(2,30,2,20));
         
-        featurePanel.add(userFeatures());
-  
-        panel.add(featurePanel);
+        JPanel optionsPanel = new JPanel(new BorderLayout(10,0));
+        adminOption.add(checkPanel);
+        adminOption.setAdmin(user);
+        optionsPanel.setBorder(BorderFactory.createEmptyBorder(2,30,2,20));
         
+        panel.add(checkPanel);
+        panel.add(optionsPanel,BorderLayout.SOUTH);
         panel.setMaximumSize(new Dimension(300, 280));
         return panel;
-    }
-
-    private JPanel userFeatures() throws EmfException {
-        UserFeature[] userFeatures = parentPresenter.getUserFeatures();
-        UserFeature[] exUserFeatures = user.getExcludedUserFeatures();
-        
-        featureWidget = new AddRemoveWidget(userFeatures, changeablesList, parentConsole, "Features");
-        featureWidget.setObjects(exUserFeatures);
-        featureWidget.setPreferredSize(new Dimension(180, 90));
-         
-        return featureWidget;
     }
 
     public Boolean getWantEmails() {
@@ -236,9 +222,4 @@ public class EditableUserProfilePanel extends JPanel {
     public String getPhone(){
         return phone.getText();
     }
-    
-    public UserFeature[] getExcludedFeatures() { 
-        UserFeature[] objects= Arrays.asList(featureWidget.getObjects()).toArray(new UserFeature[0]);
-        return objects;
-    }  
 }

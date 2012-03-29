@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.UserFeature;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.security.UserException;
 import gov.epa.emissions.framework.services.EmfException;
@@ -18,7 +19,8 @@ public class PopulateUserOnUpdateStrategy implements PopulateUserStrategy {
     }
 
     public void populate(String name, String affiliation, String phone, String email, String username, char[] password,
-            char[] confirmPassword, Boolean wantEmails, DatasetType[] eDatasetTypes) throws EmfException {
+            char[] confirmPassword, Boolean wantEmails, DatasetType[] eDatasetTypes, 
+            UserFeature[] eUserFeatures) throws EmfException {
         try {
             user.setName(name);
             user.setAffiliation(affiliation);
@@ -31,6 +33,7 @@ public class PopulateUserOnUpdateStrategy implements PopulateUserStrategy {
             }
             user.setWantEmails(wantEmails);
             user.setExcludedDatasetTypes(eDatasetTypes);
+            user.setExcludedUserFeatures(eUserFeatures);
         } catch (UserException e) {
             throw new EmfException(e.getMessage());
         }

@@ -22,10 +22,15 @@
         <property name="lastLoginDate" column="last_login_date" type="java.util.Date" not-null="false" length="4"/>
         <property name="passwordResetDate" column="password_reset_date" type="java.util.Date" not-null="false" length="4"/>
         <property name="loggedIn" column="is_login" type="boolean"/>
-         <array name="excludedDatasetTypes" table="user_excluded_dataset_types" cascade="save-update">
+        <array name="excludedDatasetTypes" table="user_excluded_dataset_types" cascade="save-update">
             <key column="user_id" not-null="true"/>
             <list-index column="list_index"/>
             <many-to-many class="gov.epa.emissions.commons.data.DatasetType" column="dataset_type_id"/>
-          </array>
+         </array>
+         <array name="excludedUserFeatures" table="user_excluded_features" cascade="save-update">
+            <key column="user_id" not-null="true"/>
+            <list-index column="list_index"/>
+            <many-to-many class="gov.epa.emissions.commons.data.UserFeature" column="user_feature_id"/>
+         </array>
     </class>
 </hibernate-mapping>

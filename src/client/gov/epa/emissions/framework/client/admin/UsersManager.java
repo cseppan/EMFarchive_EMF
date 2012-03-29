@@ -200,7 +200,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     public UpdatableUserView getUpdateUserView(User updateUser) {
-        UpdateUserWindow updateUserWindow = new UpdateUserWindow(new AddAdminOption(), desktopManager);
+        UpdateUserWindow updateUserWindow = new UpdateUserWindow(new AddAdminOption(), desktopManager, parentConsole);
 
         return updateUserWindow;
     }

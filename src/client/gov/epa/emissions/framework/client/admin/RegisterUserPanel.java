@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.UserFeature;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.LabelWidget;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -36,7 +37,7 @@ public class RegisterUserPanel extends JPanel {
 
     private RegisterCancelStrategy cancelStrategy;
 
-    private EditableUserProfilePanel panel;
+    private RegisterUserProfilePanel panel;
 
     private User user;
     
@@ -82,7 +83,7 @@ public class RegisterUserPanel extends JPanel {
         }
         
         this.populateUserStrategy = new PopulateUserOnRegisterStrategy(user);
-        panel = new EditableUserProfilePanel(user, username, adminOption,changeablesList);
+        panel = new RegisterUserProfilePanel(user, username, adminOption, changeablesList);
         
         JPanel mainContainer = new JPanel();
         mainContainer.setLayout(new BoxLayout(mainContainer, BoxLayout.Y_AXIS));
@@ -180,7 +181,7 @@ public class RegisterUserPanel extends JPanel {
     
     protected void populateUser() throws EmfException {
         populateUserStrategy.populate(panel.getName(), panel.getAffi(), panel.getPhone(), panel.getEmail(), panel.getUsername(),
-                panel.getPassword(), panel.getConfirmPassword(), panel.getWantEmails(), new DatasetType[] {});
+                panel.getPassword(), panel.getConfirmPassword(), panel.getWantEmails(), new DatasetType[] {}, new UserFeature[]{});
         //adminOption.isAdmin(user);
     }
 

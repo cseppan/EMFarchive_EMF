@@ -50,6 +50,7 @@
         <mapping resource="gov/epa/emissions/commons/db/version/Version.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/basic/ExternalSource.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/data/Region.hbm.xml"/>
+        <mapping resource="gov/epa/emissions/framework/services/data/UserFeature.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/data/Project.hbm.xml"/>
         <mapping resource="gov/epa/emissions/commons/db/intendeduse/IntendedUse.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/data/Note.hbm.xml"/>

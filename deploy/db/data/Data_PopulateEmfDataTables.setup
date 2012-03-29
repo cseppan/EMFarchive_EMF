@@ -1462,3 +1462,13 @@ insert into emf.region_type values (2, 'I/O API Regular Grid', 'A grid as descri
 insert into emf.region_type values (3, 'List of Counties', 'The region refers to a dataset that provides a list of counties that describe the region');
 insert into emf.region_type values (4, 'Shapefile','The region is described by a dataset that represents a Shapefile');
 
+--2/23/2012 user features
+insert into emf.user_features values (DEFAULT, 'Cases');
+insert into emf.user_features values (DEFAULT, 'Control Measures');
+insert into emf.user_features values (DEFAULT, 'Control Strategies');
+insert into emf.user_features values (DEFAULT, 'Control Programs');
+insert into emf.user_features values (DEFAULT, 'Sector Scenario');
+insert into emf.user_features values (DEFAULT, 'MP-SDT');
+insert into emf.user_features values (DEFAULT, 'Users');
+
+

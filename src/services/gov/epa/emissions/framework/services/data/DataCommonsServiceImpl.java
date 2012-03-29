@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.data.UserFeature;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
@@ -21,7 +22,6 @@ import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.io.csv.CSVFileReader;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
-import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFilePatternMatcher;
@@ -29,7 +29,6 @@ import gov.epa.emissions.framework.services.basic.EmfFileSerializer;
 import gov.epa.emissions.framework.services.basic.EmfServerFileSystemView;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
-import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.cost.controlStrategy.FileFormatFactory;
 import gov.epa.emissions.framework.services.editor.Revision;
@@ -424,6 +423,19 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         } catch (RuntimeException e) {
             LOG.error("Could not get all Regions", e);
             throw new EmfException("Could not get all Regions");
+        }
+    }
+    
+    public synchronized UserFeature[] getUserFeatures() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List userFeatures = dao.getUserFeatures(session);
+            session.close();
+
+            return (UserFeature[]) userFeatures.toArray(new UserFeature[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all user features", e);
+            throw new EmfException("Could not get all user features");
         }
     }
 

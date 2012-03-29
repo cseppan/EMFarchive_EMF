@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.console;
 
+import gov.epa.emissions.commons.data.UserFeature;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.admin.AddAdminOption;
@@ -24,10 +25,10 @@ import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerVi
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerWindow;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerView;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerWindow;
-import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerView;
-import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerWindow;
 import gov.epa.emissions.framework.client.fast.MPSDTManagerView;
 import gov.epa.emissions.framework.client.fast.MPSDTManagerWindow;
+import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerView;
+import gov.epa.emissions.framework.client.sms.sectorscenario.SectorScenarioManagerWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -48,6 +49,8 @@ public class ManageMenu extends JMenu implements ManageMenuView {
     private DesktopManager desktopManager;
 
     private ManageMenuPresenter presenter;
+    
+    private UserFeature[] exUserFeatures = {new UserFeature("total")};
     
     private MessagePanel messagePanel;
 
@@ -209,7 +212,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
     }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
-        UpdateUserWindow updatable = new UpdateUserWindow(new AddAdminOption(false), desktopManager);
+        UpdateUserWindow updatable = new UpdateUserWindow(new AddAdminOption(false), desktopManager, parent);
         UserView viewable = new ViewUserWindow(desktopManager);
 
         UpdateUserPresenter presenter = new UpdateUserPresenterImpl(session, session.user(), session.userService());
@@ -320,6 +323,9 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         String showMPSDTMenu = null;
         String showSectorScenarioMenu = null;
         String showCasesMenu = null;
+        
+        exUserFeatures = session.user().getExcludedUserFeatures();
+        
         try {
             showMPSDTMenu = presenter.getPropertyValue(SHOW_MP_SDT_MENU);
             showSectorScenarioMenu = presenter.getPropertyValue(SHOW_SECTOR_SCENARIO_MENU);
@@ -330,28 +336,51 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         }
         
         super.add(createDatasets(parent, messagePanel));
-        if ((showCasesMenu == null) || (!showCasesMenu.equalsIgnoreCase("false"))) {
-            super.add(createCases(parent, messagePanel));
+        
+        if ((showCasesMenu == null) || (!showCasesMenu.equalsIgnoreCase("false")) ) {
+            if (!excludeItem("Cases"))
+                super.add(createCases(parent, messagePanel));
         }
         super.addSeparator();
         super.add(createDatasetTypes(parent, messagePanel));
         super.add(createSectors(parent, messagePanel));
         super.addSeparator();
-        super.add(createControlMeasures(parent, messagePanel));
-        super.add(createControlStrategies(parent, messagePanel));
-        super.add(createControlPrograms(parent, messagePanel));
-        super.addSeparator();
-        if ((showSectorScenarioMenu == null) || (!showSectorScenarioMenu.equalsIgnoreCase("false"))) {
-            super.add(createSectorScenario(parent, messagePanel));
+        if (!excludeItem("Control Measures"))
+            super.add(createControlMeasures(parent, messagePanel));
+        if (!excludeItem("Control Strategies"))
+            super.add(createControlStrategies(parent, messagePanel));
+        if (!excludeItem("Control Programs")){
+            super.add(createControlPrograms(parent, messagePanel));
             super.addSeparator();
+        }
+        if ((showSectorScenarioMenu == null) || (!showSectorScenarioMenu.equalsIgnoreCase("false"))) {
+            if (!excludeItem("Sector Scenario")){
+                super.add(createSectorScenario(parent, messagePanel));
+                super.addSeparator();
+            }
         }
         if ((showMPSDTMenu == null) || (!showMPSDTMenu.equalsIgnoreCase("false"))) {
-            super.add(createMPSDT(parent, messagePanel));
-            super.addSeparator();
+            if (!excludeItem("MP-SDT")){
+                super.add(createMPSDT(parent, messagePanel));
+                super.addSeparator();
+            }
         }
 
-        manageUsers(session.user(), messagePanel);
+        if (!excludeItem("Users")){
+            manageUsers(session.user(), messagePanel);
+        }
         super.add(createMyProfile(session, messagePanel));
+
+    }
+    
+    private Boolean excludeItem(String name){
+        Boolean exclude = false; 
+        System.out.print(exUserFeatures.length);
+        for (int i = 0; i < exUserFeatures.length; i++) {
+            System.out.print(exUserFeatures[i].getName());
+            if (exUserFeatures[i].getName().contains(name)) exclude = true;
+        }
+        return exclude;
     }
 
 }

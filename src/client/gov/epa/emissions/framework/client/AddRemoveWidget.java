@@ -30,9 +30,16 @@ public class AddRemoveWidget extends JPanel {
     
     private Button addButton;
     private Button removeButton;
+    private String topic ="Jobs"; 
 
     public AddRemoveWidget(Object[] allObjects, ManageChangeables changeables, EmfConsole parentConsole) {
         this(allObjects, changeables, parentConsole, true, true);
+        
+    }
+    
+    public AddRemoveWidget(Object[] allObjects, ManageChangeables changeables, EmfConsole parentConsole, String topic) {
+        this(allObjects, changeables, parentConsole, true, true);
+        this.topic = topic;
     }
     
     public AddRemoveWidget(Object[] allObjects, ManageChangeables changeables, EmfConsole parentConsole, 
@@ -126,7 +133,7 @@ public class AddRemoveWidget extends JPanel {
     }
 
     private void addObjects() {
-        ObjectChooser objectSelector = new ObjectChooser("Jobs", allObjects, objectsList, parentConsole);
+        ObjectChooser objectSelector = new ObjectChooser(topic, allObjects, objectsList, parentConsole);
         objectSelector.display();
     }
 

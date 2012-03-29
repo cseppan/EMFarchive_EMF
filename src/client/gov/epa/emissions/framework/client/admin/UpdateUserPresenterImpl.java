@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.UserFeature;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -59,6 +60,10 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
 
     public void onChange() {
         this.userDataChanged = true;
+    }
+
+    public UserFeature[] getUserFeatures() throws EmfException {
+        return session.dataCommonsService().getUserFeatures();
     }
 
 }

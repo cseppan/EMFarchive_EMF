@@ -313,7 +313,15 @@
 		innerType="ns1:QAProgram"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
-
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.commons.data.UserFeature"
+		qname="ns1:UserFeature" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:UserFeatures" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.commons.data.UserFeature[]"
+		innerType="ns1:UserFeature"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+	
 	<!-- COST Mappings-->
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasure"

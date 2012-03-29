@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
+import gov.epa.emissions.commons.data.UserFeature;
 import gov.epa.emissions.commons.db.intendeduse.IntendedUse;
 import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.security.User;
@@ -132,5 +133,7 @@ public interface DataCommonsService {
     RegionType[] getRegionTypes() throws EmfException;
 
     GeoRegion obtainLockedRegion(User user, GeoRegion region) throws EmfException;
+    
+    UserFeature[] getUserFeatures() throws EmfException;
 
 }
