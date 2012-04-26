@@ -513,7 +513,7 @@ poll|poll
             String baseAggregateExpression = getBaseExpression(comparisonExpression, matchingExpressionMap, baseColumns, "b");
 //            Column compareColumn = getCompareColumn(aggregateExpression, matchingExpressionMap, compareColumns);
             String compareAggregateExpression = getCompareExpression(comparisonExpression, matchingExpressionMap, compareColumns, "c");
-            selectSQL += ",b.\"" + comparisonExpression + "\" as \"" + comparisonExpression + "_b\", c.\"" + comparisonExpression + "\" as \"" + comparisonExpression + "_c\"";
+            selectSQL += ",b.\"" + comparisonExpression + "\" as \"" + comparisonExpression + "_b\", c.\"" + comparisonExpression + "\" as \"" + comparisonExpression + "_c\"" + ",(b.\"" + comparisonExpression + "\" = " + "c.\"" + comparisonExpression + "\") as \"" + comparisonExpression + "_match\"";
             baseSelectSQL += "," + baseAggregateExpression + " as \"" + comparisonExpression + "\"";
             compareSelectSQL += "," + compareAggregateExpression + " as \"" + comparisonExpression + "\"";
             baseUnionSelectSQL += ",\"" + comparisonExpression + "\" as \"" + comparisonExpression + "\"";

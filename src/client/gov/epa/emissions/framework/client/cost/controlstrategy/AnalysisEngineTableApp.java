@@ -225,8 +225,16 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame
                     rowData.add(temp);
                 else if (colClasses[j].equals(Double.class))
                     rowData.add((temp == null || temp.isEmpty())? Double.NaN : new Double(temp));
-                else if (colClasses[j].equals(Boolean.class))
-                    rowData.add((temp == null || temp.isEmpty())? null : new Boolean(temp));
+                else if (colClasses[j].equals(Boolean.class)) {
+                    Boolean b = null;
+                    if (temp != null && !temp.isEmpty()) {
+                        if ( temp.equalsIgnoreCase("true") || temp.equalsIgnoreCase("t"))
+                            b= new Boolean(true);
+                        else if (temp.equalsIgnoreCase("false") || temp.equalsIgnoreCase("f"))
+                            b = new Boolean(false);
+                    }
+                    rowData.add(b); //(temp == null || temp.isEmpty())? null : new Boolean(temp));
+                }
                 else if (colClasses[j].equals(Date.class))
                     rowData.add((temp == null || temp.isEmpty())? null : CustomDateFormat.parse_YYYY_MM_DD_HH_MM(temp));
                 else if (colClasses[j].equals(Integer.class))
