@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
             return user;
         } catch (RuntimeException e) {
             LOG.error("Could not get User - " + username, e);
-            throw new EmfException("Could not get User due to data access failure");
+            throw new EmfException("Could not get User due to data access failure: \n" + e.getMessage());
         } finally {
             session.close();
         }

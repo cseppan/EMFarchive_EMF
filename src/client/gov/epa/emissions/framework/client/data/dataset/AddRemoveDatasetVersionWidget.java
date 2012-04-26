@@ -52,6 +52,8 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
     private int allowableRowCount = 0;  //Zero won't limit the rowcount
     
     DatasetType[] datasetTypesToInclude = null;
+    
+    private DatasetType defaultDatasetType = null;
 
     public AddRemoveDatasetVersionWidget(boolean selectSingle, int allowableRowCount, ManageChangeables changeables, EmfConsole parentConsole, EmfSession session) {
         this.selectSingle = selectSingle;
@@ -234,7 +236,11 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
             // to that of the datasets retrieved from the presenter.
             InputDatasetSelectionDialog view = new InputDatasetSelectionDialog (parentConsole);
             InputDatasetSelectionPresenter presenter = new InputDatasetSelectionPresenter(view, session, this.datasetTypesToInclude); //allDatasetTypes);
-            presenter.display(getDatasetType(0), this.selectSingle);
+            DatasetType defaultType = this.defaultDatasetType;
+            if ( defaultType == null) {
+                defaultType = getDatasetType(0);
+            }
+            presenter.display(defaultType, this.selectSingle);
             List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
             for (EmfDataset dataset : presenter.getDatasets()) {
                 datasetVersions.add(new DatasetVersion(dataset, getVersion(dataset.getId(), dataset.getDefaultVersion())));
@@ -267,6 +273,14 @@ public class AddRemoveDatasetVersionWidget extends JPanel {
 
     public void setSelectionMode(int singleSelection) {
         datasetVersionsList.setSelectionMode(singleSelection);
+    }
+
+    public void setDefaultDatasetType(DatasetType defaultDatasetType) {
+        this.defaultDatasetType = defaultDatasetType;
+    }
+
+    public DatasetType getDefaultDatasetType() {
+        return defaultDatasetType;
     }
     
 //    public void setModelSize(int modelSize) {

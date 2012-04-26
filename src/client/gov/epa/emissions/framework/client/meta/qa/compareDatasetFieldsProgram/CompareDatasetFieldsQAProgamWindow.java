@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa.compareDatasetFieldsProgram;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
@@ -70,6 +71,7 @@ public class CompareDatasetFieldsQAProgamWindow extends DisposableInteralFrame i
     
     private String joinType;
     private String whereFilter;
+    private DatasetType defaultDatasetType = null;
         
     public CompareDatasetFieldsQAProgamWindow(DesktopManager desktopManager, String program, 
             EmfSession session, DatasetVersion[] baseDatasetVersions, DatasetVersion[] compareDatasetVersions, 
@@ -91,6 +93,7 @@ public class CompareDatasetFieldsQAProgamWindow extends DisposableInteralFrame i
 
     public void display(EmfDataset dataset, QAStep qaStep) {
         super.setTitle("Setup "+qaStep.getName()+": " + dataset.getName() + "_" + qaStep.getId() );
+        this.defaultDatasetType = dataset.getDatasetType();
         super.display();
         try {
             this.getContentPane().add(createLayout(dataset));
@@ -204,6 +207,7 @@ public class CompareDatasetFieldsQAProgamWindow extends DisposableInteralFrame i
     private JPanel baseDatasetVersionWidget() throws EmfException {
         datasetWidgetBase = new AddRemoveDatasetVersionWidget(false, 0, this, parentConsole, session);
         datasetWidgetBase.setPreferredSize(new Dimension(350,220));
+        datasetWidgetBase.setDefaultDatasetType(this.defaultDatasetType);
         List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
         if(baseDatasetVersions != null && baseDatasetVersions.length > 0) {
             
@@ -218,6 +222,7 @@ public class CompareDatasetFieldsQAProgamWindow extends DisposableInteralFrame i
     private JPanel compareDatasetVersionWidget() throws EmfException {
         datasetWidgetCompare = new AddRemoveDatasetVersionWidget(false, 0, this, parentConsole, session);
         datasetWidgetCompare.setPreferredSize(new Dimension(350,220));
+        datasetWidgetCompare.setDefaultDatasetType(this.defaultDatasetType);
         List<DatasetVersion> datasetVersions = new ArrayList<DatasetVersion>();
         if(compareDatasetVersions != null && compareDatasetVersions.length > 0) {
             

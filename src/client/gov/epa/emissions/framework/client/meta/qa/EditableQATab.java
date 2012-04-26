@@ -229,41 +229,58 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
             return;
         }
 
-        CopyQAStepToDatasetSelectionView view = new CopyQAStepToDatasetSelectionDialog(parentConsole);
-        CopyQAStepToDatasetSelectionPresenter presenter = new CopyQAStepToDatasetSelectionPresenter(view, session);
-        try {
-            presenter.display(dataset.getDatasetType(), false);
-            Dataset[] datasets = presenter.getDatasets();
-//            boolean copyToExistingDatasetType = false;
-            if (datasets.length > 0) {
-                int[] datasetIds = new int[datasets.length];
-                String datasetNameList = "";
-                for (int i = 0; i < datasets.length; i++) {
-                    datasetIds[i] = datasets[i].getId();
-                    datasetNameList = datasetNameList + (i > 0 ? ", " : "") + datasets[i].getName();
-//                    if (datasets[i].getId() == datasetID) copyToExistingDatasetType = true;
-                }
-                this.presenter.doCopyQASteps((QAStep[])selected.toArray(new QAStep[0]), datasetIds, presenter.shouldReplace());
-                //if copied to self, then a lock would have been lose, and needs to be reclaimed
-                //also, refresh the templates table
-//                if (copyToExistingDatasetType) {
-//                    this.type = this.presenter.obtainLockedDatasetType(session.user(), this.type);
-//                    tableData.removeAll();
-//                    for (QAStepTemplate template : this.type.getQaStepTemplates())
-//                        tableData.add(template);
-//
-////                    tableData = new EditableQAStepTemplateTableData(this.type.getQaStepTemplates());
-////                    tableModel.refresh(tableData);
-//                    
-//                    refresh();
-//                }
-                messagePanel.setMessage("Copied " + selected.size() + " QA Steps to Datasets: " + datasetNameList + ".");
+        int answer = JOptionPane.showConfirmDialog(this, "Copy to the current dataset?");
+        if (answer == JOptionPane.CANCEL_OPTION) {
+            return;
+        } else if ( answer == JOptionPane.YES_OPTION) {
+            int[] datasetIds = new int[1];
+            datasetIds[0] = dataset.getId();
+            try {
+                this.presenter.doCopyQASteps((QAStep[])selected.toArray(new QAStep[0]), datasetIds, false);
+                messagePanel.setMessage("Copied " + selected.size() + " QA Steps to current dataset.");
+            } catch (EmfException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+                messagePanel.setError(e.getMessage());
             }
-        } catch (Exception exp) {
-            messagePanel.setError(exp.getMessage());
+        } else {
+
+            CopyQAStepToDatasetSelectionView view = new CopyQAStepToDatasetSelectionDialog(parentConsole);
+            CopyQAStepToDatasetSelectionPresenter presenter = new CopyQAStepToDatasetSelectionPresenter(view, session);
+            try {
+                presenter.display(dataset.getDatasetType(), false);
+                Dataset[] datasets = presenter.getDatasets();
+                //            boolean copyToExistingDatasetType = false;
+                if (datasets.length > 0) {
+                    int[] datasetIds = new int[datasets.length];
+                    String datasetNameList = "";
+                    for (int i = 0; i < datasets.length; i++) {
+                        datasetIds[i] = datasets[i].getId();
+                        datasetNameList = datasetNameList + (i > 0 ? ", " : "") + datasets[i].getName();
+                        //                    if (datasets[i].getId() == datasetID) copyToExistingDatasetType = true;
+                    }
+                    this.presenter.doCopyQASteps((QAStep[])selected.toArray(new QAStep[0]), datasetIds, presenter.shouldReplace());
+                    //if copied to self, then a lock would have been lose, and needs to be reclaimed
+                    //also, refresh the templates table
+                    //                if (copyToExistingDatasetType) {
+                    //                    this.type = this.presenter.obtainLockedDatasetType(session.user(), this.type);
+                    //                    tableData.removeAll();
+                    //                    for (QAStepTemplate template : this.type.getQaStepTemplates())
+                    //                        tableData.add(template);
+                    //
+                    ////                    tableData = new EditableQAStepTemplateTableData(this.type.getQaStepTemplates());
+                    ////                    tableModel.refresh(tableData);
+                    //                    
+                    //                    refresh();
+                    //                }
+                    messagePanel.setMessage("Copied " + selected.size() + " QA Steps to Datasets: " + datasetNameList + ".");
+                }
+            } catch (Exception exp) {
+                messagePanel.setError(exp.getMessage());
+            }
         }
     }
-    
+
     private void doDelete() { //BUG3615
         clearMessage();
 

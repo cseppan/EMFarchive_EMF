@@ -105,6 +105,28 @@ public class QAStep implements Serializable {
 
     public QAStep() {// needed as it's a Java bean
     }
+    
+    public QAStep(QAStep step) {// copy constructor
+        this.comments = step.comments;
+        this.configuration = step.configuration;
+        this.datasetId = step.datasetId;
+        if ( step.date != null) {
+            this.date = new Date(step.date.getTime());
+        } else {
+            this.date = new Date();
+        }
+        this.description = step.description;
+        this.id = step.id;
+        this.name = step.name;
+        this.order = step.order;
+        this.outputFolder = step.outputFolder;
+        this.program = new QAProgram(step.program);
+        this.programArguments = step.programArguments;
+        this.required = step.required;
+        this.status = step.status;
+        this.version = step.version;
+        this.who = step.who;
+    }
 
     public QAStep(QAStepTemplate template, int version) {
         this.name = template.getName();

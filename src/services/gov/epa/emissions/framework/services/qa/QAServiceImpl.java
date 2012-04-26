@@ -424,12 +424,16 @@ public class QAServiceImpl implements QAService {
                 boolean exists = false;
                 // add qa step to dataset
                 for (QAStep step : steps) {
+                    QAStep tmpStep = step;
+                    if ( i != 0) {
+                        tmpStep = new QAStep(step); 
+                    }
                     exists = false;
                     // override applicable settings...
-                    step.setDatasetId(dataset.getId());
-                    step.setWho("");
-                    step.setDate(null);
-                    step.setStatus("Not Started");
+                    tmpStep.setDatasetId(dataset.getId());
+                    tmpStep.setWho("");
+                    tmpStep.setDate(null);
+                    tmpStep.setStatus("Not Started");
                     // check if one with the same name already exists
                     for (QAStep existingQAStep : existingQaSteps) {
                         if (existingQAStep.getName().equals(step.getName())) {
@@ -444,16 +448,16 @@ public class QAServiceImpl implements QAService {
                     // if not replacing, then add "Copy of " in front of the name,
                     // also make sure the new "Copy of " + name is not already used.
                     if (exists && !replace) {
-                        String newName = "Copy of " + step.getName();
+                        String newName = "Copy of " + tmpStep.getName();
                         // check if one with the same name already exists
                         for (QAStep existingQAStep : existingQaSteps) {
                             if (existingQAStep.getName().equals(newName)) {
                                 newName = "Copy of " + newName;
                             }
                         }
-                        step.setName(newName);
+                        tmpStep.setName(newName);
                     }
-                    dao.add(new QAStep[] { step }, session);
+                    dao.add(new QAStep[] { tmpStep }, session);
                 }
                 datasetNameList += (i > 1 ? ", " : "") + dataset.getName();
             }
