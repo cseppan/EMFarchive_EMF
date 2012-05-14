@@ -18,7 +18,7 @@ public class PopulateUserOnRegisterStrategy implements PopulateUserStrategy {
     }
 
     public void populate(String name, String affiliation, String phone, String email, String username, char[] password,
-            char[] confirmPassword, Boolean wantEmails, DatasetType[] eDatasetTypes, UserFeature[] eUserFeatures) throws EmfException {
+            char[] confirmPassword, Boolean wantEmails) throws EmfException {
         try {
             System.out.print(user == null ? "user is NULL;" : name) ;
             user.setName(name);
@@ -33,8 +33,6 @@ public class PopulateUserOnRegisterStrategy implements PopulateUserStrategy {
             user.setWantEmails(wantEmails);
             user.setLastLoginDate(new Date());
             user.setPasswordResetDate(new Date());
-            user.setExcludedDatasetTypes(eDatasetTypes);
-            user.setExcludedUserFeatures(eUserFeatures);
         } catch (UserException e) {
             throw new EmfException(e.getMessage());
         }
@@ -53,6 +51,12 @@ public class PopulateUserOnRegisterStrategy implements PopulateUserStrategy {
         if (oldPassword.equals(user.getEncryptedPassword())) {
             throw new EmfException("Please specify a new password. ");
         }
+    }
+
+    public void populate(String name, String affiliation, String phone, String email, String username, char[] password,
+            char[] confirmPassword, Boolean wantEmails, DatasetType[] eDatasetTypes, UserFeature[] eUserFeatures)
+            throws EmfException {
+        // NOTE Auto-generated method stub      
     }
 
 }
