@@ -374,10 +374,8 @@ public class ManageMenu extends JMenu implements ManageMenuView {
     }
     
     private Boolean excludeItem(String name){
-        Boolean exclude = false; 
-        System.out.print(exUserFeatures.length);
+        Boolean exclude = false;         
         for (int i = 0; i < exUserFeatures.length; i++) {
-            System.out.print(exUserFeatures[i].getName());
             if (exUserFeatures[i].getName().contains(name)) exclude = true;
         }
         return exclude;
