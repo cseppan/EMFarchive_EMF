@@ -4,6 +4,11 @@ import gov.epa.emissions.framework.services.EmfException;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -29,10 +34,10 @@ public class DefaultUserPreferences implements UserPreference {
 
     public static final String EMF_PREFERENCE = "USER_PREFERENCES";
 
-    private Properties props;
+    private CommentedProperties props;
 
     public DefaultUserPreferences() throws EmfException {
-        props = new Properties();
+        props = new CommentedProperties();
         try {
             FileInputStream inStream = new FileInputStream(getFile());
             props.load(inStream);
@@ -44,17 +49,18 @@ public class DefaultUserPreferences implements UserPreference {
 
     //For testign purpose
     public DefaultUserPreferences(String prefFile) throws EmfException {
-        props = new Properties();
+        props = new CommentedProperties();
+        File file = new File(prefFile);
         try {
-            FileInputStream inStream = new FileInputStream(new File(prefFile));
+            FileInputStream inStream = new FileInputStream(file);
             props.load(inStream);
         } catch (Exception e) {
-            log.error("Cannot load user preferences file " + getFile().getAbsolutePath(), e);
-            throw new EmfException("Cannot load user preferences file "+getFile().getAbsolutePath());
+            log.error("Cannot load user preferences file " + file.getAbsolutePath(), e);
+            throw new EmfException("Cannot load user preferences file "+ file.getAbsolutePath());
         }
     }
 
-    public DefaultUserPreferences(Properties props) {
+    public DefaultUserPreferences(CommentedProperties props) {
         this.props = props;
     }
 
@@ -74,6 +80,17 @@ public class DefaultUserPreferences implements UserPreference {
 
     private String property(String name) {
         return props.getProperty(name);
+    }
+
+    public void setPreference(String preferenceKey, String preferenceValue) throws IOException {
+        //if already exists, overwrite
+        props.add(preferenceKey, preferenceValue);
+//        outStream.
+        //props.
+//        outStream.write(preferenceKey + "=" + preferenceValue + "\n");
+        FileOutputStream outStream = new FileOutputStream(getFile());
+
+        props.store(outStream, null);
     }
 
     public String inputFolder() {
@@ -103,4 +120,21 @@ public class DefaultUserPreferences implements UserPreference {
     public String sortFilterPageSize() {
         return property(SORT_FILTER_PAGE_SIZE);
     }
-}
+    
+    public static void main(String[] args) {
+        
+        try {
+            DefaultUserPreferences userPref = new DefaultUserPreferences();
+            
+            userPref.setPreference("flat_file_2010_point_column_order", "fips,region_cd,scc");
+            userPref.setPreference("flat_file_2010_point_column_order", "fips,region_cd,scc,ann_emis");
+            userPref.setPreference("flat_file_2010_point_column_hidden", "fips,region_cd,scc");
+            userPref.setPreference("flat_file_2010_point_column_hidden", "fips,region_cd");
+            userPref.setPreference("flat_file_2010_point_column_order", "fips,region_cd,scc,ann_emis,mact");
+            
+        } catch (IOException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+ }
