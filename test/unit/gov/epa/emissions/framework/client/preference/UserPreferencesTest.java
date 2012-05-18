@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 public class UserPreferencesTest extends TestCase {
 
     public void testFetchLocalInputFolder() {
-        Properties props = new Properties();
+        CommentedProperties props = new CommentedProperties();
         props.put("local.input.drive", "d:\\");
         props.put("default.input.folder", "emf_input");
 
@@ -17,7 +17,7 @@ public class UserPreferencesTest extends TestCase {
     }
 
     public void testFetchLocalOutputFolder() {
-        Properties props = new Properties();
+        CommentedProperties props = new CommentedProperties();
         props.put("local.output.drive", "d:\\");
         props.put("default.output.folder", "emf_output");
 
