@@ -182,7 +182,7 @@ public class TableColumnHeadersViewer implements MouseListener, ActionListener {
         removeAllColumns();
         
         // reset table columns from orderList
-        if ( hideColsYN ){
+        if ( ! hideColsYN ){
             if (orderList == null || orderList.size() ==0 ) return;
 
             ListIterator it = orderList.listIterator();

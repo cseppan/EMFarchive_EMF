@@ -61,7 +61,7 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
         this.doubleRenderer = new DoubleRenderer();
         this.doubleRenderer.setGroup(true);
         this.doubleRenderer.setDecimalPlaces(4);
-        this.headerPref = new DataHeaderPref(true, dataset.getDatasetTypeName());
+        this.headerPref = new DataHeaderPref(false, dataset.getDatasetTypeName());
 
         this.tableMetadata = tableMetadata;
         this.dataset = dataset;
