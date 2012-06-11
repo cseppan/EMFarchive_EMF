@@ -5,11 +5,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,11 +60,12 @@ public class DefaultUserPreferences implements UserPreference {
         this.props = props;
     }
 
-    private File getFile() {
+    public File getFile() {
         String property = System.getProperty(EMF_PREFERENCE);
+   
         if (property != null && new File(property).exists())
             return new File(property);
-
+ 
         return new File(System.getProperty("user.home"),
                 gov.epa.emissions.framework.install.installer.Constants.EMF_PREFERENCES_FILE);
     }
@@ -78,7 +75,7 @@ public class DefaultUserPreferences implements UserPreference {
         return file.exists();
     }
 
-    private String property(String name) {
+    public String property(String name) {
         return props.getProperty(name);
     }
 
@@ -121,20 +118,4 @@ public class DefaultUserPreferences implements UserPreference {
         return property(SORT_FILTER_PAGE_SIZE);
     }
     
-    public static void main(String[] args) {
-        
-        try {
-            DefaultUserPreferences userPref = new DefaultUserPreferences();
-            
-            userPref.setPreference("flat_file_2010_point_column_order", "fips,region_cd,scc");
-            userPref.setPreference("flat_file_2010_point_column_order", "fips,region_cd,scc,ann_emis");
-            userPref.setPreference("flat_file_2010_point_column_hidden", "fips,region_cd,scc");
-            userPref.setPreference("flat_file_2010_point_column_hidden", "fips,region_cd");
-            userPref.setPreference("flat_file_2010_point_column_order", "fips,region_cd,scc,ann_emis,mact");
-            
-        } catch (IOException e) {
-            // NOTE Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
  }

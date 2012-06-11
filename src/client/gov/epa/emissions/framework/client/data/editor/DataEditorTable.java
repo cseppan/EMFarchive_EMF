@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.gui.EditableTableModel;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.client.data.DateRenderer;
 import gov.epa.emissions.framework.client.data.DoubleRenderer;
-import gov.epa.emissions.framework.client.data.TableColumnHeaders;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.TableColumnWidth;
 
@@ -13,7 +12,7 @@ public class DataEditorTable extends EditableTable {
 
     public DataEditorTable(EditableTableModel tableModel, TableMetadata tableMetadata, MessagePanel messagePanel) {
         super(tableModel);
-        new TableColumnHeaders(this, tableMetadata).renderHeader();
+        new TableColumnHeadersEditor(this, tableMetadata).renderHeader();
         new TableColumnWidth(this, tableMetadata).columnWidths();
         setDefaultRenderer(Double.class, new DoubleRenderer());
         setDefaultRenderer(Float.class, new DoubleRenderer());

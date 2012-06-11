@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
@@ -18,12 +18,12 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-public class TableColumnHeaders {
+public class TableColumnHeadersEditor {
     
     private JTable table;
     private TableMetadata tableMetadata;
 
-    public TableColumnHeaders(JTable table, TableMetadata tableMetadata){
+    public TableColumnHeadersEditor(JTable table, TableMetadata tableMetadata){
         this.table = table;
         this.tableMetadata = tableMetadata;
     }

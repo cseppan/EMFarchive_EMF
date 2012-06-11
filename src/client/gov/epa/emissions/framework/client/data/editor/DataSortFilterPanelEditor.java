@@ -1,10 +1,11 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.Label;
+import gov.epa.emissions.framework.client.data.DoubleRenderer;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -25,7 +26,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-public class DataSortFilterPanel extends JPanel {
+public class DataSortFilterPanelEditor extends JPanel {
 
     private TextArea rowFilter;
 
@@ -44,16 +45,18 @@ public class DataSortFilterPanel extends JPanel {
     private JButton formatButton;
 
     private JCheckBox groupCheckBox;
+    
+    private JCheckBox hideColCheckBox;
 
     private DoubleRenderer doubleRenderer;
 
-    public DataSortFilterPanel(MessagePanel messagePanel, EmfDataset dataset, String rowFilters,
+    public DataSortFilterPanelEditor(MessagePanel messagePanel, EmfDataset dataset, String rowFilters,
             DoubleRenderer doubleRenderer) {
 
         this.messagePanel = messagePanel;
         this.dataset = dataset;
         this.doubleRenderer = doubleRenderer;
-
+        
         super.setLayout(new BorderLayout(5, 5));
         super.add(sortFilterPanel(rowFilters), BorderLayout.CENTER);
         super.add(controlPanel(), BorderLayout.EAST);
@@ -115,7 +118,7 @@ public class DataSortFilterPanel extends JPanel {
         groupCheckBox.setSelected(doubleRenderer.isGroup());
         groupCheckBox.setToolTipText("Group large numbers using commas");
         panel.add(groupCheckBox, buttonGBC);
-
+        
         buttonGBC.gridy = 2;
         buttonGBC.gridx = 3;
         buttonGBC.weightx = 0;
@@ -158,6 +161,7 @@ public class DataSortFilterPanel extends JPanel {
     private void doApplyFormat(final TablePresenter presenter) {
 
         messagePanel.clear();
+        
 
         try {
             String text = decimalPlacesField.getText();
@@ -170,6 +174,7 @@ public class DataSortFilterPanel extends JPanel {
 
             this.doubleRenderer.setGroup(this.groupCheckBox.isSelected());
             this.doubleRenderer.setDecimalPlaces(decimalPlaces);
+
             presenter.doApplyFormat();
         } catch (Exception e) {
             messagePanel.setError("'Decimal Places' must be an integer value greater than, or equal to 0.");

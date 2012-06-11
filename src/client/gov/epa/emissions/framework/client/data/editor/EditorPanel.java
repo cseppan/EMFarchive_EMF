@@ -7,7 +7,6 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
-import gov.epa.emissions.framework.client.data.DataSortFilterPanel;
 import gov.epa.emissions.framework.client.data.DoubleRenderer;
 import gov.epa.emissions.framework.client.data.PaginationPanel;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
@@ -36,7 +35,7 @@ public class EditorPanel extends JPanel implements EditorPanelView {
 
     private EditablePagePanel editablePagePanel;
 
-    private DataSortFilterPanel sortFilterPanel;
+    private DataSortFilterPanelEditor sortFilterPanel;
     
     private ManageChangeables changeablesList;
 
@@ -88,8 +87,8 @@ public class EditorPanel extends JPanel implements EditorPanelView {
         return panel;
     }
 
-    private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset, "", this.doubleRenderer);
+    private DataSortFilterPanelEditor sortFilterPanel(MessagePanel messagePanel) {
+        sortFilterPanel = new DataSortFilterPanelEditor(messagePanel, dataset, "", this.doubleRenderer);
         return sortFilterPanel;
     }
 

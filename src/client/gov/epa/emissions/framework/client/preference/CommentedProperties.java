@@ -1,7 +1,13 @@
 package gov.epa.emissions.framework.client.preference;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.Vector;
 
 /**
  * The CommentedProperties class is an extension of java.util.Properties
@@ -61,7 +67,7 @@ public class CommentedProperties extends java.util.Properties {
 
             while ( pos < line.length()
                     && ! Character.isWhitespace(c = line.charAt(pos++))
-                    && c != '=' && c != ':') {
+                    && c != '=' ) {
                 if (needsEscape && c == '\\') {
                     if (pos == line.length()) {
                         // The line continues on the next line.  If there
@@ -103,7 +109,7 @@ public class CommentedProperties extends java.util.Properties {
                     key.append(c);
             }
 
-            boolean isDelim = (c == ':' || c == '=');
+            boolean isDelim = ( c == '=');
 
             String keyString;
             if (needsEscape)
@@ -117,7 +123,7 @@ public class CommentedProperties extends java.util.Properties {
                     && Character.isWhitespace(c = line.charAt(pos)))
                 pos++;
 
-            if (! isDelim && (c == ':' || c == '=')) {
+            if (! isDelim && ( c == '=')) {
                 pos++;
                 while ( pos < line.length()
                         && Character.isWhitespace(c = line.charAt(pos)))
@@ -268,7 +274,6 @@ public class CommentedProperties extends java.util.Properties {
                 case '!':
                 case '#':
                 case '=':
-                case ':':
                     buffer.append('\\').append(c);
                     break;
                 default:
@@ -301,16 +306,5 @@ public class CommentedProperties extends java.util.Properties {
         }
     }
 
-    /**
-     * Add a comment or blank line or comment to the end of the CommentedProperties. 
-     * 
-     * @param   line The string to add to the end, make sure this is a comment
-     *             or a 'whitespace' line.
-     */
-    public void addLine(String line)
-    {
-        lineData.add(line);
-        keyData.add("");
-    }
 }
 

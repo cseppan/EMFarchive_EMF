@@ -35,6 +35,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
     private EmfConsole parent;
 
     private boolean editable;
+    private ViewerPanel viewerPanel;
 
     public DataViewer(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         this(dataset, parent, desktopManager, true);
@@ -111,7 +112,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
     }
 
     private JPanel tablePanel(TableMetadata tableMetadata) {
-        ViewerPanel viewerPanel = new ViewerPanel(messagePanel, dataset, tableMetadata, filter);
+        viewerPanel = new ViewerPanel(messagePanel, dataset, tableMetadata, filter);
         try {
             presenter.displayTable(viewerPanel);
         } catch (EmfException e) {
@@ -164,6 +165,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     private void doClose() {
         try {
+            viewerPanel.saveColPref();
             presenter.doClose();
         } catch (EmfException e) {
             messagePanel.setError("Could not close: " + e.getMessage());

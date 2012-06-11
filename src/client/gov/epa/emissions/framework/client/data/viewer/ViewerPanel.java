@@ -3,26 +3,23 @@ package gov.epa.emissions.framework.client.data.viewer;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.util.ClipBoardCopy;
-import gov.epa.emissions.framework.client.data.DataSortFilterPanel;
+import gov.epa.emissions.framework.client.data.DataHeaderPref;
+import gov.epa.emissions.framework.client.data.DateRenderer;
 import gov.epa.emissions.framework.client.data.DoubleRenderer;
 import gov.epa.emissions.framework.client.data.PaginationPanel;
-import gov.epa.emissions.framework.client.data.TableColumnHeaders;
-import gov.epa.emissions.framework.client.data.DateRenderer;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 import gov.epa.emissions.framework.ui.TableColumnWidth;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
@@ -40,7 +37,7 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
 
     private ScrollableTable table;
 
-    private DataSortFilterPanel sortFilterPanel;
+    private DataSortFilterPanelViewer sortFilterPanel;
 
     private EmfDataset dataset;
 
@@ -49,6 +46,10 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
     private String rowFilter;
 
     private DoubleRenderer doubleRenderer; 
+    
+    private DataHeaderPref headerPref;
+    
+    private TableColumnHeadersViewer tableColumnHeaders;
     
     private Page page;
 
@@ -60,6 +61,7 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
         this.doubleRenderer = new DoubleRenderer();
         this.doubleRenderer.setGroup(true);
         this.doubleRenderer.setDecimalPlaces(4);
+        this.headerPref = new DataHeaderPref(true, dataset.getDatasetTypeName());
 
         this.tableMetadata = tableMetadata;
         this.dataset = dataset;
@@ -99,8 +101,9 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
         return panel;
     }
 
-    private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset, rowFilter, this.doubleRenderer);
+    private DataSortFilterPanelViewer sortFilterPanel(MessagePanel messagePanel) {
+        sortFilterPanel = new DataSortFilterPanelViewer(messagePanel, dataset, rowFilter, 
+                this.doubleRenderer, this.headerPref);
         sortFilterPanel.setForEditor(false);
         return sortFilterPanel;
     }
@@ -117,7 +120,6 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
         }
         
         pageContainer.removeAll();
-
         paginationPanel.updateStatus(this.page);
         pageContainer.add(table(this.page), BorderLayout.CENTER);
         pageContainer.validate();
@@ -137,6 +139,7 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
             tableData = new ViewablePage(tableMetadata, page);
             tableModel.refresh(tableData);
             viewTable.setModel(tableModel);
+            tableColumnHeaders.displayClumns();
             table.repaint();
         }
         return table;
@@ -148,7 +151,8 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
     }
 
     private void viewTableConfig(JTable viewTable) {
-        new TableColumnHeaders(viewTable, tableMetadata).renderHeader();
+        this.tableColumnHeaders =new TableColumnHeadersViewer(viewTable, tableMetadata, headerPref);
+        tableColumnHeaders.renderHeader();
         new TableColumnWidth(viewTable, tableMetadata).columnWidths();
 
         viewTable.setDefaultRenderer(Double.class, doubleRenderer);
@@ -179,6 +183,10 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
 
     public String getRowFilter(){
         return rowFilter;
+    }
+
+    public void saveColPref() {
+        tableColumnHeaders.saveColPref();     
     }
 
 }
