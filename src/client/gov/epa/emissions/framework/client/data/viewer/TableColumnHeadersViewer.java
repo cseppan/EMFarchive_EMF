@@ -45,7 +45,7 @@ public class TableColumnHeadersViewer implements MouseListener, ActionListener {
     private ArrayList<TableColumn>  allColumns;
     private ArrayList<TableColumn>  orderList;
     private ArrayList<TableColumn>  hideList;
-    private Boolean hideColsYN;
+    private Boolean resetView;
     private Boolean firstTime = true;
 
     public TableColumnHeadersViewer(JTable table, TableMetadata tableMetadata, DataHeaderPref headerPref){
@@ -53,7 +53,7 @@ public class TableColumnHeadersViewer implements MouseListener, ActionListener {
         this.tableMetadata = tableMetadata;
         this.headerPref = headerPref;
         this.allColumns = getModelColumns();
-        this.hideColsYN = headerPref.getHideCols();
+        this.resetView = headerPref.getResetView();
     }
     
     private ArrayList<TableColumn> getModelColumns(){
@@ -171,7 +171,7 @@ public class TableColumnHeadersViewer implements MouseListener, ActionListener {
     }
     
     public void displayClumns(){
-        this.hideColsYN = headerPref.getHideCols();
+        this.resetView = headerPref.getResetView();
          
      // reset orderList from table model if not first time
         if ( firstTime ) 
@@ -182,9 +182,11 @@ public class TableColumnHeadersViewer implements MouseListener, ActionListener {
         removeAllColumns();
         
         // reset table columns from orderList
-        if ( ! hideColsYN ){
-            if (orderList == null || orderList.size() ==0 ) return;
-
+        if ( ! resetView ){
+            if ( (orderList == null || orderList.size() ==0 ) 
+                    && (hideList == null || hideList.size() ==0 ) )
+                showAllColumns();
+            
             ListIterator it = orderList.listIterator();
             while (it.hasNext())
             {
@@ -223,8 +225,8 @@ public class TableColumnHeadersViewer implements MouseListener, ActionListener {
             TableColumn column = allColumns.get(i);
             table.addColumn( column );
         } 
-        table.repaint();
-        table.revalidate();
+//        table.repaint();
+//        table.revalidate();
     }
      
     private TableColumn containColumn(ArrayList<TableColumn> cols, String colName){

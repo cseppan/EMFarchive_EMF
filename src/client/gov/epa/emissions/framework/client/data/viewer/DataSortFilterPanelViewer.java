@@ -46,7 +46,7 @@ public class DataSortFilterPanelViewer extends JPanel {
 
     private JCheckBox groupCheckBox;
     
-    private JCheckBox hideColCheckBox;
+    private JCheckBox resetViewCheckBox;
 
     private DoubleRenderer doubleRenderer;
     
@@ -133,8 +133,8 @@ public class DataSortFilterPanelViewer extends JPanel {
         buttonGBC.gridx = 4;
         buttonGBC.weightx = 0;
         buttonGBC.gridwidth = 1;
-        hideColCheckBox = new JCheckBox("");
-        hideColCheckBox.setSelected(headerPref.getHideCols());
+        resetViewCheckBox = new JCheckBox("");
+        resetViewCheckBox.setSelected(headerPref.getResetView());
         
 //        hideColCheckBox.addActionListener(new ActionListener() {
 //            public void actionPerformed(ActionEvent event) {
@@ -142,8 +142,8 @@ public class DataSortFilterPanelViewer extends JPanel {
 //            }
 //        });
         
-        hideColCheckBox.setToolTipText("Hide columns using preference");
-        panel.add(hideColCheckBox, buttonGBC);
+        resetViewCheckBox.setToolTipText("Hide columns using preference");
+        panel.add(resetViewCheckBox, buttonGBC);
         
         return panel;
     }
@@ -167,7 +167,7 @@ public class DataSortFilterPanelViewer extends JPanel {
         });
         this.formatButton.setToolTipText("Apply the new format settings to the table");
         
-        this.hideColCheckBox.setAction(new AbstractAction("Reset View") {
+        this.resetViewCheckBox.setAction(new AbstractAction("Reset View") {
             public void actionPerformed(ActionEvent e) {
                 doApplyFormat(presenter);
             }
@@ -198,7 +198,7 @@ public class DataSortFilterPanelViewer extends JPanel {
             this.doubleRenderer.setGroup(this.groupCheckBox.isSelected());
             this.doubleRenderer.setDecimalPlaces(decimalPlaces);
           
-            this.headerPref.setHideCols(this.hideColCheckBox.isSelected());
+            this.headerPref.setHideCols(this.resetViewCheckBox.isSelected());
             
             presenter.doApplyFormat();
         } catch (Exception e) {

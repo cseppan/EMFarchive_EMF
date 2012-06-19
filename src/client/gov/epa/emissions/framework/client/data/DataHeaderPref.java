@@ -10,7 +10,7 @@ import org.apache.commons.lang.StringUtils;
 @SuppressWarnings("serial")
 public class  DataHeaderPref {
 
-    private Boolean hideCols = true;
+    private Boolean resetView = false;
     private String dstName;
     private String dtOrderName;
     private String dtHideName;
@@ -21,8 +21,8 @@ public class  DataHeaderPref {
     private DefaultUserPreferences userPref;
 //    private String hideKey;
 
-    public DataHeaderPref(Boolean hideCols, String dstName){
-        this.hideCols = hideCols;
+    public DataHeaderPref(Boolean resetView, String dstName){
+        this.resetView = resetView;
         this.dstName = dstName;
         this.dtOrderName = dstName.replace(" ", "_") + "_column_order";
         this.dtHideName = dstName.replace(" ", "_") + "_column_hidden";
@@ -49,12 +49,12 @@ public class  DataHeaderPref {
         return null;
     }
     
-    public boolean getHideCols() {
-        return this.hideCols;
+    public boolean getResetView() {
+        return this.resetView;
     }
     
-    public void setHideCols(Boolean hideCols) {
-        this.hideCols = hideCols;
+    public void setHideCols(Boolean resetView) {
+        this.resetView = resetView;
     }
     
     public String getDstName() {
