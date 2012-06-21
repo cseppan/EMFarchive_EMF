@@ -4,9 +4,6 @@ import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
-
-
 @SuppressWarnings("serial")
 public class  DataHeaderPref {
 
@@ -45,7 +42,7 @@ public class  DataHeaderPref {
     
     private String[] setupNames(String value){
         if (value != null && value != "")
-            return StringUtils.split(value, ",");
+            return value.split(",");
         return null;
     }
     
