@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.create_table_index(table_name character varying, table_col_list character varying, index_name_prefix character varying)
+﻿CREATE OR REPLACE FUNCTION public.create_table_index(table_name character varying, table_col_list character varying, index_name_prefix character varying)
   RETURNS void AS
 $BODY$
 DECLARE
@@ -43,11 +43,11 @@ BEGIN
 		ELSE
 			index_name := index_name_prefix || '_' || table_name;
 		END IF;
-/*		execute 'CREATE INDEX ' || index_name || '
+		execute 'CREATE INDEX ' || index_name || '
 				ON emissions.' || table_name || '
 				USING btree
 				(' || table_col_list || ')';
-*/
+
 	END IF;
 END;
 $BODY$

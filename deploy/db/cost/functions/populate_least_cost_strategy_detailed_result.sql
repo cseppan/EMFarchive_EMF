@@ -1,4 +1,4 @@
-drop FUNCTION public.populate_least_cost_strategy_detailed_result(integer, 
+﻿drop FUNCTION public.populate_least_cost_strategy_detailed_result(integer, 
 	integer, 
 	integer, 
 	integer,
@@ -343,7 +343,13 @@ BEGIN
 		EXISTING_PRIMARY_DEVICE_TYPE_CODE,
 		strategy_name,
 		control_technology,
-		source_group
+		source_group,
+		county_name,
+		state_name,
+		scc_l1,
+		scc_l2,
+		scc_l3,
+		scc_l4
 		) 
 	select 	
 		' || detailed_result_dataset_id || '::integer,
@@ -390,8 +396,15 @@ BEGIN
 		EXISTING_MEASURE_ABBREVIATION,
 		EXISTING_PRIMARY_DEVICE_TYPE_CODE,
 		' || quote_literal(strategy_name) || ' as strategy_name,
-		ct.name,
-		sg.name
+		tbl.control_technology,
+		tbl.source_group,
+		county_name,
+		state_name,
+		scc_l1,
+		scc_l2,
+		scc_l3,
+		scc_l4
+
 	from (
 
 
@@ -412,12 +425,6 @@ BEGIN
 	
 	inner join emf.control_measures cm
 	on cm.id = tbl.cm_id
-	
-	left outer join emf.control_technologies ct
-	on ct.id = cm.control_technology
-
-	left outer join emf.source_groups sg
-	on sg.id = cm.source_group
 	
 	order by apply_order';
 	raise notice '%', 'populate the detailed result with the relevant results - ' || clock_timestamp();

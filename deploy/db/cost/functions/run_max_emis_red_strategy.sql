@@ -1,4 +1,4 @@
-DROP FUNCTION public.run_max_emis_red_strategy(integer, integer, integer, integer);
+﻿DROP FUNCTION public.run_max_emis_red_strategy(integer, integer, integer, integer);
 
 CREATE OR REPLACE FUNCTION public.run_max_emis_red_strategy(intControlStrategyId integer, intInputDatasetId integer, 
 	intInputDatasetVersion integer, intStrategyResultId int) RETURNS void AS $$
@@ -550,7 +550,13 @@ return;
 		strategy_name,
 		control_technology,
 		source_group,
-		apply_order
+		apply_order,
+		county_name,
+		state_name,
+		scc_l1,
+		scc_l2,
+		scc_l3,
+		scc_l4
 		)
 
 --	create table emissions.mer_new as 
@@ -597,7 +603,13 @@ select
 	strategy_name,
 	control_technology,
 	source_group, 
-	1 as apply_order
+	1 as apply_order,
+	county,
+	state_name,
+	scc_l1,
+	scc_l2,
+	scc_l3,
+	scc_l4
 --	,source_tp_remaining_emis,source_tp_count,source_annual_cost, winner
 
 from (
@@ -660,8 +672,13 @@ select
 			er.existing_dev_code,
 			' || quote_literal(strategy_name) || ' as strategy_name,
 			ct.name as control_technology,
-			sg.name as source_group
-
+			sg.name as source_group,
+			fipscode.county,
+			fipscode.state_name,
+			scc_codes.scc_l1,
+			scc_codes.scc_l2,
+			scc_codes.scc_l3,
+			scc_codes.scc_l4
 
 		FROM emissions.' || inv_table_name || ' inv
 
@@ -805,9 +822,12 @@ select
 			on ceff_var2.control_measure_id = m.id
 			and ceff_var2."name" = ''CEFF_EQUATION_'' || inv.poll || ''_VAR2''
 
-			' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
+			left outer join reference.fips fipscode
 			on fipscode.state_county_fips = inv.fips
-			and fipscode.country_num = ''0''' else '' end || '
+			and fipscode.country_num = ''0''
+
+			left outer join reference.scc_codes
+			on scc_codes.scc = inv.scc
 
 			left outer join emf.control_technologies ct
 			on ct.id = m.control_technology

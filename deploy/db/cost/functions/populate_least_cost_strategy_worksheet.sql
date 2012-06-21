@@ -1,4 +1,4 @@
-drop FUNCTION public.populate_least_cost_strategy_worksheet(integer, 
+﻿drop FUNCTION public.populate_least_cost_strategy_worksheet(integer, 
 	integer, 
 	integer);
 
@@ -497,7 +497,15 @@ BEGIN
 			plant,
 			REPLACEMENT_ADDON,
 			EXISTING_MEASURE_ABBREVIATION,
-			EXISTING_PRIMARY_DEVICE_TYPE_CODE
+			EXISTING_PRIMARY_DEVICE_TYPE_CODE,
+			control_technology,
+			source_group, 
+			county_name,
+			state_name,
+			scc_l1,
+			scc_l2,
+			scc_l3,
+			scc_l4
 			) 
 select 
 	' || worksheet_dataset_id || '::integer as dataset_id,
@@ -544,7 +552,15 @@ select
 	plant,
 	replacement_addon,
 	existing_measure_abbr,
-	existing_dev_code
+	existing_dev_code,
+	control_technology,
+	source_group, 
+	county,
+	state_name,
+	scc_l1,
+	scc_l2,
+	scc_l3,
+	scc_l4
 --	,source_tp_remaining_emis,source_tp_count,source_annual_cost, winner
 
 from (
@@ -609,8 +625,14 @@ from (
 			' || quote_literal(strategy_name) || ' as strategy_name,
 			ct.name as control_technology,
 			sg.name as source_group,
-			' || case when not has_merged_columns then 'null::integer as original_dataset_id, ' || quote_literal(sector) || '::character varying as sector' else 'inv.original_dataset_id, inv.sector' end || '
-,sources.id as source
+			' || case when not has_merged_columns then 'null::integer as original_dataset_id, ' || quote_literal(sector) || '::character varying as sector' else 'inv.original_dataset_id, inv.sector' end || ',
+			sources.id as source,
+			fipscode.county,
+			fipscode.state_name,
+			scc_codes.scc_l1,
+			scc_codes.scc_l2,
+			scc_codes.scc_l3,
+			scc_codes.scc_l4
 
 		FROM emissions.' || inv_table_name || ' inv
 
@@ -724,9 +746,12 @@ from (
 			on ceff_var2.control_measure_id = m.id
 			and ceff_var2."name" = ''CEFF_EQUATION_'' || inv.poll || ''_VAR2''
 
-			' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
+			left outer join reference.fips fipscode
 			on fipscode.state_county_fips = inv.fips
-			and fipscode.country_num = ''0''' else '' end || '
+			and fipscode.country_num = ''0''
+
+			left outer join reference.scc_codes
+			on scc_codes.scc = inv.scc
 
 			left outer join emf.control_technologies ct
 			on ct.id = m.control_technology
