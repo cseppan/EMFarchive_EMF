@@ -152,9 +152,10 @@ public class TableColumnHeadersViewer implements MouseListener, ActionListener {
         table.putClientProperty(COLUMN_ORDER, orderList);
         if ( hideCols != null && hideCols.length > 0){
             for ( int i=0; i< hideCols.length; i++){
-                TableColumn col = containColumn(allColumns, hideCols[i]); //save it when exist
-                if (col !=null ) {
-                    hideList.add(col);
+                TableColumn col1 = containColumn(allColumns, hideCols[i]); //save it when exist
+                TableColumn col2 = containColumn(hideList, orderCols[i]);
+                if (col1 !=null && col2 == null ) {
+                    hideList.add(col1);
                 }
             }
         }
@@ -184,9 +185,11 @@ public class TableColumnHeadersViewer implements MouseListener, ActionListener {
         // reset table columns from orderList
         if ( ! resetView ){
             if ( (orderList == null || orderList.size() ==0 ) 
-                    && (hideList == null || hideList.size() ==0 ) )
+                    && (hideList == null || hideList.size() ==0 ) ) {
                 showAllColumns();
-            
+                resetList();
+                return;
+            }
             ListIterator it = orderList.listIterator();
             while (it.hasNext())
             {
@@ -226,7 +229,6 @@ public class TableColumnHeadersViewer implements MouseListener, ActionListener {
             table.addColumn( column );
         } 
 //        table.repaint();
-//        table.revalidate();
     }
      
     private TableColumn containColumn(ArrayList<TableColumn> cols, String colName){
