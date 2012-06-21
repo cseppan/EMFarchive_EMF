@@ -24,7 +24,7 @@ public class CostYearTableReader {
         ResultSet rs = null;
         try {
             DataQuery query = datasource.query();
-            String queryString = "SELECT * FROM " + qualifiedTableName();
+            String queryString = "SELECT * FROM " + qualifiedTableName() + " order by annual";
             rs = query.executeQuery(queryString);
             if (rs.next())
                 table.addFirst(rs.getInt(1), rs.getDouble(3));
