@@ -1866,6 +1866,7 @@ CREATE TABLE emf.user_excluded_dataset_types
 );
 
 -- Added new 
+insert into emf.keywords ("name") values('COLUMN_LABELS');
 insert into emf.properties values(DEFAULT, 'SHOW_CASES_MENU', 'true');
 
 -- 3/22/2012 -- added table to help exclude user manage menu
@@ -1877,6 +1878,15 @@ CREATE TABLE emf.user_features
 ) 
 WITHOUT OIDS;
 
+--2/23/2012 user features
+insert into emf.user_features values (DEFAULT, 'Cases');
+insert into emf.user_features values (DEFAULT, 'Control Measures');
+insert into emf.user_features values (DEFAULT, 'Control Strategies');
+insert into emf.user_features values (DEFAULT, 'Control Programs');
+insert into emf.user_features values (DEFAULT, 'Sector Scenario');
+insert into emf.user_features values (DEFAULT, 'MP-SDT');
+insert into emf.user_features values (DEFAULT, 'Users');
+
 CREATE TABLE emf.user_excluded_features
 (
   id serial NOT NULL PRIMARY KEY,
@@ -1884,3 +1894,8 @@ CREATE TABLE emf.user_excluded_features
   user_id int4 NOT NULL REFERENCES emf.users(id),
   user_feature_id int4 NOT NULL REFERENCES emf.user_features(id)
 );
+
+
+--5/17/2012 -- added index to scc reference table
+CREATE INDEX 
+   ON reference.scc_codes (scc ASC NULLS LAST);
