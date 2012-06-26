@@ -159,10 +159,10 @@ public class TableColumnHeadersViewer implements MouseListener, ActionListener {
                 }
             }
         }
-        if ( orderCols != null ){
+        if ( orderCols != null  && orderCols.length > 0){
             for ( int i=0; i< orderCols.length; i++){
                 TableColumn col1 = containColumn(allColumns, orderCols[i]);
-                TableColumn col2 = containColumn(hideList, orderCols[i]);
+                TableColumn col2 = containColumn(orderList, orderCols[i]);
                 if (col1 !=null && col2 == null ) {
                     orderList.add(col1);
                 }
@@ -190,17 +190,12 @@ public class TableColumnHeadersViewer implements MouseListener, ActionListener {
                 resetList();
                 return;
             }
-            ListIterator it = orderList.listIterator();
-            while (it.hasNext())
+             
+            ListIterator<TableColumn> it = allColumns.listIterator();
+            while (it.hasNext())  // add the columns not in hide list
             {
-                TableColumn column = (TableColumn)it.next();
-                table.getColumnModel().addColumn( column );
-            } 
-            it = allColumns.listIterator();
-            while (it.hasNext())  // add the columns not in both order and hide list
-            {
-                TableColumn column = (TableColumn)it.next();
-                if ( (! hideList.contains(column)) && ! orderList.contains(column))
+                TableColumn column = it.next();
+                if ( ! hideList.contains(column))  
                 table.getColumnModel().addColumn( column );
             } 
         }
