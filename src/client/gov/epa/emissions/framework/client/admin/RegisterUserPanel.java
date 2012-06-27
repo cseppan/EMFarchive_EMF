@@ -181,8 +181,7 @@ public class RegisterUserPanel extends JPanel {
     
     protected void populateUser() throws EmfException {
         populateUserStrategy.populate(panel.getName(), panel.getAffi(), panel.getPhone(), panel.getEmail(), panel.getUsername(),
-                panel.getPassword(), panel.getConfirmPassword(), panel.getWantEmails(), new DatasetType[] {}, new UserFeature[]{});
-        //adminOption.isAdmin(user);
+                panel.getPassword(), panel.getConfirmPassword(), panel.getWantEmails());
     }
 
 }
