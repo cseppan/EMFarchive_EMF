@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.data.UserFeature;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.LabelWidget;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -183,5 +181,4 @@ public class RegisterUserPanel extends JPanel {
         populateUserStrategy.populate(panel.getName(), panel.getAffi(), panel.getPhone(), panel.getEmail(), panel.getUsername(),
                 panel.getPassword(), panel.getConfirmPassword(), panel.getWantEmails());
     }
-
 }

@@ -20,7 +20,6 @@ public class PopulateUserOnRegisterStrategy implements PopulateUserStrategy {
     public void populate(String name, String affiliation, String phone, String email, String username, char[] password,
             char[] confirmPassword, Boolean wantEmails) throws EmfException {
         try {
-            System.out.print(user == null ? "user is NULL;" : name) ;
             user.setName(name);
             user.setAffiliation(affiliation);
             user.setPhone(phone);
