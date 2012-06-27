@@ -266,7 +266,21 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
                 indexTable(tableName, "naics", "naics");
 
                 analyzeTable(qualifiedTableName);
-           }
+           } else if (dataset.getDatasetType().getName().equals(DatasetType.projectionPacket + " Extended")) {
+               indexTable(tableName, "region_cd", "region_cd");
+               indexTable(tableName, "reg_code", "reg_code");
+               indexTable(tableName, "facility_id", "facility_id");
+               indexTable(tableName, "unit_id", "unit_id");
+               indexTable(tableName, "poll", "poll");
+               indexTable(tableName, "scc", "scc");
+               indexTable(tableName, "rel_point_id", "rel_point_id");
+               indexTable(tableName, "sic", "sic");
+               indexTable(tableName, "process_id", "process_id");
+               indexTable(tableName, "naics", "naics");
+
+               analyzeTable(qualifiedTableName);
+          }
+
         } else if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.allowable)) {
             if (dataset.getDatasetType().getName().equals(DatasetType.allowablePacket)) {
                 
@@ -282,7 +296,20 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
                 indexTable(tableName, "naics", "naics");
 
                 analyzeTable(qualifiedTableName);
-           }
+           } else if (dataset.getDatasetType().getName().equals(DatasetType.allowablePacket + " Extended")) {
+               indexTable(tableName, "region_cd", "region_cd");
+               indexTable(tableName, "reg_code", "reg_code");
+               indexTable(tableName, "facility_id", "facility_id");
+               indexTable(tableName, "unit_id", "unit_id");
+               indexTable(tableName, "poll", "poll");
+               indexTable(tableName, "scc", "scc");
+               indexTable(tableName, "rel_point_id", "rel_point_id");
+               indexTable(tableName, "sic", "sic");
+               indexTable(tableName, "process_id", "process_id");
+               indexTable(tableName, "naics", "naics");
+
+               analyzeTable(qualifiedTableName);
+          }
         } else if (controlProgram.getControlProgramType().getName().equals(ControlProgramType.control)) {
             if (dataset.getDatasetType().getName().equals(DatasetType.controlPacket)) {
                 indexTable(tableName, "fips,plantid,pointid,stackid,segment,scc,poll,sic,mact", "comp");
@@ -298,7 +325,20 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
                 indexTable(tableName, "naics", "naics");
 
                 analyzeTable(qualifiedTableName);
-            }
+            } else if (dataset.getDatasetType().getName().equals(DatasetType.controlPacket + " Extended")) {
+                indexTable(tableName, "region_cd", "region_cd");
+                indexTable(tableName, "reg_code", "reg_code");
+                indexTable(tableName, "facility_id", "facility_id");
+                indexTable(tableName, "unit_id", "unit_id");
+                indexTable(tableName, "poll", "poll");
+                indexTable(tableName, "scc", "scc");
+                indexTable(tableName, "rel_point_id", "rel_point_id");
+                indexTable(tableName, "sic", "sic");
+                indexTable(tableName, "process_id", "process_id");
+                indexTable(tableName, "naics", "naics");
+
+                analyzeTable(qualifiedTableName);
+           }
         }
     }
     

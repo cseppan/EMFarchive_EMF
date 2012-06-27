@@ -51,7 +51,8 @@ DECLARE
 	stackid_expression character varying(64) := 'inv.stackid';
 	segment_expression character varying(64) := 'inv.segment';
 	mact_expression character varying(64) := 'inv.mact';
-
+	is_flat_file_inventory boolean := false;
+	is_monthly_source_sql character varying := 'coalesce(jan_value,feb_value,mar_value,apr_value,may_value,jun_value,jul_value,aug_value,sep_value,oct_value,nov_value,dec_value) is not null';
 BEGIN
 	--get dataset type name
 	select dataset_types."name"
@@ -69,6 +70,7 @@ BEGIN
 		stackid_expression := 'inv.rel_point_id';
 		segment_expression := 'inv.process_id';
 		mact_expression := 'inv.reg_codes';
+		is_flat_file_inventory := true;
 	END If;
 
 	-- get the input dataset info
@@ -260,7 +262,7 @@ BEGIN
 			select_column_list_sql := select_column_list_sql || ', ' ||
 			case 
 				when dataset_month != 0 then 
-					'-9.0::double precision as ann_emis'
+					'null::double precision as ann_emis'
 				else 
 					'case 
 						when cr.source_id is not null then cr.final_emissions 
@@ -270,6 +272,8 @@ BEGIN
 					end as ann_emis'
 			end;
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+
+		--this column is only relevant to the FF10 inventories
 		ELSIF column_name = 'ann_value' THEN
 			select_column_list_sql := select_column_list_sql || ', ' ||
 			'case 
@@ -278,28 +282,370 @@ BEGIN
 				when proj.source_id is not null then proj.final_emissions 
 				else inv.ann_value 
 			end as ann_value';
-			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
-		ELSIF column_name = 'ceff' THEN
-			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
-			select_column_list_sql := select_column_list_sql || ', 
+
+/*
 			case 
-				when cr.source_id is null and cont.source_id is not null and cont.percent_reduction <> 0.0 then cont.percent_reduction
-				else inv.ceff 
-			end as ceff';
+				--annual no monthly emission numbers
+				when ' || is_monthly_source_sql || ' then
+
+					coalesce(cr.jan_final_emissions,cont.jan_final_emissions,proj.jan_final_emissions,inv.jan_value,0.0)
+					+coalesce(cr.feb_final_emissions,cont.feb_final_emissions,proj.feb_final_emissions,inv.feb_value,0.0)
+					+coalesce(cr.mar_final_emissions,cont.mar_final_emissions,proj.mar_final_emissions,inv.mar_value,0.0)
+					+coalesce(cr.apr_final_emissions,cont.apr_final_emissions,proj.apr_final_emissions,inv.apr_value,0.0)
+					+coalesce(cr.may_final_emissions,cont.may_final_emissions,proj.may_final_emissions,inv.may_value,0.0)
+					+coalesce(cr.jun_final_emissions,cont.jun_final_emissions,proj.jun_final_emissions,inv.jun_value,0.0)
+					+coalesce(cr.jul_final_emissions,cont.jul_final_emissions,proj.jul_final_emissions,inv.jul_value,0.0)
+					+coalesce(cr.aug_final_emissions,cont.aug_final_emissions,proj.aug_final_emissions,inv.aug_value,0.0)
+					+coalesce(cr.sep_final_emissions,cont.sep_final_emissions,proj.sep_final_emissions,inv.sep_value,0.0)
+					+coalesce(cr.oct_final_emissions,cont.oct_final_emissions,proj.oct_final_emissions,inv.oct_value,0.0)
+					+coalesce(cr.nov_final_emissions,cont.nov_final_emissions,proj.nov_final_emissions,inv.nov_value,0.0)
+					+coalesce(cr.dec_final_emissions,cont.dec_final_emissions,proj.dec_final_emissions,inv.dec_value,0.0)
+				else
+					coalesce(cr.final_emissions,cont.final_emissions,proj.final_emissions,inv.ann_value)
+			end
+*/
+			
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'jan_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.jan_final_emissions 
+				when cont.source_id is not null then cont.jan_final_emissions 
+				when proj.source_id is not null then proj.jan_final_emissions 
+				else inv.jan_value 
+			end as jan_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'feb_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.feb_final_emissions 
+				when cont.source_id is not null then cont.feb_final_emissions 
+				when proj.source_id is not null then proj.feb_final_emissions 
+				else inv.feb_value 
+			end as feb_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'mar_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.mar_final_emissions 
+				when cont.source_id is not null then cont.mar_final_emissions 
+				when proj.source_id is not null then proj.mar_final_emissions 
+				else inv.mar_value 
+			end as mar_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'apr_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.apr_final_emissions 
+				when cont.source_id is not null then cont.apr_final_emissions 
+				when proj.source_id is not null then proj.apr_final_emissions 
+				else inv.apr_value 
+			end as apr_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'may_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.may_final_emissions 
+				when cont.source_id is not null then cont.may_final_emissions 
+				when proj.source_id is not null then proj.may_final_emissions 
+				else inv.may_value 
+			end as may_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'jun_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.jun_final_emissions 
+				when cont.source_id is not null then cont.jun_final_emissions 
+				when proj.source_id is not null then proj.jun_final_emissions 
+				else inv.jun_value 
+			end as jun_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'jul_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.jul_final_emissions 
+				when cont.source_id is not null then cont.jul_final_emissions 
+				when proj.source_id is not null then proj.jul_final_emissions 
+				else inv.jul_value 
+			end as jul_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'aug_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.aug_final_emissions 
+				when cont.source_id is not null then cont.aug_final_emissions 
+				when proj.source_id is not null then proj.aug_final_emissions 
+				else inv.aug_value 
+			end as aug_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'sep_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.sep_final_emissions 
+				when cont.source_id is not null then cont.sep_final_emissions 
+				when proj.source_id is not null then proj.sep_final_emissions 
+				else inv.sep_value 
+			end as sep_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'oct_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.oct_final_emissions 
+				when cont.source_id is not null then cont.oct_final_emissions 
+				when proj.source_id is not null then proj.oct_final_emissions 
+				else inv.oct_value 
+			end as oct_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'nov_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.nov_final_emissions 
+				when cont.source_id is not null then cont.nov_final_emissions 
+				when proj.source_id is not null then proj.nov_final_emissions 
+				else inv.nov_value 
+			end as nov_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'dec_value' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'case 
+				when cr.source_id is not null then cr.dec_final_emissions 
+				when cont.source_id is not null then cont.dec_final_emissions 
+				when proj.source_id is not null then proj.dec_final_emissions 
+				else inv.dec_value 
+			end as dec_value';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'projection_factor' THEN
+			select_column_list_sql := select_column_list_sql || ', ' ||
+			'coalesce(cr.adj_factor, proj.adj_factor) as projection_factor';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
 		ELSIF column_name = 'ann_pct_red' THEN
 			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
 			select_column_list_sql := select_column_list_sql || ', 
 			case 
-				when cr.source_id is null and cont.source_id is not null and cont.percent_reduction <> 0.0 then cont.percent_reduction
+				when cr.source_id is null and cont.source_id is not null and cont.percent_reduction <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.percent_reduction
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.percent_reduction) * (1.0 - coalesce(inv.ann_pct_red,0.0))
+						else inv.ann_pct_red 
+					end
+				when cr.source_id is not null then null::double precision 
 				else inv.ann_pct_red 
 			end as ann_pct_red';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'jan_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.jan_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.percent_reduction
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.jan_pct_red) * (1.0 - coalesce(inv.jan_pctred,0.0))
+						else inv.jan_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.jan_pctred 
+			end as jan_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'feb_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.feb_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.feb_pct_red
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.feb_pct_red) * (1.0 - coalesce(inv.feb_pctred,0.0))
+						else inv.feb_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.feb_pctred 
+			end as feb_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'mar_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.mar_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.mar_pct_red
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.mar_pct_red) * (1.0 - coalesce(inv.mar_pctred,0.0))
+						else inv.mar_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.mar_pctred 
+			end as mar_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'apr_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.apr_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.apr_pct_red
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.apr_pct_red) * (1.0 - coalesce(inv.apr_pctred,0.0))
+						else inv.apr_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.apr_pctred 
+			end as apr_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'may_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.may_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.may_pct_red
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.may_pct_red) * (1.0 - coalesce(inv.may_pctred,0.0))
+						else inv.may_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.may_pctred 
+			end as may_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'jun_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.jun_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.jun_pct_red
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.jun_pct_red) * (1.0 - coalesce(inv.jun_pctred,0.0))
+						else inv.jun_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.jun_pctred 
+			end as jun_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'jul_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.jul_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.jul_pct_red
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.jul_pct_red) * (1.0 - coalesce(inv.jul_pctred,0.0))
+						else inv.jul_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.jul_pctred 
+			end as feb_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'aug_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.aug_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.aug_pct_red
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.aug_pct_red) * (1.0 - coalesce(inv.aug_pctred,0.0))
+						else inv.aug_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.aug_pctred 
+			end as aug_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'sep_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.sep_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.sep_pct_red
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.sep_pct_red) * (1.0 - coalesce(inv.sep_pctred,0.0))
+						else inv.sep_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.sep_pctred 
+			end as sep_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'oct_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.oct_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.oct_pct_red
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.oct_pct_red) * (1.0 - coalesce(inv.oct_pctred,0.0))
+						else inv.oct_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.oct_pctred 
+			end as oct_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'nov_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.nov_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.nov_pct_red
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.nov_pct_red) * (1.0 - coalesce(inv.nov_pctred,0.0))
+						else inv.nov_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.nov_pctred 
+			end as nov_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+		ELSIF column_name = 'dec_pctred' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.dec_pct_red <> 0.0 then 
+					case 
+						when cont.replacement_addon = ''R'' then 
+							cont.dec_pct_red
+						when cont.replacement_addon = ''A'' then 
+							1.0 - (1.0 - cont.dec_pct_red) * (1.0 - coalesce(inv.dec_pctred,0.0))
+						else inv.dec_pctred 
+					end 
+				when cr.source_id is not null then null::double precision 
+				else inv.dec_pctred 
+			end as dec_pctred';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+
+
+
+		ELSIF column_name = 'ceff' THEN
+			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
+			select_column_list_sql := select_column_list_sql || ', 
+			case 
+				when cr.source_id is null and cont.source_id is not null and cont.percent_reduction <> 0.0 then cont.percent_reduction
+				when cr.source_id is not null then null::double precision 
+				else inv.ceff 
+			end as ceff';
+			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
+
+
 		ELSIF column_name = 'reff' THEN
 			--and cont.ceff <> 0.0 indicates a pass through situation, don't control source
 			select_column_list_sql := select_column_list_sql || ', 
 			case 
 				when cr.source_id is null and cont.source_id is not null and cont.percent_reduction <> 0.0 then 100.0::double precision 
+				when cr.source_id is not null then null::double precision 
 				else inv.reff 
 			end as reff';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
@@ -308,6 +654,7 @@ BEGIN
 			select_column_list_sql := select_column_list_sql || ', 
 			case 
 				when cr.source_id is null and cont.source_id is not null and cont.percent_reduction <> 0.0 then 100.0::double precision 
+				when cr.source_id is not null then null::double precision 
 				else inv.rpen 
 			end as rpen';
 			insert_column_list_sql := insert_column_list_sql || ',' || column_name;
@@ -369,7 +716,19 @@ BEGIN
 				final_emissions, 
 				annual_cost, 
 				cm_abbrev, 
-				adj_factor
+				adj_factor,
+				jan_final_emissions,
+				feb_final_emissions,
+				mar_final_emissions,
+				apr_final_emissions,
+				may_final_emissions,
+				jun_final_emissions,
+				jul_final_emissions,
+				aug_final_emissions,
+				sep_final_emissions,
+				oct_final_emissions,
+				nov_final_emissions,
+				dec_final_emissions
 			FROM emissions.' || detailed_result_table_name || '
 			where apply_order = 1
 
@@ -383,7 +742,32 @@ BEGIN
 				final_emissions, 
 				annual_cost, 
 				cm_abbrev, 
-				percent_reduction
+				percent_reduction,
+				replacement_addon,
+				jan_final_emissions,
+				feb_final_emissions,
+				mar_final_emissions,
+				apr_final_emissions,
+				may_final_emissions,
+				jun_final_emissions,
+				jul_final_emissions,
+				aug_final_emissions,
+				sep_final_emissions,
+				oct_final_emissions,
+				nov_final_emissions,
+				dec_final_emissions,
+				jan_pct_red,
+				feb_pct_red,
+				mar_pct_red,
+				apr_pct_red,
+				may_pct_red,
+				jun_pct_red,
+				jul_pct_red,
+				aug_pct_red,
+				sep_pct_red,
+				oct_pct_red,
+				nov_pct_red,
+				dec_pct_red
 			FROM emissions.' || detailed_result_table_name || '
 			where apply_order = 2
 
@@ -398,7 +782,19 @@ BEGIN
 				final_emissions, 
 				annual_cost, 
 				cm_abbrev, 
-				adj_factor
+				adj_factor,
+				jan_final_emissions,
+				feb_final_emissions,
+				mar_final_emissions,
+				apr_final_emissions,
+				may_final_emissions,
+				jun_final_emissions,
+				jul_final_emissions,
+				aug_final_emissions,
+				sep_final_emissions,
+				oct_final_emissions,
+				nov_final_emissions,
+				dec_final_emissions
 			FROM emissions.' || detailed_result_table_name || '
 			where apply_order in (3,4)
 			order by source_id, apply_order

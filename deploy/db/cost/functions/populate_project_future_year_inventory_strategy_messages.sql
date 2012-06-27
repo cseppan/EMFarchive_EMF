@@ -13,6 +13,8 @@ SELECT public.populate_project_future_year_inventory_strategy_messages(137, 5583
 SELECT public.populate_project_future_year_inventory_strategy_messages(137, 5589)
 SELECT public.populate_project_future_year_inventory_strategy_messages(137, 6109)
 SELECT public.populate_project_future_year_inventory_strategy_messages(137, 6464);
+
+SELECT public.populate_project_future_year_inventory_strategy_messages(162, 6540);
 */
 
 
@@ -55,6 +57,18 @@ DECLARE
 	pointid_expression character varying(64) = 'pointid';
 	stackid_expression character varying(64) = 'stackid';
 	segment_expression character varying(64) = 'segment';
+
+	cp_fips_expression character varying(64) := 'fips';
+	cp_plantid_expression character varying(64) := 'plantid';
+	cp_pointid_expression character varying(64) := 'pointid';
+	cp_stackid_expression character varying(64) := 'stackid';
+	cp_segment_expression character varying(64) := 'segment';
+	cp_mact_expression character varying(64) := 'mact';
+
+	is_monthly_source_sql character varying := 'coalesce(jan_value,feb_value,mar_value,apr_value,may_value,jun_value,jul_value,aug_value,sep_value,oct_value,nov_value,dec_value) is not null';
+	is_annual_source_sql character varying := 'coalesce(jan_value,feb_value,mar_value,apr_value,may_value,jun_value,jul_value,aug_value,sep_value,oct_value,nov_value,dec_value) is null and ann_value is not null';
+	is_control_packet_extended_format boolean := false;
+	is_flat_file_inventory boolean := false;
 BEGIN
 
 	-- get the detailed result dataset info
@@ -143,17 +157,19 @@ BEGIN
 
 		--if Flat File 2010 Types then change primary key field expression variables...
 		IF dataset_type_name = 'Flat File 2010 Point' or dataset_type_name = 'Flat File 2010 Nonpoint' THEN
-			fips_expression = 'region_cd';
-			plantid_expression = 'facility_id';
-			pointid_expression = 'unit_id';
-			stackid_expression = 'rel_point_id';
-			segment_expression = 'process_id';
+			fips_expression := 'region_cd';
+			plantid_expression := 'facility_id';
+			pointid_expression := 'unit_id';
+			stackid_expression := 'rel_point_id';
+			segment_expression := 'process_id';
+			is_flat_file_inventory := true;
 		ELSE
-			fips_expression = 'fips';
-			plantid_expression = 'plantid';
-			pointid_expression = 'pointid';
-			stackid_expression = 'stackid';
-			segment_expression = 'segment';
+			fips_expression := 'fips';
+			plantid_expression := 'plantid';
+			pointid_expression := 'pointid';
+			stackid_expression := 'stackid';
+			segment_expression := 'segment';
+			is_flat_file_inventory := false;
 		END If;
 
 		-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
@@ -315,11 +331,31 @@ raise notice '%', 'now lets evaluate each packet and see what we find' || clock_
 			ELSEIF control_program.type = 'Projection' or control_program.type = 'Control' or control_program.type = 'Allowable' THEN
 
 				-- make sure the dataset type is right...
-				IF (control_program.type = 'Projection' and control_program.dataset_type = 'Projection Packet') 
-					or (control_program.type = 'Control' and control_program.dataset_type = 'Control Packet')  
-					or (control_program.type = 'Allowable' and control_program.dataset_type = 'Allowable Packet') THEN
+				IF (control_program.type = 'Projection' and (control_program.dataset_type = 'Projection Packet' or control_program.dataset_type = 'Projection Packet Extended')) 
+					or (control_program.type = 'Control' and (control_program.dataset_type = 'Control Packet' or control_program.dataset_type = 'Control Packet Extended'))  
+					or (control_program.type = 'Allowable' and (control_program.dataset_type = 'Allowable Packet' or control_program.dataset_type = 'Allowable Packet Extended')) THEN
 raise notice '%', 'first see if packet affects anything -- packet type, ' || control_program.type || ', packet, ' || control_program.dataset_id || ', inv ' || inventory_record.dataset_id;
 
+					--if control packet is in the Extended Pack Format, then change the column names to the newer format
+					IF strpos(control_program.dataset_type, 'Extended') > 0 THEN
+						cp_fips_expression := 'region_cd';
+						cp_plantid_expression := 'facility_id';
+						cp_pointid_expression := 'unit_id';
+						cp_stackid_expression := 'rel_point_id';
+						cp_segment_expression := 'process_id';
+						cp_mact_expression := 'reg_code';
+					ELSE
+						cp_fips_expression := 'fips';
+						cp_plantid_expression := 'plantid';
+						cp_pointid_expression := 'pointid';
+						cp_stackid_expression := 'stackid';
+						cp_segment_expression := 'segment';
+						cp_mact_expression := 'mact';
+					END If;
+
+
+					-- see if control packet is in the extended format
+					is_control_packet_extended_format := public.check_table_for_columns(control_program.table_name, 'region_cd', ',');
 
 					-- first see if there is any issues
 					execute '
@@ -341,10 +377,48 @@ raise notice '%', 'first see if packet affects anything -- packet type, ' || con
 							case 
 								when control_program.type = 'Control' then 
 									'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone and application_control = ''Y''' 
+									|| case 
+										when is_flat_file_inventory and is_control_packet_extended_format then 
+											' and (
+												(' || is_annual_source_sql || ' and ann_pctred is not null)
+												or 
+												(' || is_monthly_source_sql || ' and coalesce(ann_pctred,jan_pctred,feb_pctred,mar_pctred,apr_pctred,may_pctred,jun_pctred,jul_pctred,aug_pctred,sep_pctred,oct_pctred,nov_pctred,dec_pctred) is not null)
+
+											)' 
+										when is_control_packet_extended_format then --dont include monthly packets, since we aren't dealing with monthly emissions (ff10 formats)
+											' and ann_pctred is not null'
+										else --dont include monthly packets
+											' and ceff is not null'
+									end
 								when control_program.type = 'Allowable' then 
 									'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone' 
+									|| case 
+										when is_flat_file_inventory and is_control_packet_extended_format then 
+											' and (
+												(' || is_annual_source_sql || ' and coalesce(ann_cap,ann_replacement) is not null)
+												or 
+												(' || is_monthly_source_sql || ' and coalesce(ann_cap,jan_cap,feb_cap,mar_cap,apr_cap,may_cap,jun_cap,jul_cap,aug_cap,sep_cap,oct_cap,nov_cap,dec_cap,jan_replacement,feb_replacement,mar_replacement,apr_replacement,may_replacement,jun_replacement,jul_replacement,aug_replacement,sep_replacement,oct_replacement,nov_replacement,dec_replacement) is not null)
+
+											)' 
+										when is_control_packet_extended_format then --dont include monthly packets, since we aren't dealing with monthly emissions (ff10 formats)
+											' and coalesce(ann_cap,ann_replacement) is not null'
+										else --dont include monthly packets
+											' and coalesce(cap,replacement) is not null'
+									end
 								else 
-									null::text 
+									case 
+										when is_flat_file_inventory and is_control_packet_extended_format then 
+											'(
+												(' || is_annual_source_sql || ' and ann_proj_factor is not null)
+												or 
+												(' || is_monthly_source_sql || ' and coalesce(ann_proj_factor,jan_proj_factor,feb_proj_factor,mar_proj_factor,apr_proj_factor,may_proj_factor,jun_proj_factor,jul_proj_factor,aug_proj_factor,sep_proj_factor,oct_proj_factor,nov_proj_factor,dec_proj_factor) is not null)
+
+											)'
+										when is_control_packet_extended_format then --dont include monthly packets, since we aren't dealing with monthly emissions (ff10 formats)
+											'ann_proj_factor is not null'
+										else --dont include monthly packets
+											'proj_factor is not null'
+									end								 
 							end,
 							3 --match_type integer	-- 1 = include only Matched Sources, 2 = Include packet records that didn't affect a source, 3 = ?
 							)
@@ -359,13 +433,16 @@ raise notice '%', 'first see if packet affects anything -- packet type, ' || con
 						unused_control_packet_records_sql := unused_control_packet_records_sql || 
 							(case when length(unused_control_packet_records_sql) > 0 then ' union all ' else '' end) || 
 
-							'select * from ( ' || public.build_project_future_year_inventory_matching_hierarchy_sql(
+							'select  
+								record_id, packet_rec_id,packet_ds_id,' || cp_fips_expression || ' as fips,scc,' || cp_plantid_expression || ' as plantid,' || cp_pointid_expression || ' as pointid,' || cp_stackid_expression || ' as stackid,' || cp_segment_expression || ' as segment,poll,sic,
+								' || cp_mact_expression || ' as mact,naics,compliance_date,control_program,ranking
+							from ( ' || public.build_project_future_year_inventory_matching_hierarchy_sql(
 								inventory_record.dataset_id, --inv_dataset_id integer, 
 								inventory_record.dataset_version, --inv_dataset_version integer, 
 								control_program.dataset_id, --control_program_dataset_id integer, 
 								control_program.dataset_version, --control_program_dataset_version integer, 
-								'record_id as packet_rec_id,dataset_id as packet_ds_id,fips,scc,plantid,pointid,stackid,segment,poll,sic,' || 
-								case when control_program.type = 'Allowable' then 'null::varchar(6) as mact' else 'mact' end || 
+								'record_id as packet_rec_id,dataset_id as packet_ds_id,' || cp_fips_expression || ',scc,' || cp_plantid_expression || ',' || cp_pointid_expression || ',' || cp_stackid_expression || ',' || cp_segment_expression || ',poll,sic,' || 
+								case when control_program.type = 'Allowable' and control_program.dataset_type = 'Allowable Packet' then 'null::varchar(6) as mact' else '' || cp_mact_expression || '' end || 
 								',naics,' || 
 								case when control_program.type = 'Projection' then 'null::timestamp without time zone as compliance_date' else 'compliance_date' end || 
 								',' || quote_literal(control_program.control_program_name) || ' as control_program', --select_columns varchar, 
@@ -376,26 +453,58 @@ raise notice '%', 'first see if packet affects anything -- packet type, ' || con
 								case 
 									when control_program.type = 'Control' then 
 										'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone and application_control = ''Y''' 
+										|| case 
+											when is_flat_file_inventory and is_control_packet_extended_format then 
+												' and (
+													(' || is_annual_source_sql || ' and ann_pctred is not null)
+													or 
+													(' || is_monthly_source_sql || ' and coalesce(ann_pctred,jan_pctred,feb_pctred,mar_pctred,apr_pctred,may_pctred,jun_pctred,jul_pctred,aug_pctred,sep_pctred,oct_pctred,nov_pctred,dec_pctred) is not null)
+
+												)' 
+										else
+											''
+										end
 									when control_program.type = 'Allowable' then 
 										'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone' 
+										|| case 
+											when is_flat_file_inventory and is_control_packet_extended_format then 
+												' and (
+													(' || is_annual_source_sql || ' and coalesce(ann_cap,ann_replacement) is not null)
+													or 
+													(' || is_monthly_source_sql || ' and coalesce(ann_cap,jan_cap,feb_cap,mar_cap,apr_cap,may_cap,jun_cap,jul_cap,aug_cap,sep_cap,oct_cap,nov_cap,dec_cap,jan_replacement,feb_replacement,mar_replacement,apr_replacement,may_replacement,jun_replacement,jul_replacement,aug_replacement,sep_replacement,oct_replacement,nov_replacement,dec_replacement) is not null)
+
+												)' 
+										else
+											''
+										end
 									else 
-										null::text 
+										case 
+											when is_flat_file_inventory and is_control_packet_extended_format then 
+												'(
+													(' || is_annual_source_sql || ' and ann_proj_factor is not null)
+													or 
+													(' || is_monthly_source_sql || ' and coalesce(ann_proj_factor,jan_proj_factor,feb_proj_factor,mar_proj_factor,apr_proj_factor,may_proj_factor,jun_proj_factor,jul_proj_factor,aug_proj_factor,sep_proj_factor,oct_proj_factor,nov_proj_factor,dec_proj_factor) is not null)
+
+												)' 
+										else
+											''
+										end								 
 								end,
 								2 --match_type integer	-- 1 = include only Matched Sources, 2 = Include packet records that didn't affect a source, 3 = ?
 								)
 
 						|| ') tbl';
 
-
+--raise notice '%', unused_control_packet_records_sql;
 					-- packet didn't affect any inventory sources...
 					ELSE
 
 						unused_control_packet_records_sql := unused_control_packet_records_sql || 
 							(case when length(unused_control_packet_records_sql) > 0 then ' union all ' else '' end) || 
 
-							'select null::integer as record_id,record_id as packet_rec_id,dataset_id as packet_ds_id,fips,scc,plantid,pointid,stackid,segment,poll,sic,' || 
-								case when control_program.type = 'Allowable' then 'null::varchar(6) as mact' else 'mact' end || 
-								',naics,' || 
+							'select null::integer as record_id,record_id as packet_rec_id,dataset_id as packet_ds_id,' || cp_fips_expression || ' as fips,scc,' || cp_plantid_expression || ' as plantid,' || cp_pointid_expression || ' as pointid,' || cp_stackid_expression || ' as stackid,' || cp_segment_expression || ' as segment,poll,sic,' || 
+								case when control_program.type = 'Allowable' and control_program.dataset_type = 'Allowable Packet' then 'null::varchar(6)' else '' || cp_mact_expression || '' end || 
+								' as mact,naics,' || 
 								case when control_program.type = 'Projection' then 'null::timestamp without time zone as compliance_date' else 'compliance_date' end || 
 								',' || quote_literal(control_program.control_program_name) || ' as control_program, null::double precision as ranking
 
@@ -517,7 +626,7 @@ raise notice '%', 'check inventory ' || inventory_record.dataset_name || ' again
 			packet_mact,
 			packet_naics,
 			--replacement,
-			packet_compliance_date
+			packet_compliance_effective_date
 			)
 		select distinct on (packet_ds_id,packet_rec_id) 
 			' || strategy_messages_dataset_id || '::integer,

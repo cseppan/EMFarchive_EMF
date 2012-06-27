@@ -134,18 +134,6 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         cols.add(new Column("SCC_L3", types.stringType(70), 70, new StringFormatter(70)));
         cols.add(new Column("SCC_L4", types.stringType(70), 70, new StringFormatter(70)));
 
-//        cols.add(new Column("jan_inv_pctred", types.realType(), new RealFormatter()));
-//        cols.add(new Column("feb_inv_pctred", types.realType(), new RealFormatter()));
-//        cols.add(new Column("mar_inv_pctred", types.realType(), new RealFormatter()));
-//        cols.add(new Column("apr_inv_pctred", types.realType(), new RealFormatter()));
-//        cols.add(new Column("may_inv_pctred", types.realType(), new RealFormatter()));
-//        cols.add(new Column("jun_inv_pctred", types.realType(), new RealFormatter()));
-//        cols.add(new Column("jul_inv_pctred", types.realType(), new RealFormatter()));
-//        cols.add(new Column("aug_inv_pctred", types.realType(), new RealFormatter()));
-//        cols.add(new Column("sep_inv_pctred", types.realType(), new RealFormatter()));
-//        cols.add(new Column("oct_inv_pctred", types.realType(), new RealFormatter()));
-//        cols.add(new Column("nov_inv_pctred", types.realType(), new RealFormatter()));
-//        cols.add(new Column("dec_inv_pctred", types.realType(), new RealFormatter()));
         cols.add(new Column("jan_final_emissions", types.realType(), new RealFormatter()));
         cols.add(new Column("feb_final_emissions", types.realType(), new RealFormatter()));
         cols.add(new Column("mar_final_emissions", types.realType(), new RealFormatter()));
@@ -158,6 +146,18 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         cols.add(new Column("oct_final_emissions", types.realType(), new RealFormatter()));
         cols.add(new Column("nov_final_emissions", types.realType(), new RealFormatter()));
         cols.add(new Column("dec_final_emissions", types.realType(), new RealFormatter()));
+        cols.add(new Column("jan_pct_red", types.realType(), new RealFormatter()));
+        cols.add(new Column("feb_pct_red", types.realType(), new RealFormatter()));
+        cols.add(new Column("mar_pct_red", types.realType(), new RealFormatter()));
+        cols.add(new Column("apr_pct_red", types.realType(), new RealFormatter()));
+        cols.add(new Column("may_pct_red", types.realType(), new RealFormatter()));
+        cols.add(new Column("jun_pct_red", types.realType(), new RealFormatter()));
+        cols.add(new Column("jul_pct_red", types.realType(), new RealFormatter()));
+        cols.add(new Column("aug_pct_red", types.realType(), new RealFormatter()));
+        cols.add(new Column("sep_pct_red", types.realType(), new RealFormatter()));
+        cols.add(new Column("oct_pct_red", types.realType(), new RealFormatter()));
+        cols.add(new Column("nov_pct_red", types.realType(), new RealFormatter()));
+        cols.add(new Column("dec_pct_red", types.realType(), new RealFormatter()));
 //        cols.add(new Column("jan_emis_reduction", types.realType(), new RealFormatter()));
 //        cols.add(new Column("feb_emis_reduction", types.realType(), new RealFormatter()));
 //        cols.add(new Column("mar_emis_reduction", types.realType(), new RealFormatter()));
