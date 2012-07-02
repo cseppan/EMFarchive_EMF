@@ -1,4 +1,4 @@
-﻿	-- Utility Functions
+-- Utility Functions
 --select public.convert_design_capacity_to_mw(150, 'MMBtu', 'hr');
 
 CREATE OR REPLACE FUNCTION public.convert_design_capacity_to_mw(design_capacity double precision, design_capacity_unit_numerator character varying, 

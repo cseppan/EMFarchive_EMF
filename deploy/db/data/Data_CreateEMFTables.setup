@@ -29,8 +29,8 @@ CREATE TABLE emf.intended_uses
 WITHOUT OIDS;
 -- emf intended_uses
 --
--- emissions.versions
-CREATE TABLE emissions.versions
+-- emf.versions
+CREATE TABLE emf.versions
 (
   id SERIAL PRIMARY KEY,
   dataset_id int4 NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE emissions.versions
   UNIQUE (dataset_id, name)
 ) 
 WITHOUT OIDS;
---emissions.versions
+--emf.versions
 --
 
 -- emf.note_types
@@ -444,7 +444,7 @@ CREATE TABLE emf.georegions
   nrows int4 DEFAULT 0,
   nthik int4 DEFAULT 0,
   ds_id int4 DEFAULT 0,
-  version_id int4 REFERENCES emissions.versions(id),
+  version_id int4 REFERENCES emf.versions(id),
   lock_owner varchar(255),
   lock_date timestamp
 ) 

@@ -12,7 +12,7 @@ BEGIN
 
 	--get version path
 	select versions.path
-	from emissions.versions
+	from emf.versions
 	where versions.dataset_id = $1
 		and versions.version = $2
 	into path;
@@ -62,7 +62,7 @@ BEGIN
 
 	--get version path
 	select versions.path
-	from emissions.versions
+	from emf.versions
 	where versions.dataset_id = $1
 		and versions.version = $2
 	into path;

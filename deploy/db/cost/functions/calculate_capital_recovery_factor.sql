@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION public.calculate_capital_recovery_factor(discount_rate double precision, equipment_life double precision)
+CREATE OR REPLACE FUNCTION public.calculate_capital_recovery_factor(discount_rate double precision, equipment_life double precision)
   RETURNS double precision AS
 $BODY$
 DECLARE
