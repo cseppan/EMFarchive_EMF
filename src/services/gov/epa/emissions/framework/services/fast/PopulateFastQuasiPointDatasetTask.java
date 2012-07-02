@@ -425,11 +425,15 @@ public class PopulateFastQuasiPointDatasetTask implements Runnable {
         return hasIt;
     }
 
-    private String qualifiedTable(String table, Datasource datasource) {
+    private String qualifiedTable(String table, Datasource datasource) throws EmfException {
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(table.toLowerCase())) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         return datasource.getName() + "." + table;
     }
 
-    private void makeSureInventoryDatasetHasIndexes(String datasetTableName, Datasource datasource) {
+    private void makeSureInventoryDatasetHasIndexes(String datasetTableName, Datasource datasource) throws EmfException {
         String query = "SELECT public.create_orl_table_indexes('" + datasetTableName.toLowerCase() + "');analyze " + qualifiedTable(datasetTableName, datasource).toLowerCase() + ";";
         try {
             datasource.query().execute(query);

@@ -68,14 +68,18 @@ public class GenerateRegionMap {
         return map;
     }
 
-    private String query(EmfDataset regionDataset, int version) {
+    private String query(EmfDataset regionDataset, int version) throws EmfException {
         String versionedQuery = new VersionedQuery(version(regionDataset, version)).query();
         return "SELECT DISTINCT fips "
             + " FROM " + qualifiedName(regionDataset.getInternalSources()[0].getTable(), emissionDatasource)
             + " where " + versionedQuery;
     }
 
-    private String qualifiedName(String tableName, Datasource datasource) {
+    private String qualifiedName(String tableName, Datasource datasource) throws EmfException {
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(tableName.toLowerCase())) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         return datasource.getName() + "." + tableName;
     }
     

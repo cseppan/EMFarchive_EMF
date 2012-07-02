@@ -233,7 +233,7 @@ public class StrategyRSMPctRedSummaryTask extends AbstractStrategySummaryTask {
         }
     }
 
-    protected String qualifiedEmissionTableName(Dataset dataset) {
+    protected String qualifiedEmissionTableName(Dataset dataset) throws EmfException {
         return qualifiedName(emissionTableName(dataset));
     }
 
@@ -242,7 +242,11 @@ public class StrategyRSMPctRedSummaryTask extends AbstractStrategySummaryTask {
         return internalSources[0].getTable().toLowerCase();
     }
 
-    private String qualifiedName(String table) {
+    private String qualifiedName(String table) throws EmfException {
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(table.toLowerCase())) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         return datasource.getName() + "." + table;
     }
 }

@@ -225,7 +225,7 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
         return pollutantList.toArray(new String[0]);
     }
 
-    private String prepareSQLStatement(EmfDataset dataset, Version datasetVersion, Grid grid, String pollutant, String sector) throws ExporterException {
+    private String prepareSQLStatement(EmfDataset dataset, Version datasetVersion, Grid grid, String pollutant, String sector) throws ExporterException, EmfException {
 
         DbServer dbServer = null;
         boolean hasXCol = false;
@@ -272,6 +272,10 @@ public class ExportFastOutputToShapeFileTask implements Runnable {
         VersionedQuery datasetVersionedQuery = new VersionedQuery(datasetVersion, "i");
 
         try {
+            // VERSIONS TABLE - Completed - throws exception if the following case is true
+            if ("versions".equalsIgnoreCase(tableName.toLowerCase())) {
+                throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+            }
             dbServer = dbServerFactory.getDbServer();
             ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
                     "select * from emissions." + tableName + " where 1 = 0");

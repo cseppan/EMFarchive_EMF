@@ -1647,7 +1647,7 @@ public class DatasetDAO {
         return versions.get(datasetId, version, session);
     }
 
-    private String qualifiedEmissionTableName(Dataset dataset) {
+    private String qualifiedEmissionTableName(Dataset dataset) throws EmfException {
         return qualifiedName(emissionTableName(dataset));
     }
 
@@ -1656,7 +1656,11 @@ public class DatasetDAO {
         return internalSources[0].getTable();
     }
 
-    private String qualifiedName(String table) {
+    private String qualifiedName(String table) throws EmfException {
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("versions".equalsIgnoreCase(table.toLowerCase())) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         return "emissions." + table;
     }
 
@@ -1763,7 +1767,7 @@ public class DatasetDAO {
         return total;
     }
     
-    private List<EmfDataset> filter( List<EmfDataset> datasets, String dataValueFilter, Session session) throws SQLException {
+    private List<EmfDataset> filter( List<EmfDataset> datasets, String dataValueFilter, Session session) throws SQLException, EmfException {
         if ( datasets == null || dataValueFilter==null || dataValueFilter.trim().isEmpty()) {
             return datasets;
         }
@@ -1848,7 +1852,7 @@ public class DatasetDAO {
         hibernateFacade.add(endStatus, session);
     }
 
-    public boolean checkBizzareCharInColumn(DbServer dbServer, Session session, int datasetId, int version, String colName) throws SQLException { 
+    public boolean checkBizzareCharInColumn(DbServer dbServer, Session session, int datasetId, int version, String colName) throws SQLException, EmfException { 
         // only for dataset that has column PLANT BUG3588
         EmfDataset dataset = this.getDataset(session, datasetId);
         DatasetType type = dataset.getDatasetType();
@@ -1859,6 +1863,10 @@ public class DatasetDAO {
         Datasource datasource = dbServer.getEmissionsDatasource();
         InternalSource source = dataset.getInternalSources()[0];
         String qualifiedTable = datasource.getName() + "." + source.getTable();
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions.versions".equalsIgnoreCase(qualifiedTable) ) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         String countQuery = "SELECT count(*) FROM " + qualifiedTable + getWhereClause(version(session,datasetId,version), session) + " and " + colName + " ~* '[[:cntrl:]]'"; //consider unicode?? |chr(127)-chr(65535)]'";
         long totalCount = 0;
 

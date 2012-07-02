@@ -596,11 +596,18 @@ public class ExportFastOutputToNetCDFFileTask implements Runnable {
         }
     }
 
-    private Map<String, String> getTableCols(Dataset dataset, Datasource datasource) {
+    private Map<String, String> getTableCols(Dataset dataset, Datasource datasource) throws EmfException {
         ResultSet rs = null;
         Map<String, String> cols = new HashMap<String, String>();
         InternalSource source = dataset.getInternalSources()[0];
+        if ("versions".equalsIgnoreCase(source.getTable().toLowerCase()) && "emissions".equalsIgnoreCase(datasource.getName().toLowerCase())) {
+            System.err.println("Versions table moved to EMF. Error in " + this.getClass().getName());
+        }
         String qualifiedTable = datasource.getName() + "." + source.getTable();
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions.versions".equalsIgnoreCase(qualifiedTable) ) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         try {
             rs = datasource.query().executeQuery("select * from " + qualifiedTable + " where 1 = 0");
             ResultSetMetaData md = rs.getMetaData();
@@ -773,7 +780,7 @@ public class ExportFastOutputToNetCDFFileTask implements Runnable {
         return cmd;
     }
 
-    private String getColsSpecdQueryString(Dataset dataset, String originalQuery, Datasource datasource) {
+    private String getColsSpecdQueryString(Dataset dataset, String originalQuery, Datasource datasource) throws EmfException {
         String selectColsString = "SELECT ";
         Column[] cols = dataset.getDatasetType().getFileFormat().cols();
         Map<String, String> tableColsMap = getTableCols(dataset, datasource);

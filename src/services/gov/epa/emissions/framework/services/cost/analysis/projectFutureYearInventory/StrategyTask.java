@@ -222,7 +222,7 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
         }
     }
 
-    private void vacuumControlProgramTables(ControlProgram controlProgram) {
+    private void vacuumControlProgramTables(ControlProgram controlProgram) throws EmfException {
         String query = "";
         EmfDataset dataset = controlProgram.getDataset();
         query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
@@ -238,7 +238,7 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
         }
     }
 
-    private void indexTable(ControlProgram controlProgram) {
+    private void indexTable(ControlProgram controlProgram) throws EmfException {
         EmfDataset dataset = controlProgram.getDataset();
         String tableName = emissionTableName(dataset);
         String qualifiedTableName = qualifiedEmissionTableName(dataset);

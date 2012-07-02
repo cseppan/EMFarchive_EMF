@@ -106,6 +106,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         this.dbServer = dbServerFactory.getDbServer();
         this.detailedResultTableFormat = new StrategyDetailedResultTableFormat(dbServer.getSqlDataTypes());
         this.datasource = dbServer.getEmissionsDatasource();
+        // VERSIONS TABLE - completed - should throw exception if emission schema and versions table apear together
         this.creator = new DatasetCreator(controlStrategy, user, 
                 sessionFactory, dbServerFactory,
                 datasource, keywords);
@@ -232,8 +233,13 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
     }
 
     protected OptimizedTableModifier dataModifier(String table) throws EmfException {
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(table.toLowerCase())) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         try {
-            return new OptimizedTableModifier(datasource, table);
+            return new OptimizedTableModifier(datasource, table); 
+            
         } catch (SQLException e) {
             throw new EmfException(e.getMessage());
         }
@@ -330,7 +336,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
                 + ".");
     }
 
-    private String getFilterFromRegionDataset() {
+    private String getFilterFromRegionDataset() throws EmfException {
         if (controlStrategy.getCountyDataset() == null) return "";
         String sqlFilter = "";
         String versionedQuery = new VersionedQuery(version(controlStrategy.getCountyDataset().getId(), controlStrategy.getCountyDatasetVersion())).query();
@@ -416,7 +422,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         }
     }
 
-    public String getFilterForSourceQuery() {
+    public String getFilterForSourceQuery() throws EmfException {
         if (filterForSourceQuery == null) {
             String sqlFilter = getFilterFromRegionDataset();
             String filter = controlStrategy.getFilter();
@@ -446,7 +452,7 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         }
     }
 
-    protected String qualifiedEmissionTableName(Dataset dataset) {
+    protected String qualifiedEmissionTableName(Dataset dataset) throws EmfException {
         return qualifiedName(emissionTableName(dataset));
     }
 
@@ -455,7 +461,11 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return internalSources[0].getTable();
     }
 
-    protected String qualifiedName(String table) {
+    protected String qualifiedName(String table) throws EmfException {
+     // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(table.toLowerCase())) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         return datasource.getName() + "." + table;
     }
 

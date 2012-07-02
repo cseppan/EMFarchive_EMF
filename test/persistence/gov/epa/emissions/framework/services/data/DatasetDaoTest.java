@@ -182,7 +182,7 @@ public class DatasetDaoTest extends ServiceTestCase {
     }
     
     //NOTE: for this test case, one has to manually remove the remaining items from db tables, namely,
-    //  emf.internal_sources, emf.datasets, emissions.versions and drop table emissions.diurnal_weekend,
+    //  emf.internal_sources, emf.datasets, emf.versions and drop table emissions.diurnal_weekend,
     //  emissions.diurnal_weekday, emissions.weekly, and emissions.monthly.
     public void testShouldDeleteDatasetDataRecordsFromCOSTYandPTPROTables() throws Exception {
         DbServer dbServer = dbServerFactory.getDbServer();

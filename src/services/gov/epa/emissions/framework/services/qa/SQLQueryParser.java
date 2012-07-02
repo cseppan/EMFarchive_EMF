@@ -847,6 +847,9 @@ public class SQLQueryParser {
     }
 
     private String qualifiedName(String datasourceName, String tableName) {
+        if ("versions".equalsIgnoreCase(tableName.toLowerCase()) && "emissions".equalsIgnoreCase(datasourceName.toLowerCase())) {
+            System.err.println("Versions table moved to EMF. Error in " + this.getClass().getName());
+        }
         return datasourceName + "." + tableName;
     }
 

@@ -197,7 +197,7 @@ public class SQLCompareCasesQuery {
         sql.append(" left outer join cases.subdirs ");
         sql.append(" on subdirs.id = cases_caseinputs.subdir_id");
 
-        sql.append(" left outer join emissions.versions ");
+        sql.append(" left outer join emf.versions ");
         sql.append(" on versions.id = cases_caseinputs.version_id");
         sql.append(" where cases_caseinputs.case_id = " + caseId);
 
@@ -481,7 +481,7 @@ on sectors.id = cases_caseinputs.sector_id
 left outer join cases.subdirs 
 on subdirs.id = cases_caseinputs.subdir_id
 
-left outer join emissions.versions 
+left outer join emf.versions 
 on versions.id = cases_caseinputs.version_id
 where cases_caseinputs.case_id = 13
 

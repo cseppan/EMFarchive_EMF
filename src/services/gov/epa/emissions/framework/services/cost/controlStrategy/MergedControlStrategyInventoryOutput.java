@@ -298,6 +298,9 @@ public class MergedControlStrategyInventoryOutput extends AbstractControlStrateg
     }
 
     private String qualifiedName(String table) {
+        if ("versions".equalsIgnoreCase(table.toLowerCase()) && "emissions".equalsIgnoreCase(datasource.getName().toLowerCase())) {
+            System.err.println("Versions table moved to EMF. Error in " + this.getClass().getName());
+        }
         return datasource.getName() + "." + table;
     }
 }

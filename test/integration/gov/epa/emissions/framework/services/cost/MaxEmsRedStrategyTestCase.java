@@ -19,10 +19,13 @@ import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.io.File;
 import java.util.Date;
+
+import org.hibernate.Session;
 
 public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
 
@@ -66,9 +69,27 @@ public class MaxEmsRedStrategyTestCase extends ServiceTestCase {
     }
 
     private void addVersionZeroEntryToVersionsTable(Dataset dataset, Datasource datasource) throws Exception {
-        TableModifier modifier = new TableModifier(datasource, "versions");
-        String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null };
-        modifier.insertOneRow(data);
+//        TableModifier modifier = new TableModifier(datasource, "versions");
+//        String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null };
+//        modifier.insertOneRow(data);
+        
+        
+        Version defaultZeroVersion = new Version(0);
+        defaultZeroVersion.setName("Initial Version");
+        defaultZeroVersion.setPath("");
+        defaultZeroVersion.setDatasetId(dataset.getId());
+        defaultZeroVersion.setFinalVersion(true);
+        defaultZeroVersion.setLastModifiedDate(null);
+
+        Session session = sessionFactory.getSession();
+
+        try {
+            new DatasetDAO().add(defaultZeroVersion, session);
+        } catch (Exception e) {
+            throw new EmfException("Could not add default zero version: " + e.getMessage());
+        } finally {
+            session.close();
+        }
     }
 
     protected void doTearDown() throws Exception {

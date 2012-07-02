@@ -340,7 +340,7 @@ public class FastRunTask {
 
     }
 
-    private void beforeRun() {
+    private void beforeRun() throws EmfException {
         for (FastRunInventory fastRunInventory : fastRun.getInventories()) {
             // make sure inventory has indexes created...
             makeSureInventoryDatasetHaveIndexes(fastRunInventory);
@@ -387,7 +387,7 @@ public class FastRunTask {
         return month != -1 ? DateUtil.daysInZeroBasedMonth(year, month) : 31;
     }
 
-    public void makeSureInventoryDatasetHaveIndexes(FastRunInventory fastRunInventory) {
+    public void makeSureInventoryDatasetHaveIndexes(FastRunInventory fastRunInventory) throws EmfException {
         String query = "SELECT public.create_orl_table_indexes('"
                 + emissionTableName(fastRunInventory.getDataset()).toLowerCase() + "');analyze "
                 + qualifiedEmissionTableName(fastRunInventory.getDataset()).toLowerCase() + ";";
@@ -488,7 +488,7 @@ public class FastRunTask {
         return populationCount;
     }
 
-    protected String qualifiedEmissionTableName(Dataset dataset) {
+    protected String qualifiedEmissionTableName(Dataset dataset) throws EmfException {
         return qualifiedName(emissionTableName(dataset));
     }
 
@@ -497,7 +497,11 @@ public class FastRunTask {
         return internalSources[0].getTable().toLowerCase();
     }
 
-    private String qualifiedName(String table) {
+    private String qualifiedName(String table) throws EmfException {
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(table.toLowerCase())) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         return datasource.getName() + "." + table;
     }
 

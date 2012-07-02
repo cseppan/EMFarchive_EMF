@@ -263,7 +263,7 @@ public class ApplyMeasureInSeriesControlStrategyInventoryOutput implements Contr
     }
 
     private String populateInventory(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
-            Dataset dataset, Datasource datasource, boolean missingColumns) {
+            Dataset dataset, Datasource datasource, boolean missingColumns) throws EmfException {
         VersionedQuery versionedQuery = new VersionedQuery(version);
         int month = inputDataset.applicableMonth();
         int noOfDaysInMonth = 31;
@@ -361,7 +361,11 @@ public class ApplyMeasureInSeriesControlStrategyInventoryOutput implements Contr
         return sql;
     }
 
-    protected String qualifiedTable(String table, Datasource datasource) {
+    protected String qualifiedTable(String table, Datasource datasource) throws EmfException {
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(table.toLowerCase())) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         return datasource.getName() + "." + table;
     }
 

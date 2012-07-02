@@ -512,7 +512,7 @@ public class FastAnalysisTask {
         }
     }
 
-    private String qualifiedEmissionTableName(Dataset dataset) {
+    private String qualifiedEmissionTableName(Dataset dataset) throws EmfException {
         return qualifiedName(emissionTableName(dataset));
     }
 
@@ -521,7 +521,11 @@ public class FastAnalysisTask {
         return internalSources[0].getTable().toLowerCase();
     }
 
-    private String qualifiedName(String table) {
+    private String qualifiedName(String table) throws EmfException {
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(table.toLowerCase())) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         return datasource.getName() + "." + table;
     }
 

@@ -1,16 +1,25 @@
 package gov.epa.emissions.framework.utils;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParameter;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.GeoRegion;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+
+import org.hibernate.Session;
 
 public class Utils {
 
@@ -417,5 +426,35 @@ public class Utils {
             System.out.println(caseInput);
         }
 
+    }
+    
+    public static void addVersionEntryToVersionsTable(
+            HibernateSessionFactory sessionFactory, 
+            User user, 
+            int datasetId,
+            int version,
+            String versionName,
+            String path,
+            boolean isFinal,
+            String description) throws Exception {
+        Version defaultZeroVersion = new Version(version);
+        defaultZeroVersion.setName(versionName);
+        defaultZeroVersion.setPath(path);
+        defaultZeroVersion.setCreator(user);
+        defaultZeroVersion.setDatasetId(datasetId);
+        defaultZeroVersion.setLastModifiedDate(new Date());
+//        defaultZeroVersion.setNumberRecords(version.getNumberRecords());
+        defaultZeroVersion.setFinalVersion(isFinal);
+        defaultZeroVersion.setDescription(description);
+        
+        Session session = sessionFactory.getSession();
+
+        try {
+            new DatasetDAO().add(defaultZeroVersion, session);
+        } catch (Exception e) {
+            throw new EmfException("Could not add version (" + version + "): " + e.getMessage());
+        } finally {
+            session.close();
+        }
     }
 }

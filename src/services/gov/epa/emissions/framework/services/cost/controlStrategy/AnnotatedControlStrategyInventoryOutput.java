@@ -113,7 +113,7 @@ public class AnnotatedControlStrategyInventoryOutput extends AbstractControlStra
     }
 
     private String populateInventory(int datasetId, String inputTable, String detailResultTable, String outputTable, Version version,
-            Dataset dataset, Datasource datasource, boolean missingColumns) {
+            Dataset dataset, Datasource datasource, boolean missingColumns) throws EmfException {
         VersionedQuery versionedQuery = new VersionedQuery(version);
         String sql = "select ";
         String columnList = "";

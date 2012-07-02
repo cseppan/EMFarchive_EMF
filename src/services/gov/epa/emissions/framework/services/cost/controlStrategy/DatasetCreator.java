@@ -425,25 +425,28 @@ public class DatasetCreator {
 //        TableModifier modifier = new TableModifier(datasource, "versions");
 //        String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null, null, null, this.user.getId() + "" };
 //        modifier.insertOneRow(data);
+               
+        
+        gov.epa.emissions.framework.utils.Utils.addVersionEntryToVersionsTable(this.sessionFactory, this.user,dataset.getId(), 0, "Initial Version", "", true, "");
 
-        Version defaultZeroVersion = new Version(0);
-        defaultZeroVersion.setName("Initial Version");
-        defaultZeroVersion.setPath("");
-        defaultZeroVersion.setCreator(user);
-        defaultZeroVersion.setDatasetId(dataset.getId());
-        defaultZeroVersion.setLastModifiedDate(new Date());
-//        defaultZeroVersion.setNumberRecords(version.getNumberRecords());
-        defaultZeroVersion.setFinalVersion(true);
-        defaultZeroVersion.setDescription("");
-        Session session = sessionFactory.getSession();
-
-        try {
-            new DatasetDAO().add(defaultZeroVersion, session);
-        } catch (Exception e) {
-            throw new EmfException("Could not add default zero version: " + e.getMessage());
-        } finally {
-            session.close();
-        }
+//        Version defaultZeroVersion = new Version(0);
+//        defaultZeroVersion.setName("Initial Version");
+//        defaultZeroVersion.setPath("");
+//        defaultZeroVersion.setCreator(user);
+//        defaultZeroVersion.setDatasetId(dataset.getId());
+//        defaultZeroVersion.setLastModifiedDate(new Date());
+////        defaultZeroVersion.setNumberRecords(version.getNumberRecords());
+//        defaultZeroVersion.setFinalVersion(true);
+//        defaultZeroVersion.setDescription("");
+//        Session session = sessionFactory.getSession();
+//
+//        try {
+//            new DatasetDAO().add(defaultZeroVersion, session);
+//        } catch (Exception e) {
+//            throw new EmfException("Could not add default zero version: " + e.getMessage());
+//        } finally {
+//            session.close();
+//        }
     }
 
     public void updateVersionZeroRecordCount(EmfDataset dataset) throws EmfException {

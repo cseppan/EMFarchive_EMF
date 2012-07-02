@@ -707,7 +707,7 @@ public abstract class AbstractStrategyTask implements Strategy {
         }
     }
 
-    protected String qualifiedEmissionTableName(Dataset dataset) {
+    protected String qualifiedEmissionTableName(Dataset dataset) throws EmfException {
         return qualifiedName(emissionTableName(dataset));
     }
 
@@ -716,7 +716,11 @@ public abstract class AbstractStrategyTask implements Strategy {
         return internalSources[0].getTable().toLowerCase();
     }
 
-    private String qualifiedName(String table) {
+    private String qualifiedName(String table) throws EmfException {
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(table.toLowerCase())) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         return datasource.getName() + "." + table;
     }
 
@@ -985,7 +989,7 @@ public abstract class AbstractStrategyTask implements Strategy {
         statusDAO.add(endStatus);
     }
     
-    public String getFilterForSourceQuery() {
+    public String getFilterForSourceQuery() throws EmfException {
         String filterForSourceQuery = "";
         String sqlFilter = getFilterFromRegionDataset();
         String filter = controlStrategy.getFilter();
@@ -1000,7 +1004,7 @@ public abstract class AbstractStrategyTask implements Strategy {
         return filterForSourceQuery;
     }
 
-    private String getFilterFromRegionDataset() {
+    private String getFilterFromRegionDataset() throws EmfException {
         if (controlStrategy.getCountyDataset() == null) return "";
         String sqlFilter = "";
         String versionedQuery = new VersionedQuery(version(controlStrategy.getCountyDataset().getId(), controlStrategy.getCountyDatasetVersion())).query();

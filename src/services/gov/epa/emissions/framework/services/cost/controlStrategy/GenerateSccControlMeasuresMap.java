@@ -132,7 +132,7 @@ public class GenerateSccControlMeasuresMap {
         return measure;
     }
 
-    private String query() {
+    private String query() throws EmfException {
         return "SELECT DISTINCT a.scc,b.control_measures_id FROM " + qualifiedEmissionTableName + " AS a, "
                 + qualifiedName("control_measure_sccs", emfDatasource) + " AS b, "
                 + qualifiedName("control_measures", emfDatasource) + " AS c"
@@ -143,7 +143,7 @@ public class GenerateSccControlMeasuresMap {
                 + (controlMeasureFilterIds.length() == 0 ? "" : " AND b.control_measures_id in (" + controlMeasureFilterIds + ")");
     }
 
-    private String query(String scc) {
+    private String query(String scc) throws EmfException {
         return "SELECT DISTINCT b.name as scc,b.control_measures_id "
                 + " FROM " + qualifiedName("control_measure_sccs", emfDatasource) + " AS b, "
                 + qualifiedName("control_measures", emfDatasource) + " AS c"
@@ -153,7 +153,11 @@ public class GenerateSccControlMeasuresMap {
                 + (controlMeasureFilterIds.length() == 0 ? "" : " AND b.control_measures_id in (" + controlMeasureFilterIds + ")");
     }
 
-    private String qualifiedName(String tableName, Datasource datasource) {
+    private String qualifiedName(String tableName, Datasource datasource) throws EmfException {
+        // VERSIONS TABLE - Completed - throws exception if the following case is true
+        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(tableName.toLowerCase())) {
+            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+        }
         return datasource.getName() + "." + tableName;
     }
 

@@ -323,7 +323,8 @@ public class ControlMeasuresImporter implements Importer {
 
     private OptimizedTableModifier dataModifier(String table, Datasource datasource) throws EmfException {
         try {
-            return new OptimizedTableModifier(datasource, table);
+            return new OptimizedTableModifier(datasource, table); 
+            // VERSIONS TABLE - completed - should throw exceptions
         } catch (SQLException e) {
             throw new EmfException(e.getMessage());
         }

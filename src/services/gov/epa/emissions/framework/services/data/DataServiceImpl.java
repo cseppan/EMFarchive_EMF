@@ -611,6 +611,11 @@ public class DataServiceImpl implements DataService {
                     "gov.epa.emissions.commons.io.generic.LineImporter")) {
                 String srcTable = datasource.getName() + "." + srcSources[0].getTable();
                 String targetTable = datasource.getName() + "." + targetSources[0].getTable();
+                
+                // VERSIONS TABLE - Completed - throws exception if the following case is true
+                if ("emissions.versions".equalsIgnoreCase(srcTable) && "emissions.versions".equalsIgnoreCase(targetTable)) {
+                    throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+                }
 
                 appendLineBasedData(filter, srcVersion, srcDS, srcTable, targetTable, targetDSid, targetDSVersion,
                         dataModifier, targetStartLineNumber.getValue());
@@ -620,6 +625,11 @@ public class DataServiceImpl implements DataService {
                     String srcTable = datasource.getName() + "." + srcSources[i].getTable();
                     String targetTable = datasource.getName() + "." + targetSources[i].getTable();
 
+                    // VERSIONS TABLE - Completed - throws exception if the following case is true
+                    if ("emissions.versions".equalsIgnoreCase(srcTable) && "emissions.versions".equalsIgnoreCase(targetTable)) {
+                        throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+                    }
+                    
                     appendData2SingleTable(filter, srcVersion, srcDS, srcTable, targetTable, targetDSid, targetDSVersion,
                             dataModifier);
                 }
@@ -834,6 +844,11 @@ public class DataServiceImpl implements DataService {
                 String srcTable = datasource.getName() + "." + srcSources[i].getTable();
                 String targetTable = datasource.getName() + "." + targetSources[i].getTable();
 
+                // VERSIONS TABLE - Completed - throws exception if the following case is true
+                if ("emissions.versions".equalsIgnoreCase(srcTable) && "emissions.versions".equalsIgnoreCase(targetTable)) {
+                    throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+                }
+                
                 String[] srcCols = getTableColumns(dataModifier, srcTable, "");
                 String[] targetCols = getTableColumns(dataModifier, targetTable, "");
 
