@@ -22,7 +22,6 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.casemanagement.jobs.ExportSelectionDialog;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -249,7 +248,8 @@ inner
 /*
 substring(fips,1,2)='37'
 */
-    
+    public static final String BASE_SUFFIX_TAG = "-base_field_suffix";
+    public static final String COMPARE_SUFFIX_TAG = "-compare_field_suffix";
     
     private String lineFeeder = System.getProperty("line.separator");
     
@@ -1345,7 +1345,8 @@ avd_emis=emis_avd
         int indexMatching = programSwitches.indexOf(MATCHING_EXPRESSIONS_TAG);
         int indexJoin     = programSwitches.indexOf(JOIN_TYPE_TAG);
         int indexWhereFilter = programSwitches.indexOf(WHERE_FILTER_TAG);
-
+        int indexBSuffix = programSwitches.indexOf(BASE_SUFFIX_TAG);
+        int indexCSuffix = programSwitches.indexOf(COMPARE_SUFFIX_TAG);
 
         if (indexBase != -1) {
             arguments = parseSwitchArguments(programSwitches, indexBase, programSwitches.indexOf("\n-", indexBase) != -1 ? programSwitches.indexOf("\n-", indexBase) : programSwitches.length());
@@ -1414,7 +1415,9 @@ avd_emis=emis_avd
                 (indexAggregate != -1 ? programSwitches.substring(indexAggregate + AGGREGATE_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexAggregate) != -1 ? programSwitches.indexOf("\n-", indexAggregate) : programSwitches.length()) : ""), 
                 (indexMatching != -1  && (indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length()) ? programSwitches.substring(indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length()) : ""),
                 (indexJoin != -1 && (indexJoin + JOIN_TYPE_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexJoin) != -1 ? programSwitches.indexOf("\n-", indexJoin) : programSwitches.length()) ? programSwitches.substring(indexJoin + JOIN_TYPE_TAG.length() + 1, programSwitches.indexOf("\n-", indexJoin) != -1 ? programSwitches.indexOf("\n-", indexJoin) : programSwitches.length()) : ""),
-                (indexWhereFilter != -1 && (indexWhereFilter + WHERE_FILTER_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) ? programSwitches.substring(indexWhereFilter + WHERE_FILTER_TAG.length() + 1, programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) : "")
+                (indexWhereFilter != -1 && (indexWhereFilter + WHERE_FILTER_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) ? programSwitches.substring(indexWhereFilter + WHERE_FILTER_TAG.length() + 1, programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) : ""),
+                (indexBSuffix != -1 && (indexBSuffix + BASE_SUFFIX_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexBSuffix) != -1 ? programSwitches.indexOf("\n-", indexBSuffix) : programSwitches.length()) ? programSwitches.substring(indexBSuffix + BASE_SUFFIX_TAG.length() + 1, programSwitches.indexOf("\n-", indexBSuffix) != -1 ? programSwitches.indexOf("\n-", indexBSuffix) : programSwitches.length()) : ""),
+                (indexCSuffix != -1 && (indexCSuffix + COMPARE_SUFFIX_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexCSuffix) != -1 ? programSwitches.indexOf("\n-", indexCSuffix) : programSwitches.length()) ? programSwitches.substring(indexCSuffix + COMPARE_SUFFIX_TAG.length() + 1, programSwitches.indexOf("\n-", indexCSuffix) != -1 ? programSwitches.indexOf("\n-", indexCSuffix) : programSwitches.length()) : "")
         );
         EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
         presenter.display(origDataset, step);
@@ -1468,7 +1471,8 @@ avd_emis=emis_avd
                 int indexMatching = programSwitches.indexOf(MATCHING_EXPRESSIONS_TAG);
                 int indexJoinType     = programSwitches.indexOf(JOIN_TYPE_TAG + "\n");
                 int indexWhereFilter = programSwitches.indexOf(WHERE_FILTER_TAG);
-
+                int indexBSuffix = programSwitches.indexOf(BASE_SUFFIX_TAG);
+                int indexCSuffix = programSwitches.indexOf(COMPARE_SUFFIX_TAG);
 
                 if (indexBase != -1) {
                     arguments = parseSwitchArguments(programSwitches, indexBase, programSwitches.indexOf("\n-", indexBase) != -1 ? programSwitches.indexOf("\n-", indexBase) : programSwitches.length());
@@ -1537,8 +1541,11 @@ avd_emis=emis_avd
                         (indexComparison != -1 ? programSwitches.substring(indexComparison + COMPARISON_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexComparison) != -1 ? programSwitches.indexOf("\n-", indexComparison) : programSwitches.length()) : ""), 
                         (indexMatching != -1  && (indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length()) ? programSwitches.substring(indexMatching + MATCHING_EXPRESSIONS_TAG.length() + 1, programSwitches.indexOf("\n-", indexMatching) != -1 ? programSwitches.indexOf("\n-", indexMatching) : programSwitches.length()) : ""),
                         (indexJoinType != -1 && (indexJoinType + JOIN_TYPE_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexJoinType) != -1 ? programSwitches.indexOf("\n-", indexJoinType) : programSwitches.length()) ? programSwitches.substring(indexJoinType + JOIN_TYPE_TAG.length() + 1, programSwitches.indexOf("\n-", indexJoinType) != -1 ? programSwitches.indexOf("\n-", indexJoinType) : programSwitches.length()) : ""),
-                        (indexWhereFilter != -1 && (indexWhereFilter + WHERE_FILTER_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) ? programSwitches.substring(indexWhereFilter + WHERE_FILTER_TAG.length() + 1, programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) : "")
+                        (indexWhereFilter != -1 && (indexWhereFilter + WHERE_FILTER_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) ? programSwitches.substring(indexWhereFilter + WHERE_FILTER_TAG.length() + 1, programSwitches.indexOf("\n-", indexWhereFilter) != -1 ? programSwitches.indexOf("\n-", indexWhereFilter) : programSwitches.length()) : ""),
+                        (indexBSuffix != -1 && (indexBSuffix + BASE_SUFFIX_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexBSuffix) != -1 ? programSwitches.indexOf("\n-", indexBSuffix) : programSwitches.length()) ? programSwitches.substring(indexBSuffix + BASE_SUFFIX_TAG.length() + 1, programSwitches.indexOf("\n-", indexBSuffix) != -1 ? programSwitches.indexOf("\n-", indexBSuffix) : programSwitches.length()) : ""),
+                        (indexCSuffix != -1 && (indexCSuffix + COMPARE_SUFFIX_TAG.length() + 1) < (programSwitches.indexOf("\n-", indexCSuffix) != -1 ? programSwitches.indexOf("\n-", indexCSuffix) : programSwitches.length()) ? programSwitches.substring(indexCSuffix + COMPARE_SUFFIX_TAG.length() + 1, programSwitches.indexOf("\n-", indexCSuffix) != -1 ? programSwitches.indexOf("\n-", indexCSuffix) : programSwitches.length()) : "")
                 );
+               
                 EditQAEmissionsPresenter presenter = new EditQAEmissionsPresenter(view, this, session);
                 presenter.display(origDataset, step);
     }
@@ -2149,9 +2156,19 @@ avd_emis=emis_avd
 
                     clear();
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    if (presenter.getTableRecordCount(stepResult) > 100000) {
+                    long records = presenter.getTableRecordCount(stepResult);
+                    long viewCount =  records;
+                    ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
+                    dialog.run();
+                    
+                    if ( dialog.shouldViewNone() )
+                        return; 
+                    else if ( !dialog.shouldViewall()){ 
+                        viewCount = dialog.getLines();
+                    } 
+                    else if (viewCount > 100000) {
                         String title = "Warning";
-                        String message = "Are you sure you want to view the result, the table has over 100,000 records?  It could take several minutes to load the data.";
+                        String message = "Are you sure you want to view more than 100,000 records?  It could take several minutes to load the data.";
                         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title,
                                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
@@ -2159,8 +2176,7 @@ avd_emis=emis_avd
                             return;
                         }
                     }
-
-                    presenter.viewResults(step, exportDir.trim());
+                    presenter.viewResults(stepResult, viewCount, exportDir.trim());
                 } catch (EmfException e) {
                     e.printStackTrace();
                     try  {

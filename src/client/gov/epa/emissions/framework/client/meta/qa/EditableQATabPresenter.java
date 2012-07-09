@@ -29,7 +29,7 @@ public interface EditableQATabPresenter extends PropertiesEditorTabPresenter {
     
     long getTableRecordCount(QAStepResult stepResult) throws EmfException;
 
-    void viewResults(QAStep qaStep) throws EmfException;
+    void viewResults(QAStep qaStep, long viewCount) throws EmfException;
 
     void doDelete(QAStep[] array) throws EmfException; //BUG3615
     

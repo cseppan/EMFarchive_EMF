@@ -455,9 +455,19 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
                             QAStepResult stepResult = presenter.getStepResult(step);
                             clearMessage();
                             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                            if (presenter.getTableRecordCount(stepResult) > 100000) {
+                            long records = presenter.getTableRecordCount(stepResult);
+                            long viewCount =  records;
+                            ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
+                            dialog.run();
+                            
+                            if ( dialog.shouldViewNone() )
+                                return; 
+                            else if ( !dialog.shouldViewall()){ 
+                                viewCount = dialog.getLines();
+                            } 
+                            if ( viewCount > 100000) {
                                 String title = "Warning";
-                                String message = "Are you sure you want to view the result, the table has over 100,000 records?  It could take several minutes to load the data.";
+                                String message = "Are you sure you want to view more than 100,000 records?  It could take several minutes to load the data.";
                                 int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                                         JOptionPane.QUESTION_MESSAGE);
 
@@ -466,7 +476,7 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
                                 }
                             }
 
-                            presenter.viewResults(step);
+                            presenter.viewResults(step, viewCount);
                         } catch (EmfException e) {
                             try  {
                                 //dataset.

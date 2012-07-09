@@ -59,6 +59,9 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
     
     private TextArea whereFilterTextField;
     
+    private TextArea bSuffixTextField;
+    private TextArea cSuffixTextField;
+    
     private String groupByExpressions;
     
     private String aggregateExpressions;
@@ -71,15 +74,17 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
     
     private String joinType;
     private String whereFilter;
+    private String baseSuffix;
+    private String compareSuffix;
     
     private DatasetType defaultDatasetType = null;
         
     public CompareDatasetsQAProgamWindow(DesktopManager desktopManager, String program, 
             EmfSession session, DatasetVersion[] baseDatasetVersions, DatasetVersion[] compareDatasetVersions, 
             String groupByExpressions, String aggregateExpressions, String matchingExpressions, 
-            String joinType, String whereFilter ) {
+            String joinType, String whereFilter, String baseSuffix, String compareSuffix) {
         
-        super("Emissions Inventories Editor", new Dimension(650, 600), desktopManager);
+        super("Emissions Inventories Editor", new Dimension(680, 600), desktopManager);
         this.program = program; 
         this.session = session;
         this.baseDatasetVersions = baseDatasetVersions;
@@ -89,6 +94,8 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
         this.matchingExpressions = matchingExpressions;
         this.joinType = joinType;
         this.whereFilter = whereFilter;
+        this.baseSuffix = baseSuffix;
+        this.compareSuffix = compareSuffix;
     }
 
 
@@ -173,7 +180,17 @@ public class CompareDatasetsQAProgamWindow extends DisposableInteralFrame implem
         scrollableComment4.setPreferredSize(new Dimension(450, 105));
         layoutGenerator.addLabelWidgetPair("Where Filter:", scrollableComment4, content);
         
-        layoutGenerator.makeCompactGrid(content, 7, 2, // rows, cols
+        this.bSuffixTextField = new TextArea("Base Suffix", this.baseSuffix, 40, 4);
+        ScrollableComponent scrollableComment5 = ScrollableComponent.createWithVerticalScrollBar(this.bSuffixTextField);
+        scrollableComment5.setAutoscrolls(true);
+        layoutGenerator.addLabelWidgetPair("Base Field Suffix :", scrollableComment5, content);
+        
+        this.cSuffixTextField = new TextArea("Compare Suffix", this.compareSuffix, 40, 4);
+        ScrollableComponent scrollableComment6 = ScrollableComponent.createWithVerticalScrollBar(this.cSuffixTextField);
+        scrollableComment5.setAutoscrolls(true);
+        layoutGenerator.addLabelWidgetPair("Compare Field Suffix :", scrollableComment6, content);
+        
+        layoutGenerator.makeCompactGrid(content, 9, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad*/
         messagePanel = new SingleLineMessagePanel();
@@ -293,6 +310,10 @@ avd_emis=emis_avd
 outer
 -where
 substring(fips,1,2)='37'
+-base_field_suffix
+2007
+-compare_field_suffix
+2010
 */
                 StringBuilder programArguments = new StringBuilder();
                 //base tag
@@ -319,9 +340,17 @@ substring(fips,1,2)='37'
                 programArguments.append(EditQAStepWindow.JOIN_TYPE_TAG + "\n");
                 programArguments.append(joinTypes.getSelectedItem()==null? "":joinTypes.getSelectedItem().toString()+"\n");
 
-                //table join tag
+                //table filter tag
                 programArguments.append(EditQAStepWindow.WHERE_FILTER_TAG + "\n");
                 programArguments.append(whereFilterTextField.getText() + "\n");
+                
+                //base suffix tag
+                programArguments.append(EditQAStepWindow.BASE_SUFFIX_TAG + "\n");
+                programArguments.append(bSuffixTextField.getText() + "\n");
+                
+                //compare suffix tag
+                programArguments.append(EditQAStepWindow.COMPARE_SUFFIX_TAG + "\n");
+                programArguments.append(cSuffixTextField.getText() + "\n");
 
                 presenter.updateProgramArguments(programArguments.toString());
                 dispose();

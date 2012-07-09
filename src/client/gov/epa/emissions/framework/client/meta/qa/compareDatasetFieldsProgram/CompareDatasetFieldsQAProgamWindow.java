@@ -58,6 +58,8 @@ public class CompareDatasetFieldsQAProgamWindow extends DisposableInteralFrame i
     private TextArea matchingExpressionsTextField;
     
     private TextArea whereFilterTextField;
+    private TextArea bSuffixTextField;
+    private TextArea cSuffixTextField;
     
     private String joinExpressions;
     
@@ -71,14 +73,17 @@ public class CompareDatasetFieldsQAProgamWindow extends DisposableInteralFrame i
     
     private String joinType;
     private String whereFilter;
+    private String baseSuffix;
+    private String compareSuffix;
+    
     private DatasetType defaultDatasetType = null;
         
     public CompareDatasetFieldsQAProgamWindow(DesktopManager desktopManager, String program, 
             EmfSession session, DatasetVersion[] baseDatasetVersions, DatasetVersion[] compareDatasetVersions, 
             String joinExpressions, String comparisonExpressions, String matchingExpressions, 
-            String joinType, String whereFilter ) {
+            String joinType, String whereFilter, String baseSuffix, String compareSuffix) {
         
-        super("Compare Dataset Fields QA Program", new Dimension(650, 600), desktopManager);
+        super("Compare Dataset Fields QA Program", new Dimension(680, 600), desktopManager);
         this.program = program; 
         this.session = session;
         this.baseDatasetVersions = baseDatasetVersions;
@@ -88,6 +93,8 @@ public class CompareDatasetFieldsQAProgamWindow extends DisposableInteralFrame i
         this.matchingExpressions = matchingExpressions;
         this.joinType = joinType;
         this.whereFilter = whereFilter;
+        this.baseSuffix = baseSuffix;
+        this.compareSuffix = compareSuffix;
     }
 
 
@@ -173,7 +180,17 @@ public class CompareDatasetFieldsQAProgamWindow extends DisposableInteralFrame i
         scrollableComment4.setPreferredSize(new Dimension(450, 105));
         layoutGenerator.addLabelWidgetPair("Where Filter:", scrollableComment4, content);
         
-        layoutGenerator.makeCompactGrid(content, 7, 2, // rows, cols
+        this.bSuffixTextField = new TextArea("Base Suffix", this.baseSuffix, 40, 4);
+        ScrollableComponent scrollableComment5 = ScrollableComponent.createWithVerticalScrollBar(this.bSuffixTextField);
+        scrollableComment5.setAutoscrolls(true);
+        layoutGenerator.addLabelWidgetPair("Base Field Suffix :", scrollableComment5, content);
+        
+        this.cSuffixTextField = new TextArea("Compare Suffix", this.compareSuffix, 40, 4);
+        ScrollableComponent scrollableComment6 = ScrollableComponent.createWithVerticalScrollBar(this.cSuffixTextField);
+        scrollableComment5.setAutoscrolls(true);
+        layoutGenerator.addLabelWidgetPair("Compare Field Suffix :", scrollableComment6, content);
+        
+        layoutGenerator.makeCompactGrid(content, 9, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad*/
         messagePanel = new SingleLineMessagePanel();
@@ -293,6 +310,10 @@ avd_emis=emis_avd
 outer
 -where
 substring(fips,1,2)='37'
+-base_field_suffix
+2007
+-compare_field_suffix
+2010
 */
                 StringBuilder programArguments = new StringBuilder();
                 //base tag
@@ -322,6 +343,14 @@ substring(fips,1,2)='37'
                 //table join tag
                 programArguments.append(EditQAStepWindow.WHERE_FILTER_TAG + "\n");
                 programArguments.append(whereFilterTextField.getText() + "\n");
+                
+              //base suffix tag
+                programArguments.append(EditQAStepWindow.BASE_SUFFIX_TAG + "\n");
+                programArguments.append(bSuffixTextField.getText() + "\n");
+                
+                //compare suffix tag
+                programArguments.append(EditQAStepWindow.COMPARE_SUFFIX_TAG + "\n");
+                programArguments.append(cSuffixTextField.getText() + "\n");
 
                 presenter.updateProgramArguments(programArguments.toString());
                 dispose();

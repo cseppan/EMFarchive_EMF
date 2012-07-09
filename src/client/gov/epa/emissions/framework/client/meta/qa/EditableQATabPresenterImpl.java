@@ -125,7 +125,7 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         return session.dataService().getTableRecordCount("emissions." + stepResult.getTable());
     }
 
-    public void viewResults(QAStep qaStep) throws EmfException {
+    public void viewResults( QAStep qaStep, long viewCount ) throws EmfException {
         QAStepResult qaResult = getStepResult(qaStep);
         
         if (qaResult == null || qaResult.getTable() == null || qaResult.getTable().isEmpty())
@@ -133,27 +133,26 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         
         File localFile = new File(tempQAStepFilePath(qaResult));
         try {
-            if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
+//            if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
                 Writer output = new BufferedWriter(new FileWriter(localFile));
                 try {
                     output.write(  writerHeader(qaStep, qaResult, dataset.getName()) );
-                    
-                    
-                    long tableRecordCount = getTableRecordCount(qaResult);
+                                       
                     long recordOffset = 0;
-                    while (recordOffset <= tableRecordCount) {
-                        output.write( getTableAsString(qaResult, 10000L, recordOffset) );
-                        recordOffset += 10000;
+                    if (viewCount < 10000L)
+                        output.write( getTableAsString(qaResult, viewCount, recordOffset) );
+                    else {
+                        while (recordOffset <= viewCount) {
+                            output.write( getTableAsString(qaResult, 10000L, recordOffset) );
+                            recordOffset += 10000;
+                        } 
                     }
-                    
-                    
-                    
                 }
                 finally {
                     output.close();
                     localFile.setLastModified(qaResult.getTableCreationDate().getTime());
                 }
-            }
+//            }
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }

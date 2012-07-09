@@ -50,7 +50,6 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -567,9 +566,19 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
                     QAStepResult stepResult = presenter.getStepResult(step);
                     clear();
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    if (presenter.getTableRecordCount(stepResult) > 100000) {
+                    long records = presenter.getTableRecordCount(stepResult);
+                    long viewCount =  records;
+                    ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
+                    dialog.run();
+                    
+                    if ( dialog.shouldViewNone() )
+                        return; 
+                    else if ( !dialog.shouldViewall()){ 
+                        viewCount = dialog.getLines();
+                    } 
+                    if (viewCount > 100000) {
                         String title = "Warning";
-                        String message = "Are you sure you want to view the result, the table has over 100,000 records?  It could take several minutes to load the data.";
+                        String message = "Are you sure you want to view more than 100,000 records?  It could take several minutes to load the data.";
                         int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                                 JOptionPane.QUESTION_MESSAGE);
                 
@@ -578,7 +587,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
                         }
                     }
 
-                    presenter.viewResults(step, exportDir.trim());
+                    presenter.viewResults(step, viewCount);
                 } catch (EmfException e) {
                     try  {
                         //if ( presenter.checkBizzareCharInColumn(step, "plant")) {

@@ -82,24 +82,33 @@ public class ViewQAStepPresenter {
         return session.user().getUsername();
     }
 
-    public void viewResults(QAStep qaStep, String exportDir) throws EmfException {
+    public void viewResults(QAStep qaStep, long viewCount) throws EmfException {
         QAStepResult qaResult = getStepResult(qaStep);
         
         if (qaResult == null || qaResult.getTable() == null || qaResult.getTable().isEmpty())
             throw new EmfException("No QA Step result available to view.");
         
-        File localFile = new File(tempQAStepFilePath(exportDir, qaResult));
+        File localFile = new File(tempQAStepFilePath(qaResult));
         try {
-            if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
+//            if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
                 Writer output = new BufferedWriter(new FileWriter(localFile));
                 try {
-                    output.write(  writerHeader(qaStep, qaResult, dataset.getName())+ getTableAsString(qaResult) );
+                    output.write(  writerHeader(qaStep, qaResult, dataset.getName()) );
+                    long recordOffset = 0;
+                    if (viewCount < 10000L)
+                        output.write( getTableAsString(qaResult, viewCount, recordOffset) );
+                    else {
+                        while (recordOffset <= viewCount) {
+                            output.write( getTableAsString(qaResult, 10000L, recordOffset) );
+                            recordOffset += 10000;
+                        }
+                    }          
                 }
                 finally {
                     output.close();
                     localFile.setLastModified(qaResult.getTableCreationDate().getTime());
                 }
-            }
+//            }
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
@@ -107,7 +116,7 @@ public class ViewQAStepPresenter {
         view.displayResultsTable(qaStep.getName(), localFile.getAbsolutePath());
     }
     
-    private String tempQAStepFilePath(String exportDir, QAStepResult qaStepResult) throws EmfException {
+    private String tempQAStepFilePath(QAStepResult qaStepResult) throws EmfException {
         String separator = File.separator; 
         UserPreference preferences = new DefaultUserPreferences();
         String tempDir = preferences.localTempDir();
@@ -160,8 +169,8 @@ public class ViewQAStepPresenter {
         return session.qaService().getQAStepResult(step);
     }
 
-    public String getTableAsString(QAStepResult stepResult) throws EmfException {
-        return session.dataService().getTableAsString("emissions." + stepResult.getTable());
+    public String getTableAsString(QAStepResult stepResult, long recordLimit, long recordOffset) throws EmfException {
+        return session.dataService().getTableAsString("emissions." + stepResult.getTable(), recordLimit, recordOffset);
     }
 
     public long getTableRecordCount(QAStepResult stepResult) throws EmfException {

@@ -132,40 +132,34 @@ public class EditQAStepPresenter {
         return session.user().getUsername();
     }
 
-    public void viewResults(QAStep qaStep, String exportDir) throws EmfException {
-        QAStepResult qaResult = getStepResult(qaStep);
+    public void viewResults(QAStepResult stepResult, long viewCount, String exportDir) throws EmfException {
 
-        if (qaResult == null)
-            throw new EmfException("Please run the QA Step before viewing the result.");
-        if (qaResult.getTable() == null || qaResult.getTable().isEmpty())
-            throw new EmfException("No QA Step result available to view.");
-
-        File localFile = new File(tempQAStepFilePath(exportDir, qaResult));
+        File localFile = new File(tempQAStepFilePath(exportDir, stepResult));
         try {
-            if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
+//            if (!localFile.exists() || localFile.lastModified() != qaResult.getTableCreationDate().getTime()) {
                 Writer output = new BufferedWriter(new FileWriter(localFile));
                 try {
-                    output.write( writeHeader(qaStep, qaResult, dataset.getName()));
-
+                    output.write( writeHeader(qaStep, stepResult, dataset.getName()));
                     
-                    long tableRecordCount = getTableRecordCount(qaResult);
+                    //long tableRecordCount = getTableRecordCount(qaResult);
                     long recordOffset = 0;
-                    while (recordOffset <= tableRecordCount) {
-                        output.write( getTableAsString(qaResult, 10000L, recordOffset) );
-                        recordOffset += 10000;
-                    }
-                    
-                    
-                    
+                    if (viewCount < 10000L)
+                        output.write( getTableAsString(stepResult, viewCount, recordOffset) );
+                    else {
+                        while (recordOffset <= viewCount) {
+                            output.write( getTableAsString(stepResult, 10000L, recordOffset) );
+                            recordOffset += 10000;
+                        }
+                    }            
 //                    output.write( getTableAsString(qaResult) );
 //                } catch (Exception e)  {
 //                    e.printStackTrace();
 //                    throw e;
                 } finally {
                     output.close();
-                    localFile.setLastModified(qaResult.getTableCreationDate().getTime());
+                    localFile.setLastModified(stepResult.getTableCreationDate().getTime());
                 }
-            }
+//            }
         } catch (Exception e) {
             e.printStackTrace(); // BUG3588
             throw new EmfException(e.getMessage());

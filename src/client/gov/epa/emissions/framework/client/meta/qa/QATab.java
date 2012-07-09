@@ -107,6 +107,11 @@ public class QATab extends JPanel implements QATabView, RefreshObserver {
 
     private void doView() {
         List steps = table.selected();
+        if ( steps == null || steps.size() == 0 ){
+            messagePanel.setMessage("Please select a QA step. ");
+            return;
+        }
+        
         for (Iterator iter = steps.iterator(); iter.hasNext();) {
             QAStep step = (QAStep) iter.next();
             ViewQAStepWindow view = new ViewQAStepWindow(parentConsole, session, desktopManager);
