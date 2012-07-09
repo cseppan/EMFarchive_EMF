@@ -4,9 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.TableMetaData;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
-import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DatasetVersion;
@@ -15,10 +13,7 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.SQLQAProgramQuery;
 import gov.epa.emissions.framework.services.qa.SQLQueryParser;
-import gov.epa.emissions.framework.tasks.DebugLevels;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,8 +25,6 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.hibernate.Session;
 
 public class SQLCompareDatasetsProgramQuery extends SQLQAProgramQuery{
     
@@ -86,6 +79,8 @@ poll|poll
 //    private static final String FULL_JOIN_EXPRESSIONS_TAG = "-fulljoin";
 
     public static final String WHERE_FILTER_TAG = "-where";
+    public static final String BASE_SUFFIX_TAG = "-base_field_suffix";
+    public static final String COMPARE_SUFFIX_TAG = "-compare_field_suffix";
     
     ArrayList<String> baseDatasetNames = new ArrayList<String>();
     
@@ -166,6 +161,8 @@ poll|poll
         String whereFilter = new String();
         String baseWhereFilter = new String();
         String compareWhereFilter = new String();
+        String baseSuffix = new String();
+        String compareSuffix = new String();
         
 //        String[] fullJoinExpressionTokens = new String[] {};
         Map<String, Column> baseColumns;
@@ -190,6 +187,8 @@ poll|poll
         int indexMatching = programArguments.indexOf(MATCHING_EXPRESSIONS_TAG);
         int indexJoin = programArguments.indexOf(JOIN_TYPE_TAG);
         int indexWhereFilter = programArguments.indexOf(WHERE_FILTER_TAG);
+        int indexBSuffix = programArguments.indexOf(BASE_SUFFIX_TAG);
+        int indexCSuffix = programArguments.indexOf(COMPARE_SUFFIX_TAG);
         
         if (indexBase != -1) {
             arguments = parseSwitchArguments(programArguments, indexBase, programArguments.indexOf("\n-", indexBase) != -1 ? programArguments.indexOf("\n-", indexBase) : programArguments.length());
@@ -256,6 +255,23 @@ poll|poll
         whereFilter = whereFilter.replaceAll("\n","").trim();
         //Validate program arguments (i.e., does dataset and version exist, does mapping make sense, etc...)
        
+        //Get the base dataset suffix
+        if (indexBSuffix != -1 
+                && (indexBSuffix + BASE_SUFFIX_TAG.length() + 1) < (programArguments.indexOf("\n-", indexBSuffix) != -1 ? programArguments.indexOf("\n-", indexBSuffix) : programArguments.length())) 
+            baseSuffix = programArguments.substring(indexBSuffix + BASE_SUFFIX_TAG.length() + 1, programArguments.indexOf("\n-", indexBSuffix) != -1 ? programArguments.indexOf("\n-", indexBSuffix) : programArguments.length());
+        else
+            baseSuffix = "b";
+        //strip off any unnecessary characters
+        baseSuffix = "_" + baseSuffix.replaceAll("\n","").trim();
+       
+        //Get the compare dataset suffix
+        if (indexCSuffix != -1 
+                && (indexCSuffix + COMPARE_SUFFIX_TAG.length() + 1) < (programArguments.indexOf("\n-", indexCSuffix) != -1 ? programArguments.indexOf("\n-", indexCSuffix) : programArguments.length())) 
+            compareSuffix = programArguments.substring(indexCSuffix + COMPARE_SUFFIX_TAG.length() + 1, programArguments.indexOf("\n-", indexCSuffix) != -1 ? programArguments.indexOf("\n-", indexCSuffix) : programArguments.length());
+        else
+            compareSuffix = "c";
+        //strip off any unnecessary characters
+        compareSuffix = "_" + compareSuffix.replaceAll("\n","").trim();
         
         //see if there is issues with the base datasets 
         if (baseDatasetList.size() > 0 ) {
@@ -506,7 +522,7 @@ poll|poll
             String baseAggregateExpression = getBaseExpression(aggregateExpression, matchingExpressionMap, baseColumns, "b");
 //            Column compareColumn = getCompareColumn(aggregateExpression, matchingExpressionMap, compareColumns);
             String compareAggregateExpression = getCompareExpression(aggregateExpression, matchingExpressionMap, compareColumns, "c");
-            selectSQL += ",sum(b.\"" + aggregateExpression + "\") as \"" + aggregateExpression + "_b\", sum(c.\"" + aggregateExpression + "\") as \"" + aggregateExpression + "_c\", sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\") as \"" + aggregateExpression + "_diff\", abs(sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) as \"" + aggregateExpression + "_absdiff\", case when coalesce(sum(b.\"" + aggregateExpression + "\"),0.0) <> 0.0 then (sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) / sum(b.\"" + aggregateExpression + "\") * 100.0 else null::double precision end as \"" + aggregateExpression + "_pctdiff\", case when coalesce(sum(b.\"" + aggregateExpression + "\"),0.0) <> 0.0 then abs((sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) / sum(b.\"" + aggregateExpression + "\") * 100.0) else null::double precision end as \"" + aggregateExpression + "_abspctdiff\"";
+            selectSQL += ",sum(b.\"" + aggregateExpression + "\") as \"" + aggregateExpression + baseSuffix +"\", sum(c.\"" + aggregateExpression + "\") as \"" + aggregateExpression + compareSuffix + "\", sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\") as \"" + aggregateExpression + "_diff\", abs(sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) as \"" + aggregateExpression + "_absdiff\", case when coalesce(sum(b.\"" + aggregateExpression + "\"),0.0) <> 0.0 then (sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) / sum(b.\"" + aggregateExpression + "\") * 100.0 else null::double precision end as \"" + aggregateExpression + "_pctdiff\", case when coalesce(sum(b.\"" + aggregateExpression + "\"),0.0) <> 0.0 then abs((sum(c.\"" + aggregateExpression + "\") - sum(b.\"" + aggregateExpression + "\")) / sum(b.\"" + aggregateExpression + "\") * 100.0) else null::double precision end as \"" + aggregateExpression + "_abspctdiff\"";
             baseSelectSQL += ",sum(" + baseAggregateExpression + ") as \"" + aggregateExpression + "\"";
             compareSelectSQL += ",sum(" + compareAggregateExpression + ") as \"" + aggregateExpression + "\"";
             baseUnionSelectSQL += ",sum(\"" + aggregateExpression + "\") as \"" + aggregateExpression + "\"";
@@ -548,7 +564,7 @@ poll|poll
          if (compareDatasetList.size() > 1) 
              innerSQLCompare += ") c " + compareUnionGroupBySQL;
          
-         String sql = selectSQL + ", sum(b.cnt) as count_b, sum(c.cnt) as count_c from (" + innerSQLBase + ") as b " +joinSQL+" (" + innerSQLCompare + ") as c ";
+         String sql = selectSQL + ", sum(b.cnt) as count" + baseSuffix+", sum(c.cnt) as count"+compareSuffix +" from (" + innerSQLBase + ") as b " +joinSQL+" (" + innerSQLCompare + ") as c ";
 //         for (int j = 0; j < fullJoinExpressionList.size(); j++) {
 //             
 //             ColumnMatchingMap columnMatchingMap = fullJoinExpressionList.get(j);

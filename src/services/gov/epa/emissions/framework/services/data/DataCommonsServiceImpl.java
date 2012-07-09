@@ -304,6 +304,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
                     checkIfUsedByDeletedDS(types[i], session);
                     checkIfUsedByDatasets(types[i], session); 
                     dao.removeUserExcludedDatasetType(types[i], dbServer);
+                    dao.removeTableConsolidation(types[i], dbServer);
                     dao.removeDatasetTypes(types[i], session);
                     
                     if (types[i].getFileFormat()!= null )

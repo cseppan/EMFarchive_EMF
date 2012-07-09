@@ -210,6 +210,21 @@ public class DataCommonsDAO {
 //                + type.getId() + "").executeUpdate();
     }
     
+    public void removeTableConsolidation(DatasetType type, DbServer dbServer) throws EmfException {
+        //remove dataset types from the user_excluded_dataset_types table
+        try {
+            dbServer.getEmfDatasource().query().execute("delete from emf.table_consolidations where dataset_type_id = "
+                    + type.getId() + "");
+        } catch (SQLException e) {
+            
+            if ( DebugLevels.DEBUG_23()) {
+                System.out.println( e.getMessage());
+            }
+            
+            throw new EmfException(e.getMessage(), e);
+        } 
+    }
+   
     public void removeXFileFormat(XFileFormat fileFormat, Session session) {
         hibernateFacade.remove(fileFormat, session);
     }

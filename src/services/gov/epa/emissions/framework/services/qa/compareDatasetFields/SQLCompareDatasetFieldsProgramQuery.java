@@ -4,9 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.TableMetaData;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
-import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DatasetVersion;
@@ -15,10 +13,7 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.SQLQAProgramQuery;
 import gov.epa.emissions.framework.services.qa.SQLQueryParser;
-import gov.epa.emissions.framework.tasks.DebugLevels;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,8 +25,6 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.hibernate.Session;
 
 public class SQLCompareDatasetFieldsProgramQuery extends SQLQAProgramQuery{
     
@@ -86,6 +79,8 @@ poll|poll
 //    private static final String FULL_JOIN_EXPRESSIONS_TAG = "-fulljoin";
 
     public static final String WHERE_FILTER_TAG = "-where";
+    public static final String BASE_SUFFIX_TAG = "-base_field_suffix";
+    public static final String COMPARE_SUFFIX_TAG = "-compare_field_suffix";
     
     ArrayList<String> baseDatasetNames = new ArrayList<String>();
     
@@ -166,6 +161,8 @@ poll|poll
         String whereFilter = new String();
         String baseWhereFilter = new String();
         String compareWhereFilter = new String();
+        String baseSuffix = new String();
+        String compareSuffix = new String();
         
 //        String[] fullJoinExpressionTokens = new String[] {};
         Map<String, Column> baseColumns;
@@ -190,6 +187,8 @@ poll|poll
         int indexMatching = programArguments.indexOf(MATCHING_EXPRESSIONS_TAG +"\n");
         int indexJoinType = programArguments.indexOf(JOIN_TYPE_TAG +"\n");
         int indexWhereFilter = programArguments.indexOf(WHERE_FILTER_TAG +"\n");
+        int indexBSuffix = programArguments.indexOf(BASE_SUFFIX_TAG);
+        int indexCSuffix = programArguments.indexOf(COMPARE_SUFFIX_TAG);
         
         //parse base and compare dataset name and version
         if (indexBase != -1) {
@@ -262,10 +261,24 @@ poll|poll
             whereFilter = programArguments.substring(indexWhereFilter + WHERE_FILTER_TAG.length() + 1, programArguments.indexOf("\n-", indexWhereFilter) != -1 ? programArguments.indexOf("\n-", indexWhereFilter) : programArguments.length());
         //strip off any unnecessary characters
         whereFilter = whereFilter.replaceAll("\n","").trim();
-
-        
         //Validate program arguments (i.e., does dataset and version exist, does mapping make sense, etc...)
        
+        if (indexBSuffix != -1 
+                && (indexBSuffix + BASE_SUFFIX_TAG.length() + 1) < (programArguments.indexOf("\n-", indexBSuffix) != -1 ? programArguments.indexOf("\n-", indexBSuffix) : programArguments.length())) 
+            baseSuffix = programArguments.substring(indexBSuffix + BASE_SUFFIX_TAG.length() + 1, programArguments.indexOf("\n-", indexBSuffix) != -1 ? programArguments.indexOf("\n-", indexBSuffix) : programArguments.length());
+        else
+            baseSuffix = "b";
+        //strip off any unnecessary characters
+        baseSuffix = "_" + baseSuffix.replaceAll("\n","").trim();
+       
+        //Get the compare dataset suffix
+        if (indexCSuffix != -1 
+                && (indexCSuffix + COMPARE_SUFFIX_TAG.length() + 1) < (programArguments.indexOf("\n-", indexCSuffix) != -1 ? programArguments.indexOf("\n-", indexCSuffix) : programArguments.length())) 
+            compareSuffix = programArguments.substring(indexCSuffix + COMPARE_SUFFIX_TAG.length() + 1, programArguments.indexOf("\n-", indexCSuffix) != -1 ? programArguments.indexOf("\n-", indexCSuffix) : programArguments.length());
+        else
+            compareSuffix = "c";
+        //strip off any unnecessary characters
+        compareSuffix = "_" + compareSuffix.replaceAll("\n","").trim();
         
         //see if there is issues with the base datasets 
         if (baseDatasetList.size() > 0 ) {
@@ -513,7 +526,7 @@ poll|poll
             String baseAggregateExpression = getBaseExpression(comparisonExpression, matchingExpressionMap, baseColumns, "b");
 //            Column compareColumn = getCompareColumn(aggregateExpression, matchingExpressionMap, compareColumns);
             String compareAggregateExpression = getCompareExpression(comparisonExpression, matchingExpressionMap, compareColumns, "c");
-            selectSQL += ",b.\"" + comparisonExpression + "\" as \"" + comparisonExpression + "_b\", c.\"" + comparisonExpression + "\" as \"" + comparisonExpression + "_c\"" + ",(b.\"" + comparisonExpression + "\" = " + "c.\"" + comparisonExpression + "\") as \"" + comparisonExpression + "_match\"";
+            selectSQL += ",b.\"" + comparisonExpression + "\" as \"" + comparisonExpression + baseSuffix + "\", c.\"" + comparisonExpression + "\" as \"" + comparisonExpression + compareSuffix +"\"" + ",(b.\"" + comparisonExpression + "\" = " + "c.\"" + comparisonExpression + "\") as \"" + comparisonExpression + "_match\"";
             baseSelectSQL += "," + baseAggregateExpression + " as \"" + comparisonExpression + "\"";
             compareSelectSQL += "," + compareAggregateExpression + " as \"" + comparisonExpression + "\"";
             baseUnionSelectSQL += ",\"" + comparisonExpression + "\" as \"" + comparisonExpression + "\"";
