@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.client.data.dataset.CopyQAStepToDatasetSelect
 import gov.epa.emissions.framework.client.data.dataset.CopyQAStepToDatasetSelectionPresenter;
 import gov.epa.emissions.framework.client.data.dataset.CopyQAStepToDatasetSelectionView;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
@@ -454,28 +455,34 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
                         try {
                             QAStepResult stepResult = presenter.getStepResult(step);
                             clearMessage();
+                            
+                            DefaultUserPreferences userPref = new DefaultUserPreferences();
+                            String sLimit = userPref.property("QA_results_limit");
+                            long rlimit = Integer.parseInt(sLimit);
+                            System.out.println("rlimit: " + rlimit);
                             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                             long records = presenter.getTableRecordCount(stepResult);
                             long viewCount =  records;
-                            ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
-                            dialog.run();
-                            
-                            if ( dialog.shouldViewNone() )
-                                return; 
-                            else if ( !dialog.shouldViewall()){ 
-                                viewCount = dialog.getLines();
-                            } 
-                            if ( viewCount > 100000) {
-                                String title = "Warning";
-                                String message = "Are you sure you want to view more than 100,000 records?  It could take several minutes to load the data.";
-                                int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
-                                        JOptionPane.QUESTION_MESSAGE);
+                            if ( records > rlimit ){
+                                ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
+                                dialog.run();
 
-                                if (selection == JOptionPane.NO_OPTION) {
-                                    return;
+                                if ( dialog.shouldViewNone() )
+                                    return; 
+                                else if ( !dialog.shouldViewall()){ 
+                                    viewCount = dialog.getLines();
+                                } 
+                                if ( viewCount > 100000) {
+                                    String title = "Warning";
+                                    String message = "Are you sure you want to view more than 100,000 records?  It could take several minutes to load the data.";
+                                    int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                                            JOptionPane.QUESTION_MESSAGE);
+
+                                    if (selection == JOptionPane.NO_OPTION) {
+                                        return;
+                                    }
                                 }
                             }
-
                             presenter.viewResults(step, viewCount);
                         } catch (EmfException e) {
                             try  {
