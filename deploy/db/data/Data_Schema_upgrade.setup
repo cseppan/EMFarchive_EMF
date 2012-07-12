@@ -1899,3 +1899,6 @@ CREATE TABLE emf.user_excluded_features
 --5/17/2012 -- added index to scc reference table
 CREATE INDEX 
    ON reference.scc_codes (scc ASC NULLS LAST);
+   
+alter table emissions.versions set schema emf
+
