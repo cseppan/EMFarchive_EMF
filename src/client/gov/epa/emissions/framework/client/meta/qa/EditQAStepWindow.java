@@ -32,6 +32,7 @@ import gov.epa.emissions.framework.client.meta.qa.compareDatasetFieldsProgram.Co
 import gov.epa.emissions.framework.client.meta.qa.comparedatasetsprogram.CompareDatasetsQAProgamWindow;
 import gov.epa.emissions.framework.client.meta.qa.flatFile2010Pnt.EnhanceFlatFile2010PointSettingWindows;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
@@ -2146,34 +2147,40 @@ avd_emis=emis_avd
 
         // if (exportDir == null || exportDir.trim().isEmpty())
         // throw new EmfException("Please specify the exported result directory.");
-
         Thread viewResultsThread = new Thread(new Runnable() {
             public void run() {
                 try {
+                    
                     QAStepResult stepResult = presenter.getStepResult(step);
                     if (stepResult == null)
                         throw new EmfException("Please run the QA step before trying to view.");
-
                     clear();
+                    
+                    DefaultUserPreferences userPref = new DefaultUserPreferences();
+                    String sLimit = userPref.property("QA_results_limit");
+                    long rlimit = Integer.parseInt(sLimit);
+                    
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     long records = presenter.getTableRecordCount(stepResult);
                     long viewCount =  records;
-                    ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
-                    dialog.run();
-                    
-                    if ( dialog.shouldViewNone() )
-                        return; 
-                    else if ( !dialog.shouldViewall()){ 
-                        viewCount = dialog.getLines();
-                    } 
-                    else if (viewCount > 100000) {
-                        String title = "Warning";
-                        String message = "Are you sure you want to view more than 100,000 records?  It could take several minutes to load the data.";
-                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title,
-                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if ( records > rlimit ){
+                        ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
+                        dialog.run();
 
-                        if (selection == JOptionPane.NO_OPTION) {
-                            return;
+                        if ( dialog.shouldViewNone() )
+                            return; 
+                        else if ( !dialog.shouldViewall()){ 
+                            viewCount = dialog.getLines();
+                        } 
+                        else if (viewCount > 100000) {
+                            String title = "Warning";
+                            String message = "Are you sure you want to view more than 100,000 records?  It could take several minutes to load the data.";
+                            int selection = JOptionPane.showConfirmDialog(parentConsole, message, title,
+                                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+                            if (selection == JOptionPane.NO_OPTION) {
+                                return;
+                            }
                         }
                     }
                     presenter.viewResults(stepResult, viewCount, exportDir.trim());

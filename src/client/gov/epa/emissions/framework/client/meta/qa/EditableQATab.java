@@ -459,7 +459,7 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
                             DefaultUserPreferences userPref = new DefaultUserPreferences();
                             String sLimit = userPref.property("QA_results_limit");
                             long rlimit = Integer.parseInt(sLimit);
-                            System.out.println("rlimit: " + rlimit);
+                          
                             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                             long records = presenter.getTableRecordCount(stepResult);
                             long viewCount =  records;

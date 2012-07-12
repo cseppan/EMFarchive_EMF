@@ -24,6 +24,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
 import gov.epa.emissions.framework.client.data.QAPrograms;
+import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
@@ -565,28 +566,34 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
                 try {
                     QAStepResult stepResult = presenter.getStepResult(step);
                     clear();
+                    
+                    DefaultUserPreferences userPref = new DefaultUserPreferences();
+                    String sLimit = userPref.property("QA_results_limit");
+                    long rlimit = Integer.parseInt(sLimit);
+                    
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     long records = presenter.getTableRecordCount(stepResult);
                     long viewCount =  records;
-                    ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
-                    dialog.run();
                     
-                    if ( dialog.shouldViewNone() )
-                        return; 
-                    else if ( !dialog.shouldViewall()){ 
-                        viewCount = dialog.getLines();
-                    } 
-                    if (viewCount > 100000) {
-                        String title = "Warning";
-                        String message = "Are you sure you want to view more than 100,000 records?  It could take several minutes to load the data.";
-                        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
-                                JOptionPane.QUESTION_MESSAGE);
-                
-                        if (selection == JOptionPane.NO_OPTION) {
-                            return;
+                    if ( viewCount > 100000) {
+                        ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
+                        dialog.run();          
+                        if ( dialog.shouldViewNone() )
+                            return; 
+                        else if ( !dialog.shouldViewall()){ 
+                            viewCount = dialog.getLines();
+                        } 
+                        if (viewCount > 100000) {
+                            String title = "Warning";
+                            String message = "Are you sure you want to view more than 100,000 records?  It could take several minutes to load the data.";
+                            int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE);
+
+                            if (selection == JOptionPane.NO_OPTION) {
+                                return;
+                            }
                         }
                     }
-
                     presenter.viewResults(step, viewCount);
                 } catch (EmfException e) {
                     try  {
