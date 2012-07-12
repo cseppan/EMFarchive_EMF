@@ -27,8 +27,8 @@ public class ViewQAResultDialg extends Dialog {
     private int lines;
     
     public ViewQAResultDialg(String stepName, EmfConsole parent) {
-        super("View QA results: "+ stepName, parent);
-        super.setSize(new Dimension(300, 130));
+        super("View QA results choices: "+ stepName, parent);
+        super.setSize(new Dimension(320, 130));
 
         super.getContentPane().add(createLayout());
         super.center();

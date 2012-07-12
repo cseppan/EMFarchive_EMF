@@ -2157,8 +2157,14 @@ avd_emis=emis_avd
                     clear();
                     
                     DefaultUserPreferences userPref = new DefaultUserPreferences();
-                    String sLimit = userPref.property("QA_results_limit");
-                    long rlimit = Integer.parseInt(sLimit);
+                    String sLimit = userPref.property("View_QA_results_limit");
+                    long rlimit;
+                    if ( sLimit == null ){
+                        messagePanel.setMessage("View_QA_results_limit is not specified in EMFPrefs.txt, default value is 50000. ");
+                        rlimit = 50000;
+                    }
+                    else   
+                        rlimit = Integer.parseInt(sLimit);
                     
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     long records = presenter.getTableRecordCount(stepResult);
