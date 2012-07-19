@@ -78,6 +78,8 @@ public interface DataService {
     int getNumExternalSources(int dsId, String filter) throws EmfException;
     
     int getNumOfRecords (String table, Version version, String filter) throws EmfException;
+    
+    Integer[] getNumOfRecords (int datasetID, Version[] versions, String tableName) throws EmfException;
 
 //    void importRemoteEMFDataset(int externalDatasetAccessId, User user) throws EmfException;
 

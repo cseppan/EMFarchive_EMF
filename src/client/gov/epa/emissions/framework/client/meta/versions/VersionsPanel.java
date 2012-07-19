@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -48,7 +49,14 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private DesktopManager desktopManager;
 
+    private JComboBox tableCombo;
+    
+    private Boolean hasMultiISources=false;
+
     private boolean editable;
+    
+    private Integer sIndex=0; // index of source table
+    private Version[] versions;
     
     public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole,
             DesktopManager desktopManager, boolean editable) {
@@ -74,9 +82,18 @@ public class VersionsPanel extends JPanel implements VersionsView {
     }
 
     public void display(Version[] versions, InternalSource[] sources) {
+        this.versions = versions;
         if (sources.length != 0)
             add(topPanel(sources), BorderLayout.PAGE_START);
         add(tablePanel(versions), BorderLayout.CENTER);
+        if (hasMultiISources)
+            try {
+                doRefresh();
+            } catch (EmfException e) {
+                // NOTE Auto-generated catch block
+                e.printStackTrace();
+                messagePanel.setError("Could not retrieve number of lines of table " + tableCombo.getSelectedItem() );
+            }
     }
 
     public void reload(Version[] versions) {
@@ -132,14 +149,17 @@ public class VersionsPanel extends JPanel implements VersionsView {
     }
 
     private JPanel rightControlPanel(InternalSource[] sources) {
+        if ( sources != null && sources.length > 1)  // for multi tables
+            hasMultiISources = true;
+        
         JPanel panel = new JPanel();
-
         panel.add(new Label("Table:"));
 
         DefaultComboBoxModel tablesModel = new DefaultComboBoxModel(tableNames(sources));
-        final JComboBox tableCombo = new JComboBox(tablesModel);
+        tableCombo = new JComboBox(tablesModel);
         tableCombo.setName("tables");
         tableCombo.setEditable(false);
+        tableCombo.addActionListener(sourceAction());
         panel.add(tableCombo);
 
         Button view = new ViewButton(new AbstractAction() {
@@ -247,4 +267,30 @@ public class VersionsPanel extends JPanel implements VersionsView {
         return (String[]) tables.toArray(new String[0]);
     }
 
+    private Action sourceAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                if (hasMultiISources){
+                    if  (tableCombo.getSelectedIndex() != sIndex) {
+                        try {
+                            doRefresh(); 
+                        } catch (EmfException e1) {
+                            messagePanel.setError("Could not retrieve number of lines of table " + tableCombo.getSelectedItem() );
+                        }
+                    }
+                }   
+            }
+        };
+    } 
+    
+    private void doRefresh() throws EmfException{
+        String selectedSource = (String) tableCombo.getSelectedItem();
+        Integer[] nRecords = presenter.getDatasetRecords(dataset.getId(), versions, selectedSource);
+        for (int i = 0; i < versions.length; i++){
+            Version version = versions[i];
+            version.setNumberRecords(nRecords[i]);
+            sIndex = tableCombo.getSelectedIndex();
+        }  
+        reload(versions);   
+    }
 }

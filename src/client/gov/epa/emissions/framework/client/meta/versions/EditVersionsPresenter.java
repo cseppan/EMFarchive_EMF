@@ -32,15 +32,11 @@ public class EditVersionsPresenter {
         view.observe(this);
 
         Version[] versions = editorService().getVersions(dataset.getId());
-        view.display(versions, dataset.getInternalSources());
+        view.display(versions);
     }
 
     private DataEditorService editorService() {
         return session.dataEditorService();
-    }
-
-    private DataService dataservice() {
-        return session.dataService();
     }
 
     private DataService dataService() {
@@ -119,11 +115,11 @@ public class EditVersionsPresenter {
     public void markFinalNDefault(Version version) throws Exception {
         editorService().markFinal(token(version));
 
-        EmfDataset locked = dataservice().obtainLockedDataset(getUser(), dataset);
+        EmfDataset locked = dataService().obtainLockedDataset(getUser(), dataset);
 
         if (locked != null && locked.isLocked(getUser())) {
             locked.setDefaultVersion(version.getVersion());
-            dataservice().updateDataset(locked);
+            dataService().updateDataset(locked);
         }
 
         reload();
@@ -140,6 +136,10 @@ public class EditVersionsPresenter {
         if (!version.isFinalVersion())
             throw new EmfException("Can only copy a version that is Final");
 
-        session.dataService().copyDataset(dataset.getId(), version, session.user());
+        dataService().copyDataset(dataset.getId(), version, session.user());
+    }
+    
+    public Integer[] getDatasetRecords(int datasetID, Version[] versions, String tableName) throws EmfException{
+        return dataService().getNumOfRecords(datasetID, versions, tableName);
     }
 }

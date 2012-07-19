@@ -42,4 +42,7 @@ public class VersionsViewPresenter {
         session.dataService().copyDataset(dataset.getId(), version, session.user());
     }
 
+    public Integer[] getDatasetRecords(int datasetID, Version[] versions, String tableName) throws EmfException{
+        return session.dataService().getNumOfRecords(datasetID, versions, tableName);
+    }
 }

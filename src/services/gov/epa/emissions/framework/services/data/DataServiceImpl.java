@@ -1476,6 +1476,22 @@ public class DataServiceImpl implements DataService {
             closeDB(dbServer);
         }
     }
+    
+    public synchronized Integer[] getNumOfRecords (int datasetId, Version[] versions, String tableName) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        Session session = sessionFactory.getSession();
+        try {
+            EmfDataset dataset = getDataset(datasetId);
+            return dao.getDatasetRecordsNumber(dbServer, session, dataset, versions, tableName);
+        } catch (Exception e) {
+            LOG.error("Error: ", e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            if (session != null && session.isConnected())
+                session.close();
+            closeDB(dbServer);
+        }
+    }
 
     public String[] getTableColumnDistinctValues(int datasetId, int datasetVersion, String columnName, String whereFilter,
             String sortOrder) throws EmfException {

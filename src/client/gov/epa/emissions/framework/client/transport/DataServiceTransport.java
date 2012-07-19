@@ -414,6 +414,19 @@ public class DataServiceTransport implements DataService {
         
         return (Integer)call.requestResponse(new Object[]{table, version, filter});
     }
+    
+    public synchronized Integer[] getNumOfRecords (int datasetId, 
+        Version[] versions, String tableName) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("getNumOfRecords");
+        call.addIntegerParam("datasetId");
+        call.addParam("versions", mappings.versions());
+        call.addStringParam("tableName");
+        call.setReturnType(mappings.integers());
+        
+        return (Integer[])call.requestResponse(new Object[]{datasetId, versions, tableName});
+    }
 
 //    public void importRemoteEMFDataset(int externalDatasetAccessId, User user) throws EmfException {
 //        EmfCall call = call();

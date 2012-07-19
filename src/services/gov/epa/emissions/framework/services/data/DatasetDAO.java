@@ -563,6 +563,40 @@ public class DatasetDAO {
         return totalCount;
     }
 
+    public Integer[] getDatasetRecordsNumber(DbServer dbServer, Session session, EmfDataset dataset, Version[] versions, String tableName)
+    throws SQLException {
+        DatasetType type = dataset.getDatasetType();
+
+        if (type.getExporterClassName().endsWith("ExternalFilesExporter"))
+            return new Integer[]{getExternalSrcs(dataset.getId(), -1, null, session).length};
+
+        int nSources = dataset.getInternalSources().length;
+        Integer[] totalCount = new Integer[nSources];
+        
+        Datasource datasource = dbServer.getEmissionsDatasource();
+      
+        for ( int i =0 ; i < versions.length; i++ ){
+            //source = dataset.getInternalSources()[sIndex];
+            String qualifiedTable = datasource.getName() + "." + tableName;
+            String countQuery = "SELECT count(*) FROM " + qualifiedTable + getWhereClause(versions[i], session);
+            totalCount[i] = 0;
+
+            try {
+                Connection connection = datasource.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(countQuery);
+                resultSet.next();
+                totalCount[i] = resultSet.getInt(1);
+
+                resultSet.close();
+            } catch (SQLException e) {
+                throw new SQLException("Cannot get total records number on dataset: " + dataset.getName() + " Reason: "
+                        + e.getMessage());
+            }
+        }
+        return totalCount;
+    }
+
     private String getWhereClause(Version version, Session session) {
         String versions = versionsList(version, session);
         String deleteClause = createDeleteClause(versions);
