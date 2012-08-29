@@ -70,6 +70,8 @@ public interface DataService {
     boolean checkTableDefinitions(int srcDSid, int targetDSid) throws EmfException;
     
     void replaceColValues(String table, String colName, String find, String replaceWith, Version version, String rowFilter) throws EmfException;
+    
+    void replaceColValues(String table, String findFilter, String replaceWith, Version version, String rowFilter) throws EmfException;
 
     void deleteRecords (User user, String table, Version version, String filter) throws EmfException;
     

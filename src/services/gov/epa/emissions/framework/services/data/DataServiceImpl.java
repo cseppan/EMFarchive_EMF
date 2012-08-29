@@ -944,7 +944,7 @@ public class DataServiceImpl implements DataService {
             VersionedQuery versionedQuery = new VersionedQuery(version);
             Map<String,Column> columnMap = getColumnMap(table.replace("emissions.", ""));
 
-            //make sure we are only finding and replacing onm the following data types;
+            //make sure we are only finding and replacing on the following data types;
             //due to precision issues with floats, doubles, timestamp we won't allow these to be replaced... 
             String sqlType = columnMap.get(col).getSqlType();
             if (!(
@@ -1012,7 +1012,7 @@ public class DataServiceImpl implements DataService {
                 + vNum + "') " + whereClause;
 
             }
-            
+
             if (DebugLevels.DEBUG_16()) {
                 System.out.println("Query to select records: " + selectQuery);
                 System.out.println("Query to select records in current version: " + selectCurVerQuery);
@@ -1037,6 +1037,97 @@ public class DataServiceImpl implements DataService {
 
             // NOTE: if no records found in previous version and current version, throw exception
             throw new EmfException("No record found for column = '" + col + "' and value  LIKE '" + find + "'.");
+        } catch (SQLException e) {
+            LOG.error("Could not query table : ", e);
+            throw new EmfException("Could not query table.");
+        } catch (Exception e) {
+            LOG.error("Error : ", e);
+            throw new EmfException(e.getMessage());
+        } finally {
+            closeDB(dbServer);
+        }
+    }
+    
+    public void replaceColValues(String table, String findFilter, String replaceWith, Version version, 
+            String filter) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+
+        try {
+            Datasource datasource = dbServer.getEmissionsDatasource();
+            DataModifier dataModifier = datasource.dataModifier();
+            VersionedQuery versionedQuery = new VersionedQuery(version);
+//            Map<String,Column> columnMap = getColumnMap(table.replace("emissions.", ""));
+//
+//            //make sure we are only finding and replacing onm the following data types;
+//            //due to precision issues with floats, doubles, timestamp we won't allow these to be replaced... 
+//            String sqlType = columnMap.get(col).getSqlType();
+//            if (!(
+//                    sqlType.startsWith("VARCHAR")
+//                    || sqlType.startsWith("TEXT")
+//                    || sqlType.startsWith("INTEGER")
+//                    || sqlType.startsWith("INT2")
+//                    || sqlType.startsWith("BIGINT")
+//                    )
+//            ) throw new EmfException("Only these data types; varchar, text, smallint, integer, bigint; can be replaced.");
+//                
+//            
+            String[] cols = getTableColumns(dataModifier, table, "");
+
+            
+            int vNum = version.getVersion();
+            String useWhere = findFilter.trim().toUpperCase().startsWith("WHERE")? "" : "WHERE";
+            String whereClause = "";
+            String selectQuery = "";
+            String selectCurVerQuery = "";
+            String insertQuery = "";
+            String updateQuery = "";
+            String updateDelVersions = "";
+            
+
+            whereClause = " " + useWhere + " " + findFilter + " " + " AND (" + versionedQuery.query() + ")"
+            + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
+            + " AND dataset_id = " + version.getDatasetId() + " AND version <> " + vNum;
+
+            selectQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols) + " FROM "
+            + table + whereClause;
+
+            selectCurVerQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols)
+            + " FROM " + table + " " + useWhere + " " + findFilter + " AND (" + versionedQuery.query() + ")"
+            + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
+            + " AND dataset_id = " + version.getDatasetId() + " AND version = " + vNum;
+
+            insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")" + selectQuery;
+
+            updateQuery = "UPDATE " + table + " SET " + replaceWith + " " + useWhere + " " + findFilter + " " 
+            + " AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ; 
+
+            updateDelVersions = "UPDATE " + table + " SET delete_versions = trim(both ',' from coalesce(delete_versions,'')||'," 
+            + vNum + "') " + whereClause;            
+            System.out.println("debug16: "+DebugLevels.DEBUG_16());
+            if (DebugLevels.DEBUG_16()) {
+                System.out.println("Query to select records: " + selectQuery);
+                System.out.println("Query to select records in current version: " + selectCurVerQuery);
+                System.out.println("Query to insert records: " + insertQuery);
+                System.out.println("Query to replace column values: " + updateQuery);
+                System.out.println("Query to update previous delete_versions: " + updateDelVersions);
+            }
+
+            // NOTE: replace values of records in previous versions and also in current version
+            if (dataModifier.resultExists(selectQuery)) {
+                dataModifier.execute(insertQuery);
+                dataModifier.execute(updateQuery);
+                dataModifier.execute(updateDelVersions);
+                return;
+            }
+
+            // NOTE: replace values of records only in current version
+            if (dataModifier.resultExists(selectCurVerQuery)) {
+                dataModifier.execute(updateQuery);
+                return;
+            }
+
+            // NOTE: if no records found in previous version and current version, throw exception
+            throw new EmfException("No record found. ");
         } catch (SQLException e) {
             LOG.error("Could not query table : ", e);
             throw new EmfException("Could not query table.");

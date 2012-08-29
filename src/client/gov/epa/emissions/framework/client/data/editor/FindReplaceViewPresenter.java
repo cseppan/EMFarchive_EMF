@@ -28,6 +28,10 @@ public class FindReplaceViewPresenter {
         this.session.dataService().replaceColValues(table, colName, find, replaceWith, version, rowFilter);
     }
     
+    public void replaceValues(String table, String findFilter, String replaceWith, Version version, String rowFilter) throws EmfException {
+        this.session.dataService().replaceColValues(table, findFilter, replaceWith, version, rowFilter);
+    }
+    
     public void applyConstraint(String rowFilter, String sortOrder) throws EmfException {
         tablePresenter.doApplyConstraints(rowFilter, sortOrder);
     }

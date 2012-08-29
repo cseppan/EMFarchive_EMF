@@ -2,30 +2,24 @@ package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
-import java.awt.Color;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.SpringLayout;
 
 public class DataFindReplaceWindow extends ReusableInteralFrame implements FindReplaceWindowView {
 
@@ -36,12 +30,6 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
     private FindReplaceViewPresenter presenter;
 
     private JPanel layout;
-
-    private ComboBox columnNames;
-
-    private TextField find;
-
-    private TextField replaceWith;
 
     private JLabel filterLabel;
 
@@ -54,10 +42,16 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
     private JTextArea sortOrder;
     
     private ManageChangeables listOfChangeables;
+    
+    private JTabbedPane tabbedPane;
+    
+    private DataFindReplaceNoFilterTab noFilterTab;
+    
+    private DataFindReplaceWithFilterTab withFilterTab;
 
     public DataFindReplaceWindow(String dsName, String table, Version version, JTextArea filter, JTextArea sortOrder,
             DesktopManager desktopManager, String[] cols, ManageChangeables listOfChangeables) {
-        super("Find and Replace Column Values", new Dimension(500, 260), desktopManager);
+        super("Find and Replace Column Values", new Dimension(480, 270), desktopManager);
         super.setLabel("Find and Replace Column Values: " + dsName + " (version: " + version.getVersion() + ")");
         
         this.cols = cols;
@@ -73,48 +67,51 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
     }
 
     public void display() {
+        
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
 
-        layout.add(messagePanel);
-        layout.add(selectionPanel());
-        layout.add(createButtonPanel());
+        layout.add( messagePanel, BorderLayout.PAGE_START );
+        layout.add(createTabbedPane());
+        layout.add(createButtonPanel(), BorderLayout.PAGE_END);
+
+//        layout.add(selectionPanel());
+//        layout.add(createButtonPanel());
 
         setResizable(true);
         super.display();
     }
+    
+    private JTabbedPane createTabbedPane() {
+        tabbedPane = new JTabbedPane();
 
-    private JPanel selectionPanel() {
-        JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Make Selections",
-                0, 0, Font.decode(""), Color.BLUE));
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        tabbedPane.addTab("Basic", createNoFilterTab());
+        tabbedPane.addTab("Advanced", createWithFilterTab());
+        return tabbedPane;
+    }
 
-        layoutGenerator.addLabelWidgetPair("Row Filter ", filterLabel, panel);
-
-        columnNames = new ComboBox("Select a column", this.cols);
-        columnNames.setToolTipText("Select a column name to find and replace column values");
-        layoutGenerator.addLabelWidgetPair("Column  ", columnNames, panel);
-
-        find = new TextField("findColValue", 30);
-        layoutGenerator.addLabelWidgetPair("Find  ", find, panel);
-
-        replaceWith = new TextField("replaceColValuesWith", 30);
-        layoutGenerator.addLabelWidgetPair("Replace with  ", replaceWith, panel);
-
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
-                5, 5, // initialX, initialY
-                5, 5);// xPad, yPad
-
-        return panel;
+    private JPanel createNoFilterTab() {
+        noFilterTab = new DataFindReplaceNoFilterTab( table, version, filterLabel, 
+                sortOrder, cols, listOfChangeables, messagePanel);
+        noFilterTab.observe(presenter);
+        noFilterTab.display();
+        return noFilterTab;
+    }
+    
+    private JPanel createWithFilterTab() {
+        withFilterTab = new DataFindReplaceWithFilterTab( table, version, filterLabel, 
+                sortOrder, listOfChangeables, messagePanel);
+        withFilterTab.observe(presenter);
+        withFilterTab.display();
+        return withFilterTab;
     }
 
     private Component createButtonPanel() {
         JPanel panel = new JPanel();
 
-        okButton = new Button("Apply", okAction());
+        okButton = new Button("Apply", applyAction());
         panel.add(okButton);
 
         Button closeButton = new Button("Close", closeWindowAction());
@@ -127,25 +124,19 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
         this.presenter = presenter;
     }
 
-    private Action okAction() {
+    private Action applyAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 clearMsgPanel();
-
                 try {
-                    if (!validateFields())
-                        return;
-
-                    String col = columnNames.getSelectedItem().toString();
-                    String findString = (find.getText() == null) ?  "": find.getText().trim();
-                    String replaceString = (replaceWith.getText() == null) ? "" : replaceWith.getText().trim();
-                    String rowFilter = (filterLabel.getText().equals("NO FILTER")) ? "" : filterLabel.getText().trim();
-
-                    presenter.replaceColValues(table, col, findString, replaceString, version, rowFilter);
-                    presenter.applyConstraint(rowFilter, sortOrder.getText().trim());
-                    resetDataeditorRevisionField();
+                    Integer tabIdx = tabbedPane.getSelectedIndex();
+                    if ( tabIdx == 0 )
+                        noFilterTab.apply();
+                    if ( tabIdx == 1 )
+                        withFilterTab.apply();
                     setMsg("Successfully replaced column values.");
                 } catch (EmfException e) {
+//                    e.printStackTrace();
                     if (!e.getMessage().trim().isEmpty())
                         setErrorMsg(e.getMessage());
                 }
@@ -153,30 +144,6 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
         };
     }
 
-    private boolean validateFields() throws EmfException {
-        String findString = (find.getText() == null) ?  "": find.getText();
-        String replaceString = (replaceWith.getText() == null) ? "" : replaceWith.getText().trim();
-        
-        if (columnNames.getSelectedItem() == null)
-            throw new EmfException("Please select a valid column");
-        if (findString.equals(replaceString))
-            throw new EmfException("Please specify different find and replace values.");
-        if (replaceString.isEmpty()){
-            String message = "Replace field is empty, would you like to continue?";
-            int selection = JOptionPane.showConfirmDialog( this, message, "Warning", JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE);
-            if (selection == JOptionPane.NO_OPTION)   
-                return false;
-        }
-        return true; 
-    }
-    
-    private void resetDataeditorRevisionField() {
-        boolean nofilter = filterLabel.getText().equals("NO FILTER");
-        ((DataEditor)listOfChangeables).setHasReplacedValues(true);
-        ((DataEditor)listOfChangeables).append2WhatField("Replaced '" + find.getText() + "' with '" + replaceWith.getText() + "' for column " +
-                columnNames.getSelectedItem().toString() + (nofilter ? "" : " using filter '" + filterLabel.getText() + "'"));
-    }
 
     private Action closeWindowAction() {
         return new AbstractAction() {
@@ -185,7 +152,7 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
             }
         };
     }
-
+    
     private void clearMsgPanel() {
         messagePanel.clear();
     }

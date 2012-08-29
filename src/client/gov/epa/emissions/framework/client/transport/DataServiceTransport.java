@@ -322,6 +322,20 @@ public class DataServiceTransport implements DataService {
         call.request(new Object[]{table, colName, find, replaceWith, version, rowFilter});
     }
     
+    public void replaceColValues(String table, String findFilter, String replaceWith, Version version, String rowFilter) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("replaceColValues");
+        call.addStringParam("table");
+        call.addStringParam("findFilter");
+        call.addStringParam("replaceWith");
+        call.addParam("version", mappings.version());
+        call.addStringParam("rowFilter");
+        call.setVoidReturnType();
+        
+        call.request(new Object[]{table, findFilter, replaceWith, version, rowFilter});
+    }
+    
     public void deleteRecords(User user, String table, Version version, String filter) throws EmfException {
         EmfCall call = call();
         
