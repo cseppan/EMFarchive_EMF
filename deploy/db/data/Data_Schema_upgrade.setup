@@ -843,8 +843,8 @@ where name in ('Control Strategy Detailed Result'));
 
 
 --3/26/2008 add column creator to emissions.version, may need to change the default value accordingly
-ALTER TABLE emf.versions ADD COLUMN creator int4 NOT NULL REFERENCES emf.users(id) default 2;
-ALTER TABLE emf.versions ADD COLUMN number_records int8 default 0;
+ALTER TABLE emissions.versions ADD COLUMN creator int4 NOT NULL REFERENCES emf.users(id) default 2;
+ALTER TABLE emissions.versions ADD COLUMN number_records int8 default 0;
 
 CREATE OR REPLACE FUNCTION public.populate_version_table_creator_and_record_count_columns() RETURNS void AS $$
 DECLARE
@@ -858,7 +858,7 @@ BEGIN
 			versions.dataset_id,
 			versions."version",
 			internal_sources.table_name
-		from emf.versions
+		from emissions.versions
 			inner join emf.internal_sources
 			on internal_sources.dataset_id = versions.dataset_id
 			-- make sure the table exists
@@ -870,7 +870,7 @@ BEGIN
 		raise notice '%', 
 		--execute 
 		'
-begin;update emf.versions
+begin;update emissions.versions
 set number_records = coalesce((SELECT count(1) from emissions.' || version_record.table_name || ' where ' || public.build_version_where_filter(version_record.dataset_id, version_record."version") || '),0),
 	creator = coalesce((SELECT users.id from emf.datasets inner join emf.users on users.username = datasets.creator where datasets.id = ' || version_record.dataset_id || '),2)
 where id = ' || version_record.id || ';
@@ -931,7 +931,7 @@ CREATE TABLE emf.georegions
   nrows int4 DEFAULT 0,
   nthik int4 DEFAULT 0,
   ds_id int4 DEFAULT 0,
-  version_id int4 REFERENCES emf.versions(id)
+  version_id int4 REFERENCES emissions.versions(id)
 ) 
 WITHOUT OIDS;
 
@@ -975,10 +975,10 @@ ALTER TABLE emf.datasets_keywords ADD COLUMN kwname varchar(255) NOT NULL DEFAUL
 UPDATE emf.datasets_keywords AS kw SET kwname = (SELECT name FROM emf.keywords WHERE id = kw.keyword_id);
 
 --added (10/7/09) to add descriptions to dataset versions
-ALTER TABLE emf.versions ADD COLUMN description text NOT NULL DEFAULT '';
+ALTER TABLE emissions.versions ADD COLUMN description text NOT NULL DEFAULT '';
 
 --added (10/13/09) to add intended use to dataset versions
-ALTER TABLE emf.versions ADD COLUMN intended_use int4 REFERENCES emf.intended_uses (id) DEFAULT 1;
+ALTER TABLE emissions.versions ADD COLUMN intended_use int4 REFERENCES emf.intended_uses (id) DEFAULT 1;
 
 --added (10/21/09) to allow search datasets on dataset types' KeyVal
 ALTER TABLE emf.dataset_types_keywords ADD COLUMN kwname varchar(255) NOT NULL DEFAULT '';
@@ -1899,6 +1899,12 @@ CREATE TABLE emf.user_excluded_features
 --5/17/2012 -- added index to scc reference table
 CREATE INDEX 
    ON reference.scc_codes (scc ASC NULLS LAST);
-   
-alter table emissions.versions set schema emf
 
+   
+   
+--9/6/12 move versions schema
+ALTER TABLE emissions.versions SET SCHEMA emf;
+
+
+--9/6/12
+--added new data/functions/count_estimate.sql script please update your system.
