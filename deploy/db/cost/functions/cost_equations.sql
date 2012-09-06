@@ -632,7 +632,7 @@ raise notice '%', emis_reduction_sql;
 				else 
 		' else '
 	' end || '
-				' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end)
+				' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || chained_gdp_adjustment_factor || ' * ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end)
 
 	' || case 
 		when use_cost_equations then '
@@ -1072,7 +1072,7 @@ raise notice '%', emis_reduction_sql;
 						-- calculate operation maintenance cost
 						operation_maintenance_cost := annual_cost - coalesce(annualized_capital_cost, 0);
 					*/
-					' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end) * ' || control_measure_efficiencyrecord_table_alias || '.cap_ann_ratio::double precision
+					' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || chained_gdp_adjustment_factor || ' * ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end) * ' || control_measure_efficiencyrecord_table_alias || '.cap_ann_ratio::double precision
 	' || case 
 		when use_cost_equations then '
 			end 
@@ -1506,8 +1506,8 @@ raise notice '%', emis_reduction_sql;
 						-- calculate operation maintenance cost
 						operation_maintenance_cost := annual_cost - coalesce(annualized_capital_cost, 0);
 					*/
-					' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end)
-					 - coalesce(' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end) * ' || control_measure_efficiencyrecord_table_alias || '.cap_ann_ratio::double precision * ' || capital_recovery_factor_expression || ', 0)
+					' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || chained_gdp_adjustment_factor || ' * ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end)
+					 - coalesce(' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || chained_gdp_adjustment_factor || ' * ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end) * ' || control_measure_efficiencyrecord_table_alias || '.cap_ann_ratio::double precision * ' || capital_recovery_factor_expression || ', 0)
 	' || case 
 		when use_cost_equations then '
 			end 
@@ -2663,7 +2663,7 @@ raise notice '%', emis_reduction_sql;
 						-- calculate operation maintenance cost
 						operation_maintenance_cost := annual_cost - coalesce(annualized_capital_cost, 0);
 					*/
-					' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end) * ' || control_measure_efficiencyrecord_table_alias || '.cap_ann_ratio::double precision
+					' || emis_reduction_sql || ' * (case when coalesce(' || inv_ceff_expression || ', 0.0) <> 0.0 and coalesce(' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton, 0.0) <> 0.0 then (' || chained_gdp_adjustment_factor || ' * ' || ref_cost_year_chained_gdp || ' / cast(' || gdplev_incr_table_alias || '.chained_gdp as double precision)) * ' || control_measure_efficiencyrecord_table_alias || '.incremental_cost_per_ton else ' || chained_gdp_adjustment_factor || ' * ' || control_measure_efficiencyrecord_table_alias || '.ref_yr_cost_per_ton end) * ' || control_measure_efficiencyrecord_table_alias || '.cap_ann_ratio::double precision
 					* (' || capital_recovery_factor_expression || ')
 	' || case 
 		when use_cost_equations then '
