@@ -252,13 +252,17 @@ public class DatasetCreator {
         //update dataset start and stop date time to correct year
         Calendar cal = Calendar.getInstance();
         Date dateTime = inputDataset.getStartDateTime();
-        cal.setTime(dateTime);
-        cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
-        dataset.setStartDateTime(cal.getTime());
+        if (dateTime != null) {
+            cal.setTime(dateTime);
+            cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+            dataset.setStartDateTime(cal.getTime());
+        }
         dateTime = inputDataset.getStopDateTime();
-        cal.setTime(dateTime);
-        cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
-        dataset.setStopDateTime(cal.getTime());
+        if (dateTime != null) {
+            cal.setTime(dateTime);
+            cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+            dataset.setStopDateTime(cal.getTime());
+        }
         
 //        Iterator iterator = keywordValues.entrySet().iterator();
 //
