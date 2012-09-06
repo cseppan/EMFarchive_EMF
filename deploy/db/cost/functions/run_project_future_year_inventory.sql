@@ -17,13 +17,14 @@ SELECT public.clean_project_future_year_inventory_control_programs(162);
 
 */
 
---DROP FUNCTION public.run_project_future_year_inventory(integer, integer, integer, integer);
+DROP FUNCTION IF EXISTS public.run_project_future_year_inventory(integer, integer, integer, integer);
 
 CREATE OR REPLACE FUNCTION public.run_project_future_year_inventory(
 	int_control_strategy_id integer, 
 	input_dataset_id integer, 
 	input_dataset_version integer, 
-	strategy_result_id integer
+	strategy_result_id integer,
+	run_packet_type varchar(64) = 'all'
 	) RETURNS void AS
 $BODY$
 DECLARE
@@ -431,6 +432,7 @@ BEGIN
 	-- to various sources
 
 	-- first lets do plant closures.
+	IF run_packet_type = 'all' OR run_packet_type = 'closure' THEN
   	FOR control_program IN EXECUTE 
 		'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
 			cp.start_date, cp.end_date, 
@@ -547,7 +549,7 @@ BEGIN
 				' else '' end || '
 
 				-- only keep if before cutoff date
-				and pc.effective_date::timestamp without time zone < ''' || effective_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
+				and coalesce(pc.effective_date::timestamp without time zone, ''1/1/1900''::timestamp without time zone) < ''' || effective_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 
 				and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'pc') || '
 
@@ -567,10 +569,12 @@ BEGIN
 		END IF;
 
 	END LOOP;
-
+	END IF;
+	
 	raise notice '%', 'next lets process projections ' || clock_timestamp();
 
 	-- next lets process projections, need to union the the various program tables together, so we can make sure and get the most source specific projection
+	IF run_packet_type = 'all' OR run_packet_type = 'projection' THEN
   	FOR control_program IN EXECUTE 
 		'select cp."name" as control_program_name, cpt."name" as type, lower(i.table_name) as table_name, 
 			cp.start_date, cp.end_date, 
@@ -1021,10 +1025,11 @@ BEGIN
 			--remove plant closures from consideration
 			inv.record_id not in (select source_id from emissions.' || detailed_result_table_name || ' where apply_order = 0)';
 	END IF;
-
+	END IF;
 
 	-- next lets process controls, need to union the the various program tables together, so we can make sure and get the most source specific controls
 	sql := ''; --reset
+	IF run_packet_type = 'all' OR run_packet_type = 'control' THEN
 	-- see if control strategy program have specific measures or technologies specified
 	select count(cptech.id),
 		count(cpm.id)
@@ -1173,14 +1178,14 @@ BEGIN
 		inv_percent_reduction_sql := 
 			case 
 				when is_flat_file_inventory then 
-					'(coalesce(case when inv.ann_pct_red = 100.0 and inv.ann_value > 0.0 then 0.0 else inv.ann_pct_red end, 0.0) / 100.0)'
+					'(coalesce(case when inv.ann_pct_red = 100.0 and inv.ann_value > 0.0 then 0.0 else inv.ann_pct_red end, 0.0))'
 				else 
 					'(coalesce(case when inv.ceff = 100.0 and coalesce(inv.avd_emis, inv.ann_emis) > 0.0 then 0.0 else inv.ceff end, 0.0) * coalesce(case when inv.reff = 0.0 and inv.ceff > 0.0 then 100.0 else inv.reff end, 100) / 100 ' || case when has_rpen_column then ' * coalesce(case when inv.rpen = 0.0 and inv.ceff > 0.0 then 100.0 else inv.rpen end, 100.0) / 100.0 ' else '' end || ')'
 			end;
 		jan_inv_percent_reduction_sql := 
 			case 
 				when is_flat_file_inventory then 
-					'(coalesce(case when inv.jan_pctred = 100.0 and inv.jan_value > 0.0 then 0.0 else inv.jan_pctred end, 0.0) / 100.0)'
+					'(coalesce(case when inv.jan_pctred = 100.0 and inv.jan_value > 0.0 then 0.0 else inv.jan_pctred end,' || inv_percent_reduction_sql || ', 0.0))'
 				else 
 					'null::double precision'
 			end;
@@ -1203,7 +1208,6 @@ BEGIN
 		mar_cont_packet_percent_reduction_sql := replace(jan_cont_packet_percent_reduction_sql, 'jan_', 'mar_');
 		apr_cont_packet_percent_reduction_sql := replace(jan_cont_packet_percent_reduction_sql, 'jan_', 'apr_');
 		may_cont_packet_percent_reduction_sql := replace(jan_cont_packet_percent_reduction_sql, 'jan_', 'may_');
-		apr_cont_packet_percent_reduction_sql := replace(jan_cont_packet_percent_reduction_sql, 'jan_', 'apr_');
 		jun_cont_packet_percent_reduction_sql := replace(jan_cont_packet_percent_reduction_sql, 'jan_', 'jun_');
 		jul_cont_packet_percent_reduction_sql := replace(jan_cont_packet_percent_reduction_sql, 'jan_', 'jul_');
 		aug_cont_packet_percent_reduction_sql := replace(jan_cont_packet_percent_reduction_sql, 'jan_', 'aug_');
@@ -1401,25 +1405,25 @@ BEGIN
 				when coalesce((' 
 				|| case 
 				when not is_flat_file_inventory  then -- no monthly values to worry about
-					emis_sql
+					uncontrolled_emis_sql
 				else
 					'case 
 						when ' || is_monthly_source_sql || ' then
-							coalesce(' || jan_emis_sql || ', 0.0)
-							+ coalesce(' || feb_emis_sql || ', 0.0)
-							+ coalesce(' || mar_emis_sql || ', 0.0)
-							+ coalesce(' || apr_emis_sql || ', 0.0)
-							+ coalesce(' || may_emis_sql || ', 0.0)
-							+ coalesce(' || jun_emis_sql || ', 0.0)
-							+ coalesce(' || jul_emis_sql || ', 0.0)
-							+ coalesce(' || aug_emis_sql || ', 0.0)
-							+ coalesce(' || sep_emis_sql || ', 0.0)
-							+ coalesce(' || oct_emis_sql || ', 0.0)
-							+ coalesce(' || nov_emis_sql || ', 0.0)
-							+ coalesce(' || dec_emis_sql || ', 0.0)
+							coalesce(' || jan_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || feb_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || mar_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || apr_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || may_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || jun_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || jul_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || aug_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || sep_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || oct_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || nov_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || dec_uncontrolled_emis_sql || ', 0.0)
 
 						else -- no monthly values to worry about
-							' || emis_sql || '
+							' || uncontrolled_emis_sql || '
 					end'
 			end || '),0.0) <> 0.0 then
 				(' || 
@@ -1560,25 +1564,25 @@ BEGIN
 				end || ') 
 				/ (' || case 
 					when not is_flat_file_inventory  then -- no monthly values to worry about
-						emis_sql
+						uncontrolled_emis_sql
 					else
 						'case 
 							when ' || is_monthly_source_sql || ' then
-								coalesce(' || jan_emis_sql || ', 0.0)
-								+ coalesce(' || feb_emis_sql || ', 0.0)
-								+ coalesce(' || mar_emis_sql || ', 0.0)
-								+ coalesce(' || apr_emis_sql || ', 0.0)
-								+ coalesce(' || may_emis_sql || ', 0.0)
-								+ coalesce(' || jun_emis_sql || ', 0.0)
-								+ coalesce(' || jul_emis_sql || ', 0.0)
-								+ coalesce(' || aug_emis_sql || ', 0.0)
-								+ coalesce(' || sep_emis_sql || ', 0.0)
-								+ coalesce(' || oct_emis_sql || ', 0.0)
-								+ coalesce(' || nov_emis_sql || ', 0.0)
-								+ coalesce(' || dec_emis_sql || ', 0.0)
+								coalesce(' || jan_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || feb_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || mar_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || apr_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || may_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || jun_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || jul_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || aug_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || sep_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || oct_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || nov_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || dec_uncontrolled_emis_sql || ', 0.0)
 
 							else -- no monthly values to worry about
-								' || emis_sql || '
+								' || uncontrolled_emis_sql || '
 						end'
 				end || ') * 100.0 
 			else
@@ -1594,25 +1598,25 @@ BEGIN
 				when coalesce((' 
 				|| case 
 				when not is_flat_file_inventory  then -- no monthly values to worry about
-					emis_sql
+					uncontrolled_emis_sql
 				else
 					'case 
 						when ' || is_monthly_source_sql || ' then
-							coalesce(' || jan_emis_sql || ', 0.0)
-							+ coalesce(' || feb_emis_sql || ', 0.0)
-							+ coalesce(' || mar_emis_sql || ', 0.0)
-							+ coalesce(' || apr_emis_sql || ', 0.0)
-							+ coalesce(' || may_emis_sql || ', 0.0)
-							+ coalesce(' || jun_emis_sql || ', 0.0)
-							+ coalesce(' || jul_emis_sql || ', 0.0)
-							+ coalesce(' || aug_emis_sql || ', 0.0)
-							+ coalesce(' || sep_emis_sql || ', 0.0)
-							+ coalesce(' || oct_emis_sql || ', 0.0)
-							+ coalesce(' || nov_emis_sql || ', 0.0)
-							+ coalesce(' || dec_emis_sql || ', 0.0)
+							coalesce(' || jan_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || feb_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || mar_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || apr_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || may_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || jun_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || jul_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || aug_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || sep_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || oct_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || nov_uncontrolled_emis_sql || ', 0.0)
+							+ coalesce(' || dec_uncontrolled_emis_sql || ', 0.0)
 
 						else -- no monthly values to worry about
-							' || emis_sql || '
+							' || uncontrolled_emis_sql || '
 					end'
 			end || '),0.0) <> 0.0 then
 				(' || 
@@ -1753,25 +1757,25 @@ BEGIN
 				end || ') 
 				/ (' || case 
 					when not is_flat_file_inventory  then -- no monthly values to worry about
-						emis_sql
+						uncontrolled_emis_sql
 					else
 						'case 
 							when ' || is_monthly_source_sql || ' then
-								coalesce(' || jan_emis_sql || ', 0.0)
-								+ coalesce(' || feb_emis_sql || ', 0.0)
-								+ coalesce(' || mar_emis_sql || ', 0.0)
-								+ coalesce(' || apr_emis_sql || ', 0.0)
-								+ coalesce(' || may_emis_sql || ', 0.0)
-								+ coalesce(' || jun_emis_sql || ', 0.0)
-								+ coalesce(' || jul_emis_sql || ', 0.0)
-								+ coalesce(' || aug_emis_sql || ', 0.0)
-								+ coalesce(' || sep_emis_sql || ', 0.0)
-								+ coalesce(' || oct_emis_sql || ', 0.0)
-								+ coalesce(' || nov_emis_sql || ', 0.0)
-								+ coalesce(' || dec_emis_sql || ', 0.0)
+								coalesce(' || jan_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || feb_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || mar_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || apr_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || may_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || jun_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || jul_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || aug_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || sep_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || oct_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || nov_uncontrolled_emis_sql || ', 0.0)
+								+ coalesce(' || dec_uncontrolled_emis_sql || ', 0.0)
 
 							else -- no monthly values to worry about
-								' || emis_sql || '
+								' || uncontrolled_emis_sql || '
 						end'
 				end || ') * 100.0 
 			else
@@ -2528,7 +2532,7 @@ BEGIN
 			' || cont_packet_percent_reduction_sql || ' desc, 
 			' || get_strategt_cost_sql || '.computed_cost_per_ton';
 	END IF;
-
+	END IF;
 
 
 
@@ -2545,6 +2549,7 @@ BEGIN
 
 	-- next lets caps/replacements, need to union the the various program tables together, so we can make sure and get the most source specific controls
 	sql := ''; --reset
+	IF run_packet_type = 'all' OR run_packet_type = 'allowable' THEN
 	-- see if control strategy program have specific measures or technologies specified
 	select count(cptech.id),
 		count(cpm.id)
@@ -3397,7 +3402,7 @@ BEGIN
 			case when length(er.locale) = 5 then 0 when length(er.locale) = 2 then 1 else 2 end, 	
 			er.efficiency - case when ' || emis_sql || ' <> 0 then coalesce(cont.ann_replacement, cont.ann_cap) * ' || number_of_days_in_year || ' / ' || emis_sql || ' else 0.0::double precision end';
 	END IF;
-
+	END IF;
 END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE;

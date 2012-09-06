@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.ControlProgram;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyInputDataset;
 import gov.epa.emissions.framework.services.cost.analysis.common.AbstractStrategyLoader;
@@ -112,21 +113,64 @@ public class StrategyLoader extends AbstractStrategyLoader {
         String query = "";
         query = "SELECT public.run_project_future_year_inventory(" + controlStrategy.getId() + ", "
                 + controlStrategyInputDataset.getInputDataset().getId() + ", "
-                + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId() + ");";
+                + controlStrategyInputDataset.getVersion() + ", " + controlStrategyResult.getId();
         if (DebugLevels.DEBUG_25())
             System.out.println(System.currentTimeMillis() + " " + query);
         try {
-            setStatus("Started applying control programs on inventory, " 
+            setStatus("Started applying \"plant closure\" control programs on inventory, " 
                     + controlStrategyInputDataset.getInputDataset().getName() 
                     + ".");
-            datasource.query().execute(query);
-            setStatus("Completed applying control programs on inventory, " 
+            datasource.query().execute(query + ",'closure');");
+            //this will update indexes for next step
+            vacuumDetailedResultTable(controlStrategyResult);
+            setStatus("Completed applying \"plant closure\" control programs on inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
+            setStatus("Started applying \"projection\" control programs on inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
+            datasource.query().execute(query + ",'projection');");
+            //this will update indexes for next step
+            vacuumDetailedResultTable(controlStrategyResult);
+            setStatus("Completed applying \"projection\" control programs on inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
+            setStatus("Started applying \"control\" control programs on inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
+            datasource.query().execute(query + ",'control');");
+            //this will update indexes for next step
+            vacuumDetailedResultTable(controlStrategyResult);
+            setStatus("Completed applying \"control\" control programs on inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
+            setStatus("Started applying \"allowable\" control programs on inventory, " 
+                    + controlStrategyInputDataset.getInputDataset().getName() 
+                    + ".");
+            datasource.query().execute(query + ",'allowable');");
+            setStatus("Completed applying \"allowable\" control programs on inventory, " 
                     + controlStrategyInputDataset.getInputDataset().getName() 
                     + ".");
         } catch (SQLException e) {
             if (DebugLevels.DEBUG_25())
-                System.out.println("SQLException runStrategyUsingSQLApproach");
+                System.out.println("SQLException applyControlPrograms = " + e.getMessage());
             throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            //
+        }
+    }
+
+    private void vacuumDetailedResultTable(ControlStrategyResult controlStrategyResult) throws EmfException {
+        String query = "";
+        EmfDataset dataset = (EmfDataset)controlStrategyResult.getDetailedResultDataset();
+        query = "vacuum analyze "  + qualifiedEmissionTableName(dataset) + ";";
+        
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
+        try {
+            datasource.query().execute(query);
+        } catch (SQLException e) {
+            //throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
         } finally {
             //
         }

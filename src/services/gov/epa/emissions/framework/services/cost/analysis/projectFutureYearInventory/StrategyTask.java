@@ -70,13 +70,17 @@ public class StrategyTask extends AbstractCheckMessagesStrategyTask {
 
                     Calendar cal = Calendar.getInstance();
                     Date dateTime = result.getInputDataset().getStartDateTime();
-                    cal.setTime(dateTime);
-                    cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
-                    result.getDetailedResultDataset().setStartDateTime(cal.getTime());
+                    if (dateTime != null) {
+                        cal.setTime(dateTime);
+                        cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+                        result.getDetailedResultDataset().setStartDateTime(cal.getTime());
+                    }
                     dateTime = result.getInputDataset().getStopDateTime();
-                    cal.setTime(dateTime);
-                    cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
-                    result.getDetailedResultDataset().setStopDateTime(cal.getTime());
+                    if (dateTime != null) {
+                        cal.setTime(dateTime);
+                        cal.set(Calendar.YEAR, controlStrategy.getInventoryYear());
+                        result.getDetailedResultDataset().setStopDateTime(cal.getTime());
+                    }
                     
                     detailedResults += result.getDetailedResultDataset().getName();
                     
