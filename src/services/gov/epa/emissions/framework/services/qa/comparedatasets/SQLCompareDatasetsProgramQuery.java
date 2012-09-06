@@ -259,19 +259,21 @@ poll|poll
         if (indexBSuffix != -1 
                 && (indexBSuffix + BASE_SUFFIX_TAG.length() + 1) < (programArguments.indexOf("\n-", indexBSuffix) != -1 ? programArguments.indexOf("\n-", indexBSuffix) : programArguments.length())) 
             baseSuffix = programArguments.substring(indexBSuffix + BASE_SUFFIX_TAG.length() + 1, programArguments.indexOf("\n-", indexBSuffix) != -1 ? programArguments.indexOf("\n-", indexBSuffix) : programArguments.length());
-        else
+        baseSuffix = baseSuffix.replaceAll("\n","").trim();
+        if (baseSuffix.isEmpty())
             baseSuffix = "b";
         //strip off any unnecessary characters
-        baseSuffix = "_" + baseSuffix.replaceAll("\n","").trim();
+        baseSuffix = "_" + baseSuffix;
        
         //Get the compare dataset suffix
         if (indexCSuffix != -1 
                 && (indexCSuffix + COMPARE_SUFFIX_TAG.length() + 1) < (programArguments.indexOf("\n-", indexCSuffix) != -1 ? programArguments.indexOf("\n-", indexCSuffix) : programArguments.length())) 
             compareSuffix = programArguments.substring(indexCSuffix + COMPARE_SUFFIX_TAG.length() + 1, programArguments.indexOf("\n-", indexCSuffix) != -1 ? programArguments.indexOf("\n-", indexCSuffix) : programArguments.length());
-        else
+        compareSuffix = compareSuffix.replaceAll("\n","").trim();
+        if (compareSuffix.isEmpty())
             compareSuffix = "c";
         //strip off any unnecessary characters
-        compareSuffix = "_" + compareSuffix.replaceAll("\n","").trim();
+        compareSuffix = "_" + compareSuffix;
         
         //see if there is issues with the base datasets 
         if (baseDatasetList.size() > 0 ) {
