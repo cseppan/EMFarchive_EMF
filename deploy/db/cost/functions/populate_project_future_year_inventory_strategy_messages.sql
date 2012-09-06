@@ -236,30 +236,27 @@ raise notice '%', 'now lets evaluate each packet and see what we find' || clock_
 				execute 
 				'select 
 					count(1) as cnt
-				FROM emissions.' || inv_table_name || ' inv
+				FROM emissions.' || control_program.table_name || ' pc
 
-					inner join emissions.' || control_program.table_name || ' pc
-					on pc.fips = inv.' || fips_expression || '
-					' || case when is_point_table then '
-					and pc.plantid = inv.' || plantid_expression || '
-					and coalesce(pc.pointid, inv.' || pointid_expression || ') = inv.' || pointid_expression || '
-					and coalesce(pc.stackid, inv.' || stackid_expression || ') = inv.' || stackid_expression || '
-					and coalesce(pc.segment, inv.' || segment_expression || ') = inv.' || segment_expression || '
-					' else '' end || '
+						inner join emissions.' || inv_table_name || ' inv
+						on pc.fips = inv.' || fips_expression || '
+						' || case when not is_point_table then '
+						and pc.plantid is null
+						and pc.pointid is null
+						and pc.stackid is null
+						and pc.segment is null
+						' else '
+						and pc.plantid = inv.' || plantid_expression || '
+						and coalesce(pc.pointid, inv.' || pointid_expression || ') = inv.' || pointid_expression || '
+						and coalesce(pc.stackid, inv.' || stackid_expression || ') = inv.' || stackid_expression || '
+						and coalesce(pc.segment, inv.' || segment_expression || ') = inv.' || segment_expression || '
+						' end || '
+						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 
-					-- only keep if before cutoff date
-					and coalesce(pc.effective_date, ''1/1/1900'')::timestamp without time zone < ''' || effective_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
-
-					and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'pc') || '
-
-				where 	' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-					' || case when not is_point_table then '
-					and pc.plantid is null
-					and pc.pointid is null
-					and pc.stackid is null
-					and pc.segment is null
-					' else '
-					' end || '
+					where 	
+						-- only keep if before cutoff date
+						coalesce(pc.effective_date::timestamp without time zone, ''1/1/1900''::timestamp without time zone) < ''' || effective_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
+						and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'pc') || '
 				limit 1' -- only need to return one...
 				into cnt;
 
@@ -278,7 +275,8 @@ raise notice '%', 'now lets evaluate each packet and see what we find' || clock_
 						pc.stackid, 
 						pc.segment, 
 						' || quote_literal(control_program.control_program_name) || '::character varying(255) as control_program,
-						''Plant'' || case when pc.plant is not null and length(pc.plant) > 0 then coalesce('', '' || pc.plant || '','', '''') else '''' end || '' is missing from the inventory.'' as "comment"
+						''Plant'' || case when pc.plant is not null and length(pc.plant) > 0 then coalesce('', '' || pc.plant || '','', '''') else '''' end || '' is missing from the inventory.'' as "comment",
+						pc.effective_date
 
 					FROM emissions.' || control_program.table_name || ' pc
 
@@ -296,12 +294,12 @@ raise notice '%', 'now lets evaluate each packet and see what we find' || clock_
 						and coalesce(pc.segment, inv.' || segment_expression || ') = inv.' || segment_expression || '
 						' end || '
 						and ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-						and inv.record_id is null
 
 					where 	
 						-- only keep if before cutoff date
-						pc.effective_date::timestamp without time zone < ''' || effective_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
-						and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'pc') || '';
+						coalesce(pc.effective_date::timestamp without time zone, ''1/1/1900''::timestamp without time zone) < ''' || effective_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
+						and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'pc') || '
+						and inv.record_id is null';
 						
 				ELSE
 				
@@ -316,13 +314,13 @@ raise notice '%', 'now lets evaluate each packet and see what we find' || clock_
 						pc.stackid, 
 						pc.segment, 
 						' || quote_literal(control_program.control_program_name) || '::character varying(255) as control_program,
-						''Plant'' || case when pc.plant is not null and length(pc.plant) > 0 then coalesce('', '' || pc.plant || '','', '''') else '''' end || '' is missing from the inventory.'' as "comment"
-
+						''Plant'' || case when pc.plant is not null and length(pc.plant) > 0 then coalesce('', '' || pc.plant || '','', '''') else '''' end || '' is missing from the inventory.'' as "comment",
+						pc.effective_date
 					FROM emissions.' || control_program.table_name || ' pc
 
 					where 	
 						-- only keep if before cutoff date
-						pc.effective_date::timestamp without time zone < ''' || effective_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
+						coalesce(pc.effective_date::timestamp without time zone, ''1/1/1900''::timestamp without time zone) < ''' || effective_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 						and ' || public.build_version_where_filter(control_program.dataset_id, control_program.dataset_version, 'pc') || '';
 						
 				end if;
@@ -461,8 +459,10 @@ raise notice '%', 'first see if packet affects anything -- packet type, ' || con
 													(' || is_monthly_source_sql || ' and coalesce(ann_pctred,jan_pctred,feb_pctred,mar_pctred,apr_pctred,may_pctred,jun_pctred,jul_pctred,aug_pctred,sep_pctred,oct_pctred,nov_pctred,dec_pctred) is not null)
 
 												)' 
-										else
-											''
+											when is_control_packet_extended_format then --dont include monthly packets, since we aren't dealing with monthly emissions (ff10 formats)
+												' and ann_pctred is not null'
+											else --dont include monthly packets
+												' and ceff is not null'
 										end
 									when control_program.type = 'Allowable' then 
 										'coalesce(compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone' 
@@ -474,8 +474,10 @@ raise notice '%', 'first see if packet affects anything -- packet type, ' || con
 													(' || is_monthly_source_sql || ' and coalesce(ann_cap,jan_cap,feb_cap,mar_cap,apr_cap,may_cap,jun_cap,jul_cap,aug_cap,sep_cap,oct_cap,nov_cap,dec_cap,jan_replacement,feb_replacement,mar_replacement,apr_replacement,may_replacement,jun_replacement,jul_replacement,aug_replacement,sep_replacement,oct_replacement,nov_replacement,dec_replacement) is not null)
 
 												)' 
-										else
-											''
+											when is_control_packet_extended_format then --dont include monthly packets, since we aren't dealing with monthly emissions (ff10 formats)
+												' and coalesce(ann_cap,ann_replacement) is not null'
+											else --dont include monthly packets
+												' and coalesce(cap,replacement) is not null'
 										end
 									else 
 										case 
@@ -486,8 +488,10 @@ raise notice '%', 'first see if packet affects anything -- packet type, ' || con
 													(' || is_monthly_source_sql || ' and coalesce(ann_proj_factor,jan_proj_factor,feb_proj_factor,mar_proj_factor,apr_proj_factor,may_proj_factor,jun_proj_factor,jul_proj_factor,aug_proj_factor,sep_proj_factor,oct_proj_factor,nov_proj_factor,dec_proj_factor) is not null)
 
 												)' 
-										else
-											''
+											when is_control_packet_extended_format then --dont include monthly packets, since we aren't dealing with monthly emissions (ff10 formats)
+												'ann_proj_factor is not null'
+											else --dont include monthly packets
+												'proj_factor is not null'
 										end								 
 								end,
 								2 --match_type integer	-- 1 = include only Matched Sources, 2 = Include packet records that didn't affect a source, 3 = ?
@@ -542,7 +546,7 @@ raise notice '%', 'first see if packet affects anything -- packet type, ' || con
 				' || quote_literal(inventory_record.dataset_id) || ',
 				' || quote_literal(inventory_record.dataset_version) || ',
 				' || quote_literal(inventory_record.dataset_name) || ',
-				' || case when cnt > 0 then true else false end || '::boolean;';
+				' || case when coalesce(cnt, 0) > 0 then true else false end || '::boolean;';
 
 raise notice '%', 'check inventory ' || inventory_record.dataset_name || ' against ' || control_program.table_name || clock_timestamp();
 
@@ -677,7 +681,8 @@ raise notice '%', 'check inventory ' || inventory_record.dataset_name || ' again
 			status,
 			control_program,
 			message_type,
-			message
+			message,
+			packet_compliance_effective_date
 			)
 		select distinct on (packet_ds_id,packet_rec_id) 
 			' || strategy_messages_dataset_id || '::integer,
@@ -689,14 +694,16 @@ raise notice '%', 'check inventory ' || inventory_record.dataset_name || ' again
 			''Warning''::character varying(11) as status,
 			control_program,
 			''Packet Level''::character varying(255) as message_type,
-			''Packet record does not affect any inventory records.'' as message
+			''Packet record does not affect any inventory records.'' as message,
+			effective_date::timestamp without time zone
 		from (
 			select *, count(1) OVER w as cnt
 
 			from (
-				' || unused_plant_closure_packet_records_sql || ') tbl
-				WINDOW w AS (PARTITION BY packet_rec_id,packet_ds_id)
+				' || unused_plant_closure_packet_records_sql || '
 			) tbl
+			WINDOW w AS (PARTITION BY packet_rec_id,packet_ds_id)
+		) tbl
 		where cnt = ' || inventory_count || '
 		order by packet_ds_id,packet_rec_id
 		';
