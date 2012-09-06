@@ -1,6 +1,6 @@
 ------------------------ Data Management tables ------------------------------
 DELETE FROM emf.datasets_sectors;
-DELETE FROM emf.versions;
+DELETE FROM emissions.versions;
 DELETE FROM emf.countries;
 DELETE FROM emf.dataset_access_logs;
 DELETE FROM emf.dataset_types;

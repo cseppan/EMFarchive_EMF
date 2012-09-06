@@ -34,10 +34,10 @@ create table sms.sector_scenario (
   sector_mappping_dataset_version integer 
   /*,
   CONSTRAINT sector_scenario_eecs_mappping_dataset_version_fkey FOREIGN KEY (eecs_mappping_dataset_version, eecs_mappping_dataset_version)
-    REFERENCES emf.versions (dataset_id, version) MATCH SIMPLE
+    REFERENCES emissions.versions (dataset_id, version) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT sector_scenario_sector_mappping_dataset_version_fkey FOREIGN KEY (sector_mappping_dataset_id, sector_mappping_dataset_version)
-    REFERENCES emf.versions (dataset_id, version) MATCH SIMPLE
+    REFERENCES emissions.versions (dataset_id, version) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION
 */);
 
@@ -56,7 +56,7 @@ create table sms.sector_scenario_inventory (
   inventory_dataset_version integer NOT NULL
 --  ,
   --CONSTRAINT sector_scenario_inventory_inventory_dataset_version_fkey FOREIGN KEY (inventory_dataset_id, inventory_dataset_version)
-    --REFERENCES emf.versions (dataset_id, version) MATCH SIMPLE
+    --REFERENCES emissions.versions (dataset_id, version) MATCH SIMPLE
     --ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
@@ -77,6 +77,6 @@ create table sms.sector_scenario_output (
   run_status character varying(255)
   /*,
   CONSTRAINT sector_scenario_output_inventory_dataset_version_fkey FOREIGN KEY (inventory_dataset_id, inventory_dataset_version)
-    REFERENCES emf.versions (dataset_id, version) MATCH SIMPLE
+    REFERENCES emissions.versions (dataset_id, version) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION*/
 );

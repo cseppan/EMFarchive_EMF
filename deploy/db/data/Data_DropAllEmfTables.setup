@@ -1,8 +1,8 @@
 
 ------------------------------------------- Data Management tables----------------------------
---emf.versions
-DROP TABLE emf.versions CASCADE;
---emf.versions
+--emissions.versions
+DROP TABLE emissions.versions CASCADE;
+--emissions.versions
 -- emf.users
 DROP TABLE emf.users CASCADE;
 --emf.users

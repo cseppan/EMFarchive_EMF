@@ -250,7 +250,7 @@ CREATE TABLE cases.cases_caseinputs
   envt_vars_id int4  REFERENCES cases.input_envt_vars(id),
   input_name_id int4  REFERENCES cases.inputnames(id),
   dataset_id int4  REFERENCES emf.datasets(id),
-  version_id int4  REFERENCES emf.versions(id),
+  version_id int4  REFERENCES emissions.versions(id),
   dataset_type_id int4  REFERENCES emf.dataset_types(id),
   subdir_id int4  REFERENCES cases.subdirs(id),
   UNIQUE (case_id, input_name_id, region_id, sector_id, program_id, case_job_id)
