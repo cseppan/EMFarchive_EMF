@@ -984,7 +984,9 @@ public class DataServiceImpl implements DataService {
                 insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")" + selectQuery;
 
                 updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith + "' WHERE " + col + " LIKE '"
-                + find + "' AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ; 
+                + find + "' "
+                + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
+                + " AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ; 
                 
                 updateDelVersions = "UPDATE " + table + " SET delete_versions = trim(both ',' from coalesce(delete_versions,'')||'," 
                 + vNum + "') " + whereClause;
@@ -1006,7 +1008,9 @@ public class DataServiceImpl implements DataService {
                 insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")" + selectQuery;
 
                 updateQuery = "UPDATE " + table + " SET " + col + "='" + replaceWith + "' WHERE coalesce(" + col + "::text,'')='"
-                + find + "' AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ;
+                + find + "' "
+                + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
+                + " AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ;
 
                 updateDelVersions = "UPDATE " + table + " SET delete_versions = trim(both ',' from coalesce(delete_versions,'')||'," 
                 + vNum + "') " + whereClause;
@@ -1084,21 +1088,30 @@ public class DataServiceImpl implements DataService {
             String updateDelVersions = "";
             
 
-            whereClause = " " + useWhere + " " + findFilter + " " + " AND (" + versionedQuery.query() + ")"
+            //include SQL based filter (findFilter), also include dataset editor defined filter(filter) (from toolbar),
+            //and include all records for this version except for records with this version number 
+            //(e.g., version 3, include relevant version 2,1, and 0 records but not version 3 records)
+            whereClause = " " + useWhere + " (" + findFilter + ") " + " AND (" + versionedQuery.query() + ")"
             + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
             + " AND dataset_id = " + version.getDatasetId() + " AND version <> " + vNum;
 
+            //get relevant records to use using above filter, these will be new records, and columns for the new records will be updated  
+            //in a later UPDATE step
             selectQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols) + " FROM "
             + table + whereClause;
+            
+            //insert these new records...
+            insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")" + selectQuery;
 
+            //target same records as above SELECT statement, except only include the current version records...
             selectCurVerQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols)
-            + " FROM " + table + " " + useWhere + " " + findFilter + " AND (" + versionedQuery.query() + ")"
+            + " FROM " + table + " " + useWhere + " (" + findFilter + ") AND (" + versionedQuery.query() + ")"
             + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
             + " AND dataset_id = " + version.getDatasetId() + " AND version = " + vNum;
 
-            insertQuery = "INSERT INTO " + table + "(" + getTargetColString(cols) + ")" + selectQuery;
-
-            updateQuery = "UPDATE " + table + " SET " + replaceWith + " " + useWhere + " " + findFilter + " " 
+            //update new records with new values...
+            updateQuery = "UPDATE " + table + " SET " + replaceWith + " " + useWhere + " (" + findFilter + ") " 
+            + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
             + " AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ; 
 
             updateDelVersions = "UPDATE " + table + " SET delete_versions = trim(both ',' from coalesce(delete_versions,'')||'," 
