@@ -42,6 +42,7 @@ public class ControlStrategyProgramsTabPresenter implements EditControlStrategyT
 
     public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
          this.controlStrategy = controlStrategy;
+         view.refresh(controlStrategy);
     }
 
     public void doSave(ControlStrategy controlStrategy) {

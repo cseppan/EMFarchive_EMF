@@ -12,7 +12,7 @@ public class EmfPanel extends JPanel {
 
     private DesktopManager desktopManager;
 
-    private MessagePanel messagePanel;
+    protected MessagePanel messagePanel;
 
     public EmfPanel(String name, EmfConsole parentConsole, DesktopManager desktopManager, MessagePanel messagePanel) {
 

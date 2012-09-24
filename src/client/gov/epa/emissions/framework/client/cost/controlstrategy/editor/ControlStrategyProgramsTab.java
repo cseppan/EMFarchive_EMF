@@ -206,8 +206,13 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
         // NOTE Auto-generated method stub
     }
 
-    public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
-        // NOTE Auto-generated method stub
+    public void refresh(ControlStrategy controlStrategy) {
+        try {
+            tableData = new ControlStrategyProgramTableData(controlStrategy.getControlPrograms());
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        }
+        refresh();
     }
 
     public void save(ControlStrategy controlStrategy) {
@@ -244,10 +249,12 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
             //editControlProgramViewList.add(view);
             try {
                 presenter.doEdit(view, controlProgram);
+//                presenter.doSave(controlStrategy);
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
             }
         }
+        
     }
     
     private List selected() {
@@ -272,6 +279,11 @@ public class ControlStrategyProgramsTab extends JPanel implements EditControlStr
     }
 
     public void fireStrategyTypeChanges(StrategyType strategyType) {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         // NOTE Auto-generated method stub
         
     }
