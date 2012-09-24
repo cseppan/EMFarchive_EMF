@@ -48,7 +48,7 @@ public class DataFindReplaceNoFilterTab extends JPanel implements DataFindReplac
         this.table = table;
         this.version = version;
         this.listOfChangeables = listOfChangeables;
-        this.filterLabel = filterLabel;
+        this.filterLabel = new JLabel(filterLabel.getText());
         this.sortOrder = sortOrder;
         this.messagePanel = messagePanel;
     }
@@ -71,7 +71,7 @@ public class DataFindReplaceNoFilterTab extends JPanel implements DataFindReplac
 //        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Make Selections",
 //              0, 0, Font.decode(""), Color.BLUE));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
+         
         layoutGenerator.addLabelWidgetPair("Row Filter ", filterLabel, panel);
 
         columnNames = new ComboBox("Select a column", this.cols);
@@ -134,8 +134,8 @@ public class DataFindReplaceNoFilterTab extends JPanel implements DataFindReplac
     private void resetDataeditorRevisionField() {
         boolean nofilter = filterLabel.getText().equals("NO FILTER");
         ((DataEditor)listOfChangeables).setHasReplacedValues(true);
-        ((DataEditor)listOfChangeables).append2WhatField("Replaced '" + find.getText() + "' with '" + replaceWith.getText() + "' for column " +
-                columnNames.getSelectedItem().toString() + (nofilter ? "" : " using filter '" + filterLabel.getText() + "'"));
+        ((DataEditor)listOfChangeables).append2WhatField("Replaced '" + find.getText() + "' with '" + replaceWith.getText() + "' for column '" +
+                columnNames.getSelectedItem().toString() + "' "+ (nofilter ? "" : " using filter '" + filterLabel.getText() + "'"));
     }
   
     private void clearMsgPanel() {

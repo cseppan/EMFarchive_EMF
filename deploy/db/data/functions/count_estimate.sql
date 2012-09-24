@@ -1,4 +1,4 @@
-﻿CREATE FUNCTION count_estimate(query text) RETURNS integer AS $$
+CREATE FUNCTION count_estimate(query text) RETURNS integer AS $$
 DECLARE
     rec   record;
     rows  integer;

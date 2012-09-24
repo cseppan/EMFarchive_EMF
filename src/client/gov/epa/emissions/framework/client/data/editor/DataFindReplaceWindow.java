@@ -134,7 +134,7 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
                         noFilterTab.apply();
                     if ( tabIdx == 1 )
                         withFilterTab.apply();
-                    setMsg("Successfully replaced column values.");
+                     
                 } catch (EmfException e) {
 //                    e.printStackTrace();
                     if (!e.getMessage().trim().isEmpty())

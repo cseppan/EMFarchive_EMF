@@ -569,8 +569,10 @@ public class DataServiceImpl implements DataService {
         DbServer dbServer = dbServerFactory.getDbServer();
         long recordCount = 0;
         try {
+            System.out.println("vacuum analyze "  
+                    + qualifiedTableName + ";");
             ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
-                    "select count(1) as record_count from " + qualifiedTableName);
+                    "select count_estimate ('select * from "  + qualifiedTableName + " ') ");
             if (rs.next())
                 recordCount = rs.getLong(1);
         } catch (RuntimeException e) {
@@ -1079,7 +1081,7 @@ public class DataServiceImpl implements DataService {
 
             
             int vNum = version.getVersion();
-            String useWhere = findFilter.trim().toUpperCase().startsWith("WHERE")? "" : "WHERE";
+            String useWhere = findFilter.trim().toUpperCase().startsWith("WHERE")? "" : " WHERE ";
             String whereClause = "";
             String selectQuery = "";
             String selectCurVerQuery = "";
@@ -1105,7 +1107,7 @@ public class DataServiceImpl implements DataService {
 
             //target same records as above SELECT statement, except only include the current version records...
             selectCurVerQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols)
-            + " FROM " + table + " " + useWhere + " (" + findFilter + ") AND (" + versionedQuery.query() + ")"
+            + " FROM " + table + " " + useWhere + " "+ findFilter + " AND (" + versionedQuery.query() + ")"
             + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
             + " AND dataset_id = " + version.getDatasetId() + " AND version = " + vNum;
 

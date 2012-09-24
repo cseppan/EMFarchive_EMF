@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.emissions.framework.ui.YesNoDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -45,7 +46,7 @@ public class DataFindReplaceWithFilterTab extends JPanel implements DataFindRepl
         this.table = table;
         this.version = version;
         this.listOfChangeables = listOfChangeables;
-        this.filterLabel = filterLabel;
+        this.filterLabel = new JLabel(filterLabel.getText());;
         this.sortOrder = sortOrder;
         this.messagePanel = messagePanel;
     }
@@ -70,7 +71,7 @@ public class DataFindReplaceWithFilterTab extends JPanel implements DataFindRepl
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Row Filter ", filterLabel, panel);
-
+         
         filter = new TextArea("filterValue", "", 40,3);
         filter.setToolTipText("<html>SQL Filter"
                 + "<br/><br/>This is a SQL WHERE clause that is used to filter the current dataset."
@@ -90,7 +91,8 @@ public class DataFindReplaceWithFilterTab extends JPanel implements DataFindRepl
                 + "<br/><br/>This is a SQL SET clause that is used to set column(s) values of the current dataset. " 
                 + "<br/>The expressions in the SET clause must contain valid column(s) and separated by ','"
                 + "<br/><br/>Sample SQL Filter:"
-                + "<br/>set fips = '37001', <br/>ann_emis = 0.5 <html>" );
+                + "<br/>stack_flow_rate = 1.25 * stack_flow_rate, <br/>ann_emis = 0.5 <html>" );
+        
         ScrollableComponent scrollableSet = ScrollableComponent.createWithVerticalScrollBar(this.replaceWith);
         scrollableSet.setPreferredSize(new Dimension(350, 105));
         layoutGenerator.addLabelWidgetPair("Set SQL  ", scrollableSet, panel);
@@ -104,19 +106,24 @@ public class DataFindReplaceWithFilterTab extends JPanel implements DataFindRepl
     }
     
     public void apply() throws EmfException {
+        
         clearMsgPanel();
+        String message = "<html> You are about to change all records match the filter, "
+              + "<br/> are you sure you want to do this? Y/N ?<html>";
+        YesNoDialog dialog = new YesNoDialog(this, "Warning", message);
+        if (dialog.confirm()) {
+            if (!validateFields())
+                return;
 
-        if (!validateFields())
-            return;
+            String findFilter = (filter.getText() == null) ?  "": filter.getText().trim();
+            String setString = (replaceWith.getText() == null) ? "" : replaceWith.getText().trim();
+            String rowFilter = (filterLabel.getText().equals("NO FILTER")) ? "" : filterLabel.getText().trim();
 
-        String findFilter = (filter.getText() == null) ?  "": filter.getText().trim();
-        String setString = (replaceWith.getText() == null) ? "" : replaceWith.getText().trim();
-        String rowFilter = (filterLabel.getText().equals("NO FILTER")) ? "" : filterLabel.getText().trim();
-
-        presenter.replaceValues(table, findFilter, setString, version, rowFilter);
-        presenter.applyConstraint(rowFilter, sortOrder.getText().trim());
-        resetDataeditorRevisionField();
-         
+            presenter.replaceValues(table, findFilter, setString, version, rowFilter);
+            presenter.applyConstraint(rowFilter, sortOrder.getText().trim());
+            resetDataeditorRevisionField();
+            setMsg("Successfully replaced column values.");
+        }       
     }
     
     public void observe(FindReplaceViewPresenter presenter) {
@@ -124,10 +131,11 @@ public class DataFindReplaceWithFilterTab extends JPanel implements DataFindRepl
     }
     
     private boolean validateFields() throws EmfException {
+        String rowFilterString = (filterLabel.getText().equals("NO FILTER"))? "": filterLabel.getText();
         String filterString = (filter.getText() == null) ?  "": filter.getText();
         String replaceString = (replaceWith.getText() == null) ? "" : replaceWith.getText().trim();
         
-        if (filterString.trim().isEmpty())
+        if (filterString.trim().isEmpty() && rowFilterString.trim().isEmpty())
             throw new EmfException("Please specify the filter value.");
         if (replaceString.isEmpty()){
             String message = "Replace field is empty, would you like to continue?";
@@ -141,9 +149,12 @@ public class DataFindReplaceWithFilterTab extends JPanel implements DataFindRepl
     
     private void resetDataeditorRevisionField() {
         boolean nofilter = filterLabel.getText().equals("NO FILTER");
+        boolean sqlfilter = filter.getText().trim().equals("");
         ((DataEditor)listOfChangeables).setHasReplacedValues(true);
-        ((DataEditor)listOfChangeables).append2WhatField("Replaced '" + filter.getText() + "' with '" + replaceWith.getText()
-                + (nofilter ? "" : " using filter '" + filterLabel.getText() + "'"));
+        ((DataEditor)listOfChangeables).append2WhatField("Replaced expressions, '" + replaceWith.getText() + "' "
+                + (nofilter ? "" : " using filter, '" + filterLabel.getText() + "'" )
+                + ( nofilter && sqlfilter ? "": " and ")
+                + (sqlfilter ? "": "'" + filter.getText() + "'"));
     }
   
     private void clearMsgPanel() {
