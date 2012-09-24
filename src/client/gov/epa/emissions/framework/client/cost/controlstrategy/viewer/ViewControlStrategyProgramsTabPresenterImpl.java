@@ -41,6 +41,7 @@ public class ViewControlStrategyProgramsTabPresenterImpl implements ViewControlS
 
     public void doRefresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         this.controlStrategy = controlStrategy;
+        view.refresh(controlStrategy);
     }
 
     public void doRun(ControlStrategy controlStrategy) throws EmfException {

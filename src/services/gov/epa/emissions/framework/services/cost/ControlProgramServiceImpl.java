@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class ControlProgramServiceImpl implements ControlProgramService {
     private synchronized void init(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
         this.sessionFactory = sessionFactory;
 //        this.dbServerFactory = dbServerFactory;
-        dao = new ControlProgramDAO();
+        dao = new ControlProgramDAO(dbServerFactory, sessionFactory);
         threadPool = createThreadPool();
 
     }
@@ -208,6 +209,9 @@ public class ControlProgramServiceImpl implements ControlProgramService {
 
             dao.remove(element, session);
         } catch (RuntimeException e) {
+            LOG.error("Could not remove control program: " + element, e);
+            throw new EmfException("Could not remove control program: " + element.getName());
+        } catch (SQLException e) {
             LOG.error("Could not remove control program: " + element, e);
             throw new EmfException("Could not remove control program: " + element.getName());
         } finally {

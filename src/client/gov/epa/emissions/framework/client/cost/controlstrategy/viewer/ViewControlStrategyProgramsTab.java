@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyResult;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SelectableSortFilterWrapper;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.sort.SortCriteria;
 
 import java.awt.BorderLayout;
@@ -39,6 +40,8 @@ public class ViewControlStrategyProgramsTab extends EmfPanel implements ViewCont
     private ControlStrategyProgramTableData tableData;
 
     private ViewControlStrategyProgramsTabPresenter presenter;
+    
+    private SingleLineMessagePanel messagePanel;
 
     public ViewControlStrategyProgramsTab(MessagePanel messagePanel, EmfConsole parentConsole,
             DesktopManager desktopManager) {
@@ -137,6 +140,20 @@ public class ViewControlStrategyProgramsTab extends EmfPanel implements ViewCont
     public void refresh(ControlStrategy controlStrategy, ControlStrategyResult[] controlStrategyResults) {
         // no-op
     }
+
+    public void refresh(ControlStrategy controlStrategy) {
+        try {
+            tableData = new ControlStrategyProgramTableData(controlStrategy.getControlPrograms());
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        }
+
+        table.refresh(tableData);
+        tablePanel.removeAll();
+        tablePanel.add(table);
+        super.validate();
+    }
+    
 
     private void viewControlPrograms() {
 

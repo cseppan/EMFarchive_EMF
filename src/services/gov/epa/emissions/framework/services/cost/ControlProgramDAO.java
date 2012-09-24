@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
@@ -7,6 +9,10 @@ import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -24,9 +30,9 @@ public class ControlProgramDAO {
 
     private HibernateFacade hibernateFacade;
 
-//    private HibernateSessionFactory sessionFactory;
-//
-//    private DbServerFactory dbServerFactory;
+    private HibernateSessionFactory sessionFactory;
+
+    private DbServerFactory dbServerFactory;
     
     public ControlProgramDAO() {
         lockingScheme = new LockingScheme();
@@ -35,8 +41,8 @@ public class ControlProgramDAO {
 
     public ControlProgramDAO(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         this();
-//        this.dbServerFactory = dbServerFactory;
-//        this.sessionFactory = sessionFactory;
+        this.dbServerFactory = dbServerFactory;
+        this.sessionFactory = sessionFactory;
     }
 
     public int add(ControlProgram element, Session session) {
@@ -117,16 +123,31 @@ public class ControlProgramDAO {
         return hibernateFacade.exists(id, clazz, session);
     }
 
-    public void remove(ControlProgram controlProgram, Session session) throws EmfException {
+    public void remove(ControlProgram controlProgram, Session session) throws EmfException, SQLException {
         //see if control strategy is using the program, if so throw an error...
-        List list = session.createQuery("select cS.name " +
-                "from ControlStrategy cS, ControlProgram cP " +
-                "where cP.id = :id").setInteger("id", controlProgram.getId()).list();
-        if (list.size() > 0)
-            throw new EmfException("Error: dataset used by control strategy " + list.get(0) + ".");
+        DbServer dbServer = this.dbServerFactory.getDbServer();
+        Datasource datasource = dbServer.getEmissionsDatasource();
+        Connection connection = datasource.getConnection();
+        
+        String sqlString =  "select cS.name from emf.control_strategies as cS,  " +
+        		"emf.control_strategy_programs as csP where csP.control_strategy_id = cS.id " +
+        		"and csP.control_program_id = " + controlProgram.getId() + ";";
+        //        List list = session.createQuery("select cS.name " +
+        //                "from ControlStrategy as cS where cS.id in " +
+        //                "(select EDT.id from ControlProgram as cP " +
+        //                "inner join cS.controlPrograms as EDT where cP.id = "+controlProgram.getId() + ")").list();
+        Statement statement;
+        ResultSet resultSet = null;
 
-        hibernateFacade.remove(controlProgram, session);
-    }
+        statement = connection.createStatement();
+        resultSet = statement.executeQuery(sqlString);
+
+        if ( resultSet != null && resultSet.next() )
+            throw new EmfException("Error: dataset used by control strategy: " + resultSet.getString("name"));
+        //        resultSet.close();
+        hibernateFacade.remove(controlProgram, session);        
+        resultSet.close();
+}
 
     public ControlProgram getByName(String name, Session session) {
         ControlProgram cs = (ControlProgram) hibernateFacade.load(ControlProgram.class, Restrictions.eq("name", new String(name)), session);
@@ -137,7 +158,7 @@ public class ControlProgramDAO {
         ControlProgram cs = (ControlProgram) hibernateFacade.load(ControlProgram.class, Restrictions.eq("id", new Integer(id)), session);
         return cs;
     }
-    
+
     public List<ControlProgram> getControlProgramsByControlMeasures(int[] cmIds, Session session) {
         List<ControlProgram> list = new ArrayList<ControlProgram>();
         String idList = "";
