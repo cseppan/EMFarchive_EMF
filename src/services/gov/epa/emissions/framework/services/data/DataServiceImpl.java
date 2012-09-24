@@ -569,8 +569,6 @@ public class DataServiceImpl implements DataService {
         DbServer dbServer = dbServerFactory.getDbServer();
         long recordCount = 0;
         try {
-            System.out.println("vacuum analyze "  
-                    + qualifiedTableName + ";");
             ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
                     "select count_estimate ('select * from "  + qualifiedTableName + " ') ");
             if (rs.next())
