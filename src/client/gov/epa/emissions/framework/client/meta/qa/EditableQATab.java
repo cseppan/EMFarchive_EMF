@@ -478,6 +478,7 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
                                 else if ( !dialog.shouldViewall()){ 
                                     viewCount = dialog.getLines();
                                 } 
+                                if ( viewCount > records ) viewCount = records;
                                 if ( viewCount > 100000) {
                                     String title = "Warning";
                                     String message = "Are you sure you want to view more than 100,000 records?  It could take several minutes to load the data.";
