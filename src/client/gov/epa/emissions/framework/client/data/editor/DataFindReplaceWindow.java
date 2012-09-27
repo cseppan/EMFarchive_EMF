@@ -48,26 +48,33 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
     private DataFindReplaceNoFilterTab noFilterTab;
     
     private DataFindReplaceWithFilterTab withFilterTab;
+    
+    private JTextArea filter;
 
     public DataFindReplaceWindow(String dsName, String table, Version version, JTextArea filter, JTextArea sortOrder,
             DesktopManager desktopManager, String[] cols, ManageChangeables listOfChangeables) {
-        super("Find and Replace Column Values", new Dimension(480, 270), desktopManager);
+        super("Find and Replace Column Values", new Dimension(490, 270), desktopManager);
         super.setLabel("Find and Replace Column Values: " + dsName + " (version: " + version.getVersion() + ")");
         
         this.cols = cols;
         this.table = table;
         this.version = version;
         this.listOfChangeables = listOfChangeables;
+        this.sortOrder = sortOrder;
+        this.filter = filter;
         this.filterLabel = new JLabel(filter.getText() == null || filter.getText().trim().isEmpty() ? "NO FILTER"
                 : filter.getText().trim());
-        this.sortOrder = sortOrder;
-
         layout = new JPanel();
         this.getContentPane().add(layout);
     }
 
     public void display() {
         
+        System.out.println(filter.getText());
+        this.filterLabel.setText(filter.getText() == null || filter.getText().trim().isEmpty() ? "NO FILTER"
+                : filter.getText().trim());
+        System.out.println(filterLabel.getText());
+
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();

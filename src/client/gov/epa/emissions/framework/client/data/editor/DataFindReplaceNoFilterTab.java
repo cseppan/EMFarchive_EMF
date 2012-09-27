@@ -40,20 +40,26 @@ public class DataFindReplaceNoFilterTab extends JPanel implements DataFindReplac
     private JTextArea sortOrder;
     
     private ManageChangeables listOfChangeables;
+    
+    private JLabel filterFromParentWindow;
 
-    public DataFindReplaceNoFilterTab(String table, Version version, JLabel filterLabel, 
+    public DataFindReplaceNoFilterTab(String table, Version version, JLabel filterFromParentWindow, 
             JTextArea sortOrder, String[] cols, ManageChangeables listOfChangeables, SingleLineMessagePanel messagePanel){
         super.setName("Basic");
         this.cols = cols;
         this.table = table;
         this.version = version;
         this.listOfChangeables = listOfChangeables;
-        this.filterLabel = new JLabel(filterLabel.getText());
+        this.filterFromParentWindow = filterFromParentWindow;
+        this.filterLabel = new JLabel(filterFromParentWindow.getText());
         this.sortOrder = sortOrder;
         this.messagePanel = messagePanel;
     }
     
     public void display(){
+        this.filterLabel.setText(filterFromParentWindow.getText());
+        System.out.println(filterLabel.getText());
+        this.filterLabel.validate();
         setLayout();
     }
 

@@ -1091,7 +1091,8 @@ public class DataServiceImpl implements DataService {
             //include SQL based filter (findFilter), also include dataset editor defined filter(filter) (from toolbar),
             //and include all records for this version except for records with this version number 
             //(e.g., version 3, include relevant version 2,1, and 0 records but not version 3 records)
-            whereClause = " " + useWhere + " (" + findFilter + ") " + " AND (" + versionedQuery.query() + ")"
+            whereClause = " " + useWhere + " (" + versionedQuery.query() + ")" 
+            + (findFilter == null || findFilter.isEmpty() ? "" : " AND (" + findFilter + ")") 
             + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
             + " AND dataset_id = " + version.getDatasetId() + " AND version <> " + vNum;
 
@@ -1105,14 +1106,16 @@ public class DataServiceImpl implements DataService {
 
             //target same records as above SELECT statement, except only include the current version records...
             selectCurVerQuery = " SELECT " + getSrcColString(version.getDatasetId(), vNum, cols, cols)
-            + " FROM " + table + " " + useWhere + " "+ findFilter + " AND (" + versionedQuery.query() + ")"
+            + " FROM " + table + " " + useWhere + " (" + versionedQuery.query() + ")"
+            + (findFilter == null || findFilter.isEmpty() ? "" : " AND (" + findFilter + ")") 
             + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")")
             + " AND dataset_id = " + version.getDatasetId() + " AND version = " + vNum;
 
             //update new records with new values...
-            updateQuery = "UPDATE " + table + " SET " + replaceWith + " " + useWhere + " (" + findFilter + ") " 
-            + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")") 
-            + " AND version=" + vNum + " AND dataset_id = " + version.getDatasetId() ; 
+            updateQuery = "UPDATE " + table + " SET " + replaceWith + " " + useWhere 
+            + " version=" + vNum + " AND dataset_id = " + version.getDatasetId()  
+            + (findFilter == null || findFilter.isEmpty() ? "" : " AND (" + findFilter + ")") 
+            + (filter == null || filter.isEmpty() ? "" : " AND (" + filter + ")"); 
 
             updateDelVersions = "UPDATE " + table + " SET delete_versions = trim(both ',' from coalesce(delete_versions,'')||'," 
             + vNum + "') " + whereClause;            
