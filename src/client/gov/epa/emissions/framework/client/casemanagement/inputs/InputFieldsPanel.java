@@ -52,7 +52,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
     private EditableComboBox envtVar;
 
-    private TextField dataset;
+    private TextField datasetTxt;
+    
+    private EmfDataset inputDataset;
 
     protected ComboBox version;
 
@@ -159,7 +161,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
                 } else if (subDir != null)
                     subDir.setEnabled(true);
                 
-                dataset.setText("");
+                datasetTxt.setText("");
                 fillVersions(null);
             }
         });
@@ -223,20 +225,20 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
 
     private JPanel datasetPanel() {
 
-        dataset = new TextField("dataset", 38);
-        dataset.setEditable(false);
-        EmfDataset inputDataset = input.getDataset();
+        datasetTxt = new TextField("dataset", 38);
+        datasetTxt.setEditable(false);
+        inputDataset = input.getDataset();
         if (inputDataset != null)
-            dataset.setText(input.getDataset().getName());
+            datasetTxt.setText(input.getDataset().getName());
 
-        changeablesList.addChangeable(dataset);
-        dataset.setToolTipText("Press select button to choose from a dataset list.");
+        changeablesList.addChangeable(datasetTxt);
+        datasetTxt.setToolTipText("Press select button to choose from a dataset list.");
         selectButton = new AddButton("Select", selectAction());
         selectButton.setMargin(new Insets(1, 2, 1, 2));
 
         JPanel invPanel = new JPanel(new BorderLayout(5, 0));
 
-        invPanel.add(dataset, BorderLayout.LINE_START);
+        invPanel.add(datasetTxt, BorderLayout.LINE_START);
         invPanel.add(selectButton);
         return invPanel;
     }
@@ -279,8 +281,9 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
             return;
         }
         if (datasets != null || datasets.length > 0) {
-            dataset.setText(datasets[0].getName());
-            updateDataset(datasets[0]);
+            datasetTxt.setText(datasets[0].getName());
+            inputDataset=datasets[0];
+            //updateDataset(datasets[0]);
             fillVersions(datasets[0]);
         }
     }
@@ -373,7 +376,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         updateRegion();
         updateSector();
         input.setDatasetType((DatasetType) dsType.getSelectedItem());
-        // updateDataset();
+        updateDataset(inputDataset);
         updateVersion();
         updateSubdir();
         input.setRequired(required.isSelected());
@@ -506,7 +509,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         subDir.setEditable(false);
         required.setEnabled(false);
         localBox.setEnabled(false);
-        dataset.setPreferredSize(preferredSize);
+        datasetTxt.setPreferredSize(preferredSize);
         selectButton.setVisible(false);
     }
 

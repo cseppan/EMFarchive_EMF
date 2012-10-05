@@ -36,7 +36,7 @@ import javax.swing.SpringLayout;
 
 public class SetInputFieldsPanel extends InputFieldsPanel{
 
-    private TextField dataset;
+    private TextField datasetTxt;
     
     private Dimension preferredSize = new Dimension(380, 20);
     
@@ -93,20 +93,20 @@ public class SetInputFieldsPanel extends InputFieldsPanel{
 
     private JPanel datasetPanel() {
 
-        dataset = new TextField("dataset", 26);
-        dataset.setEditable(false);
+        datasetTxt = new TextField("dataset", 26);
+        datasetTxt.setEditable(false);
         EmfDataset inputDataset = input.getDataset();
         if(inputDataset!= null )
-            dataset.setText(input.getDataset().getName());
+            datasetTxt.setText(input.getDataset().getName());
         
-        changeablesList.addChangeable(dataset);
-        dataset.setToolTipText("Press select button to choose from a dataset list.");
+        changeablesList.addChangeable(datasetTxt);
+        datasetTxt.setToolTipText("Press select button to choose from a dataset list.");
         Button selectButton = new AddButton("Select", selectAction());
         selectButton.setMargin(new Insets(1, 2, 1, 2));
         Button viewButton = new BorderlessButton("View", viewDatasetAction());
         JPanel invPanel = new JPanel(new BorderLayout(5,0));
 
-        invPanel.add(dataset, BorderLayout.LINE_START);
+        invPanel.add(datasetTxt, BorderLayout.LINE_START);
         invPanel.add(selectButton);
         invPanel.add(viewButton, BorderLayout.LINE_END );
         return invPanel;
@@ -159,7 +159,7 @@ public class SetInputFieldsPanel extends InputFieldsPanel{
     }
     
     private void setDatasets(EmfDataset [] datasets) {
-        dataset.setText(datasets[0].getName());
+        datasetTxt.setText(datasets[0].getName());
         updateDataset(datasets[0]);
         fillVersions(datasets[0]);
     }
