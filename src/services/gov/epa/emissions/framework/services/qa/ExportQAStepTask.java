@@ -74,6 +74,8 @@ public class ExportQAStepTask implements Runnable {
         try {
             getStepResult();
             file = exportFile(dirName);
+            file.setReadable(true, false);
+            file.setWritable(true, false);
             Exporter exporter = new DatabaseTableCSVExporter(dbServer.getEmissionsDatasource().getName() + "." + result.getTable(), dbServer.getEmissionsDatasource());
             suffix = suffix();
             prepare(suffix);
