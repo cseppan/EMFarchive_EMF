@@ -1849,8 +1849,6 @@ from emf.dataset_types dt
 where name in ('Flat File 2010 Point','Flat File 2010 Nonpoint'));
 
 
-
-
 -- add ds type keyword for indexing ff10 point and nonpoint datsets 
 
 -- nonpt - region_cd|country_cd|tribal_code|poll|scc|emis_type|census_tract_cd|shape_id
@@ -1908,3 +1906,44 @@ ALTER TABLE emissions.versions SET SCHEMA emf;
 
 --9/6/12
 --added new data/functions/count_estimate.sql script please update your system.
+
+-- 10/19/12
+-- QA Step -- Summarize by Country and Pollutant with Toxicity Weighting
+insert into emf.dataset_types_qa_step_templates (dataset_type_id, list_index, name, qa_program_id, program_arguments, required, order_no, description)
+select dt.id, 
+(select COALESCE(max(list_index) + 1, 0) from emf.dataset_types_qa_step_templates where dataset_type_id = dt.id) as list_index, 
+'Summarize by Country and Pollutant with Toxicity Weighting', 
+1, 
+'select e.country_cd, 
+                e.poll, 
+                t.pollutant_code_desc, 
+                sum(e.ann_value) as ann_value,
+                sum(case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+                                e.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) * t.ure
+                else
+                                null::double precision
+                end) as cancer_weight,
+                sum(case when t.record_id is not null and t.pollutant_code <> ''136'' and t.pollutant_code <> ''7440473'' then
+                                case when coalesce(t.rfc, 0.0) <> 0.0 then 
+                                                e.ann_value * coalesce(t.metal_cn_speciation_factor, 1.0) / t.rfc
+                                else 
+                                                0.0 
+                                end 
+                else
+                                null::double precision
+                end) as noncancer_weight
+from $TABLE[1] e 
+                left outer join (
+                                select distinct on (t.pollutant_code)
+                                                *
+                                from $DATASET_TABLE_VERSION["toxicity_weights_datasetName",1,0] t
+                ) t
+                on t.pollutant_code = e.poll
+group by e.country_cd, e.poll, t.pollutant_code_desc
+order by e.country_cd, e.poll', 
+false, 
+1, 
+''
+from emf.dataset_types dt
+where name in ('Flat File 2010 Point','Flat File 2010 Nonpoint'); 
+
