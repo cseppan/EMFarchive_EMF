@@ -79,16 +79,15 @@ public class SQLCompareCasesQuery {
             if (i > 0) {
                 sql.append(" on case" + i + ".tab = case0.tab");
                 sql.append(" and case" + i + ".name = case0.name");
-                sql.append(" and coalesce(case" + i + ".input_name_id, 0) = coalesce(case0.input_name_id, 0)");
-                sql.append(" and coalesce(case" + i + ".region_id, 0) = coalesce(case0.region_id, 0)");
-                sql.append(" and coalesce(case" + i + ".sector_id, 0) = coalesce(case0.sector_id, 0)");
-                sql.append(" and coalesce(case" + i + ".program_id, 0) = coalesce(case0.program_id, 0)");
+                sql.append(" and coalesce(case" + i + ".region, '') = coalesce(case0.region, '')");
+                sql.append(" and coalesce(case" + i + ".sector, '') = coalesce(case0.sector, '')");
+                sql.append(" and coalesce(case" + i + ".program, '') = coalesce(case0.program, '')");
                 sql.append(" and coalesce(case" + i + ".job, '') = coalesce(case0.job, '')");
-                sql.append(" and coalesce(case" + i + ".envt_vars_id, 0) = coalesce(case0.envt_vars_id, 0)");
+                sql.append(" and coalesce(case" + i + ".env_var, '') = coalesce(case0.env_var, '')");
             }
         
         }
-
+        
         sql.append(" order by case when coalesce(" + tabSelectList + ") = 'Summary' then 0 when coalesce(" + tabSelectList + ") = 'Inputs' then 1 when coalesce(" + tabSelectList + ") = 'Parameters' then 2 else 3 end,"); 
         sql.append(" coalesce(" + nameSelectList + ")");
 
