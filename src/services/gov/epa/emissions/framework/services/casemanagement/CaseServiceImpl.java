@@ -784,6 +784,27 @@ public class CaseServiceImpl implements CaseService {
             }
         }
     }
-
+    
+    public String getCaseQaReports(int[] caseIds, String gridName, String sector, String repType) throws EmfException {
+        DbServer dbServer = dbFactory.getDbServer();
+        // get dataset ids by using dataset names derived from gridName, case abbrev, 
+        // sectors in case sectorlist input, state/county, speciation, and so on 
+        //int[] datasetIds = getDatasetIds()
+        
+        try {
+            return new QueryToString(dbServer, new SQLCompareCasesQuery(sessionFactory).createCompareOutputsQuery(caseIds), ",").toString();
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not retrieve case outputs: " + e.getMessage(), e);
+        } catch (ExporterException e) {
+            throw new EmfException("Could not retrieve case outputs: " + e.getMessage(), e);
+        } finally {
+            try {
+                if (dbServer != null && dbServer.isConnected())
+                    dbServer.disconnect();
+            } catch (Exception e) {
+                throw new EmfException("ManagedCaseService: error closing db server. " + e.getMessage());
+            }
+        }
+    }
     
 }

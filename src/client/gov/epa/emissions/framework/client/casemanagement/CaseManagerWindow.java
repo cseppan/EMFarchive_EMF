@@ -334,6 +334,19 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         });
         crudPanel.add(compareButton);
         
+        Button qaButton = new Button("Final QA", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                clearMsgPanel();
+                try {
+                    compareCasesOutputs();
+                } catch (EmfException e1) {
+                    // NOTE Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        crudPanel.add(qaButton);
+        
         return crudPanel;
     }
 
@@ -351,6 +364,23 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             ids[i] = ((Case)cases.get(i)).getId();
         }
         presenter.viewCaseComparisonResult(ids, "");
+    }
+    
+    protected void compareCasesOutputs() throws EmfException {
+        cases = selected();
+
+        if (cases.isEmpty()) {
+            messagePanel.setMessage("Please select at least one case to compare");
+            return;
+        }
+        
+        int[] ids = new int[cases.size()];
+        
+        for (int i = 0; i < cases.size(); ++i) {
+            ids[i] = ((Case)cases.get(i)).getId();
+        }
+        CompareCaseWindow view = new CompareCaseWindow(desktopManager);
+        presenter.doQA(ids, view);
     }
 
     private SelectAwareButton editButton(ConfirmDialog confirmDialog) {

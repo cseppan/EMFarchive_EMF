@@ -228,5 +228,7 @@ public interface CaseService {
     String isGeoRegionInSummary(int caseId, GeoRegion[] grids) throws EmfException;
 
     String getCaseComparisonResult(int[] caseIds) throws EmfException;
+    
+    String getCaseQaReports(int[] caseIds, String gridName, String sector, String repType) throws EmfException;
 
  }

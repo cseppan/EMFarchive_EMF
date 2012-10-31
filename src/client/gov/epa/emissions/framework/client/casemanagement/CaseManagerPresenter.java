@@ -16,6 +16,8 @@ public interface CaseManagerPresenter {
     void doRemove(Case caseObj) throws EmfException;
     
     void doEdit(CaseEditorView caseView, Case caseObj) throws EmfException; 
+    
+    void doQA(int[] ids, CompareCaseView view) throws EmfException; 
 
     //void doRefresh(String nameContains) throws EmfException;
     
@@ -46,4 +48,6 @@ public interface CaseManagerPresenter {
     Case[] getCases(CaseCategory category, String nameContains) throws EmfException;
 
     void viewCaseComparisonResult(int[] caseIds, String exportDir) throws EmfException;
+    
+    void viewCaseQaReports(int[] caseIds, String gridName, String sector, String repType, String exportDir) throws EmfException;
 }

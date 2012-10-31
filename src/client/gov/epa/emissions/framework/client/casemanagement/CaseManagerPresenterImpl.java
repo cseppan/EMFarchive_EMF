@@ -191,8 +191,37 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
         view.displayCaseComparisonResult("Case Comparison", localFile.getAbsolutePath());
     }
     
+    public void viewCaseQaReports(int[] caseIds, String gridName, String sector, String repType, String exportDir) throws EmfException {
+        if (caseIds == null || caseIds.length == 0)
+            throw new EmfException("No cases to compare.");
+        
+                File localFile = new File(tempQAStepFilePath(exportDir));
+                try {
+                    if (!localFile.exists()) {
+                        Writer output = new BufferedWriter(new FileWriter(localFile));
+                        try {
+                            output.write(  
+        //                            writerHeader(qaStep, qaResult, dataset.getName())
+                                    ""+ getCaseQaReports(caseIds, gridName, repType, sector) 
+                                    );
+                        }
+                        finally {
+                            output.close();
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new EmfException(e.getMessage());
+                }
+
+                view.displayCaseComparisonResult("Summary Case Output", localFile.getAbsolutePath());
+    }
+    
     private String getCaseComparisonResult(int[] caseIds) throws EmfException {
         return service().getCaseComparisonResult(caseIds);
+    }
+    
+    private String getCaseQaReports(int[] caseIds, String gridName, String sector, String repType) throws EmfException {
+        return service().getCaseQaReports(caseIds, gridName, sector, repType);
     }
 
     private String tempQAStepFilePath(String exportDir) throws EmfException {
@@ -213,6 +242,11 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
 
 
         return tempDir + separator + (UUID.randomUUID()).toString().replaceAll("-", "") + ".csv"; // this is how exported file name was
+    }
+
+    public void doQA(int[] ids, CompareCaseView view) throws EmfException {
+        CompareCasePresenter presenter = new CompareCasePresenter(session, ids, view, this);
+        presenter.doDisplay();       
     }
 
 //    private String writerHeader(QAStep qaStep, QAStepResult stepResult, String dsName){

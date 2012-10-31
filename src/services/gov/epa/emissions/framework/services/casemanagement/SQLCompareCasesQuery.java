@@ -93,10 +93,64 @@ public class SQLCompareCasesQuery {
 
         return sql.toString();
     }
+    
+    public String createCompareOutputsQuery(int[] caseIds) throws EmfException {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" select ");
+        sql.append(" inputnames.\"name\", ");
+        sql.append(" input_envt_vars.\"name\" as env_var,");
+        sql.append(" georegions.\"name\" as region,");
+        sql.append(" coalesce(sectors.\"name\", '') as sector,");
+        sql.append(" coalesce(cases_casejobs.\"name\", '') as job,");
+        sql.append(" internal_sources.table_name as table, ");
+        sql.append(" programs.name as program,");
+        sql.append(" datasets.name as dataset, ");
+        sql.append("coalesce(versions.version || '', '') as version ");
+
+
+        sql.append(" from cases.cases_caseinputs");
+
+        sql.append(" left outer join emf.datasets");
+        sql.append(" on datasets.id = cases_caseinputs.dataset_id");
+
+        sql.append(" left outer join emf.dataset_types");
+        sql.append(" on dataset_types.id = cases_caseinputs.dataset_type_id");
+
+        sql.append(" left outer join cases.cases_casejobs");
+        sql.append(" on cases_casejobs.id = cases_caseinputs.case_job_id");
+
+        sql.append(" left outer join cases.input_envt_vars ");
+        sql.append(" on input_envt_vars.id = cases_caseinputs.envt_vars_id");
+
+        sql.append(" left outer join cases.inputnames ");
+        sql.append(" on inputnames.id = cases_caseinputs.input_name_id");
+
+        sql.append(" left outer join cases.programs ");
+        sql.append(" on programs.id = cases_caseinputs.program_id");
+
+        sql.append(" left outer join emf.georegions ");
+        sql.append(" on georegions.id = cases_caseinputs.region_id");
+
+        sql.append(" left outer join emf.sectors ");
+        sql.append(" on sectors.id = cases_caseinputs.sector_id");
+
+        sql.append(" left outer join cases.subdirs ");
+        sql.append(" on subdirs.id = cases_caseinputs.subdir_id");
+        
+        sql.append(" left outer join emf.internal_sources ");
+        sql.append(" on datasets.id = internal_sources.dataset_id ");
+
+        sql.append(" left outer join emf.versions ");
+        sql.append(" on versions.id = cases_caseinputs.version_id");
+        sql.append(" where cases_caseinputs.case_id = " + caseIds[0]);
+        sql.append(" and input_envt_vars.\"name\" = 'SECTORLIST' ");
+        System.out.println(sql);
+        return sql.toString();
+    }
 
     private StringBuilder buildIndividualCaseQuery(int caseId) {
         StringBuilder sql = new StringBuilder();
-        
+
         
 //Summary Tab Info being flattened out...
         sql.append("select null::integer as input_name_id, ");
