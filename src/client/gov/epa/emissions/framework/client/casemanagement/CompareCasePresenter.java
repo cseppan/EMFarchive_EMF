@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.services.data.GeoRegion;
 
 import java.util.Date;
 
@@ -46,8 +47,8 @@ public class CompareCasePresenter {
         return caseObjectManager.getSectors();
     }
     
-    public Region[] getAllRegions() throws EmfException {
-        return caseObjectManager.getRegions();
+    public GeoRegion[] getAllRegions() throws EmfException {
+        return caseObjectManager.getGeoRegions();
     }
 
     public CaseCategory getSelectedCategory() {

@@ -117,7 +117,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 resetChanges();
-                Region region = (Region)gridNamesCombo.getSelectedItem();
+                GeoRegion region = (GeoRegion)gridNamesCombo.getSelectedItem();
                 Sector sec = (Sector)sectorsCombo.getSelectedItem();
                 String repType = (String) reportTypesCombo.getSelectedItem();
 
@@ -132,7 +132,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
                 }  
                 
                 try {
-                    presenter.showCaseQA(gridNamesCombo.getName(), sec.getName(), repType);
+                    presenter.showCaseQA(region.getName(), sec.getName(), repType);
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
                 }

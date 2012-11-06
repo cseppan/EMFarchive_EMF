@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.security.User;
@@ -21,7 +22,11 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.QueryToString;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,6 +58,10 @@ public class CaseServiceImpl implements CaseService {
     private ManagedCaseService caseService;
     
     private CaseAssistanceService assistanceService;
+    
+    private Datasource datasource;
+    
+    private DbServer dbServer;
 
     public CaseServiceImpl() {
         this(HibernateSessionFactory.get(), DbServerFactory.get());
@@ -786,13 +795,59 @@ public class CaseServiceImpl implements CaseService {
     }
     
     public String getCaseQaReports(int[] caseIds, String gridName, String sector, String repType) throws EmfException {
-        DbServer dbServer = dbFactory.getDbServer();
         // get dataset ids by using dataset names derived from gridName, case abbrev, 
         // sectors in case sectorlist input, state/county, speciation, and so on 
         //int[] datasetIds = getDatasetIds()
         
+        this.dbServer = dbFactory.getDbServer();
+        this.datasource = dbServer.getEmissionsDatasource();
+         
         try {
-            return new QueryToString(dbServer, new SQLCompareCasesQuery(sessionFactory).createCompareOutputsQuery(caseIds), ",").toString();
+            // 1. Get sectorList table name and dataset version
+            String sectorListSql = new SQLCompareCasesQuery(sessionFactory).createCompareOutputsQuery(caseIds, gridName);
+             
+            ResultSet rs = null;
+            List<Integer> newCaseIds = new ArrayList<Integer>();
+            List<String> tableNames = new ArrayList<String>();
+            List<Integer> versions = new ArrayList<Integer>();
+            List<Integer> dsIds = new ArrayList<Integer>();
+            String gridAbbr = null;
+            
+            try {
+                rs = datasource.query().executeUpdateQuery(sectorListSql);
+                while (rs.next()) {
+                    
+                    newCaseIds.add(rs.getInt(1)); 
+                    gridAbbr = rs.getString(4);
+                    dsIds.add(rs.getInt(8));
+                    tableNames.add(rs.getString(6));
+                    versions.add(rs.getInt(9));
+                    System.out.println("table: " + rs.getInt(1)+ gridAbbr + rs.getString(6) + gridName );
+                }
+                
+            } catch (SQLException e) {
+                e.printStackTrace();
+                log.error("Could not execute query -" + sectorListSql + "\n" + e.getMessage());
+                throw new EmfException("Could not execute query -" + sectorListSql + "\n" + e.getMessage());
+            } finally {
+                if (rs != null)
+                    try {
+                        rs.close();
+                    } catch (SQLException e) {
+                        //
+                    }
+            }
+            
+            
+            
+            
+            String tableQuery = new QueryToString(dbServer, new SQLCompareCasesQuery(sessionFactory).createCompareOutputsQuery(caseIds, gridName), ",").toString();
+            //String tableQuery = new SQLCompareCasesQuery(sessionFactory).createCompareOutputsQuery(caseIds);
+            System.out.println("Table:" + tableQuery);
+            //String[] getInternalTableName();
+            //return new QueryToString(dbServer, new SQLCompareCasesQuery(sessionFactory).createCompareOutputsQuery(caseIds), ",").toString();
+            return tableQuery;
+           
         } catch (RuntimeException e) {
             throw new EmfException("Could not retrieve case outputs: " + e.getMessage(), e);
         } catch (ExporterException e) {

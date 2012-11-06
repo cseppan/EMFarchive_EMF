@@ -94,18 +94,21 @@ public class SQLCompareCasesQuery {
         return sql.toString();
     }
     
-    public String createCompareOutputsQuery(int[] caseIds) throws EmfException {
+    public String createCompareOutputsQuery(int[] caseIds, String gridName) throws EmfException {
         StringBuilder sql = new StringBuilder();
-        sql.append(" select ");
+        for (int i = 0; i < caseIds.length; ++i) {
+            if ( i > 0 ) sql.append( " union all " );
+        sql.append(" (select ");
+        sql.append(" cases_caseinputs.case_id as caseid, " );
         sql.append(" inputnames.\"name\", ");
         sql.append(" input_envt_vars.\"name\" as env_var,");
-        sql.append(" georegions.\"name\" as region,");
-        sql.append(" coalesce(sectors.\"name\", '') as sector,");
+        sql.append(" georegions.abbr as region,");
+        //sql.append(" coalesce(sectors.\"name\", '') as sector,");
         sql.append(" coalesce(cases_casejobs.\"name\", '') as job,");
         sql.append(" internal_sources.table_name as table, ");
         sql.append(" programs.name as program,");
-        sql.append(" datasets.name as dataset, ");
-        sql.append("coalesce(versions.version || '', '') as version ");
+        sql.append(" datasets.id as datasetid, ");
+        sql.append(" versions.\"version\" as version ");
 
 
         sql.append(" from cases.cases_caseinputs");
@@ -142,9 +145,11 @@ public class SQLCompareCasesQuery {
 
         sql.append(" left outer join emf.versions ");
         sql.append(" on versions.id = cases_caseinputs.version_id");
-        sql.append(" where cases_caseinputs.case_id = " + caseIds[0]);
-        sql.append(" and input_envt_vars.\"name\" = 'SECTORLIST' ");
-        System.out.println(sql);
+        sql.append(" where cases_caseinputs.case_id = " + caseIds[i]);
+        sql.append(" and input_envt_vars.\"name\" = 'SECTORLIST' " 
+                +" and georegions.\"name\" = '" + gridName + "')");
+        }
+  
         return sql.toString();
     }
 
@@ -632,5 +637,23 @@ where cases_parameters.case_id = 13
                 session.close();
         }
     }
+    
+    private Version version(int datasetId, int version) {
+        Session session = sessionFactory.getSession();
+        try {
+            Versions versions = new Versions();
+            return versions.get(datasetId, version, session);
+        } finally {
+            session.close();
+        }
+    }
+    
+//    private String qualifiedName(String table) throws EmfException {
+//        // VERSIONS TABLE - Completed - throws exception if the following case is true
+//        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(table.toLowerCase())) {
+//            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
+//        }
+//        return datasource.getName() + "." + table;
+//    }
 
 }
