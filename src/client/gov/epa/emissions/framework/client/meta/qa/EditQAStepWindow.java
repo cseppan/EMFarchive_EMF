@@ -2170,6 +2170,7 @@ avd_emis=emis_avd
                     long records = presenter.getTableRecordCount(stepResult);
                     long viewCount =  records;
                     if ( records > rlimit ){
+                        messagePanel.setMessage("Total records: " + records + ", limit: "+rlimit );
                         ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
                         dialog.run();
 

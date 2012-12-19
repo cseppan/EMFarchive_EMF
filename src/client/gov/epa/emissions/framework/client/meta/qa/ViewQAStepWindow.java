@@ -582,6 +582,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
                     long viewCount =  records;
                     
                     if ( viewCount > rlimit) {
+                        messagePanel.setMessage("Total records: " + records + ", limit: "+rlimit );
                         ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
                         dialog.run();          
                         if ( dialog.shouldViewNone() )

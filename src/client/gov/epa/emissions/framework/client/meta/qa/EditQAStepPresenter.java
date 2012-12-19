@@ -143,11 +143,13 @@ public class EditQAStepPresenter {
                     
                     //long tableRecordCount = getTableRecordCount(qaResult);
                     long recordOffset = 0;
-                    if (viewCount < 10000L)
+                    long count = 0;
+                    if (viewCount <= 10000L)
                         output.write( getTableAsString(stepResult, viewCount, recordOffset) );
                     else {
-                        while (recordOffset <= viewCount) {
-                            output.write( getTableAsString(stepResult, 10000L, recordOffset) );
+                        while (recordOffset < viewCount) {
+                            count = viewCount - recordOffset > 10000L? 10000L: (viewCount - recordOffset);
+                            output.write( getTableAsString(stepResult, count, recordOffset) );
                             recordOffset += 10000;
                         }
                     }            

@@ -460,7 +460,8 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
                             String sLimit = userPref.property("View_QA_results_limit");
                             long rlimit;
                             if ( sLimit == null ){
-                                messagePanel.setMessage("View_QA_results_limit is not specified in EMFPrefs.txt, default value is 50000. ");
+                                JOptionPane.showMessageDialog(parentConsole, 
+                                        "View_QA_results_limit is not specified in EMFPrefs.txt, default value is 50000.", "Warning", JOptionPane.WARNING_MESSAGE);
                                 rlimit = 50000;
                             }
                             else   
@@ -470,9 +471,10 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
                             long records = presenter.getTableRecordCount(stepResult);
                             long viewCount =  records;
                             if ( records > rlimit ){
+                                messagePanel.setMessage("Total records: " + records + ", limit: "+rlimit );
                                 ViewQAResultDialg dialog = new ViewQAResultDialg(step.getName(), parentConsole);
                                 dialog.run();
-
+                                 
                                 if ( dialog.shouldViewNone() )
                                     return; 
                                 else if ( !dialog.shouldViewall()){ 
