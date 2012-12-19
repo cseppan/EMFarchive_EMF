@@ -570,8 +570,8 @@ public class DatasetDAO {
         if (type.getExporterClassName().endsWith("ExternalFilesExporter"))
             return new Integer[]{getExternalSrcs(dataset.getId(), -1, null, session).length};
 
-        int nSources = dataset.getInternalSources().length;
-        Integer[] totalCount = new Integer[nSources];
+        int nVersions = versions.length;
+        Integer[] totalCount = new Integer[nVersions];
         
         Datasource datasource = dbServer.getEmissionsDatasource();
       
