@@ -2158,9 +2158,11 @@ avd_emis=emis_avd
                     
                     DefaultUserPreferences userPref = new DefaultUserPreferences();
                     String sLimit = userPref.property("View_QA_results_limit");
-                    long rlimit;
+                    
+                    long rlimit;                    
                     if ( sLimit == null ){
-                        messagePanel.setMessage("View_QA_results_limit is not specified in EMFPrefs.txt, default value is 50000. ");
+                        JOptionPane.showMessageDialog(parentConsole, 
+                                "View_QA_results_limit is not specified in EMFPrefs.txt, default value is 50000.", "Warning", JOptionPane.WARNING_MESSAGE);
                         rlimit = 50000;
                     }
                     else   

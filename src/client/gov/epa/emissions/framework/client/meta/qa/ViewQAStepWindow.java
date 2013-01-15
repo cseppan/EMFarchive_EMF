@@ -571,7 +571,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
                     String sLimit = userPref.property("View_QA_results_limit");
                     long rlimit;
                     if ( sLimit == null ){
-                        messagePanel.setMessage("View_QA_results_limit is not specified in EMFPrefs.txt, default value is 50000. ");
+                        JOptionPane.showMessageDialog(parentConsole, 
+                                "View_QA_results_limit is not specified in EMFPrefs.txt, default value is 50000.", "Warning", JOptionPane.WARNING_MESSAGE);
                         rlimit = 50000;
                     }
                     else   
@@ -602,7 +603,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
                             }
                         }
                     }
-                    presenter.viewResults(step, viewCount);
+                    System.out.println("ViewCount: " + viewCount);
+                    presenter.viewResults(step, stepResult, viewCount);
                 } catch (EmfException e) {
                     try  {
                         //if ( presenter.checkBizzareCharInColumn(step, "plant")) {

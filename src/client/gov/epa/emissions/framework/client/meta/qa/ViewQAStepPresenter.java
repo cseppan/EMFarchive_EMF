@@ -82,8 +82,8 @@ public class ViewQAStepPresenter {
         return session.user().getUsername();
     }
 
-    public void viewResults(QAStep qaStep, long viewCount) throws EmfException {
-        QAStepResult qaResult = getStepResult(qaStep);
+    public void viewResults(QAStep qaStep, QAStepResult qaResult, long viewCount) throws EmfException {
+//        QAStepResult qaResult = getStepResult(qaStep);
         
         if (qaResult == null || qaResult.getTable() == null || qaResult.getTable().isEmpty())
             throw new EmfException("No QA Step result available to view.");
@@ -99,7 +99,7 @@ public class ViewQAStepPresenter {
                     if (viewCount < 10000L)
                         output.write( getTableAsString(qaResult, viewCount, recordOffset) );
                     else {
-                        while (recordOffset <= viewCount) {
+                        while (recordOffset < viewCount) {
                             count = viewCount - recordOffset > 10000L? 10000L: (viewCount - recordOffset);
                             output.write( getTableAsString(qaResult, count, recordOffset) );
                             recordOffset += 10000;
