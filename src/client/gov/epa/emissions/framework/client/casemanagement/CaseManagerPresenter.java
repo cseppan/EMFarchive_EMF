@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorView;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseViewerView;
 import gov.epa.emissions.framework.client.casemanagement.sensitivity.SensitivityView;
@@ -49,5 +50,5 @@ public interface CaseManagerPresenter {
 
     void viewCaseComparisonResult(int[] caseIds, String exportDir) throws EmfException;
     
-    void viewCaseQaReports(int[] caseIds, String gridName, String sector, String repType, String exportDir) throws EmfException;
+    void viewCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims, String exportDir) throws EmfException;
 }

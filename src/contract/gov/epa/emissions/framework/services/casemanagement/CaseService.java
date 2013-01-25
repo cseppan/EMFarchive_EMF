@@ -229,6 +229,6 @@ public interface CaseService {
 
     String getCaseComparisonResult(int[] caseIds) throws EmfException;
     
-    String getCaseQaReports(int[] caseIds, String gridName, String sector, String repType) throws EmfException;
+    String getCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims) throws EmfException;
 
  }

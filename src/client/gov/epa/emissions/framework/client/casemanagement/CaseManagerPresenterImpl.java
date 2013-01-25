@@ -7,6 +7,7 @@ import java.io.Writer;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
@@ -76,19 +77,11 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
         view.addNewCaseToTableData(newCase);
     }
 
-//    public void doSaveCopiedCase(Case newCase, String templateused) throws EmfException {
-//        if (isDuplicate(newCase))
-//            throw new EmfException("A Case named '" + newCase.getName() + "' already exists.");
-//
-//        newCase.setLastModifiedBy(session.user());
-//        newCase.setLastModifiedDate(new Date());
-//        newCase.setTemplateUsed(templateused);
-//
-//        service().addCase(session.user(), newCase);
-//        //doRefresh();
+//    public Case[] getCases(int[] caseIds) throws EmfException {
+//        return service().getCases();
 //    }
-//    
-//    private boolean isDuplicate(Case newCase) throws EmfException {
+////    
+////    private boolean isDuplicate(Case newCase) throws EmfException {
 //        Case[] cases = service().getCases();
 //        for (int i = 0; i < cases.length; i++) {
 //            if (cases[i].getName().equals(newCase.getName()))
@@ -191,7 +184,7 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
         view.displayCaseComparisonResult("Case Comparison", localFile.getAbsolutePath());
     }
     
-    public void viewCaseQaReports(int[] caseIds, String gridName, String sector, String repType, String exportDir) throws EmfException {
+    public void viewCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims, String exportDir) throws EmfException {
         if (caseIds == null || caseIds.length == 0)
             throw new EmfException("No cases to compare.");
         
@@ -202,7 +195,7 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
                         try {
                             output.write(  
         //                            writerHeader(qaStep, qaResult, dataset.getName())
-                                    ""+ getCaseQaReports(caseIds, gridName, repType, sector) 
+                                    ""+ getCaseQaReports(caseIds, gridName, sectors, repDims) 
                                     );
                         }
                         finally {
@@ -220,8 +213,8 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
         return service().getCaseComparisonResult(caseIds);
     }
     
-    private String getCaseQaReports(int[] caseIds, String gridName, String sector, String repType) throws EmfException {
-        return service().getCaseQaReports(caseIds, gridName, sector, repType);
+    private String getCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims) throws EmfException {
+        return service().getCaseQaReports(caseIds, gridName, sectors, repDims);
     }
 
     private String tempQAStepFilePath(String exportDir) throws EmfException {
