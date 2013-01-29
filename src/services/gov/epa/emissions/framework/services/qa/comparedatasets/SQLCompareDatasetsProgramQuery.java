@@ -472,6 +472,8 @@ poll|poll
         String groupBySQL = "group by ";
         String baseGroupBySQL = "group by ";
         String compareGroupBySQL = "group by ";
+        String baseWhereSQL = "";
+        String compareWhereSQL = "";
         String baseUnionGroupBySQL = "group by ";
         String compareUnionGroupBySQL = "group by ";
         String fullJoinClauseSQL = "on ";
@@ -666,9 +668,9 @@ poll|poll
         String aliasedExpression = expression;
         
         //see if there is a mapping if so override the expression
-//        if (columnMatchingMap.get(expression.toLowerCase()) != null) {
-//            aliasedExpression = columnMatchingMap.get(expression.toLowerCase()).getBaseExpression();
-//        }
+        if (columnMatchingMap.get(expression.toLowerCase()) != null) {
+            aliasedExpression = columnMatchingMap.get(expression.toLowerCase()).getBaseExpression();
+        }
         while (iterator2.hasNext()) {
             String mappedExpression = iterator2.next();
             Pattern pattern = getPattern(mappedExpression);
@@ -754,9 +756,9 @@ poll|poll
         String aliasedExpression = expression;
 
         //see if there is a mapping if so override the expression
-//        if (columnMatchingMap.get(expression.toLowerCase()) != null) {
-//            aliasedExpression = columnMatchingMap.get(expression.toLowerCase()).getCompareExpression();
-//        }
+        if (columnMatchingMap.get(expression.toLowerCase()) != null) {
+            aliasedExpression = columnMatchingMap.get(expression.toLowerCase()).getCompareExpression();
+        }
         while (iterator2.hasNext()) {
             String mappedExpression = iterator2.next();
             Pattern pattern = getPattern(mappedExpression);
