@@ -49,7 +49,7 @@ public class ViewQAResultDialg extends Dialog {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         linesText = new TextField("", 10);
-        layoutGenerator.addLabelWidgetPair("Number of lines to preview (i.e., 1000): ", linesText, panel);
+        layoutGenerator.addLabelWidgetPair("Number of records to preview (i.e., 1000): ", linesText, panel);
        
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
