@@ -569,8 +569,13 @@ public class DataServiceImpl implements DataService {
         DbServer dbServer = dbServerFactory.getDbServer();
         long recordCount = 0;
         try {
+            
+            //need to perform a ANALYZE SQL command to make sure statistics are updated...
+          
+            dbServer.getEmissionsDatasource().query().execute("analyze "  + qualifiedTableName + ";");
+            
             ResultSet rs = dbServer.getEmissionsDatasource().query().executeQuery(
-                    "select count_estimate ('select * from "  + qualifiedTableName + " ') ");
+                    "select public.count_estimate ('select * from "  + qualifiedTableName + " ') ");
             if (rs.next())
                 recordCount = rs.getLong(1);
         } catch (RuntimeException e) {
