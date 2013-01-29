@@ -167,7 +167,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         inReportScrollPane.setPreferredSize(new Dimension(100, 100));
         JPanel inPanel = new JPanel();
         inPanel.setLayout(new BoxLayout(inPanel, BoxLayout.Y_AXIS));
-        inPanel.add(new JLabel("included: "));
+        inPanel.add(new JLabel("Included: "));
         inPanel.add(inReportScrollPane);
         return inPanel;        
     }
