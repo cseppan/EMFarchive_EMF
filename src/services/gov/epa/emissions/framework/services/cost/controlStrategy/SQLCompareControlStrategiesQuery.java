@@ -27,6 +27,8 @@ public class SQLCompareControlStrategiesQuery {
         sql.append(" case when " + matchSelectList + " then 'true'::character varying(5) else 'false'::character varying(5) end as match,");
         sql.append(" " + valueSelectList);
         sql.append(" from ");
+        String tabRunningSelectList = "cs0.tab";
+        String nameRunningSelectList = "cs0.\"name\"";
         for (int i = 0; i < controlStrategyIds.length; ++i) {
             //add join condition
             if (i > 0)
@@ -36,10 +38,11 @@ public class SQLCompareControlStrategiesQuery {
             sql.append(" ) as cs" + i);
             //add join condition
             if (i > 0) {
-                sql.append(" on cs" + i + ".tab = cs0.tab");
-                sql.append(" and cs" + i + ".name = cs0.name");
+                sql.append(" on coalesce(cs" + i + ".tab, '') = coalesce(" + tabRunningSelectList + ", '')");
+                sql.append(" and coalesce(cs" + i + ".name, '') = coalesce(" + nameRunningSelectList + ", '')");
             }
-        
+            tabRunningSelectList += ",cs" + i + ".tab";
+            nameRunningSelectList += ",cs" + i + ".\"name\"";
         }
 
         sql.append(" order by case when coalesce(" + tabSelectList + ") = 'Summary' then 0 when coalesce(" + tabSelectList + ") = 'Inventories' then 1 when coalesce(" + tabSelectList + ") = 'Measures' then 2 when coalesce(" + tabSelectList + ") = 'Programs' then 3 else 4 end,"); 
