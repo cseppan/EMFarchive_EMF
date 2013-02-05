@@ -945,19 +945,17 @@ public class CaseServiceImpl implements CaseService {
             + " ) as foo group by " + tailSelectSql;
             if (DebugLevels.DEBUG_0())
                 System.out.println(finalSql);
+            
+             
             String tableQuery = new QueryToString(dbServer, finalSql, ",").toString();
-            //            //String tableQuery = new SQLCompareCasesQuery(sessionFactory).createCompareOutputsQuery(caseIds);
-            //            System.out.println("Table:" + tableQuery);
-            //            //String[] getInternalTableName();
-            //            //return new QueryToString(dbServer, new SQLCompareCasesQuery(sessionFactory).createCompareOutputsQuery(caseIds), ",").toString();
             return tableQuery;
-
+             
         } catch (RuntimeException e) {
             log.error("Could not retrieve annual Reports: " + e.getMessage(), e);
             throw new EmfException("Could not retrieve annual Reports. ");
         } catch (ExporterException e) {
             log.error("Could not retrieve annual Reports: " + e.getMessage(), e);
-            throw new EmfException("Could not retrieve annual Reports. ");
+            throw new EmfException("Could not retrieve annual Reports. " + e.getMessage());
         } finally {
             try {
                 if (dbServer != null && dbServer.isConnected())

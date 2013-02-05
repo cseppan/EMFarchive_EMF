@@ -80,7 +80,7 @@ public class SQLAnnualReportQuery {
     
     public String getReportTableQuery(String sector, String mapSectorCase, String gridName) throws EmfException {
         StringBuilder sql = new StringBuilder();
-        
+
         sql.append(" select ");
         sql.append(" internal_sources.table_name, " );
         sql.append(" outputs.dataset_id, ");
@@ -101,6 +101,8 @@ public class SQLAnnualReportQuery {
         sql.append(" AND cases_casejobs.sector_id = (select id from emf.sectors where name = '" + sector + "')");
         sql.append(" AND cases_casejobs.region_id = " +
                 " (select id from emf.georegions where name = '" + gridName + "') " );
+        sql.append(" AND datasets.dataset_type = " +
+        		"(select id from emf.dataset_types where name = 'Smkmerge report state annual summary (CSV)')");
 
         return sql.toString();
     }
