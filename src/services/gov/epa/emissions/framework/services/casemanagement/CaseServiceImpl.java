@@ -845,9 +845,12 @@ public class CaseServiceImpl implements CaseService {
                         version = rs.getInt(3);
                     }
                     else {
-                        throw new EmfException("No SECTORLIST file, case: " + caseQa.getName() );
+                        log.error("No SECTORLIST file, case: " + caseQa.getName() + "; region: " + gridName);
+                        log.error("query -" + sectorListSql + "\n" );
+                        throw new EmfException("No SECTORLIST file, case: " + caseQa.getName() + "; " + gridName );
                     }               
                 } catch (SQLException e) {
+                    e.printStackTrace();
                     if (session != null && session.isConnected())
                         session.close();  
                     log.error("Could not execute getting sectorlist query -" + sectorListSql + "\n" + e.getMessage());
@@ -964,7 +967,7 @@ public class CaseServiceImpl implements CaseService {
             throw new EmfException("Could not retrieve annual Reports. ");
         } catch (ExporterException e) {
             log.error("Could not retrieve annual Reports: " + e.getMessage(), e);
-            throw new EmfException("Could not retrieve annual Reports. " + e.getMessage());
+            throw new EmfException("Could not retrieve annual Reports. " );
         } finally {
             try {
                 if (dbServer != null && dbServer.isConnected())

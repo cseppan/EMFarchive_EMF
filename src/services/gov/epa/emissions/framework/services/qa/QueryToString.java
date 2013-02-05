@@ -38,7 +38,7 @@ public class QueryToString {
             System.out.println("ColumnNameList: "+columnNameList );
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ExporterException("could not convert table to string ", e);
+            throw new ExporterException("could not convert table to string, query:  " + sqlQuery , e);
         }
     }
 
