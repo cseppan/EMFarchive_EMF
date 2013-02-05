@@ -112,15 +112,55 @@ public class RemoteCommand {
 
         // TBD: need to generalize this to accept other queue ID formats - perhaps with
         //      new property
-        Pattern p = Pattern.compile("^[0-9]*\\.(.)*");
+        Pattern p = Pattern.compile("^[0-9]*\\.(.)*", Pattern.MULTILINE);
         Matcher m = p.matcher(message.trim());
 
-        if (m.find())
-            return message.trim();
+        if (m.find()) {
+            return m.group();
+        }
 
         return null;
     }
 
+    public static void main(String[] args) {
+        String str = "";
+        str = "\n"
++ "        WARNING NOTICE\n"
++ "\n"
++ "\n"
++ "You are accessing a U.S. Government information system, which includes \n"
++ "(1) this computer, (2) this computer network, (3) all computers connected \n"
++ "to this network, and (4) all devices and storage media attached to this \n"
++ "network or to a computer on this network.  This information system is \n"
++ "provided for U.S. Government-authorized use only.  Unauthorized or improper \n"
++ "use of this system may result in disciplinary action, as well as civil and \n"
++ "criminal penalties.  By using this information system you understand and \n"
++ "consent to the following: \n"
++ "\n"
++ "o You have no reasonable expectation of privacy regarding any communications \n"
++ "or data transiting or stored on this information system.  At any time, \n"
++ "the government may for any lawful government purpose monitor, intercept, \n"
++ "search and seize any communication or data transiting or stored on this \n"
++ "information system. \n"
++ "\n"
++ "o Any communications or data transiting or stored on this information \n"
++ "system may be disclosed or used for any lawful government purpose. \n"
++ "\n"
++ "By continuing to access this information system, you acknowledge you \n"
++ "understand and you consent to the above terms. \n"
++ "\n"
++ "EPA Security Policy - Passwords will expire after 90 days. \n"
++ "\n"
++ "***************************************************************************** \n"
++ "\n"
++ "NEWS: \n"
++ "\n"
++ "23485.garnet01";
+//        str = "23485.garnet01.co";
+        
+        System.out.println(extractQId(str));
+        }
+    
     public static String logStderr(String title, InputStream inStream) throws Exception {
         // log the title of this series of message to the LOG
         LOG.error(title);
@@ -336,7 +376,7 @@ public class RemoteCommand {
         }
     }
     
-    public static void main(String[] args) {
+    public static void mainOld(String[] args) {
         //NOTE: test Linux side (EMF server) remote access functions
         String unixShell = "csh";
         String unixOptions = "-c";
