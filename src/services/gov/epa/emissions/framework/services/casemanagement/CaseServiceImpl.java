@@ -823,6 +823,10 @@ public class CaseServiceImpl implements CaseService {
         headSelectSql = tailSelectSql;
         try {
 
+            String stateRunningSelectList = "case0.state";
+            String sectorRunningSelectList = "case0.sector";
+            String speciesRunningSelectList = "case0.species";
+
             for ( int i =0; i<caseIds.length; i++) {
                 // 1. Get sectorList table name and dataset version
                 Case caseQa = dao.getCase(caseIds[i], session);
@@ -933,12 +937,17 @@ public class CaseServiceImpl implements CaseService {
                     finalSql += " from ( " + annualReportSql + ") as case0 ";
                 else {
                     finalSql += "  full join (" + annualReportSql + " ) as case" + i +
-                    " on case"+i + ".state= case0.state " +
-                    " and case"+i + ".sector= case0.sector " +
-                    " and case"+i + ".species= case0.species ";
-                }
+                    " on coalesce(case" + i + ".state, '')= coalesce(" + stateRunningSelectList + ", '') " +
+                    " and coalesce(case" + i + ".sector, '')= coalesce(" + sectorRunningSelectList + ", '') " +
+                    " and coalesce(case" + i + ".species, '')= coalesce(" + speciesRunningSelectList + ", '') ";
+                }                
+                
                 selectSql += ", case"+ i + "." + caseAbbrev;
                 headSelectSql += ", sum(" + caseAbbrev + ") as " + caseAbbrev;
+
+                stateRunningSelectList += ",case" + i + ".state";
+                sectorRunningSelectList += ",case" + i + ".sector";
+                speciesRunningSelectList += ",case" + i + ".species";
                 
             }
             finalSql = "select " +headSelectSql + " from ( " + selectSql + finalSql 
