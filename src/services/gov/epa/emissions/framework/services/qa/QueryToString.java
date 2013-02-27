@@ -35,10 +35,10 @@ public class QueryToString {
             for (int i = 1; i <= md.getColumnCount(); i++) {
                 this.columnNameList += (i > 1 ? "," : "") + "\"" + md.getColumnName(i) + "\"";
             }
-            System.out.println("ColumnNameList: "+columnNameList );
+            //System.out.println("ColumnNameList: "+columnNameList );
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ExporterException("could not convert table to string, query:  " + sqlQuery , e);
+            throw new ExporterException(e.getMessage());
         }
     }
 

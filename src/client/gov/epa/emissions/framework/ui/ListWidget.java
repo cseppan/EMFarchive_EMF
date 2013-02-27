@@ -109,6 +109,10 @@ public class ListWidget extends JList implements Changeable {
         }
     }
     
+    public void removeElement(Object removeValue) {
+        model.removeElement(removeValue);
+    }
+
     public void removeAllElements() {
         model.removeAllElements();
 //        for (int i = 0; i < model.size(); i++) {

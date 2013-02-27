@@ -50,5 +50,5 @@ public interface CaseManagerPresenter {
 
     void viewCaseComparisonResult(int[] caseIds, String exportDir) throws EmfException;
     
-    void viewCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims, String exportDir) throws EmfException;
+    String viewCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims, String whereClause) throws EmfException;
 }

@@ -32,20 +32,22 @@ public class SQLAnnualReportQuery {
         this.sessionFactory = sessionFactory;
     }
     
-    public String getSectorListTableQuery(int caseId, String gridName) throws EmfException {
+    public String getSectorListTableQuery(int caseId, String gridName) {
         StringBuilder sql = new StringBuilder();
 //        for (int i = 0; i < caseIds.length; ++i) {
 //            if ( i > 0 ) sql.append( " union all " );
         sql.append(" select ");
         sql.append(" internal_sources.table_name, " );
         sql.append(" cases_caseinputs.dataset_id, ");
-        sql.append(" versions.version");
+        sql.append(" versions.version, ");
+        sql.append(" georegions.name" );
         sql.append(" FROM ");
         sql.append(" emf.internal_sources, " );
         sql.append(" cases.input_envt_vars, ");
         sql.append(" cases.cases, ");
         sql.append(" cases.cases_caseinputs, ");
-        sql.append(" emf.versions ");
+        sql.append(" emf.versions, ");
+        sql.append(" emf.georegions ");
         
         sql.append(" WHERE ");
         sql.append(" input_envt_vars.id = cases_caseinputs.envt_vars_id " );
@@ -55,9 +57,14 @@ public class SQLAnnualReportQuery {
         sql.append(" AND cases_caseinputs.version_id = versions.id ");
         sql.append(" AND cases.id = cases_caseinputs.case_id ");
         sql.append(" AND cases.id = " + caseId );
-        sql.append(" AND cases_caseinputs.region_id = " +
-        		" (select id from emf.georegions where name = '" + gridName + "')" );
-        
+        if ( ! gridName.trim().equalsIgnoreCase("")){
+            sql.append(" AND cases_caseinputs.region_id = emf.georegions.id" );  
+            sql.append(" AND georegions.name = '" + gridName + "' " );
+        }          
+        else 
+            //sql.append(" )" );
+            sql.append(" AND cases_caseinputs.region_id = emf.georegions.id " );
+
         return sql.toString();
     }
     
@@ -78,20 +85,23 @@ public class SQLAnnualReportQuery {
         return sql.toString();
     }
     
-    public String getReportTableQuery(String sector, String mapSectorCase, String gridName) throws EmfException {
+    public String getReportTableQuery(String sector, String mapSectorCase, 
+            String gridName, Boolean useCounty) {
         StringBuilder sql = new StringBuilder();
 
         sql.append(" select ");
         sql.append(" internal_sources.table_name, " );
         sql.append(" outputs.dataset_id, ");
-        sql.append(" datasets.default_version ");
+        sql.append(" datasets.default_version, ");
+        sql.append(" georegions.name" );
         //            sql.append( caseAbbrev + " as caseAbbrev" );
         sql.append(" FROM ");
         sql.append(" emf.internal_sources, " );
         sql.append(" cases.outputs, ");
         sql.append(" cases.cases_casejobs, ");
         sql.append(" cases.cases, ");
-        sql.append(" emf.datasets ");
+        sql.append(" emf.datasets, ");
+        sql.append(" emf.georegions ");       
         sql.append(" WHERE ");
         sql.append(" cases.id = outputs.case_id " );
         sql.append(" AND cases_casejobs.id = outputs.job_id ");
@@ -99,30 +109,48 @@ public class SQLAnnualReportQuery {
         sql.append(" AND internal_sources.dataset_id = datasets.id ");
         sql.append(" AND cases.abbreviation_id = ( select id from cases.case_abbreviations where name = '" + mapSectorCase + "')");
         sql.append(" AND cases_casejobs.sector_id = (select id from emf.sectors where name = '" + sector + "')");
-        sql.append(" AND cases_casejobs.region_id = " +
-                " (select id from emf.georegions where name = '" + gridName + "') " );
-        sql.append(" AND datasets.dataset_type = " +
-        		"(select id from emf.dataset_types where name = 'Smkmerge report state annual summary (CSV)')");
+        if ( ! gridName.trim().isEmpty()){
+            sql.append(" AND cases_casejobs.region_id = emf.georegions.id" );  
+            sql.append(" AND georegions.name = '" + gridName + "' " );
+        }  
+        else
+            sql.append(" AND cases_casejobs.region_id = emf.georegions.id " );
+        
+        if ( ! useCounty )
+            sql.append(" AND datasets.dataset_type in " +
+            "(select id from emf.dataset_types where name = 'Smkmerge report state annual summary (CSV)' " +
+            " or name = 'Smkmerge report county annual summary (CSV)')"
+                     );
+        else
+            sql.append(" AND datasets.dataset_type = " +
+            "(select id from emf.dataset_types where name = 'Smkmerge report county annual summary (CSV)')");
 
         return sql.toString();
     }
     
-    public String getSectorsReportsQuery(String[] tableNames, Integer[] dsIds, Integer[] dsVers, String caseAbbrev) throws EmfException {
+    public String getSectorsReportsQuery(String[] tableNames, Integer[] dsIds, 
+            Integer[] dsVers, String caseAbbrev, String whereClause, Boolean useCounty ) throws EmfException {
         StringBuilder sql = new StringBuilder();
         Session session = sessionFactory.getSession();
+        String colString = "";
+        if ( useCounty )
+            colString = " select fips, state, county, sector, species, ann_emis as " + caseAbbrev;
+        else
+            colString = " select state, sector, species, ann_emis as " + caseAbbrev;
         for (int i = 0; i < tableNames.length; i++) {
             // skip the loop if a sector is not in the current case
-            if ( dsIds[i] != null && dsIds[i] !=null) {
+            if ( tableNames[i] != null && dsIds[i] !=null) {
                 Version version = version(session, dsIds[i], dsVers[i] );            
                 String datasetVersionedQuery = new VersionedQuery(version).query();
                 if ( sql.toString().contains("select")) sql.append( " union all " );
-                sql.append(" select " );
-                sql.append(" state,");
-                sql.append(" sector,");
-                sql.append(" species,");
-                sql.append(" ann_emis as " + caseAbbrev );
+                sql.append(colString);
                 sql.append(" from " + qualifiedName(tableNames[i]) );
-                sql.append(" where " + datasetVersionedQuery );
+                if ( whereClause.trim().isEmpty())
+                    sql.append(" where " + datasetVersionedQuery );
+                else {
+                    sql.append("  " + whereClause);
+                    sql.append(" AND " + datasetVersionedQuery ); 
+                }
             }   
         }
         return sql.toString();

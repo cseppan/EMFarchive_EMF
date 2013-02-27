@@ -163,7 +163,7 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
         if (caseIds == null || caseIds.length == 0)
             throw new EmfException("No cases to compare.");
         
-        File localFile = new File(tempQAStepFilePath(exportDir));
+        File localFile = new File(tempQAStepFilePath());
         try {
             if (!localFile.exists()) {
                 Writer output = new BufferedWriter(new FileWriter(localFile));
@@ -184,40 +184,51 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
         view.displayCaseComparisonResult("Case Comparison", localFile.getAbsolutePath());
     }
     
-    public void viewCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims, String exportDir) throws EmfException {
+    public String viewCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims, String whereClause) throws EmfException {
+        String message = "";
         if (caseIds == null || caseIds.length == 0)
             throw new EmfException("No cases to compare.");
-        
-                File localFile = new File(tempQAStepFilePath(exportDir));
+          
+        File localFile = new File(tempQAStepFilePath());
+        try {
+            if (!localFile.exists()) {
+                Writer output = new BufferedWriter(new FileWriter(localFile));
                 try {
-                    if (!localFile.exists()) {
-                        Writer output = new BufferedWriter(new FileWriter(localFile));
-                        try {
-                            output.write(  
-        //                            writerHeader(qaStep, qaResult, dataset.getName())
-                                    ""+ getCaseQaReports(caseIds, gridName, sectors, repDims) 
-                                    );
-                        }
-                        finally {
-                            output.close();
-                        }
-                    }
-                } catch (Exception e) {
-                    throw new EmfException(e.getMessage());
+                    String[] reportsInfo = getCaseQaReports(caseIds, gridName, sectors, repDims, whereClause);   
+                    output.write(  
+                            ""+ reportsInfo[0] 
+                    );
+                    
+                    message = reportsInfo[1];
+                }catch (Exception e) {
+                    e.printStackTrace();
+                    throw new EmfException( e.getMessage());
+                }finally {
+                    output.close();
                 }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new EmfException(e.getMessage());
+        }
+        
+        view.displayCaseComparisonResult("Summary Case Output", localFile.getAbsolutePath());
+        return message;
 
-                view.displayCaseComparisonResult("Summary Case Output", localFile.getAbsolutePath());
+//        view.displayCaseComparisonResult("Summary Case Output", localFile.getAbsolutePath());
+//        System.out.println(reportsInfo[1]);
+//        return reportsInfo[1];
     }
     
     private String getCaseComparisonResult(int[] caseIds) throws EmfException {
         return service().getCaseComparisonResult(caseIds);
     }
     
-    private String getCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims) throws EmfException {
-        return service().getCaseQaReports(caseIds, gridName, sectors, repDims);
+    private String[] getCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims, String whereClause) throws EmfException {
+        return service().getCaseQaReports(caseIds, gridName, sectors, repDims, whereClause);
     }
 
-    private String tempQAStepFilePath(String exportDir) throws EmfException {
+    private String tempQAStepFilePath() throws EmfException {
         String separator = File.separator; 
         UserPreference preferences = new DefaultUserPreferences();
         String tempDir = preferences.localTempDir();

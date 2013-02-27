@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
+import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
@@ -48,13 +50,17 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
     private ListWidget sectorsListWidget;
     private ListWidget inReportWidget;
     private ListWidget exReportWidget;
+    private ListWidget validColsWidget;
+    
+    private TextArea whereArea;
+    private TextArea infoArea;
     
     private Case[] cases;
     
     private Dimension defaultDimension = new Dimension(255, 22);
 
     public CompareCaseWindow(DesktopManager desktopManager, Case[] cases) {
-        super("Compare Cases Outputs", new Dimension(420, 450), desktopManager);
+        super("Compare Cases Outputs", new Dimension(450, 600), desktopManager);
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         this.cases = cases;
@@ -68,6 +74,10 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         try {
             layout.add(createInputPanel());
             layout.add(selectReportPanel());
+            layout.add(Box.createRigidArea(new Dimension(0,6)));
+            layout.add(wherePanel());
+            layout.add(Box.createRigidArea(new Dimension(0,6)));
+            layout.add(inforPanel());
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -109,12 +119,13 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
     
     private JPanel selectReportPanel() throws EmfException {
         JPanel panel = new JPanel();
-        panel.setBorder(new Border("Report Dimentions"));
+        panel.setBorder(new Border("Report Dimensions"));
        
         JPanel reportPanel = new JPanel(new BorderLayout(10,0));        
         reportPanel.add(reportPanel());  
-        panel.add(reportPanel);        
-        panel.setMaximumSize(new Dimension(380, 120));
+        panel.add(reportPanel);  
+            
+        panel.setMaximumSize(new Dimension(380, 100));
         return panel;
     }
     
@@ -147,27 +158,91 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         JPanel panel1 = new JPanel();
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
                  
-        panel1.add(Box.createRigidArea(new Dimension(8,0)));
+        panel1.add(Box.createRigidArea(new Dimension(6,0)));
         panel1.add(inPanel());
-        panel1.add(Box.createRigidArea(new Dimension(8,0)));
+        panel1.add(Box.createRigidArea(new Dimension(6,0)));
         panel1.add(reportButtonsPanel());
-        panel1.add(Box.createRigidArea(new Dimension(8,0)));
+        panel1.add(Box.createRigidArea(new Dimension(6,0)));
         panel1.add(exPanel());  
-        panel1.add(Box.createRigidArea(new Dimension(8,0)));
+        panel1.add(Box.createRigidArea(new Dimension(6,0)));
            
         return panel1;
     }
     
+    private JPanel wherePanel() {
+        JPanel panel1 = new JPanel();
+        panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+                 
+        panel1.add(Box.createRigidArea(new Dimension(10,0)));
+        panel1.add(validColPanel());
+        panel1.add(Box.createRigidArea(new Dimension(10,0)));
+        panel1.add(whereTextPanel());  
+        panel1.add(Box.createRigidArea(new Dimension(10,0)));          
+        return panel1;
+    }
+    
+    private JPanel inforPanel(){
+        JPanel panel = new JPanel();
+        infoArea = new TextArea("Information", "", 20, 3);
+        
+        ScrollableComponent descScrollableTextArea = new ScrollableComponent(infoArea);
+        descScrollableTextArea.setPreferredSize(new Dimension(240, 120));        
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(new JLabel("Information: "));
+        panel.add(descScrollableTextArea);
+        
+        JPanel panel1 = new JPanel();
+        panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+        
+        panel1.add(Box.createRigidArea(new Dimension(10,0)));
+        panel1.add(panel);
+        panel1.add(Box.createRigidArea(new Dimension(10,0)));
+        return panel1;
+    }
+   
+    private JPanel whereTextPanel(){
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        whereArea = new TextArea("where clause", "", 20, 3);
+        whereArea.setToolTipText("ie: where species = 'NO' ");
+
+        ScrollableComponent descScrollableTextArea = new ScrollableComponent(whereArea);
+        descScrollableTextArea.setPreferredSize(new Dimension(150, 70));        
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(new JLabel("Where: "));
+        panel.add(descScrollableTextArea);
+        
+        panel.add(Box.createRigidArea(new Dimension(10,0)));
+        panel.add(descScrollableTextArea);
+        panel.add(Box.createRigidArea(new Dimension(10,0)));
+         
+        return panel;
+    }
+    
+    private JPanel validColPanel(){  
+        String[] values= new String[]{"Fips", "State", "County", "Sector", "Species", "Ann_emis"};
+        validColsWidget = new ListWidget(values);   
+         
+        JScrollPane inReportScrollPane = new JScrollPane(validColsWidget, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        inReportScrollPane.setPreferredSize(new Dimension(90, 70));
+        JPanel inPanel = new JPanel();
+        inPanel.setLayout(new BoxLayout(inPanel, BoxLayout.Y_AXIS));
+        inPanel.add(new JLabel("Valid Columns: "));
+        inPanel.add(inReportScrollPane);
+        return inPanel;        
+    }
+    
     private JPanel inPanel(){
-        String [] values= new String[]{"State", "Sector", "Species"};
+        String [] values= new String[]{"State", "County", "Sector", "Species"};
         inReportWidget = new ListWidget(values);        
         inReportWidget.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);        
         JScrollPane inReportScrollPane = new JScrollPane(inReportWidget, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        inReportScrollPane.setPreferredSize(new Dimension(100, 100));
+        inReportScrollPane.setPreferredSize(new Dimension(100, 70));
         JPanel inPanel = new JPanel();
         inPanel.setLayout(new BoxLayout(inPanel, BoxLayout.Y_AXIS));
-        inPanel.add(new JLabel("Included: "));
+        inPanel.add(new JLabel("included: "));
         inPanel.add(inReportScrollPane);
         return inPanel;        
     }
@@ -178,7 +253,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         exReportWidget.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);        
         JScrollPane exReportScrollPane = new JScrollPane(exReportWidget, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        exReportScrollPane.setPreferredSize(new Dimension(100, 100));
+        exReportScrollPane.setPreferredSize(new Dimension(100, 70));
 
         JPanel exPanel = new JPanel();
         exPanel.setLayout(new BoxLayout(exPanel, BoxLayout.Y_AXIS));
@@ -215,9 +290,20 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 String[] objects= Arrays.asList(exReportWidget.getSelectedValues()).toArray(new String[0]);
-                if ( objects != null && objects.length> 0 ){    
-                    for (Object obj : objects) 
+                if ( objects != null && objects.length> 0 ){  
+                    int i=0;
+                    for (Object obj : objects){ 
                         inReportWidget.addElement(obj);
+                        if ( objects[i].equalsIgnoreCase("State") 
+                                || objects[i].equalsIgnoreCase("Sector") 
+                                || objects[i].equalsIgnoreCase("Species") )
+                            validColsWidget.addElement(obj);
+                        if ( objects[i].equalsIgnoreCase("County") ){
+                            validColsWidget.addElement("Fips");
+                            validColsWidget.addElement("County");
+                        }                            
+                        i++;
+                    }
                     exReportWidget.removeElements(objects);
                 }
             }
@@ -228,15 +314,26 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 String[] objects= Arrays.asList(inReportWidget.getSelectedValues()).toArray(new String[0]);
-                if ( objects != null && objects.length> 0 ){    
-                    for (Object obj : objects) 
+                if ( objects != null && objects.length> 0 ){ 
+                    int i = 0;
+                    for (Object obj : objects){
                         exReportWidget.addElement(obj);
+                        if ( objects[i].equalsIgnoreCase("State") 
+                                || objects[i].equalsIgnoreCase("Sector") 
+                                || objects[i].equalsIgnoreCase("Species") )
+                            validColsWidget.removeElement(obj);
+                        if ( objects[i].equalsIgnoreCase("County") ){
+                            validColsWidget.removeElement("Fips");
+                            validColsWidget.removeElement("County");
+                        }
+                        i++;
+                    }                    
                     inReportWidget.removeElements(objects);
                 }
             }
         };
     }
-
+    
     private GeoRegion[] regions() {
         List<GeoRegion> regionList = new ArrayList<GeoRegion>();
         for ( int i = 0; i < cases.length; i++) {
@@ -252,6 +349,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 messagePanel.clear();
+                infoArea.setText("");
                 resetChanges();
                 GeoRegion selectedRegion = (GeoRegion)gridNamesCombo.getSelectedItem();
                 Sector[] selectedSectors= Arrays.asList(sectorsListWidget.getSelectedValues()).toArray(new Sector[0]);
@@ -267,8 +365,9 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
                     return;
                 } else if (selectedSectors[0].getName().equalsIgnoreCase("All")) {
                     selectedSectors= getCaseSectors().toArray(new Sector[0]);
-                    //System.out.println("selectedSectors-- " + selectedSectors.length);
                 }
+                
+                String whereClause = whereArea.getText().trim();
                 
                 if ( repDims == null || repDims.length == 0 ) {
                     messagePanel.setError("Please select columns included.");
@@ -276,9 +375,10 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
                 }  
                 
                 try {
-                    presenter.showCaseQA(selectedRegion.getName(), selectedSectors, repDims);
+                    String inforString = presenter.showCaseQA(selectedRegion.getName(), selectedSectors, repDims, whereClause);
+                    infoArea.setText(inforString);
                 } catch (EmfException e) {            
-                    messagePanel.setError(e.getMessage());
+                    infoArea.setText("Errors: \n" + e.getMessage());
                 }
             }
         };
@@ -322,7 +422,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
 
         return panel;
     }
-
+    
     public void addSector(Sector sector) {
         // NOTE Auto-generated method stub
         

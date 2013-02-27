@@ -1231,16 +1231,18 @@ public class CaseServiceTransport implements CaseService {
         return (String) call.requestResponse(new Object[] { caseIds });
     }
     
-    public String getCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims) throws EmfException {
+    public String[] getCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, 
+            String[] repDims, String whereClause) throws EmfException {
         EmfCall call = call();
         call.setOperation("getCaseQaReports"); 
         call.addParam("caseIds", dataMappings.integers());
         call.addStringParam("gridName");
         call.addParam("sectors", dataMappings.sectors());
         call.addParam("repDims", dataMappings.strings());
-        call.setStringReturnType();
+        call.addStringParam("whereClause");
+        call.setStringArrayReturnType();
         
-        return (String) call.requestResponse(new Object[] { caseIds, gridName, sectors, repDims});
+        return (String[]) call.requestResponse(new Object[] { caseIds, gridName, sectors, repDims, whereClause});
     }
 
 
