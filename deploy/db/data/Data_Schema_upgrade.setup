@@ -1947,3 +1947,6 @@ false,
 from emf.dataset_types dt
 where name in ('Flat File 2010 Point','Flat File 2010 Nonpoint'); 
 
+-- 2/13/2013 -- added a new debug level to trace case job run parse Queue Id functionality
+insert into emf.properties values(DEFAULT, 'DEBUG_26', 'true');
+update emf.properties set value = 'true' where name = 'DEBUG_26';
