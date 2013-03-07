@@ -465,7 +465,12 @@ public class EditableQATab extends JPanel implements EditableQATabView, RefreshO
                                 rlimit = 50000;
                             }
                             else   
-                                rlimit = Integer.parseInt(sLimit);
+                                try {
+                                    rlimit = Integer.parseInt(sLimit.trim());
+                                } catch (NumberFormatException e) {
+                                    //just default if they entered a non number string
+                                    rlimit = 50000;
+                                }
                           
                             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                             long records = presenter.getTableRecordCount(stepResult);
