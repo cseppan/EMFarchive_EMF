@@ -860,10 +860,10 @@ substring(fips,1,2)='37'
             if (!check)
                 throw new EmfException (" Inventories are needed ");
         } else if (QAStep.sqlProgram.equals(program.getSelectedItem())) {
-            if (!programSwitches.trim().toUpperCase().startsWith("SELECT ")) {
-                check = false;
-                throw new EmfException(" SQL is not start with SELECT ");
-            }
+//            if (!programSwitches.trim().toUpperCase().startsWith("SELECT ")) {
+//                check = false;
+//                throw new EmfException(" SQL is not start with SELECT ");
+//            }
         }else if (QAStep.MultiInvDifRepProgram.equalsIgnoreCase(program.getSelectedItem().toString())
                 || QAStep.CompareControlStrategies.equalsIgnoreCase(program.getSelectedItem().toString())){
             check = checkMultiInvDiff(programSwitches) ;
@@ -2164,9 +2164,13 @@ avd_emis=emis_avd
                         JOptionPane.showMessageDialog(parentConsole, 
                                 "View_QA_results_limit is not specified in EMFPrefs.txt, default value is 50000.", "Warning", JOptionPane.WARNING_MESSAGE);
                         rlimit = 50000;
-                    }
-                    else   
-                        rlimit = Integer.parseInt(sLimit);
+                    } else
+                        try {
+                            rlimit = Integer.parseInt(sLimit.trim());
+                        } catch (NumberFormatException e) {
+                            //just default if they entered a non number string
+                            rlimit = 50000;
+                        }
                     
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     long records = presenter.getTableRecordCount(stepResult);
