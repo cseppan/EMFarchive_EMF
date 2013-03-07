@@ -4,9 +4,11 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -124,6 +126,7 @@ public class RemoteCommand {
 
     public static void main(String[] args) {
         String str = "";
+        
         str = "\n"
 + "        WARNING NOTICE\n"
 + "\n"
@@ -157,7 +160,18 @@ public class RemoteCommand {
 + "\n"
 + "23485.garnet01";
 //        str = "23485.garnet01.co";
-        
+        InputStream is = null;
+        try {
+            is = new ByteArrayInputStream(str.getBytes("UTF-8"));
+            System.out.println(logStdout("", is, false));
+        } catch (UnsupportedEncodingException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+
         System.out.println(extractQId(str));
         }
     
@@ -310,14 +324,28 @@ public class RemoteCommand {
             errorLevel = p.waitFor(); //If timeout (5 minutes), process has been terminated by now
             waitNKill.done(); //If not timeout, tell the thread to stop itself
 
+            if (DebugLevels.DEBUG_26()) {
+                
+                LOG.warn("errorLevel = " + errorLevel + " for (" + hostname + ") : " + remoteCmd );
+                try {
+                    if (p.getErrorStream() != null)
+                        logStderr("stderr from (" + hostname + "): " + remoteCmd, p.getErrorStream());
+                //suppress exceptions for now
+                } catch (Exception e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
             if (errorLevel > 0) {
                 // if have error print remote commands error message to the logs
                 // and throw an exception
                 if (waitNKill.getErrorMsg() != null)
                     throw new EmfException(waitNKill.getErrorMsg());
                 
-                String errorTitle = "stderr from (" + hostname + "): " + remoteCmd;
-                logStderr(errorTitle, p.getErrorStream());
+//removed for now, since errorstream is already closed...                
+//                String errorTitle = "stderr from (" + hostname + "): " + remoteCmd;
+//                logStderr(errorTitle, p.getErrorStream());
                 
                 return p.getErrorStream();
             }
