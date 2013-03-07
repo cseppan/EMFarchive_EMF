@@ -295,6 +295,9 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
             } else if (columnName.equalsIgnoreCase("ceff")) {
                 sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then (1- b.final_emissions / b.starting_emissions) * 100 else null::double precision end else ceff end as ceff";
                 columnList += "," + columnName;
+            } else if (columnName.equalsIgnoreCase("ann_pct_red")) {//ff10 column
+                sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then (1- b.final_emissions / b.starting_emissions) * 100 else null::double precision end else ann_pct_red end as ann_pct_red";
+                columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("avd_emis")) {
                     sql += ", case when b.source_id is not null then b.final_emissions / " + (month != -1 ? noOfDaysInMonth : "365") + " else avd_emis end as avd_emis";
                 columnList += "," + columnName;
@@ -303,6 +306,40 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
                     sql += ", -9.0::double precision as ann_emis";
                 else
                     sql += ", case when b.source_id is not null then b.final_emissions else ann_emis end as ann_emis";
+                columnList += "," + columnName;
+            } else if (columnName.equalsIgnoreCase("ann_value")) {//ff10 column
+                sql += ", case when b.source_id is not null then b.final_emissions else ann_value end as ann_value";
+                columnList += "," + columnName;
+            
+            } else if (columnName.equalsIgnoreCase("jan_value")
+                    || columnName.equalsIgnoreCase("feb_value")
+                    || columnName.equalsIgnoreCase("mar_value")
+                    || columnName.equalsIgnoreCase("apr_value")
+                    || columnName.equalsIgnoreCase("may_value")
+                    || columnName.equalsIgnoreCase("jun_value")
+                    || columnName.equalsIgnoreCase("jul_value")
+                    || columnName.equalsIgnoreCase("aug_value")
+                    || columnName.equalsIgnoreCase("sep_value")
+                    || columnName.equalsIgnoreCase("oct_value")
+                    || columnName.equalsIgnoreCase("nov_value")
+                    || columnName.equalsIgnoreCase("dec_value")
+                    ) {//ff10 column
+                sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then (1- b.final_emissions / b.starting_emissions) else null::double precision end else 1.0::double precision end * " + columnName + " as " + columnName;
+                columnList += "," + columnName;
+            } else if (columnName.equalsIgnoreCase("jan_pctred")
+                    || columnName.equalsIgnoreCase("feb_pctred")
+                    || columnName.equalsIgnoreCase("mar_pctred")
+                    || columnName.equalsIgnoreCase("apr_pctred")
+                    || columnName.equalsIgnoreCase("may_pctred")
+                    || columnName.equalsIgnoreCase("jun_pctred")
+                    || columnName.equalsIgnoreCase("jul_pctred")
+                    || columnName.equalsIgnoreCase("aug_pctred")
+                    || columnName.equalsIgnoreCase("sep_pctred")
+                    || columnName.equalsIgnoreCase("oct_pctred")
+                    || columnName.equalsIgnoreCase("nov_pctred")
+                    || columnName.equalsIgnoreCase("dec_pctred")
+                    ) {//ff10 column
+                sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then (1- b.final_emissions / b.starting_emissions) * 100.0 else null::double precision end else " + columnName + " end as " + columnName;
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("reff")) {
                 sql += ", case when b.source_id is not null then 100 else reff end as reff";

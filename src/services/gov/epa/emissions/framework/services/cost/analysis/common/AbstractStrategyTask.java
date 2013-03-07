@@ -121,10 +121,10 @@ public abstract class AbstractStrategyTask implements Strategy {
             //process/load each input dataset
             ControlStrategyInputDataset[] controlStrategyInputDatasets = controlStrategy.getControlStrategyInputDatasets();
             for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
-                if (!controlStrategyInputDatasets[i].getInputDataset().getDatasetType().getName().contains("ORL")) {
-                    setStatus("The inventory, " + controlStrategyInputDatasets[i].getInputDataset().getName() + ", won't be processed only ORL Inventores are currently supported.");
-                    break;
-                }
+//                if (!controlStrategyInputDatasets[i].getInputDataset().getDatasetType().getName().contains("ORL")) {
+//                    setStatus("The inventory, " + controlStrategyInputDatasets[i].getInputDataset().getName() + ", won't be processed only ORL Inventores are currently supported.");
+//                    break;
+//                }
                 ControlStrategyResult result = null;
                 try {
                     result = loader.loadStrategyResult(controlStrategyInputDatasets[i]);
@@ -594,14 +594,17 @@ public abstract class AbstractStrategyTask implements Strategy {
                         Version v = version(results[i].getInputDataset().getId(), results[i].getInputDatasetVersion());
                         VersionedQuery versionedQuery = new VersionedQuery(v);
                         int month = results[i].getInputDataset().applicableMonth();
+                        String datsetTypeName = results[i].getInputDataset().getDatasetType().getName();
+                        boolean isFlatFileInventory = datsetTypeName.equals(DatasetType.FLAT_FILE_2010_POINT) 
+                            || datsetTypeName.equals(DatasetType.FLAT_FILE_2010_NONPOINT);
                         int noOfDaysInMonth = 31;
                         if (month != -1) {
                             noOfDaysInMonth = getDaysInMonth(month);
                         }
-                        String sqlAnnEmis = (month != -1 ? "coalesce(" + noOfDaysInMonth + " * i.avd_emis, i.ann_emis)" : "i.ann_emis");
+                        String sqlAnnEmis = (isFlatFileInventory ? "i.ann_value" : (month != -1 ? "coalesce(" + noOfDaysInMonth + " * i.avd_emis, i.ann_emis)" : "i.ann_emis"));
                         sql += (count > 0 ? " union all " : "") 
                             + "select '" + sector.replace("'", "''") + "'::character varying(64) as sector, "
-                            + "i.fips, "
+                            + "i." + (isFlatFileInventory ? "region_cd" : "fips") + " as fips, "
                             + "i.poll, "
                             + "sum(" + sqlAnnEmis + ") as Input_Emis, "
                             + "sum(e.Emis_Reduction) as Emis_Reduction, "
@@ -616,7 +619,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                             + "left outer join " + detailedresultTableName + " e "
                             + "on e.source_id = i.record_id "
                             + "where " + versionedQuery.query().replaceAll("delete_versions ", "i.delete_versions ").replaceAll("version ", "i.version ").replaceAll("dataset_id", "i.dataset_id") + " "
-                            + "group by i.fips, i.poll ";
+                            + "group by i." + (isFlatFileInventory ? "region_cd" : "fips") + ", i.poll ";
                         ++count;
                     }
                 }

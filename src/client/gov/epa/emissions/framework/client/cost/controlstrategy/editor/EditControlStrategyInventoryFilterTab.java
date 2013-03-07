@@ -214,12 +214,31 @@ public class EditControlStrategyInventoryFilterTab extends JPanel implements Edi
                             editControlStrategyPresenter.getDatasetType(DatasetType.FLAT_FILE_2010_NONPOINT)
                         }
                         :
-                        new DatasetType[] { 
-                            editControlStrategyPresenter.getDatasetType(DatasetType.orlPointInventory),
-                            editControlStrategyPresenter.getDatasetType(DatasetType.orlNonpointInventory),
-                            editControlStrategyPresenter.getDatasetType(DatasetType.orlNonroadInventory),
-                            editControlStrategyPresenter.getDatasetType(DatasetType.orlOnroadInventory)
-                        }
+                            (controlStrategy.getStrategyType() != null 
+                                    && 
+                                    (
+                                        controlStrategy.getStrategyType().getName().equals(StrategyType.maxEmissionsReduction)
+                                        || controlStrategy.getStrategyType().getName().equals(StrategyType.MULTI_POLLUTANT_MAX_EMISSIONS_REDUCTION)
+                                        || controlStrategy.getStrategyType().getName().equals(StrategyType.leastCost)
+                                        || controlStrategy.getStrategyType().getName().equals(StrategyType.leastCostCurve)
+                                    )
+                                    ?
+                                    new DatasetType[] { 
+                                        editControlStrategyPresenter.getDatasetType(DatasetType.orlPointInventory),
+                                        editControlStrategyPresenter.getDatasetType(DatasetType.orlNonpointInventory),
+                                        editControlStrategyPresenter.getDatasetType(DatasetType.orlNonroadInventory),
+                                        editControlStrategyPresenter.getDatasetType(DatasetType.orlOnroadInventory),
+                                        editControlStrategyPresenter.getDatasetType(DatasetType.FLAT_FILE_2010_POINT),
+                                        editControlStrategyPresenter.getDatasetType(DatasetType.FLAT_FILE_2010_NONPOINT)
+                                    }
+                                    :
+                                    new DatasetType[] { 
+                                        editControlStrategyPresenter.getDatasetType(DatasetType.orlPointInventory),
+                                        editControlStrategyPresenter.getDatasetType(DatasetType.orlNonpointInventory),
+                                        editControlStrategyPresenter.getDatasetType(DatasetType.orlNonroadInventory),
+                                        editControlStrategyPresenter.getDatasetType(DatasetType.orlOnroadInventory)
+                                    }
+                            )
                 )
             );
         try {
