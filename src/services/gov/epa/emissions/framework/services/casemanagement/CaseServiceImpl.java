@@ -864,18 +864,18 @@ public class CaseServiceImpl implements CaseService {
                             tableName = rs.getString(1);
                             dsId = rs.getInt(2);
                             version = rs.getInt(3);
-                            regName = rs.getString(4);
+                            regName = "";
                         }
                         else {
-                            log.error("No SECTORLIST file, case: " + caseQa.getName() + "\n" );
+                            log.error("No SECTORLIST file, case: \"" + caseQa.getName() + "\"\n" );
                             log.error("query -" + allRegionSectorListSql + "\n" );
-                            infoString += "\n" + caseQa.getName() + ": No SECTORLIST file. \n";
+                            infoString += "\n\"" + caseQa.getName() + "\": No SECTORLIST file. \n";
                             continue;
                         }          
                     }
                     
                     infoString += "\n";
-                    infoString += caseQa.getName() + ": " + regName + "\n";
+                    infoString += caseQa.getName() + ": \"" + regName + "\"\n";
                 } catch (SQLException e) {
                     e.printStackTrace();
                     if (session != null && session.isConnected())
@@ -952,7 +952,7 @@ public class CaseServiceImpl implements CaseService {
                                 dsIds[j] = rs.getInt(2);
                                 dsVers[j] = rs.getInt(3);
                                 regionNames[j] = rs.getString(4);
-                                infoString += "  " + sectorName + ": " + secCaseAbbrev + ", " + regName +"\n";
+                                infoString += "  " + sectorName + ": \"" + secCaseAbbrev + "\", \"" + regName +"\"\n";
                             }
                             else {
                                 rs = datasource.query().executeQuery(noRegReportTableSql);
@@ -960,12 +960,12 @@ public class CaseServiceImpl implements CaseService {
                                     sectorTables[j] = rs.getString(1);
                                     dsIds[j] = rs.getInt(2);
                                     dsVers[j] = rs.getInt(3);
-                                    regionNames[j] = rs.getString(4);
-                                    infoString += "  " + sectorName + ": " + secCaseAbbrev + ", " + regionNames[j] +"\n";
+                                    regionNames[j] = " ";
+                                    infoString += "  " + sectorName + ": \"" + secCaseAbbrev + "\", \"" + regionNames[j] +"\"\n";
                                 }
                                 else{
-                                    log.warn("No annual report table for case " + caseQa.getName() + ", sector "+ sectorName);
-                                    infoString += "  " + sectorName + ": " + secCaseAbbrev + ", No annual report. \n" ;
+                                    log.warn("No annual report table for case \"" + caseQa.getName() + "\", sector \""+ sectorName + "\"");
+                                    infoString += "  " + sectorName + ": \"" + secCaseAbbrev + "\", No annual report. \n" ;
                                 }
                             }            
                         } catch (SQLException e) {
@@ -1021,8 +1021,8 @@ public class CaseServiceImpl implements CaseService {
                         selectSql = "coalesce(case" + i + ".$$" ;
                     }
                    
-                    annemisSql += ", case"+ i + "." + caseAbbrev;
-                    headSelectSql += ", sum(" + caseAbbrev + ") as " + caseAbbrev;
+                    annemisSql += ", case"+ i + ".\"" + caseAbbrev + "\"";
+                    headSelectSql += ", sum(\"" + caseAbbrev + "\") as \"" + caseAbbrev + "\"";
                 }
                     
             }
@@ -1044,7 +1044,7 @@ public class CaseServiceImpl implements CaseService {
                 throw new EmfException("No county  state annual Reports. ");
             }
 
-            finalSql = "select " +headSelectSql + " from ( " + selectSql + finalSql + " ) as foo group by " + tailSelectSql;
+            finalSql = "select " + headSelectSql + " from ( " + selectSql + finalSql + " ) as foo group by " + tailSelectSql;
             if (DebugLevels.DEBUG_0())
                 System.out.println("Final Query -- " + finalSql);
             

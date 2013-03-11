@@ -61,9 +61,9 @@ public class SQLAnnualReportQuery {
             sql.append(" AND cases_caseinputs.region_id = emf.georegions.id" );  
             sql.append(" AND georegions.name = '" + gridName + "' " );
         }          
-        else 
-            //sql.append(" )" );
-            sql.append(" AND cases_caseinputs.region_id = emf.georegions.id " );
+//        else 
+//            //sql.append(" )" );
+//            sql.append(" AND cases_caseinputs.region_id = emf.georegions.id " );
 
         return sql.toString();
     }
@@ -113,9 +113,9 @@ public class SQLAnnualReportQuery {
             sql.append(" AND cases_casejobs.region_id = emf.georegions.id" );  
             sql.append(" AND georegions.name = '" + gridName + "' " );
         }  
-        else
-            sql.append(" AND cases_casejobs.region_id = emf.georegions.id " );
-        
+//        else
+//            sql.append(" AND cases_casejobs.region_id = emf.georegions.id " );
+//  
         if ( ! useCounty )
             sql.append(" AND datasets.dataset_type in " +
             "(select id from emf.dataset_types where name = 'Smkmerge report state annual summary (CSV)' " +
@@ -134,9 +134,9 @@ public class SQLAnnualReportQuery {
         Session session = sessionFactory.getSession();
         String colString = "";
         if ( useCounty )
-            colString = " select fips, state, county, sector, species, ann_emis as " + caseAbbrev;
+            colString = " select fips, state, county, sector, species, ann_emis as \"" + caseAbbrev + "\"";
         else
-            colString = " select state, sector, species, ann_emis as " + caseAbbrev;
+            colString = " select state, sector, species, ann_emis as \"" + caseAbbrev +"\"";
         for (int i = 0; i < tableNames.length; i++) {
             // skip the loop if a sector is not in the current case
             if ( tableNames[i] != null && dsIds[i] !=null) {
