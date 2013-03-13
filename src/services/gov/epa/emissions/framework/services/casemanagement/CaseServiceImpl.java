@@ -867,15 +867,15 @@ public class CaseServiceImpl implements CaseService {
                             regName = "";
                         }
                         else {
-                            log.error("No SECTORLIST file, case: \"" + caseQa.getName() + "\"\n" );
+                            log.error("No SECTORLIST file, case: \"" + caseAbbrev + "\"\n" );
                             log.error("query -" + allRegionSectorListSql + "\n" );
-                            infoString += "\n\"" + caseQa.getName() + "\": No SECTORLIST file. \n";
+                            infoString += "\n\"" + caseAbbrev + "\": No SECTORLIST file. \n";
                             continue;
                         }          
                     }
                     
                     infoString += "\n";
-                    infoString += caseQa.getName() + ": \"" + regName + "\"\n";
+                    infoString += caseAbbrev + ": \"" + regName + "\"\n";
                 } catch (SQLException e) {
                     e.printStackTrace();
                     if (session != null && session.isConnected())
@@ -937,7 +937,7 @@ public class CaseServiceImpl implements CaseService {
                     String secCaseAbbrev = mapSectorCase.get(sectorName);
                     if ( secCaseAbbrev != null ){
                         reportTableSql = new SQLAnnualReportQuery(sessionFactory).getReportTableQuery(sectorName, 
-                                secCaseAbbrev, regName, useCounty);
+                                secCaseAbbrev, gridName, useCounty);
                         noRegReportTableSql = new SQLAnnualReportQuery(sessionFactory).getReportTableQuery(sectorName, 
                                 secCaseAbbrev, "", useCounty);
                         if (DebugLevels.DEBUG_0())
@@ -960,11 +960,11 @@ public class CaseServiceImpl implements CaseService {
                                     sectorTables[j] = rs.getString(1);
                                     dsIds[j] = rs.getInt(2);
                                     dsVers[j] = rs.getInt(3);
-                                    regionNames[j] = " ";
+                                    regionNames[j] = rs.getString(4);;
                                     infoString += "  " + sectorName + ": \"" + secCaseAbbrev + "\", \"" + regionNames[j] +"\"\n";
                                 }
                                 else{
-                                    log.warn("No annual report table for case \"" + caseQa.getName() + "\", sector \""+ sectorName + "\"");
+                                    log.warn("No annual report table for case \"" + caseAbbrev + "\", sector \""+ sectorName + "\"");
                                     infoString += "  " + sectorName + ": \"" + secCaseAbbrev + "\", No annual report. \n" ;
                                 }
                             }            

@@ -113,9 +113,9 @@ public class SQLAnnualReportQuery {
             sql.append(" AND cases_casejobs.region_id = emf.georegions.id" );  
             sql.append(" AND georegions.name = '" + gridName + "' " );
         }  
-//        else
-//            sql.append(" AND cases_casejobs.region_id = emf.georegions.id " );
-//  
+        else
+            sql.append(" AND cases_casejobs.region_id = emf.georegions.id " );
+  
         if ( ! useCounty )
             sql.append(" AND datasets.dataset_type in " +
             "(select id from emf.dataset_types where name = 'Smkmerge report state annual summary (CSV)' " +

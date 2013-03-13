@@ -89,7 +89,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
     }
 
     public void display() {
-        super.setLabel("Compare Case");
+        super.setLabel("Compare Case Annual Reports");
         layout.removeAll();
         doLayout(layout);
 
@@ -106,7 +106,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         gridNamesCombo.setToolTipText("Select a region with grid name on the end in (). ");
         layoutGenerator.addLabelWidgetPair("Grid Name:", gridNamesCombo, panel);
         
-        layoutGenerator.addLabelWidgetPair("Sector: ", sectors(), panel);
+        layoutGenerator.addLabelWidgetPair("Sectors: ", sectors(), panel);
         
         //layoutGenerator.addLabelWidgetPair("Report Dimensions:", reports(), panel);
         // Lay out the panel.
@@ -183,12 +183,12 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
     
     private JPanel inforPanel(){
         JPanel panel = new JPanel();
-        infoArea = new TextArea("Information", "", 20, 3);
+        infoArea = new TextArea("Messages: ", "", 20, 3);
         
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(infoArea);
         descScrollableTextArea.setPreferredSize(new Dimension(240, 120));        
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(new JLabel("Information: "));
+        panel.add(new JLabel("Messages: "));
         panel.add(descScrollableTextArea);
         
         JPanel panel1 = new JPanel();
@@ -209,7 +209,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(whereArea);
         descScrollableTextArea.setPreferredSize(new Dimension(150, 70));        
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(new JLabel("Where: "));
+        panel.add(new JLabel("Where Filter: "));
         panel.add(descScrollableTextArea);
         
         panel.add(Box.createRigidArea(new Dimension(10,0)));
@@ -225,7 +225,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
          
         JScrollPane inReportScrollPane = new JScrollPane(validColsWidget, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        inReportScrollPane.setPreferredSize(new Dimension(90, 70));
+        inReportScrollPane.setPreferredSize(new Dimension(90, 90));
         JPanel inPanel = new JPanel();
         inPanel.setLayout(new BoxLayout(inPanel, BoxLayout.Y_AXIS));
         inPanel.add(new JLabel("Valid Columns: "));
@@ -378,7 +378,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
                     String inforString = presenter.showCaseQA(selectedRegion.getName(), selectedSectors, repDims, whereClause);
                     infoArea.setText(inforString);
                 } catch (EmfException e) {            
-                    infoArea.setText("Errors: \n" + e.getMessage());
+                    infoArea.setText("ERROR: \n" + e.getMessage());
                 }
             }
         };
