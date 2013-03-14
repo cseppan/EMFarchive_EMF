@@ -34,37 +34,26 @@ public class SQLAnnualReportQuery {
     
     public String getSectorListTableQuery(int caseId, String gridName) {
         StringBuilder sql = new StringBuilder();
-//        for (int i = 0; i < caseIds.length; ++i) {
-//            if ( i > 0 ) sql.append( " union all " );
+
         sql.append(" select ");
         sql.append(" internal_sources.table_name, " );
         sql.append(" cases_caseinputs.dataset_id, ");
         sql.append(" versions.version, ");
-        sql.append(" georegions.name" );
+        sql.append(" coalesce(emf.georegions.name, ' ') as gridname" );
         sql.append(" FROM ");
-        sql.append(" emf.internal_sources, " );
-        sql.append(" cases.input_envt_vars, ");
-        sql.append(" cases.cases, ");
-        sql.append(" cases.cases_caseinputs, ");
-        sql.append(" emf.versions, ");
-        sql.append(" emf.georegions ");
-        
-        sql.append(" WHERE ");
-        sql.append(" input_envt_vars.id = cases_caseinputs.envt_vars_id " );
-        sql.append(" AND cases.id = cases_caseinputs.case_id ");
-        sql.append(" AND input_envt_vars.name = 'SECTORLIST' ");
-        sql.append(" AND internal_sources.dataset_id = cases_caseinputs.dataset_id ");
-        sql.append(" AND cases_caseinputs.version_id = versions.id ");
-        sql.append(" AND cases.id = cases_caseinputs.case_id ");
-        sql.append(" AND cases.id = " + caseId );
-        if ( ! gridName.trim().equalsIgnoreCase("")){
-            sql.append(" AND cases_caseinputs.region_id = emf.georegions.id" );  
-            sql.append(" AND georegions.name = '" + gridName + "' " );
-        }          
-//        else 
-//            //sql.append(" )" );
-//            sql.append(" AND cases_caseinputs.region_id = emf.georegions.id " );
+        sql.append(" emf.internal_sources " );
+        sql.append(" inner join cases.cases_caseinputs ");
+        sql.append(" on internal_sources.dataset_id = cases_caseinputs.dataset_id  ");
+        sql.append(" inner join cases.input_envt_vars  ");
+        sql.append(" on input_envt_vars.id = cases_caseinputs.envt_vars_id  AND input_envt_vars.name = 'SECTORLIST' ");
+        sql.append(" inner join emf.versions on cases_caseinputs.version_id = versions.id ");
+        sql.append(" inner join cases.cases on cases.id = cases_caseinputs.case_id  AND cases.id = " + caseId );
 
+        sql.append(" LEFT outer join emf.georegions ");
+        sql.append(" on  cases_caseinputs.region_id = emf.georegions.id  " );
+    
+        sql.append(" AND georegions.name = '" + gridName + "' " );
+       
         return sql.toString();
     }
     

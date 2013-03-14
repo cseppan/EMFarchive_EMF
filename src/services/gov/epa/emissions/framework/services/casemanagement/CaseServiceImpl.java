@@ -842,7 +842,7 @@ public class CaseServiceImpl implements CaseService {
                 Case caseQa = dao.getCase(caseIds[i], session);
                 String caseAbbrev = caseQa.getAbbreviation().getName();
                 String sectorListSql = new SQLAnnualReportQuery(sessionFactory).getSectorListTableQuery(caseIds[i], gridName);
-                String allRegionSectorListSql = new SQLAnnualReportQuery(sessionFactory).getSectorListTableQuery(caseIds[i], "");
+                //String allRegionSectorListSql = new SQLAnnualReportQuery(sessionFactory).getSectorListTableQuery(caseIds[i], "");
                 ResultSet rs = null;
                 String tableName = "";
                 Integer dsId;
@@ -857,22 +857,14 @@ public class CaseServiceImpl implements CaseService {
                         tableName = rs.getString(1);
                         dsId = rs.getInt(2);
                         version = rs.getInt(3);
+                        regName = rs.getString(4);
                     }
                     else {
-                        rs = datasource.query().executeQuery(allRegionSectorListSql);
-                        if ( rs.next() ) { 
-                            tableName = rs.getString(1);
-                            dsId = rs.getInt(2);
-                            version = rs.getInt(3);
-                            regName = "";
-                        }
-                        else {
-                            log.error("No SECTORLIST file, case: \"" + caseAbbrev + "\"\n" );
-                            log.error("query -" + allRegionSectorListSql + "\n" );
-                            infoString += "\n\"" + caseAbbrev + "\": No SECTORLIST file. \n";
-                            continue;
-                        }          
-                    }
+                        log.error("No SECTORLIST file, case: \"" + caseAbbrev + "\"\n" );
+                        log.error("query -" + sectorListSql + "\n" );
+                        infoString += "\n\"" + caseAbbrev + "\": No SECTORLIST file. \n";
+                        continue;
+                    }          
                     
                     infoString += "\n";
                     infoString += caseAbbrev + ": \"" + regName + "\"\n";
@@ -880,7 +872,7 @@ public class CaseServiceImpl implements CaseService {
                     e.printStackTrace();
                     if (session != null && session.isConnected())
                         session.close();  
-                    log.error("Could not execute getting sectorlist query -" + allRegionSectorListSql + "\n" + e.getMessage());
+                    log.error("Could not execute getting sectorlist query -" + sectorListSql + "\n" + e.getMessage());
                     throw new EmfException("Could not execute getting sectorlist query. ");
                 } finally {
                     if (rs != null)
@@ -952,7 +944,7 @@ public class CaseServiceImpl implements CaseService {
                                 dsIds[j] = rs.getInt(2);
                                 dsVers[j] = rs.getInt(3);
                                 regionNames[j] = rs.getString(4);
-                                infoString += "  " + sectorName + ": \"" + secCaseAbbrev + "\", \"" + regName +"\"\n";
+                                infoString += "  " + sectorName + ": \"" + secCaseAbbrev + "\", \"" + regionNames[j] +"\"\n";
                             }
                             else {
                                 rs = datasource.query().executeQuery(noRegReportTableSql);
@@ -960,7 +952,7 @@ public class CaseServiceImpl implements CaseService {
                                     sectorTables[j] = rs.getString(1);
                                     dsIds[j] = rs.getInt(2);
                                     dsVers[j] = rs.getInt(3);
-                                    regionNames[j] = rs.getString(4);;
+                                    regionNames[j] = rs.getString(4);
                                     infoString += "  " + sectorName + ": \"" + secCaseAbbrev + "\", \"" + regionNames[j] +"\"\n";
                                 }
                                 else{
