@@ -334,7 +334,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         });
         crudPanel.add(compareButton);
         
-        Button qaButton = new Button("Compare Outputs", new AbstractAction() {
+        Button qaButton = new Button("Compare Reports", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 clearMsgPanel();
                 try {
@@ -381,7 +381,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
             ids[i] = ((Case)cases.get(i)).getId();
             selectedCases[i] = (Case)cases.get(i);
         }
-        CompareCaseWindow view = new CompareCaseWindow(desktopManager, selectedCases);
+        CompareCaseWindow view = new CompareCaseWindow(desktopManager, selectedCases, parentConsole, session );
         presenter.doQA(ids, view);
     }
 

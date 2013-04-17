@@ -55,9 +55,11 @@ public class CompareCasePresenter {
         return managerPresenter.getSelectedCategory();
     }
     
-    public String showCaseQA(String gridName, Sector[] sectors, String[] repDims, String whereClause) throws EmfException{
+    public String showCaseQA(String gridName, Sector[] sectors, String[] repDims, 
+            String whereClause, String serverDir) throws EmfException{
         //System.out.println("sector name: " + sector + " gridname: " + gridName);
-        return managerPresenter.viewCaseQaReports(ids, gridName, sectors, repDims, whereClause);
+        return managerPresenter.viewCaseQaReports(session.user(), ids, gridName, sectors, 
+                repDims, whereClause, serverDir);
     }
 
 }

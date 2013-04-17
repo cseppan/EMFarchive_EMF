@@ -22,6 +22,8 @@ public class QueryToString {
     protected String lineFeeder = System.getProperty("line.separator");
 
     private String columnNameList = "";
+    
+    private int rows; 
 
     public QueryToString(DbServer dbServer, String sqlQuery, String delimiter) throws ExporterException {
         this.sqlQuery = sqlQuery;
@@ -49,7 +51,7 @@ public class QueryToString {
             // NOTE Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println(output.toString());
+        //System.out.println(output.toString());
         return output.toString();
     }
 
@@ -64,13 +66,14 @@ public class QueryToString {
             ResultSetMetaData md = rs.getMetaData();
             int columnCount = md.getColumnCount();
             int startingColumn=1;
-
+            rows = 0;
             writeHeaderRow(md, startingColumn, columnCount);
 
             String row = "";
             String value = "";
                        
             while (rs.next()) {
+                rows = rows + 1;
                 row = "";
                 for (int i = startingColumn; i <= columnCount; i++) {
                     value = rs.getString(i);
@@ -108,5 +111,9 @@ public class QueryToString {
             colNames += delimiter + "extra";
         }
         output.append(colTypes + lineFeeder + colNames + lineFeeder);
+    }
+    
+    public int getRows(){
+        return rows; 
     }
 }

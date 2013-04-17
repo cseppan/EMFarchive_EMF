@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterN
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
 import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.qa.QAProgramRunner;
 import gov.epa.emissions.framework.services.qa.QueryToString;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
@@ -60,10 +61,6 @@ public class CaseServiceImpl implements CaseService {
     
     private CaseAssistanceService assistanceService;
     
-    private Datasource datasource;
-    
-    private DbServer dbServer;
-
     public CaseServiceImpl() {
         this(HibernateSessionFactory.get(), DbServerFactory.get());
     }
@@ -795,268 +792,19 @@ public class CaseServiceImpl implements CaseService {
         }
     }
     
-    public synchronized String[] getCaseQaReports(int[] caseIds, String gridName, 
-            Sector[] sectors, String[] repDims, String whereClause) throws EmfException {
+    public synchronized String[] getCaseQaReports(User user, int[] caseIds, String gridName, 
+            Sector[] sectors, String[] repDims, String whereClause, String serverDir) throws EmfException {
         // get dataset ids by using dataset names derived from gridName, case abbrev, 
         // sectors in case sectorlist input, state/county, speciation, and so on 
         //int[] datasetIds = getDatasetIds()
+        long startTime = System.currentTimeMillis();
         
-        this.dbServer = dbFactory.getDbServer();
-        this.datasource = dbServer.getEmissionsDatasource();
-        Session session = sessionFactory.getSession();
-        String infoString = "";
-        String selectSql = "";
-        String headSelectSql = "";
-        String tailSelectSql = "";
-        String finalSql = " ";
-        String annemisSql = "";
-        Boolean useCounty = false;
-        
-        String whereSql = whereClause.trim(); 
-        if (whereSql.length() > 0)
-            whereSql = whereSql.toLowerCase().startsWith("where")? 
-                    whereSql:" where " + whereSql;
-         
-        List<String> repDimsList = Arrays.asList(repDims);
-        if ( repDimsList.contains("County") ) 
-            useCounty = true;
-        
-        
-        // Set up the final select header
-        if ( useCounty )
-            headSelectSql += "Fips, ";
-        for ( int i =0; i<repDims.length; i++) {
-            headSelectSql += repDims[i] + ", ";
-        }
-        tailSelectSql = headSelectSql.substring(0, headSelectSql.length()-2);
-        headSelectSql = tailSelectSql;
-        try {
-            String fipsRunningSelectList = "";
-            String countyRunningSelectList = "";
-            String stateRunningSelectList = "";
-            String sectorRunningSelectList = "";
-            String speciesRunningSelectList = "";
-
-            for ( int i =0; i<caseIds.length; i++) {
-                // 1. Get sectorList table name and dataset version
-                Case caseQa = dao.getCase(caseIds[i], session);
-                String caseAbbrev = caseQa.getAbbreviation().getName();
-                String sectorListSql = new SQLAnnualReportQuery(sessionFactory).getSectorListTableQuery(caseIds[i], gridName);
-                //String allRegionSectorListSql = new SQLAnnualReportQuery(sessionFactory).getSectorListTableQuery(caseIds[i], "");
-                ResultSet rs = null;
-                String tableName = "";
-                Integer dsId;
-                Integer version;
-                String regName= gridName;
-            
-                if (DebugLevels.DEBUG_0())
-                    System.out.println(sectorListSql);
-                try {
-                    rs = datasource.query().executeQuery(sectorListSql);
-                    if ( rs.next() ) { 
-                        tableName = rs.getString(1);
-                        dsId = rs.getInt(2);
-                        version = rs.getInt(3);
-                        regName = rs.getString(4);
-                    }
-                    else {
-                        log.error("No SECTORLIST file, case: \"" + caseAbbrev + "\"\n" );
-                        log.error("query -" + sectorListSql + "\n" );
-                        infoString += "\n\"" + caseAbbrev + "\": No SECTORLIST file. \n";
-                        continue;
-                    }          
-                    
-                    infoString += "\n";
-                    infoString += caseAbbrev + ": \"" + regName + "\"\n";
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    if (session != null && session.isConnected())
-                        session.close();  
-                    log.error("Could not execute getting sectorlist query -" + sectorListSql + "\n" + e.getMessage());
-                    throw new EmfException("Could not execute getting sectorlist query. ");
-                } finally {
-                    if (rs != null)
-                        try {
-                            rs.close();
-                        } catch (SQLException e) {
-                            //
-                        }     
-                }
-
-                //2. Get sector names and its source cases from SECTORLIST file, 
-                //   Save them to a map
-                String sectorMergeSql="";
-                HashMap<String, String> mapSectorCase = new HashMap<String, String>();
-
-                try {
-                    sectorMergeSql = new SQLAnnualReportQuery(sessionFactory).getSectorsCasesQuery(tableName, dsId, version);
-                    if (DebugLevels.DEBUG_0())
-                        System.out.println("Extract sectorlist table  -- " +sectorMergeSql);
-                    
-                    rs = datasource.query().executeQuery(sectorMergeSql);
-                    while ( rs.next() ) { 
-                        String cSector = rs.getString(1);
-                        String sCase = rs.getString(2);
-                        mapSectorCase.put(cSector, sCase);
-                        if (DebugLevels.DEBUG_0())
-                            System.out.println("mapping: " + cSector + "  " + sCase  );
-                    }
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    log.error("Could not execute extracting sectlist query -" + sectorMergeSql + "\n" + e.getMessage());
-                    throw new EmfException("Could not execute extracting sectlist query. ");
-                } finally {
-                    if (rs != null)
-                        try {
-                            rs.close();
-                        } catch (SQLException e) {
-                            //
-                        }
-                }
-
-                //3. Create SQL to get Annual Report Dataset table name
-                String reportTableSql = "";
-                String noRegReportTableSql = "";
-
-                String[] sectorTables = new String[sectors.length];
-                Integer[] dsIds =  new Integer[sectors.length];
-                Integer[] dsVers = new Integer[sectors.length];
-                String[] regionNames = new String[sectors.length];
-
-                for ( int j = 0; j < sectors.length; j++ ) {
-                    String sectorName = sectors[j].getName();
-                    String secCaseAbbrev = mapSectorCase.get(sectorName);
-                    if ( secCaseAbbrev != null ){
-                        reportTableSql = new SQLAnnualReportQuery(sessionFactory).getReportTableQuery(sectorName, 
-                                secCaseAbbrev, gridName, useCounty);
-                        noRegReportTableSql = new SQLAnnualReportQuery(sessionFactory).getReportTableQuery(sectorName, 
-                                secCaseAbbrev, "", useCounty);
-                        if (DebugLevels.DEBUG_0())
-                            System.out.println("Get report table  -- " + reportTableSql);
-                        
-                        rs = null;
-                        try {
-                            rs = datasource.query().executeQuery(reportTableSql);
-
-                            if ( rs.next() ) { 
-                                sectorTables[j] = rs.getString(1);
-                                dsIds[j] = rs.getInt(2);
-                                dsVers[j] = rs.getInt(3);
-                                regionNames[j] = rs.getString(4);
-                                infoString += "  " + sectorName + ": \"" + secCaseAbbrev + "\", \"" + regionNames[j] +"\"\n";
-                            }
-                            else {
-                                rs = datasource.query().executeQuery(noRegReportTableSql);
-                                if ( rs.next() ) { 
-                                    sectorTables[j] = rs.getString(1);
-                                    dsIds[j] = rs.getInt(2);
-                                    dsVers[j] = rs.getInt(3);
-                                    regionNames[j] = rs.getString(4);
-                                    infoString += "  " + sectorName + ": \"" + secCaseAbbrev + "\", \"" + regionNames[j] +"\"\n";
-                                }
-                                else{
-                                    log.warn("No annual report table for case \"" + caseAbbrev + "\", sector \""+ sectorName + "\"");
-                                    infoString += "  " + sectorName + ": \"" + secCaseAbbrev + "\", No annual report. \n" ;
-                                }
-                            }            
-                        } catch (SQLException e) {
-                            if (session != null && session.isConnected())
-                                session.close();  
-                            e.printStackTrace();
-                            log.error("Could not execute query -" + reportTableSql + "\n" + e.getMessage());
-                            throw new EmfException("Could not get annual report tables.  ");
-                        } finally {
-                            if (rs != null)
-                                try {
-                                    rs.close();
-                                } catch (SQLException e) {
-                                    //
-                                }     
-                        }
-                    }
-                    else
-                        infoString += "  " + sectorName + ": Not in sectorlist table. \n";
-                }
-                //4. Extract info from Annual Report Dataset table
-                
-                String annualReportSql = new SQLAnnualReportQuery(sessionFactory).getSectorsReportsQuery(sectorTables, 
-                        dsIds, dsVers, caseAbbrev, whereSql, useCounty );
-                //System.out.println("annual Query -- " + annualReportSql);
-                if ( ! annualReportSql.trim().isEmpty()) {
-                    
-                    if ( ! finalSql.trim().isEmpty()){
-                        finalSql += "  full join (" + annualReportSql + " ) as case" + i +
-                        " on coalesce(case" + i + ".state, '')= coalesce(" + stateRunningSelectList + ", '') " +
-                        " and coalesce(case" + i + ".sector, '')= coalesce(" + sectorRunningSelectList + ", '') " +
-                        " and coalesce(case" + i + ".species, '')= coalesce(" + speciesRunningSelectList + ", '') ";
-
-                        if (useCounty)
-                            finalSql += " and coalesce(case" + i + ".fips, '')= coalesce(" + fipsRunningSelectList + ", '') " +
-                            " and coalesce(case" + i + ".county, '')= coalesce(" + countyRunningSelectList + ", '') ";
-
-                        fipsRunningSelectList += ",case" + i + ".fips";
-                        countyRunningSelectList = ",case" + i + ".county";
-                        stateRunningSelectList += ",case" + i + ".state";
-                        sectorRunningSelectList += ",case" + i + ".sector";
-                        speciesRunningSelectList += ",case" + i + ".species";
-                        
-                        selectSql += ", case" + i + ".$$" ;
-                    }
-                    else {
-                        finalSql += "  from (" + annualReportSql + " ) as case" + i ;
-                        fipsRunningSelectList += "case" + i + ".fips";
-                        countyRunningSelectList = "case" + i + ".county";
-                        stateRunningSelectList += "case" + i + ".state";
-                        sectorRunningSelectList += "case" + i + ".sector";
-                        speciesRunningSelectList += "case" + i + ".species";
-                        selectSql = "coalesce(case" + i + ".$$" ;
-                    }
-                   
-                    annemisSql += ", case"+ i + ".\"" + caseAbbrev + "\"";
-                    headSelectSql += ", sum(\"" + caseAbbrev + "\") as \"" + caseAbbrev + "\"";
-                }
-                    
-            }
-            if ( useCounty )
-                selectSql = "select " + selectSql.replace("$$", "fips") + ") as fips, " +
-                selectSql.replace("$$", "state") + ") as state, " +
-                selectSql.replace("$$", "county") + ") as county, " +
-                selectSql.replace("$$", "sector") + ") as sector, " +
-                selectSql.replace("$$", "species") + ") as species " ;
-            else
-                selectSql = "select " + selectSql.replace("$$", "state") + ") as state, " +
-                selectSql.replace("$$", "sector") + ") as sector, " +
-                selectSql.replace("$$", "species") + ") as species " ; 
-            selectSql = selectSql + annemisSql;
-            
-            if (  finalSql.trim().isEmpty()){
-                if ( useCounty)
-                    throw new EmfException("No county annual Reports. ");
-                throw new EmfException("No county  state annual Reports. ");
-            }
-
-            finalSql = "select " + headSelectSql + " from ( " + selectSql + finalSql + " ) as foo group by " + tailSelectSql;
-            if (DebugLevels.DEBUG_0())
-                System.out.println("Final Query -- " + finalSql);
-            
-            String tableQuery = new QueryToString(dbServer, finalSql, ",").toString();
-            return new String[]{tableQuery, infoString};
-            
-        } catch (RuntimeException e) {
-            log.error("Could not retrieve annual Reports: " + e.getMessage(), e);
-            throw new EmfException("Could not retrieve annual Reports. \n" + e.getMessage());
-        } catch (ExporterException e) {
-            log.error("Could not retrieve annual Reports: " + e.getMessage(), e);
-            throw new EmfException("Could not retrieve annual Reports. \n" + e.getMessage());
-        } finally {
-            try {
-                if (dbServer != null && dbServer.isConnected())
-                    dbServer.disconnect();
-            } catch (Exception e) {
-                throw new EmfException("ManagedCaseService: error closing db server. " + e.getMessage());
-            }
-        }
+        RunQACaseReports runQACaseReports = new RunQACaseReports(user, dbFactory, dao, 
+                sessionFactory, serverDir);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Ran QA Case Report in " + ((endTime - startTime) / (1000))  + " secs");
+        return runQACaseReports.runQA(caseIds, gridName, sectors, 
+                repDims, whereClause);
     }
     
 }

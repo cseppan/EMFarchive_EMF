@@ -1,25 +1,33 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
-import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.buttons.AddButton;
+import gov.epa.emissions.commons.gui.buttons.BrowseButton;
 import gov.epa.emissions.commons.gui.buttons.CancelButton;
 import gov.epa.emissions.commons.gui.buttons.OKButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfFileInfo;
+import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.ui.Border;
+import gov.epa.emissions.framework.ui.EmfFileChooser;
+import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -31,9 +39,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 
@@ -46,6 +56,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
     private SingleLineMessagePanel messagePanel;
 
     private ComboBox gridNamesCombo;
+    private JTextField serverfolder;
     
     private ListWidget sectorsListWidget;
     private ListWidget inReportWidget;
@@ -56,14 +67,19 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
     private TextArea infoArea;
     
     private Case[] cases;
+    private EmfConsole parentConsole;
+    private DataCommonsService service;
+    private boolean serverFolderExist;
     
     private Dimension defaultDimension = new Dimension(255, 22);
 
-    public CompareCaseWindow(DesktopManager desktopManager, Case[] cases) {
-        super("Compare Cases Outputs", new Dimension(450, 600), desktopManager);
+    public CompareCaseWindow(DesktopManager desktopManager, Case[] cases, EmfConsole parentConsole, EmfSession session) {
+        super("Compare Case Report", new Dimension(500, 600), desktopManager);
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         this.cases = cases;
+        this.parentConsole = parentConsole;
+        this.service = session.dataCommonsService();
         super.getContentPane().add(layout);
     }
 
@@ -108,9 +124,23 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         
         layoutGenerator.addLabelWidgetPair("Sectors: ", sectors(), panel);
         
-        //layoutGenerator.addLabelWidgetPair("Report Dimensions:", reports(), panel);
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+        serverfolder = new JTextField();
+        serverfolder.setPreferredSize(defaultDimension);
+        serverfolder.setName("serverfolder");
+        Button serverButton = new BrowseButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                messagePanel.clear();
+                selectFolder(serverfolder);
+            }
+        });
+        Icon icon = new ImageResources().open("Open a folder");
+        serverButton.setIcon(icon);
+
+        JPanel folderPanel = new JPanel(new BorderLayout(2, 0));
+        folderPanel.add(serverfolder, BorderLayout.LINE_START);
+        folderPanel.add(serverButton, BorderLayout.LINE_END);
+        layoutGenerator.addLabelWidgetPair("Server Folder", folderPanel, panel);
+        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 10, 0, // initialX, initialY
                 10, 10);// xPad, yPad
         
@@ -203,7 +233,7 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
     private JPanel whereTextPanel(){
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        whereArea = new TextArea("where clause", "", 20, 3);
+        whereArea = new TextArea("where Filter", "", 20, 3);
         whereArea.setToolTipText("ie: where species = 'NO' ");
 
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(whereArea);
@@ -348,6 +378,52 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
     private Action okAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
+//                messagePanel.clear();
+//                infoArea.setText("");
+//                resetChanges();
+//                GeoRegion selectedRegion = (GeoRegion)gridNamesCombo.getSelectedItem();
+//                Sector[] selectedSectors= Arrays.asList(sectorsListWidget.getSelectedValues()).toArray(new Sector[0]);
+//                String[] repDims = Arrays.asList(inReportWidget.getAllElements()).toArray(new String[0]);
+//                if (selectedRegion == null || selectedRegion.getName().equalsIgnoreCase("Select one"))
+//                {
+//                    messagePanel.setError("Please select a grid.");
+//                    return;
+//                }                
+//                    
+//                if ( selectedSectors == null || selectedSectors.length == 0 ) {
+//                    messagePanel.setError("Please select a valid sector.");
+//                    return;
+//                } else if (selectedSectors[0].getName().equalsIgnoreCase("All")) {
+//                    selectedSectors= getCaseSectors().toArray(new Sector[0]);
+//                }
+//                
+//                String whereClause = whereArea.getText().trim();
+//                
+//                if ( repDims == null || repDims.length == 0 ) {
+//                    messagePanel.setError("Please select columns included.");
+//                    return;
+//                }  
+//                
+//                String serverDir = serverfolder.getText();
+//                try {
+//                    checkFolderField();
+//                    if (serverFolderExist){
+//                        String inforString = presenter.showCaseQA(selectedRegion.getName(), 
+//                                selectedSectors, repDims, whereClause, serverDir);
+//                        infoArea.setText(inforString);
+//                    }
+//                } catch (EmfException e) {            
+//                    infoArea.setText("ERROR: \n" + e.getMessage());
+//                }
+                kickPopulateThread();
+            }
+        };
+        return action;
+    }
+    
+    private void kickPopulateThread() {
+        Thread populateThread = new Thread(new Runnable() {
+            public void run() {
                 messagePanel.clear();
                 infoArea.setText("");
                 resetChanges();
@@ -359,31 +435,40 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
                     messagePanel.setError("Please select a grid.");
                     return;
                 }                
-                    
+
                 if ( selectedSectors == null || selectedSectors.length == 0 ) {
                     messagePanel.setError("Please select a valid sector.");
                     return;
                 } else if (selectedSectors[0].getName().equalsIgnoreCase("All")) {
                     selectedSectors= getCaseSectors().toArray(new Sector[0]);
                 }
-                
+
                 String whereClause = whereArea.getText().trim();
-                
+
                 if ( repDims == null || repDims.length == 0 ) {
                     messagePanel.setError("Please select columns included.");
                     return;
                 }  
-                
+
+                String serverDir = serverfolder.getText();
                 try {
-                    String inforString = presenter.showCaseQA(selectedRegion.getName(), selectedSectors, repDims, whereClause);
-                    infoArea.setText(inforString);
+                    checkFolderField();
+                    if (serverFolderExist){
+                        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                        String inforString = presenter.showCaseQA(selectedRegion.getName(), 
+                                selectedSectors, repDims, whereClause, serverDir);
+                        infoArea.setText(inforString);
+                    }
                 } catch (EmfException e) {            
                     infoArea.setText("ERROR: \n" + e.getMessage());
+                } finally {
+                    setCursor(Cursor.getDefaultCursor());
                 }
             }
-        };
-        return action;
+        });
+        populateThread.start();
     }
+
 
     public void windowClosing() {
         doClose();
@@ -421,6 +506,44 @@ public class CompareCaseWindow extends DisposableInteralFrame implements Compare
         panel.add(container, BorderLayout.CENTER);
 
         return panel;
+    }
+    
+    private void selectFolder(JTextField folder) {
+        
+        EmfFileInfo initDir = new EmfFileInfo(folder.getText(), true, true);
+
+        EmfFileChooser chooser = new EmfFileChooser(initDir, new EmfFileSystemView(service));
+        chooser.setTitle("Select a folder for exported case settings");
+        int option = chooser.showDialog(parentConsole, "Select a folder");
+
+        EmfFileInfo file = (option == EmfFileChooser.APPROVE_OPTION) ? chooser.getSelectedDir() : null;
+        if (file == null)
+            return;
+
+        if (file.isDirectory()) {
+            folder.setText(file.getAbsolutePath());
+        }
+    }
+    
+    private void checkFolderField() throws EmfException {
+        String serverSide = serverfolder.getText();
+
+        if ( serverSide == null || serverSide.trim().isEmpty() || serverSide.trim().length() == 1)
+            throw new EmfException("Please specify a valid server or local folder.");
+        
+        if (serverSide != null && !serverSide.trim().isEmpty() && serverSide.trim().length() > 1  ){
+            if (serverSide.contains("/home/"))
+                throw new EmfException("The EMF (tomcat user) cannot export data into a home directory.");
+            
+            if ( serverSide.charAt(0) != '/' && serverSide.charAt(1) != ':' )
+                throw new EmfException("Specified server folder is not in a right format (ex. C:\\, /home, etc.).");
+
+            if ( serverSide.charAt(0) != '/' && !Character.isLetter(serverSide.charAt(0)))
+                throw new EmfException("Specified server folder is not in a right format (ex. C:\\).");
+            serverFolderExist = true;
+        }
+        else 
+            serverFolderExist = false;
     }
     
     public void addSector(Sector sector) {

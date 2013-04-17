@@ -8,6 +8,7 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
@@ -184,35 +185,35 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
         view.displayCaseComparisonResult("Case Comparison", localFile.getAbsolutePath());
     }
     
-    public String viewCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims, String whereClause) throws EmfException {
+    public String viewCaseQaReports(User user, int[] caseIds, String gridName, Sector[] sectors, 
+            String[] repDims, String whereClause, String serverDir) throws EmfException {
         String message = "";
         if (caseIds == null || caseIds.length == 0)
             throw new EmfException("No cases to compare.");
           
-        File localFile = new File(tempQAStepFilePath());
+        //File localFile = new File(tempQAStepFilePath());
         try {
-            if (!localFile.exists()) {
-                Writer output = new BufferedWriter(new FileWriter(localFile));
-                try {
-                    String[] reportsInfo = getCaseQaReports(caseIds, gridName, sectors, repDims, whereClause);   
-                    output.write(  
-                            ""+ reportsInfo[0] 
-                    );
-                    
-                    message = reportsInfo[1];
-                }catch (Exception e) {
-                    e.printStackTrace();
-                    throw new EmfException( e.getMessage());
-                }finally {
-                    output.close();
-                }
+            //if (!localFile.exists()) {
+            //Writer output = new BufferedWriter(new FileWriter(localFile));
+            try {
+                String[] reportsInfo = getCaseQaReports(user, caseIds, gridName, sectors, 
+                        repDims, whereClause, serverDir);   
+                //output.write(  ""+ reportsInfo[0] );
+
+                message = reportsInfo[1];
+            }catch (Exception e) {
+                //e.printStackTrace();
+                throw new EmfException( e.getMessage());
+            }finally {
+                //output.close();
             }
+            //}
         } catch (Exception e) {
             e.printStackTrace();
             throw new EmfException(e.getMessage());
         }
         
-        view.displayCaseComparisonResult("Summary Case Output", localFile.getAbsolutePath());
+        //view.displayCaseComparisonResult("Summary Case Report", localFile.getAbsolutePath());
         return message;
 
 //        view.displayCaseComparisonResult("Summary Case Output", localFile.getAbsolutePath());
@@ -224,8 +225,10 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
         return service().getCaseComparisonResult(caseIds);
     }
     
-    private String[] getCaseQaReports(int[] caseIds, String gridName, Sector[] sectors, String[] repDims, String whereClause) throws EmfException {
-        return service().getCaseQaReports(caseIds, gridName, sectors, repDims, whereClause);
+    private String[] getCaseQaReports(User user, int[] caseIds, String gridName, Sector[] sectors, 
+            String[] repDims, String whereClause, String serverDir) throws EmfException {
+        return service().getCaseQaReports(user, caseIds, gridName, sectors, repDims, 
+                whereClause, serverDir);
     }
 
     private String tempQAStepFilePath() throws EmfException {

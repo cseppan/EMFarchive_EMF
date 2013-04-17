@@ -2104,6 +2104,7 @@ avd_emis=emis_avd
             date.setText(DATE_FORMATTER.format(step.getDate()));
             status.setSelectedItem(step.getStatus());
             tableName.setText(result.getTable());
+            tableName.setToolTipText(result.getTable());
             creationStatusLabel.setText(result.getTableCreationStatus());
             creationDateLabel.setText(CustomDateFormat.format_MM_DD_YYYY_HH_mm(result.getTableCreationDate()));
             currentTable.setSelected(result.isCurrentTable());
