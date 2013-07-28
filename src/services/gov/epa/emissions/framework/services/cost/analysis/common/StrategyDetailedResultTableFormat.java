@@ -26,7 +26,7 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
     }
 
     public String identify() {
-        return "Maximum Emissions Reduction";
+        return "Control Strategy Detailed Result";
     }
     
     public String key() {
@@ -92,6 +92,10 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
         cols.add(new Column("Rule_Eff", types.realType(), new RealFormatter()));
         cols.add(new Column("Percent_Reduction", types.realType(), new RealFormatter()));
         cols.add(new Column("Adj_Factor", types.realType(), new RealFormatter()));
+        
+        //primary device code...
+        cols.add(new Column("CONTROL_IDS", types.stringType(256), 256, new StringFormatter(256)));
+
         cols.add(new Column("Inv_Ctrl_Eff", types.realType(), new RealFormatter()));
         cols.add(new Column("Inv_Rule_Pen", types.realType(), new RealFormatter()));
         cols.add(new Column("Inv_Rule_Eff", types.realType(), new RealFormatter()));
@@ -183,6 +187,10 @@ public class StrategyDetailedResultTableFormat implements TableFormat {
 //        cols.add(new Column("nov_inv_emissions", types.realType(), new RealFormatter()));
 //        cols.add(new Column("dec_inv_emissions", types.realType(), new RealFormatter()));
 
+        cols.add(new Column("Annual_Cost_3Pct", types.realType(), new RealFormatter()));
+        cols.add(new Column("Ann_Cost_per_Ton_3Pct", types.realType(), new RealFormatter()));
+        cols.add(new Column("Annualized_Capital_Cost_3Pct", types.realType(), new RealFormatter()));
+        
         cols.add(new Column("Comment", types.stringType(128), new StringFormatter(128)));
         
         return cols.toArray(new Column[0]);
