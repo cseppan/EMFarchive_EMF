@@ -1,8 +1,8 @@
--- Function: create_least_cost_worksheet_table_indexes(character varying)
+﻿-- Function: create_least_cost_worksheet_table_indexes(character varying)
 
--- DROP FUNCTION create_least_cost_worksheet_table_indexes(character varying);
+-- DROP FUNCTION public.create_least_cost_worksheet_table_indexes(character varying);
 
-CREATE OR REPLACE FUNCTION create_least_cost_worksheet_table_indexes(table_name character varying)
+CREATE OR REPLACE FUNCTION public.create_least_cost_worksheet_table_indexes(table_name character varying(64))
   RETURNS void AS
 $BODY$
 DECLARE
@@ -95,7 +95,7 @@ BEGIN
 		ALTER TABLE emissions.' || table_name || '
 			CLUSTER ON ' || index_name || ';';
 
-	-- create cm_id btree index
+/*	-- create cm_id btree index
 	IF length('cm_id_' || table_name) >= 63 - 6 THEN
 		index_name := 'cm_id_' || substr(table_name, 8, 63);
 	ELSE
@@ -105,9 +105,9 @@ BEGIN
 			ON emissions.' || table_name || '
 			USING btree
 			(cm_id);';
-
+*/
 END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE
   COST 100;
-ALTER FUNCTION create_least_cost_worksheet_table_indexes(character varying) OWNER TO emf;
+ALTER FUNCTION public.create_least_cost_worksheet_table_indexes(character varying) OWNER TO emf;

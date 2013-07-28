@@ -55,22 +55,33 @@ BEGIN
 	execute 'update emissions.' || worksheet_table_name || '
 	set status = 0
 	where record_id in (
+		select case 
+				when coalesce(tbl.emis_reduction, 0.0) <> 0.0 and abs(tbl.emis_reduction - LAG(emis_reduction, 1)  over(partition by tbl.source, tbl.original_dataset_id, tbl.Source_Id order by tbl.source, tbl.original_dataset_id, tbl.Source_Id, tbl.emis_reduction desc, tbl.marginal, tbl.record_id)) / tbl.emis_reduction <= 0.001 then 
+					record_id 
+				else 
+					null::integer 
+			end as record_id
+		from emissions.' || worksheet_table_name || ' tbl
+		where poll = ' || quote_literal(target_pollutant) || '
+		order by source, emis_reduction desc, marginal
+/*
 		select 
 			case 
 				when 
-					coalesce(tbl.emis_reduction, 0.0) <> 0.0 and (tbl.emis_reduction - LAG(grp_max, 1)  over(partition by tbl.source order by tbl.source, tbl.marginal, tbl.emis_reduction desc, tbl.record_id)) / tbl.emis_reduction <= 0.001
+					coalesce(tbl.emis_reduction, 0.0) <> 0.0 and (tbl.emis_reduction - LAG(grp_max, 1)  over(partition by tbl.source, tbl.original_dataset_id order by tbl.source, tbl.marginal, tbl.emis_reduction desc, tbl.record_id)) / tbl.emis_reduction <= 0.001
 					then record_id else null::integer 
 			end as record_id
 		from (
 			select source, 
+				original_dataset_id, 
 				record_id, 
 				emis_reduction, 
 				marginal, 
 				source_poll_cnt, 
-				max(emis_reduction) over(partition by source order by source, marginal, emis_reduction desc, record_id) as grp_max
+				max(emis_reduction) over(partition by source, original_dataset_id order by source, marginal, emis_reduction desc, record_id) as grp_max
 			from emissions.' || worksheet_table_name || '
 			where poll = ' || quote_literal(target_pollutant) || '
-		) tbl
+		) tbl*/
 	)';
 
 	if not include_unspecified_costs then 
@@ -80,14 +91,15 @@ BEGIN
 		where record_id in (
 			select tbl2.record_id
 			from (
-			select CM_Id, source--, record_id
+			select CM_Id, source, original_dataset_id
 			from emissions.' || worksheet_table_name || '
-			group by CM_Id, source
+			group by CM_Id, source, original_dataset_id
 			having sum(annual_cost) = 0.0
 			) tbl
 			inner join emissions.' || worksheet_table_name || ' tbl2
 			on tbl2.CM_Id = tbl.CM_Id
 			and tbl2.source = tbl.source
+			and coalesce(tbl2.original_dataset_id,0) = coalesce(tbl.original_dataset_id,0)
 		)';
 
 	end if;
@@ -106,6 +118,7 @@ BEGIN
 				on 
 				ap.source = tp.source
 				and ap.cm_id = tp.cm_id
+				and coalesce(ap.original_dataset_id,0) = coalesce(tp.original_dataset_id,0)
 			where tp.status = 0
 				and tp.poll = ' || quote_literal(target_pollutant) || ');';
 				

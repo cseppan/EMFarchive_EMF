@@ -1,4 +1,4 @@
--- Function: get_least_cost_worksheet_emis_reduction(character varying, character varying, integer)
+﻿-- Function: get_least_cost_worksheet_emis_reduction(character varying, character varying, integer)
 
 -- DROP FUNCTION get_least_cost_worksheet_emis_reduction(character varying, character varying, integer);
 
@@ -11,16 +11,16 @@ BEGIN
 
 	execute 'SELECT sum(emis_reduction)
 	from (
-		SELECT distinct on (source) emis_reduction
+		SELECT distinct on (source, original_dataset_id, source_id) emis_reduction
 		from (
-			SELECT emis_reduction, marginal, record_id, source, source_poll_cnt
+			SELECT emis_reduction, marginal, original_dataset_id, record_id, source, source_id, source_poll_cnt
 			FROM emissions.' || worksheet_table_name || '
 			where status is null 
 				and poll = ' || quote_literal(target_pollutant) || '
 			ORDER BY marginal, emis_reduction desc, source_poll_cnt desc, record_id
 			limit ' || target_record_offset || '
 		) tbl
-		ORDER BY source, marginal, emis_reduction desc, source_poll_cnt desc, record_id
+		ORDER BY source, original_dataset_id, source_id, marginal, emis_reduction desc, source_poll_cnt desc, record_id
 	) tbl' 
 	into emis_reduction;
 

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.convert_design_capacity_to_mw(design_capacity double precision, design_capacity_unit_numerator character varying, design_capacity_unit_denominator character varying)
+﻿CREATE OR REPLACE FUNCTION public.convert_design_capacity_to_mw(design_capacity double precision, design_capacity_unit_numerator character varying, design_capacity_unit_denominator character varying)
   RETURNS double precision AS
 $BODY$
 DECLARE
@@ -81,3 +81,26 @@ $BODY$
   LANGUAGE plpgsql IMMUTABLE STRICT
   COST 100;
 ALTER FUNCTION public.convert_design_capacity_to_mw(double precision, character varying, character varying) OWNER TO postgres;
+
+
+CREATE OR REPLACE FUNCTION public.convert_design_capacity_to_mw(design_capacity double precision, design_capacity_units character varying)
+  RETURNS double precision AS
+$BODY$
+DECLARE
+	converted_design_capacity double precision := null;
+	unit_numerator character varying;
+	unit_denominator character varying;
+BEGIN
+
+        --default if not known and uppercase/trim string
+	design_capacity_units := coalesce(trim(upper(design_capacity_units)), '');
+	unit_numerator := split_part(design_capacity_units, '/', 1);
+	unit_denominator := split_part(design_capacity_units, '/', 2);
+
+	return public.convert_design_capacity_to_mw(design_capacity, unit_numerator, unit_denominator);
+END;
+$BODY$
+  LANGUAGE plpgsql IMMUTABLE STRICT
+  COST 100;
+ALTER FUNCTION public.convert_design_capacity_to_mw(double precision, character varying) OWNER TO postgres;
+

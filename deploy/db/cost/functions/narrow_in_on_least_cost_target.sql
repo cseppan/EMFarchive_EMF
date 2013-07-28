@@ -1,4 +1,4 @@
---select public.narrow_in_on_least_cost_target('cslcm__measure_worksheet_nc_ptnonipm_20080420_20080420054230884', 
+﻿--select public.narrow_in_on_least_cost_target('cslcm__measure_worksheet_nc_ptnonipm_20080420_20080420054230884', 
 --	'NOX', 
 --	36797.935745);
 
@@ -16,6 +16,7 @@ DECLARE
 	prev_target_record_offset integer := 0;
 	target_record_offset_diff integer;
 	emis_reduction double precision;
+	max_emis_reduction double precision;
 	record_count integer;
 	continue_trying boolean := true;
 	tries_around_target integer := 0;
@@ -28,7 +29,15 @@ BEGIN
 			and poll = ' || quote_literal(target_pollutant)
 		into record_count;
 
+	-- get maximum emission reduction that can be acheived...
+	max_emis_reduction := public.get_least_cost_worksheet_emis_reduction(worksheet_table_name, 
+			target_pollutant, 
+			record_count);
 
+	IF domain_wide_emis_reduction >= max_emis_reduction THEN
+		RETURN record_count;
+	END IF;
+	
 	-- start at the end of the table
 	target_record_offset := record_count;
 
@@ -47,8 +56,20 @@ BEGIN
 --			target_record_offset := target_record_offset - (target_record_offset_diff / 2 );
 			target_record_offset := target_record_offset - case when target_record_offset_diff <> 1 then target_record_offset_diff / 2 else 1 end;
 		ELSE
+/*			-- first pass through....
+			IF target_record_offset >= record_count THEN 
+				target_record_offset := target_record_offset - case when target_record_offset_diff <> 1 then target_record_offset_diff / 2 else 1 end;
+			ELSE
+				target_record_offset := target_record_offset + case when target_record_offset_diff <> 1 then target_record_offset_diff / 2 else 1 end;
+			END IF;
+			-- first pass through....
+			IF target_record_offset = record_count THEN 
+				target_record_offset := target_record_offset - case when target_record_offset_diff <> 1 then target_record_offset_diff / 2 else 1 end;
+			ELSE
+				target_record_offset := target_record_offset + case when target_record_offset_diff <> 1 then target_record_offset_diff / 2 else 1 end;
+			END IF;
+*/			target_record_offset := target_record_offset + case when target_record_offset_diff <> 1 then target_record_offset_diff / 2 else 1 end;
 --			target_record_offset := target_record_offset + (target_record_offset_diff / 2 );
-			target_record_offset := target_record_offset + case when target_record_offset_diff <> 1 then target_record_offset_diff / 2 else 1 end;
 		END IF;
 		IF target_record_offset_diff > 1 THEN
 			continue_trying := true;
@@ -68,8 +89,6 @@ BEGIN
 		END IF;
 	END LOOP;
 
-
-			
 	RETURN target_record_offset;
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;

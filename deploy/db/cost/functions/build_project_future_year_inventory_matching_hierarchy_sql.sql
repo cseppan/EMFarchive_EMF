@@ -46,6 +46,9 @@ select public.build_project_future_year_inventory_matching_hierarchy_sql(
 							and coalesce(packet.compliance_date, ''1/1/1900''::timestamp without time zone) < ''' || compliance_date_cutoff_daymonth || '/' || inventory_year || '''::timestamp without time zone
 							' else '' end || '
 */
+
+DROP FUNCTION build_project_future_year_inventory_matching_hierarchy_sql(integer, integer, integer, integer, character varying, text, integer, integer, text, integer);
+
 CREATE OR REPLACE FUNCTION public.build_project_future_year_inventory_matching_hierarchy_sql(
 	inv_dataset_id integer, 
 	inv_dataset_version integer, 

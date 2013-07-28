@@ -29,6 +29,7 @@ DECLARE
 	has_constraints boolean := null;
 	dataset_month smallint := 0;
 	no_days_in_month smallint := 31;
+	no_days_in_year smallint := 365;
 	ref_cost_year integer := 2006;
 	cost_year_chained_gdp double precision := null;
 	ref_cost_year_chained_gdp double precision := null;
@@ -44,6 +45,7 @@ DECLARE
 	has_rpen_column boolean := false;
 	get_strategt_cost_inner_sql character varying;
 	annualized_uncontrolled_emis_sql character varying;
+	annualized_emis_sql character varying;
 	uncontrolled_emis_sql character varying;
 	emis_sql character varying;
 	percent_reduction_sql character varying;
@@ -53,6 +55,7 @@ DECLARE
 	has_pm_target_pollutant boolean := false; 
 	has_cpri_column boolean := false; 
 	has_primary_device_type_code_column boolean := false; 
+	has_control_ids_column boolean := false;
 	creator_user_id integer := 0;
 	is_cost_su boolean := false;
 
@@ -67,6 +70,21 @@ DECLARE
 	annualized_capital_cost_expression text;
 	computed_cost_per_ton_expression text;
 	actual_equation_type_expression text;
+
+	--support for flat file ds types...
+	dataset_type_name character varying(255) := '';
+	fips_expression character varying(64) := 'fips';
+	plantid_expression character varying(64) := 'plantid';
+	pointid_expression character varying(64) := 'pointid';
+	stackid_expression character varying(64) := 'stackid';
+	segment_expression character varying(64) := 'segment';
+	is_flat_file_inventory boolean := false;
+	is_flat_file_point_inventory boolean := false;
+	inv_pct_red_expression character varying(256);
+	inv_ceff_expression character varying(64) := 'ceff';
+	longitude_expression character varying(64) := 'xloc';
+	latitude_expression character varying(64) := 'yloc';
+	plant_name_expression character varying(64) := 'plant';
 BEGIN
 
 	-- get the input dataset info
@@ -74,6 +92,41 @@ BEGIN
 	from emf.internal_sources i
 	where i.dataset_id = intInputDatasetId
 	into inv_table_name;
+
+	--get dataset type name
+	select dataset_types."name"
+	from emf.datasets
+	inner join emf.dataset_types
+	on datasets.dataset_type = dataset_types.id
+	where datasets.id = intInputDatasetId
+	into dataset_type_name;
+
+	--if Flat File 2010 Types then change primary key field expression variables...
+	IF dataset_type_name = 'Flat File 2010 Point' or dataset_type_name = 'Flat File 2010 Nonpoint' THEN
+		fips_expression := 'region_cd';
+		plantid_expression := 'facility_id';
+		pointid_expression := 'unit_id';
+		stackid_expression := 'rel_point_id';
+		segment_expression := 'process_id';
+		inv_ceff_expression := 'ann_pct_red';
+		is_flat_file_inventory := true;
+		IF dataset_type_name = 'Flat File 2010 Point' THEN
+			is_flat_file_point_inventory := true;
+		END IF;
+		longitude_expression := 'longitude';
+		latitude_expression := 'latitude';
+		plant_name_expression := 'facility_name';
+	ELSE
+		fips_expression := 'fips';
+		plantid_expression := 'plantid';
+		pointid_expression := 'pointid';
+		stackid_expression := 'stackid';
+		segment_expression := 'segment';
+		inv_ceff_expression := 'ceff';
+		longitude_expression := 'xloc';
+		latitude_expression := 'yloc';
+		plant_name_expression := 'plant';
+	END If;
 
 	-- get the detailed result dataset info
 	select sr.detailed_result_dataset_id,
@@ -139,8 +192,6 @@ BEGIN
 
 
 	-- see if strategyt creator is a CoST SU
-
---	SELECT strpos('abc,def,ght','ght')
 	SELECT 
 		case 
 			when 
@@ -157,7 +208,7 @@ BEGIN
 	has_pm_target_pollutant := case when target_pollutant = 'PM10' or target_pollutant = 'PM2_5' then true else false end;
 
 	-- see if there are point specific columns in the inventory
-	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
+	is_point_table := public.check_table_for_columns(inv_table_name, '' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '', ',');
 
 	-- see if there is a sic column in the inventory
 	has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
@@ -172,16 +223,19 @@ BEGIN
 	has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',');
 
 	-- see if there is lat & long columns in the inventory
-	has_latlong_columns := public.check_table_for_columns(inv_table_name, 'xloc,yloc', ',');
+	has_latlong_columns := public.check_table_for_columns(inv_table_name, '' || longitude_expression || ',' || latitude_expression || '', ',');
 
 	-- see if there is plant column in the inventory
-	has_plant_column := public.check_table_for_columns(inv_table_name, 'plant', ',');
+	has_plant_column := public.check_table_for_columns(inv_table_name, '' || plant_name_expression || '', ',');
 
 	-- see if there is plant column in the inventory
 	has_cpri_column := public.check_table_for_columns(inv_table_name, 'cpri', ',');
 
 	-- see if there is primary_device_type_code column in the inventory
 	has_primary_device_type_code_column := public.check_table_for_columns(inv_table_name, 'primary_device_type_code', ',');
+
+	-- see if there is control_ids column in the inventory
+	has_control_ids_column := public.check_table_for_columns(inv_table_name, 'control_ids', ',');
 
 	-- get strategy constraints
 	SELECT csc.max_emis_reduction,
@@ -220,6 +274,9 @@ BEGIN
 	select public.get_days_in_month(dataset_month::smallint, inventory_year::smallint)
 	into no_days_in_month;
 
+	select public.get_days_in_year(inventory_year::smallint)
+	into no_days_in_year;
+	
 	-- get gdp chained values
 	SELECT chained_gdp
 	FROM reference.gdplev
@@ -278,7 +335,7 @@ BEGIN
 
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
-		county_dataset_filter_sql := ' and inv.fips in (SELECT fips
+		county_dataset_filter_sql := ' and inv.' || fips_expression || ' in (SELECT fips
 			FROM emissions.' || (SELECT table_name FROM emf.internal_sources where dataset_id = county_dataset_id) || '
 			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
 	END IF;
@@ -303,9 +360,9 @@ BEGIN
 		select record_id, missing_ceff, 100.0, 100.0
 		from (
 			select record_id,
-				ceff,
-				first_value(ceff) over source_window as missing_ceff,
-				sum(case when coalesce(inv.ceff,0.0) = 0.0 then 1 else null end) over source_window as missing_ceff_count,
+				' || inv_ceff_expression || ',
+				first_value(' || inv_ceff_expression || ') over source_window as missing_ceff,
+				sum(case when coalesce(inv.' || inv_ceff_expression || ',0.0) = 0.0 then 1 else null end) over source_window as missing_ceff_count,
 				sum(1) over source_window as partition_record_count
 
 			from emissions.' || inv_table_name || ' inv
@@ -313,10 +370,10 @@ BEGIN
 			where ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
 				and inv.poll in (''PM10'',''PM2_5'')
 
-			WINDOW source_window AS (PARTITION BY fips,scc' || case when is_point_table = false then '' else ',plantid,pointid,stackid,segment' end || ' order by fips,scc' || case when is_point_table = false then '' else ',plantid,pointid,stackid,segment' end || ',coalesce(ceff,0.0) desc)
+			WINDOW source_window AS (PARTITION BY ' || fips_expression || ',scc' || case when is_point_table = false then '' else ',' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '' end || ' order by ' || fips_expression || ',scc' || case when is_point_table = false then '' else ',' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '' end || ',coalesce(' || inv_ceff_expression || ',0.0) desc)
 		) foo
 		where missing_ceff_count <> partition_record_count
-			and coalesce(ceff,0.0) = 0.0;';
+			and coalesce(' || inv_ceff_expression || ',0.0) = 0.0;';
 
 	EXECUTE 'CREATE INDEX inv_overrides_record_id ON inv_overrides USING btree (record_id);';
 
@@ -354,32 +411,59 @@ BEGIN
 	EXECUTE 'CREATE INDEX source_fact_source ON source_fact USING btree (scc, fips, plantid, pointid, stackid, segment);';
 
 
-	uncontrolled_emis_sql := public.get_uncontrolled_ann_emis_expression('inv', no_days_in_month, 'inv_ovr', has_rpen_column);
-	emis_sql := public.get_ann_emis_expression('inv', no_days_in_month);
+--	uncontrolled_emis_sql := public.get_uncontrolled_ann_emis_expression('inv', no_days_in_month, 'inv_ovr', has_rpen_column);
+--	emis_sql := public.get_ann_emis_expression('inv', no_days_in_month);
 	
-	annualized_uncontrolled_emis_sql := public.get_uncontrolled_ann_emis_expression('inv', no_days_in_month, 'inv_ovr', has_rpen_column);
+			
+	IF NOT is_flat_file_inventory THEN
+		inv_pct_red_expression := 'coalesce(inv.ceff, inv_ovr.ceff) * coalesce(coalesce(inv.reff, inv_ovr.reff) / 100, 1.0)' || case when has_rpen_column then ' * coalesce(coalesce(inv.rpen, inv_ovr.rpen) / 100, 1.0)' else '' end;
+		emis_sql := public.get_ann_emis_expression('inv', no_days_in_month);
+		annualized_emis_sql := case when dataset_month != 0 then 'coalesce(inv.avd_emis * ' || no_days_in_year || ', inv.ann_emis)' else 'inv.ann_emis' end;
+	ELSE
+		inv_pct_red_expression := 'coalesce(inv.ann_pct_red, inv_ovr.ceff)';
+		emis_sql := 'inv.ann_value';
+		annualized_emis_sql := 'inv.ann_value';
+	END IF;
+
+	uncontrolled_emis_sql := public.get_uncontrolled_emis_expression(inv_pct_red_expression, emis_sql);
+
+--	annualized_uncontrolled_emis_sql := public.get_uncontrolled_ann_emis_expression('inv', no_days_in_month, 'inv_ovr', has_rpen_column);
+	annualized_uncontrolled_emis_sql := public.get_uncontrolled_emis_expression(inv_pct_red_expression, annualized_emis_sql);
 
 	-- build sql that calls ceff SQL equation 
-	get_strategty_ceff_equation_sql := public.get_ceff_equation_expression(
+/*	get_strategty_ceff_equation_sql := public.get_ceff_equation_expression(
 		intInputDatasetId, -- int_input_dataset_id
 		inventory_year, -- inventory_year
 		'inv', --inv_table_alias character varying(64), 
-		'er');
+		'er');*/
+	get_strategty_ceff_equation_sql := public.get_ceff_equation_expression(
+		annualized_emis_sql, 
+		'inv', 
+		'er',
+		is_point_table);
 
 
-	percent_reduction_sql := public.get_control_percent_reduction_expression(intInputDatasetId,
+	/*percent_reduction_sql := public.get_control_percent_reduction_expression(intInputDatasetId,
 		inventory_year,
 		'inv', 
 		no_days_in_month, 
 		'inv_ovr', 
 		measures_count, 
 		'csm', 
-		'er');
+		'er');*/
+	percent_reduction_sql := public.get_control_percent_reduction_expression(
+		emis_sql,
+		'inv', 
+		'er',
+		is_point_table, 
+		measures_count, 
+		'csm');
+
 --	percent_reduction_sql := 'er.efficiency * ' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' * ' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' / 100 / 100';
 	-- relative emission reduction from inventory emission (i.e., ann emis in inv 100 tons (add on control gives addtl 50% red --> 50 tons
 	-- whereas a 95% ceff replacement control on a source with an existing control of 90% reduction needs to back out source to an 
 	-- uncontrolled emission 100 / (1 - 0.9) = 1000 tons giving a and then applying new control gives 950 tons reduced giving a 95% control
-	remaining_emis_sql := public.get_remaining_emis_expression(intInputDatasetId,
+	/*remaining_emis_sql := public.get_remaining_emis_expression(intInputDatasetId,
 		inventory_year,
 		'inv', 
 		no_days_in_month, 
@@ -387,7 +471,15 @@ BEGIN
 		measures_count, 
 		'csm', 
 		'er', 
-		has_rpen_column);
+		has_rpen_column);*/
+	remaining_emis_sql := public.get_remaining_emis_expression(
+		emis_sql, 
+		inv_pct_red_expression,
+		'inv', 
+		'er',
+		is_point_table,
+		measures_count,
+		'csm');
 
 	-- get various costing sql expressions
 	select annual_cost_expression(cost_expressions),
@@ -554,13 +646,12 @@ select
 		-- get all matches, dont worry if source doesnt have the target pollutant of interest (subsuquent pass of data will filter on sources with target pollutant if affected)
 		
 		select DISTINCT ON (inv.record_id,er.control_measures_id) 
---		select DISTINCT ON (inv.fips, inv.scc' || case when is_point_table = false then '' else ', inv.plantid, inv.pointid, inv.stackid, inv.segment' end || ', er.control_measures_id,inv.record_id) 
 			p.id as pollutant_id,
 			m.abbreviation,
 			inv.poll,
 			inv.scc,
-			inv.fips,
-			' || case when is_point_table = false then 'null::character varying(15) as plantid, null::character varying(15) as pointid, null::character varying(15) as stackid, null::character varying(15) as segment, ' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
+			inv.' || fips_expression || ' as fips,
+			' || case when is_point_table = false then 'null::character varying(15) as plantid, null::character varying(15) as pointid, null::character varying(15) as stackid, null::character varying(15) as segment, ' else 'inv.' || plantid_expression || ' as plantid, inv.' || pointid_expression || ' as pointid, inv.' || stackid_expression || ' as stackid, inv.' || segment_expression || ' as segment, ' end || '
 			' || operation_maintenance_cost_expression || '  as operation_maintenance_cost,
 			' || variable_operation_maintenance_cost_expression || '  as annual_variable_oper_maint_cost,
 			' || fixed_operation_maintenance_cost_expression || '  as annual_fixed_oper_maint_cost,
@@ -572,24 +663,24 @@ select
 			' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' as rule_pen,
 			' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
 			' || percent_reduction_sql || ' as percent_reduction,
-			coalesce(inv_ovr.ceff, inv.ceff) as ceff,
-			' || case when is_point_table = false then 'coalesce(inv_ovr.rpen, inv.rpen)' else '100' end || ' as rpen,
-			coalesce(inv_ovr.reff, inv.reff) as reff,
+			coalesce(inv_ovr.ceff, inv.' || inv_ceff_expression || ') as ceff,
+			' || case when not is_point_table and not is_flat_file_inventory then 'coalesce(inv_ovr.rpen, inv.rpen)' else '100' end || ' as rpen,
+			' || case when not is_flat_file_inventory then 'coalesce(inv_ovr.reff, inv.reff)' else '100' end || ' as reff,
 			case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - ' || percent_reduction_sql || ' / 100) as final_emissions,
 			' || emis_sql || ' - case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - ' || percent_reduction_sql || ' / 100) as emis_reduction,
 			' || emis_sql || ' as inv_emissions,
 			case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end as input_emis,
 			case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - ' || percent_reduction_sql || ' / 100) as output_emis,
-			substr(inv.fips, 1, 2) as fipsst,
-			substr(inv.fips, 3, 3) as fipscty,
+			substr(inv.' || fips_expression || ', 1, 2) as fipsst,
+			substr(inv.' || fips_expression || ', 3, 3) as fipscty,
 			' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ' as sic,
 			' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ' as naics,
 			inv.record_id::integer as source_id,
 			er.control_measures_id,
 			' || coalesce(actual_equation_type_expression, quote_literal('')) || ' as equation_type,
 			' || quote_literal(inventory_sectors) || ' as sector,
-			' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
-			' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
+			' || case when has_latlong_columns then 'inv.' || longitude_expression || ' as xloc,inv.' || latitude_expression || ' as yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
+			' || case when has_plant_column then 'inv.' || plant_name_expression || ' as plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
 			case when coalesce(er.existing_measure_abbr, '''') <> '''' or er.existing_dev_code <> 0 then ''A''
 						else ''R'' end as REPLACEMENT_ADDON,
 			er.existing_measure_abbr,
@@ -614,14 +705,14 @@ select
 			on inv_ovr.record_id = inv.record_id
 
 			left outer join source_fact sf
-			on sf.fips = inv.fips
+			on sf.fips = inv.' || fips_expression || '
 			and sf.scc = inv.scc
 
 					' || case when is_point_table then 
-			'and sf.plantid = inv.plantid
-			and sf.pointid = inv.pointid
-			and sf.stackid = inv.stackid
-			and sf.segment = inv.segment' 
+			'and sf.plantid = inv.' || plantid_expression || '
+			and sf.pointid = inv.' || pointid_expression || '
+			and sf.stackid = inv.' || stackid_expression || '
+			and sf.segment = inv.' || segment_expression || '' 
 					else 
 						''
 					end || '
@@ -674,7 +765,7 @@ select
 			and ' || annualized_uncontrolled_emis_sql || ' between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
 --					and source_total.total_ann_emis between coalesce(er.min_emis, -1E+308) and coalesce(er.max_emis, 1E+308)
 			-- locale filter
-			and (er.locale = inv.fips or er.locale = substr(inv.fips, 1, 2) or er.locale = '''')
+			and (er.locale = inv.' || fips_expression || ' or er.locale = substr(inv.' || fips_expression || ', 1, 2) or er.locale = '''')
 			-- effecive date filter
 			and ' || inventory_year || '::integer >= coalesce(date_part(''year'', er.effective_date), ' || inventory_year || '::integer)		
 			-- Replacement vs Add On Logic...
@@ -687,6 +778,7 @@ select
 					(
 						(length(inv.control_measures) > 0 and strpos(''&'' || coalesce(inv.control_measures, '''') || ''&'', ''&'' || er.existing_measure_abbr || ''&'') > 0) '
 						|| case when has_cpri_column then ' or (inv.cpri <> 0 and er.existing_dev_code = inv.cpri) '
+						when has_control_ids_column then ' or (length(inv.control_ids) > 0 and strpos(''&'' || coalesce(inv.control_ids, '''') || ''&'', ''&'' || er.existing_dev_code || ''&'') > 0) '
 						when has_primary_device_type_code_column then ' or (length(inv.primary_device_type_code) > 0 and er.existing_dev_code || '''' = inv.primary_device_type_code) '
 						else '' end || '
 					)
@@ -729,7 +821,7 @@ select
 			and ceff_var2."name" = ''CEFF_EQUATION_'' || inv.poll || ''_VAR2''
 
 			left outer join reference.fips fipscode
-			on fipscode.state_county_fips = inv.fips
+			on fipscode.state_county_fips = inv.' || fips_expression || '
 			and fipscode.country_num = ''0''
 
 			left outer join reference.scc_codes
@@ -745,17 +837,17 @@ select
 			--and p.id = ' ||  intTargetPollutantId || '
 
 			-- dont include sources that have no emissions...
-			and ' || uncontrolled_emis_sql || ' <> 0.0
+			and (' || uncontrolled_emis_sql || ') <> 0.0
 
 			-- dont include measures with no specified ceff (look for null values)...
-			and ' || get_strategty_ceff_equation_sql || ' is not null
+			and (' || get_strategty_ceff_equation_sql || ') is not null
 
 			-- only relevant for target pollutant
 			and (
 				(p.id = ' ||  intTargetPollutantId || '
 
 				-- dont include sources that have been fully controlled...
-				and coalesce(100 * coalesce(inv_ovr.ceff, inv.ceff) / 100 * coalesce(coalesce(inv_ovr.reff, inv.reff) / 100, 1.0)' || case when has_rpen_column then ' * coalesce(coalesce(inv_ovr.rpen, inv.rpen) / 100, 1.0)' else '' end || ', 0) <> 100.0
+				and coalesce(' || inv_pct_red_expression || ', 0) <> 100.0
 
 
 				-- make sure the new control is worthy
@@ -763,7 +855,7 @@ select
 				and (
 					-- source has no existing control
 					(
-						coalesce(inv_ovr.ceff, inv.ceff, 0.0) = 0.0
+						coalesce(inv_ovr.ceff, inv.' || inv_ceff_expression || ', 0.0) = 0.0
 					)
 					-- control is add-on type
 					or (
@@ -771,7 +863,7 @@ select
 					)
 					-- replacement control that meets the constraint, source has existing control
 					or (
-						coalesce(inv_ovr.ceff, inv.ceff, 0.0) <> 0.0
+						coalesce(inv_ovr.ceff, inv.' || inv_ceff_expression || ', 0.0) <> 0.0
 						and (coalesce(er.existing_measure_abbr, '''') = '''' and coalesce(er.existing_dev_code, 0) = 0)
 						and ((' ||  emis_sql || ') - (' || remaining_emis_sql || ')) / (' ||  emis_sql || ') * 100 >= ' || replacement_control_min_eff_diff_constraint || '
 					)
@@ -808,7 +900,7 @@ select
 							on r.region_id = mr.region_id
 							and r.region_version = mr.region_version
 						where mr.control_measure_id = m.id
-							and r.fips = inv.fips
+							and r.fips = inv.' || fips_expression || '
 					)
 					and exists (
 						select 1 
@@ -825,9 +917,6 @@ select
 
 		order by inv.record_id,
 			er.control_measures_id, 
---		order by inv.fips, 
---			inv.scc, ' || case when not is_point_table then '' else 'inv.plantid, inv.pointid, inv.stackid, inv.segment, ' end || '
---			er.control_measures_id, inv.record_id,
 			case when length(er.locale) = 5 then 0 when length(er.locale) = 2 then 1 else 2 end, 
 			' || remaining_emis_sql || ',
 			(' || annual_cost_expression || ') 

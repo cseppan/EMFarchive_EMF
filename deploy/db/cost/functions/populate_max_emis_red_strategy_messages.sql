@@ -1,4 +1,4 @@
-DROP FUNCTION populate_max_emis_red_strategy_messages(integer, integer, integer, integer, integer);
+﻿DROP FUNCTION populate_max_emis_red_strategy_messages(integer, integer, integer, integer, integer);
 
 CREATE OR REPLACE FUNCTION public.populate_max_emis_red_strategy_messages(
 	intControlStrategyId integer, 
@@ -57,6 +57,16 @@ DECLARE
 	has_pct_reduction_col boolean := false;
 	sql character varying := '';
 	has_control_measures_column boolean := false; 
+
+	--support for flat file ds types...
+	dataset_type_name character varying(255) := '';
+	fips_expression character varying(64) := 'fips';
+	plantid_expression character varying(64) := 'plantid';
+	pointid_expression character varying(64) := 'pointid';
+	stackid_expression character varying(64) := 'stackid';
+	segment_expression character varying(64) := 'segment';
+	is_flat_file_inventory boolean := false;
+	is_flat_file_point_inventory boolean := false;
 BEGIN
 
 	-- get the input dataset info
@@ -64,6 +74,33 @@ BEGIN
 	from emf.internal_sources i
 	where i.dataset_id = input_dataset_id
 	into inv_table_name;
+
+	--get dataset type name
+	select dataset_types."name"
+	from emf.datasets
+	inner join emf.dataset_types
+	on datasets.dataset_type = dataset_types.id
+	where datasets.id = input_dataset_id
+	into dataset_type_name;
+
+	--if Flat File 2010 Types then change primary key field expression variables...
+	IF dataset_type_name = 'Flat File 2010 Point' or dataset_type_name = 'Flat File 2010 Nonpoint' THEN
+		fips_expression := 'region_cd';
+		plantid_expression := 'facility_id';
+		pointid_expression := 'unit_id';
+		stackid_expression := 'rel_point_id';
+		segment_expression := 'process_id';
+		is_flat_file_inventory := true;
+		IF dataset_type_name = 'Flat File 2010 Point' THEN
+			is_flat_file_point_inventory := true;
+		END IF;
+	ELSE
+		fips_expression := 'fips';
+		plantid_expression := 'plantid';
+		pointid_expression := 'pointid';
+		stackid_expression := 'stackid';
+		segment_expression := 'segment';
+	END If;
 
 	-- get the strategy messages result dataset info
 	select sr.detailed_result_dataset_id,
@@ -122,7 +159,7 @@ BEGIN
 		discount_rate;
 
 	-- see if there are point specific columns in the inventory
-	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
+	is_point_table := public.check_table_for_columns(inv_table_name, '' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '', ',');
 	
 	-- see if there is a mact column in the inventory
 	has_mact_column := public.check_table_for_columns(inv_table_name, 'mact', ',');
@@ -213,7 +250,7 @@ BEGIN
 
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
-		county_dataset_filter_sql := ' and a.fips in (SELECT fips
+		county_dataset_filter_sql := ' and a.' || fips_expression || ' in (SELECT fips
 			FROM emissions.' || (SELECT table_name FROM emf.internal_sources where dataset_id = county_dataset_id) || '
 			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
 	END IF;
@@ -273,13 +310,13 @@ BEGIN
 		)
 		select 
 		' || strategy_messages_dataset_id || '::integer,
-		fips,
+		' || fips_expression || ',
 		scc,
 		' || case when is_point_table then '
-		plantid, 
-		pointid, 
-		stackid, 
-		segment, 
+		' || plantid_expression || ', 
+		' || pointid_expression || ', 
+		' || stackid_expression || ', 
+		' || segment_expression || ', 
 		' else '' end || ' 
 		poll,
 		''Warning''::character varying(11) as status,
@@ -300,10 +337,10 @@ BEGIN
 
 		from (
 			select record_id,
-				' || case when is_point_table = false then '' else 'plantid,pointid,stackid,segment,' end || '
+				' || case when is_point_table = false then '' else '' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || ',' end || '
 				poll,
 				scc,
-				fips,
+				' || fips_expression || ',
 				ceff,
 				lag(a.ceff, 1 , a.ceff) over source_window as lagging_ceff, 
 				lead(a.ceff, 1 , a.ceff) over source_window as leading_ceff,
@@ -315,7 +352,7 @@ BEGIN
 			where ' || inv_filter || '
 				and a.poll in (''PM10'',''PM2_5'')
 
-			WINDOW source_window AS (PARTITION BY fips,scc' || case when is_point_table = false then '' else ',plantid,pointid,stackid,segment' end || ' order by fips,scc' || case when is_point_table = false then '' else ',plantid,pointid,stackid,segment' end || ')
+			WINDOW source_window AS (PARTITION BY ' || fips_expression || ',scc' || case when is_point_table = false then '' else ',' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '' end || ' order by ' || fips_expression || ',scc' || case when is_point_table = false then '' else ',' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '' end || ')
 		) foo
 		where missing_ceff_count <> partition_record_count
 			and coalesce(ceff,0.0) = 0.0;';
@@ -340,13 +377,13 @@ BEGIN
 		)
 	select 
 		' || strategy_messages_dataset_id || '::integer,
-		a.fips,
+		a.' || fips_expression || ',
 		a.scc,
 		' || case when is_point_table then '
-		a.plantid, 
-		a.pointid, 
-		a.stackid, 
-		a.segment, 
+		a.' || plantid_expression || ', 
+		a.' || pointid_expression || ', 
+		a.' || stackid_expression || ', 
+		a.' || segment_expression || ', 
 		' else '' end || ' 
 		a.poll,
 		''Warning''::character varying(11) as status,
@@ -386,13 +423,13 @@ BEGIN
 			else ''
 			end || '
 		)
-	order by a.fips,
+	order by a.' || fips_expression || ',
 		a.scc, 
 		' || case when is_point_table then '
-		a.plantid, 
-		a.pointid, 
-		a.stackid, 
-		a.segment, 
+		a.' || plantid_expression || ', 
+		a.' || pointid_expression || ', 
+		a.' || stackid_expression || ', 
+		a.' || segment_expression || ', 
 		' else '' end || ' 
 		a.poll';
 

@@ -26,27 +26,10 @@ DECLARE
 	target_pollutant_id integer := 0;
 	target_pollutant varchar;
 	county_dataset_filter_sql text := '';
-	cost_year integer := null;
 	inventory_year integer := null;
-	is_point_table boolean := false;
-	use_cost_equations boolean := false;
 	dataset_month smallint := 0;
 	no_days_in_month smallint := 31;
-	ref_cost_year integer := 2006;
-	discount_rate double precision;
-	has_design_capacity_columns boolean := false; 
-	has_sic_column boolean := false; 
-	has_naics_column boolean := false;
-	has_rpen_column boolean := false;
-	has_latlong_columns boolean := false;
-	has_plant_column boolean := false;
 	gimme_count integer := 0;
-	min_emis_reduction_constraint real := null;
-	min_control_efficiency_constraint real := null;
-	max_cost_per_ton_constraint real := null;
-	max_ann_cost_constraint real := null;
-	has_constraints boolean := null;
-	str varchar;
 	marginal double precision;
 	emis_reduction double precision;
 	record_id double precision;
@@ -57,7 +40,14 @@ DECLARE
 	increasing_trend boolean := false;
 	prev_apply_order integer;
 	uncontrolled_emis double precision;
+	emis_sql character varying;
 --	random_number double precision := random();
+
+	--support for flat file ds types...
+	dataset_type_name character varying(255) := '';
+	fips_expression character varying(64) := 'fips';
+	is_flat_file_inventory boolean := false;
+	is_flat_file_point_inventory boolean := false;
 BEGIN
 --	SET work_mem TO '256MB';
 --	SET enable_seqscan TO 'off';
@@ -68,6 +58,25 @@ BEGIN
 	from emf.internal_sources i
 	where i.dataset_id = input_dataset_id
 	into inv_table_name;
+
+	--get dataset type name
+	select dataset_types."name"
+	from emf.datasets
+	inner join emf.dataset_types
+	on datasets.dataset_type = dataset_types.id
+	where datasets.id = input_dataset_id
+	into dataset_type_name;
+
+	--if Flat File 2010 Types then change primary key field expression variables...
+	IF dataset_type_name = 'Flat File 2010 Point' or dataset_type_name = 'Flat File 2010 Nonpoint' THEN
+		fips_expression := 'region_cd';
+		is_flat_file_inventory := true;
+		IF dataset_type_name = 'Flat File 2010 Point' THEN
+			is_flat_file_point_inventory := true;
+		END IF;
+	ELSE
+		fips_expression := 'fips';
+	END If;
 
 	-- get the detailed result dataset info
 	select sr.detailed_result_dataset_id,
@@ -109,23 +118,17 @@ BEGIN
 	SELECT cs.name,
 		cs.pollutant_id,
 		case when length(trim(cs.filter)) > 0 then '(' || public.alias_inventory_filter(cs.filter, 'inv') || ')' else null end,
-		cs.cost_year,
 		cs.analysis_year,
 		cs.county_dataset_id,
-		cs.county_dataset_version,
-		cs.use_cost_equations,
-		cs.discount_rate / 100
+		cs.county_dataset_version
 	FROM emf.control_strategies cs
 	where cs.id = int_control_strategy_id
 	INTO strategy_name,
 		target_pollutant_id,
 		inv_filter,
-		cost_year,
 		inventory_year,
 		county_dataset_id,
-		county_dataset_version,
-		use_cost_equations,
-		discount_rate;
+		county_dataset_version;
 
 	-- get target pollutant name
 	select name
@@ -133,73 +136,36 @@ BEGIN
 	where id = target_pollutant_id
 	into target_pollutant;
 
-	-- see if there are point specific columns in the inventory
-	is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
-
-	-- see if there is a sic column in the inventory
-	has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
-
-	-- see if there is a naics column in the inventory
-	has_naics_column := public.check_table_for_columns(inv_table_name, 'naics', ',');
-
-	-- see if there is a rpen column in the inventory
-	has_rpen_column := public.check_table_for_columns(inv_table_name, 'rpen', ',');
-
-	-- see if there is design capacity columns in the inventory
-	has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',');
-
-	-- see if there is lat & long columns in the inventory
-	has_latlong_columns := public.check_table_for_columns(inv_table_name, 'xloc,yloc', ',');
-
-	-- see if there is lat & long columns in the inventory
-	has_plant_column := public.check_table_for_columns(inv_table_name, 'plant', ',');
-
 	-- get month of the dataset, 0 (Zero) indicates an annual inventory
 	select public.get_dataset_month(input_dataset_id)
 	into dataset_month;
 
-	IF dataset_month = 1 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 2 THEN
-		no_days_in_month := 29;
-	ELSIF dataset_month = 3 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 4 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 5 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 6 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 7 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 8 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 9 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 10 THEN
-		no_days_in_month := 31;
-	ELSIF dataset_month = 11 THEN
-		no_days_in_month := 30;
-	ELSIF dataset_month = 12 THEN
-		no_days_in_month := 31;
-	END IF;
+	select public.get_days_in_month(dataset_month::smallint, inventory_year::smallint)
+	into no_days_in_month;
 
 	-- see if their was a county dataset specified for the strategy, is so then build a sql where clause filter for later use
 	IF county_dataset_id is not null THEN
-		county_dataset_filter_sql := ' and fips in (SELECT fips
+		county_dataset_filter_sql := ' and inv.' || fips_expression || ' in (SELECT fips
 			FROM emissions.' || (SELECT table_name FROM emf.internal_sources where dataset_id = county_dataset_id) || '
 			where ' || public.build_version_where_filter(county_dataset_id, county_dataset_version) || ')';
 	END IF;
 	-- build version info into where clause filter
 	inv_filter := '(' || public.build_version_where_filter(input_dataset_id, input_dataset_version) || ')' || coalesce(' and ' || inv_filter, '');
 
+	IF NOT is_flat_file_inventory THEN
+		emis_sql := public.get_ann_emis_expression('inv', no_days_in_month);
+	ELSE
+		emis_sql := 'inv.ann_value';
+	END IF;
+
 	-- get the target pollutant uncontrolled emission 
-	execute 'select sum(' || case when dataset_month != 0 then 'coalesce(inv.avd_emis * ' || no_days_in_month || ', inv.ann_emis)' else 'inv.ann_emis' end || ') 
+	execute 'select sum(' || emis_sql || ') 
 		FROM emissions.' || inv_table_name || ' as inv
 		where ' || inv_filter || county_dataset_filter_sql || '
 			and poll = ' || quote_literal(target_pollutant)
 	into uncontrolled_emis;
 
+	-- 
 	execute 'update emissions.' || worksheet_table_name || '
 				set status = null::integer
 				where status = 1';
@@ -210,16 +176,18 @@ BEGIN
 	raise notice '%', 'emissions.' || worksheet_table_name || ' count = ' || record_count || ' - ' || clock_timestamp();
 
 	-- lets figure out what maximum emission reduction, is possible
-	execute 'SELECT sum(emis_reduction)
+	select public.get_least_cost_worksheet_emis_reduction(worksheet_table_name, target_pollutant, record_count)
+	into emis_reduction;
+/*	execute 'SELECT sum(emis_reduction)
 		from (
-			SELECT distinct on (source) 
+			SELECT distinct on (source, original_dataset_id, source_id) 
 				emis_reduction
 			FROM emissions.' || worksheet_table_name || '
 			where status is null 
 				and poll = ' || quote_literal(target_pollutant) || '
-			ORDER BY source, emis_reduction desc
+			ORDER BY source, original_dataset_id, source_id, emis_reduction desc
 		) tbl'
-	into emis_reduction;
+	into emis_reduction;*/
 	get diagnostics gimme_count = row_count;
 	raise notice '%', ' figure out what maximum emission reduction, is possible, emis_reduction = ' || emis_reduction || ' - ' || clock_timestamp();
 
@@ -234,6 +202,8 @@ BEGIN
 		apply_order := record_count;
 	END IF;
 
+	raise notice '%', 'narrow in on least cost target. apply_order = ' || apply_order || ', emis_reduction = ' || emis_reduction || ' - ' || clock_timestamp();
+
 	execute 'update emissions.' || worksheet_table_name || '
 		set status = 1
 		where status is null 
@@ -244,9 +214,9 @@ BEGIN
 			FROM emissions.' || worksheet_table_name || ' ap
 				inner join (
 					-- get sources measure for tp
-					SELECT distinct on (source) source, cm_id
+					SELECT distinct on (source, original_dataset_id, source_id) source, original_dataset_id, cm_id
 					from (
-						SELECT emis_reduction, marginal, record_id, source, source_poll_cnt, cm_id
+						SELECT emis_reduction, marginal, original_dataset_id, record_id, source, source_id, source_poll_cnt, cm_id
 						FROM emissions.' || worksheet_table_name || '
 						where status is null 
 							and poll = ' || quote_literal(target_pollutant) || '
@@ -254,10 +224,11 @@ BEGIN
 --						limit ' || (apply_order) || '
 						limit ' || (apply_order + 1) || '
 					) tbl
-					ORDER BY source, marginal desc, emis_reduction, source_poll_cnt, record_id desc
+					ORDER BY source, original_dataset_id, source_id, marginal, emis_reduction desc, source_poll_cnt desc, record_id
 --					source, marginal, emis_reduction desc, source_poll_cnt desc, record_id
 				) tp
 				on tp.source = ap.source
+				and coalesce(tp.original_dataset_id,0) = coalesce(ap.original_dataset_id,0)
 				and tp.cm_id = ap.cm_id
 		)';
 --		and apply_order <= ' || (apply_order + 1);
@@ -303,7 +274,7 @@ BEGIN
 		poll,
 		scc,
 		fips,
-		' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
+		plantid, pointid, stackid, segment, 
 		annual_oper_maint_cost,
 		annual_variable_oper_maint_cost,
 		annual_fixed_oper_maint_cost,
@@ -357,7 +328,7 @@ BEGIN
 		poll,
 		scc,
 		fips,
-		' || case when is_point_table = false then '' else 'plantid, pointid, stackid, segment, ' end || '
+		plantid, pointid, stackid, segment,
 		annual_oper_maint_cost as operation_maintenance_cost,
 		annual_variable_oper_maint_cost,
 		annual_fixed_oper_maint_cost,
@@ -380,8 +351,8 @@ BEGIN
 		output_emis,
 		substr(fips, 1, 2),
 		substr(fips, 3, 3),
-		' || case when has_sic_column = false then 'null::character varying' else 'sic' end || ',
-		' || case when has_naics_column = false then 'null::character varying' else 'naics' end || ',
+		sic,
+		naics,
 		source_id,
 		' || input_dataset_id || '::integer,
 		' || int_control_strategy_id || '::integer,

@@ -1,4 +1,4 @@
-/*
+﻿/*
 select * from emf.control_strategies where name = 'test mer nc so2 costing type 3 4 11';
 select * from emf.strategy_results where control_strategy_id = 156;
 
@@ -30,10 +30,8 @@ DECLARE
 	is_point_table boolean := false;
 	dataset_month smallint := 0;
 	no_days_in_month smallint := 31;
-	has_design_capacity_columns boolean := false; 
 	has_sic_column boolean := false; 
 	has_naics_column boolean := false;
-	has_target_pollutant integer := 0;
 	has_latlong_columns boolean := false;
 	has_plant_column boolean := false;
 	has_rpen_column boolean := false;
@@ -50,6 +48,21 @@ DECLARE
 
 	detailedResults RECORD;
 	inventoryWithDetailedResults RECORD;
+
+	--support for flat file ds types...
+	dataset_type_name character varying(255) := '';
+	fips_expression character varying(64) := 'fips';
+	plantid_expression character varying(64) := 'plantid';
+	pointid_expression character varying(64) := 'pointid';
+	stackid_expression character varying(64) := 'stackid';
+	segment_expression character varying(64) := 'segment';
+	is_flat_file_inventory boolean := false;
+	is_flat_file_point_inventory boolean := false;
+	inv_pct_red_expression character varying(256);
+	inv_ceff_expression character varying(64) := 'ceff';
+	longitude_expression character varying(64) := 'xloc';
+	latitude_expression character varying(64) := 'yloc';
+	plant_name_expression character varying(64) := 'plant';
 BEGIN
 
 	-- get target pollutant, inv filter, and county dataset info if specified
@@ -105,8 +118,43 @@ raise notice '%', intInputDatasetId || ' ' || intInputDatasetVersion || ' ' || i
 			where ds.dataset_id = intInputDatasetId
 			into inventory_sectors;
 
+			--get dataset type name
+			select dataset_types."name"
+			from emf.datasets
+			inner join emf.dataset_types
+			on datasets.dataset_type = dataset_types.id
+			where datasets.id = intInputDatasetId
+			into dataset_type_name;
+
+			--if Flat File 2010 Types then change primary key field expression variables...
+			IF dataset_type_name = 'Flat File 2010 Point' or dataset_type_name = 'Flat File 2010 Nonpoint' THEN
+				fips_expression := 'region_cd';
+				plantid_expression := 'facility_id';
+				pointid_expression := 'unit_id';
+				stackid_expression := 'rel_point_id';
+				segment_expression := 'process_id';
+				inv_ceff_expression := 'ann_pct_red';
+				is_flat_file_inventory := true;
+				IF dataset_type_name = 'Flat File 2010 Point' THEN
+					longitude_expression := 'longitude';
+					latitude_expression := 'latitude';
+					plant_name_expression := 'facility_name';
+				END IF;
+			ELSE
+				is_flat_file_inventory := false;
+				fips_expression := 'fips';
+				plantid_expression := 'plantid';
+				pointid_expression := 'pointid';
+				stackid_expression := 'stackid';
+				segment_expression := 'segment';
+				inv_ceff_expression := 'ceff';
+				longitude_expression := 'xloc';
+				latitude_expression := 'yloc';
+				plant_name_expression := 'plant';
+			END If;
+
 			-- see if there are point specific columns in the inventory
-			is_point_table := public.check_table_for_columns(inv_table_name, 'plantid,pointid,stackid,segment', ',');
+			is_point_table := public.check_table_for_columns(inv_table_name, '' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '', ',');
 
 			-- see if there is a sic column in the inventory
 			has_sic_column := public.check_table_for_columns(inv_table_name, 'sic', ',');
@@ -117,14 +165,11 @@ raise notice '%', intInputDatasetId || ' ' || intInputDatasetVersion || ' ' || i
 			-- see if there is a rpen column in the inventory
 			has_rpen_column := public.check_table_for_columns(inv_table_name, 'rpen', ',');
 
-			-- see if there is design capacity columns in the inventory
-			has_design_capacity_columns := public.check_table_for_columns(inv_table_name, 'design_capacity,design_capacity_unit_numerator,design_capacity_unit_denominator', ',');
-
 			-- see if there is lat & long columns in the inventory
-			has_latlong_columns := public.check_table_for_columns(inv_table_name, 'xloc,yloc', ',');
+			has_latlong_columns := public.check_table_for_columns(inv_table_name, '' || longitude_expression || ',' || latitude_expression || '', ',');
 
 			-- see if there is plant column in the inventory
-			has_plant_column := public.check_table_for_columns(inv_table_name, 'plant', ',');
+			has_plant_column := public.check_table_for_columns(inv_table_name, '' || plant_name_expression || '', ',');
 
 			-- see if there is plant column in the inventory
 			has_cpri_column := public.check_table_for_columns(inv_table_name, 'cpri', ',');
@@ -139,55 +184,20 @@ raise notice '%', intInputDatasetId || ' ' || intInputDatasetVersion || ' ' || i
 			select public.get_days_in_month(dataset_month::smallint, inventory_year::smallint)
 			into no_days_in_month;
 
-			uncontrolled_emis_sql := public.get_uncontrolled_ann_emis_expression('inv', no_days_in_month, null::character varying(64), has_rpen_column);
-			emis_sql := public.get_ann_emis_expression('inv', no_days_in_month);
+--			uncontrolled_emis_sql := public.get_uncontrolled_ann_emis_expression('inv', no_days_in_month, null::character varying(64), has_rpen_column);
+--			emis_sql := public.get_ann_emis_expression('inv', no_days_in_month);
+raise notice '%', dataset_type_name;
+raise notice '%', is_flat_file_inventory;
 
 
-		raise notice '%', '
-		-- distinct on (inv.record_id) makes sure we dont double control the source record...
-		select DISTINCT ON (dr.record_id,chm.pollutant,chm.eis_pollutant_code) 
-			*
-		FROM emissions.' || detailed_result_table_name || ' dr
-
-			inner join emissions.' || inv_table_name || ' inv
-			on inv.fips = dr.fips
-			and inv.scc = dr.scc
-			' || case when is_point_table then 
-			'and inv.plantid = dr.plantid
-			and inv.pointid = dr.pointid
-			and inv.stackid = dr.stackid
-			and inv.segment = dr.segment' 
-			else 
-			'and dr.plantid is null
-			and dr.pointid is null
-			and dr.stackid is null
-			and dr.segment is null' 
-			end || '
-
---			on inv.dataset_id = coalesce(dr.original_dataset_id, dr.input_dataset_id)
---			on inv.record_id = dr.source_id
-
-			-- get hap pollutants from inventory based on mapping (i.e., PM2_5 --> 100027 "4-Nitrophenol")
-			inner join reference.cap_measure_to_hap_mapping chm
-			on chm.pollutant = dr.poll
-			and chm.eis_pollutant_code = inv.poll
-
-
-		where ' || public.build_version_where_filter(intInputDatasetId, intInputDatasetVersion, 'inv') || '
-
-			-- target only detailed result sources that have a mapped pollutant
-			and dr.poll in (select distinct pollutant from reference.cap_measure_to_hap_mapping chm)
-
-			-- disinclude inventory source records that have already been controlled
-			and inv.record_id not in 
-				(
-				select invdr.source_id 
-				from emissions.' || inventory_detailed_result_table_name || ' invdr
-				where ' || public.build_version_where_filter(inventory_detailed_result_dataset_id, 0, 'invdr') || '
-					and coalesce(dr.original_dataset_id, dr.input_ds_id) = ' || intInputDatasetId || '
-				)
-		;';
-
+			IF NOT is_flat_file_inventory THEN
+				inv_pct_red_expression := 'inv.ceff  * coalesce(inv.reff / 100, 1.0)' || case when has_rpen_column then ' * coalesce(inv.rpen / 100, 1.0)' else '' end;
+				emis_sql := public.get_ann_emis_expression('inv', no_days_in_month);
+			ELSE
+				inv_pct_red_expression := 'inv.ann_pct_red';
+				emis_sql := 'inv.ann_value';
+			END IF;
+			uncontrolled_emis_sql := public.get_uncontrolled_emis_expression(inv_pct_red_expression, emis_sql);
 
 
 	execute
@@ -252,16 +262,16 @@ raise notice '%', intInputDatasetId || ' ' || intInputDatasetVersion || ' ' || i
 		dr.rule_pen,
 		dr.rule_eff,
 		dr.percent_reduction,
-		inv.ceff as inv_ctrl_eff,
-		null as inv_rule_pen,
-		inv.reff as inv_rule_eff,		
+		inv.' || inv_ceff_expression || ' as inv_ctrl_eff,
+		' || case when not is_point_table and not is_flat_file_inventory then 'inv.rpen' else '100.0' end || ' as inv_rule_pen,
+		' || case when not is_flat_file_inventory then 'inv.reff' else '100.0' end || ' as inv_rule_eff,
 		case when coalesce(dr.replacement_addon, '''') = ''A'' then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - dr.percent_reduction / 100) as final_emissions,
-		inv.ann_emis - case when coalesce(dr.replacement_addon, '''') = ''A'' then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - dr.percent_reduction / 100) as emis_reduction,
+		' || emis_sql || ' - case when coalesce(dr.replacement_addon, '''') = ''A'' then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - dr.percent_reduction / 100) as emis_reduction,
 		' || emis_sql || ' as inv_emissions,
 		case when coalesce(dr.replacement_addon, '''') = ''A'' then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end as input_emis,
 		case when coalesce(dr.replacement_addon, '''') = ''A'' then ' || emis_sql || ' else ' || uncontrolled_emis_sql || ' end * (1 - dr.percent_reduction / 100) as output_emis,
-		substr(inv.fips, 1, 2) as fipsst,
-		substr(inv.fips, 3, 3) as fipscty,
+		substr(inv.' || fips_expression || ', 1, 2) as fipsst,
+		substr(inv.' || fips_expression || ', 3, 3) as fipscty,
 		' || case when has_sic_column = false then 'null::character varying' else 'inv.sic' end || ' as sic,
 		' || case when has_naics_column = false then 'null::character varying' else 'inv.naics' end || ' as naics,
 		inv.record_id as source_id,
@@ -272,8 +282,8 @@ raise notice '%', intInputDatasetId || ' ' || intInputDatasetVersion || ' ' || i
 		dr.original_dataset_id,
 		' || quote_literal(inventory_sectors) || ' as sector,
 
-		' || case when has_latlong_columns then 'inv.xloc,inv.yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
-		' || case when has_plant_column then 'inv.plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
+		' || case when has_latlong_columns then 'inv.' || longitude_expression || ' as xloc,inv.' || latitude_expression || ' as yloc,' else 'fipscode.centerlon as xloc,fipscode.centerlat as yloc,' end || '
+		' || case when has_plant_column then 'inv.' || plant_name_expression || ' as plant' when not has_latlong_columns then 'fipscode.state_county_fips_code_desc as plant' else 'null::character varying as plant' end || ',
 
 		dr.replacement_addon,
 		dr.EXISTING_MEASURE_ABBREVIATION,
@@ -285,13 +295,13 @@ raise notice '%', intInputDatasetId || ' ' || intInputDatasetVersion || ' ' || i
 	FROM emissions.' || detailed_result_table_name || ' dr
 
 		inner join emissions.' || inv_table_name || ' inv
-		on inv.fips = dr.fips
+		on inv.' || fips_expression || ' = dr.fips
 		and inv.scc = dr.scc
 		' || case when is_point_table then 
-		'and inv.plantid = dr.plantid
-		and inv.pointid = dr.pointid
-		and inv.stackid = dr.stackid
-		and inv.segment = dr.segment' 
+		'and inv.' || plantid_expression || ' = dr.plantid
+		and inv.' || pointid_expression || ' = dr.pointid
+		and inv.' || stackid_expression || ' = dr.stackid
+		and inv.' || segment_expression || ' = dr.segment' 
 		else 
 		'and dr.plantid is null
 		and dr.pointid is null
@@ -308,7 +318,7 @@ raise notice '%', intInputDatasetId || ' ' || intInputDatasetVersion || ' ' || i
 		and chm.eis_pollutant_code = inv.poll
 
 		' || case when not has_latlong_columns then 'left outer join reference.fips fipscode
-		on fipscode.state_county_fips = inv.fips
+		on fipscode.state_county_fips = inv.' || fips_expression || '
 		and fipscode.country_num = ''0''' else '' end || '
 
 
