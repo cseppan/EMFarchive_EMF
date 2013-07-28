@@ -72,5 +72,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/AnalysisEngine"/>
 	<classpathentry kind="lib" path="lib/xerces-2.10.0/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/xerces-2.10.0/xml-apis.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.2.5.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.2.4.jar"/>
+	<classpathentry kind="lib" path="lib/fluent-hc-4.2.5.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
