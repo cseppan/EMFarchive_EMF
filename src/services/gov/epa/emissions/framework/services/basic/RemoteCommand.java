@@ -310,7 +310,7 @@ public class RemoteCommand {
 
         int errorLevel = 0;
         String[] cmds = new String[3];
-        final String executeCmd = sshCmd + " " + sshOptions + " " + username + "@" + hostname + " " + remoteCmd;
+        final String executeCmd = sshCmd + " " + sshOptions + " " + username + "@" + hostname + " \"" + remoteCmd + "\" |& tee";
         cmds[0] = unixShell;
         cmds[1] = unixOptions;
         cmds[2] = executeCmd;
