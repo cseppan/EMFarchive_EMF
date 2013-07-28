@@ -40,17 +40,34 @@ public class StrategyLoader extends LeastCostAbstractStrategyLoader {
         if (controlStrategy.getDeleteResults() || results.length == 0)
             populateWorksheet(controlStrategyInputDataset);
         else {
-            for (ControlStrategyResult result : results) {
+            for (int i = results.length; i > 0; i--) {
+                ControlStrategyResult result = results[i - 1];
+                ControlStrategyResult leastCostCMWorksheetResult = null;
+                ControlStrategyResult leastCostCurveSummaryResult = null;
                 if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostControlMeasureWorksheet)) {
-                    leastCostCMWorksheetResult = result;
+                    if (leastCostCMWorksheetResult == null) {
+                        //set local and module level so we not to set again...
+                        leastCostCMWorksheetResult = result;
+                        this.leastCostCMWorksheetResult = result;
+                    }
                 } else if (result.getStrategyResultType().getName().equals(StrategyResultType.leastCostCurveSummary)) {
-                    leastCostCurveSummaryResult = result;
+                    if (leastCostCurveSummaryResult == null) {
+                        //set local and module level so we not to set again...
+                        leastCostCurveSummaryResult = result;
+                        this.leastCostCurveSummaryResult = result;
+                    }
                 }
             }
         }
         
+        //allow all measure-source matches to be available, previous run would have 
+        //set status to 1 for measures not to use
+        makeApplicableMeasuresAvailable(leastCostCMWorksheetResult);
+        
         //also get the uncontrolled emission...
         uncontrolledEmis = getUncontrolledEmission(controlStrategyInputDataset);
+
+        //get the maximum acheivable emission reduction...
         maxEmisReduction = getMaximumEmissionReduction(leastCostCMWorksheetResult);
 
         Double pctRedIncrement = controlStrategy.getConstraint().getDomainWidePctReductionIncrement();

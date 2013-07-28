@@ -517,8 +517,13 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         int month = controlStrategyInputDataset.getInputDataset().applicableMonth();
         int daysInMonth = getDaysInMonth(month);
         double uncontrolledEmission = 0.0D;
+
+        String datsetTypeName = controlStrategyInputDataset.getInputDataset().getDatasetType().getName();
+        boolean isFlatFileInventory = datsetTypeName.equals(DatasetType.FLAT_FILE_2010_POINT) 
+            || datsetTypeName.equals(DatasetType.FLAT_FILE_2010_NONPOINT);
+        String sqlAnnEmis = (isFlatFileInventory ? "ann_value" : (month != -1 ? "coalesce(" + daysInMonth + " * avd_emis, ann_emis)" : "ann_emis"));
         
-        String query = "SELECT sum("  + (month != -1 ? "coalesce(avd_emis * " + daysInMonth + ", ann_emis)" : "ann_emis") + ") "
+        String query = "SELECT sum(" + sqlAnnEmis + ") "
             + " FROM " + qualifiedEmissionTableName(controlStrategyInputDataset.getInputDataset()) 
             + " where " + versionedQuery
             + " and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "

@@ -153,17 +153,18 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
                         .getControlStrategyInputDatasets();
                 //insert one table at a time...
                 for (int i = 0; i < controlStrategyInputDatasets.length; i++) {
-                    if (!controlStrategyInputDatasets[i].getInputDataset().getDatasetType().getName().contains("ORL")) {
-                        setStatus("The inventory, " + controlStrategyInputDatasets[i].getInputDataset().getName() + ", won't be processed only ORL Inventores are currently supported.");
-                        break;
-                    }
+//                    if (!controlStrategyInputDatasets[i].getInputDataset().getDatasetType().getName().contains("ORL")) {
+//                        setStatus("The inventory, " + controlStrategyInputDatasets[i].getInputDataset().getName() + ", won't be processed only ORL Inventores are currently supported.");
+//                        break;
+//                    }
                     String sql = "INSERT INTO " + qualifiedEmissionTableName(mergedDataset) + " (dataset_id, "
                     + columnDelimitedList + ") ";
                     EmfDataset inputDataset = controlStrategyInputDatasets[i].getInputDataset();
                     if (!inputDataset.getDatasetType().getName().equals(DatasetType.orlMergedInventory)) {
                         String tableName = qualifiedEmissionTableName(controlStrategyInputDatasets[i].getInputDataset());
-                        boolean isPointDataset = inputDataset.getDatasetType().getName().equals(
-                                DatasetType.orlPointInventory);
+                        boolean isPointDataset = inputDataset.getDatasetType().getName().equals(DatasetType.orlPointInventory);
+                        boolean isFlatFilePointDataset = inputDataset.getDatasetType().getName().equals(DatasetType.FLAT_FILE_2010_POINT);
+                        boolean isFlatFileNonpointDataset = inputDataset.getDatasetType().getName().equals(DatasetType.FLAT_FILE_2010_NONPOINT);
                         String inventoryColumnDelimitedList = columnDelimitedList;
                         ResultSetMetaData md = getDatasetResultSetMetaData(tableName);
                         // we need to figure out what dataset columns we have to work with.
@@ -190,12 +191,39 @@ public abstract class LeastCostAbstractStrategyTask extends AbstractCheckMessage
                                 ++designCapacityColumnCount;
                             } else if (md.getColumnName(j).equalsIgnoreCase("design_capacity_unit_denominator")) {
                                 ++designCapacityColumnCount;
+                            } else if (md.getColumnName(j).equalsIgnoreCase("design_capacity_units")) {
+                                ++designCapacityColumnCount;
                             }
                         }
                         if (isPointDataset) {
-                            if (designCapacityColumnCount == 3) hasDesignCapacityColumns = true;
+                            if (designCapacityColumnCount == 3) 
+                                hasDesignCapacityColumns = true;
                             inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("RPEN", "100::double precision as RPEN");
-                            if (!hasDesignCapacityColumns) inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("DESIGN_CAPACITY, DESIGN_CAPACITY_UNIT_NUMERATOR, DESIGN_CAPACITY_UNIT_DENOMINATOR", "null::double precision as DESIGN_CAPACITY, null::text as DESIGN_CAPACITY_UNIT_NUMERATOR, null::text as DESIGN_CAPACITY_UNIT_DENOMINATOR");
+                            if (!hasDesignCapacityColumns) 
+                                inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("DESIGN_CAPACITY, DESIGN_CAPACITY_UNIT_NUMERATOR, DESIGN_CAPACITY_UNIT_DENOMINATOR", "null::double precision as DESIGN_CAPACITY, null::text as DESIGN_CAPACITY_UNIT_NUMERATOR, null::text as DESIGN_CAPACITY_UNIT_DENOMINATOR");
+                        } else if (isFlatFileNonpointDataset) {
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("ANN_EMIS", "ANN_VALUE as ANN_EMIS");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("CEFF", "ANN_PCT_RED as CEFF");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("AVD_EMIS", "null::double precision as AVD_EMIS");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("FIPS, PLANTID, POINTID, STACKID, SEGMENT, PLANT", "region_cd as fips, null::text as PLANTID, null::text as POINTID, null::text as STACKID, null::text as SEGMENT, null::text as PLANT");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("DESIGN_CAPACITY, DESIGN_CAPACITY_UNIT_NUMERATOR, DESIGN_CAPACITY_UNIT_DENOMINATOR", "null::double precision as DESIGN_CAPACITY, null::text as DESIGN_CAPACITY_UNIT_NUMERATOR, null::text as DESIGN_CAPACITY_UNIT_DENOMINATOR");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("STKFLOW", "null::double precision as STKFLOW");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("STKTEMP", "null::double precision as STKTEMP");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("STKVEL", "null::double precision as STKVEL");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("STKDIAM", "null::double precision as STKDIAM");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("ANNUAL_AVG_HOURS_PER_YEAR", "null::double precision as ANNUAL_AVG_HOURS_PER_YEAR");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("REFF", "100::double precision as REFF");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("RPEN", "100::double precision as RPEN");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("PCT_REDUCTION", "null::text as PCT_REDUCTION");
+                        } else if (isFlatFilePointDataset) {
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("ANN_EMIS", "ANN_VALUE as ANN_EMIS");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("CEFF", "ANN_PCT_RED as CEFF");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("AVD_EMIS", "null::double precision as AVD_EMIS");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("FIPS, PLANTID, POINTID, STACKID, SEGMENT, PLANT", "region_cd as fips, facility_id as PLANTID, unit_id as POINTID, rel_point_id as STACKID, process_id as SEGMENT, facility_name as PLANT");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("DESIGN_CAPACITY, DESIGN_CAPACITY_UNIT_NUMERATOR, DESIGN_CAPACITY_UNIT_DENOMINATOR", "null::double precision as DESIGN_CAPACITY, case when array_length(string_to_array(DESIGN_CAPACITY_UNITS,'/'), 1) >= 1 then (string_to_array(DESIGN_CAPACITY_UNITS,'/'))[1] else null end as DESIGN_CAPACITY_UNIT_NUMERATOR, case when array_length(string_to_array(DESIGN_CAPACITY_UNITS,'/'), 1) >= 2 then (string_to_array(DESIGN_CAPACITY_UNITS,'/'))[2] else null end as DESIGN_CAPACITY_UNIT_DENOMINATOR");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("REFF", "100::double precision as REFF");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("RPEN", "100::double precision as RPEN");
+                            inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("PCT_REDUCTION", "null::text as PCT_REDUCTION");
                         } else {
                             inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("PLANTID, POINTID, STACKID, SEGMENT, PLANT", "null::text as PLANTID, null::text as POINTID, null::text as STACKID, null::text as SEGMENT, null::text as PLANT");
                             inventoryColumnDelimitedList = inventoryColumnDelimitedList.replaceAll("DESIGN_CAPACITY, DESIGN_CAPACITY_UNIT_NUMERATOR, DESIGN_CAPACITY_UNIT_DENOMINATOR", "null::double precision as DESIGN_CAPACITY, null::text as DESIGN_CAPACITY_UNIT_NUMERATOR, null::text as DESIGN_CAPACITY_UNIT_DENOMINATOR");

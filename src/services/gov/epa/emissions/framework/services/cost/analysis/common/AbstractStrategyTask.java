@@ -554,14 +554,17 @@ public abstract class AbstractStrategyTask implements Strategy {
                               Version v = version(inventory);
                               VersionedQuery versionedQuery = new VersionedQuery(v);
                               int month = inventory.getInputDataset().applicableMonth();
+                              String datsetTypeName = inventory.getInputDataset().getDatasetType().getName();
+                              boolean isFlatFileInventory = datsetTypeName.equals(DatasetType.FLAT_FILE_2010_POINT) 
+                                  || datsetTypeName.equals(DatasetType.FLAT_FILE_2010_NONPOINT);
                               int noOfDaysInMonth = 31;
                               if (month != -1) {
                                   noOfDaysInMonth = getDaysInMonth(month);
                               }
-                              String sqlAnnEmis = (month != -1 ? "coalesce(" + noOfDaysInMonth + " * i.avd_emis, i.ann_emis)" : "i.ann_emis");
+                              String sqlAnnEmis = (isFlatFileInventory ? "i.ann_value" : (month != -1 ? "coalesce(" + noOfDaysInMonth + " * i.avd_emis, i.ann_emis)" : "i.ann_emis"));
                               sql += (count > 0 ? " union all " : "") 
                                   + "select '" + sector.replace("'", "''") + "'::character varying(64) as sector, "
-                                  + "i.fips, "
+                                  + "i." + (isFlatFileInventory ? "region_cd" : "fips") + " as fips, "
                                   + "i.poll, "
                                   + "sum(" + sqlAnnEmis + ") as Input_Emis, "
                                   + "sum(e.Emis_Reduction) as Emis_Reduction, "
@@ -577,7 +580,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                                   + "on e.source_id = i.record_id "
                                   + "and e.ORIGINAL_DATASET_ID = " + inventory.getInputDataset().getId() + " "
                                   + "where " + versionedQuery.query().replaceAll("delete_versions ", "i.delete_versions ").replaceAll("version ", "i.version ").replaceAll("dataset_id", "i.dataset_id") + " "
-                                  + "group by i.fips, i.poll ";
+                                  + "group by i." + (isFlatFileInventory ? "region_cd" : "fips") + ", i.poll ";
                               ++count;
                               }
                           }
@@ -648,9 +651,9 @@ public abstract class AbstractStrategyTask implements Strategy {
         if (datasets.length > 0) {
             for (int i = 0; i < datasets.length; i++) {
                 //ignore non ORL inventories
-                if (!datasets[i].getInputDataset().getDatasetType().getName().contains("ORL")) {
-                    break;
-                }
+//                if (!datasets[i].getInputDataset().getDatasetType().getName().contains("ORL")) {
+//                    break;
+//                }
 
                 //make sure inventory has indexes created...
 //                makeSureInventoryDatasetHasIndexes(datasets[i]);
@@ -662,7 +665,7 @@ public abstract class AbstractStrategyTask implements Strategy {
                     //populate source table...
                     datasource.query().execute(sql);
                     //analzye source table...
-                    datasource.query().execute("analyze emf.sources;");
+                    datasource.query().execute("vacuum analyze emf.sources;");
                 } catch (SQLException e) {
                     throw new EmfException("Error occured when populating the sources table " + "\n" + e.getMessage());
                 }

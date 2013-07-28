@@ -212,18 +212,36 @@ public class LeastCostAbstractStrategyLoader extends AbstractStrategyLoader {
         }
     }
 
+    protected void makeApplicableMeasuresAvailable(ControlStrategyResult leastCostCMWorksheetResult) throws EmfException {
+        
+        String query = "update " + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + " set status = null::integer where status = 1;vacuum analyze " + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) + ";";
+
+        if (DebugLevels.DEBUG_25())
+            System.out.println(System.currentTimeMillis() + " " + query);
+        try {
+            datasource.query().execute(query);
+        } catch (SQLException e) {
+            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
+        } finally {
+            //
+        }
+    }
+
     protected double getMaximumEmissionReduction(ControlStrategyResult leastCostCMWorksheetResult) throws EmfException {
         double maximumEmissionReduction = 0.0D;
-        String query = "SELECT sum(emis_reduction) "
+        String query = " SELECT sum(emis_reduction) "
             + " from ( "
-            + " SELECT distinct on (source) " 
-            + "    emis_reduction "
-            + " FROM " + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) 
-            + " where status is null " 
-            + "    and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "
-            + " ORDER BY source, emis_reduction desc "
-            + " ) tbl";
-
+            + "     SELECT distinct on (source, original_dataset_id, source_id) emis_reduction "
+            + "     from ( "
+            + "         SELECT emis_reduction, marginal, original_dataset_id, record_id, source, source_id, source_poll_cnt "
+            + "         FROM " + qualifiedEmissionTableName(leastCostCMWorksheetResult.getDetailedResultDataset()) 
+            + "         where status is null  "
+            + "             and poll = '" + controlStrategy.getTargetPollutant().getName() + "' "
+            + "         ORDER BY marginal, emis_reduction desc, source_poll_cnt desc, record_id "
+            + "     ) tbl "
+            + "     ORDER BY source, original_dataset_id, source_id, marginal, emis_reduction desc, source_poll_cnt desc, record_id "
+            + " ) tbl; ";
+        
         ResultSet rs = null;
         if (DebugLevels.DEBUG_25())
             System.out.println(System.currentTimeMillis() + " " + query);
