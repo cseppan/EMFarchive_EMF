@@ -1950,3 +1950,58 @@ where name in ('Flat File 2010 Point','Flat File 2010 Nonpoint');
 -- 2/13/2013 -- added a new debug level to trace case job run parse Queue Id functionality
 insert into emf.properties values(DEFAULT, 'DEBUG_26', 'true');
 update emf.properties set value = 'true' where name = 'DEBUG_26';
+
+
+-- 4/15/2013 -- added new table to track file downloads
+CREATE TABLE emf.file_downloads
+(
+  id serial NOT NULL,
+  user_id integer NOT NULL,
+  "type" character varying(255) NOT NULL,
+  url text NOT NULL,
+  is_read boolean NOT NULL DEFAULT false,
+  date timestamp without time zone NOT NULL,
+  CONSTRAINT file_downloads_pkey PRIMARY KEY (id),
+  CONSTRAINT file_downloads_userid_fkey FOREIGN KEY (user_id)
+      REFERENCES emf.users (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE emf.file_downloads OWNER TO postgres;
+
+-- 6/05/2013 -- added a new properties to help with download functionality
+insert into emf.properties values(DEFAULT, 'DOWNLOAD_EXPORT_FOLDER', '/usr/tomcat/apache-tomcat-6.0.36/webapps/exports/');
+insert into emf.properties values(DEFAULT, 'DOWNLOAD_EXPORT_ROOT_URL', 'http://sage.nesc.epa.gov:8080/exports/');
+
+--06/08/2013 -- added some additional columns...
+ALTER TABLE emf.file_downloads ADD COLUMN absolute_path character varying(1024) NOT NULL;
+ALTER TABLE emf.file_downloads ADD COLUMN size bigint NOT NULL;
+
+-- 7/11/2013 -- added a new properties to help keep track of fields that define state, county, and point information
+insert into emf.properties values(DEFAULT, 'POSTGIS_COUNTY_FIELDS', 'fips,region_cd');
+insert into emf.properties values(DEFAULT, 'POSTGIS_STATE_FIELDS', 'fipsst');
+insert into emf.properties values(DEFAULT, 'POSTGIS_LATITUDE_FIELDS', 'yloc,lat,latitude');
+insert into emf.properties values(DEFAULT, 'POSTGIS_LONGITUDE_FIELDS', 'xloc,lon,longitde');
+
+-- 7/17/13 -- added new column to help track when to overwrite a file during a download
+ALTER TABLE emf.file_downloads ADD COLUMN overwrite boolean NOT NULL DEFAULT false;
+
+-- 7/18/13 -- added new column to the projection shapefiles table, 
+-- also added update scripts to set description
+alter table public.projection_shapefiles add column description text NOT NULL DEFAULT ''::text;
+UPDATE public.projection_shapefiles SET description='U.S. State based shapefile based on NAD83 datum' WHERE name = 'fe_2007_us_state_NAD83';
+UPDATE public.projection_shapefiles SET description='U.S. County based shapefile (100+ demographic fields) based on the WGS84 datum' WHERE name = 'US_counties_WGS84';
+UPDATE public.projection_shapefiles SET description='U.S. County based shapefile (100+ demographic fields) based on the NAD83 datum' WHERE name = 'US_counties_NAD83';
+UPDATE public.projection_shapefiles SET description='U.S. State based shapefile based on WGS84 datum' WHERE name = 'fe_2007_us_state_WGS84';
+UPDATE public.projection_shapefiles SET description='Point geometry which is based on the WGS84 datum' WHERE name = 'WGS 84';
+UPDATE public.projection_shapefiles SET description='Point geometry which is based on the NAD83 datum' WHERE name = 'NAD 83';
+
+-- 7/18/13 -- added trimmed down US county base shapefile 
+create table public.us_county_shape_abbrv as 
+SELECT gid, objectid, county_nam, state_abbr, county_are, cent_lat, 
+       cent_long, fips, state, county, the_geom
+FROM public.us_county_shape;
+INSERT INTO projection_shapefiles (name, table_schema, table_name, prj_text, srid, type, description) VALUES ('US_counties_WGS84_trimmed', 'public', 'us_county_shape_abbrv', 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]', 4326, 'county', 'U.S. County based shapefile (trimmed down version) based on the WGS84 datum');
+
