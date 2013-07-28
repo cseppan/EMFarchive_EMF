@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.PivotConfiguration;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
@@ -8,6 +9,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
@@ -53,10 +55,10 @@ public class ViewQAStepPresenter {
         view.disposeView();
     }
 
-    public void exportToShapeFile(QAStep qaStep, 
-            QAStepResult stepResult, 
-            String dirName, 
-            String fileName, boolean overide, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
+    public void exportToShapeFile(QAStep qaStep, QAStepResult stepResult, 
+            String dirName, String fileName, 
+            boolean overide, ProjectionShapeFile projectionShapeFile, 
+            String rowFilter, PivotConfiguration pivotConfiguration) throws EmfException {
         lastFolder = dirName;
 
         if (stepResult == null || stepResult.getTable() == null)
@@ -65,18 +67,45 @@ public class ViewQAStepPresenter {
         qaStep.setOutputFolder(dirName);
         session.qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
 //        ProjectionShapeFile projectionShapeFile = session.qaService().getProjectionShapeFiles()[1];
-        session.qaService().exportShapeFileQAStep(qaStep, session.user(), dirName, fileName, overide, projectionShapeFile, pollutant);
+        session.qaService().exportShapeFileQAStep(qaStep, session.user(), dirName, fileName, overide, projectionShapeFile, rowFilter, pivotConfiguration);
     }
 
-    public void doExport(QAStep qaStep, QAStepResult stepResult, String dirName, String fileName, boolean overide) throws EmfException {
+    public void downloadToShapeFile(QAStep qaStep, QAStepResult stepResult, 
+            String fileName, ProjectionShapeFile projectionShapeFile, 
+            String rowFilter, PivotConfiguration pivotConfiguration, boolean overwrite) throws EmfException {
+
+        if (stepResult == null || stepResult.getTable() == null)
+            throw new EmfException("You must have run the QA step successfully before exporting ");
+
+        qaStep.setOutputFolder(session.userService().getPropertyValue(EmfProperty.DOWNLOAD_EXPORT_FOLDER_PROPERTY) + "/" + session.user().getUsername());
+        session.qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
+//        ProjectionShapeFile projectionShapeFile = session.qaService().getProjectionShapeFiles()[1];
+        session.qaService().downloadShapeFileQAStep(qaStep, session.user(), fileName, projectionShapeFile, rowFilter, pivotConfiguration, overwrite);
+    }
+
+    public void doExport(QAStep qaStep, QAStepResult stepResult, String dirName, String fileName, boolean overide, String rowFilter) throws EmfException {
+        export(qaStep, stepResult, dirName, fileName, overide, rowFilter);
+    }
+
+    public void export(QAStep qaStep, QAStepResult stepResult, String dirName, String fileName, boolean overide, String rowFilter) throws EmfException {
         if (stepResult == null || stepResult.getTable() == null)
             throw new EmfException("You have to run the QA step successfully before exporting ");
 
         qaStep.setOutputFolder(dirName);
         session.qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
-        session.qaService().exportQAStep(qaStep, session.user(), dirName, fileName, overide);
+        session.qaService().exportQAStep(qaStep, session.user(), dirName, fileName, overide, rowFilter);
 
     }
+
+    public void download(QAStep qaStep, QAStepResult stepResult, String fileName, boolean overwrite, String rowFilter) throws EmfException {
+        if (stepResult == null || stepResult.getTable() == null)
+            throw new EmfException("You must run the QA step successfully before exporting ");
+
+        qaStep.setOutputFolder(session.userService().getPropertyValue(EmfProperty.DOWNLOAD_EXPORT_FOLDER_PROPERTY) + "/" + session.user().getUsername());
+        qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
+        qaService().downloadQAStep(qaStep, session.user(), fileName, overwrite, rowFilter);
+    }
+    
 
     public String userName() {
         return session.user().getUsername();
@@ -183,6 +212,10 @@ public class ViewQAStepPresenter {
         return session.dataService().checkBizzareCharInColumn(step.getDatasetId(), step.getVersion(), colName);
     }
 
+    public boolean isShapeFileCapable(QAStepResult stepResult) throws EmfException {
+        return session.qaService().isShapefileCapable(stepResult);
+    }
+    
     public boolean ignoreShapeFileFunctionality() throws EmfException {
         try {
             String value = session.userService().getPropertyValue("IGNORE_SHAPEFILE_FUNCTIONALITY");

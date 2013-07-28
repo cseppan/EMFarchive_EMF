@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.qa;
 
+import gov.epa.emissions.commons.data.PivotConfiguration;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
@@ -25,9 +26,13 @@ public interface QAService {
 
     void runQAStep(QAStep step, User user) throws EmfException;
 
-    public void exportQAStep(QAStep step, User user, String dirName, String fileName, boolean overide) throws EmfException;
+    public void exportQAStep(QAStep step, User user, String dirName, String fileName, boolean overide, String rowFilter) throws EmfException;
 
-    public void exportShapeFileQAStep(QAStep step, User user, String dirName, String fileName, boolean overide, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException;
+    public void downloadQAStep(QAStep step, User user, String fileName, boolean overwrite, String rowFilter) throws EmfException;
+
+    public void exportShapeFileQAStep(QAStep step, User user, String dirName, String fileName, boolean overide, ProjectionShapeFile projectionShapeFile, String rowFilter, PivotConfiguration pivotConfiguration) throws EmfException;
+
+    public void downloadShapeFileQAStep(QAStep step, User user, String fileName, ProjectionShapeFile projectionShapeFile, String rowFilter, PivotConfiguration pivotConfiguration, boolean overwrite) throws EmfException;
 
     QAStepResult getQAStepResult(QAStep step) throws EmfException;
     
@@ -40,5 +45,7 @@ public interface QAService {
     void copyQAStepsToDatasets(User user, QAStep[] steps, int[] datasetIds, boolean replace) throws EmfException;
 
     void deleteQASteps(User user, QAStep[] steps, int datasetId) throws EmfException; //BUG3615
+
+    boolean isShapefileCapable(QAStepResult stepResult) throws EmfException;
 
 }

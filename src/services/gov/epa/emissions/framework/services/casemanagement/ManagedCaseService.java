@@ -14,7 +14,7 @@ import gov.epa.emissions.commons.util.CustomDateFormat;
 import gov.epa.emissions.commons.util.StringTools;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.RemoteCommand;
 import gov.epa.emissions.framework.services.basic.Status;

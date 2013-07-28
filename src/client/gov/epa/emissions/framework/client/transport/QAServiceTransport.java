@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.data.PivotConfiguration;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
@@ -84,7 +85,7 @@ public class QAServiceTransport implements QAService {
 
     }
 
-    public synchronized void exportQAStep(QAStep step, User user, String dirName, String fileName, boolean overide) throws EmfException {
+    public synchronized void exportQAStep(QAStep step, User user, String dirName, String fileName, boolean overide, String rowFilter) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("exportQAStep");
@@ -93,12 +94,27 @@ public class QAServiceTransport implements QAService {
         call.addStringParam("dirName");
         call.addStringParam("fileName");
         call.addBooleanParameter("overide");
+        call.addStringParam("rowFilter");
         call.setVoidReturnType();
 
-        call.request(new Object[] { step, user, dirName, fileName, new Boolean(overide) });
+        call.request(new Object[] { step, user, dirName, fileName, new Boolean(overide), rowFilter });
     }
 
-    public synchronized void exportShapeFileQAStep(QAStep step, User user, String dirName, String fileName, boolean overide, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
+    public synchronized void downloadQAStep(QAStep step, User user, String fileName, boolean overwrite, String rowFilter) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("downloadQAStep");
+        call.addParam("step", mappings.qaStep());
+        call.addParam("user", mappings.user());
+        call.addStringParam("fileName");
+        call.addBooleanParameter("overwrite");
+        call.addStringParam("rowFilter");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { step, user, fileName, overwrite, rowFilter });
+    }
+
+    public synchronized void exportShapeFileQAStep(QAStep step, User user, String dirName, String fileName, boolean overide, ProjectionShapeFile projectionShapeFile, String rowFilter, PivotConfiguration pivotConfiguration) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("exportShapeFileQAStep");
@@ -108,10 +124,27 @@ public class QAServiceTransport implements QAService {
         call.addStringParam("fileName");
         call.addBooleanParameter("overide");
         call.addParam("projectionShapeFile", mappings.projectionShapeFile());
-        call.addParam("pollutant", mappings.pollutant());
+        call.addParam("rowFilter", mappings.string());
+        call.addParam("pivotConfiguration", mappings.pivotConfiguration());
         call.setVoidReturnType();
 
-        call.request(new Object[] { step, user, dirName, fileName, new Boolean(overide), projectionShapeFile, pollutant });
+        call.request(new Object[] { step, user, dirName, fileName, new Boolean(overide), projectionShapeFile, rowFilter, pivotConfiguration });
+    }
+
+    public synchronized void downloadShapeFileQAStep(QAStep step, User user, String fileName, ProjectionShapeFile projectionShapeFile, String rowFilter, PivotConfiguration pivotConfiguration, boolean overwrite) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("downloadShapeFileQAStep");
+        call.addParam("step", mappings.qaStep());
+        call.addParam("user", mappings.user());
+        call.addStringParam("fileName");
+        call.addParam("projectionShapeFile", mappings.projectionShapeFile());
+        call.addParam("rowFilter", mappings.string());
+        call.addParam("pivotConfiguration", mappings.pivotConfiguration());
+        call.addBooleanParameter("overwrite");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { step, user, fileName, projectionShapeFile, rowFilter, pivotConfiguration, overwrite });
     }
 
     public synchronized QAStepResult getQAStepResult(QAStep step) throws EmfException {
@@ -191,6 +224,16 @@ public class QAServiceTransport implements QAService {
 
         call.request(new Object[] { user, steps, datasetId });
         
+    }
+
+    public boolean isShapefileCapable(QAStepResult stepResult) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("isShapefileCapable");
+        call.addParam("stepResult", mappings.qaStepResult());
+        call.setBooleanReturnType();
+        
+        return (Boolean)call.requestResponse(new Object[]{ stepResult });
     }
 
 }

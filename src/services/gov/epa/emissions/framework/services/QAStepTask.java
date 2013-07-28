@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.meta.qa.QAProperties;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;

@@ -509,4 +509,15 @@ public class DataServiceTransport implements DataService {
         return (Boolean)call.requestResponse(new Object[]{new Integer(datasetId), new Integer(version), colName});
     }
 
+    public synchronized String[] getTableColumns(String table) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getTableColumns");
+        call.addStringParam("table");
+        call.setReturnType(mappings.strings());
+
+        return (String[]) call.requestResponse(new Object[] { table });
+        
+    }
+
 }

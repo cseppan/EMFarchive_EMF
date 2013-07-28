@@ -12,7 +12,7 @@ import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.io.VersionedQuery;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;

@@ -120,4 +120,23 @@ public class ExImServiceTransport implements ExImService {
         return (String) call.requestResponse(new Object[] { });
     }
 
+    public void downloadDatasets(User user, Integer[] datasetIds, Version[] versions, String prefix, String rowFilters,
+            EmfDataset filterDataset, Version filterDatasetVersion, String filterDatasetJoinCondition,
+            String colOrders, String purpose) throws EmfException {
+        call.setOperation("downloadDatasets");
+        call.addParam("user", mappings.user());
+        call.addParam("datasetids", mappings.integers());
+        call.addParam("versions", mappings.versions());
+        call.addStringParam("prefix");
+        call.addStringParam("rowFilters");
+        call.addParam("filterDataset", mappings.dataset());
+        call.addParam("filterDatasetVersion", mappings.version());
+        call.addStringParam("filterDatasetJoinCondition");
+        call.addStringParam("colOrders");
+        call.addStringParam("purpose");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, datasetIds, versions, prefix, rowFilters, filterDataset, filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose });
+    }
+
 }

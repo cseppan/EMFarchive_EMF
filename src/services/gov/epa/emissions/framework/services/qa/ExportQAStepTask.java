@@ -6,6 +6,8 @@ import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.FileDownload;
+import gov.epa.emissions.framework.services.basic.FileDownloadDAO;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
@@ -14,6 +16,7 @@ import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -27,6 +30,8 @@ public class ExportQAStepTask implements Runnable {
     private User user;
 
     private StatusDAO statusDao;
+    
+    private FileDownloadDAO fileDownloadDao;
 
     private Log log = LogFactory.getLog(ExportQAStepTask.class);
 
@@ -46,6 +51,10 @@ public class ExportQAStepTask implements Runnable {
     
     private boolean verboseStatusLogging = true;
 
+    private boolean download = false;
+
+    private String rowFilter;
+
     public ExportQAStepTask(String dirName, String fileName, 
             boolean overide, QAStep qaStep, 
             User user, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) {
@@ -57,15 +66,28 @@ public class ExportQAStepTask implements Runnable {
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
         this.statusDao = new StatusDAO(sessionFactory);
+        this.fileDownloadDao = new FileDownloadDAO(sessionFactory);
     }
 
     public ExportQAStepTask(String dirName, String fileName, 
             boolean overide, QAStep qaStep, 
-            User user, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory, boolean verboseStatusLogging) {
+            User user, HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory, boolean verboseStatusLogging, String rowFilter) {
         this(dirName, fileName, 
                 overide, qaStep, 
                 user, sessionFactory, dbServerFactory);
+        this.rowFilter = rowFilter;
         this.verboseStatusLogging = verboseStatusLogging;
+    }
+
+    public ExportQAStepTask(String dirName, String fileName, 
+            boolean overide, QAStep qaStep, 
+            User user, HibernateSessionFactory sessionFactory, 
+            DbServerFactory dbServerFactory, boolean verboseStatusLogging,
+            boolean download, String rowFilter) {
+        this(dirName, fileName, 
+                overide, qaStep, 
+                user, sessionFactory, dbServerFactory, verboseStatusLogging, rowFilter);
+        this.download  = download;
     }
 
     public void run() {        
@@ -76,10 +98,25 @@ public class ExportQAStepTask implements Runnable {
             file = exportFile(dirName);
             file.setReadable(true, false);
             file.setWritable(true, false);
-            Exporter exporter = new DatabaseTableCSVExporter(dbServer.getEmissionsDatasource().getName() + "." + result.getTable(), dbServer.getEmissionsDatasource());
+            String fileAbsolutePath = file.getAbsolutePath();
+            String fileName = fileAbsolutePath.substring(fileAbsolutePath.lastIndexOf("/")+1, fileAbsolutePath.length());
+            Exporter exporter = new DatabaseTableCSVExporter(dbServer.getEmissionsDatasource().getName() + "." + result.getTable(), dbServer.getEmissionsDatasource(), rowFilter);
             suffix = suffix();
             prepare(suffix);
             exporter.export(file);
+
+            if (download) {
+                //lets add a filedownload item for the user, so they can download the file
+                FileDownload fileDownload = new FileDownload();
+                fileDownload.setUserId(user.getId());
+                fileDownload.setType("QA Step - CSV");
+                fileDownload.setTimestamp(new Date());
+                fileDownload.setAbsolutePath(fileDownloadDao.getDownloadExportFolder() + "/" + user.getUsername() + "/" + file.getName());
+                fileDownload.setUrl(fileDownloadDao.getDownloadExportRootURL() + "/" + user.getUsername() + "/" + file.getName());
+                fileDownload.setOverwrite(overide);
+                fileDownloadDao.add(fileDownload);
+            }
+
             complete(suffix);
         } catch (Exception e) {
             logError("Failed to export QA step : " + qastep.getName() + suffix, e);
@@ -105,7 +142,8 @@ public class ExportQAStepTask implements Runnable {
 
     private void complete(String suffixMsg) {
         if (verboseStatusLogging)
-            setStatus("Completed exporting QA step '" + qastep.getName() + "'" + suffixMsg);
+            setStatus("Completed exporting QA step '" + qastep.getName() + "'" + suffixMsg
+                    + (download ? ".  The file will start downloading momentarily, see the Download Manager for the download status." : ""));
     }
 
     private void logError(String message, Exception e) {
@@ -161,6 +199,10 @@ public class ExportQAStepTask implements Runnable {
 
     private File exportFile(String dirName) throws EmfException {
         File f = new File(validateDir(dirName), fileName());
+
+        if (download)
+            return f;
+        
         if (!overide && f.exists()) {
             throw new EmfException("The file " + f.getAbsolutePath() + " already exists.");
         }
@@ -175,6 +217,14 @@ public class ExportQAStepTask implements Runnable {
 
     private File validateDir(String dirName) throws EmfException {
         File file = new File(dirName);
+
+        //don't check if exists when downloading, just create
+        if (download) {
+            file.mkdir();
+            file.setReadable(true, true);
+            file.setWritable(true, false);
+            return file;
+        }
 
         if (!file.exists() || !file.isDirectory()) {
             log.error("Folder " + dirName + " does not exist");

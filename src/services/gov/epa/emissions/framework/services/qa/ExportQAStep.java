@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
+import gov.epa.emissions.framework.services.basic.FileDownloadDAO;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -28,14 +29,20 @@ public class ExportQAStep {
 
     private boolean verboseStatusLogging = true;
 
+    private FileDownloadDAO fileDownloadDAO;
+
+    private String rowFilter;
+
     public ExportQAStep(QAStep step, DbServerFactory dbServerFactory, 
             User user, HibernateSessionFactory sessionFactory,
-            PooledExecutor threadPool) {
+            PooledExecutor threadPool, String rowFilter) {
         this.step = step;
         this.dbServerFactory = dbServerFactory;
         this.user = user;
         this.sessionFactory = sessionFactory;
         this.threadPool = threadPool;
+        this.fileDownloadDAO = new FileDownloadDAO(sessionFactory);
+        this.rowFilter = rowFilter;
     }
 
     public ExportQAStep(QAStep step, DbServerFactory dbServerFactory, 
@@ -43,14 +50,26 @@ public class ExportQAStep {
             PooledExecutor threadPool, boolean verboseStatusLogging) {
         this(step, dbServerFactory,
             user, sessionFactory,
-            threadPool);
+            threadPool, null);
         this.verboseStatusLogging = verboseStatusLogging;
     }
 
     public void export(String dirName, String fileName, boolean overide) throws EmfException {
         ExportQAStepTask task = new ExportQAStepTask(dirName, fileName, 
                 overide, step, 
-                user, sessionFactory, dbServerFactory, verboseStatusLogging);
+                user, sessionFactory, dbServerFactory, verboseStatusLogging, rowFilter);
+        try {
+            threadPool.execute(new GCEnforcerTask("Export QA Step : " + step.getProgram().getName(), task));
+        } catch (InterruptedException e) {
+            LOG.error("Error while exporting a qa step: " + step.getName(), e);
+            throw new EmfException(e.getMessage());
+        }
+    }
+
+    public void download(String fileName, boolean overwrite) throws EmfException {
+        ExportQAStepTask task = new ExportQAStepTask(fileDownloadDAO.getDownloadExportFolder() + "/" + user.getUsername(), fileName, 
+                overwrite, step, 
+                user, sessionFactory, dbServerFactory, verboseStatusLogging, true, rowFilter);
         try {
             threadPool.execute(new GCEnforcerTask("Export QA Step : " + step.getProgram().getName(), task));
         } catch (InterruptedException e) {

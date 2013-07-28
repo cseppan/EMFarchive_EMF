@@ -19,7 +19,6 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.client.casemanagement.jobs.ExportSelectionDialog;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
@@ -112,6 +111,10 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     private EmfDataset origDataset;
 
     private QAStepResult qaStepResult;
+
+    private JCheckBox download;
+
+    private BrowseButton exportFolderButton;
 
     public ViewQAStepWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("View QA Step", new Dimension(680, 580), desktopManager);
@@ -232,6 +235,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(comments);
         layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
 
+        layoutGenerator.addLabelWidgetPair("", downloadResultsChkboxPanel(step), panel);
         layoutGenerator.addLabelWidgetPair("Folder:", exportFolderPanel(step), panel);
         layoutGenerator.addLabelWidgetPair("Export Name:", exportNamePanel(step), panel);
         layoutGenerator.addLabelWidgetPair("", overideChkboxPanel(step), panel);
@@ -255,6 +259,28 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         return namePanel;
     }
     
+    private JPanel downloadResultsChkboxPanel(QAStep step) {
+        download = new JCheckBox("Download result file to local machine?");
+        download.setName("download");
+        download.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+
+                Object source = e.getItemSelectable();
+
+                if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    exportFolder.setEnabled(true);
+                    exportFolderButton.setEnabled(true);
+                } else {
+                    exportFolder.setEnabled(false);
+                    exportFolderButton.setEnabled(false);
+                }
+            }            
+        });
+        JPanel downloadPanel = new JPanel(new BorderLayout(2, 10));
+        downloadPanel.add(download, BorderLayout.LINE_START);
+        return downloadPanel;
+    }
+
     private JPanel overideChkboxPanel(QAStep step) {
         overide = new JCheckBox("Overwrite files if they exist?");
         overide.setToolTipText("If the box checked, the files with the same names will be overiden if they already exist in the folder.");
@@ -269,14 +295,14 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         exportFolder.setName("folder");
         String outputFolder = step.getOutputFolder();
         exportFolder.setText(outputFolder != null ? outputFolder : "");
-        Button button = new BrowseButton(new AbstractAction() {
+        exportFolderButton = new BrowseButton(new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 selectFolder();
             }
         });
         JPanel folderPanel = new JPanel(new BorderLayout(10, 10));
         folderPanel.add(exportFolder);
-        folderPanel.add(button, BorderLayout.EAST);
+        folderPanel.add(exportFolderButton, BorderLayout.EAST);
         return folderPanel;
     }
     
@@ -488,27 +514,51 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     
     protected void doExport() {
         try {
-            checkExportFolder();
+            //only make user specify folder when exporting to EMF server, not downloading
+            if (!download.isSelected())
+                checkExportFolder();
             if ( !checkExportName()) 
                 return;
-            if (!presenter.ignoreShapeFileFunctionality()) {
-                ExportSelectionDialog dialog = new ExportSelectionDialog(parentConsole, presenter.getProjectionShapeFiles(), presenter.getPollutants());
-                dialog.display();
-                if (dialog.shouldCreateShapeFile()){
-                    messagePanel.setMessage("Started Exporting Shape File. Please monitor the Status window "
-                            + "to track your export request.");
-                    presenter.exportToShapeFile(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected(), dialog.getProjectionShapeFile(), dialog.getPollutant());
+//            if (!presenter.ignoreShapeFileFunctionality() 
+//                    && presenter.isShapeFileCapable(qaStepResult)) {
+                QAStepExportWizard dialog = new QAStepExportWizard(parentConsole);
+                QAStepExportWizardPresenter presenter2 = new QAStepExportWizardPresenter(session);
+                presenter2.display(dialog, qaStepResult);
+                if (!presenter2.isCanceled()) { //make sure they didn't cancel the export operation...
+                    if (dialog.shouldCreateShapeFile()){
+                        if (download.isSelected()) {
+                            messagePanel.setMessage("Started Exporting Shape File to download. Please monitor the Status window "
+                                    + "to track your export request.");
+                            this.presenter.downloadToShapeFile(step, qaStepResult, exportName.getText(), dialog.getProjectionShapeFile(), dialog.getRowFilter(), dialog.getPivotConfiguration(), overide.isSelected());
+                        } else {
+                            messagePanel.setMessage("Started Exporting Shape File. Please monitor the Status window "
+                                    + "to track your export request.");
+                            this.presenter.exportToShapeFile(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected(), dialog.getProjectionShapeFile(), dialog.getRowFilter(), dialog.getPivotConfiguration());
+                        }
+                    }
+                    if(dialog.shouldCreateCSV()) {
+                        if (download.isSelected()) {
+                            messagePanel.setMessage("Started Export to download. Please monitor the Status window "
+                                    + "to track your export request.");
+                            this.presenter.download(step, qaStepResult, exportName.getText(), overide.isSelected(), dialog.getRowFilter());
+                        } else {
+                            messagePanel.setMessage("Started Export. Please monitor the Status window "
+                                    + "to track your export request.");
+                            this.presenter.export(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected(), dialog.getRowFilter()); // pass in fileName
+                        }
+                    }
                 }
-                if(dialog.shouldCreateCSV()) {
-                    messagePanel.setMessage("Started Export. Please monitor the Status window "
-                            + "to track your export request.");
-                    presenter.doExport(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected()); // pass in fileName
-                }
-            } else {
-                messagePanel.setMessage("Started Export. Please monitor the Status window "
-                        + "to track your export request.");
-                presenter.doExport(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected()); // pass in fileName
-            }
+//            } else {
+//                if (download.isSelected()) {
+//                    messagePanel.setMessage("Started Export to download. Please monitor the Status window "
+//                            + "to track your export request.");
+//                    this.presenter.download(step, qaStepResult, exportName.getText(), overide.isSelected());
+//                } else {
+//                    messagePanel.setMessage("Started Export. Please monitor the Status window "
+//                            + "to track your export request.");
+//                    this.presenter.export(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected(), dialog.get); // pass in fileName
+//                }
+//            }
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -608,7 +658,6 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
                             }
                         }
                     }
-                    System.out.println("ViewCount: " + viewCount);
                     presenter.viewResults(step, stepResult, viewCount);
                 } catch (EmfException e) {
                     try  {

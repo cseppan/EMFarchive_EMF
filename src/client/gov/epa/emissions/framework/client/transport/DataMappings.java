@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.data.PivotConfiguration;
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.ProjectionShapeFile;
@@ -29,6 +30,7 @@ import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
+import gov.epa.emissions.framework.services.basic.FileDownload;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureClass;
@@ -121,7 +123,8 @@ public class DataMappings extends Mappings {
         bean(call, Version.class, version());
         bean(call, DataAccessToken.class, dataAccessToken());
         bean(call, ChangeSet.class, changeset());
-
+        
+        bean(call, FileDownload.class, fileDownload());
         bean(call, Status.class, status());
         bean(call, AccessLog.class, log());
 
@@ -137,6 +140,7 @@ public class DataMappings extends Mappings {
         bean(call, QAProgram.class, program());
         bean(call, QAStepResult.class, qaStepResult());
         bean(call, ProjectionShapeFile.class, projectionShapeFile());
+        bean(call, PivotConfiguration.class, pivotConfiguration());
 
         bean(call, TableMetadata.class, tablemetadata());
         bean(call, ColumnMetaData.class, columnmetadata());
@@ -228,6 +232,7 @@ public class DataMappings extends Mappings {
         array(call, Version[].class, versions());
 
         array(call, Status[].class, statuses());
+        array(call, FileDownload[].class, fileDownloads());
         array(call, AccessLog[].class, logs());
 
         array(call, Note[].class, notes());
@@ -242,6 +247,7 @@ public class DataMappings extends Mappings {
         array(call, QAStep[].class, qaSteps());
         array(call, QAStepResult[].class, qaStepResults());
         array(call, ProjectionShapeFile[].class, projectionShapeFiles());
+        array(call, PivotConfiguration[].class, pivotConfigurations());
         array(call, QAProgram[].class, programs());
 
         array(call, ControlMeasure[].class, controlMeasures());
@@ -480,6 +486,16 @@ public class DataMappings extends Mappings {
         return qname("ProjectionShapeFiles");
     }
 
+    public QName pivotConfiguration() {
+        return qname("PivotConfiguration");
+    }
+
+    public QName pivotConfigurations() {
+        return qname("PivotConfigurations");
+    }
+
+    
+    
     public QName tablemetadata() {
         return qname("TableMetadata");
     }
@@ -894,6 +910,14 @@ public class DataMappings extends Mappings {
 
     public QName fastAnalysisRuns() {
         return qname("FastAnalysisRuns");
+    }
+
+    public QName fileDownload() {
+        return qname("FileDownload");
+    }
+
+    public QName fileDownloads() {
+        return qname("FileDownloads");
     }
 
 }

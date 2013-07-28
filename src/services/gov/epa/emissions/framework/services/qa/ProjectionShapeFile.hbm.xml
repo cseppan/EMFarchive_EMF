@@ -14,6 +14,7 @@
         <property name="prjText" column="prj_text" type="java.lang.String" not-null="true"/>
         <property name="srid" column="srid" type="integer" not-null="true"/>
         <property name="type" column="type" type="java.lang.String" not-null="true"/>
+        <property name="description" column="description" type="java.lang.String" not-null="true"/>
     </class>
 </hibernate-mapping>  
 

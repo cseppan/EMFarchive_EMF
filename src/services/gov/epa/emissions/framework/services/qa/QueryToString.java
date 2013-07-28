@@ -113,7 +113,7 @@ public class QueryToString {
         output.append(colTypes + lineFeeder + colNames + lineFeeder);
     }
     
-    public int getRows(){
+    public long getRows(){
         return rows; 
     }
 }

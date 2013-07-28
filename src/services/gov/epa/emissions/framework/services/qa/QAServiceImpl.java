@@ -1,17 +1,18 @@
 package gov.epa.emissions.framework.services.qa;
 
-import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.PivotConfiguration;
 import gov.epa.emissions.commons.data.ProjectionShapeFile;
 import gov.epa.emissions.commons.data.QAProgram;
-import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.TableCreator;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.GCEnforcerTask;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
 import gov.epa.emissions.framework.services.basic.RemoteCommand;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
@@ -19,17 +20,15 @@ import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -249,9 +248,9 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public synchronized void exportQAStep(QAStep step, User user, String dirName, String fileName, boolean overide) throws EmfException {
+    public synchronized void exportQAStep(QAStep step, User user, String dirName, String fileName, boolean overide, String rowFilter) throws EmfException {
         try {
-            ExportQAStep exportQATask = new ExportQAStep(step, dbServerFactory, user, sessionFactory, threadPool);
+            ExportQAStep exportQATask = new ExportQAStep(step, dbServerFactory, user, sessionFactory, threadPool, rowFilter);
             exportQATask.export(dirName, fileName, overide);
         } catch (Exception e) {
             LOG.error("Could not export QA step", e);
@@ -259,16 +258,116 @@ public class QAServiceImpl implements QAService {
         }
     }
 
-    public synchronized void exportShapeFileQAStep(QAStep step, User user, String dirName,
-            String fileName, boolean overide, ProjectionShapeFile projectionShapeFile, Pollutant pollutant) throws EmfException {
+    public synchronized void downloadQAStep(QAStep step, User user, String fileName, boolean overwrite, String rowFilter) throws EmfException {
         try {
-            ExportShapeFileQAStep exportQATask = new ExportShapeFileQAStep(step, dbServerFactory, user, sessionFactory,
-                    threadPool, true, pollutant);
-            exportQATask.export(dirName, fileName, projectionShapeFile, overide);
+            ExportQAStep exportQATask = new ExportQAStep(step, dbServerFactory, user, sessionFactory, threadPool, rowFilter);
+            exportQATask.download(fileName, overwrite);
         } catch (Exception e) {
             LOG.error("Could not export QA step", e);
             throw new EmfException("Could not export QA step: " + e.getMessage());
         }
+    }
+
+    public synchronized void exportShapeFileQAStep(QAStep step, User user, String dirName,
+            String fileName, boolean overide, ProjectionShapeFile projectionShapeFile, String rowFilter, PivotConfiguration pivotConfiguration) throws EmfException {
+        try {
+            ExportShapeFileQAStep exportQATask = new ExportShapeFileQAStep(step, dbServerFactory, user, sessionFactory,
+                    threadPool, true);
+            exportQATask.export(dirName, fileName, projectionShapeFile, overide, rowFilter, pivotConfiguration);
+        } catch (Exception e) {
+            LOG.error("Could not export QA step", e);
+            throw new EmfException("Could not export QA step: " + e.getMessage());
+        }
+    }
+
+    public synchronized void downloadShapeFileQAStep(QAStep step, User user, 
+            String fileName, ProjectionShapeFile projectionShapeFile, 
+            String rowFilter, PivotConfiguration pivotConfiguration, 
+            boolean overwrite) throws EmfException {
+        try {
+            ExportShapeFileQAStep exportQATask = new ExportShapeFileQAStep(step, dbServerFactory, user, sessionFactory,
+                    threadPool, true);
+            exportQATask.download(fileName, projectionShapeFile, rowFilter, pivotConfiguration, overwrite);
+        } catch (Exception e) {
+            LOG.error("Could not export QA step", e);
+            throw new EmfException("Could not export QA step: " + e.getMessage());
+        }
+    }
+
+    private String getProperty(String propertyName) {
+        Session session = sessionFactory.getSession();
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty(propertyName, session);
+            return property.getValue();
+        } finally {
+            session.close();
+        }
+    }
+
+    private boolean findColumn(String actualColumnName, String columnNameToFind) {
+        if (columnNameToFind.matches("(?i)(\"*)(" + actualColumnName + ")(\"*)"))
+            return true;
+        return false;
+    }
+
+    public boolean isShapefileCapable(QAStepResult stepResult) throws EmfException {
+        DbServer dbServer = null;
+        boolean hasLatitudeCol = false;
+        boolean hasLongitudeCol = false;
+        String[] validCountyFields = getProperty(EmfProperty.POSTGIS_COUNTY_FIELDS).split(",");
+        String[] validStateFields = getProperty(EmfProperty.POSTGIS_STATE_FIELDS).split(",");
+        String[] validLatitudeFields = getProperty(EmfProperty.POSTGIS_LATITUDE_FIELDS).split(",");
+        String[] validLongitudeFields = getProperty(EmfProperty.POSTGIS_LONGITUDE_FIELDS).split(",");
+
+        try {
+            dbServer = dbServerFactory.getDbServer();
+            Column[] columns = dbServer.getEmissionsDatasource().dataModifier().getColumns(stepResult.getTable());
+
+            for (Column column : columns) {
+                String colName = column.getName();
+                // String colType = column.getColumnTypeName(i);
+
+                for (String fipsField : validCountyFields) {
+                    if (findColumn(colName, fipsField)) {
+                        return true;
+                    }
+                }
+                for (String fipsStField : validStateFields) {
+                    if (findColumn(colName, fipsStField)) {
+                        return true;
+                    }
+                }
+                if (!hasLatitudeCol) {
+                    for (String latitudeField : validLatitudeFields) {
+                        if (findColumn(colName, latitudeField)) {
+                            hasLatitudeCol = true;
+                            break;
+                        }
+                    }
+                }
+                if (!hasLongitudeCol) {
+                    for (String longitudeField : validLongitudeFields) {
+                        if (findColumn(colName, longitudeField)) {
+                            hasLongitudeCol = true;
+                            break;
+                        }
+                    }
+                }
+                if (hasLatitudeCol && hasLongitudeCol)
+                    return true;
+            }
+        } catch (SQLException e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            if (dbServer != null)
+                try {
+                    dbServer.disconnect();
+                } catch (Exception e) {
+                    // NOTE Auto-generated catch block
+                    e.printStackTrace();
+                }
+        }
+        return false;
     }
 
     private synchronized void checkRestrictions(QAStep step) throws EmfException {

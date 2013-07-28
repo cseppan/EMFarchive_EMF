@@ -1,5 +1,9 @@
 package gov.epa.emissions.framework.services.data;
 
+import java.util.List;
+
+import org.hibernate.Session;
+
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Keyword;
@@ -15,6 +19,7 @@ import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
+import gov.epa.emissions.framework.services.basic.FileDownload;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.editor.Revision;
 
@@ -76,6 +81,14 @@ public interface DataCommonsService {
 
     DatasetType releaseLockedDatasetType(User owner, DatasetType type) throws EmfException;
 
+    // FileDownload
+    FileDownload[] getFileDownloads(Integer userId) throws EmfException;
+    FileDownload[] getUnreadFileDownloads(Integer userId) throws EmfException;
+    void addFileDownload(FileDownload fileDownload) throws EmfException;
+    void markFileDownloadsRead(Integer[] fileDownloadIds) throws EmfException;
+    void removeFileDownloads(Integer userId) throws EmfException;
+
+    
     // Status
     Status[] getStatuses(String username) throws EmfException;
 

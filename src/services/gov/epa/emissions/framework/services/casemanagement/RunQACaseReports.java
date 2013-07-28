@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.postgres.PostgresCOPYExport;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.security.User;
@@ -18,10 +19,13 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.QueryToString;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,7 +40,7 @@ import org.hibernate.Session;
 
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
-public class RunQACaseReports {
+public class RunQACaseReports implements Runnable {
 
     private StatusDAO statusDao;
     private User user;
@@ -48,6 +52,8 @@ public class RunQACaseReports {
     private Datasource datasource;
     private CaseDAO dao;
     private DbServer dbServer;
+    private String reportSQL;
+    private PostgresCOPYExport postgresCOPYExport;
 
     public RunQACaseReports(User user, DbServerFactory dbFactory, CaseDAO dao,
             HibernateSessionFactory sessionFactory,  String exportDir) {
@@ -59,10 +65,11 @@ public class RunQACaseReports {
         this.exportDir = exportDir;
         this.statusDao = new StatusDAO(sessionFactory);
         this.session = sessionFactory.getSession();
+        this.postgresCOPYExport = new PostgresCOPYExport(dbServer);
     }
 
 
-    public String[] runQA(int[] caseIds, String gridName, 
+    public String validateAndBuildReportSQL(int[] caseIds, String gridName, 
             Sector[] sectors, String[] repDims, String whereClause) throws EmfException {
         String infoString = "";
         String selectSql = "";
@@ -71,6 +78,9 @@ public class RunQACaseReports {
         String finalSql = " ";
         String annemisSql = "";
         Boolean useCounty = false;
+
+        //reset report SQL, there could validation issues...
+        this.reportSQL = "";
 
         String whereSql = whereClause.trim(); 
         if (whereSql.length() > 0)
@@ -304,42 +314,19 @@ public class RunQACaseReports {
             }
 
             finalSql = "select " + headSelectSql + " from ( " + selectSql + finalSql + " ) as foo group by " + tailSelectSql;
-            if (DebugLevels.DEBUG_0())
-                System.out.println("Final Query: " + finalSql);
-            QueryToString queryToString = new QueryToString(dbServer, finalSql, ",");
-            String tableQuery = queryToString.toString();
-            String rows = queryToString.getRows()+ "";
-            //System.out.println(user.getUsername() + " rows: "+  rows);
-            File localFile = new File(tempQAFilePath());
+            
+            //store report SQL in module level field so its available to threaded run method...
+            this.reportSQL = finalSql;
 
-            Writer output;
-            try {
-                output = new BufferedWriter(new FileWriter(localFile));
-                output.write( tableQuery );
-                output.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new EmfException( e.getMessage());
-            }
-            //setStatus(infoString);
-            setStatus("Completed running QA case Reports: " + localFile.getName() + "  Total lines: " + rows);
-            return new String[]{"", infoString};
+            if (DebugLevels.DEBUG_0())
+                System.out.println("Final Query: " + this.reportSQL);
+            
+            return infoString;
              
         } catch (RuntimeException e) {
             e.printStackTrace();
             //setStatus("Error: Could not retrieve annual Reports: " + e.getMessage());
             throw new EmfException("Error: Could not retrieve annual Reports. \n" + e.getMessage());
-        } catch (ExporterException e) {
-            e.printStackTrace();
-            setStatus("Could not retrieve annual Reports: " + e.getMessage());
-            throw new EmfException("Could not retrieve annual Reports. \n" + e.getMessage());
-        } finally {
-            try {
-                if (dbServer != null && dbServer.isConnected())
-                    dbServer.disconnect();
-            } catch (Exception e) {
-                throw new EmfException("ManagedCaseService: error closing db server. " + e.getMessage());
-            }
         }
     }
     
@@ -372,6 +359,58 @@ public class RunQACaseReports {
         return exportDir + separator +  "runQACaseReports_" + timeStamp + ".csv"; // this is how exported file name was
     }
 
+
+    public void run() {
+        // NOTE Auto-generated method stub
+        File localFile;
+        try {
+            localFile = new File(tempQAFilePath());
+
+            postgresCOPYExport.export(this.reportSQL, localFile.getAbsolutePath());
+        
+            setStatus("Completed running QA case Reports.  Report was exported to " + localFile.getAbsolutePath() + ".  Total lines in report: " + countLines(localFile));
+        
+        
+        } catch (EmfException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+            setStatus("Error running QA case Reports:  " + e.getMessage());
+        } catch (ExporterException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+            setStatus("Error running QA case Reports:  " + e.getMessage());
+        } catch (IOException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+            setStatus("Error running QA case Reports:  " + e.getMessage());
+        } finally {
+            try {
+                if (dbServer != null && dbServer.isConnected())
+                    dbServer.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+    }
+    
+    private static long countLines(File file) throws IOException
+    {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        int count = 0;
+        try
+        {
+            while (br.readLine() != null)
+            {
+                count++;
+            }
+        }
+        finally
+        {
+            br.close();
+        }
+        return count;
+    }
 }
 
   

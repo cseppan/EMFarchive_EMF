@@ -6,8 +6,9 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.EmfServiceImpl;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
+import gov.epa.emissions.framework.services.basic.FileDownloadDAO;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
@@ -36,6 +37,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     private ManagedExportService exportService;
     
+    private FileDownloadDAO fileDownloadDAO;
+    
     public ExImServiceImpl() throws Exception {
         this(DbServerFactory.get(), HibernateSessionFactory.get());
     }
@@ -50,7 +53,6 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     public ExImServiceImpl(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) throws Exception {
         if (DebugLevels.DEBUG_4())
             System.out.println(myTag());
-        
         init(dbServerFactory, sessionFactory);
         myTag();
     }
@@ -59,6 +61,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         setProperties(sessionFactory);
         exportService = new ManagedExportService(dbServerFactory, sessionFactory);
         managedImportService = new ManagedImportService(dbServerFactory, sessionFactory);
+        this.fileDownloadDAO = new FileDownloadDAO(sessionFactory);
     }
 
     private void setProperties(HibernateSessionFactory sessionFactory) {
@@ -90,6 +93,25 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         submitterId = exportService.exportForClient(user, datasets, versions, dirName, 
                     prefix, rowFilters, filterDataset,
                     filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose, overwrite);
+        if (DebugLevels.DEBUG_4())
+            System.out.println("In ExImServiceImpl:exportDatasets() SUBMITTERID= " + submitterId);
+        if (DebugLevels.DEBUG_21())
+            System.out.println("rowFilters: "+rowFilters+" colOrders: "+colOrders);
+    }
+
+    public void downloadDatasets(User user, EmfDataset[] datasets, Version[] versions, String dirName, String prefix,
+            boolean overwrite, String rowFilters, EmfDataset filterDataset,
+            Version filterDatasetVersion, String filterDatasetJoinCondition, String colOrders, String purpose) throws EmfException {
+        if (DebugLevels.DEBUG_4())
+            System.out.println(">>## calling export datasets in eximSvcImp: " + myTag() + " for datasets: "
+                    + datasets.toString());
+        String submitterId;
+//        if (rowFilters.isEmpty() && colOrders.isEmpty())
+//            submitterId = exportService.exportForClient(user, datasets, versions, dirName, purpose, overwrite);
+//        else
+        submitterId = exportService.downloadForClient(user, datasets, versions, dirName, 
+                    prefix, rowFilters, filterDataset,
+                    filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose);
         if (DebugLevels.DEBUG_4())
             System.out.println("In ExImServiceImpl:exportDatasets() SUBMITTERID= " + submitterId);
         if (DebugLevels.DEBUG_21())
@@ -191,5 +213,46 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return managedImportService.printStatusImportTaskManager() ;
     }
 
+    public void downloadDatasets(User user, Integer[] datasetIds, Version[] versions, String prefix, String rowFilters,
+            EmfDataset filterDataset, Version filterDatasetVersion, String filterDatasetJoinCondition,
+            String colOrders, String purpose) throws EmfException {
+        
+//        exportDatasetids(user, datasetIds, versions, , prefix, true, rowFilters, filterDataset, filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose);
+        int numOfDS = datasetIds.length;
+        EmfDataset[] datasets = new EmfDataset[numOfDS];
+        DataServiceImpl ds = new DataServiceImpl();
 
+        // Sift through and choose only those whose id matches
+        // one of the list of dataset ids in the array.
+        /** * this has caused the sequence of the retrieved datasets is different from the original one in datasetIds ** */
+
+        // for (int i=0; i<rawDatasets.length;i++){
+        // if (dsetIds.contains(new Integer (rawDatasets[i].getId()))){
+        // rawDatasets[i].setAccessedDateTime(new Date());
+        // ar.add(rawDatasets[i]);
+        // }
+
+        try {
+            for (int i = 0; i < numOfDS; i++)
+                datasets[i] = ds.getDataset(new Integer(datasetIds[i]));
+
+            // if Vservion[] is not specified, get the default versions from datasets themselves
+            if (versions == null) {
+                Version[] defaultVersions = new Version[numOfDS];
+
+                for (int j = 0; j < numOfDS; j++)
+                    defaultVersions[j] = getVersion(datasets[j], datasets[j].getDefaultVersion());
+
+                downloadDatasets(user, datasets, defaultVersions, this.fileDownloadDAO.getDownloadExportFolder() + "/" + user.getUsername() + "/", prefix, true, rowFilters, filterDataset, filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose);
+                return;
+            }
+
+            // Invoke the local method that uses the datasets
+            downloadDatasets(user, datasets, versions, this.fileDownloadDAO.getDownloadExportFolder() + "/" + user.getUsername() + "/", prefix, true, rowFilters, filterDataset, filterDatasetVersion, filterDatasetJoinCondition, colOrders, purpose);
+        } catch (RuntimeException e) {
+            // NOTE Auto-generated catch block
+            //e.printStackTrace();
+            throw new EmfException("Error exporting dataset. " + e.getMessage());
+        }
+    }
 }

@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.casemanagement.jobs.CaseJob;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Executable;
 import gov.epa.emissions.framework.services.casemanagement.jobs.Host;
@@ -17,6 +18,7 @@ import gov.epa.emissions.framework.services.casemanagement.parameters.CaseParame
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterEnvVar;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ParameterName;
 import gov.epa.emissions.framework.services.casemanagement.parameters.ValueType;
+import gov.epa.emissions.framework.services.cost.ControlStrategyInventoryOutputTask;
 import gov.epa.emissions.framework.services.data.GeoRegion;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.QAProgramRunner;
@@ -35,6 +37,8 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 
+import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
+
 public class CaseServiceImpl implements CaseService {
     private static Log log = LogFactory.getLog(CaseServiceImpl.class);
 
@@ -43,6 +47,8 @@ public class CaseServiceImpl implements CaseService {
     private String svcLabel = null;
 
     private CaseDAO dao;
+
+    private PooledExecutor threadPool;
 
     public String myTag() {
         if (svcLabel == null) {
@@ -76,7 +82,16 @@ public class CaseServiceImpl implements CaseService {
         myTag();
         if (DebugLevels.DEBUG_0())
             System.out.println(myTag());
+        threadPool = createThreadPool();
 
+    }
+
+    private synchronized PooledExecutor createThreadPool() {
+        PooledExecutor threadPool = new PooledExecutor(20);
+        threadPool.setMinimumPoolSize(1);
+        threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
+
+        return threadPool;
     }
 
     @Override
@@ -85,6 +100,8 @@ public class CaseServiceImpl implements CaseService {
         this.dbFactory = null;
         this.dao = null;
         
+        threadPool.shutdownAfterProcessingCurrentlyQueuedTasks();
+        threadPool.awaitTerminationAfterShutdown();
         super.finalize();
     }
 
@@ -792,19 +809,27 @@ public class CaseServiceImpl implements CaseService {
         }
     }
     
-    public synchronized String[] getCaseQaReports(User user, int[] caseIds, String gridName, 
+    public synchronized String getCaseQaReports(User user, int[] caseIds, String gridName, 
             Sector[] sectors, String[] repDims, String whereClause, String serverDir) throws EmfException {
         // get dataset ids by using dataset names derived from gridName, case abbrev, 
         // sectors in case sectorlist input, state/county, speciation, and so on 
         //int[] datasetIds = getDatasetIds()
-        long startTime = System.currentTimeMillis();
-        
-        RunQACaseReports runQACaseReports = new RunQACaseReports(user, dbFactory, dao, 
-                sessionFactory, serverDir);
-        long endTime = System.currentTimeMillis();
-        System.out.println("Ran QA Case Report in " + ((endTime - startTime) / (1000))  + " secs");
-        return runQACaseReports.runQA(caseIds, gridName, sectors, 
-                repDims, whereClause);
+        try {
+            long startTime = System.currentTimeMillis();
+            
+            RunQACaseReports runQACaseReports = new RunQACaseReports(user, dbFactory, dao, 
+                    sessionFactory, serverDir);
+            long endTime = System.currentTimeMillis();
+            System.out.println("Ran QA Case Report in " + ((endTime - startTime) / (1000))  + " secs");
+            String validationIssues = runQACaseReports.validateAndBuildReportSQL(caseIds, gridName, sectors, 
+                    repDims, whereClause);
+
+            threadPool.execute(new GCEnforcerTask("Run Case Output Comparison Report", runQACaseReports));
+            return validationIssues;
+        } catch (Exception e) {
+            log.error("Error running Case Output Comparison Report", e);
+            throw new EmfException(e.getMessage());
+        }
     }
     
 }

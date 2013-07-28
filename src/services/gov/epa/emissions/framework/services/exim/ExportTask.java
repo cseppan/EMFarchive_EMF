@@ -8,9 +8,11 @@ import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.external.ExternalFilesExporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
-import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.AccessLog;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
+import gov.epa.emissions.framework.services.basic.FileDownload;
+import gov.epa.emissions.framework.services.basic.FileDownloadDAO;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -80,6 +82,10 @@ public class ExportTask extends Task {
 
     private String filterDatasetJoinCondition;
 
+    private boolean download;
+
+    private FileDownloadDAO fileDownloadDAO;
+
     protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog, // BUG3589 need to know where the task constructed in case job
             DbServerFactory dbFactory, HibernateSessionFactory sessionFactory, Version version) {
         super();
@@ -97,6 +103,7 @@ public class ExportTask extends Task {
         this.sessionFactory = sessionFactory;
         this.version = version;
         this.datasetDao = new DatasetDAO();
+        this.fileDownloadDAO = new FileDownloadDAO(sessionFactory);
     }
     
     protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
@@ -108,6 +115,13 @@ public class ExportTask extends Task {
         this.filterDataset = filterDataset;
         this.filterDatasetVersion = filterDatasetVersion;
         this.filterDatasetJoinCondition = filterDatasetJoinCondition;
+    } 
+
+    protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
+            String rowFilters, String colOrders,
+            DbServerFactory dbFactory, HibernateSessionFactory sessionFactory, Version version, EmfDataset filterDataset, Version filterDatasetVersion, String filterDatasetJoinCondition, boolean download) {
+        this(user, file, dataset, services, accesslog, rowFilters, colOrders, dbFactory, sessionFactory, version, filterDataset, filterDatasetVersion, filterDatasetJoinCondition);
+        this.download = download;
     } 
 
     public void run() {
@@ -135,7 +149,8 @@ public class ExportTask extends Task {
 
             if (file.exists()) {
                 setStatus("completed", "FILE EXISTS: Completed export of " + dataset.getName() + " to "
-                        + file.getAbsolutePath() + " in " + accesslog.getTimereqrd() + " seconds.");
+                        + file.getAbsolutePath() + " in " + accesslog.getTimereqrd() + " seconds."
+                        + (download ? "  The file will start downloading momentarily, see the Download Manager for the download status." : ""));
 
             } else {
                 dbServer = this.dbFactory.getDbServer();
@@ -156,7 +171,7 @@ public class ExportTask extends Task {
                     throw new Exception("ERROR: "+dataset.getName()+
                             " will not be exported because no records satisfied the filter " );
                 }
-                
+
                 accesslog.setEnddate(new Date());
                 accesslog.setLinesExported(exportedLineCount);
 
@@ -169,7 +184,7 @@ public class ExportTask extends Task {
                     accesslog.setFolderPath("");
                 } else{
                     System.out.println(msghead + " to " + file.getAbsolutePath() + msgend + "\n"+ lineCompare );
-                    setStatus("completed", msghead + " to " + file.getAbsolutePath() + msgend + "\n"+ lineCompare );
+                    setStatus("completed", msghead + " to " + file.getAbsolutePath() + msgend + (download ? "  The file will start downloading momentarily, see the Download Manager for the download status." : "") + "\n"+ lineCompare );
                 }
                 
                 // for bug 3589
@@ -188,7 +203,20 @@ public class ExportTask extends Task {
                 }
                 
             } // else of if file exists
-            
+
+            //if they request a download then queue it up so the client's
+            //download manager will pick up the new download request...
+            if (download) {
+                //lets add a filedownload item for the user, so they can download the file
+                FileDownload fileDownload = new FileDownload();
+                fileDownload.setUserId(user.getId());
+                fileDownload.setType("Dataset Export");
+                fileDownload.setTimestamp(new Date());
+                fileDownload.setAbsolutePath(file.getAbsolutePath());
+                fileDownload.setUrl(fileDownloadDAO.getDownloadExportRootURL() + "/" + user.getUsername() + "/" + file.getName());
+                fileDownloadDAO.add(fileDownload);
+            }
+
             if ( DebugLevels.DEBUG_24()) {
                 // NOTE: want to check if accesslog exists for the same dataset, version, and description.
                 // If it is there, don't set accesslog.

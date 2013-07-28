@@ -15,6 +15,7 @@ import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfFileInfo;
+import gov.epa.emissions.framework.services.basic.FileDownload;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DatasetNote;
@@ -607,5 +608,55 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.setVoidReturnType();
         
         call.request(new Object[]{owner, types}); 
+    }
+
+    public synchronized FileDownload[] getFileDownloads(Integer userId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getFileDownloads");
+        call.addIntegerParam("userId");
+        call.setReturnType(mappings.fileDownloads());
+
+        return (FileDownload[]) call.requestResponse(new Object[] { userId });
+    }
+
+    public synchronized void addFileDownload(FileDownload fileDownload) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addFileDownload");
+        call.addParam("fileDownload", mappings.fileDownload());
+        call.setVoidReturnType();
+
+        call.requestResponse(new Object[] { fileDownload });
+    }
+
+    public synchronized FileDownload[] getUnreadFileDownloads(Integer userId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getUnreadFileDownloads");
+        call.addIntegerParam("userId");
+        call.setReturnType(mappings.fileDownloads());
+
+        return (FileDownload[]) call.requestResponse(new Object[] { userId });
+    }
+
+    public synchronized void markFileDownloadsRead(Integer[] fileDownloadIds) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("markFileDownloadsRead");
+        call.addParam("fileDownloadIds", mappings.integers());
+        call.setVoidReturnType();
+
+        call.requestResponse(new Object[] { fileDownloadIds });
+    }
+
+    public synchronized void removeFileDownloads(Integer userId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("removeFileDownloads");
+        call.addIntegerParam("userId");
+        call.setVoidReturnType();
+
+        call.requestResponse(new Object[] { userId });
     }
 }

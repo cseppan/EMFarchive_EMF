@@ -26,11 +26,21 @@ public class DatabaseTableCSVExporter implements Exporter {
 
     private boolean windowsOS = false;
 
+    private String rowFilter;
+
     public DatabaseTableCSVExporter(String qualifiedTableName, Datasource datasource) {
         this.qualifiedTableName = qualifiedTableName;
         this.datasource = datasource;
         if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS"))
             windowsOS = true;
+    }
+
+    public DatabaseTableCSVExporter(String qualifiedTableName, Datasource datasource, String rowFilter) {
+        this.qualifiedTableName = qualifiedTableName;
+        this.datasource = datasource;
+        if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS"))
+            windowsOS = true;
+        this.rowFilter = rowFilter;
     }
 
     public void export(File file) throws ExporterException {
@@ -74,7 +84,7 @@ public class DatabaseTableCSVExporter implements Exporter {
     private String getWriteQueryString(String dataFile) {
         String withClause = " WITH NULL '' CSV HEADER FORCE QUOTE " + getNeedQuotesCols();
 
-        return "COPY " + qualifiedTableName + " to '" + putEscape(dataFile) + "'" + withClause;
+        return "COPY " + (rowFilter == null || rowFilter.isEmpty() ? qualifiedTableName : "(select * from " + qualifiedTableName + " where " + rowFilter + ")") + " to '" + putEscape(dataFile) + "'" + withClause;
     }
     private String getNeedQuotesCols() {
         ResultSet rs = null;
