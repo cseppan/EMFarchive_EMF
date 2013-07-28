@@ -27,6 +27,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,6 +78,10 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private DataCommonsService service;
     
     private EmfSession session;
+
+    private JCheckBox download;
+
+    private JButton browseFileButton;
 
     public ExportWindow(EmfDataset[] datasets, DesktopManager desktopManager, EmfConsole parentConsole,
             EmfSession session, String colOrders, String rowFilters) {
@@ -135,14 +141,61 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
         layoutGenerator.addLabelWidgetPair("Datasets  ", dsArea, panel);
 
+        // overwrite
+        JPanel downloadPanel = new JPanel(new BorderLayout());
+        download = new JCheckBox("Download files to local machine?", false);
+        download.setEnabled(true);
+        download.setName("download");
+        download.setToolTipText("<html>Download the existing dataset file to your local machine.</html>");
+        download.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+
+                Object source = e.getItemSelectable();
+
+//                if (source == chinButton) {
+//                    //...make a note of it...
+//                } else if (source == glassesButton) {
+//                    //...make a note of it...
+//                } else if (source == hairButton) {
+//                    //...make a note of it...
+//                } else if (source == teethButton) {
+//                    //...make a note of it...
+//                }
+
+                if (e.getStateChange() == ItemEvent.DESELECTED) {
+                    folder.setEnabled(true);
+                    browseFileButton.setEnabled(true);
+                } else {
+                    folder.setEnabled(false);
+                    browseFileButton.setEnabled(false);
+                }
+            }            
+        });
+        //overwrite.setVisible(false);
+        downloadPanel.add(download, BorderLayout.LINE_START);
+        //overwritePanel.setVisible(false);
+        layoutGenerator.addLabelWidgetPair(" ", downloadPanel, panel);
+
         // folder
         JPanel chooser = new JPanel(new BorderLayout(10, 10));
         folder = new TextField("folder", width);
         folder.setToolTipText("Folder to store exported dataset(s).");
         chooser.add(folder);
-        chooser.add(browseFileButton(), BorderLayout.EAST);
+        browseFileButton = browseFileButton();
+        chooser.add(browseFileButton, BorderLayout.EAST);
         layoutGenerator.addLabelWidgetPair("Folder  ",chooser, panel);
         
+        // overwrite
+        JPanel overwritePanel = new JPanel(new BorderLayout());
+        overwrite = new JCheckBox("Overwrite files if they exist?", false);
+        overwrite.setEnabled(true);
+        overwrite.setName("overwrite");
+        overwrite.setToolTipText("<html>Overwrite the existing export dataset file.</html>");
+        //overwrite.setVisible(false);
+        overwritePanel.add(overwrite, BorderLayout.LINE_START);
+        //overwritePanel.setVisible(false);
+        layoutGenerator.addLabelWidgetPair(" ",overwritePanel, panel);
+
         JPanel prefixPanel = new JPanel(new BorderLayout(10, 10));
         prefix = new TextField("prefix", width);
         prefix.setToolTipText("Prefix to be added to the names of the exported files");
@@ -203,22 +256,12 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         layoutGenerator.addLabelWidgetPair("Purpose  ", purposeArea, panel);
         //purposePanel.add(purposeArea);
  
-        // overwrite
-        JPanel overwritePanel = new JPanel(new BorderLayout());
-        overwrite = new JCheckBox("Overwrite files if they exist?", false);
-        overwrite.setEnabled(true);
-        overwrite.setName("overwrite");
-        overwrite.setToolTipText("<html>Overwrite the existing export dataset file.</html>");
-        //overwrite.setVisible(false);
-        overwritePanel.add(overwrite, BorderLayout.LINE_START);
-        //overwritePanel.setVisible(false);
-        layoutGenerator.addLabelWidgetPair(" ",overwritePanel, panel);
         if (datasets.length == 1)    
-            layoutGenerator.makeCompactGrid(panel, 9, 2, // rows, cols
+            layoutGenerator.makeCompactGrid(panel, 10, 2, // rows, cols
                     10, 10, // initialX, initialY
                     5, 10);// xPad, yPad
         else
-            layoutGenerator.makeCompactGrid(panel, 8, 2, // rows, cols
+            layoutGenerator.makeCompactGrid(panel, 9, 2, // rows, cols
                     10, 10, // initialX, initialY
                     5, 10);// xPad, yPad
 
@@ -319,9 +362,9 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
                 versions=new Version[]{(Version) version.getSelectedItem()};
             
             if (!overwrite.isSelected())
-                presenter.doExport(datasets, versions, folder.getText(), prefix.getText(), rowFilters, (filterDatasetVersionWidget.getDatasetVersions().length > 0 ? (DatasetVersion)filterDatasetVersionWidget.getDatasetVersions()[0] : null), filterDatasetJoinCondition.getText(), colOrders, purpose.getText(), false);
+                presenter.doExport(datasets, versions, folder.getText(), prefix.getText(), rowFilters, (filterDatasetVersionWidget.getDatasetVersions().length > 0 ? (DatasetVersion)filterDatasetVersionWidget.getDatasetVersions()[0] : null), filterDatasetJoinCondition.getText(), colOrders, purpose.getText(), false, download.isSelected());
             else
-                presenter.doExport(datasets, versions, folder.getText(), prefix.getText(), rowFilters, (filterDatasetVersionWidget.getDatasetVersions().length > 0 ? (DatasetVersion)filterDatasetVersionWidget.getDatasetVersions()[0] : null), filterDatasetJoinCondition.getText(), colOrders, purpose.getText(), true);
+                presenter.doExport(datasets, versions, folder.getText(), prefix.getText(), rowFilters, (filterDatasetVersionWidget.getDatasetVersions().length > 0 ? (DatasetVersion)filterDatasetVersionWidget.getDatasetVersions()[0] : null), filterDatasetJoinCondition.getText(), colOrders, purpose.getText(), true, download.isSelected());
 
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
@@ -381,6 +424,10 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     }
     
     private void validateFolder(String folder) throws EmfException {
+        //if performing download, then don't validate directory
+        if (download.isSelected())
+            return;
+        
         if (folder == null || folder.trim().isEmpty())
             throw new EmfException("Please specify a valid export folder.");
         

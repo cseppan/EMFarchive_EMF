@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.gui.Confirm;
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.download.FileDownloadPresenter;
+import gov.epa.emissions.framework.client.download.FileDownloadWindow;
 import gov.epa.emissions.framework.client.sms.SectorScenarioDialog;
 import gov.epa.emissions.framework.client.sms.SectorScenarioPresenter;
 import gov.epa.emissions.framework.client.status.StatusPresenter;
@@ -39,6 +41,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private StatusPresenter presenter;
 
+    private FileDownloadPresenter fileDownloadPresenter;
+
     private static String aboutMessage = "<html><center>Emissions Modeling Framework (EMF)<br>"
             + gov.epa.emissions.framework.client.login.LoginWindow.EMF_VERSION + 
             "<br>Developed by the Institute for the Environment<br>"
@@ -58,6 +62,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         setProperties();
         createLayout(session);
         showStatus();
+        showFileDownload();
     }
 
     private void createLayout(EmfSession session) {
@@ -83,6 +88,14 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
         presenter = new StatusPresenter(session.user(), session.dataCommonsService(), new ConcurrentTaskRunner());
         presenter.display(status);
+    }
+
+    private void showFileDownload() {
+        FileDownloadWindow fileDownloadWindow = new FileDownloadWindow(this, desktopManager);
+        windowMenuPresenter.addPermanently(fileDownloadWindow);
+
+        fileDownloadPresenter = new FileDownloadPresenter(session.user(), session.dataCommonsService(), new ConcurrentTaskRunner());
+        fileDownloadPresenter.display(fileDownloadWindow);
     }
 
     private void setProperties() {

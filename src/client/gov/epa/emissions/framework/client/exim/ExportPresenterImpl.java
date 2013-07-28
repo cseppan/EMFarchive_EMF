@@ -38,7 +38,7 @@ public class ExportPresenterImpl implements ExportPresenter {
     }
 
     public void doExport(EmfDataset[] datasets, Version[] versions, String folder, String prefix, String rowFilters, DatasetVersion filterDatasetVersion, 
-            String filterDatasetJoinCondition, String colOrders, String purpose, boolean overwrite) throws EmfException {
+            String filterDatasetJoinCondition, String colOrders, String purpose, boolean overwrite, boolean download) throws EmfException {
       
         ExImService services;
         try {
@@ -54,8 +54,12 @@ public class ExportPresenterImpl implements ExportPresenter {
             if (dir.isDirectory())
                 lastFolder = folder;
 
-           services.exportDatasetids(session.user(), datasetIds, versions, folder, prefix, 
-                   overwrite, rowFilters, (filterDatasetVersion != null ? filterDatasetVersion.getDataset() : null), (filterDatasetVersion != null ? filterDatasetVersion.getVersion() : null), filterDatasetJoinCondition, colOrders, purpose);
+            if (!download) 
+                services.exportDatasetids(session.user(), datasetIds, versions, folder, prefix, 
+                        overwrite, rowFilters, (filterDatasetVersion != null ? filterDatasetVersion.getDataset() : null), (filterDatasetVersion != null ? filterDatasetVersion.getVersion() : null), filterDatasetJoinCondition, colOrders, purpose);
+            else 
+                services.downloadDatasets(session.user(), datasetIds, versions, prefix, 
+                       rowFilters, (filterDatasetVersion != null ? filterDatasetVersion.getDataset() : null), (filterDatasetVersion != null ? filterDatasetVersion.getVersion() : null), filterDatasetJoinCondition, colOrders, purpose);
            
         } catch (Exception e) {
             // NOTE Auto-generated catch block
