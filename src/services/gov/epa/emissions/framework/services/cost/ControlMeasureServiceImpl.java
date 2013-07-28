@@ -7,19 +7,27 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTable;
 import gov.epa.emissions.framework.services.cost.controlStrategy.CostYearTableReader;
+import gov.epa.emissions.framework.services.cost.controlmeasure.ControlMeasuresPDFReport;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.controlmeasure.io.ControlMeasurePropertyCategories;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
+
+import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
+
+import com.itextpdf.text.DocumentException;
 
 public class ControlMeasureServiceImpl implements ControlMeasureService {
 
@@ -34,21 +42,39 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     private DbServerFactory dbServerFactory;
 
     private ReferencesDAO referencesDAO;
-    
+
+    private PooledExecutor threadPool;
+
     public ControlMeasureServiceImpl() throws Exception {
         this(HibernateSessionFactory.get(), DbServerFactory.get());
     }
 
-//    public ControlMeasureServiceImpl(HibernateSessionFactory sessionFactory) throws Exception {
-//        init(sessionFactory);
-//    }
-//
+    // public ControlMeasureServiceImpl(HibernateSessionFactory sessionFactory) throws Exception {
+    // init(sessionFactory);
+    // }
+    //
 
-    public ControlMeasureServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory) throws Exception {
-//        this(sessionFactory);
+    public ControlMeasureServiceImpl(HibernateSessionFactory sessionFactory, DbServerFactory dbServerFactory)
+            throws Exception {
+        // this(sessionFactory);
         this.sessionFactory = sessionFactory;
         this.dbServerFactory = dbServerFactory;
+        this.threadPool = createThreadPool();
         init();
+    }
+
+    public synchronized void finalize() throws Throwable {
+        threadPool.shutdownAfterProcessingCurrentlyQueuedTasks();
+        threadPool.awaitTerminationAfterShutdown();
+        super.finalize();
+    }
+
+    private synchronized PooledExecutor createThreadPool() {
+        PooledExecutor threadPool = new PooledExecutor(20);
+        threadPool.setMinimumPoolSize(1);
+        threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
+
+        return threadPool;
     }
 
     private void init() {
@@ -57,7 +83,6 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         controlTechnologiesDAO = new ControlTechnologiesDAO();
         this.referencesDAO = new ReferencesDAO();
     }
-
 
     public synchronized ControlMeasure[] getMeasures() throws EmfException {
         Session session = sessionFactory.getSession();
@@ -69,10 +94,10 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             throw new EmfException("Could not retrieve control measures.");
         } finally {
             session.close();
-            
+
         }
     }
-    
+
     public synchronized ControlMeasure[] getMeasures(Pollutant pollutant) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -80,7 +105,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             return (ControlMeasure[]) all.toArray(new ControlMeasure[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve all control measures with major pollutant -- " + pollutant.getName(), e);
-            throw new EmfException("Could not retrieve all control measureswith major pollutant -- " + pollutant.getName());
+            throw new EmfException("Could not retrieve all control measureswith major pollutant -- "
+                    + pollutant.getName());
         } finally {
             session.close();
         }
@@ -129,7 +155,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         try {
             session = sessionFactory.getSession();
             ControlMeasure locked = dao.obtainLocked(owner, controlMeasureId, session);
-            
+
             return locked;
         } catch (RuntimeException e) {
             LOG.error("Could not obtain lock for ControlMeasure Id: " + controlMeasureId + " by owner: "
@@ -157,20 +183,20 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-//    public ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException {
-//        Session session = sessionFactory.getSession();
-//        try {
-//            ControlMeasure released = dao.releaseLocked(locked, session);
-//            return released;
-//        } catch (RuntimeException e) {
-//            LOG.error("Could not release lock for ControlMeasure: " + locked.getName() + " by owner: "
-//                    + locked.getLockOwner(), e);
-//            throw new EmfException("Could not release lock for ControlMeasure: " + locked.getName() + " by owner: "
-//                    + locked.getLockOwner());
-//        } finally {
-//            session.close();
-//        }
-//    }
+    // public ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException {
+    // Session session = sessionFactory.getSession();
+    // try {
+    // ControlMeasure released = dao.releaseLocked(locked, session);
+    // return released;
+    // } catch (RuntimeException e) {
+    // LOG.error("Could not release lock for ControlMeasure: " + locked.getName() + " by owner: "
+    // + locked.getLockOwner(), e);
+    // throw new EmfException("Could not release lock for ControlMeasure: " + locked.getName() + " by owner: "
+    // + locked.getLockOwner());
+    // } finally {
+    // session.close();
+    // }
+    // }
 
     public synchronized void releaseLockedControlMeasure(User user, int id) throws EmfException {
         Session session = sessionFactory.getSession();
@@ -371,7 +397,20 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public synchronized EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter) throws EmfException {
+    public synchronized int getEfficiencyRecordCount(int controlMeasureId) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return (int) dao.getEfficiencyRecordCount(controlMeasureId, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not retrieve control measure efficiency record count.", e);
+            throw new EmfException("Could not retrieve control measures efficiency record count.");
+        } finally {
+            session.close();
+        }
+    }
+
+    public synchronized EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter)
+            throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             return dao.getEfficiencyRecords(controlMeasureId, recordLimit, filter, dbServer);
@@ -407,7 +446,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             dao.updateEfficiencyRecord(efficiencyRecord, session, dbServer);
         } catch (RuntimeException e) {
             LOG.error("Could not update for control measure efficiency record Id: " + efficiencyRecord.getId(), e);
-            throw new EmfException("Could not update for control measure efficiency record Id: " + efficiencyRecord.getId());
+            throw new EmfException("Could not update for control measure efficiency record Id: "
+                    + efficiencyRecord.getId());
         } finally {
             session.close();
             close(dbServer);
@@ -445,7 +485,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
 
     public synchronized ControlMeasure[] getControlMeasures(String whereFilter) throws EmfException {
 
-        DbServer dbServer = dbServerFactory.getDbServer();        
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
             return dao.getLightControlMeasures(whereFilter, dbServer).toArray(new ControlMeasure[0]);
         } catch (RuntimeException e) {
@@ -459,7 +499,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public synchronized ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, String whereFilter) throws EmfException {
+    public synchronized ControlMeasure[] getSummaryControlMeasures(int majorPollutantId, String whereFilter)
+            throws EmfException {
         DbServer dbServer = dbServerFactory.getDbServer();
         try {
             return dao.getSummaryControlMeasures(majorPollutantId, dbServer, whereFilter);
@@ -474,11 +515,13 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         }
     }
 
-    public synchronized ControlMeasure[] getControlMeasures(int majorPollutantId, String whereFilter) throws EmfException {
+    public synchronized ControlMeasure[] getControlMeasures(int majorPollutantId, String whereFilter)
+            throws EmfException {
 
-        DbServer dbServer = dbServerFactory.getDbServer();        
+        DbServer dbServer = dbServerFactory.getDbServer();
         try {
-            return dao.getLightControlMeasures(majorPollutantId, whereFilter, dbServer).toArray((new ControlMeasure[0]));
+            return dao.getLightControlMeasures(majorPollutantId, whereFilter, dbServer)
+                    .toArray((new ControlMeasure[0]));
         } catch (RuntimeException e) {
             LOG.error("Could not retrieve control measures.", e);
             throw new EmfException("Could not retrieve control measures.");
@@ -531,7 +574,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
         } finally {
             session.close();
         }
-        
+
     }
 
     public ControlMeasure[] getControlMeasureBySector(int[] sectorIds) throws EmfException {
@@ -546,18 +589,37 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             session.close();
         }
     }
-//    public List<ControlStrategy> getLightControlStrategies(int[] cmIds, Session session) {
 
-//    public ControlStrategy[] getLightControlStrategies(int[] cmIds) throws EmfException {
-//        Session session = sessionFactory.getSession();
-//        try {
-//            List<ControlMeasure> all = dao.getControlMeasureBySectors(sectorIds, session);
-//            return all.toArray(new ControlMeasure[0]);
-//        } catch (RuntimeException e) {
-//            LOG.error("Could not retrieve control measures.", e);
-//            throw new EmfException("Could not retrieve control measuress.");
-//        } finally {
-//            session.close();
-//        }
-//    }
+    // public List<ControlStrategy> getLightControlStrategies(int[] cmIds, Session session) {
+
+    // public ControlStrategy[] getLightControlStrategies(int[] cmIds) throws EmfException {
+    // Session session = sessionFactory.getSession();
+    // try {
+    // List<ControlMeasure> all = dao.getControlMeasureBySectors(sectorIds, session);
+    // return all.toArray(new ControlMeasure[0]);
+    // } catch (RuntimeException e) {
+    // LOG.error("Could not retrieve control measures.", e);
+    // throw new EmfException("Could not retrieve control measuress.");
+    // } finally {
+    // session.close();
+    // }
+    // }
+
+    public void generateControlMeasurePDFReport(User user, int[] controlMeasureIds) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            threadPool.execute(new GCEnforcerTask("Generate control measures report.", 
+                    new ControlMeasuresPDFReport(
+                            user, controlMeasureIds, 
+                            this, sessionFactory,
+                            dbServerFactory)
+            ));
+        } catch (Exception e) {
+            LOG.error("Could not create control measure PDF report.", e);
+            throw new EmfException("Could not create control measure PDF report.", e);
+        } finally {
+            session.close();
+        }
+    }
+
 }

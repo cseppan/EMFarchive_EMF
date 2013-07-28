@@ -63,6 +63,8 @@ public interface ControlMeasureService extends EMFService {
 
     EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId) throws EmfException;
 
+    int getEfficiencyRecordCount(int controlMeasureId) throws EmfException;
+
     EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter) throws EmfException;
 
     int addEfficiencyRecord(EfficiencyRecord efficiencyRecord) throws EmfException;
@@ -89,4 +91,5 @@ public interface ControlMeasureService extends EMFService {
     
     ControlMeasure[] getControlMeasureBySector(int[] sectorIds) throws EmfException;
 
+    void generateControlMeasurePDFReport(User user, int[] controlMeasureIds) throws EmfException;
 }

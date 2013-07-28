@@ -672,6 +672,12 @@ public class ControlMeasureDAO {
         return hibernateFacade.get(EfficiencyRecord.class, c, session);
     }
 
+    public long getEfficiencyRecordCount(int controlMeasureId, Session session) {
+        return (Long) session.createQuery(
+                "select count(EF) from EfficiencyRecord as EF where EF.controlMeasureId =  :controlMeasureId").setInteger(
+                "controlMeasureId", controlMeasureId).uniqueResult();
+    }
+
     public List getEfficiencyRecords(int controlMeasureId, int inventoryYear, 
             String[] pollutants, Session session) {
         String sql = "from EfficiencyRecord as e where e.controlMeasureId = :controlMeasureId and coalesce(date_part('year', e.effectiveDate), :inventoryYear) <= :inventoryYear";

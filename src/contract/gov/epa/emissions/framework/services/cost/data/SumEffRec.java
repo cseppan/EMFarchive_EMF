@@ -7,24 +7,24 @@ import java.io.Serializable;
 public class SumEffRec implements Serializable {
 
     private Pollutant pollutant;
-    private float maxCE;
-    private float minCE;
-    private float avgCE;
-    private float maxCPT;
-    private float minCPT;
-    private float avgCPT;
-    private float avgRE;
-    private float avgRP;
+    private Float maxCE;
+    private Float minCE;
+    private Float avgCE;
+    private Float maxCPT;
+    private Float minCPT;
+    private Float avgCPT;
+    private Float avgRE;
+    private Float avgRP;
 
     public SumEffRec() {
         //
     }
 
-    public SumEffRec(Pollutant pollutant, float maxEfficiency,
-        float minEfficiency, float avgEfficiency,
-        float maxCostPerTon, float minCostPerTon,
-        float avgCostPerTon, float avgRuleEffectiveness,
-        float avgRulePenetration) {
+    public SumEffRec(Pollutant pollutant, Float maxEfficiency,
+            Float minEfficiency, Float avgEfficiency,
+            Float maxCostPerTon, Float minCostPerTon,
+            Float avgCostPerTon, Float avgRuleEffectiveness,
+            Float avgRulePenetration) {
         this.pollutant = pollutant;
         this.maxCE = maxEfficiency;
         this.minCE = minEfficiency;
@@ -44,67 +44,67 @@ public class SumEffRec implements Serializable {
         this.pollutant = pollutant;
     }
 
-    public float getMaxCE() {
+    public Float getMaxCE() {
         return maxCE;
     }
 
-    public void setMaxCE(float maxEfficiency) {
+    public void setMaxCE(Float maxEfficiency) {
         this.maxCE = maxEfficiency;
     }
 
-    public float getMinCE() {
+    public Float getMinCE() {
         return minCE;
     }
 
-    public void setMinCE(float minEfficiency) {
+    public void setMinCE(Float minEfficiency) {
         this.minCE = minEfficiency;
     }
 
-    public float getAvgCE() {
+    public Float getAvgCE() {
         return avgCE;
     }
 
-    public void setAvgCE(float avgEfficiency) {
+    public void setAvgCE(Float avgEfficiency) {
         this.avgCE = avgEfficiency;
     }
 
-    public float getMaxCPT() {
+    public Float getMaxCPT() {
         return maxCPT;
     }
 
-    public void setMaxCPT(float maxCostPerTon) {
+    public void setMaxCPT(Float maxCostPerTon) {
         this.maxCPT = maxCostPerTon;
     }
 
-    public float getMinCPT() {
+    public Float getMinCPT() {
         return minCPT;
     }
 
-    public void setMinCPT(float minCostPerTon) {
+    public void setMinCPT(Float minCostPerTon) {
         this.minCPT = minCostPerTon;
     }
 
-    public float getAvgCPT() {
+    public Float getAvgCPT() {
         return avgCPT;
     }
 
-    public void setAvgCPT(float avgCostPerTon) {
+    public void setAvgCPT(Float avgCostPerTon) {
         this.avgCPT = avgCostPerTon;
     }
 
-    public float getAvgRE() {
+    public Float getAvgRE() {
         return avgRE;
     }
 
-    public void setAvgRE(float avgRuleEffectiveness) {
+    public void setAvgRE(Float avgRuleEffectiveness) {
         this.avgRE = avgRuleEffectiveness;
     }
 
-    public float getAvgRP() {
+    public Float getAvgRP() {
         return avgRP;
     }
 
-    public void setAvgRP(float avgRulePenetration) {
+    public void setAvgRP(Float avgRulePenetration) {
         this.avgRP = avgRulePenetration;
     }
 
