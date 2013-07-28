@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.services.persistence;
 
-import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.ServiceTestCase;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
 
 public class EmfPropertiesDAOTest extends ServiceTestCase {
 
