@@ -249,6 +249,16 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         return (EfficiencyRecord[]) call.requestResponse(new Object[] { new Integer(controlMeasureId) });
     }
 
+    public synchronized int getEfficiencyRecordCount(int controlMeasureId) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getEfficiencyRecordCount");
+        call.addIntegerParam("controlMeasureId");
+        call.setIntegerReturnType();
+
+        return (Integer) call.requestResponse(new Object[] { new Integer(controlMeasureId) });
+    }
+
     public synchronized EfficiencyRecord[] getEfficiencyRecords(int controlMeasureId, int recordLimit, String filter)
             throws EmfException {
         EmfCall call = call();
@@ -383,5 +393,16 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         call.addParam("sectorIds", mappings.integers());
         call.setReturnType(mappings.controlMeasures());
         return (ControlMeasure[]) call.requestResponse(new Object[] { sectorIds });
+    }
+
+    public synchronized void generateControlMeasurePDFReport(User user, int[] controlMeasureIds) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("generateControlMeasurePDFReport");
+        call.addParam("user", mappings.user());
+        call.addParam("controlMeasureIds", mappings.integers());
+        call.setVoidReturnType();
+
+        call.requestResponse(new Object[] { user, controlMeasureIds });
     }
 }

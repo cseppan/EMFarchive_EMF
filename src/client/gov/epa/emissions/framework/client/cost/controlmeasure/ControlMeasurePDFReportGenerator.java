@@ -1,8 +1,8 @@
 /*
  * $Source: /home/catherine/Projects/emf_cvs/cvs_repo/EMF/src/client/gov/epa/emissions/framework/client/cost/controlmeasure/ControlMeasurePDFReportGenerator.java,v $
- * $Revision: 1.5 $
+ * $Revision: 1.6 $
  * $Author: ddelvecchio $
- * $Date: 2011/03/15 05:55:48 $
+ * $Date: 2013/07/28 04:48:49 $
  */
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
@@ -1372,7 +1372,7 @@ public class ControlMeasurePDFReportGenerator {
 //    }
 
     private String getDoubleAsStringSpecial(Double d, String defaultValue, Format format) {
-        return d != null ? format.format(d * 531.123) : defaultValue;
+        return d != null ? format.format(d * 1.0) : defaultValue;
     }
 
     private String getFloatAsString(Float f) {

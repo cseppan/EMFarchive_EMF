@@ -425,6 +425,9 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         find.setToolTipText("Find measures that apply to specific SCCs");
         panel.add(find);
 
+        Button genereateReport = new Button("Report", generatePDFReportAction());
+        panel.add(genereateReport);
+
         return panel;
     }
 
@@ -566,6 +569,32 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                     if ((measures.length > 5 && confirmDialog.confirm()) || measures.length <= 5) {
                         for (int i = 0; i < measures.length; i++)
                             presenter.doEdit(parentConsole, measures[i], desktopManager);
+                    }
+
+                } catch (EmfException e) {
+                    showError(e.getMessage());
+                }
+            }
+        };
+        return action;
+    }
+
+    private Action generatePDFReportAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                messagePanel.clear();
+                ControlMeasure[] measures = getSelectedMeasures().toArray(new ControlMeasure[0]);
+                if (measures.length == 0)
+                    showError("Please select a control measure.");
+                try {
+                    String message = "You have asked to generate a Control Measure At-A-Glance PDF Report. Do you wish to proceed?";
+                    ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", parentConsole);
+                    if (confirmDialog.confirm()) {
+                        int[] controlMeasureIds = new int[measures.length];
+                        for (int i = 0; i < measures.length; i++) {
+                            controlMeasureIds[i] = measures[i].getId();
+                        }
+                        presenter.generatePDFReport(controlMeasureIds);
                     }
 
                 } catch (EmfException e) {
