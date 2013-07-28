@@ -1231,7 +1231,7 @@ public class CaseServiceTransport implements CaseService {
         return (String) call.requestResponse(new Object[] { caseIds });
     }
     
-    public String[] getCaseQaReports(User user, int[] caseIds, String gridName, Sector[] sectors, 
+    public String getCaseQaReports(User user, int[] caseIds, String gridName, Sector[] sectors, 
             String[] repDims, String whereClause, String serverDir) throws EmfException {
         EmfCall call = call();
         call.addParam("user", dataMappings.user());
@@ -1242,9 +1242,9 @@ public class CaseServiceTransport implements CaseService {
         call.addParam("repDims", dataMappings.strings());
         call.addStringParam("whereClause");
         call.addStringParam("serverDir");
-        call.setStringArrayReturnType();
+        call.setStringReturnType();
         
-        return (String[]) call.requestResponse(new Object[] { user, caseIds, gridName, sectors, 
+        return (String) call.requestResponse(new Object[] { user, caseIds, gridName, sectors, 
                 repDims, whereClause, serverDir});
     }
 

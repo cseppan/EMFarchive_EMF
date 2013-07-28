@@ -196,11 +196,11 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
             //if (!localFile.exists()) {
             //Writer output = new BufferedWriter(new FileWriter(localFile));
             try {
-                String[] reportsInfo = getCaseQaReports(user, caseIds, gridName, sectors, 
+                message = runCaseQaReports(user, caseIds, gridName, sectors, 
                         repDims, whereClause, serverDir);   
                 //output.write(  ""+ reportsInfo[0] );
 
-                message = reportsInfo[1];
+//                message = reportsInfo[1];
             }catch (Exception e) {
                 //e.printStackTrace();
                 throw new EmfException( e.getMessage());
@@ -225,7 +225,7 @@ public class CaseManagerPresenterImpl implements CaseManagerPresenter {
         return service().getCaseComparisonResult(caseIds);
     }
     
-    private String[] getCaseQaReports(User user, int[] caseIds, String gridName, Sector[] sectors, 
+    private String runCaseQaReports(User user, int[] caseIds, String gridName, Sector[] sectors, 
             String[] repDims, String whereClause, String serverDir) throws EmfException {
         return service().getCaseQaReports(user, caseIds, gridName, sectors, repDims, 
                 whereClause, serverDir);
