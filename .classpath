@@ -75,5 +75,8 @@
 	<classpathentry kind="lib" path="lib/httpclient-4.2.5.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-4.2.4.jar"/>
 	<classpathentry kind="lib" path="lib/fluent-hc-4.2.5.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-nio-4.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/httpasyncclient-4.0-beta3.jar"/>
+	<classpathentry kind="lib" path="lib/guava-10.0.1.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
