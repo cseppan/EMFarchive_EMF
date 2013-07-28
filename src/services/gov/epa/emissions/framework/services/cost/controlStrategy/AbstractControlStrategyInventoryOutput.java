@@ -310,7 +310,6 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
             } else if (columnName.equalsIgnoreCase("ann_value")) {//ff10 column
                 sql += ", case when b.source_id is not null then b.final_emissions else ann_value end as ann_value";
                 columnList += "," + columnName;
-            
             } else if (columnName.equalsIgnoreCase("jan_value")
                     || columnName.equalsIgnoreCase("feb_value")
                     || columnName.equalsIgnoreCase("mar_value")
@@ -324,7 +323,7 @@ public class AbstractControlStrategyInventoryOutput implements ControlStrategyIn
                     || columnName.equalsIgnoreCase("nov_value")
                     || columnName.equalsIgnoreCase("dec_value")
                     ) {//ff10 column
-                sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then (1- b.final_emissions / b.starting_emissions) else null::double precision end else 1.0::double precision end * " + columnName + " as " + columnName;
+                sql += ", case when b.source_id is not null then case when coalesce(b.starting_emissions, 0.0) <> 0.0 then (b.final_emissions / b.starting_emissions) else null::double precision end else 1.0::double precision end * " + columnName + " as " + columnName;
                 columnList += "," + columnName;
             } else if (columnName.equalsIgnoreCase("jan_pctred")
                     || columnName.equalsIgnoreCase("feb_pctred")

@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsFactory;
 import gov.epa.emissions.framework.services.EmfProperties;
-import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
 
 import org.hibernate.Session;
 import org.jmock.Mock;

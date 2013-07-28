@@ -740,6 +740,21 @@ public class DataServiceImpl implements DataService {
             LOG.warn("Query ends at: " + new Date());
     }
 
+    public synchronized String[] getTableColumns(String table) throws EmfException {
+        DbServer dbServer = dbServerFactory.getDbServer();
+        try {
+            DataModifier dataModifier = dbServer.getEmissionsDatasource().dataModifier();
+
+            return getTableColumns(dataModifier, table, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("Could not query table : ", e);
+            throw new EmfException("Could not query table: " + e.getMessage());
+        } finally {
+            closeDB(dbServer);
+        }
+    }
+    
     private String[] getTableColumns(DataModifier mod, String table, String filter) throws Exception {
         ResultSetMetaData md = null;
         String query = null;

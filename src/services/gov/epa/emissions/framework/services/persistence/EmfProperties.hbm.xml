@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false"> 
-  <class name="gov.epa.emissions.framework.services.EmfProperty" table="properties" schema="emf"> 
+  <class name="gov.epa.emissions.framework.services.basic.EmfProperty" table="properties" schema="emf"> 
  	<id name="id" type="integer" column="id">
 	  <generator class="identity"/>
  	</id>

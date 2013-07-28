@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
 import gov.epa.emissions.framework.services.EmfProperties;
-import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
 import gov.epa.emissions.framework.services.editor.ChangeSets.ChangeSetsIterator;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 

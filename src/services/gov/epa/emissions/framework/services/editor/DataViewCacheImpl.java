@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.VersionedRecordsFactory;
 import gov.epa.emissions.framework.services.EmfProperties;
-import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 
 import java.sql.SQLException;

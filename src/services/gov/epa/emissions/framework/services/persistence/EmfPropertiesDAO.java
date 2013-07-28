@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.services.persistence;
 
 import gov.epa.emissions.framework.services.EmfProperties;
-import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.basic.EmfProperty;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;

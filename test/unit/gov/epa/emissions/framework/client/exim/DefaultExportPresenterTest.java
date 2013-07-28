@@ -64,7 +64,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
         ExportPresenter presenter = new ExportPresenterImpl((EmfSession) session.proxy());
 
-        presenter.doExport(datasets, versions, folder, null, "", null, "",  "", description, true);
+        presenter.doExport(datasets, versions, folder, null, "", null, "",  "", description, true, false);
     }
 
     public void testSendsExportRequestToEximServiceOnExportWithoutOverwrite() throws Exception {
@@ -90,7 +90,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
         ExportPresenter presenter = new ExportPresenterImpl((EmfSession) session.proxy());
 
-        presenter.doExport(datasets, versions, folder, null, "", null, "", "", description, true);
+        presenter.doExport(datasets, versions, folder, null, "", null, "", "", description, true, false);
     }
 
     public void testClosesViewOnDoneExport() {

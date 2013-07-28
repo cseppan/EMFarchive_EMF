@@ -27,6 +27,8 @@ import gov.epa.emissions.framework.services.basic.EmfFileInfo;
 import gov.epa.emissions.framework.services.basic.EmfFilePatternMatcher;
 import gov.epa.emissions.framework.services.basic.EmfFileSerializer;
 import gov.epa.emissions.framework.services.basic.EmfServerFileSystemView;
+import gov.epa.emissions.framework.services.basic.FileDownload;
+import gov.epa.emissions.framework.services.basic.FileDownloadDAO;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -57,6 +59,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     private DataCommonsDAO dao;
 
+    private FileDownloadDAO fileDownloadDAO;
+
     private EmfFileInfo[] files;
 
     private EmfFileInfo[] subdirs;
@@ -71,6 +75,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public DataCommonsServiceImpl(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         dao = new DataCommonsDAO();
+        this.fileDownloadDAO= new FileDownloadDAO(this.sessionFactory);
+        
     }
 
     public synchronized Keyword[] getKeywords() throws EmfException {
@@ -384,6 +390,66 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
+    public synchronized FileDownload[] getFileDownloads(Integer userId) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List fileDownloads = fileDownloadDAO.getFileDownloads(userId, session);
+            session.close();
+
+            return (FileDownload[]) fileDownloads.toArray(new FileDownload[fileDownloads.size()]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all FileDownloads", e);
+            throw new EmfException("Could not get all FileDownloads");
+        }
+    }
+
+    public synchronized FileDownload[] getUnreadFileDownloads(Integer userId) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List fileDownloads = fileDownloadDAO.getUnreadFileDownloads(userId, session);
+            session.close();
+
+            return (FileDownload[]) fileDownloads.toArray(new FileDownload[fileDownloads.size()]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all FileDownloads", e);
+            throw new EmfException("Could not get all FileDownloads");
+        }
+    }
+
+    public void addFileDownload(FileDownload fileDownload) throws EmfException {
+        try {
+            fileDownloadDAO.add(fileDownload);
+        } catch (RuntimeException e) {
+            LOG.error("Could not add FileDownload", e);
+            throw new EmfException("Could not add FileDownload");
+        }
+    }
+
+    public void markFileDownloadsRead(Integer[] fileDownloadIds) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            fileDownloadDAO.markFileDownloadsRead(fileDownloadIds, session);
+//            session.clear();
+            session.flush();
+                       
+            session.close();
+        } catch (RuntimeException e) {
+            LOG.error("Could not add FileDownload", e);
+            throw new EmfException("Could not add FileDownload");
+        }
+    }
+    
+    public void removeFileDownloads(Integer userId) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            fileDownloadDAO.removeFileDownloads(userId, session);
+            session.close();
+        } catch (RuntimeException e) {
+            LOG.error("Could not add FileDownload", e);
+            throw new EmfException("Could not add FileDownload");
+        }
+    }
+                
     public synchronized Project[] getProjects() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
