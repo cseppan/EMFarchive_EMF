@@ -37,6 +37,7 @@
 		<!-- Mappings : Data Management -->
     	<mapping resource="gov/epa/emissions/framework/services/basic/User.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/basic/XFileFormat.hbm.xml"/>
+        <mapping resource="gov/epa/emissions/framework/services/basic/FileDownload.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/basic/Status.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/data/Sector.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/data/Country.hbm.xml"/>

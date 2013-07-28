@@ -207,6 +207,10 @@
 		qname="ns1:ProjectionShapeFile" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 	
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.commons.data.PivotConfiguration"
+		qname="ns1:PivotConfiguration" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+	
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.editor.Revision"
 		qname="ns1:Revision" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
@@ -225,6 +229,10 @@
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.commons.security.User"
 		qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.basic.FileDownload"
+		qname="ns1:FileDownload" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.basic.Status"
@@ -775,6 +783,11 @@
 		innerType="ns1:ProjectionShapeFile"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
+	<arrayMapping qname="ns1:PivotConfigurations" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.commons.data.PivotConfiguration[]"
+		innerType="ns1:PivotConfiguration"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
 	<arrayMapping qname="ns1:Revisions" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.editor.Revision[]"
 		innerType="ns1:Revision"
@@ -849,6 +862,12 @@
 		xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.commons.data.SectorCriteria[]"
 		innerType="ns1:SectorCriteria"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+	
+	<arrayMapping qname="ns1:FileDownloads"
+		xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.basic.FileDownload[]"
+		innerType="ns1:FileDownload"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
 	<arrayMapping qname="ns1:Statuses"
