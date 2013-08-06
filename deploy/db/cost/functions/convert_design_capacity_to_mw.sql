@@ -37,6 +37,10 @@ BEGIN
 		return design_capacity;
 	END IF;
 
+	IF (unit_numerator = 'KW' and unit_denominator = '') THEN
+		return design_capacity / 1000.0;
+	END IF;
+
         IF (unit_numerator = 'MMBTU'
             or unit_numerator = 'E6BTU'
             or unit_numerator = 'BTU'

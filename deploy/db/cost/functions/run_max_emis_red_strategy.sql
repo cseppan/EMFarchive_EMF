@@ -73,10 +73,6 @@ DECLARE
 	--store 3% Discount Rate Costs...
 	discount_rate_3pct double precision := 0.03;	--store as fraction
 	annual_cost_3pct_expression text;
-	capital_cost_3pct_expression text;
-	operation_maintenance_cost_3pct_expression text;
-	fixed_operation_maintenance_cost_3pct_expression text;
-	variable_operation_maintenance_cost_3pct_expression text;
 	annualized_capital_cost_3pct_expression text;
 	computed_cost_per_ton_3pct_expression text;
 
@@ -94,6 +90,7 @@ DECLARE
 	longitude_expression character varying(64) := 'xloc';
 	latitude_expression character varying(64) := 'yloc';
 	plant_name_expression character varying(64) := 'plant';
+	control_ids_expression character varying(255) := 'control_ids';
 BEGIN
 
 	-- get the input dataset info
@@ -125,6 +122,7 @@ BEGIN
 		longitude_expression := 'longitude';
 		latitude_expression := 'latitude';
 		plant_name_expression := 'facility_name';
+		control_ids_expression := 'control_ids';
 	ELSE
 		fips_expression := 'fips';
 		plantid_expression := 'plantid';
@@ -135,6 +133,18 @@ BEGIN
 		longitude_expression := 'xloc';
 		latitude_expression := 'yloc';
 		plant_name_expression := 'plant';
+		-- if orl types...
+		IF dataset_type_name = 'ORL Point Inventory (PTINV)' THEN
+			control_ids_expression := 'case when coalesce(cpri,0) <> 0 then coalesce(cpri || '''','''') else '''' end || case when coalesce(csec,0) <> 0 then coalesce(''&'' || csec,'''') end';
+		ELSIF dataset_type_name = 'ORL Nonpoint Inventory (ARINV)' THEN
+			control_ids_expression := 'coalesce(PRIMARY_DEVICE_TYPE_CODE,'''') || coalesce(''&'' || SECONDARY_DEVICE_TYPE_CODE,'''')';
+		ELSIF dataset_type_name = 'ORL Nonroad Inventory (ARINV)' THEN
+			control_ids_expression := 'null::character varying';
+		ELSIF dataset_type_name = 'ORL Onroad Inventory (MBINV)' THEN
+			control_ids_expression := 'null::character varying';
+		ELSIF dataset_type_name = 'ORL Merged Inventory' THEN
+			control_ids_expression := 'case when coalesce(cpri,0) <> 0 then coalesce(cpri || '''','''') else '''' end || coalesce(PRIMARY_DEVICE_TYPE_CODE,'''')';
+		END IF;
 	END If;
 
 	-- get the detailed result dataset info
@@ -541,13 +551,8 @@ BEGIN
 
 	-- get various costing sql expressions (based on 3% discount rate)
 	select annual_cost_expression(cost_expressions),
-		capital_cost_expression(cost_expressions),
-		operation_maintenance_cost_expression(cost_expressions),
-		fixed_operation_maintenance_cost_expression(cost_expressions),
-		variable_operation_maintenance_cost_expression(cost_expressions),
 		annualized_capital_cost_expression(cost_expressions),
-		computed_cost_per_ton_expression(cost_expressions),
-		actual_equation_type_expression(cost_expressions)
+		computed_cost_per_ton_expression(cost_expressions)
 	from public.get_cost_expressions(
 		intControlStrategyId, -- int_control_strategy_id
 		intInputDatasetId, -- int_input_dataset_id
@@ -564,14 +569,8 @@ BEGIN
 		discount_rate_3pct
 		) as cost_expressions
 	into annual_cost_3pct_expression,
-		capital_cost_3pct_expression,
-		operation_maintenance_cost_3pct_expression,
-		fixed_operation_maintenance_cost_3pct_expression,
-		variable_operation_maintenance_cost_3pct_expression,
 		annualized_capital_cost_3pct_expression,
-		computed_cost_per_ton_3pct_expression
-		--,actual_equation_type_expression
-		;
+		computed_cost_per_ton_3pct_expression;
 
 /*raise notice '%', annual_cost_expression;
 raise notice '%', capital_cost_expression;
@@ -656,17 +655,14 @@ return;
 		total_capital_cost,
 		annual_cost,
 		ann_cost_per_ton,
-		annual_oper_maint_cost_3pct,
-		annual_variable_oper_maint_cost_3pct,
-		annual_fixed_oper_maint_cost_3pct,
 		annualized_capital_cost_3pct,
-		total_capital_cost_3pct,
 		annual_cost_3pct,
 		ann_cost_per_ton_3pct,
 		control_eff,
 		rule_pen,
 		rule_eff,
 		percent_reduction,
+		control_ids,
 		inv_ctrl_eff,
 		inv_rule_pen,
 		inv_rule_eff,
@@ -722,17 +718,14 @@ select
 	capital_cost,
 	ann_cost,
 	computed_cost_per_ton,
-	operation_maintenance_cost_3pct,
-	annual_variable_oper_maint_cost_3pct,
-	annual_fixed_oper_maint_cost_3pct,
 	annualized_capital_cost_3pct,
-	capital_cost_3pct,
 	ann_cost_3pct,
 	computed_cost_per_ton_3pct,
 	efficiency,
 	rule_pen,
 	rule_eff,
 	percent_reduction,
+	control_ids,
 	ceff,
 	rpen,
 	reff,
@@ -798,11 +791,7 @@ select
 			' || computed_cost_per_ton_expression || '  as computed_cost_per_ton,
 
 --3pct discount rate costs
-			' || operation_maintenance_cost_3pct_expression || '  as operation_maintenance_cost_3pct,
-			' || variable_operation_maintenance_cost_3pct_expression || '  as annual_variable_oper_maint_cost_3pct,
-			' || fixed_operation_maintenance_cost_3pct_expression || '  as annual_fixed_oper_maint_cost_3pct,
 			' || annualized_capital_cost_3pct_expression || '  as annualized_capital_cost_3pct,
-			' || capital_cost_3pct_expression || ' as capital_cost_3pct,
 			' || annual_cost_3pct_expression || ' as ann_cost_3pct,
 			' || computed_cost_per_ton_3pct_expression || '  as computed_cost_per_ton_3pct,
 
@@ -810,6 +799,7 @@ select
 			' || case when measures_count > 0 then 'coalesce(csm.rule_penetration, er.rule_penetration)' else 'er.rule_penetration' end || ' as rule_pen,
 			' || case when measures_count > 0 then 'coalesce(csm.rule_effectiveness, er.rule_effectiveness)' else 'er.rule_effectiveness' end || ' as rule_eff,
 			' || percent_reduction_sql || ' as percent_reduction,
+			' || control_ids_expression || ' as control_ids,
 			coalesce(inv_ovr.ceff, inv.' || inv_ceff_expression || ') as ceff,
 			' || case when not is_point_table and not is_flat_file_inventory then 'coalesce(inv_ovr.rpen, inv.rpen)' else '100' end || ' as rpen,
 			' || case when not is_flat_file_inventory then 'coalesce(inv_ovr.reff, inv.reff)' else '100' end || ' as reff,
