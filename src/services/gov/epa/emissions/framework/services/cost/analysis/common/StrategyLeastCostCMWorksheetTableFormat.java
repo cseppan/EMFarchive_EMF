@@ -86,10 +86,19 @@ public class StrategyLeastCostCMWorksheetTableFormat implements TableFormat {
         cols.add(new Column("Annualized_Capital_Cost", types.realType(), new RealFormatter()));
         cols.add(new Column("Total_Capital_Cost", types.realType(), new RealFormatter()));
 
+        cols.add(new Column("Annual_Cost_3Pct", types.realType(), new RealFormatter()));
+        cols.add(new Column("Ann_Cost_per_Ton_3Pct", types.realType(), new RealFormatter()));
+        cols.add(new Column("Annualized_Capital_Cost_3Pct", types.realType(), new RealFormatter()));
+
         cols.add(new Column("Control_Eff", types.realType(), new RealFormatter()));
         cols.add(new Column("Rule_Pen", types.realType(), new RealFormatter()));
         cols.add(new Column("Rule_Eff", types.realType(), new RealFormatter()));
         cols.add(new Column("Percent_Reduction", types.realType(), new RealFormatter()));
+
+        
+
+        cols.add(new Column("CONTROL_IDS", types.stringType(256), 256, new StringFormatter(256)));
+        
         cols.add(new Column("Inv_Ctrl_Eff", types.realType(), new RealFormatter()));
         cols.add(new Column("Inv_Rule_Pen", types.realType(), new RealFormatter()));
         cols.add(new Column("Inv_Rule_Eff", types.realType(), new RealFormatter()));
