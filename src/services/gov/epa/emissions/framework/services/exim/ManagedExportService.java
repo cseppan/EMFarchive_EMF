@@ -114,8 +114,16 @@ public class ManagedExportService {
         return status;
     }
 
-    private File validatePath(String folderPath) throws EmfException {
+    private File validatePath(String folderPath, boolean download) throws EmfException {
         File file = new File(folderPath);
+
+        //don't check if exists when downloading, just create
+        if (download) {
+            file.mkdir();
+            file.setReadable(true, true);
+            file.setWritable(true, false);
+            return file;
+        }
 
         if (!file.canWrite()) {
             log.error("Folder " + folderPath + " is not writable by tomcat.");
@@ -387,7 +395,7 @@ public class ManagedExportService {
         // toSubDir.mkdirs();
         // }
 
-        File path = validatePath(dirName);
+        File path = validatePath(dirName, false);
 
         if (datasets.length != versions.length) {
             log.error("Export failed: version numbers do not match those for specified datasets.");
@@ -478,7 +486,7 @@ public class ManagedExportService {
         // toSubDir.mkdirs();
         // }
 
-        File path = validatePath(dirName);
+        File path = validatePath(dirName, true);
 
         if (datasets.length != versions.length) {
             log.error("Export failed: version numbers do not match those for specified datasets.");
@@ -571,7 +579,7 @@ public class ManagedExportService {
         // toSubDir.mkdirs();
         // }
 
-        File path = validatePath(dirName);
+        File path = validatePath(dirName, false);
 
         if (datasets.length != versions.length) {
             log.error("Export failed: version numbers do not match those for specified datasets.");
