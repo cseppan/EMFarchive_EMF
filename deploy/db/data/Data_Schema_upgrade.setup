@@ -1976,8 +1976,8 @@ insert into emf.properties values(DEFAULT, 'DOWNLOAD_EXPORT_FOLDER', '/usr/tomca
 insert into emf.properties values(DEFAULT, 'DOWNLOAD_EXPORT_ROOT_URL', 'http://sage.nesc.epa.gov:8080/exports/');
 
 --06/08/2013 -- added some additional columns...
-ALTER TABLE emf.file_downloads ADD COLUMN absolute_path character varying(1024) NOT NULL;
-ALTER TABLE emf.file_downloads ADD COLUMN size bigint NOT NULL;
+ALTER TABLE emf.file_downloads ADD COLUMN absolute_path character varying(1024) NOT NULL DEFAULT ''::character varying;
+ALTER TABLE emf.file_downloads ADD COLUMN size bigint NOT NULL DEFAULT 0;
 
 -- 7/11/2013 -- added a new properties to help keep track of fields that define state, county, and point information
 insert into emf.properties values(DEFAULT, 'POSTGIS_COUNTY_FIELDS', 'fips,region_cd');
