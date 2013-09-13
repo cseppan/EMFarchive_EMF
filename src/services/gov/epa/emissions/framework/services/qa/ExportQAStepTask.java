@@ -221,7 +221,7 @@ public class ExportQAStepTask implements Runnable {
         //don't check if exists when downloading, just create
         if (download) {
             file.mkdir();
-            file.setReadable(true, true);
+            file.setReadable(true, false);
             file.setWritable(true, false);
             return file;
         }

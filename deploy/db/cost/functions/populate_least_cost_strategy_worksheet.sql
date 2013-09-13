@@ -554,15 +554,15 @@ BEGIN
 		int_control_strategy_id, -- int_control_strategy_id
 		input_dataset_id, -- int_input_dataset_id
 		false, --use_override_dataset
-		'inv', --inv_table_alias character varying(64), 
-		'm', --control_measure_table_alias character varying(64), 
-		'et', --equation_type_table_alias character varying(64), 
-		'eq', --control_measure_equation_table_alias
-		'er', --control_measure_efficiencyrecord_table_alias
-		'csm', --control_strategy_measure_table_alias
-		'gdplev', --gdplev_table_alias
-		'inv_ovr', --inv_override_table_alias
-		'gdplev_incr', --gdplev_incr_table_alias
+		'inv'::varchar, --inv_table_alias character varying(64), 
+		'm'::varchar, --control_measure_table_alias character varying(64), 
+		'et'::varchar, --equation_type_table_alias character varying(64), 
+		'eq'::varchar, --control_measure_equation_table_alias
+		'er'::varchar, --control_measure_efficiencyrecord_table_alias
+		'csm'::varchar, --control_strategy_measure_table_alias
+		'gdplev'::varchar, --gdplev_table_alias
+		'inv_ovr'::varchar, --inv_override_table_alias
+		'gdplev_incr'::varchar, --gdplev_incr_table_alias
 		discount_rate
 		) as cost_expressions
 	into annual_cost_expression,
