@@ -590,7 +590,8 @@ return;
 			record_id integer NOT NULL, 
 			ceff double precision, 
 			reff double precision,
-			rpen double precision
+			rpen double precision,
+			so2_ann_value double precision
 		) ON COMMIT DROP;';
 		EXECUTE 
 --		raise notice '%', 
@@ -598,25 +599,49 @@ return;
 				record_id, 
 				ceff, 
 				reff, 
-				rpen
+				rpen, 
+				so2_ann_value
 			)
-		select record_id, missing_ceff, 100.0, 100.0
+		select coalesce(pm_fillin_ceff.record_id, so2_emis.record_id) as record_id, missing_ceff, 100.0, 100.0, so2_emis.so2_ann_value
 		from (
-			select record_id,
-				' || inv_ceff_expression || ',
-				first_value(' || inv_ceff_expression || ') over source_window as missing_ceff,
-				sum(case when coalesce(inv.' || inv_ceff_expression || ',0.0) = 0.0 then 1 else null end) over source_window as missing_ceff_count,
-				sum(1) over source_window as partition_record_count
+			select record_id, missing_ceff, 100.0, 100.0
+			from (
+				select record_id,
+					' || inv_ceff_expression || ',
+					first_value(' || inv_ceff_expression || ') over source_window as missing_ceff,
+					sum(case when coalesce(inv.' || inv_ceff_expression || ',0.0) = 0.0 then 1 else null end) over source_window as missing_ceff_count,
+					sum(1) over source_window as partition_record_count
 
-			from emissions.' || inv_table_name || ' inv
+				from emissions.' || inv_table_name || ' inv
 
-			where ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
-				and inv.poll in (''PM10'',''PM2_5'')
+				where ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+					and inv.poll in (''PM10'',''PM2_5'')
 
-			WINDOW source_window AS (PARTITION BY ' || fips_expression || ',scc' || case when is_point_table = false then '' else ',' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '' end || ' order by ' || fips_expression || ',scc' || case when is_point_table = false then '' else ',' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '' end || ',coalesce(' || inv_ceff_expression || ',0.0) desc)
-		) foo
-		where missing_ceff_count <> partition_record_count
-			and coalesce(' || inv_ceff_expression || ',0.0) = 0.0;';
+				WINDOW source_window AS (PARTITION BY ' || fips_expression || ',scc' || case when is_point_table = false then '' else ',' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '' end || ' order by ' || fips_expression || ',scc' || case when is_point_table = false then '' else ',' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '' end || ',coalesce(' || inv_ceff_expression || ',0.0) desc)
+			) foo
+			where missing_ceff_count <> partition_record_count
+				and coalesce(' || inv_ceff_expression || ',0.0) = 0.0
+			) pm_fillin_ceff
+
+			--get so2 emission for equation type 16
+			full join (
+				select record_id,so2_ann_value
+				from (
+					select record_id,poll,
+						sum(case when poll = ''SO2'' then ' || emis_sql || ' else null::double precision end) over source_window as so2_ann_value
+
+					from emissions.' || inv_table_name || ' inv
+
+					where ' || inv_filter || coalesce(county_dataset_filter_sql, '') || '
+						and inv.poll in (''PM10'',''PM2_5'',''SO2'')
+
+					WINDOW source_window AS (PARTITION BY ' || fips_expression || ',scc' || case when is_point_table = false then '' else ',' || plantid_expression || ',' || pointid_expression || ',' || stackid_expression || ',' || segment_expression || '' end || ')
+
+				) tbl
+				where so2_ann_value is not null and poll in (''PM10'',''PM2_5'')
+			) so2_emis
+
+			on pm_fillin_ceff.record_id = so2_emis.record_id';
 
 /*		FOR region IN EXECUTE 
 			'SELECT record_id, nann_emis, navd_emis, nceff, nreff, nrpen, cm_ids, last_source_apply_order, already_controlled_pollutant_ids
@@ -629,8 +654,6 @@ return;
 
 
 		EXECUTE 'CREATE INDEX inv_overrides_record_id ON inv_overrides USING btree (record_id);';
-
-
 
 
 
