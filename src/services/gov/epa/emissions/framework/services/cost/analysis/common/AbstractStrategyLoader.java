@@ -3,11 +3,8 @@ package gov.epa.emissions.framework.services.cost.analysis.common;
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
-import gov.epa.emissions.commons.data.KeyVal;
-import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.commons.db.OptimizedTableModifier;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.TableFormat;
@@ -232,19 +229,6 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         return controlStrategyDetailedResultDatasetType;
     }
 
-    protected OptimizedTableModifier dataModifier(String table) throws EmfException {
-        // VERSIONS TABLE - Completed - throws exception if the following case is true
-        if ("emissions".equalsIgnoreCase(datasource.getName()) && "versions".equalsIgnoreCase(table.toLowerCase())) {
-            throw new EmfException("Table versions moved to schema emf."); // VERSIONS TABLE
-        }
-        try {
-            return new OptimizedTableModifier(datasource, table); 
-            
-        } catch (SQLException e) {
-            throw new EmfException(e.getMessage());
-        }
-    }
-
     public final int getRecordCount() {
         return recordCount;
     }
@@ -343,26 +327,6 @@ public abstract class AbstractStrategyLoader implements StrategyLoader {
         String query = "SELECT distinct fips "
             + " FROM " + qualifiedEmissionTableName(controlStrategy.getCountyDataset()) 
             + " where " + versionedQuery;
-//        ResultSet rs = null;
-//        try {
-//            rs = datasource.query().executeQuery(query);
-//            while (rs.next()) {
-//                if (sqlFilter.length() > 0) {
-//                    sqlFilter += ",'" + rs.getString(1) + "'";
-//                } else {
-//                    sqlFilter = "'" + rs.getString(1) + "'";
-//                }
-//            }
-//        } catch (SQLException e) {
-//            throw new EmfException("Could not execute query -" + query + "\n" + e.getMessage());
-//        } finally {
-//            if (rs != null)
-//                try {
-//                    rs.close();
-//                } catch (SQLException e) {
-//                    //
-//                }
-//        }
         return sqlFilter.length() > 0 ? " and fips in (" + query + ")" : "" ;
     }
 
