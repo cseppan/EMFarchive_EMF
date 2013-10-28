@@ -529,7 +529,7 @@ public class ExportShapeFileQAStepTask implements Runnable {
             "   \"" + category + "\" \n" +
             "order by " + rowName + ", \"" + category + "\" \n" +
             " \n" +
-            "','SELECT distinct \"" + category + "\" \n" +
+            "',E'SELECT distinct \"" + category + "\" \n" +
             "FROM emissions." + result.getTable() + " \n" +
             (rowFilter == null || rowFilter.isEmpty() ? "" : "where " + rowFilter.replaceAll("'", "\\\\'") + "") + " \n" +
             "order by 1') as c( \n" +
