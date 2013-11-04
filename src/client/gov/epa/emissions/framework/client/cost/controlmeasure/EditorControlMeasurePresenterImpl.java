@@ -159,7 +159,7 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
                 throw new EmfException(e.getLocalizedMessage());
             }
         } else {
-            System.out.println("Save command cancelled by user.");
+//            System.out.println("Save command cancelled by user.");
         }
 
     }

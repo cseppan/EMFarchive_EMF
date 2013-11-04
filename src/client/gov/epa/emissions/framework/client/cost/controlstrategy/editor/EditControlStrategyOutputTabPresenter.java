@@ -78,7 +78,7 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
                 if (!localFile.exists() || localFile.lastModified() != datasets[i].getModifiedDateTime().getTime()) {
                     Writer output = new BufferedWriter(new FileWriter(localFile));
                     try {
-                        System.out.println("Writing out file...");
+//                        System.out.println("Writing out file...");
                         output.write( writeHeader(datasets[i]));
 //                        output.write( getTableAsString(datasets[i]) );
                         long tableRecordCount = getTableRecordCount(datasets[i]);
