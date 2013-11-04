@@ -78,5 +78,12 @@
 	<classpathentry kind="lib" path="lib/httpcore-nio-4.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/httpasyncclient-4.0-beta3.jar"/>
 	<classpathentry kind="lib" path="lib/guava-10.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/spring-aop-3.2.4.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring-beans-3.2.4.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring-context-3.2.4.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring-core-3.2.4.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring-expression-3.2.4.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring-hibernate3-2.0.8.jar"/>
+	<classpathentry kind="lib" path="lib/spring-dao-2.0.8.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
