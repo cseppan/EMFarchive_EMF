@@ -77,7 +77,7 @@ public class ViewQAStepPresenter {
         if (stepResult == null || stepResult.getTable() == null)
             throw new EmfException("You must have run the QA step successfully before exporting ");
 
-        qaStep.setOutputFolder(session.userService().getPropertyValue(EmfProperty.DOWNLOAD_EXPORT_FOLDER_PROPERTY) + "/" + session.user().getUsername());
+        qaStep.setOutputFolder(session.userService().getPropertyValue(EmfProperty.DOWNLOAD_EXPORT_FOLDER) + "/" + session.user().getUsername());
         session.qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
 //        ProjectionShapeFile projectionShapeFile = session.qaService().getProjectionShapeFiles()[1];
         session.qaService().downloadShapeFileQAStep(qaStep, session.user(), fileName, projectionShapeFile, rowFilter, pivotConfiguration, overwrite);
@@ -101,7 +101,7 @@ public class ViewQAStepPresenter {
         if (stepResult == null || stepResult.getTable() == null)
             throw new EmfException("You must run the QA step successfully before exporting ");
 
-        qaStep.setOutputFolder(session.userService().getPropertyValue(EmfProperty.DOWNLOAD_EXPORT_FOLDER_PROPERTY) + "/" + session.user().getUsername());
+        qaStep.setOutputFolder(session.userService().getPropertyValue(EmfProperty.DOWNLOAD_EXPORT_FOLDER) + "/" + session.user().getUsername());
         qaService().updateWitoutCheckingConstraints(new QAStep[] { qaStep });
         qaService().downloadQAStep(qaStep, session.user(), fileName, overwrite, rowFilter);
     }
