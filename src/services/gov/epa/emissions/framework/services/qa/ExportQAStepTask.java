@@ -107,14 +107,7 @@ public class ExportQAStepTask implements Runnable {
 
             if (download) {
                 //lets add a filedownload item for the user, so they can download the file
-                FileDownload fileDownload = new FileDownload();
-                fileDownload.setUserId(user.getId());
-                fileDownload.setType("QA Step - CSV");
-                fileDownload.setTimestamp(new Date());
-                fileDownload.setAbsolutePath(fileDownloadDao.getDownloadExportFolder() + "/" + user.getUsername() + "/" + file.getName());
-                fileDownload.setUrl(fileDownloadDao.getDownloadExportRootURL() + "/" + user.getUsername() + "/" + file.getName());
-                fileDownload.setOverwrite(overide);
-                fileDownloadDao.add(fileDownload);
+                fileDownloadDao.add(user, new Date(), file.getName(), "QA Step - CSV", overide);
             }
 
             complete(suffix);

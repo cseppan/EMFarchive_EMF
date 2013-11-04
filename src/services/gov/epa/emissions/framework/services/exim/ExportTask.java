@@ -208,13 +208,7 @@ public class ExportTask extends Task {
             //download manager will pick up the new download request...
             if (download) {
                 //lets add a filedownload item for the user, so they can download the file
-                FileDownload fileDownload = new FileDownload();
-                fileDownload.setUserId(user.getId());
-                fileDownload.setType("Dataset Export");
-                fileDownload.setTimestamp(new Date());
-                fileDownload.setAbsolutePath(file.getAbsolutePath());
-                fileDownload.setUrl(fileDownloadDAO.getDownloadExportRootURL() + "/" + user.getUsername() + "/" + file.getName());
-                fileDownloadDAO.add(fileDownload);
+                fileDownloadDAO.add(user, new Date(), file.getName(), "Dataset Export", false);
             }
 
             if ( DebugLevels.DEBUG_24()) {
