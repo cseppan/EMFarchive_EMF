@@ -45,9 +45,9 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
     
     private JTabbedPane tabbedPane;
     
-    private DataFindReplaceNoFilterTab noFilterTab;
+    private DataFindReplaceBasicTab noFilterTab;
     
-    private DataFindReplaceWithFilterTab withFilterTab;
+    private DataFindReplaceAdvancedTab withFilterTab;
     
     private JTextArea filter;
 
@@ -70,10 +70,8 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
 
     public void display() {
         
-        System.out.println(filter.getText());
         this.filterLabel.setText(filter.getText() == null || filter.getText().trim().isEmpty() ? "NO FILTER"
                 : filter.getText().trim());
-        System.out.println(filterLabel.getText());
 
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
 
@@ -100,16 +98,16 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
     }
 
     private JPanel createNoFilterTab() {
-        noFilterTab = new DataFindReplaceNoFilterTab( table, version, filterLabel, 
-                sortOrder, cols, listOfChangeables, messagePanel);
+        noFilterTab = new DataFindReplaceBasicTab( table, version, filterLabel, 
+                sortOrder, cols, listOfChangeables, messagePanel, this);
         noFilterTab.observe(presenter);
         noFilterTab.display();
         return noFilterTab;
     }
     
     private JPanel createWithFilterTab() {
-        withFilterTab = new DataFindReplaceWithFilterTab( table, version, filterLabel, 
-                sortOrder, listOfChangeables, messagePanel);
+        withFilterTab = new DataFindReplaceAdvancedTab( table, version, filterLabel, 
+                sortOrder, listOfChangeables, messagePanel, this);
         withFilterTab.observe(presenter);
         withFilterTab.display();
         return withFilterTab;
@@ -131,6 +129,10 @@ public class DataFindReplaceWindow extends ReusableInteralFrame implements FindR
         this.presenter = presenter;
     }
 
+    public void setOkButtonEnableState(boolean state) {
+        okButton.setEnabled(state);
+    }
+    
     private Action applyAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {

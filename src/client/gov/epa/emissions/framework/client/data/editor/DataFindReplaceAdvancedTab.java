@@ -10,7 +10,10 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.YesNoDialog;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -18,8 +21,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
+import javax.swing.SwingWorker;
 
-public class DataFindReplaceWithFilterTab extends JPanel implements DataFindReplaceView{
+public class DataFindReplaceAdvancedTab extends JPanel implements DataFindReplaceView {
 
     private SingleLineMessagePanel messagePanel;
 
@@ -41,10 +45,12 @@ public class DataFindReplaceWithFilterTab extends JPanel implements DataFindRepl
 
     private JLabel filterFromParentWindow;
 
-    public DataFindReplaceWithFilterTab(String table, Version version, JLabel filterFromParentWindow, 
-            JTextArea sortOrder, ManageChangeables listOfChangeables, SingleLineMessagePanel messagePanel){
+    private DataFindReplaceWindow dataFindReplaceWindow;
+
+    public DataFindReplaceAdvancedTab(String table, Version version, JLabel filterFromParentWindow, 
+            JTextArea sortOrder, ManageChangeables listOfChangeables, SingleLineMessagePanel messagePanel,
+            DataFindReplaceWindow dataFindReplaceWindow){
         super.setName("Advanced");
-         
         this.table = table;
         this.version = version;
         this.filterFromParentWindow = filterFromParentWindow;
@@ -52,11 +58,11 @@ public class DataFindReplaceWithFilterTab extends JPanel implements DataFindRepl
         this.listOfChangeables = listOfChangeables;
         this.sortOrder = sortOrder;
         this.messagePanel = messagePanel;
+        this.dataFindReplaceWindow = dataFindReplaceWindow;
     }
     
     public void display(){
         this.filterLabel.setText(filterFromParentWindow.getText());
-        System.out.println(filterLabel.getText());
         this.filterLabel.validate();
         setLayout();
     }
@@ -97,7 +103,7 @@ public class DataFindReplaceWithFilterTab extends JPanel implements DataFindRepl
                 + "<br/><br/>This is a SQL UPDATE SET clause that is used to set column(s) values of the current dataset. " 
                 + "<br/>The expressions in the UPDATE SET clause must contain valid column(s) and separated by ','"
                 + "<br/><br/>Sample SQL UPDATE SET Statement:"
-                + "<br/>stack_flow_rate = 1.25 * stack_flow_rate, <br/>ann_emis = 0.5 * ann_emis <html>" );
+                + "<br/><br/>stack_flow_rate = 1.25 * stack_flow_rate, <br/>ann_emis = 0.5 * ann_emis <html>" );
         
         ScrollableComponent scrollableSet = ScrollableComponent.createWithVerticalScrollBar(this.replaceWith);
         scrollableSet.setPreferredSize(new Dimension(350, 105));
@@ -121,21 +127,69 @@ public class DataFindReplaceWithFilterTab extends JPanel implements DataFindRepl
             if (!validateFields())
                 return;
 
-            String findFilter = (filter.getText() == null) ?  "": filter.getText().trim();
-            String setString = (replaceWith.getText() == null) ? "" : replaceWith.getText().trim();
-            String rowFilter = (filterLabel.getText().equals("NO FILTER")) ? "" : filterLabel.getText().trim();
+            final String findFilter = (filter.getText() == null) ?  "": filter.getText().trim();
+            final String setString = (replaceWith.getText() == null) ? "" : replaceWith.getText().trim();
+            final String rowFilter = (filterLabel.getText().equals("NO FILTER")) ? "" : filterLabel.getText().trim();
+           
+            
+            this.dataFindReplaceWindow.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)); //turn on the wait cursor
+            this.dataFindReplaceWindow.setOkButtonEnableState(false);
+            setMsg("Note some find replace operations could take several minutes to finish");
 
-            presenter.replaceValues(table, findFilter, setString, version, rowFilter);
-            presenter.applyConstraint(rowFilter, sortOrder.getText().trim());
-            resetDataeditorRevisionField();
-            setMsg("Successfully replaced column values.");
-        }       
+            //long running methods.....
+            
+            //Instances of javax.swing.SwingWorker are not reusuable, so
+            //we create new instances as needed.
+            class FindReplaceTask extends SwingWorker<Void, Void> {
+                
+                private DataFindReplaceWindow parentContainer;
+
+                public FindReplaceTask(DataFindReplaceWindow parentContainer) {
+                    this.parentContainer = parentContainer;
+                }
+
+                /*
+                 * Main task. Executed in background thread.
+                 * don't update gui here
+                 */
+                @Override
+                public Void doInBackground() throws EmfException  {
+                    presenter.replaceValues(table, findFilter, setString, version, rowFilter);
+                    return null;
+                }
+
+                /*
+                 * Executed in event dispatching thread
+                 */
+                @Override
+                public void done() {
+                    try {
+                        //make sure something didn't happen
+                        get();
+                        
+                        presenter.applyConstraint(rowFilter, sortOrder.getText().trim());
+                        resetDataeditorRevisionField();
+                        setMsg("Successfully replaced column values.");
+                    } catch (InterruptedException e1) {
+                        setErrorMsg(e1.getMessage());
+                    } catch (ExecutionException e1) {
+                        setErrorMsg(e1.getCause().getMessage());
+                    } catch (EmfException e2) {
+                        setErrorMsg(e2.getMessage());
+                    } finally {
+                        this.parentContainer.setCursor(null); //turn off the wait cursor
+                        this.parentContainer.setOkButtonEnableState(true);
+                    }
+                }
+            };
+            new FindReplaceTask(this.dataFindReplaceWindow).execute();
+        }
     }
-    
+
     public void observe(FindReplaceViewPresenter presenter) {
         this.presenter = presenter;
     }
-    
+
     private boolean validateFields() throws EmfException {
         String rowFilterString = (filterLabel.getText().equals("NO FILTER"))? "": filterLabel.getText();
         String filterString = (filter.getText() == null) ?  "": filter.getText();

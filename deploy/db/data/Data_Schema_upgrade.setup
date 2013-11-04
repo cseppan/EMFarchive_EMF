@@ -2005,3 +2005,5 @@ SELECT gid, objectid, county_nam, state_abbr, county_are, cent_lat,
 FROM public.us_county_shape;
 INSERT INTO projection_shapefiles (name, table_schema, table_name, prj_text, srid, type, description) VALUES ('US_counties_WGS84_trimmed', 'public', 'us_county_shape_abbrv', 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]', 4326, 'county', 'U.S. County based shapefile (trimmed down version) based on the WGS84 datum');
 
+-- 10/30/2013 -- added a new properties to help with download functionality - expiry time in hours
+insert into emf.properties values(DEFAULT, 'DOWNLOAD_EXPORT_FILE_HOURS_TO_EXPIRE', '1');
