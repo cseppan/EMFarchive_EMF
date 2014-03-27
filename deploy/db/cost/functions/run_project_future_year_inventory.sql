@@ -623,7 +623,8 @@ BEGIN
 					
 			--see http://www.smoke-model.org/version2.4/html/ch06s02.html for source matching hierarchy
 			sql := sql || '
-			select distinct on (record_id)
+			select 
+				/*distinct on (record_id)*/
 				record_id,ann_proj_factor,jan_proj_factor,feb_proj_factor,mar_proj_factor,apr_proj_factor,may_proj_factor,jun_proj_factor,jul_proj_factor,aug_proj_factor,sep_proj_factor,oct_proj_factor,nov_proj_factor,dec_proj_factor,
 				' || quote_literal(control_program.control_program_name) || ' as control_program_name, ranking
 			from (
