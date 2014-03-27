@@ -7,7 +7,9 @@ import gov.epa.emissions.commons.db.postgres.PostgresConnectionFactory;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -85,6 +87,11 @@ public class EmfDatabaseSetup extends DatabaseSetup {
             }
 
             public <T> T unwrap(Class<T> arg0) {
+                // NOTE Auto-generated method stub
+                return null;
+            }
+
+            public Logger getParentLogger() throws SQLFeatureNotSupportedException {
                 // NOTE Auto-generated method stub
                 return null;
             }

@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.data.Keyword;
-import gov.epa.emissions.framework.client.meta.keywords.Keywords;
+import gov.epa.emissions.framework.services.data.Keywords;
 import junit.framework.TestCase;
 
 public class KeywordsTest extends TestCase {

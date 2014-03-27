@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.services.cost;
 
-import gov.epa.emissions.framework.client.cost.controlstrategy.LocaleFilter;
+import gov.epa.emissions.framework.services.cost.controlStrategy.LocaleFilter;
 import junit.framework.TestCase;
 
 public class LocaleFilterTest extends TestCase {

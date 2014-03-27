@@ -53,12 +53,15 @@
 	<property name="tomcat.stop.prefix" value="-jar -Duser.dir=${tomcat.home} ${tomcat.home}/bin/bootstrap.jar" />
 	<property name="tomcat.stop" value="${tomcat.stop.prefix} stop" />
 	
-	<property name="win7.tomcat.start.prefix" value="-jar -Duser.dir=&quot;${tomcat.home}&quot; -Djava.endorsed.dirs=&quot;${tomcat.home}&quot;/common/endorsed ${tomcat.memory.vmargs} &quot;${tomcat.home}&quot;/bin/bootstrap.jar" />
+	<property name="win7.tomcat.start.prefix" value="-Duser.dir=&quot;${tomcat.home}&quot; -Djava.endorsed.dirs=&quot;${tomcat.home}&quot;/common/endorsed ${tomcat.memory.vmargs} -classpath &quot;${tomcat.home}&quot;/bin/bootstrap.jar;&quot;${tomcat.home}&quot;/bin/tomcat-juli.jar org.apache.catalina.startup.Bootstrap" />
+<!--	<property name="win7.tomcat.start.prefix" value="-jar -Duser.dir=&quot;${tomcat.home}&quot; -Djava.endorsed.dirs=&quot;${tomcat.home}&quot;/common/endorsed ${tomcat.memory.vmargs} -classpath C:\Apache_Software_Foundation\Tomcat_7.0\bin\bootstrap.jar;C:\Apache_Software_Foundation\Tomcat_7.0\bin\tomcat-juli.jar &quot;${tomcat.home}&quot;/bin/bootstrap.jar" />-->
 	<property name="win7.tomcat.start" value="${win7.tomcat.start.prefix} start" />
-	<property name="win7.tomcat.start.debug.prefix" value="-jar -Duser.dir=&quot;${tomcat.home}&quot; -Djava.endorsed.dirs=&quot;${tomcat.home}&quot;/common/endorsed ${tomcat.memory.vmargs} ${tomcat.debug.vmargs} &quot;${tomcat.home}&quot;/bin/bootstrap.jar" />
+	
+	<property name="win7.tomcat.start.debug.prefix" value="-Duser.dir=&quot;${tomcat.home}&quot; -Djava.endorsed.dirs=&quot;${tomcat.home}&quot;/common/endorsed ${tomcat.memory.vmargs} ${tomcat.debug.vmargs} -classpath &quot;${tomcat.home}&quot;/bin/bootstrap.jar;&quot;${tomcat.home}&quot;/bin/tomcat-juli.jar org.apache.catalina.startup.Bootstrap" />
 	<property name="win7.tomcat.start.debug" value="${win7.tomcat.start.debug.prefix} start" />
 
-	<property name="win7.tomcat.stop.prefix" value="-jar -Duser.dir=&quot;${tomcat.home}&quot; &quot;${tomcat.home}&quot;/bin/bootstrap.jar" />
+	<property name="win7.tomcat.stop.prefix" value="-Duser.dir=&quot;${tomcat.home}&quot; -classpath &quot;${tomcat.home}&quot;/bin/bootstrap.jar;&quot;${tomcat.home}&quot;/bin/tomcat-juli.jar org.apache.catalina.startup.Bootstrap" />
+<!--	<property name="win7.tomcat.stop.prefix" value="-jar -Duser.dir=&quot;${tomcat.home}&quot; &quot;${tomcat.home}&quot;/bin/bootstrap.jar" />-->
 	<property name="win7.tomcat.stop" value="${win7.tomcat.stop.prefix} stop" />
 	
 
@@ -592,11 +595,10 @@
 	</target>	
 	
 	<target name="win7-tomcat-stop">
+		<echo message="Stopping Tomcat7 with: ${win7.tomcat.stop}" />
 		<exec executable="${jdk.home}/bin/java.exe" dir="${build.home}" output="${build.home}/tomcat-stop.txt" error="${build.home}/tomcat-stop-error.txt" failonerror="false">
 			<arg line="${win7.tomcat.stop}" />
 		</exec>
-		<echo>
-		</echo>
 		<echo message="Tomcat stopped." />
 	</target>	
 

@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.framework.client.data.dataset.KeywordRowSource;
-import gov.epa.emissions.framework.client.meta.keywords.Keywords;
+import gov.epa.emissions.framework.services.data.Keywords;
 import junit.framework.TestCase;
 
 public class DatasetTypeKeywordRowSourceTest extends TestCase {

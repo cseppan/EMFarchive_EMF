@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.keywords;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueRowSource;
+import gov.epa.emissions.framework.services.data.Keywords;
 
 import org.jmock.cglib.MockObjectTestCase;
 

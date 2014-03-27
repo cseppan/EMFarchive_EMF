@@ -1,5 +1,5 @@
-  <?xml version="1.0" encoding="UTF-8" ?> 
- <wsdl:definitions targetNamespace="http://ben.cep.unc.edu:8080/emf-web/services/EMFUserManagerService" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://ben.cep.unc.edu:8080/emf-web/services/EMFUserManagerService" xmlns:intf="http://ben.cep.unc.edu:8080/emf-web/services/EMFUserManagerService" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<?xml version="1.0" encoding="UTF-8" ?> 
+<wsdl:definitions targetNamespace="http://ben.cep.unc.edu:8080/emf-web/services/EMFUserManagerService" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://ben.cep.unc.edu:8080/emf-web/services/EMFUserManagerService" xmlns:intf="http://ben.cep.unc.edu:8080/emf-web/services/EMFUserManagerService" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
  <!-- 
 WSDL created by Apache Axis version: 1.2.1
 Built on Jun 14, 2005 (09:15:57 EDT)

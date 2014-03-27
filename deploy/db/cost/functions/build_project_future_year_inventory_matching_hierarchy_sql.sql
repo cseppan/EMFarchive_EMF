@@ -346,6 +346,52 @@ BEGIN
 			|| (case when match_type = 3 then ' limit 1)' else '' end) || ' 
 
 
+		--3.5 - Country/State/County code, plant ID, point ID, 8-digit SCC code, pollutant
+		union all
+		' || -- add paranthesis so we can limit to only one record, cant use limit 1 with UNIONs
+		(case when match_type = 3 then '(' else '' end) 
+		|| 'select 
+			' || (case when match_type = 2 then 'null::integer as record_id' else 'inv.record_id' end) || ',' || coalesce(select_columns || ',','') || '
+			case 
+				when (' || cp_fips_expression || ' is not null) and (length(' || cp_fips_expression || ') = 5 or length(' || cp_fips_expression || ') = 6) and (' || cp_plantid_expression || ' is not null) and (' || cp_pointid_expression || ' is not null) and (cp.scc is not null) and (cp.poll is not null) then 3.5::double precision --3.5
+			end as ranking
+		FROM emissions.' || control_program_table_name || ' cp
+
+			' || case when inv_is_point_table then '
+
+			' || join_type || ' join inv
+					
+			on ' || cp_fips_expression || ' = ' || fips_expression || '
+			
+			and ' || cp_plantid_expression || ' = ' || plantid_expression || '
+			and ' || cp_pointid_expression || ' = ' || pointid_expression || '
+			and cp.scc = inv.scc
+			and cp.poll = inv.poll
+
+			' || inventory_to_control_program_join_constraints || '
+
+			' else '' end || '
+
+		where ' || cp_fips_expression || ' is not null 
+			and ' || cp_plantid_expression || ' is not null 
+			and ' || cp_pointid_expression || ' is not null 
+			and ' || cp_stackid_expression || ' is null 
+			and ' || cp_segment_expression || ' is null 
+			and cp.scc is not null 
+			and cp.poll is not null
+			and cp.sic is null
+			' || case when control_packet_has_naics_column then 'and cp.naics is null' else '' end || '
+			' || case when control_packet_has_mact_column then 'and ' || cp_mact_expression || ' is null' else '' end || '
+
+			' -- inlcude packets that didnt match anything (keep in WHERE Clause)
+			|| case when inv_is_point_table then case when join_type <> 'left outer' then '' else 'and inv.record_id is null' end else '' end || '
+
+			and ' -- inlcude packets versioning filter
+			|| control_program_dataset_version_filter_sql || '
+
+			' -- add paranthesis so we can limit to only one record, cant use limit 1 with UNIONs
+			|| (case when match_type = 3 then ' limit 1)' else '' end) || ' 
+
 		--4 - Country/State/County code, plant ID, point ID, pollutant
 		union all
 		' || -- add paranthesis so we can limit to only one record, cant use limit 1 with UNIONs
