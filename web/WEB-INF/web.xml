@@ -54,7 +54,7 @@
         <servlet-class>gov.epa.emissions.framework.service.servlets.LoginServlet</servlet-class>
     </servlet>
     
-    <servlet>
+<!--    <servlet>
         <servlet-name>dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 	    <init-param>
@@ -65,7 +65,7 @@
 	      <param-name>contextConfigLocation</param-name>
 	      <param-value>gov.epa.emissions.framework.services.spring.AppConfig</param-value>
 	    </init-param>
-    </servlet>
+    </servlet>-->
     
     
 <!--
@@ -128,11 +128,6 @@
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
     
-  <servlet-mapping>
-      <servlet-name>dispatcher</servlet-name>
-      <url-pattern>/app/*</url-pattern>
-  </servlet-mapping>
-
   <servlet-mapping>
     <servlet-name>AxisServlet</servlet-name>
     <url-pattern>/servlet/AxisServlet</url-pattern>
