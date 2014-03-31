@@ -37,8 +37,8 @@ public class ControlProgramSummaryTabPresenter  implements ControlProgramTabPres
         this.controlProgram.setControlProgramType(controlProgramType);
     }
 
-    public DatasetType[] getDatasetTypes() throws EmfException {
-        return session.dataCommonsService().getDatasetTypes(session.user().getId());
+    public DatasetType[] getDatasetTypes() {
+        return session.getLightDatasetTypes();
      }
 
      public EmfDataset[] getDatasets(DatasetType type) throws EmfException

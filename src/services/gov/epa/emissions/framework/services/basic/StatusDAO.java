@@ -23,6 +23,10 @@ public class StatusDAO {
         dao = new DataCommonsDAO();
     }
 
+//    public void setSessionFactory(SessionFactory sessionFactory) {
+//        this.sessionFactory2 = sessionFactory;
+//    }
+    
     public void add(Status status) {
         StatelessSession session = sessionFactory.getStatelessSession();
         Transaction tx = null;

@@ -31,7 +31,7 @@ public class EditSectorScenarioOptionsTabPresenter implements EditSectorScenario
     }
     
     public DatasetType getDatasetType(String name) throws EmfException{
-        return session.dataCommonsService().getDatasetType(name);
+        return session.getLightDatasetType(name);
     }
 
     public void doRefresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) throws EmfException {

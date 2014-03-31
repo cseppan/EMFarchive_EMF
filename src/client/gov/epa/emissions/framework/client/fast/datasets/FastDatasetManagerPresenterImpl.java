@@ -115,6 +115,6 @@ public class FastDatasetManagerPresenterImpl implements RefreshObserver, FastDat
     }
 
     public DatasetType getDatasetType(String name) throws EmfException {
-        return session.dataCommonsService().getDatasetType(name);
+        return session.getLightDatasetType(name);
     }
 }

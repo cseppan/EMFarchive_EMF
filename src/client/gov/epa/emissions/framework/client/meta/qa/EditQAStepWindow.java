@@ -40,6 +40,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
+import gov.epa.emissions.framework.services.qa.QAProperties;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -2145,6 +2146,11 @@ avd_emis=emis_avd
         try {
 
 
+            QAStepResult stepResult = presenter.getStepResult(step);
+            if (stepResult == null)
+                throw new EmfException("Please run the QA step before trying to view.");
+            clear();
+            
             //only make user specify folder when exporting to EMF server, not downloading
             if (!download.isSelected())
                 checkExportFolder();
@@ -2154,28 +2160,28 @@ avd_emis=emis_avd
 //                    && presenter.isShapeFileCapable(qaStepResult)) {
                 QAStepExportWizard dialog = new QAStepExportWizard(parentConsole);
                 QAStepExportWizardPresenter presenter2 = new QAStepExportWizardPresenter(session);
-                presenter2.display(dialog, qaStepResult);
+                presenter2.display(dialog, stepResult);
                 if (!presenter2.isCanceled()) { //make sure they didn't cancel the export operation...
                     if (dialog.shouldCreateShapeFile()){
                         if (download.isSelected()) {
                             messagePanel.setMessage("Started Exporting Shape File to download. Please monitor the Status window "
                                     + "to track your export request.");
-                            this.presenter.downloadToShapeFile(step, qaStepResult, exportName.getText(), dialog.getProjectionShapeFile(), dialog.getRowFilter(), dialog.getPivotConfiguration(), overide.isSelected());
+                            this.presenter.downloadToShapeFile(step, stepResult, exportName.getText(), dialog.getProjectionShapeFile(), dialog.getRowFilter(), dialog.getPivotConfiguration(), overide.isSelected());
                         } else {
                             messagePanel.setMessage("Started Exporting Shape File. Please monitor the Status window "
                                     + "to track your export request.");
-                            this.presenter.exportToShapeFile(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected(), dialog.getProjectionShapeFile(), dialog.getRowFilter(), dialog.getPivotConfiguration());
+                            this.presenter.exportToShapeFile(step, stepResult, exportFolder.getText(), exportName.getText(), overide.isSelected(), dialog.getProjectionShapeFile(), dialog.getRowFilter(), dialog.getPivotConfiguration());
                         }
                     }
                     if(dialog.shouldCreateCSV()) {
                         if (download.isSelected()) {
                             messagePanel.setMessage("Started Export to download. Please monitor the Status window "
                                     + "to track your export request.");
-                            this.presenter.download(step, qaStepResult, exportName.getText(), overide.isSelected(), dialog.getRowFilter());
+                            this.presenter.download(step, stepResult, exportName.getText(), overide.isSelected(), dialog.getRowFilter());
                         } else {
                             messagePanel.setMessage("Started Export. Please monitor the Status window "
                                     + "to track your export request.");
-                            this.presenter.export(step, qaStepResult, exportFolder.getText(), exportName.getText(), overide.isSelected(), dialog.getRowFilter()); // pass in fileName
+                            this.presenter.export(step, stepResult, exportFolder.getText(), exportName.getText(), overide.isSelected(), dialog.getRowFilter()); // pass in fileName
                         }
                     }
                 }

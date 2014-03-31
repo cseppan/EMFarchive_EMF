@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.cost.controlstrategy;
+package gov.epa.emissions.framework.services.cost.controlStrategy;
 
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 

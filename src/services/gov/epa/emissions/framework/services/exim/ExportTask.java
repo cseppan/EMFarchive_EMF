@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Conrad F. D'Cruz
@@ -101,9 +102,9 @@ public class ExportTask extends Task {
         this.dbFactory = dbFactory;
         this.accesslog = accesslog;
         this.sessionFactory = sessionFactory;
+        this.fileDownloadDAO = new FileDownloadDAO(sessionFactory);
         this.version = version;
         this.datasetDao = new DatasetDAO();
-        this.fileDownloadDAO = new FileDownloadDAO(sessionFactory);
     }
     
     protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,

@@ -13,7 +13,6 @@ import gov.epa.emissions.commons.io.importer.DataTable;
 import gov.epa.emissions.commons.io.other.StrategyMessagesFileFormat;
 import gov.epa.emissions.commons.io.temporal.VersionedTableFormat;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.DateUtil;
@@ -30,6 +29,7 @@ import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.Keywords;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 

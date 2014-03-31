@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypeKeyValueTableData;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.Keywords;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.TableData;

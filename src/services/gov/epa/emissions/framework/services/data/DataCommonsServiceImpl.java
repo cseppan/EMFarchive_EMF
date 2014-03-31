@@ -48,7 +48,12 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+//@Transactional(readOnly = true)
+//@Repository
 public class DataCommonsServiceImpl implements DataCommonsService {
 
     private static Log LOG = LogFactory.getLog(DataCommonsServiceImpl.class);
@@ -74,9 +79,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public DataCommonsServiceImpl(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+        this.fileDownloadDAO = new FileDownloadDAO(sessionFactory);
         dao = new DataCommonsDAO();
-        this.fileDownloadDAO= new FileDownloadDAO(this.sessionFactory);
-        
     }
 
     public synchronized Keyword[] getKeywords() throws EmfException {
@@ -194,6 +198,21 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
+    // DatasetType (limit to viewable dataset types)
+    public synchronized DatasetType[] getLightDatasetTypes(int userId) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List list = dao.getLightDatasetTypes(userId, session);
+
+            session.close();
+
+            return (DatasetType[]) list.toArray(new DatasetType[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all DatasetTypes", e);
+            throw new EmfException("Could not get all DatasetTypes ");
+        }
+    }
+
     public synchronized DatasetType[] getLightDatasetTypes() throws EmfException {
         Session session = sessionFactory.getSession();
         try {
@@ -205,6 +224,18 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             throw new EmfException("Could not get all DatasetTypes ");
         } finally {
             if (session != null) session.close();
+        }
+    }
+
+    public synchronized DatasetType getLightDatasetType(String name) throws EmfException {
+        Session session = sessionFactory.getSession();
+        try {
+            return dao.getLightDatasetType(name, session);
+        } catch (HibernateException e) {
+            LOG.error("Could not get DatasetType", e);
+            throw new EmfException("Could not get DatasetType");
+        } finally {
+            session.close();
         }
     }
 

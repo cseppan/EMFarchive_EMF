@@ -14,7 +14,6 @@ import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.XFileFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.basic.FileDownload;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
@@ -22,8 +21,6 @@ import gov.epa.emissions.framework.services.persistence.LockingScheme;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -116,8 +113,32 @@ public class DataCommonsDAO {
             .list();
     }
 
+    public List<DatasetType> getLightDatasetTypes(int userId, Session session) {
+        return session
+            .createQuery(
+                    "select new DatasetType(DT.id, DT.name) from DatasetType as DT " 
+                    + "where "
+                    + " DT.id not in (select EDT.id from User as U "
+                    + " inner join U.excludedDatasetTypes as EDT where U.id = "
+                    + userId + ")" 
+                    + " order by DT.name") 
+            .list();
+        
+//        "select new DatasetType(dT.id, dT.name) " +
+//        "from DatasetType dT order by dT.name"
+    }
+
     public List<DatasetType> getLightDatasetTypes(Session session) {
         return datasetTypesDAO.getLightAll(session);
+    }
+
+    public DatasetType getLightDatasetType(String name, Session session) {
+        return (DatasetType) session
+                .createQuery(
+                        "select new DatasetType(DT.id, DT.name) from DatasetType as DT " 
+                        + "where DT.name = :datasetTypeName") 
+                .setString("datasetTypeName", name)
+                .uniqueResult();
     }
 
     public DatasetType getDatasetType(String name, Session session) {

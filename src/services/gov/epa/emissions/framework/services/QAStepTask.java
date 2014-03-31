@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.meta.qa.QAProperties;
 import gov.epa.emissions.framework.services.basic.EmfProperty;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -12,6 +11,7 @@ import gov.epa.emissions.framework.services.data.QAStepResult;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.qa.QADAO;
+import gov.epa.emissions.framework.services.qa.QAProperties;
 import gov.epa.emissions.framework.services.qa.RunQAStepTask;
 
 import java.util.ArrayList;

@@ -9,7 +9,6 @@ import gov.epa.emissions.framework.client.meta.info.InfoTabView;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
-import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.qa.EditableQATabPresenter;
@@ -22,6 +21,7 @@ import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.Keywords;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -22,7 +22,7 @@ public class EditSectorScenarioSummaryTabPresenterImpl implements EditSectorScen
     }
 
     public Project[] getProjects() throws EmfException {
-       return session.dataCommonsService().getProjects();
+       return session.getProjects();
     }
 
     public void doRefresh(SectorScenario sectorScenario, SectorScenarioOutput[] sectorScenarioOutputs) throws EmfException {

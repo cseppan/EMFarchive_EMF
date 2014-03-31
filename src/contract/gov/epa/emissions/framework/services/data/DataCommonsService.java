@@ -1,9 +1,5 @@
 package gov.epa.emissions.framework.services.data;
 
-import java.util.List;
-
-import org.hibernate.Session;
-
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Keyword;
@@ -62,9 +58,13 @@ public interface DataCommonsService {
     // DatasetType (limit to viewable dataset types)
     DatasetType[] getDatasetTypes(int userId) throws EmfException;
 
+    DatasetType[] getLightDatasetTypes(int userId) throws EmfException;
+
     DatasetType[] getLightDatasetTypes() throws EmfException;
 
     DatasetType getDatasetType(String name) throws EmfException;
+
+    DatasetType getLightDatasetType(String name) throws EmfException;
 
     void addDatasetType(DatasetType type) throws EmfException;
     

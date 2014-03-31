@@ -30,6 +30,7 @@ import gov.epa.emissions.framework.services.basic.EmfFileSystemView;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.data.QAStepResult;
+import gov.epa.emissions.framework.services.qa.QAProperties;
 import gov.epa.emissions.framework.ui.EmfFileChooser;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;

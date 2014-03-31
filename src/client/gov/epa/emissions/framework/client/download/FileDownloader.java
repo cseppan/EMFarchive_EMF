@@ -9,17 +9,11 @@ import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.fluent.Async;
-import org.apache.http.client.fluent.Request;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.nio.client.DefaultHttpAsyncClient;

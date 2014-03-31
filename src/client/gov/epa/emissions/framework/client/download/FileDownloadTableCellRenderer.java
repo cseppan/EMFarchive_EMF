@@ -80,9 +80,9 @@ public class FileDownloadTableCellRenderer extends JPanel implements TableCellRe
         progressBar.setStringPainted(true);
         progressBar.setVisible(false);
         progressBar.setSize(new Dimension(50, 40));
-        rightPanel.add(progressBar, BorderLayout.NORTH);
+        rightPanel.add(progressBar, BorderLayout.SOUTH);
         messageLabel = new JLabel();
-        rightPanel.add(messageLabel, BorderLayout.SOUTH);
+        rightPanel.add(messageLabel, BorderLayout.NORTH);
         noFocusBorder = new EmptyBorder(1, 2, 1, 2);
 //        setLineWrap(true);
 //        setWrapStyleWord(true);

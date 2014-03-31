@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
 import gov.epa.emissions.commons.data.Keyword;
-import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.Keywords;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class KeywordRowSource implements RowSource {

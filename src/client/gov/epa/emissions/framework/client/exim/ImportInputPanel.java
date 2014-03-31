@@ -134,8 +134,8 @@ public class ImportInputPanel extends JPanel {
 
     }
 
-    private JComboBox typesComboBox() throws EmfException {
-        DatasetType[] allDatasetTypes = service.getDatasetTypes(session.user().getId());
+    private JComboBox typesComboBox() {
+        DatasetType[] allDatasetTypes = session.getLightDatasetTypes();
         DatasetType[] allTypesWithMessage = new DatasetType[allDatasetTypes.length + 1];
         copyDatasetTypes(allDatasetTypes, allTypesWithMessage);
         datasetTypesModel = new DefaultComboBoxModel(allTypesWithMessage);

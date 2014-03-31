@@ -57,7 +57,7 @@ public class EditQAEmissionsPresenter {
     }
 
     public DatasetType getDatasetType(String name) throws EmfException {
-        return session.dataCommonsService().getDatasetType(name);
+        return session.getLightDatasetType(name);
     }
 
     public void updateDatasets(Object temporalProfile, Object[] smkRpts, Object year) {

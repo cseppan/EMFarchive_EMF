@@ -45,7 +45,7 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
     }
     
     public DatasetType[] getDatasetTypes(int userID) throws EmfException {
-        return session.dataCommonsService().getDatasetTypes(userID);
+        return session.dataCommonsService().getLightDatasetTypes(userID);
     }
 
     public void doClose() throws EmfException {

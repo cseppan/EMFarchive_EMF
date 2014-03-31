@@ -26,7 +26,7 @@ public class EditQAECControlScenarioPresenter {
     }
     
     public DatasetType getDatasetType(String name) throws EmfException {
-        return session.dataCommonsService().getDatasetType(name);
+        return session.getLightDatasetType(name);
     }
 
     public void updateECControlScenarioArguments(Object inventory, Object detailedResult, Object[] gsrefs,

@@ -56,7 +56,7 @@ public abstract class AbstractFastNonPointDatasetPresenterImpl implements FastDa
     }
 
     public DatasetType getDatasetType(String name) throws EmfException {
-        return session.dataCommonsService().getDatasetType(name);
+        return session.getLightDatasetType(name);
     }
 
     public Version[] getVersions(EmfDataset dataset) throws EmfException {

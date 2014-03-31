@@ -11,7 +11,6 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.EmfProperty;
-import gov.epa.emissions.framework.services.basic.FileDownload;
 import gov.epa.emissions.framework.services.basic.FileDownloadDAO;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
@@ -22,7 +21,6 @@ import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -35,6 +33,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ExportShapeFileQAStepTask implements Runnable {
 
@@ -93,6 +92,7 @@ public class ExportShapeFileQAStepTask implements Runnable {
         this.user = user;
         this.sessionFactory = sessionFactory;
         this.statusDao = new StatusDAO(sessionFactory);
+        this.fileDownloadDao = new FileDownloadDAO(sessionFactory);
         this.dbServerFactory = dbServerFactory;
         this.projectionShapeFile = projectionShapeFile;
         this.verboseStatusLogging = verboseStatusLogging;
@@ -102,7 +102,6 @@ public class ExportShapeFileQAStepTask implements Runnable {
         this.validStateFields = getProperty(EmfProperty.POSTGIS_STATE_FIELDS).split(",");
         this.validLatitudeFields = getProperty(EmfProperty.POSTGIS_LATITUDE_FIELDS).split(",");
         this.validLongitudeFields = getProperty(EmfProperty.POSTGIS_LONGITUDE_FIELDS).split(",");
-        this.fileDownloadDao = new FileDownloadDAO(sessionFactory);
     }
 
     public ExportShapeFileQAStepTask(String dirName, String fileName, 
@@ -120,7 +119,7 @@ public class ExportShapeFileQAStepTask implements Runnable {
         this.download = download;
     }
     
-   public void run() {
+    public void run() {
         
         String suffix = "";
         DbServer dbServer = dbServerFactory.getDbServer();
@@ -137,21 +136,12 @@ public class ExportShapeFileQAStepTask implements Runnable {
             exporter.create(getProperty("postgres-bin-dir"), getProperty("postgres-db"), getProperty("postgres-user"),
                     getProperty("pgsql2shp-info"), file.getAbsolutePath(), overide, prepareSQLStatement(), projectionShapeFile);
 
-            
+            //add to download queue if required...
             if (download) {
-                String downloadExportFolder = fileDownloadDao.getDownloadExportFolder();
-                String downloadExportRootURL = fileDownloadDao.getDownloadExportRootURL();
-                String username = user.getUsername();
                 for (File f : getShapefiles(file.getName())) {
-                    //lets add a filedownload item for the user, so they can download the file
-                    FileDownload fileDownload = new FileDownload();
-                    fileDownload.setUserId(user.getId());
-                    fileDownload.setType("QA Step - Shapefile");
-                    fileDownload.setTimestamp(new Date());
-                    fileDownload.setAbsolutePath(downloadExportFolder + "/" + username + "/" + f.getName());
-                    fileDownload.setUrl(downloadExportRootURL + "/" + username + "/" + f.getName());
-                    fileDownload.setOverwrite(overide);
-                    fileDownloadDao.add(fileDownload);
+                    //lets add shapefiles (remember there are multiple files to worry about prj, dbf, etc...) 
+                    //for the user to download
+                    fileDownloadDao.add(user, new Date(), f.getName(), "QA Step - Shapefile", overide);
                 }
             }
             complete(suffix);
@@ -652,12 +642,13 @@ public class ExportShapeFileQAStepTask implements Runnable {
     }
 
     private File[] getShapefiles(String fileName) throws EmfException {
+        File shapefileDirectory = validateDir(dirName);
         
         return new File[] {
-            new File(validateDir(dirName), fileName + ".prj"),
-            new File(validateDir(dirName), fileName + ".shp"),
-            new File(validateDir(dirName), fileName + ".shx"),
-            new File(validateDir(dirName), fileName + ".dbf")
+            new File(shapefileDirectory, fileName + ".prj"),
+            new File(shapefileDirectory, fileName + ".shp"),
+            new File(shapefileDirectory, fileName + ".shx"),
+            new File(shapefileDirectory, fileName + ".dbf")
         };
     }
 

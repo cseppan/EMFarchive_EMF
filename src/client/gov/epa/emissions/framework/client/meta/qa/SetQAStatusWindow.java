@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.qa.QAProperties;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;

@@ -20,7 +20,7 @@ public class MPSDTUtils {
     }
 
     public static DatasetType getDatasetType(EmfSession session, String name) throws EmfException {
-        return session.dataCommonsService().getDatasetType(name);
+        return session.getLightDatasetType(name);
     }
 
 }

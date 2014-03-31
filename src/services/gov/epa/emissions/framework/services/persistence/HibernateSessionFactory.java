@@ -30,6 +30,10 @@ public class HibernateSessionFactory {
         this.sessionFactory = sessionFactory;
     }
 
+    public SessionFactory getSessionFactory() {
+        return this.sessionFactory;
+    }
+
     // TODO: stick a single instance in the Axis application-level cache. Only
     // one instance is needed for the entire application i.e. one per db
     public static HibernateSessionFactory get() {

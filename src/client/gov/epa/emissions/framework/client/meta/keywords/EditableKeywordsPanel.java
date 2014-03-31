@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.data.Keywords;
 import gov.epa.emissions.framework.ui.EditableTablePanel;
 
 import java.awt.BorderLayout;

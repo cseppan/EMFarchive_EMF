@@ -26,7 +26,7 @@ public class EditQAAnnualStateSummariesCrosstabEmissionsPresenter {
     }
     
     public DatasetType getDatasetType(String name) throws EmfException {
-        return session.dataCommonsService().getDatasetType(name);
+        return session.getLightDatasetType(name);
     }
 
     public void updateAnnualStateSummariesDatasets(Object[] smkRpts, Object coStCy, Object[] polls,

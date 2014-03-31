@@ -375,7 +375,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
     }
 
     private Project[] getProjects() throws EmfException {
-        return this.getSession().dataCommonsService().getProjects();
+        return this.getSession().getProjects();
     }
 
     private JComponent projects() throws EmfException {
@@ -556,7 +556,7 @@ public class ViewControlStrategySummaryTab extends EmfPanel implements ViewContr
     }
 
     private Project project(String projectName) throws EmfException {
-        return new Projects(this.getSession().dataCommonsService().getProjects()).get(projectName);
+        return new Projects(this.getSession().getProjects()).get(projectName);
     }
 
     public void setRunMessage(ControlStrategy controlStrategy) {

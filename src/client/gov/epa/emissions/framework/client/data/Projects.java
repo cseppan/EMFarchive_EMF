@@ -9,10 +9,10 @@ import java.util.List;
 
 public class Projects {
 
-    private List list;
+    private List<Project> list;
 
     public Projects(Project[] array) {
-        this.list = new ArrayList(Arrays.asList(array));
+        this.list = new ArrayList<Project>(Arrays.asList(array));
     }
 
     public Project get(String name) {
@@ -21,7 +21,7 @@ public class Projects {
         
         name = name.trim();
         for (int i = 0; i < list.size(); i++) {
-            Project item = ((Project) list.get(i));
+            Project item = list.get(i);
             if (item.getName().equalsIgnoreCase(name))
                 return item;
         }
@@ -29,12 +29,12 @@ public class Projects {
     }
 
     public String[] names() {
-        List names = new ArrayList();
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
-            Project element = (Project) iter.next();
+        List<String> names = new ArrayList<String>();
+        for (Iterator<Project> iter = list.iterator(); iter.hasNext();) {
+            Project element = iter.next();
             names.add(element.getName());
         }
         
-        return (String[]) names.toArray(new String[0]);
+        return names.toArray(new String[0]);
     }
 }

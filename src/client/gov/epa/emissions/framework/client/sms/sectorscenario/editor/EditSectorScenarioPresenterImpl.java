@@ -118,8 +118,8 @@ public class EditSectorScenarioPresenterImpl  implements EditSectorScenarioPrese
         }
     }
 
-    public DatasetType getDatasetType(String name) throws EmfException {
-        return session.dataCommonsService().getDatasetType(name);
+    public DatasetType getDatasetType(String name) {
+        return session.getLightDatasetType(name);
     }
     
     public Version[] getVersions(EmfDataset dataset) throws EmfException 
@@ -168,7 +168,7 @@ public class EditSectorScenarioPresenterImpl  implements EditSectorScenarioPrese
     }
 
     public Project[] getProjects() throws EmfException {
-        return session.dataCommonsService().getProjects();
+        return session.getProjects();
     }
 
     public void fireTracking() {

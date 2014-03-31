@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
@@ -54,9 +55,9 @@ public class ExportShapeFileQAStep {
         this.dbServerFactory = dbServerFactory;
         this.user = user;
         this.sessionFactory = sessionFactory;
+        this.fileDownloadDAO = new FileDownloadDAO(sessionFactory);
         this.threadPool = threadPool;
         this.verboseStatusLogging = verboseStatusLogging;
-        this.fileDownloadDAO = new FileDownloadDAO(sessionFactory);
     }
 
     public void export(String dirName, String fileName, ProjectionShapeFile projectionShapeFile, boolean overide, String rowFilter, PivotConfiguration pivotConfiguration) throws EmfException {

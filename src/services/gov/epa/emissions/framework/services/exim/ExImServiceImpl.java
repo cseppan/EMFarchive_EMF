@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.tasks.DebugLevels;
 import java.util.Date;
 
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     private static int svcCount = 0;
@@ -59,9 +60,9 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     private void init(DbServerFactory dbServerFactory, HibernateSessionFactory sessionFactory) {
         setProperties(sessionFactory);
+        this.fileDownloadDAO = new FileDownloadDAO(sessionFactory);
         exportService = new ManagedExportService(dbServerFactory, sessionFactory);
         managedImportService = new ManagedImportService(dbServerFactory, sessionFactory);
-        this.fileDownloadDAO = new FileDownloadDAO(sessionFactory);
     }
 
     private void setProperties(HibernateSessionFactory sessionFactory) {

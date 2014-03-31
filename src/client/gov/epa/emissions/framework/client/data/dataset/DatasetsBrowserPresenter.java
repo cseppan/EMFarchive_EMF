@@ -83,8 +83,16 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
         return temp;
     }
 
-    public DatasetType[] getDSTypes() throws EmfException {
-        return session.dataCommonsService().getDatasetTypes(session.user().getId());
+    public DatasetType[] getDSTypes() {
+//        long start = System.currentTimeMillis();
+//        System.out.println("getDSTypes.start " + start);
+//        DatasetType[] dSTypes = session.getLightDatasetTypes();
+//        System.out.println("getDSTypes.stop light " + (System.currentTimeMillis() - start) + " ms");
+////        start = System.currentTimeMillis();
+////        DatasetType[] dSTypes = session.dataCommonsService().getDatasetTypes(session.user().getId());
+//        System.out.println("getDSTypes.stop not light " + (System.currentTimeMillis() - start) + " ms");
+        
+        return session.getLightDatasetTypes();//dSTypes//session.dataCommonsService().getLightDatasetTypes(session.user().getId());
     }
     
     public User[] getUsers() throws EmfException {
@@ -247,7 +255,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     }
     
     public synchronized Project[] getProjects() throws EmfException {
-        return session.dataCommonsService().getProjects();
+        return session.getProjects();
     }
 
     public DatasetType getDSType() {

@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.Keywords;
 
 import java.util.Set;
 import java.util.TreeSet;

@@ -32,7 +32,7 @@ public class CopyQAStepToDatasetSelectionPresenter {
         //get data...
         DatasetType[] datasetTypes = new DatasetType[] {};
         if (datasetTypesToInclude == null)
-            datasetTypes = session.dataCommonsService().getDatasetTypes(session.user().getId());
+            datasetTypes = session.getLightDatasetTypes();
         else
             datasetTypes = datasetTypesToInclude;
 

@@ -1,17 +1,26 @@
 package gov.epa.emissions.framework.services.basic;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.spring.AppConfig;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.stereotype.Repository;
 
+@Repository
+//@Scope("prototype")
 public class FileDownloadDAO {
 
     private HibernateSessionFactory sessionFactory;
@@ -23,6 +32,10 @@ public class FileDownloadDAO {
     public FileDownloadDAO(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
+
+//    public void setSessionFactory(SessionFactory sessionFactory) {
+//        this.sessionFactory = sessionFactory;
+//      }
 
     private String getPropertyValue(String name) throws EmfException {
         Session session = sessionFactory.getSession();
@@ -39,11 +52,15 @@ public class FileDownloadDAO {
     }
 
     public String getDownloadExportFolder() throws EmfException {
-        return getPropertyValue(EmfProperty.DOWNLOAD_EXPORT_FOLDER_PROPERTY);
+        return getPropertyValue(EmfProperty.DOWNLOAD_EXPORT_FOLDER);
     }
 
     public String getDownloadExportRootURL() throws EmfException {
-        return getPropertyValue(EmfProperty.DOWNLOAD_EXPORT_ROOT_URL_PROPERTY);
+        return getPropertyValue(EmfProperty.DOWNLOAD_EXPORT_ROOT_URL);
+    }
+
+    public int getDownloadExportFileHoursToExpire() throws EmfException {
+        return Integer.parseInt(getPropertyValue(EmfProperty.DOWNLOAD_EXPORT_FILE_HOURS_TO_EXPIRE));
     }
 
     public void add(FileDownload fileDownload) throws EmfException  {
@@ -67,14 +84,41 @@ public class FileDownloadDAO {
         } finally {
             session.close();
         }
-    }
+         
+        try {
+            ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+            ThreadPoolTaskExecutor taskExecutor = (ThreadPoolTaskExecutor) context.getBean("poolTaskExecutor");
+
+//                PrintTask2 printTask1 = (PrintTask2) context.getBean("printTask2");
+//                printTask1.setName("Thread 1");
+            taskExecutor.execute(new RemoveDownloadFilesTask(getDownloadExportFolder(), getDownloadExportFileHoursToExpire()));
+
+        } catch (Exception e) {
+            //suppress all errors this shouldn't stop the process from working....
+            //throw new EmfException(e.getMessage());
+        }
+   }
     
-    public String getDownloadRootURL() {
-        String rootURL = "http://localhost:8080/exports/";
-        return rootURL;
+    public void add(User user, Date dateAdded, String fileName, String type, Boolean overwrite) throws EmfException {
+        
+        String username = user.getUsername();
+        
+        FileDownload fileDownload = new FileDownload();
+        fileDownload.setUserId(user.getId());
+        fileDownload.setType(type);
+        fileDownload.setTimestamp(dateAdded);
+        fileDownload.setAbsolutePath(getDownloadExportFolder() + "/" + username + "/" + fileName);
+        fileDownload.setUrl(getDownloadExportRootURL() + "/" + username + "/" + fileName);
+        fileDownload.setOverwrite(overwrite);
+
+        //persist record
+        add(fileDownload);
     }
     
     public List getFileDownloads(Integer userId, Session session) {
+//        return this.getHibernateTemplate().find(
+//                "from FileDownload as FD where "
+//                        + " FD.userId=?", userId);
         return session
         .createQuery(
                 "Select FD from FileDownload as FD where "
@@ -84,6 +128,9 @@ public class FileDownloadDAO {
     }
 
     public List getUnreadFileDownloads(Integer userId, Session session) {
+//        return this.getHibernateTemplate().find(
+//                "from FileDownload as FD where FD.read = false "
+//                        + " and FD.userId=?", userId);
         return session
         .createQuery(
                 "Select FD from FileDownload as FD where "
@@ -127,5 +174,4 @@ public class FileDownloadDAO {
             throw e;
         }
     }
-
 }
