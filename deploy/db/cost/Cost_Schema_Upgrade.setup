@@ -1562,3 +1562,8 @@ insert into emf.equation_type_variables (equation_type_id, name, file_col_positi
 select e.id, 'O&M Emissions Multiplier', (select COALESCE(max(file_col_position) + 1, 1) from emf.equation_type_variables where equation_type_id = e.id) as file_col_position, (select COALESCE(max(list_index) + 1, 0) from emf.equation_type_variables where equation_type_id = e.id) as list_index
 from emf.equation_types as e 
 where name = 'Type 13';
+
+
+--4/1/2014 - need to make list_index not nullable, for some reason nulls were introduced
+ALTER TABLE emf.control_measure_sectors ALTER COLUMN list_index SET NOT NULL;
+
