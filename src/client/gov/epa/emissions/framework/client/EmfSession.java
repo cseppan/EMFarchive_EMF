@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client;
 
 import java.security.PublicKey;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
@@ -77,4 +79,10 @@ public interface EmfSession {
 
     FastService fastService();
     
+    //cache for things that are used all the time
+    DatasetType[] getLightDatasetTypes();
+    Project[] getProjects();
+    
+    DatasetType getLightDatasetType(String name);
+
 }

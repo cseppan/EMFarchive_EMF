@@ -178,6 +178,10 @@ public class ControlStrategyDAO {
         return (ControlStrategy) lockingScheme.releaseLockOnUpdate(locked, current(locked, session), session);
     }
 
+    public void updateWithoutLock(ControlStrategy controlStrategy, Session session) throws EmfException {
+        hibernateFacade.saveOrUpdate(controlStrategy, session);
+    }
+    
     public ControlStrategy updateWithLock(ControlStrategy locked, Session session) throws EmfException {
         return (ControlStrategy) lockingScheme.renewLockOnUpdate(locked, current(locked, session), session);
     }

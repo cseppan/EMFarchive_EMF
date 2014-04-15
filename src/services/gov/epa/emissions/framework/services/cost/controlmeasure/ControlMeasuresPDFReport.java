@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -1823,13 +1825,9 @@ public class ControlMeasuresPDFReport implements Runnable {
             setStatus("Started generating Control Measure Control Measure AT-A-GLANCE PDF Report.  This could take several minutes to finish.");
             generate();
             //lets add a filedownload item for the user, so they can download the file
-            FileDownload fileDownload = new FileDownload();
-            fileDownload.setUserId(user.getId());
-            fileDownload.setType("PDF");
-            fileDownload.setTimestamp(new Date());
-            fileDownload.setUrl(fileDownloadDao.getDownloadExportRootURL() + "/" + user.getUsername() + "/" + this.outputFile.getName());
-            fileDownload.setAbsolutePath(fileDownloadDao.getDownloadExportFolder() + "/" + user.getUsername() + "/" + this.outputFile.getName());
-            fileDownloadDao.add(fileDownload);
+            fileDownloadDao.add(user, new Date(), this.outputFile.getName(), "PDF", true);
+
+            
             setStatus("Completed generating Control Measure Control Measure AT-A-GLANCE PDF Report.  Report was exported to " + outputFile.getAbsolutePath());
         } catch (Exception e) {
             // NOTE Auto-generated catch block

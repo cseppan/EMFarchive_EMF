@@ -357,7 +357,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private Project[] getProjects() throws EmfException {
-        return session.dataCommonsService().getProjects();
+        return session.getProjects();
     }
     
     private EditableComboBox projects() throws EmfException {
@@ -608,7 +608,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private Project project(String projectName) throws EmfException {
-        return new Projects(session.dataCommonsService().getProjects()).get(projectName);
+        return new Projects(session.getProjects()).get(projectName);
     }
 
     public void setRunMessage(ControlStrategy controlStrategy) {

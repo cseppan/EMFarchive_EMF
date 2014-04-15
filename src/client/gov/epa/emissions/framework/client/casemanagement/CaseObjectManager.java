@@ -155,9 +155,9 @@ public class CaseObjectManager {
         jobsForLastCaseId = jobs.toArray(new CaseJob[jobs.size()]);
     }
 
-    public synchronized DatasetType[] getDatasetTypes() throws EmfException {
+    public synchronized DatasetType[] getDatasetTypes() {
         if (datasetTypes == null)
-            datasetTypes = dataCommonsService.getDatasetTypes(session.user().getId());
+            datasetTypes = session.getLightDatasetTypes();
 
         return datasetTypes;
     }

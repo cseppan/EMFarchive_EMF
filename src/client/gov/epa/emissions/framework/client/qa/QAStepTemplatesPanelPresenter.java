@@ -33,10 +33,6 @@ public class QAStepTemplatesPanelPresenter {
         session.dataCommonsService().copyQAStepTemplates(session.user(), templates, datasetTypeIds, replace);
     }
 
-    public DatasetType[] getDatasetTypes() throws EmfException {
-        return session.dataCommonsService().getDatasetTypes(session.user().getId());
-    }
-    
     public DatasetType obtainLockedDatasetType(User user, DatasetType datasetType) throws EmfException {
         return session.dataCommonsService().obtainLockedDatasetType(user, datasetType);
     }

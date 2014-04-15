@@ -51,17 +51,13 @@ public class OutputFieldsPanelPresenter{
         return caseObjectManager.getCaseJobsWithAll(caseId);
    }
     
-    public DatasetType[] getDSTypes() throws EmfException {
+    public DatasetType[] getDSTypes() {
        return caseObjectManager.getDatasetTypes();
     }
     
-    public DatasetType getDatasetType(String datasetType) throws EmfException
+    public DatasetType getDatasetType(String datasetType)
     {
-            return dataCommonsService().getDatasetType(datasetType);
-    }
-    
-    private DataCommonsService dataCommonsService() {
-        return session.dataCommonsService();
+            return session.getLightDatasetType(datasetType);
     }
     
     public EmfDataset[] getDatasets(DatasetType type) throws EmfException

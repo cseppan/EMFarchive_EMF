@@ -80,8 +80,8 @@ public class ParameterFieldsPanelPresenter {
         return job.getId();
     }
 
-    public DatasetType[] getDSTypes() throws EmfException {
-        return dataCommonsService().getDatasetTypes(session.user().getId());
+    public DatasetType[] getDSTypes() {
+        return session.getLightDatasetTypes();
     }
 
     public EmfDataset[] getDatasets(DatasetType type) throws EmfException {

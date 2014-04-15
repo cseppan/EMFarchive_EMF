@@ -83,10 +83,10 @@ public class DebugLevels {
     }
 
     public static final boolean DEBUG_0() { refresh(); return debug_0; }
-	public static final boolean DEBUG_1() { refresh(); return debug_1; }
-	public static final boolean DEBUG_2() { refresh(); return debug_2; }
-	public static final boolean DEBUG_3() { refresh(); return debug_3; }
-	public static final boolean DEBUG_4() { refresh(); return debug_4; } 
+    public static final boolean DEBUG_1() { refresh(); return debug_1; }
+    public static final boolean DEBUG_2() { refresh(); return debug_2; }
+    public static final boolean DEBUG_3() { refresh(); return debug_3; }
+    public static final boolean DEBUG_4() { refresh(); return debug_4; } 
     public static final boolean DEBUG_5() { refresh(); return debug_5; }
     public static final boolean DEBUG_6() { refresh(); return debug_6; }
     public static final boolean DEBUG_7() { refresh(); return debug_7; }

@@ -4,29 +4,19 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresCOPYExport;
-import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.ExporterException;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
-import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.DbServerFactory;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
-import gov.epa.emissions.framework.services.data.DatasetDAO;
-import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
-import gov.epa.emissions.framework.services.qa.QueryToString;
 import gov.epa.emissions.framework.tasks.DebugLevels;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -34,11 +24,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import org.hibernate.Session;
-
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
 public class RunQACaseReports implements Runnable {
 

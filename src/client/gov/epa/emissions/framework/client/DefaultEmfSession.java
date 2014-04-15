@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.security.EMFCipher;
 import gov.epa.emissions.commons.security.SecurityConstants;
 import gov.epa.emissions.commons.security.User;
@@ -30,10 +32,16 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 
 public class DefaultEmfSession implements EmfSession {
 
@@ -50,11 +58,31 @@ public class DefaultEmfSession implements EmfSession {
     private PublicKey publicKey;
     
     private byte[] encryptedPassword;
-
-    public DefaultEmfSession(User user, ServiceLocator locator) throws EmfException {
+    
+    Cache<ObjectCacheType, Object> objectCache;
+    
+    private enum ObjectCacheType {
+        LIGHT_DATASET_TYPES_LIST, PROJECTS_LIST
+    }
+    
+    public DefaultEmfSession(final User user, ServiceLocator locator) throws EmfException {
         serviceLocator = locator;
         this.preferences = new DefaultUserPreferences();
         this.user = user;
+        
+        objectCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(
+                new CacheLoader<ObjectCacheType, Object>() {
+                    public Object load(ObjectCacheType key) throws EmfException {
+                        if (key.equals(ObjectCacheType.LIGHT_DATASET_TYPES_LIST)) {
+                            System.out.println("loading client-side object cache -- LIGHT_DATASET_TYPES_LIST");
+                            return serviceLocator.dataCommonsService().getLightDatasetTypes(user.getId());
+                        } else if (key.equals(ObjectCacheType.PROJECTS_LIST)) {
+                            System.out.println("loading client-side object cache -- PROJECTS_LIST");
+                            return serviceLocator.dataCommonsService().getProjects();
+                        }
+                        return null;
+                    }
+                  });
     }
 
     public UserPreference preferences() {
@@ -186,5 +214,36 @@ public class DefaultEmfSession implements EmfSession {
         } catch (BadPaddingException e) {
             throw new EmfException("Encryption padding is invalid");
         }
+    }
+
+    @Override
+    public DatasetType[] getLightDatasetTypes() {
+        try {
+            return (DatasetType[]) objectCache.get(ObjectCacheType.LIGHT_DATASET_TYPES_LIST);
+        } catch (ExecutionException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+        return new DatasetType[] {};
+    }
+
+    @Override
+    public DatasetType getLightDatasetType(String name) {
+        for (DatasetType datasetType : getLightDatasetTypes()) {
+            if (name.equals(datasetType.getName()))
+                return datasetType;
+        }
+        return null;
+    }
+
+    @Override
+    public Project[] getProjects() {
+        try {
+            return (Project[]) objectCache.get(ObjectCacheType.PROJECTS_LIST);
+        } catch (ExecutionException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+        return new Project[] {};
     }
 }

@@ -26,6 +26,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.ToolTipManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -100,6 +101,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private void setProperties() {
         setSize();
+        ToolTipManager.sharedInstance().setDismissDelay(10000);  //set to ten seconds for now...
         super.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         super.setResizable(true);
     }

@@ -31,8 +31,8 @@ public class ControlProgramSummaryTabPresenter {
         // NOTE Auto-generated method stub
     }
 
-    public DatasetType[] getDatasetTypes() throws EmfException {
-        return session.dataCommonsService().getDatasetTypes(session.user().getId());
+    public DatasetType[] getDatasetTypes() {
+        return session.getLightDatasetTypes();
     }
 
     public EmfDataset[] getDatasets(DatasetType type) throws EmfException {

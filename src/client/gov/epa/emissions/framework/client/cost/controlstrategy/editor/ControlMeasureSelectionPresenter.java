@@ -106,9 +106,9 @@ public class ControlMeasureSelectionPresenter {
             return dataService().getDatasets(type);
     }
     
-    public DatasetType getDatasetType(String datasetType) throws EmfException
+    public DatasetType getDatasetType(String datasetType)
     {
-            return dataCommonsService().getDatasetType(datasetType);
+            return session.getLightDatasetType(datasetType);
     }
     
     public Version[] getVersions(EmfDataset dataset) throws EmfException 

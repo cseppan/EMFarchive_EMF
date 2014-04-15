@@ -127,7 +127,7 @@ public class EnhanceFlatFile2010PointSettingWindows extends DisposableInteralFra
     
     private JPanel flatFile2010PointVersionWidget() throws EmfException {
         DatasetType[] datasetTypesToInclude = new DatasetType[1];
-        datasetTypesToInclude[0] = session.dataCommonsService().getDatasetType("Flat File 2010 Point");
+        datasetTypesToInclude[0] = session.getLightDatasetType("Flat File 2010 Point");
 
         datasetWidgetFlatFile2010Point = new AddRemoveDatasetVersionWidget(false, 1, this, parentConsole, session);
         datasetWidgetFlatFile2010Point.setPreferredSize(new Dimension(350,220));
@@ -145,7 +145,7 @@ public class EnhanceFlatFile2010PointSettingWindows extends DisposableInteralFra
     
     private JPanel supportingSmokeFlatFileVersionWidget() throws EmfException {
         DatasetType[] datasetTypesToInclude = new DatasetType[1];
-        datasetTypesToInclude[0] = session.dataCommonsService().getDatasetType("Comma Separated Values (CSV)");
+        datasetTypesToInclude[0] = session.getLightDatasetType("Comma Separated Values (CSV)");
         
         datasetWidgetSupportingSmokeFlatFile = new AddRemoveDatasetVersionWidget(false, 1, this, parentConsole, session);
         datasetWidgetSupportingSmokeFlatFile.setPreferredSize(new Dimension(350,220));
@@ -163,7 +163,7 @@ public class EnhanceFlatFile2010PointSettingWindows extends DisposableInteralFra
     
     private JPanel supportingFlatFileVersionWidget2() throws EmfException {
         DatasetType[] datasetTypesToInclude = new DatasetType[1];
-        datasetTypesToInclude[0] = session.dataCommonsService().getDatasetType("Comma Separated Values (CSV)");
+        datasetTypesToInclude[0] = session.getLightDatasetType("Comma Separated Values (CSV)");
         
         datasetWidgetSupportingFlatFile2 = new AddRemoveDatasetVersionWidget(false, 1, this, parentConsole, session);
         datasetWidgetSupportingFlatFile2.setPreferredSize(new Dimension(350,220));
