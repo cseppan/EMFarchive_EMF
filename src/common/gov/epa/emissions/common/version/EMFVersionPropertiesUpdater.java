@@ -1,5 +1,5 @@
 /*
- * $Source: /home/catherine/Projects/emf_cvs/cvs_repo/EMF/src/common/gov/epa/emissions/common/version/EMFVersionPropertiesUpdater.java,v $
+ * $Source: /cvsroot/emisview/EMF/src/common/gov/epa/emissions/common/version/EMFVersionPropertiesUpdater.java,v $
  * $Revision: 1.1 $
  * $Author: rross67 $
  * $Date: 2010/05/20 14:38:27 $
